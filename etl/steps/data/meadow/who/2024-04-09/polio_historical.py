@@ -22,11 +22,11 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = pr.melt(tb, id_vars=["WHO_REGION", "ISO_code", "Cname", "Disease"], var_name="year", value_name="cases")
-    tb = tb.drop(columns=["WHO_REGION", "ISO_code", "Disease"])
-    tb = tb.rename(columns={"Cname": "country"})
+    tb = tb.drop(columns=["WHO_REGION", "ISO_code", "Disease"], errors="raise")
+    tb = tb.rename(columns={"Cname": "country"}, errors="raise")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format()
 
     #
     # Save outputs.

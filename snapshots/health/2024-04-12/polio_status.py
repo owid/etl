@@ -49,10 +49,7 @@ def main(upload: bool) -> None:
             ],
         }
     )
-    df_to_file(df, file_path=snap.path)
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(data=df, upload=upload)
 
 
 if __name__ == "__main__":

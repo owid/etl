@@ -3,13 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Polio cases - World Health Organization
+    title: Polio Cases and Acute Flaccid Paralysis (AFP) Surveillance
     date_published: "2024-04-04"
 
     # Citation
     producer: World Health Organization
     citation_full: |-
-      World Health Organization (2024)
+      World Health Organization - Polio cases (2024).
     attribution_short: WHO
     # Files
     url_main: https://extranet.who.int/polis/public/CaseCount.aspx
@@ -17,8 +17,8 @@ meta:
 
     # License
     license:
-      name: CC BY 4.0
-      url: https://www.who.int/about/policies/terms-of-use
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
   - md5: 00d57ac66f4507ae66a35fecec365971

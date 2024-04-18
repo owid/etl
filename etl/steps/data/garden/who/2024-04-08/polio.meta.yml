@@ -36,16 +36,18 @@ tables:
       non_polio_afp_rate:
         title: Non-Polio acute flaccid paralysis (afp) rate
         description_short: The number of cases of acute flaccid paralysis (AFP) per 100,000 children aged 15 or under, not attributed to polio, that were detected and reported to the WHO.
-        description_key: ["Acute flaccid paralysis (AFP) surveillance is the gold standard for detecting cases of poliomyelitis.", "At least one case of non-polio AFP should be detected annually per 100,000 population aged less than 15 years. In endemic regions, to ensure even higher sensitivity, this rate should be two per 100 000."]
+        description_key:
+          - Acute flaccid paralysis (AFP) surveillance is the gold standard for detecting cases of poliomyelitis.
+          - At least one case of non-polio AFP should be detected annually per 100,000 population aged less than 15 years. In endemic regions, to ensure even higher sensitivity, this rate should be two per 100 000.
         unit: cases per 100,000 children
       pct_adequate_stool_collection:
         title: Adequate stool collection (%)
-        description_short: "The share of acute flaccid paralysis (AFP) cases, where stool samples were tested for poliovirus and reported to the WHO"
+        description_short: The share of acute flaccid paralysis (AFP) cases, where stool samples were tested for poliovirus and reported to the WHO.
         unit: "%"
         short_unit: "%"
       pending:
         title: Pending
-        description_short: "The number of acute flaccid paralysis (AFP) cases pending classification by the WHO"
+        description_short: The number of acute flaccid paralysis (AFP) cases pending classification by the WHO.
         unit: cases
       wild_poliovirus_cases:
         title: Wild Poliovirus cases
@@ -55,19 +57,19 @@ tables:
           numDecimalPlaces: 0
       wild_poliovirus_cases_per_million:
         title: Wild Poliovirus cases per million
-        description_short: "The number of cases of wild poliovirus detected in a given year per million people"
+        description_short: The number of cases of wild poliovirus detected in a given year per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1
       cvdpv_cases:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
-        description_short: "The number of cases of circulating vaccine-derived poliovirus detected in a given year"
+        description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year.
         unit: cases
         display:
           numDecimalPlaces: 0
       cvdpv_cases_per_million:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases per million
-        description_short: "The number of cases of circulating vaccine-derived poliovirus detected in a given year per million people"
+        description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1
@@ -79,74 +81,77 @@ tables:
         unit: ""
       correction_factor:
         title: Correction factor
-        description_short: "Correction factor applied to the number of reported polio cases to account for underreporting"
+        description_short: Correction factor applied to the number of reported polio cases to account for underreporting.
         unit: factor
       polio_surveillance_status:
         title: Polio surveillance status
         description_short: "The status of polio surveillance in a given country"
-        description_key: ["A country is considered to have adequate screening if it has a non-polio AFP rate of at least 2 per 100,000 children aged 15 or under.", "A country is considered to have adequate testing if it has a percentage adequate stool collection of at least 80%.", "Countries are labelled 'low risk' if they were considered low risk by the risk assessment carried out for the [2022 GPEI surveillance action plan](https://polioeradication.org/wp-content/uploads/2022/05/GPSAP-2022-2024-EN.pdf)"]
+        description_key:
+          - A country is considered to have adequate screening if it has a non-polio AFP rate of at least 2 per 100,000 children aged 15 or under.
+          - A country is considered to have adequate testing if it has a percentage adequate stool collection of at least 80%.
+          - Countries are labelled 'low risk' if they were considered low risk by the risk assessment carried out for the [2022 GPEI surveillance action plan.](https://polioeradication.org/wp-content/uploads/2022/05/GPSAP-2022-2024-EN.pdf)
         unit: ""
         #type: ordinal
         #sort: *surveillance_sort
       total_cases:
         title: Total polio cases
-        description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases
+        description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases.
         unit: cases
         display:
           numDecimalPlaces: 0
       total_cases_per_million:
         title: Total polio cases per million
-        description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases per million people
+        description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1
       estimated_cases:
         title: Estimated polio cases
         description_short: The total estimated number of polio cases.
-        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al (2010).
+        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al. (2010).
         unit: cases
         display:
           numDecimalPlaces: 0
       estimated_cases_per_million:
         title: Estimated polio cases per million
         description_short: The total estimated number of polio cases per million people.
-        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al (2010).
+        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al. (2010).
         unit: cases per million
         display:
           numDecimalPlaces: 1
       cvdpv1:
         title: Circulating Vaccine-Derived Poliovirus type 1 (cVDPV1) cases
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year.
         unit: cases
         display:
           numDecimalPlaces: 0
       cvdpv1_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 1 (cVDPV2) cases per million
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year, per million people"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year, per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1
       cvdpv2:
         title: Circulating Vaccine-Derived Poliovirus type 2 (cVDPV2) cases
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year.
         unit: cases
         display:
           numDecimalPlaces: 0
       cvdpv2_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 2 (cVDPV2) cases per million
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year, per million people"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year, per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1
       cvdpv3:
         title: Circulating Vaccine-Derived Poliovirus type 3 (cVDPV3) cases
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year.
         unit: cases
         display:
           numDecimalPlaces: 0
       cvdpv3_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 3 (cVDPV3) cases per million
-        description_short: "The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year, per million people"
+        description_short: The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year, per million people.
         unit: cases per million
         display:
           numDecimalPlaces: 1

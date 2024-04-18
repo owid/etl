@@ -5,21 +5,22 @@ meta:
     # Data product / Snapshot
     title: WHO Historical Polio Dataset
     date_published: "2019-12-10"
+    description: |-
+      The World Health Organization (WHO) provides a historical dataset on polio cases, but it is no longer available directly from the WHO website. Instead the web archived version can be downloaded [here](https://web.archive.org/web/20200101000000*/http://www.who.int/entity/immunization/monitoring_surveillance/data/incidence_series.xls?ua=1) and it can be accessed by opening in 'Read Only' mode.
 
     # Citation
     producer: World Health Organization
     citation_full: |-
-      World Health Organization (2019)
+      World Health Organization - Historical Polio Dataset (2019).
     attribution_short: WHO
-
     # Files
-    url_main: https://web.archive.org/web/20200101000000*/http://www.who.int/entity/immunization/monitoring_surveillance/data/incidence_series.xls?ua=1
+    url_main: https://www.who.int/news-room/fact-sheets/detail/poliomyelitis
     date_accessed: 2024-04-09
 
     # License
     license:
-      name: CC BY 4.0
-      url: https://www.who.int/about/policies/terms-of-use
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
   - md5: 189201470a046c95b5f38c05a77fd6c2

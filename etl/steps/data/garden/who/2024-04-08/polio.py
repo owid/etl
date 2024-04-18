@@ -86,8 +86,7 @@ def run(dest_dir: str) -> None:
     # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb, tb_regions, ds_regions)
     tb = add_cases_per_million(tb, tb_population)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
-    tb.metadata.short_name = "polio"
+    tb.format(short_name="polio")
 
     #
     # Save outputs.
@@ -262,7 +261,7 @@ def add_screening_and_testing(tb: Table, tb_regions: Dataset, ds_regions: Datase
 
     tb = identify_low_risk_countries(tb, tb_regions, ds_regions)
     # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
-    tb["polio_surveillance_status"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
+    tb["polio_surveillance_status"] = tb["polio_surveillance_status"].copy_metadata(tb["non_polio_afp_rate"])
     return tb
 
 
@@ -322,5 +321,5 @@ def clean_adequate_stool_collection(tb: Table) -> Table:
 
 def remove_pre_2001_data(tb: Table) -> Table:
     """Remove data from before 2001."""
-    tb = tb[tb["year"] >= 2001]
+    tb = tb[tb["year"] >= 2001].reset_index(drop=True)
     return tb
