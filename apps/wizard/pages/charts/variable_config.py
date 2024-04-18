@@ -1,4 +1,5 @@
 """Concerns the second stage of wizard charts, when the variable mapping is constructed."""
+
 from typing import Any, Dict, List
 
 import pandas as pd

@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Polio-Free Countries
+    description: |-
+      This dataset shows the last recorded case of indigenous wild poliovirus (WPV) by country. As data methodology and quality varied widely across regions and countries in earlier years, this table is based on the best-available sources for the years before 2000.
+    date_published: "2023"
+    # Citation
+    producer: Global Polio Eradication Initiative
+    citation_full: |-
+      Global Polio Eradication Initiative (2023)
+
+    # Files
+    url_main: https://polioeradication.org/where-we-work/polio-free-countries/
+    date_accessed: 2024-04-12
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://polioeradication.org/terms-of-use/
+
+outs:
+  - md5: 3670959ed02bcdb84fc0080734fc1bf7
+    size: 5123
+    path: polio_free_countries.csv
