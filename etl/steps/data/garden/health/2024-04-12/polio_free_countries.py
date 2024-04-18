@@ -88,13 +88,13 @@ def define_polio_free(tb: Table, latest_year: int) -> Table:
     tb["year"] = tb["year"].astype(str)
 
     # Drop countries with missing values explicitly copying to avoid setting on a slice warning
-    tb = tb[tb["year"] != "data not available"].copy()
+    tb = tb[tb["year"] != "data not available"]
 
     # Change 'pre 1985' to 1984 and 'ongoing' to LATEST_YEAR + 1
     tb.loc[tb["year"] == "pre 1985", "year"] = "1984"
-    tb.loc[tb["year"] == "ongoing", "year"] = str(latest_year + 1)
+    tb.loc[tb["year"] == "ongoing", "year"] = str(latest_year)
 
-    tb["year"] = tb["year"].astype(int).copy()
+    tb["year"] = tb["year"].astype(int)
     # Rename year to latest year
     tb = tb.rename(columns={"year": "latest_year_wild_polio_case"})
     tb["year"] = latest_year
