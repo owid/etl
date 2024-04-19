@@ -443,13 +443,13 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     # Merge multi-dimensional table with region aggregates.
     # Since there are two ways of estimating the regional aggregates, we create two versions of the indicators
     tb_multi_with_regions["aggregate_method"] = "average"
-    tb_multi_with_regions_popw = tb_multi_with_regions.copy()
-    tb_multi_with_regions_popw["aggregate_method"] = "population-weighted average"
+    # tb_multi_with_regions_popw = tb_multi_with_regions.copy()
+    # tb_multi_with_regions_popw["aggregate_method"] = "population-weighted average"
     tb_countries_avg["aggregate_method"] = "average"
     tb_population_avg["aggregate_method"] = "population-weighted average"
     # Combine
     tb_multi_with_regions = concat(
-        [tb_multi_with_regions, tb_multi_with_regions_popw, tb_countries_avg, tb_population_avg], ignore_index=True
+        [tb_multi_with_regions, tb_countries_avg, tb_population_avg], ignore_index=True
     )
 
     return tb_uni, tb_multi_without_regions, tb_multi_with_regions
