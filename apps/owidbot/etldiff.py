@@ -159,6 +159,10 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
     # pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?=. Dataset|\n)"
     # diff = re.sub(pattern, "", diff)
 
+    # Github has limit of 65,536 characters
+    if len(diff) > 64000:
+        diff = diff[:64000] + "\n\n...diff too long, truncated..."
+
     return diff, result
 
 

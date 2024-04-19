@@ -512,3 +512,39 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/health/2024-04-02/organ_donation_and_transplantation:
     - data://garden/health/2024-04-02/organ_donation_and_transplantation
+
+  # Polio AFP surveillance
+  data://meadow/who/2024-04-08/polio_afp:
+    - snapshot://who/2024-04-08/polio_afp.csv
+
+  # Polio historical data
+  data://meadow/who/2024-04-09/polio_historical:
+    - snapshot://who/2024-04-09/polio_historical.xls
+  data://garden/who/2024-04-09/polio_historical:
+    - data://meadow/who/2024-04-09/polio_historical
+
+  # Combining polio datasets
+  data://garden/who/2024-04-08/polio:
+    - data://meadow/who/2024-04-08/polio_afp
+    - data://meadow/who/2024-04-09/polio_historical
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+    - snapshot://fasttrack/latest/gpei.csv
+    - snapshot://health/2024-04-12/polio_status.csv
+  data://grapher/who/2024-04-08/polio:
+    - data://garden/who/2024-04-08/polio
+
+  # Polio certification status
+  data://meadow/health/2024-04-12/polio_status:
+    - snapshot://health/2024-04-12/polio_status.csv
+
+  # Polio free countries
+  data://meadow/health/2024-04-12/polio_free_countries:
+    - snapshot://health/2024-04-12/polio_free_countries.csv
+  data://garden/health/2024-04-12/polio_free_countries:
+    - data://meadow/health/2024-04-12/polio_status
+    - data://meadow/health/2024-04-12/polio_free_countries
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/health/2024-04-12/polio_free_countries:
+    - data://garden/health/2024-04-12/polio_free_countries
