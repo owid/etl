@@ -13,6 +13,6 @@ meta:
   description: The environmental and animal welfare footprint of different pig production systems in the UK and Brazil.
   license: {}
 outs:
-  - md5: bb7587c423bb8630fd04272c4f17e8a2
-    size: 8867
+  - md5: 3af5156c713b6a2cbef42f8d3b1625e3
+    size: 8899
     path: pig_production_bartlett.csv
