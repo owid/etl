@@ -50,6 +50,57 @@ REGIONS_LIST = [
     "World (excluding India)",
 ]
 
+# Define columns that are not poverty (mostly inequality)
+NON_POVERTY_COLS = [
+    "country",
+    "year",
+    "reporting_level",
+    "welfare_type",
+    "gini",
+    "mld",
+    "decile1_share",
+    "decile2_share",
+    "decile3_share",
+    "decile4_share",
+    "decile5_share",
+    "decile6_share",
+    "decile7_share",
+    "decile8_share",
+    "decile9_share",
+    "decile10_share",
+    "bottom50_share",
+    "middle40_share",
+    "headcount_40_median",
+    "headcount_50_median",
+    "headcount_60_median",
+    "headcount_ratio_40_median",
+    "headcount_ratio_50_median",
+    "headcount_ratio_60_median",
+    "income_gap_ratio_40_median",
+    "income_gap_ratio_50_median",
+    "income_gap_ratio_60_median",
+    "poverty_gap_index_40_median",
+    "poverty_gap_index_50_median",
+    "poverty_gap_index_60_median",
+    "avg_shortfall_40_median",
+    "avg_shortfall_50_median",
+    "avg_shortfall_60_median",
+    "total_shortfall_40_median",
+    "total_shortfall_50_median",
+    "total_shortfall_60_median",
+    "poverty_severity_40_median",
+    "poverty_severity_50_median",
+    "poverty_severity_60_median",
+    "waits_40_median",
+    "waits_50_median",
+    "waits_60_median",
+    "palma_ratio",
+    "s80_s20_ratio",
+    "p90_p10_ratio",
+    "p90_p50_ratio",
+    "p50_p10_ratio",
+]
+
 # Set table format when printing
 TABLEFMT = "pretty"
 
@@ -789,8 +840,45 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     # Create a table with the rest
     tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True).copy()
 
-    # Create a list of the countries and years with both income and consumption in the series
+    # Create a list of the countries with both income and consumption in the series
     countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
+
+    # Assert that the countries with both income and consumption are expected
+    assert countries_inc_cons == [
+        "Albania",
+        "Armenia",
+        "Belarus",
+        "Belize",
+        "Bulgaria",
+        "China",
+        "China (rural)",
+        "China (urban)",
+        "Croatia",
+        "Estonia",
+        "Haiti",
+        "Hungary",
+        "Kazakhstan",
+        "Kyrgyzstan",
+        "Latvia",
+        "Lithuania",
+        "Montenegro",
+        "Namibia",
+        "Nepal",
+        "Nicaragua",
+        "North Macedonia",
+        "Peru",
+        "Philippines",
+        "Poland",
+        "Romania",
+        "Russia",
+        "Saint Lucia",
+        "Serbia",
+        "Seychelles",
+        "Slovakia",
+        "Slovenia",
+        "Turkey",
+        "Ukraine",
+    ], f"Unexpected countries with both income and consumption: {countries_inc_cons}."
 
     # Define empty table to store the smoothed series
     tb_smoothed = Table()
@@ -802,21 +890,64 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         max_year = tb_country["year"].max()
 
         # Define welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
-        # last_welfare_type = list(tb_country[tb["year"] == max_year]["welfare_type"].unique())
+        last_welfare_type = list(tb_country[tb["year"] == max_year]["welfare_type"].unique()).sort()
+
+        # Count how many times welfare_type switches from income to consumption and vice versa
+        number_of_welfare_series = (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).cumsum().max()
 
         # Count the number of observations with income and consumption
         n_income = len(tb_country[tb_country["welfare_type"] == "income"])
         n_consumption = len(tb_country[tb_country["welfare_type"] == "consumption"])
         pct_consumption = n_consumption / (n_income + n_consumption)
 
-        print(f"{country}: {n_income} income, {n_consumption} consumption ({pct_consumption:.2f})")
+        # print(
+        #     f"{country}: {n_income} income, {n_consumption} consumption ({pct_consumption:.2f}). Welfare switches: {number_of_welfare_series}."
+        # )
 
-        # tb_smoothed = tb_smoothed.append(tb_country)
+        # If there are only two welfare series, use both, except for countries where we have to choose one
+        if number_of_welfare_series == 2:
+            # assert if last_welfare type values are expected
+            if country in ["Armenia", "Belarus", "North Macedonia", "Peru"]:
+                if country in ["Armenia", "Belarus"]:
+                    assert (
+                        len(last_welfare_type) == 1 and last_welfare_type == ["consumption"]
+                    ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['consumption']."
+
+                elif country in ["North Macedonia", "Peru"]:
+                    assert len(last_welfare_type) == 1 and last_welfare_type == [
+                        "income"
+                    ], f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']."
+
+                tb_country = tb_country[tb_country["welfare_type"] == last_welfare_type].reset_index(drop=True)
+
+            else:
+                continue
+        # With Turkey I also want to keep both series, but there are duplicates for some years
+        elif country in ["Turkey"]:
+            assert len(last_welfare_type) == 1 and last_welfare_type == [
+                "income"
+            ], f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']."
+
+            tb_country = tb_country[
+                (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"] == last_welfare_type)
+            ].reset_index(drop=True)
+
+        elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
+            assert (
+                len(last_welfare_type) == 2
+                and last_welfare_type
+                == [
+                    "consumption",
+                    "income",
+                ]
+            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['consumption','income']."
+
+        # tb_smoothed = pr.concat([tb_smoothed, tb_country])
 
     # Drop the columns created in this function
-    tb = tb.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+    tb_smoothed = tb_smoothed.drop(columns=["only_inc_or_cons", "duplicate_flag"])
 
-    return tb
+    return tb_smoothed
 
 
 def check_jumps_in_grapher_dataset(tb: Table) -> Table:
@@ -880,60 +1011,9 @@ def remove_confusing_datapoints_in_grapher_dataset(tb: Table) -> Table:
     Remove datapoints that are confusing when we are showing a unique series for both income and consumption.
     """
 
-    # Define columns to keep data. Inequality is mostly not affected by the income/consumption choice
-    cols_to_keep = [
-        "country",
-        "year",
-        "reporting_level",
-        "welfare_type",
-        "gini",
-        "mld",
-        "decile1_share",
-        "decile2_share",
-        "decile3_share",
-        "decile4_share",
-        "decile5_share",
-        "decile6_share",
-        "decile7_share",
-        "decile8_share",
-        "decile9_share",
-        "decile10_share",
-        "bottom50_share",
-        "middle40_share",
-        "headcount_40_median",
-        "headcount_50_median",
-        "headcount_60_median",
-        "headcount_ratio_40_median",
-        "headcount_ratio_50_median",
-        "headcount_ratio_60_median",
-        "income_gap_ratio_40_median",
-        "income_gap_ratio_50_median",
-        "income_gap_ratio_60_median",
-        "poverty_gap_index_40_median",
-        "poverty_gap_index_50_median",
-        "poverty_gap_index_60_median",
-        "avg_shortfall_40_median",
-        "avg_shortfall_50_median",
-        "avg_shortfall_60_median",
-        "total_shortfall_40_median",
-        "total_shortfall_50_median",
-        "total_shortfall_60_median",
-        "poverty_severity_40_median",
-        "poverty_severity_50_median",
-        "poverty_severity_60_median",
-        "waits_40_median",
-        "waits_50_median",
-        "waits_60_median",
-        "palma_ratio",
-        "s80_s20_ratio",
-        "p90_p10_ratio",
-        "p90_p50_ratio",
-        "p50_p10_ratio",
-    ]
-
     # Make nan the data for Poland from 2020 onwards, except for columns in cols_to_keep
     mask = (tb["country"] == "Poland") & (tb["year"] >= 2020)
-    tb.loc[mask, tb.columns.difference(cols_to_keep)] = np.nan
+    tb.loc[mask, tb.columns.difference(NON_POVERTY_COLS)] = np.nan
 
     return tb
 
