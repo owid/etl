@@ -1,21 +1,5 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
-NOTES:
-1. We don't have population for some historical regions (e.g. East Germany, or North Yemen).
-2. Some issues in the data were detected (see below, we may report them to EM-DAT). Some of them could not be fixed.
-   Namely, some disasters affect, in one year, a number of people that is larger than the entire population.
-   For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population
-   was 982753. I suppose this could be due to inaccuracies in the estimates of affected people or in the population
-   (which may not include people living temporarily in the country or visitors).
-3. There are some potential issues that can't be fixed:
-   * On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does
-   not include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option
-   is to treat missing data as zeros.
-   * On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
-   people multiple times during the same year. This can't be fixed, but I suppose it's not common.
-   * Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and
-   that there may be duplicated events.
-
 """
 
 import datetime
@@ -402,7 +386,7 @@ def create_decade_data(tb: Table) -> Table:
     tb_decadal = tb.copy()
 
     # Ensure each country has data for all years (and fill empty rows with zeros).
-    # Otherwise, the average would only be performed only across years for which we have data.
+    # Otherwise, the average would be performed only across years for which we have data.
     # For example, if we have data only for 1931 (and no other year in the 1930s) we want that data point to be averaged
     # over all years in the decade (assuming they are all zero).
     # Note that, for the current decade, since it's not complete, we want to average over the number of current years
@@ -618,7 +602,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create new Garden dataset.
+    # Create new garden dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb, tb_decadal], default_metadata=ds_meadow.metadata, check_variables_metadata=True
     )
