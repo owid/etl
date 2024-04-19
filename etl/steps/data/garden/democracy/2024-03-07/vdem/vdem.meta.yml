@@ -353,20 +353,22 @@ tables:
           Indicator name: `v2x_delibdem`
         unit: ''
 
-      ## 2.2.18 Egalitarian component index
-      egal_vdem:
-        title: |-
-          Egalitarian political institutions index (<< estimate >> estimate, aggregate: << aggregate_method >>)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
-        description_from_producer: |-
-          Question: To what extent is the egalitarian principle achieved?
 
-          Clarification: The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; 2 resources are distributed equally across all social groups; and 3 access to power is equally distributed by gender, socioeconomic class and social group.
+      ## 2.1.5 Egalitarian democracy index
+      egaldem_vdem:
+        title: |-
+          Egalitarian democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal.
+        description_from_producer: |-
+          Question: To what extent is the ideal of egalitarian democracy achieved?
+
+          Clarification:
+          The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; and 2 resources are distributed equally across all social groups; 3 groups and individuals enjoy equal access to power. To make it a measure of egalitarian democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_egal`
+          Indicator name: `v2x_egaldem`
         unit: ''
 
       ## 3.5.1.6 Legislature corrupt activities
@@ -889,20 +891,20 @@ tables:
           Indicator name: `v2xdl_delib`
         unit: ''
 
-      ## 2.1.5 Egalitarian democracy index
-      egaldem_vdem:
-        title: Egalitarian democracy index (<< estimate >> estimate)
+      ## 2.2.18 Egalitarian component index
+      egal_vdem:
+        title: |-
+          Egalitarian political institutions index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal.
+          << estimate.title() >> estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
         description_from_producer: |-
-          Question: To what extent is the ideal of egalitarian democracy achieved?
+          Question: To what extent is the egalitarian principle achieved?
 
-          Clarification:
-          The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; and 2 resources are distributed equally across all social groups; 3 groups and individuals enjoy equal access to power. To make it a measure of egalitarian democracy, the index also takes the level of electoral democracy into account.
+          Clarification: The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; 2 resources are distributed equally across all social groups; and 3 access to power is equally distributed by gender, socioeconomic class and social group.
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_egaldem`
+          Indicator name: `v2x_egal`
         unit: ''
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index

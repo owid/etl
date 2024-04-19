@@ -60,7 +60,7 @@ _indicators_avg = [
     "libdem_vdem",
     "participdem_vdem",
     "delibdem_vdem",
-    "egal_vdem",
+    "egaldem_vdem",
     "civ_libs_vdem",
     "phys_integr_libs_vdem",
     "pol_libs_vdem",
