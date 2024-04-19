@@ -170,13 +170,12 @@ steps:
     - data://meadow/hmd/2022-12-07/life_tables
 
   # UNDP
-  data://meadow/un/2022-11-29/undp_hdr:
-    - snapshot://un/2022-11-29/undp_hdr.csv
-    - snapshot://un/2022-11-29/undp_hdr.xlsx
-  data://garden/un/2022-11-29/undp_hdr:
-    - data://meadow/un/2022-11-29/undp_hdr
-  data://grapher/un/2022-11-29/undp_hdr:
-    - data://garden/un/2022-11-29/undp_hdr
+  data://meadow/un/2024-04-09/undp_hdr:
+    - snapshot://un/2024-04-09/undp_hdr.csv
+  data://garden/un/2024-04-09/undp_hdr:
+    - data://meadow/un/2024-04-09/undp_hdr
+  data://grapher/un/2024-04-09/undp_hdr:
+    - data://garden/un/2024-04-09/undp_hdr
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:

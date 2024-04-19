@@ -107,6 +107,15 @@ steps:
   data://grapher/wvs/2023-03-08/wvs_trust:
     - data://garden/wvs/2023-03-08/wvs_trust
 
+  # UNDP HDR
+  data://meadow/un/2022-11-29/undp_hdr:
+    - snapshot://un/2022-11-29/undp_hdr.csv
+    - snapshot://un/2022-11-29/undp_hdr.xlsx
+  data://garden/un/2022-11-29/undp_hdr:
+    - data://meadow/un/2022-11-29/undp_hdr
+  data://grapher/un/2022-11-29/undp_hdr:
+    - data://garden/un/2022-11-29/undp_hdr
+
   #
   # EM-DAT Natural disasters (2023).
   #
