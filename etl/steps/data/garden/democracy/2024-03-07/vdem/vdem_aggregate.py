@@ -329,6 +329,7 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
         tb=tb_,
         ds_regions=ds_regions,
         aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # type: ignore
+        min_num_values_per_year=1,
     )
 
     # Normalize by region's populatino
@@ -448,9 +449,7 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     tb_countries_avg["aggregate_method"] = "average"
     tb_population_avg["aggregate_method"] = "population-weighted average"
     # Combine
-    tb_multi_with_regions = concat(
-        [tb_multi_with_regions, tb_countries_avg, tb_population_avg], ignore_index=True
-    )
+    tb_multi_with_regions = concat([tb_multi_with_regions, tb_countries_avg, tb_population_avg], ignore_index=True)
 
     return tb_uni, tb_multi_without_regions, tb_multi_with_regions
 
@@ -517,6 +516,7 @@ def add_regions_and_global_aggregates(
     tb: Table,
     ds_regions: Dataset,
     aggregations: Optional[Dict[str, str]] = None,
+    min_num_values_per_year: Optional[int] = None,
     aggregations_world: Optional[Dict[str, str]] = None,
 ) -> Table:
     """Add regions, and world aggregates."""
@@ -525,12 +525,13 @@ def add_regions_and_global_aggregates(
         ds_regions,
         regions=REGIONS,
         aggregations=aggregations,
+        min_num_values_per_year=min_num_values_per_year,
     )
     tb_regions = tb_regions.loc[tb_regions["country"].isin(REGIONS.keys())]
 
     # Add world
     if aggregations_world is None:
-        tb_world = tb.groupby("year", as_index=False).sum(numeric_only=True).assign(country="World")
+        tb_world = tb.groupby("year", as_index=False).sum(numeric_only=True, min_count=1).assign(country="World")
     else:
         tb_world = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
     tb = concat([tb_regions, tb_world], ignore_index=True, short_name="region_counts")
