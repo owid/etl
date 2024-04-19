@@ -86,6 +86,7 @@ def run(dest_dir: str) -> None:
     # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb, tb_regions, ds_regions)
     tb = add_cases_per_million(tb, tb_population)
+    tb = tb[tb["year"] <= SCREENING_YEAR]
     tb = tb.format(short_name="polio")
 
     #
