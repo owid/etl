@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Harriet Bartlett et al. (2024). Trade-offs in the externalities of pig production are not inevitable.
+    title: pig_production_bartlett
+    citation_full: |-
+      Bartlett, H., Zanella, M., Kaori, B., Sabei, L., Araujo, M. S., de Paula, T. M., ... & Balmford, A. (2024). Trade-offs in the externalities of pig production are not inevitable. Nature Food.
+    version_producer: Google Sheet
+    url_main: https://www.nature.com/articles/s43016-024-00921-2
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQOfOMzhhfQzCDrVwlX6S8MbW5TfkQPRcwXZV0nY0-Fjc0sxBSacX7jeZq9mLu4gteDN_o8yDx_StTG/pub?output=csv
+    date_accessed: '2024-04-19'
+  name: Pig production impacts (Bartlett et al. 2024)
+  description: The environmental and animal welfare footprint of different pig production systems in the UK and Brazil.
+  license: {}
+outs:
+  - md5: bb7587c423bb8630fd04272c4f17e8a2
+    size: 8867
+    path: pig_production_bartlett.csv
