@@ -3,21 +3,26 @@
 """
 
 import datetime
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, Variable, utils
 from owid.datautils.dataframes import map_series
-from shared import (
-    HISTORIC_TO_CURRENT_REGION,
-    REGIONS,
-    add_region_aggregates,
-    correct_data_points,
-    get_last_day_of_month,
-)
 
 from etl.data_helpers import geo
+
+# Temporary imports (while add_regions_to_table is not directly imported from geo).
+from etl.data_helpers.geo import (
+    TableOrDataFrame,
+    Union,
+    add_region_aggregates,
+    create_table_of_regions_and_subregions,
+    detect_overlapping_regions,
+    list_members_of_region,
+    log,
+)
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -88,11 +93,93 @@ VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not i
 # New natural disaster type corresponding to the sum of all disasters.
 ALL_DISASTERS_TYPE = "all_disasters"
 
+# Aggregate regions to add, following OWID definitions.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "European Union (27)": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    "World": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+}
+
+# Overlaps found between historical regions and successor countries, that we accept in the data.
+# We accept them either because they happened close to the transition, or to avoid needing to introduce new
+# countries for which we do not have data (like the Russian Empire).
+ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}, {1991: {"West Germany", "Germany"}}]
+
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
 # and another dictionary that specifies the changes.
 # Note: Countries here should appear as in the raw data (i.e. not harmonized).
 DATA_CORRECTIONS = []
+
+
+def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+    """Make individual corrections to data points in a table.
+
+    Parameters
+    ----------
+    tb : Table
+        Data to be corrected.
+    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
+        Corrections.
+
+    Returns
+    -------
+    tb_corrected : Table
+        Corrected data.
+
+    """
+    tb_corrected = tb.copy()
+
+    for correction in corrections:
+        wrong_row, corrected_row = correction
+
+        # Select the row in the table where the wrong data point is.
+        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
+        selection = tb_corrected.loc[(tb_corrected[list(wrong_row)] == Variable(wrong_row)).fillna(False).all(axis=1)]
+        # Sanity check.
+        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
+        assert len(selection) == 1, error
+
+        # Replace wrong fields by the corrected ones.
+        # Note: Changes to categorical fields will not work.
+        tb_corrected.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
+
+    return tb_corrected
+
+
+def get_last_day_of_month(year: int, month: int):
+    """Get the number of days in a specific month of a specific year.
+
+    Parameters
+    ----------
+    year : int
+        Year.
+    month : int
+        Month.
+
+    Returns
+    -------
+    last_day
+        Number of days in month.
+
+    """
+    if month == 12:
+        last_day = 31
+    else:
+        last_day = (datetime.datetime.strptime(f"{year:04}-{month + 1:02}", "%Y-%m") + datetime.timedelta(days=-1)).day
+
+    return last_day
 
 
 def prepare_input_data(tb: Table) -> Table:
@@ -418,7 +505,7 @@ def create_decade_data(tb: Table) -> Table:
     return tb_decadal
 
 
-def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
+def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) -> None:
     """Run sanity checks on output (yearly or decadal) data.
 
     Parameters
@@ -427,6 +514,8 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
         Output (yearly or decadal) data.
     is_decade : bool
         True if tb is decadal data; False if it is yearly data.
+    ds_regions : Dataset
+        Regions dataset.
 
     """
     # Common sanity checks for yearly and decadal data.
@@ -461,9 +550,13 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
     error = "There are unexpected nans in data."
     assert tb[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
 
+    # Get names of historical regions in the data.
+    regions = ds_regions["regions"].reset_index()
+    historical_regions_in_data = set(regions[regions["is_historical"]]["name"]) & set(tb["country"])
+
     # Sanity checks only for yearly data.
     if not is_decade:
-        all_countries = sorted(set(tb["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
+        all_countries = sorted(set(tb["country"]) - set(REGIONS) - historical_regions_in_data)
 
         # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
         # This check would not pass when adding historical regions (since we know there are some overlaps between data
@@ -509,6 +602,249 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
         for column in columns_to_inspect:
             informed_rows = tb[column].notnull() & tb["population"].notnull()
             assert (tb[informed_rows][column] <= tb[informed_rows]["population"]).all(), error
+
+
+########################################################################################################################
+# TODO: Remove this code and import it from data_helpers.geo once the code is properly tested.
+def add_regions_to_table(
+    tb: TableOrDataFrame,
+    ds_regions: Dataset,
+    ds_income_groups: Optional[Dataset] = None,
+    regions: Optional[Union[List[str], Dict[str, Any]]] = None,
+    aggregations: Optional[Dict[str, str]] = None,
+    index_columns: Optional[List[str]] = None,
+    num_allowed_nans_per_year: Optional[int] = None,
+    frac_allowed_nans_per_year: Optional[float] = None,
+    min_num_values_per_year: Optional[int] = None,
+    country_col: str = "country",
+    year_col: str = "year",
+    keep_original_region_with_suffix: Optional[str] = None,
+    check_for_region_overlaps: bool = True,
+    accepted_overlaps: Optional[List[Dict[int, Set[str]]]] = None,
+    ignore_overlaps_of_zeros: bool = False,
+    subregion_type: str = "successors",
+    countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
+) -> Table:
+    """Add one or more region aggregates to a table (or dataframe).
+
+    This should be the default function to use when adding data for regions to a table (or dataframe).
+    This function respects the metadata of the incoming data.
+
+    If the original data for a region already exists:
+    * If keep_original_region_with_suffix is None, the original data for the region will be replaced by a new aggregate.
+    * If keep_original_region_with_suffix is not None, the original data for the region will be kept, and the value of
+      keep_original_region_with_suffix will be appended to the name of the region.
+
+    Parameters
+    ----------
+    tb : TableOrDataFrame
+        Original data, which may or may not contain data for regions.
+    ds_regions : Dataset
+        Regions dataset.
+    ds_income_groups : Optional[Dataset], default: None
+        World Bank income groups dataset.
+        * If given, aggregates for income groups may be added to the data.
+        * If None, no aggregates for income groups will be added.
+    regions : Optional[Union[List[str], Dict[str, Any]]], default: None
+        Regions to be added.
+        * If it is a list, it must contain region names of default regions or income groups.
+          Example: ["Africa", "Europe", "High-income countries"]
+        * If it is a dictionary, each key must be the name of a default, or custom region, and the value is another
+          dictionary, that can contain any of the following keys:
+          * "additional_regions": Additional regions whose members should be included in the region.
+          * "excluded_regions": Regions whose members should be excluded from the region.
+          * "additional_members": Additional individual members (countries) to include in the region.
+          * "excluded_members": Individual members to exclude from the region.
+          Example: {
+            "Asia": {},  # No need to define anything, since it is a default region.
+            "Asia excluding China": {  # Custom region that must be defined based on other known regions and countries.
+                "additional_regions": ["Asia"],
+                "excluded_members": ["China"],
+                },
+            }
+        * If None, the default regions will be added (defined as REGIONS in etl.data_helpers.geo).
+    aggregations : Optional[Dict[str, str]], default: None
+        Aggregation to implement for each variable.
+        * If a dictionary is given, the keys must be columns of the input data, and the values must be valid operations.
+          Only the variables indicated in the dictionary will be affected. All remaining variables will have an
+          aggregate value for the new regions of nan.
+          Example: {"column_1": "sum", "column_2": "mean", "column_3": lambda x: some_function(x)}
+          If there is a "column_4" in the data, for which no aggregation is defined, then the e.g. "Europe" will have
+          only nans for "column_4".
+        * If None, "sum" will be assumed to all variables.
+    index_columns : Optional[List[str]], default: None
+        Names of index columns (usually ["country", "year"]) to group by.
+    num_allowed_nans_per_year : Optional[int], default: None
+        * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
+          year. If that number of nans is exceeded, the aggregate will be nan.
+        * If None, an aggregate is constructed regardless of the number of nans.
+    frac_allowed_nans_per_year : Optional[float], default: None
+        * If a number is passed, this is the maximum fraction of nans that can be present in a particular variable and
+          year. If that fraction of nans is exceeded, the aggregate will be nan.
+        * If None, an aggregate is constructed regardless of the fraction of nans.
+    min_num_values_per_year : Optional[int], default: None
+        * If a number is passed, this is the minimum number of valid (not-nan) values that must be present in a
+          particular variable and year grouped. If that number of values is not reached, the aggregate will be nan.
+          However, if all values in the group are valid, the aggregate will also be valid, even if the number of values
+          in the group is smaller than min_num_values_per_year.
+        * If None, an aggregate is constructed regardless of the number of non-nan values.
+    country_col : Optional[str], default: "country"
+        Name of country column.
+    year_col : Optional[str], default: "year"
+        Name of year column.
+    keep_original_region_with_suffix : Optional[str], default: None
+        * If not None, the original data for a region will be kept, with the same name, but having suffix
+          keep_original_region_with_suffix appended to its name.
+          Example: If keep_original_region_with_suffix is " (WB)", then there will be rows for, e.g. "Europe (WB)", with
+          the original data, and rows for "Europe", with the new aggregate data.
+        * If None, the original data for a region will be replaced by new aggregate data constructed by this function.
+    check_for_region_overlaps : bool, default: True
+        * If True, a warning is raised if a historical region has data on the same year as any of its successors.
+          TODO: For now, this function simply warns about overlaps, but does nothing else about them.
+            Consider adding the option to remove the data for the historical region, or the data for the successor, at
+            the moment the aggregate is created.
+        * If False, any possible overlap is ignored.
+    accepted_overlaps : Optional[List[Dict[int, Set[str]]]], default: None
+        Only relevant if check_for_region_overlaps is True.
+        * If a dictionary is passed, it must contain years as keys, and sets of overlapping countries as values.
+          This is used to avoid warnings when there are known overlaps in the data that are accepted.
+          Note that, if the overlaps passed here are not present in the data, a warning is also raised.
+          Example: [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
+        * If None, any possible overlap in the data will raise a warning.
+    ignore_overlaps_of_zeros : bool, default: False
+        Only relevant if check_for_region_overlaps is True.
+        * If True, overlaps of values of zero are ignored. In other words, if a region and one of its successors have
+          both data on the same year, and that data is zero for both, no warning is raised.
+        * If False, overlaps of values of zero are not ignored.
+    subregion_type : str, default: "successors"
+        Only relevant if check_for_region_overlaps is True.
+        * If "successors", the function will look for overlaps between historical regions and their successors.
+        * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
+          overseas territories).
+    countries_that_must_have_data : Optional[Dict[str, List[str]]], default: None
+        * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
+          must have data for that region. If any of those countries is not informed on a particular variable and year,
+          that region will have nan for that particular variable and year.
+        * If None, an aggregate is constructed regardless of the countries missing.
+
+    Returns
+    -------
+    TableOrDataFrame
+        Original table (or dataframe) after adding (or replacing) aggregate data for regions.
+
+    """
+    df_with_regions = pd.DataFrame(tb).copy()
+
+    if index_columns is None:
+        index_columns = [country_col, year_col]
+
+    if check_for_region_overlaps:
+        # Find overlaps between regions and its members.
+
+        if accepted_overlaps is None:
+            accepted_overlaps = []
+
+        # Create a dictionary of regions and its members.
+        df_regions_and_members = create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type=subregion_type
+        )
+        regions_and_members = df_regions_and_members[subregion_type].to_dict()
+
+        # Assume incoming table has a dummy index (the whole function may not work otherwise).
+        # Example of region_and_members:
+        # {"Czechoslovakia": ["Czechia", "Slovakia"]}
+        all_overlaps = detect_overlapping_regions(
+            df=df_with_regions,
+            regions_and_members=regions_and_members,
+            country_col=country_col,
+            year_col=year_col,
+            index_columns=index_columns,
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
+        )
+        # Example of accepted_overlaps:
+        # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
+        # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
+        all_overlaps_sorted = sorted(all_overlaps, key=lambda d: str(d))
+        accepted_overlaps_sorted = sorted(accepted_overlaps, key=lambda d: str(d))
+        if all_overlaps_sorted != accepted_overlaps_sorted:
+            log.warning(
+                "Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "
+                f"Accepted overlaps: {accepted_overlaps_sorted}.\nFound overlaps: {all_overlaps_sorted}."
+            )
+
+    if aggregations is None:
+        # Create region aggregates for all columns (with a simple sum) except for index columns.
+        aggregations = {column: "sum" for column in df_with_regions.columns if column not in index_columns}
+
+    if regions is None:
+        regions = REGIONS
+    elif isinstance(regions, list):
+        # Assume they are known regions and they have no modifications.
+        regions = {region: {} for region in regions}
+
+    if countries_that_must_have_data:
+        # If countries_that_must_have_data is neither None or [], it must be a dictionary with regions as keys.
+        # Check that the dictionary has the right format.
+        error = "Argument countries_that_must_have_data must be a dictionary with regions as keys."
+        assert set(countries_that_must_have_data) <= set(regions), error
+        # Fill missing regions with an empty list.
+        countries_that_must_have_data = {
+            region: countries_that_must_have_data.get(region, []) for region in list(regions)
+        }
+    else:
+        countries_that_must_have_data = {region: [] for region in list(regions)}
+
+    # Add region aggregates.
+    for region in regions:
+        # Check that the content of the region dictionary is as expected.
+        expected_items = {"additional_regions", "excluded_regions", "additional_members", "excluded_members"}
+        unknown_items = set(regions[region]) - expected_items
+        if len(unknown_items) > 0:
+            log.warning(
+                f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
+            )
+
+        # List members of the region.
+        members = list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_regions=regions[region].get("additional_regions"),
+            excluded_regions=regions[region].get("excluded_regions"),
+            additional_members=regions[region].get("additional_members"),
+            excluded_members=regions[region].get("excluded_members"),
+            # By default, include historical regions in income groups.
+            include_historical_regions_in_income_groups=True,
+        )
+        # TODO: Here we could optionally define _df_with_regions, which is passed to add_region_aggregates, and is
+        #   identical to df_with_regions, but overlaps in accepted_overlaps are solved (e.g. the data for the historical
+        #   or parent region is made nan).
+
+        # Add aggregate data for current region.
+        df_with_regions = add_region_aggregates(
+            df=df_with_regions,
+            region=region,
+            aggregations=aggregations,
+            index_columns=index_columns,
+            countries_in_region=members,
+            countries_that_must_have_data=countries_that_must_have_data[region],
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+            country_col=country_col,
+            year_col=year_col,
+            keep_original_region_with_suffix=keep_original_region_with_suffix,
+        )
+
+    # If the original object was a Table, copy metadata
+    if isinstance(tb, Table):
+        # TODO: Add entry to processing log.
+        return Table(df_with_regions).copy_metadata(tb)
+    else:
+        return df_with_regions  # type: ignore
+
+
+########################################################################################################################
 
 
 def run(dest_dir: str) -> None:
@@ -566,12 +902,13 @@ def run(dest_dir: str) -> None:
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
     # Add region aggregates.
-    tb = add_region_aggregates(
-        data=tb,
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=REGIONS,
         index_columns=["country", "year", "type"],
-        regions_to_add=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
     # Add damages per GDP, and rates per 100,000 people.
@@ -584,10 +921,10 @@ def run(dest_dir: str) -> None:
     tb_decadal = create_decade_data(tb=tb)
 
     # Run sanity checks on output yearly data.
-    sanity_checks_on_outputs(tb=tb, is_decade=False)
+    sanity_checks_on_outputs(tb=tb, is_decade=False, ds_regions=ds_regions)
 
     # Run sanity checks on output decadal data.
-    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
+    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True, ds_regions=ds_regions)
 
     # Set an appropriate index to yearly data and sort conveniently.
     tb = tb.format(keys=["country", "year", "type"], sort_columns=True)
