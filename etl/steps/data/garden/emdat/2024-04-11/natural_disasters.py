@@ -147,7 +147,7 @@ def sanity_checks_on_inputs(tb: Table) -> None:
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
     assert (
-        tb["total_affected"].fillna(0) >= tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
+        tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
     ).all(), error
 
     error = "Natural disasters are not expected to last more than 9 years."
@@ -227,7 +227,7 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
     tb["end_date"] = pd.to_datetime(tb["end_date"])
 
     error = "Events can't have an end_date prior to start_date."
-    assert ((tb["end_date"] - tb["start_date"]).dt.days >= 0).all(), error
+    assert (tb["end_date"] >= tb["start_date"]).all(), error
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["start_year", "start_month", "start_day", "end_year", "end_month", "end_day"])

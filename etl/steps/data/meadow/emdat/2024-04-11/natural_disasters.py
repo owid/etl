@@ -9,15 +9,12 @@ paths = PathFinder(__file__)
 # Columns to extract from raw data, and how to rename them.
 COLUMNS = {
     "Country": "country",
-    # "Year": "year",
     "Disaster Group": "group",
     "Disaster Subgroup": "subgroup",
     "Disaster Type": "type",
     "Disaster Subtype": "subtype",
-    # "Disaster Subsubtype": "subsubtype",
     "Event Name": "event",
     "Region": "region",
-    # "Continent": "continent",
     "Total Deaths": "total_dead",
     "No. Injured": "injured",
     "No. Affected": "affected",
