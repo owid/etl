@@ -286,6 +286,22 @@ tables:
         <% endif %>
       display:
         numDecimalPlaces: 2
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - "Africa"
+            - "Asia"
+            - "Europe"
+            - "North America"
+            - "Oceania"
+            - "South America"
+          selectedEntityColors:
+            "Africa": "#A2559C"
+            "Asia": "#00847E"
+            "Europe": "#4C6A9C"
+            "North America": "#C4523E"
+            "Oceania": "#9A5129"
+            "South America": "#883039"
 
     variables:
       # 2.1 V-Dem High-Level Democracy Indices
