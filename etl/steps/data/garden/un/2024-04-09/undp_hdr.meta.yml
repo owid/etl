@@ -156,6 +156,7 @@ tables:
           topic_tags:
               - Human Development Index (HDI)
               - Global Education
+
       # Inequality in income
       ineq_inc:
         title: Inequality in income
@@ -169,6 +170,7 @@ tables:
           topic_tags:
               - Human Development Index (HDI)
               - Economic Growth
+              - Economic Inequality
       # Inequality in life expectancy
       ineq_le:
         title: Inequality in Life expectancy
@@ -218,7 +220,7 @@ tables:
         title: Gender Development Index
         unit: ""
         description_short: |-
-          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. The groups below define the level of equality in these achievements as the absolute deviation of GDI from gender parity.
+          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living.
         description_key:
           - "The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income."
           - Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
@@ -230,7 +232,7 @@ tables:
         title: GDI Group
         unit: ""
         description_short: |-
-          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. The groups below define the level of equality in these achievements as the absolute deviation of GDI from gender parity.
+          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. This indicator defines the level of equality in these achievements as the absolute deviation of GDI from gender parity.
         description_key:
           - The GDI groups are based on the absolute deviation of GDI from gender parity, 100 ∙ |GDI - 1|.
           - "Group 1: Countries with absolute deviation from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and men."
