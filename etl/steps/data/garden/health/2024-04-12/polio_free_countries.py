@@ -44,6 +44,7 @@ def run(dest_dir: str) -> None:
     tb = define_polio_free(tb, latest_year=LATEST_YEAR)
 
     tb = add_polio_region_certification(tb, tb_region_status, who_regions, ds_regions)
+    tb = tb[tb["year"] <= LATEST_YEAR]
     # Set an index and sort.
     tb = tb.format()
     #
