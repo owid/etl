@@ -32,7 +32,7 @@ tables:
         description_short: Number of new cases of acute flaccid paralysis (AFP) reported in a given year per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       non_polio_afp_rate:
         title: Non-Polio acute flaccid paralysis (afp) rate
         description_short: The number of cases of acute flaccid paralysis (AFP) per 100,000 children aged 15 or under, not attributed to polio, that were detected and reported to the WHO.
@@ -60,7 +60,7 @@ tables:
         description_short: The number of cases of wild poliovirus detected in a given year per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       cvdpv_cases:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year.
@@ -72,7 +72,7 @@ tables:
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       compatibles:
         title: Compatibles
         unit: ""
@@ -104,7 +104,7 @@ tables:
         description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       estimated_cases:
         title: Estimated polio cases
         description_short: The total estimated number of polio cases.
@@ -118,7 +118,7 @@ tables:
         description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al. (2010).
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       cvdpv1:
         title: Circulating Vaccine-Derived Poliovirus type 1 (cVDPV1) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year.
@@ -130,7 +130,7 @@ tables:
         description_short: The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year, per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       cvdpv2:
         title: Circulating Vaccine-Derived Poliovirus type 2 (cVDPV2) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year.
@@ -142,7 +142,7 @@ tables:
         description_short: The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year, per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
       cvdpv3:
         title: Circulating Vaccine-Derived Poliovirus type 3 (cVDPV3) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year.
@@ -154,4 +154,4 @@ tables:
         description_short: The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year, per million people.
         unit: cases per million
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
