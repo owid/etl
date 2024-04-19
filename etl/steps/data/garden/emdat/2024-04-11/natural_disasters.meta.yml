@@ -50,61 +50,58 @@ tables:
       total_dead:
         title: Total deaths
         unit: 'people'
-        description_short: |
+        description_short: |-
           Total number of deaths as a result of a natural disaster. In EM-DAT, it is the sum of deaths and missing.
       injured:
         title: Injured
         unit: 'people'
-        description_short: |
+        description_short: |-
           People suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster.
       affected:
         title: Affected
         unit: 'people'
-        description_short: |
+        description_short: |-
           Number of people requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
       homeless:
         title: Homeless
         unit: 'people'
-        description_short: |
+        description_short: |-
           Number of people whose house is destroyed or heavily damaged and therefore need shelter after an event.
       total_affected:
         title: Total affected
         unit: 'people'
-        description_short: |
+        description_short: |-
           Total number of people affected by a natural disaster. In EM-DAT, it is the sum of the injured, affected and left homeless after a disaster.
       reconstruction_costs:
         title: Reconstruction costs
         short_unit: '$'
         unit: 'current US$'
-        description_short: |
+        description_short: |-
           Reconstruction costs.
       insured_damages:
         title: Insured damages
         short_unit: "$"
         unit: "current US$"
-        description_short: |
+        description_short: |-
           Insured losses are those which are covered by the insurance sector and paid directly to the owner of the damaged or destroyed property or crops and livestock or the primary insurance company (in case of reinsurance).
       total_damages:
         title: "Total economic damage from natural disasters"
         short_unit: '$'
         unit: 'current US$'
-        description_short: |
+        description_short: |-
           The amount of damage to property, crops, and livestock. In EM-DAT estimated damage are given in US$. For each disaster, the registered figure corresponds to the damage value at the moment of the event, i.e. the figures are shown true to the year of the event.
       n_events:
         title: Number of reported natural disasters
         unit: 'events'
-        description_short: |
+        description_short: |-
           Number of reported natural disasters.
       population:
         title: Population
         unit: 'people'
-        presentation:
-          topic_tags:
-            - Uncategorized
       total_dead_per_100k_people:
         title: Total number of deaths per 100,000 people
         unit: 'deaths per 100k people'
-        description_processing: &description-processing-100k |
+        description_processing: &description-processing-100k |-
           Disaster-related impacts from EM-DAT have been normalized by Our World in Data to provide data in terms of occurrences per 100,000 people.
       injured_per_100k_people:
         title: Number of injured persons per 100,000 people
@@ -130,30 +127,27 @@ tables:
         title: "GDP"
         unit: "current US$"
         short_unit: "$"
-        description_processing: &description-processing-gdp |
+        description_processing: &description-processing-gdp |-
           Our World in Data has calculated economic damage metrics adjusted for gross domestic product (GDP).
-        presentation:
-          topic_tags:
-            - Uncategorized
       reconstruction_costs_per_gdp:
         title: "Reconstruction costs from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
-        description_short: |
+        description_short: |-
           Reconstruction costs from natural disasters as a share of GDP.
         description_processing: *description-processing-gdp
       insured_damages_per_gdp:
         title: "Insured damages from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
-        description_short: |
+        description_short: |-
           Insured damages from natural disasters as a share of GDP.
         description_processing: *description-processing-gdp
       total_damages_per_gdp:
         title: "Total economic damages from natural disasters as a share of GDP"
         unit: "%"
         short_unit: "%"
-        description_short: |
+        description_short: |-
           Total economic damages from natural disasters as a share of GDP.
         description_processing: *description-processing-gdp
   natural_disasters_yearly:

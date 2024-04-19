@@ -44,7 +44,7 @@ def create_wide_tables(table: Table) -> Table:
     """
     # Adapt disaster type names to match those in the old explorer files.
     table = table.reset_index()
-    table["type"] = table["type"].replace(DISASTER_TYPE_RENAMING)
+    table["type"] = table.astype({"type": str})["type"].replace(DISASTER_TYPE_RENAMING)
 
     # Create wide table.
     table_wide = table.pivot(index=["country", "year"], columns="type", join_column_levels_with="_")
@@ -56,7 +56,8 @@ def create_wide_tables(table: Table) -> Table:
             .replace("total_dead", "deaths")
             .replace("total_damages_per_gdp", "total_damages_pct_gdp")
             for column in table_wide.columns
-        }
+        },
+        errors="raise",
     )
 
     # Remove unnecessary columns.
@@ -77,23 +78,32 @@ def create_wide_tables(table: Table) -> Table:
     ]
 
     # Set an appropriate index and sort conveniently.
-    table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
+    table_wide = table_wide.format()
 
     return table_wide
 
 
 def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
     # Load the latest dataset from garden.
     ds_garden = paths.load_dataset("natural_disasters")
 
-    # Load tables with yearly and decadal data.
+    # Read tables with yearly and decadal data.
     tb_yearly = ds_garden["natural_disasters_yearly"]
     tb_decadal = ds_garden["natural_disasters_decadal"]
 
+    #
+    # Process data.
+    #
     # Create wide tables adapted to the old format in explorers.
     tb_yearly_wide = create_wide_tables(table=tb_yearly)
     tb_decadal_wide = create_wide_tables(table=tb_decadal)
 
+    #
+    # Save outputs.
+    #
     # Initialize a new grapher dataset and add dataset metadata.
     ds_grapher = create_dataset(
         dest_dir,

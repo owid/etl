@@ -24,6 +24,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
+from owid.datautils.dataframes import map_series
 from shared import (
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
@@ -44,18 +45,19 @@ paths = PathFinder(__file__)
 # For completeness, add all existing types here, and rename them as np.nan if they should not be used.
 # If new types are included on a data update, simply add them here.
 EXPECTED_DISASTER_TYPES = {
-    "Animal accident": np.nan,
+    "Animal incident": np.nan,
     "Drought": "Drought",
     "Earthquake": "Earthquake",
     "Epidemic": np.nan,
     "Extreme temperature": "Extreme temperature",
     "Flood": "Flood",
     "Fog": "Fog",
-    "Glacial lake outburst": "Glacial lake outburst",
+    "Glacial lake outburst flood": "Glacial lake outburst flood",
     "Impact": np.nan,
-    "Insect infestation": np.nan,
-    "Landslide": "Landslide",
+    "Infestation": np.nan,
+    # "Landslide (dry)": "Landslide",
     "Mass movement (dry)": "Dry mass movement",
+    "Mass movement (wet)": "Wet mass movement",
     "Storm": "Extreme weather",
     "Volcanic activity": "Volcanic activity",
     "Wildfire": "Wildfire",
@@ -64,7 +66,6 @@ EXPECTED_DISASTER_TYPES = {
 # List of columns to select from raw data, and how to rename them.
 COLUMNS = {
     "country": "country",
-    "year": "year",
     "type": "type",
     "total_dead": "total_dead",
     "injured": "injured",
@@ -115,6 +116,9 @@ def prepare_input_data(tb: Table) -> Table:
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
+    # Add a year column (assume the start of the event).
+    tb["year"] = tb["start_year"].copy()
+
     # Correct wrong data points (defined above in DATA_CORRECTIONS).
     tb = correct_data_points(tb=tb, corrections=DATA_CORRECTIONS)
 
@@ -126,7 +130,9 @@ def prepare_input_data(tb: Table) -> Table:
     assert set(tb["type"]) == set(EXPECTED_DISASTER_TYPES), error
 
     # Rename disaster types conveniently.
-    tb["type"] = tb["type"].replace(EXPECTED_DISASTER_TYPES)
+    tb["type"] = map_series(
+        series=tb["type"], mapping=EXPECTED_DISASTER_TYPES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
 
     # Drop rows for disaster types that are not relevant.
     tb = tb.dropna(subset="type").reset_index(drop=True)
@@ -141,7 +147,7 @@ def sanity_checks_on_inputs(tb: Table) -> None:
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
     assert (
-        tb["total_affected"].fillna(0) >= tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
+        tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
     ).all(), error
 
     error = "Natural disasters are not expected to last more than 9 years."
@@ -221,7 +227,7 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
     tb["end_date"] = pd.to_datetime(tb["end_date"])
 
     error = "Events can't have an end_date prior to start_date."
-    assert ((tb["end_date"] - tb["start_date"]).dt.days >= 0).all(), error
+    assert (tb["end_date"] >= tb["start_date"]).all(), error
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["start_year", "start_month", "start_day", "end_year", "end_month", "end_day"])
@@ -254,9 +260,9 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     # Go row by row, and create a new disaster event with the impact normalized by the fraction of days it happened
     # in a specific year.
     added_events = Table().copy_metadata(tb)
-    for i, row in multi_year_rows.iterrows():
-        # Start dataframe for new event.
-        new_event = Table(row).transpose().copy_metadata(tb)
+    for _, row in multi_year_rows.iterrows():
+        # Start table for new event.
+        new_event = Table(row).transpose().reset_index(drop=True).copy_metadata(tb)
         # Years spanned by the disaster.
         years = np.arange(row["start_date"].year, row["end_date"].year + 1).tolist()
         # Calculate the total number of days spanned by the disaster (and add 1 day to include the day of the end date).
@@ -269,33 +275,43 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Fraction of days affected this year.
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
+                # Ensure "total_affected" is the sum of "injured", "affected" and "homeless".
+                # Note that the previous line may have introduced rounding errors.
+                impacts["total_affected"] = impacts["injured"] + impacts["affected"] + impacts["homeless"]
                 # Start a series that counts the impacts accumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
-                new_event[IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             elif years[0] < year < years[-1]:
                 # The entire year was affected by the disaster.
                 # Note: Ignore leap years.
                 days_fraction = 365 / days_total
                 # Impacts this year.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
+                # Ensure "total_affected" is the sum of "injured", "affected" and "homeless".
+                # Note that the previous line may have introduced rounding errors.
+                impacts["total_affected"] = impacts["injured"] + impacts["affected"] + impacts["homeless"]
                 # Add impacts to the cumulative impacts series.
                 cumulative_impacts += impacts  # type: ignore
                 # Normalize data by the number of days affected in this year.
-                new_event[IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = row[IMPACT_COLUMNS] - cumulative_impacts  # type: ignore
-                new_event[IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                impacts = (pd.Series(row[IMPACT_COLUMNS]) - cumulative_impacts).astype(int)  # type: ignore
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
-            added_events = pr.concat([added_events, new_event], ignore_index=True)
+                new_event["end_date"] = row["end_date"]
+            added_events = pr.concat([added_events, new_event], ignore_index=True).copy()
 
     # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
     tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # type: ignore
@@ -323,6 +339,10 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     )
     # Copy metadata from any other column into the new column of counts of events.
     counts["n_events"] = counts["n_events"].copy_metadata(tb["total_dead"])
+    # Ensure columns have the right type.
+    tb = tb.astype(
+        {column: int for column in tb.columns if column not in ["country", "year", "type", "start_date", "end_date"]}
+    )
     # Get the sum of impacts per country, year and type of disaster.
     tb = tb.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
     # Add the column of the number of events.
@@ -351,9 +371,7 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
 def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table) -> Table:
     """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
     # Add population to table.
-    tb = geo.add_population_to_table(
-        tb=tb, ds_population=ds_population, expected_countries_without_population=["North Yemen", "South Yemen"]
-    )
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
 
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
@@ -511,7 +529,7 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
 
 def run(dest_dir: str) -> None:
     #
-    # Load data.
+    # Load inputs.
     #
     # Load natural disasters dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("natural_disasters")
@@ -588,10 +606,10 @@ def run(dest_dir: str) -> None:
     sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
 
     # Set an appropriate index to yearly data and sort conveniently.
-    tb = tb.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+    tb = tb.format(keys=["country", "year", "type"], sort_columns=True)
 
     # Set an appropriate index to decadal data and sort conveniently.
-    tb_decadal = tb_decadal.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+    tb_decadal = tb_decadal.format(keys=["country", "year", "type"], sort_columns=True)
 
     # Rename yearly and decadal tables.
     tb.metadata.short_name = "natural_disasters_yearly"
