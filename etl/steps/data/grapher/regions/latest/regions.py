@@ -258,7 +258,7 @@ def run(dest_dir: str) -> None:
     ds_garden: Dataset = paths.load_dependency("regions")
 
     # Read tables from regions dataset.
-    regions = ds_garden["regions"][["name", "short_name", "region_type", "is_historical", "defined_by"]]
+    regions: Table = ds_garden["regions"].loc[:, ["name", "short_name", "region_type", "is_historical", "defined_by"]]
     members = ds_garden["regions"][["members"]]
     legacy_codes = ds_garden["regions"][
         [
@@ -281,9 +281,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Drop unneeded columns
-    regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
-
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)
 
@@ -301,21 +298,21 @@ def run(dest_dir: str) -> None:
         members["members"].astype(object).apply(lambda x: ";".join(ast.literal_eval(x)) if pd.notna(x) else "")
     )
 
-    # Add owid_continent for convenience.
-    regions["owid_continent"] = None
-    continents = regions[regions["region_type"] == "continent"]
-    for continent in continents.itertuples():
-        continent = cast(Any, continent)
-        continent_members = continent.members.split(";")
-        assert regions.loc[continent_members, "owid_continent"].isnull().all(), "Some regions already have a continent"
-        regions.loc[continent_members, "owid_continent"] = continent.name
+    regions_by_owid = create_regions_by_owid(regions)
+
+    # Drop unneeded columns
+    regions = regions.drop(columns=["defined_by"])
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[regions], default_metadata=ds_garden.metadata, formats=["csv"], run_grapher_checks=False
+        dest_dir,
+        tables=[regions, regions_by_owid],
+        default_metadata=ds_garden.metadata,
+        formats=["csv"],
+        run_grapher_checks=False,
     )
 
     # Save changes in the new grapher dataset.
@@ -324,3 +321,25 @@ def run(dest_dir: str) -> None:
 
 def slugify(name):
     return re.sub(r"[^\w\-]", "", name.lower().replace(" ", "-"))
+
+
+def create_regions_by_owid(regions: Table) -> Table:
+    regions = regions.copy()
+
+    # Select only owid definitions
+    regions = regions[regions.defined_by == "owid"].drop(columns=["defined_by"])
+
+    # Add continent for convenience.
+    regions["continent"] = None
+    continents = regions[regions["region_type"] == "continent"]
+    for continent in continents.itertuples():
+        continent = cast(Any, continent)
+        continent_members = continent.members.split(";")
+        assert regions.loc[continent_members, "continent"].isnull().all(), "Some regions already have a continent"
+        regions.loc[continent_members, "continent"] = continent.name
+
+    # Update metadata
+    regions.m.short_name = "regions_by_owid"
+    regions.m.title = "Defined by Our World in Data"
+
+    return regions
