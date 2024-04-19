@@ -125,6 +125,7 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+          name: cVDPV1 cases
       cvdpv1_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 1 (cVDPV2) cases per million
         description_short: The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year, per million people.
@@ -137,6 +138,7 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+          name: cVDPV2 cases
       cvdpv2_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 2 (cVDPV2) cases per million
         description_short: The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year, per million people.
@@ -149,6 +151,7 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+          name: cVDPV3 cases
       cvdpv3_per_million:
         title: Circulating Vaccine-Derived Poliovirus type 3 (cVDPV3) cases per million
         description_short: The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year, per million people.
