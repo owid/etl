@@ -1,7 +1,9 @@
 """Concerns the second stage of wizard charts, when the variable mapping is constructed."""
+
 from typing import Any, Dict, List
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 from pydantic import BaseModel
 from streamlit_extras.grid import grid
@@ -384,8 +386,23 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     # st.write(countries)
     # if countries:
     #     df_variables = df_variables[df_variables["entityName"].isin(countries)]
+    score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 1)
+    if score == 100:
+        score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 2)
+        if score == 100:
+            score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 3)
+            if score == 100:
+                score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 4)
+    num_nan_score = df_variables["Relative difference (abs, %)"].isna().sum()
+
+    nrows_0 = df_variables.shape[0]
     ## Keep only rows with relative difference != 0
     df_variables = df_variables[df_variables["Relative difference (abs, %)"] != 0]
+    ## Keep only rows with different values (old != new)
+    df_variables = df_variables[
+        df_variables[var_id_to_display[variable_old]] != df_variables[var_id_to_display[variable_new]]
+    ]
+    nrows_1 = df_variables.shape[0]
 
     # Row sanity check
     ## (Streamlit has a limit on the number of rows it can show)
@@ -404,8 +421,30 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     #     cmap="OrRd", subset=["Relative difference (abs, %)"], vmin=0, vmax=20
     # )
 
+    # Show preliminary information
+    nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        st.metric(
+            "Data matching score (%)",
+            score,
+            help="The data matching score is based on the average of the relative difference between the two variables. A high score indicates a good match. It is estimated as `100 - average(relative scores)`.",
+        )
+    with col2:
+        st.info(
+            f"""
+            - {num_nan_score} rows with unknown score
+            - {nrows_change_relative} % of the rows changed ({nrows_1} out of {nrows_0})
+        """
+        )
     # Show table
     st.dataframe(df_variables)
+
+    # Show distribution of relative change
+    fig = px.histogram(
+        df_variables, x="Relative difference (abs, %)", nbins=100, title="Distribution of relative change"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def reset_variable_form() -> None:

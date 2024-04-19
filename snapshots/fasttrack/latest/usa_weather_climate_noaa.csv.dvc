@@ -7,11 +7,11 @@ meta:
     url_main: https://www.epa.gov/climate-indicators/view-indicators
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSDHxZsuT6bFCjqagPqRQCAuSKbUvf9ag8A6BQVZU2POn6nDOh0VIo_fUfNtfI4vuQtAbqhBzSHQEMC/pub?output=csv
-    date_accessed: '2024-04-17'
+    date_accessed: '2024-04-18'
   name: US Weather and Climate (NOAA via EPA, 2024)
   description: Weather and climate indicators such as temperature, precipitation, and droughts in the United States.
   license: {}
 outs:
-  - md5: d72f3b7e95e7ad4f50fff92609d57cb2
-    size: 38524
+  - md5: 690104badc66215d3b381bb575e1e2b8
+    size: 38510
     path: usa_weather_climate_noaa.csv

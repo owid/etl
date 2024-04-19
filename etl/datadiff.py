@@ -565,7 +565,10 @@ def _data_diff(
         )
         samp_a = table_a.loc[neq, cols]
         samp_b = table_b.loc[neq, cols]
-        both = samp_a.merge(samp_b, on=dims, suffixes=(" -", " +"))
+        if dims:
+            both = samp_a.merge(samp_b, on=dims, suffixes=(" -", " +"))
+        else:
+            both = samp_a.join(samp_b, lsuffix=" -", rsuffix=" +")
         lines += _df_to_str(both)
 
     # add color
