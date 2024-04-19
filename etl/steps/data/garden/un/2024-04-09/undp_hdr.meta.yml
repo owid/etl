@@ -102,7 +102,7 @@ tables:
         title: Human Development Index (female)
         unit: ""
         description_short: |-
-          The HDI is a summary measure of key dimensions of human development (only females): a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.
+          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only female population is considered.
         description_key: *description_key_hdi
         description_from_producer: *description_prod_hdi
         display:
@@ -117,7 +117,7 @@ tables:
         title: Human Development Index (male)
         unit: ""
         description_short: |-
-          The HDI is a summary measure of key dimensions of human development (only males): a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.
+          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only female population is considered.
         description_key: *description_key_hdi
         description_from_producer: *description_prod_hdi
         display:
@@ -284,14 +284,14 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Difference in ranks on the PHDI and the HDI is calculated only for countries for which both an IHDI value and an HDI value are calculated. Due to data limitations, PHDI values are calculated for a smaller set of countries.
+          Difference in ranks on the PHDI and the HDI is calculated only for countries for which both an PHDI value and an HDI value are calculated. Due to data limitations, PHDI values are calculated for a smaller set of countries.
         display:
           numDecimalPlaces: 2
       rankdiff_hdi_phdi:
         title: Difference from HDI rank
         unit: ""
         description_short: |-
-          To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an IHDI value is calculated.
+          To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an PHDI value is calculated.
         display:
           numDecimalPlaces: 0
 
