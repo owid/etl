@@ -101,6 +101,43 @@ NON_POVERTY_COLS = [
     "p50_p10_ratio",
 ]
 
+# Define countries expected to have both income and consumption data
+COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
+    "Albania",
+    "Armenia",
+    "Belarus",
+    "Belize",
+    "Bulgaria",
+    "China",
+    "China (rural)",
+    "China (urban)",
+    "Croatia",
+    "Estonia",
+    "Haiti",
+    "Hungary",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Latvia",
+    "Lithuania",
+    "Montenegro",
+    "Namibia",
+    "Nepal",
+    "Nicaragua",
+    "North Macedonia",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Romania",
+    "Russia",
+    "Saint Lucia",
+    "Serbia",
+    "Seychelles",
+    "Slovakia",
+    "Slovenia",
+    "Turkey",
+    "Ukraine",
+]
+
 # Set table format when printing
 TABLEFMT = "pretty"
 
@@ -806,15 +843,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
 
     tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons)
 
-    # Drop income where income and consumption are available
-    tb_inc_or_cons = tb_inc_or_cons[
-        (~tb_inc_or_cons["duplicate_flag"]) | (tb_inc_or_cons["welfare_type"] == "consumption")
-    ]
-    tb_inc_or_cons.drop(columns=["duplicate_flag"], inplace=True)
-
     tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
-
-    tb_inc_or_cons = remove_confusing_datapoints_in_grapher_dataset(tb_inc_or_cons)
 
     return tb_inc, tb_cons, tb_inc_or_cons
 
@@ -829,7 +858,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     # Flag duplicates per year – indicating multiple welfare_types
     # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
     tb = tb.sort_values(by=["country", "year", "welfare_type"], ignore_index=True)
-    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year"])
+    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year"], keep=False)
 
     # Create a boolean column that is true if each ppp_version, country, reporting_level has only income or consumption
     tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
@@ -844,44 +873,12 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
 
     # Assert that the countries with both income and consumption are expected
-    assert countries_inc_cons == [
-        "Albania",
-        "Armenia",
-        "Belarus",
-        "Belize",
-        "Bulgaria",
-        "China",
-        "China (rural)",
-        "China (urban)",
-        "Croatia",
-        "Estonia",
-        "Haiti",
-        "Hungary",
-        "Kazakhstan",
-        "Kyrgyzstan",
-        "Latvia",
-        "Lithuania",
-        "Montenegro",
-        "Namibia",
-        "Nepal",
-        "Nicaragua",
-        "North Macedonia",
-        "Peru",
-        "Philippines",
-        "Poland",
-        "Romania",
-        "Russia",
-        "Saint Lucia",
-        "Serbia",
-        "Seychelles",
-        "Slovakia",
-        "Slovenia",
-        "Turkey",
-        "Ukraine",
-    ], f"Unexpected countries with both income and consumption: {countries_inc_cons}."
+    assert (
+        countries_inc_cons == COUNTRIES_WITH_INCOME_AND_CONSUMPTION
+    ), f"Unexpected countries with both income and consumption: {countries_inc_cons}."
 
     # Define empty table to store the smoothed series
-    tb_smoothed = Table()
+    tb_both_inc_and_cons_smoothed = Table()
     for country in countries_inc_cons:
         # Filter country
         tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True).copy()
@@ -890,64 +887,74 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         max_year = tb_country["year"].max()
 
         # Define welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
-        last_welfare_type = list(tb_country[tb["year"] == max_year]["welfare_type"].unique()).sort()
+        last_welfare_type = list(tb_country[tb_country["year"] == max_year]["welfare_type"].unique())
+        last_welfare_type.sort()
 
         # Count how many times welfare_type switches from income to consumption and vice versa
         number_of_welfare_series = (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).cumsum().max()
-
-        # Count the number of observations with income and consumption
-        n_income = len(tb_country[tb_country["welfare_type"] == "income"])
-        n_consumption = len(tb_country[tb_country["welfare_type"] == "consumption"])
-        pct_consumption = n_consumption / (n_income + n_consumption)
-
-        # print(
-        #     f"{country}: {n_income} income, {n_consumption} consumption ({pct_consumption:.2f}). Welfare switches: {number_of_welfare_series}."
-        # )
 
         # If there are only two welfare series, use both, except for countries where we have to choose one
         if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
             if country in ["Armenia", "Belarus", "North Macedonia", "Peru"]:
                 if country in ["Armenia", "Belarus"]:
+                    welfare_expected = ["consumption"]
                     assert (
-                        len(last_welfare_type) == 1 and last_welfare_type == ["consumption"]
-                    ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['consumption']."
+                        len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
+                    ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
 
                 elif country in ["North Macedonia", "Peru"]:
                     assert len(last_welfare_type) == 1 and last_welfare_type == [
                         "income"
                     ], f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']."
 
-                tb_country = tb_country[tb_country["welfare_type"] == last_welfare_type].reset_index(drop=True)
+                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
             else:
                 continue
         # With Turkey I also want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
-            assert len(last_welfare_type) == 1 and last_welfare_type == [
-                "income"
-            ], f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']."
+            welfare_expected = ["income"]
+            assert (
+                len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
+            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
 
             tb_country = tb_country[
-                (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"] == last_welfare_type)
+                (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"].isin(last_welfare_type))
             ].reset_index(drop=True)
 
         elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
+            welfare_expected = ["consumption", "income"]
             assert (
-                len(last_welfare_type) == 2
-                and last_welfare_type
-                == [
-                    "consumption",
-                    "income",
-                ]
-            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['consumption','income']."
+                len(last_welfare_type) == 2 and last_welfare_type == welfare_expected
+            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+            if country in ["Haiti", "Romania", "Saint Lucia"]:
+                tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
+            else:
+                tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
 
-        # tb_smoothed = pr.concat([tb_smoothed, tb_country])
+        else:
+            if country in ["Albania", "Russia", "Ukraine"]:
+                welfare_expected = ["consumption"]
+                assert (
+                    len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
+                ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+            else:
+                welfare_expected = ["income"]
+                assert (
+                    len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
+                ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+
+            tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+
+        tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
+
+    tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
 
     # Drop the columns created in this function
-    tb_smoothed = tb_smoothed.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+    tb_inc_or_cons = tb_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"])
 
-    return tb_smoothed
+    return tb_inc_or_cons
 
 
 def check_jumps_in_grapher_dataset(tb: Table) -> Table:
@@ -1002,18 +1009,6 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             "check_diff_welfare_type",
         ]
     )
-
-    return tb
-
-
-def remove_confusing_datapoints_in_grapher_dataset(tb: Table) -> Table:
-    """
-    Remove datapoints that are confusing when we are showing a unique series for both income and consumption.
-    """
-
-    # Make nan the data for Poland from 2020 onwards, except for columns in cols_to_keep
-    mask = (tb["country"] == "Poland") & (tb["year"] >= 2020)
-    tb.loc[mask, tb.columns.difference(NON_POVERTY_COLS)] = np.nan
 
     return tb
 
