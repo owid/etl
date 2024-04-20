@@ -1044,7 +1044,7 @@ def regional_headcount(tb: Table) -> Table:
     tb_out = tb_regions[mask].reset_index()
     if len(tb_out) > 0:
         log.info(
-            f"""There are {len(tb_out)} years with more than one null region value and will be deleted:
+            f"""There are {len(tb_out)} years with more than one null region value so we can't extract regional data for them. Years are:
             {list(tb_out.year.unique())}"""
         )
         tb_regions = tb_regions[~mask].reset_index()
