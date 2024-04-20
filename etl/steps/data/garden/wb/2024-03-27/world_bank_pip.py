@@ -910,8 +910,6 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
                 tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
-            else:
-                continue
         # With Turkey I also want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
             welfare_expected = ["income"]
