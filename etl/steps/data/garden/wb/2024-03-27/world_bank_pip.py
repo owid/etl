@@ -896,8 +896,8 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         # If there are only two welfare series, use both, except for countries where we have to choose one
         if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
-            if country in ["Armenia", "Belarus", "North Macedonia", "Peru"]:
-                if country in ["Armenia", "Belarus"]:
+            if country in ["Armenia", "Belarus", "Kyrgyzstan", "North Macedonia", "Peru"]:
+                if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
                     welfare_expected = ["consumption"]
                     assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                         f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
