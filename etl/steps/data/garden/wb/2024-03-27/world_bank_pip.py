@@ -873,9 +873,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
 
     # Assert that the countries with both income and consumption are expected
-    assert (
-        countries_inc_cons == COUNTRIES_WITH_INCOME_AND_CONSUMPTION
-    ), f"Unexpected countries with both income and consumption: {countries_inc_cons}."
+    assert countries_inc_cons == COUNTRIES_WITH_INCOME_AND_CONSUMPTION, log.fatal(
+        f"Unexpected countries with both income and consumption: {countries_inc_cons}."
+    )
 
     # Define empty table to store the smoothed series
     tb_both_inc_and_cons_smoothed = Table()
@@ -899,23 +899,23 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             if country in ["Armenia", "Belarus", "North Macedonia", "Peru"]:
                 if country in ["Armenia", "Belarus"]:
                     welfare_expected = ["consumption"]
-                    assert (
-                        len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
-                    ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                    )
 
                 elif country in ["North Macedonia", "Peru"]:
-                    assert len(last_welfare_type) == 1 and last_welfare_type == [
-                        "income"
-                    ], f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']."
+                    assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
+                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
+                    )
 
                 tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
         # With Turkey I also want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
             welfare_expected = ["income"]
-            assert (
-                len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
-            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+            assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
+            )
 
             tb_country = tb_country[
                 (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"].isin(last_welfare_type))
@@ -923,9 +923,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
         elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
             welfare_expected = ["consumption", "income"]
-            assert (
-                len(last_welfare_type) == 2 and last_welfare_type == welfare_expected
-            ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+            assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
+                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
+            )
             if country in ["Haiti", "Romania", "Saint Lucia"]:
                 tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
             else:
@@ -934,14 +934,14 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         else:
             if country in ["Albania", "Russia", "Ukraine"]:
                 welfare_expected = ["consumption"]
-                assert (
-                    len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
-                ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
             else:
                 welfare_expected = ["income"]
-                assert (
-                    len(last_welfare_type) == 1 and last_welfare_type == welfare_expected
-                ), f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
 
             tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
@@ -986,7 +986,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
 
         # Check if the difference is too high
-        mask = (abs(tb["check_diff_column"]) > 20) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
+        mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
         tb_error = tb[mask].reset_index(drop=True).copy()
 
         if not tb_error.empty:
