@@ -205,7 +205,7 @@ tables:
 
       ## HOE female (custom)
       wom_hoe_vdem:  # wom_hoe_vdem_owid
-        title: Woman head of executive
+        title: Woman chief executive
         description_short: |-
           The variable denotes whether the chief executive of government in office on December 31 is a woman.
         description_processing: |-
@@ -1426,9 +1426,9 @@ tables:
       population_hoe:
         title: |-
           <% if category == '-1' %>
-          People living in countries in which head of executive's gender is unknown
+          People living in countries in which chief executive's gender is unknown
           <% else %>
-          People living in countries in which head of executive is a << category.lower() >>
+          People living in countries in which chief executive is a << category.lower() >>
           <% endif %>
       population_hog:
         title: |-
