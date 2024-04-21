@@ -170,6 +170,8 @@ tables:
 
           Indicator name: `v2eltrnout`
         unit: '%'
+        display:
+          numDecimalPlaces: 2
 
       # 3.4.2.18 HOS female
       wom_hos_vdem:  # wom_hos_vdem_owid
@@ -1422,14 +1424,14 @@ tables:
       population_hoe:
         title: |-
           <% if category == '-1' %>
-          People living in countries in which chief executive's gender is unknown
+          People living in countries in which head of executive's gender is unknown
           <% else %>
           People living in countries in which head of executive is a << category.lower() >>
           <% endif %>
       population_hog:
         title: |-
           <% if category == '-1' %>
-          People living in countries in which head of executive's gender is unknown
+          People living in countries in which head of government's gender is unknown
           <% else %>
           People living in countries in which head of government is a << category.lower() >>
           <% endif %>
