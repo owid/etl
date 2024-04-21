@@ -47,6 +47,8 @@ tables:
 
           Notes: The data spans 2012-present due to the methodological incomparability with the data prior 2012.
         unit: ''
+        display:
+          numDecimalPlaces: 2
 
       ## 2.2.14 Direct popular vote index
       dirpop_vote_vdem:
