@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ice_sheet_mass_balance_greenland:
+    variables:
+      cumulative_mass_balance__gt:
+        title: Cumulative ice sheet mass balance
+        unit: billion tonnes
+        short_unit: billion t
+        processing_level: minor

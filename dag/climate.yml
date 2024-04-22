@@ -251,3 +251,9 @@ steps:
   #
   data://grapher/climate/2024-04-17/climate_change_impacts_monthly:
     - data://garden/climate/2024-04-17/climate_change_impacts
+  data://meadow/imbie/2024-04-22/ice_sheet_mass_balance_greenland:
+    - snapshot://imbie/2024-04-22/ice_sheet_mass_balance_greenland.csv
+  data://garden/imbie/2024-04-22/ice_sheet_mass_balance_greenland:
+    - data://meadow/imbie/2024-04-22/ice_sheet_mass_balance_greenland
+  data://grapher/imbie/2024-04-22/ice_sheet_mass_balance_greenland:
+    - data://garden/imbie/2024-04-22/ice_sheet_mass_balance_greenland
