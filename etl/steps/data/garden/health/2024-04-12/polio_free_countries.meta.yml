@@ -18,7 +18,7 @@ tables:
     variables:
       latest_year_wild_polio_case:
         title: Latest year of wild polio case
-        description_short: "The type of polio vaccines used in the national immunization schedule in each country: only inactivated poliovirus vaccines (IPV), oral poliovirus vaccines (OPV), or both."
+        description_short: The most recent year in which a case of wild poliovirus was detected in a country.
         unit: ""
         display:
           numDecimalPlaces: 0
