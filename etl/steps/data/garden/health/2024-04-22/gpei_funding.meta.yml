@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - Polio
         - Eradication of Diseases
+    unit: "current US$"
+    short_unit: "$"
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -17,42 +19,35 @@ tables:
       domestic_resources:
         title: Domestic resources
         description_short: "Domestic resources for polio eradication, including government contributions and other domestic funding."
-        unit: ""
         display:
           numDecimalPlaces: 0
       g7_countries__and__european_commission:
         title: G7 countries and European Commission
         description_short: "Funding from G7 countries and the European Commission for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
       multilateral_sector:
         title: Multilateral sector
         description_short: "Funding from multilateral organizations for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
       non_g7_oecd_countries:
         title: Non-G7 OECD countries
         description_short: "Funding from non-G7 OECD countries for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
       other_donor_countries:
         title: Other donor countries
         description_short: "Funding from other donor countries for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
       private_sector__non_governmental_donors:
         title: Private sector & non-governmental donors
         description_short: "Funding from the private sector and non-governmental donors for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
       total:
         title: Total
         description_short: "Total funding for polio eradication."
-        unit: ""
         display:
           numDecimalPlaces: 0
