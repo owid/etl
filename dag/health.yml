@@ -548,3 +548,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/health/2024-04-12/polio_free_countries:
     - data://garden/health/2024-04-12/polio_free_countries
+
+  # Polio vaccine schedule
+  data://meadow/who/2024-04-22/polio_vaccine_schedule:
+    - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
+  data://garden/who/2024-04-22/polio_vaccine_schedule:
+    - data://meadow/who/2024-04-22/polio_vaccine_schedule
+  data://grapher/who/2024-04-22/polio_vaccine_schedule:
+    - data://garden/who/2024-04-22/polio_vaccine_schedule
