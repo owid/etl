@@ -102,7 +102,7 @@ tables:
         title: Human Development Index (female)
         unit: ""
         description_short: |-
-          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only female population is considered.
+          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only male population is considered.
         description_key: *description_key_hdi
         description_from_producer: *description_prod_hdi
         display:
@@ -293,7 +293,7 @@ tables:
         title: Difference from HDI rank
         unit: ""
         description_short: |-
-          To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an PHDI value is calculated.
+          To calculate the PHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an PHDI value is calculated.
         display:
           numDecimalPlaces: 0
 
@@ -406,12 +406,14 @@ tables:
         unit: international-$ in 2017 prices
         description_short: |-
           Measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
-        description_key:
-          - &description_key_gnipc1 GNI per capita (formerly GNP per capita) is the gross national income, converted to U.S. dollars using the World Bank Atlas method, divided by the midyear population. GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad (World Bank).
-          - &description_key_gnipc2 GNI, calculated in national currency, is usually converted to U.S. dollars at official exchange rates for comparisons across economies, although an alternative rate is used when the official exchange rate is judged to diverge by an exceptionally large margin from the rate actually applied in international transactions (World Bank).
         description_from_producer: &description_prod_gnipc |-
           UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
 
+          The World Bank's 2023 World Development Indicators database contains estimates of GNI per capita in constant 2017 purchasing power parity (PPP) terms for many countries. For countries missing this indicator (entirely or partly), the Human Development Report Office calculates it by converting GNI per capita in local currency from current to constant terms using two steps. First, the value of GNI per capita in current terms is converted into PPP terms for the base year (2017). Second, a time series of GNI per capita in 2017 PPP constant terms is constructed by applying the real growth rates to the GNI per capita in PPP terms for the base year. The real growth rate is implied by the ratio of the nominal growth of GNI per capita in current local currency terms to the GDP deflator.
+
+          For several countries without a value of GNI per capita in constant 2017 PPP terms for 20 22 reported in the World Development Indicators database, real growth rates of GDP per capita available in the World Development Indicators database or in the International Monetary Fund's Economic Outlook database are applied to the most recent GNI values in constant PPP terms.
+
+          Official PPP conversion rates are produced by the International Comparison Program, whose surveys periodically collect thousands of prices of matched goods and services in many countries. The last round of this exercise refers to 2017 and covered 176 economies.
       gni_pc_m:
         title: Gross national income per capita (male)
         short_unit: $
@@ -425,8 +427,6 @@ tables:
             The male share of the wage bill is calculated as _Sm = 1 - Sf_, where _Sf_ is the female wage bill.
           - |-
             The female share o the wage bill is calculated as _Sf = (Wf/Wm * EAf) / (Wf/Wm * EAf + EAm)_, where _Wf/Wm_ is the ratio of female to male wage, _EAf_ is the female share of the economically active population and _Eam_ is the male share.
-          - *description_key_gnipc1
-          - *description_key_gnipc2
         description_from_producer: *description_prod_gnipc
 
       gni_pc_f:
@@ -440,8 +440,6 @@ tables:
             The estimated female earned income per capita (_GNIpcm_) is obtained from GNI per capita (_GNIpc_), first by multiplying it by the female share of the wage bill (_Sf_), and then rescaling it by the female share of the population that is female (_Pf_): _GNIpcm = GNIpc * Sf/Pf_
           - |-
             The female share of the wage bill is calculated as _Sf = (Wf/Wm * EAf) / (Wf/Wm * EAf + EAm)_, where _Wf/Wm_ is the ratio of female to male wage, _EAf_ is the female share of the economically active population and _Eam_ is the male share.
-          - *description_key_gnipc1
-          - *description_key_gnipc2
         description_from_producer: *description_prod_gnipc
 
       ###########################################################
