@@ -166,7 +166,7 @@ def cli(
                 _remove_nonexisting_column_slug(source_chart, source_session)
 
                 try:
-                    target_chart = source_chart.migrate_to_db(
+                    migrated_chart = source_chart.migrate_to_db(
                         source_session, target_session, include=include, exclude=exclude
                     )
                 except ValueError as e:
@@ -180,7 +180,7 @@ def cli(
                             raise e
 
                 # exclude charts with variables whose catalogPath matches the provided string
-                if target_chart is None:
+                if migrated_chart is None:
                     log.info(
                         "staging_sync.skip",
                         slug=source_chart.config["slug"],
@@ -191,47 +191,47 @@ def cli(
 
                 # try getting chart with the same slug
                 try:
-                    existing_chart = gm.Chart.load_chart(target_session, slug=source_chart.config["slug"])
+                    target_chart = gm.Chart.load_chart(target_session, slug=source_chart.config["slug"])
                 except NoResultFound:
-                    existing_chart = None
+                    target_chart = None
 
                 # it's possible that slug is different, but chart id is the same
-                if existing_chart is None:
+                if target_chart is None:
                     try:
-                        existing_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+                        target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
 
                         # make sure createdAt matches and double check with createdAt
-                        if existing_chart.createdAt != source_chart.createdAt:
+                        if target_chart.createdAt != source_chart.createdAt:
                             log.warning("staging_sync.different_chart_with_same_id", chart_id=chart_id)
-                            existing_chart = None
+                            target_chart = None
                     except NoResultFound:
-                        existing_chart = None
+                        target_chart = None
 
-                if existing_chart:
-                    if _charts_configs_are_equal(existing_chart.config, target_chart.config):
+                if target_chart:
+                    if _charts_configs_are_equal(target_chart.config, migrated_chart.config):
                         log.info(
                             "staging_sync.skip",
-                            slug=target_chart.config["slug"],
+                            slug=migrated_chart.config["slug"],
                             reason="identical chart already exists",
                             chart_id=chart_id,
                         )
                         continue
 
                     # warn if chart has been updated in production after the staging server got created
-                    if existing_chart.updatedAt > min(staging_created_at, source_chart.updatedAt):
+                    if target_chart.updatedAt > min(staging_created_at, source_chart.updatedAt):
                         log.warning(
                             "staging_sync.chart_modified_in_target",
-                            slug=target_chart.config["slug"],
-                            target_updatedAt=str(existing_chart.updatedAt),
+                            slug=migrated_chart.config["slug"],
+                            target_updatedAt=str(target_chart.updatedAt),
                             source_updatedAt=str(source_chart.updatedAt),
                             staging_created_at=str(staging_created_at),
                             chart_id=chart_id,
                         )
                         print(
-                            f"[bold red]WARNING[/bold red]: [bright_cyan]Chart [bold]{target_chart.config['slug']}[/bold] has been modified in target[/bright_cyan]"
+                            f"[bold red]WARNING[/bold red]: [bright_cyan]Chart [bold]{migrated_chart.config['slug']}[/bold] has been modified in target[/bright_cyan]"
                         )
                         print("[yellow]\tDifferences between SOURCE (-) and TARGET (+) chart[/yellow]")
-                        print(_chart_config_diff(target_chart.config, existing_chart.config))
+                        print(_chart_config_diff(migrated_chart.config, target_chart.config))
 
                     # if the chart has gone through a revision, update it directly
                     revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
@@ -243,28 +243,28 @@ def cli(
                         if rev.status == "approved"
                         and rev.updatedBy == 1
                         # min(rev.createdAt, rev.updatedAt) is needed because of a bug in chart revisions, it should be fixed soon
-                        and min(rev.createdAt, rev.updatedAt) > existing_chart.updatedAt
+                        and min(rev.createdAt, rev.updatedAt) > target_chart.updatedAt
                     ]
 
                     # if chart has gone through revision in source and --approve-revisions is set and
                     # chart hasn't been updated in production, update it directly
-                    if approve_revisions and revs and staging_created_at > existing_chart.updatedAt:
+                    if approve_revisions and revs and staging_created_at > target_chart.updatedAt:
                         log.info(
-                            "staging_sync.update_chart", slug=target_chart.config["slug"], chart_id=existing_chart.id
+                            "staging_sync.update_chart", slug=migrated_chart.config["slug"], chart_id=target_chart.id
                         )
                         if not dry_run:
-                            target_chart.config["id"] = existing_chart.id
-                            assert existing_chart.id
-                            target_api.update_chart(existing_chart.id, target_chart.config)
+                            migrated_chart.config["id"] = target_chart.id
+                            assert target_chart.id
+                            target_api.update_chart(target_chart.id, migrated_chart.config)
 
                     # create chart revision
                     else:
                         # there's already a chart with the same slug, create a new revision
                         chart_revision = gm.SuggestedChartRevisions(
-                            chartId=existing_chart.id,
+                            chartId=target_chart.id,
                             createdBy=int(GRAPHER_USER_ID),  # type: ignore
-                            originalConfig=existing_chart.config,
-                            suggestedConfig=target_chart.config,
+                            originalConfig=target_chart.config,
+                            suggestedConfig=migrated_chart.config,
                             status="pending",
                             createdAt=dt.datetime.utcnow(),
                             updatedAt=dt.datetime.utcnow(),
@@ -273,7 +273,7 @@ def cli(
                             # delete previously submitted revisions
                             (
                                 target_session.query(gm.SuggestedChartRevisions)
-                                .filter_by(chartId=existing_chart.id, status="pending", createdBy=int(GRAPHER_USER_ID))  # type: ignore
+                                .filter_by(chartId=target_chart.id, status="pending", createdBy=int(GRAPHER_USER_ID))  # type: ignore
                                 .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)
                                 .delete()
                             )
@@ -287,30 +287,30 @@ def cli(
                                 log.info(
                                     "staging_sync.skip",
                                     reason="revision already exists",
-                                    slug=target_chart.config["slug"],
+                                    slug=migrated_chart.config["slug"],
                                     chart_id=chart_id,
                                 )
                                 continue
 
                         log.info(
-                            "staging_sync.create_chart_revision", slug=target_chart.config["slug"], chart_id=chart_id
+                            "staging_sync.create_chart_revision", slug=migrated_chart.config["slug"], chart_id=chart_id
                         )
                 else:
                     # create new chart
                     if not publish:
                         # only published charts are synced
-                        assert target_chart.config["isPublished"], "Unexpected error"
-                        del target_chart.config["isPublished"]
+                        assert migrated_chart.config["isPublished"], "Unexpected error"
+                        del migrated_chart.config["isPublished"]
 
                     chart_tags = source_chart.tags(source_session)
 
                     if not dry_run:
-                        resp = target_api.create_chart(target_chart.config)
+                        resp = target_api.create_chart(migrated_chart.config)
                         target_api.set_tags(resp["chartId"], chart_tags)
                     else:
                         resp = {"chartId": None}
                     log.info(
-                        "staging_sync.create_chart", slug=target_chart.config["slug"], new_chart_id=resp["chartId"]
+                        "staging_sync.create_chart", slug=migrated_chart.config["slug"], new_chart_id=resp["chartId"]
                     )
 
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")

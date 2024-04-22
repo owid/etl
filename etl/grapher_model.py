@@ -262,6 +262,7 @@ class Chart(SQLModel, table=True):
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     config: Dict[Any, Any] = Field(sa_column=Column("config", JSON, nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
@@ -284,7 +285,7 @@ class Chart(SQLModel, table=True):
         if chart_id:
             cond = cls.id == chart_id
         elif slug:
-            cond = _json_is(cls.config, "slug", slug)
+            cond = cls.slug == slug
         else:
             raise ValueError("Either chart_id or slug must be provided")
         charts = session.exec(select(cls).where(cond)).all()
