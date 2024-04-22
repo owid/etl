@@ -556,3 +556,8 @@ steps:
     - data://meadow/who/2024-04-22/polio_vaccine_schedule
   data://grapher/who/2024-04-22/polio_vaccine_schedule:
     - data://garden/who/2024-04-22/polio_vaccine_schedule
+  # Polio GPEI funding
+  data://meadow/health/2024-04-22/gpei_funding:
+    - snapshot://health/2024-04-22/gpei_funding.xlsx
+  data://garden/health/2024-04-22/gpei_funding:
+    - data://meadow/health/2024-04-22/gpei_funding

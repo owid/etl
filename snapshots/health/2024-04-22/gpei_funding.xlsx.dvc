@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GPEI Historical Contributions
+    date_published: "2022-12-31"
+
+    # Citation
+    producer: Global Polio Eradication Initiative
+    citation_full: |-
+      Historical Contributions, Global Polio Eradication Initiative (2022)
+    attribution_short: GPEI
+
+    # Files
+    url_main: https://polioeradication.org/financing/donors/historical-contributions/
+    date_accessed: 2024-04-22
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 06720e26fc98e049759c0c462559ec48
+    size: 6408
+    path: gpei_funding.xlsx
