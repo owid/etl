@@ -2,7 +2,7 @@
 
     Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
 
-!!! info "Check the [metadata reference](reference.md) for a complete list of metadata fields."
+!!! info "Check the [metadata reference](reference) for a complete list of metadata fields."
 
 
 One of the main values of our work is the careful documentation that we provide along with our data and articles. In the context of
