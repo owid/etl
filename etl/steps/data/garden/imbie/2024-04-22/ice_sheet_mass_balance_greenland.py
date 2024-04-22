@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     # Years are given as decimals. For this exercise, get the average cumulative mass balance for each year.
     tb["year"] = tb["year"].astype(int)
-    tb = tb.groupby(["country", "year"], observed=True, as_index=False).agg({"cumulative_mass_balance__gt": "sum"})
+    tb = tb.groupby(["country", "year"], observed=True, as_index=False).agg({"cumulative_mass_balance__gt": "mean"})
 
     # Format conveniently.
     tb = tb.format(["country", "year"])
