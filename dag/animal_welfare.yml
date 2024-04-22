@@ -114,3 +114,12 @@ steps:
   # To be archived:
 
   ######################################################################################################################
+  #
+  # Fur laws (Fur Free Alliance, 2023).
+  #
+  data://meadow/animal_welfare/2024-04-22/fur_laws:
+    - snapshot://animal_welfare/2024-04-22/fur_laws.xlsx
+  data://garden/animal_welfare/2024-04-22/fur_laws:
+    - data://meadow/animal_welfare/2024-04-22/fur_laws
+  data://grapher/animal_welfare/2024-04-22/fur_laws:
+    - data://garden/animal_welfare/2024-04-22/fur_laws
