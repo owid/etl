@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Dongarra et al.
+    title: TOP 500
+    title_snapshot: Performance development
+    citation_full: |-
+      “Performance of Various Computers Using Standard Linear Equations Software”, Jack Dongarra, University of Tennessee, Knoxville TN, 37996, Computer Science Technical Report Number CS - 89 – 85, today’s date, url:http://www.netlib.org/benchmark/performance.ps.
+    version_producer: Google Sheet
+    url_main: https://www.top500.org/statistics/perfdevel/
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRRFJBsgBDtah3Eavq4euW0vqgpMGmjVMq0P-H3Z5KrG_iyzsC9Oub4zH64kwSPtxlTLXP4Ua4TxHPW/pub?output=csv
+    date_accessed: '2024-04-22'
+    date_published: '2023'
+  name: TOP500 Supercomputer Database
+  description: ''
+  license: {}
+outs:
+  - md5: 6ba504b70cbf97b9c29a367ab865feaf
+    size: 593
+    path: supercomputers.csv
