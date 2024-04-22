@@ -3,8 +3,7 @@ meta:
     producer: Dongarra et al.
     title: TOP 500
     title_snapshot: Performance development
-    citation_full: |-
-      “Performance of Various Computers Using Standard Linear Equations Software”, Jack Dongarra, University of Tennessee, Knoxville TN, 37996, Computer Science Technical Report Number CS - 89 – 85, today’s date, url:http://www.netlib.org/benchmark/performance.ps.
+    citation_full: Jack Dongarra, Martin Meuer, Horst Simon, Erich Strohmaier. TOP500, Performance Development
     version_producer: Google Sheet
     url_main: https://www.top500.org/statistics/perfdevel/
     url_download: |-
