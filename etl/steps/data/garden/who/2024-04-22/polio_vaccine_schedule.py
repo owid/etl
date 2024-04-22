@@ -61,7 +61,7 @@ def categorize_schedule(row):
 
     if has_opv:
         if has_ipv_or_ipvf:
-            return "Both"  # 'IPV' in ipv/ipvf and 'OPV' in opv
+            return "Both IPV and OPV"  # 'IPV' in ipv/ipvf and 'OPV' in opv
         else:
             return "OPV"  # Only 'OPV' in opv
     else:

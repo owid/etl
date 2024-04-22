@@ -17,7 +17,7 @@ tables:
     variables:
       vaccine_schedule:
         title: Polio vaccine schedule
-        description_short: The type of polio vaccines used in each country.
+        description_short: "The type of polio vaccines used in the national immunization schedule in each country: only inactivated poliovirus vaccines (IPV), oral poliovirus vaccines (OPV), or both."
         unit: ""
         display:
           numDecimalPlaces: 0
