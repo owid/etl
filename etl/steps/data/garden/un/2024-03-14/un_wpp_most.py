@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import cast
 
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -65,7 +65,7 @@ def create_ten_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.age != "0-4") & (tb.age != "5-9") & (tb.age != "10-14") & (tb.age != "15-19")]
     # Concatenate the 0-9 and 10-19 age groups with the original table
     tb = pr.concat([tb, tb_0_9, tb_10_19])
-
+    tb = tb.reset_index(drop=True)
     return tb
 
 
@@ -81,9 +81,10 @@ def create_five_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.sex == "all") & (tb.metric == "population") & (tb.variant == "estimates") & (tb.age.isin(age_bands))]
     assert tb["age"].nunique() == len(age_bands), "Age groups are not as expected"
     tb = tb.drop(columns=["metric", "sex", "variant"])
+    tb = tb.reset_index(drop=True)
     return tb
 
 
 # Function to apply to each group to find the age group with the largest population
 def get_largest_age_group(group):
-    return group.loc[group["value"].idxmax(observed=False)]
+    return group.loc[group["value"].idxmax()]
