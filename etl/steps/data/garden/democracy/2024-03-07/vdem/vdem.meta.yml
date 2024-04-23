@@ -284,7 +284,7 @@ tables:
     common:
       description_processing: |-
         <% if aggregate_method == 'average' %>
-        The regional aggregates (including values for World) have been estimated by averaging the country values.
+        The regional aggregates (including values for the World) have been estimated by averaging the country values.
         <% elif aggregate_method < 'population-weighted average' %>
         The regional aggregates (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2022 revision dataset.
         <% endif %>
@@ -349,7 +349,7 @@ tables:
         description_from_producer: |-
           Question: To what extent is the ideal of participatory democracy achieved?
 
-          Clarification: The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies. To make it a measure of participatory democracy, the index also takes the level of electoral democracy into account.
+          Clarification: The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies. To make it a measure of participatory democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
 
@@ -403,13 +403,13 @@ tables:
 
           Please make your best estimate, based upon what is known or suspected to be true.
 
-          For reasons of consistency, as of December, 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
+          For reasons of consistency, as of December 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
 
           Responses:
           0: Commonly. Most legislators probably engage in these activities.
           1: Often. Many legislators probably engage in these activities.
           2: Sometimes. Some legislators probably engage in these activities.
-          3: Very occasionally. There may be a few legislators who engage in these activities but the vast majority do not.
+          3: Very occasionally. There may be a few legislators who engage in these activities, but the vast majority do not.
           4: Never, or hardly ever.
 
           Indicator name: `v2lgcrrpt`
@@ -442,7 +442,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Notes: For reasons of consistency, as of December, 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
+          Notes: For reasons of consistency, as of December 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
 
           Indicator name: `v2jucorrdc`
         unit: ''
@@ -554,7 +554,7 @@ tables:
         title: |-
           Equality of political power across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
+          << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics or have similar political power.
         description_from_producer: |-
           Question: Is political power distributed according to social groups?
 
@@ -575,7 +575,7 @@ tables:
         title: |-
           Presidentialism index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral managementbody, and other oversight.
+          << estimate.title() >> estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral management body, and other oversight.
         description_from_producer: |-
           Question: To what extent is the regime characterized by presidentialism?
 
@@ -608,7 +608,7 @@ tables:
         title: |-
           Private civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
+          << estimate.title() >> estimate the extent to which people are free from forced labor, have property rights, and enjoy freedom of movement and religion.
         description_from_producer: |-
           Question: To what extent are private liberties respected?
 
@@ -802,7 +802,7 @@ tables:
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
       accessjust_m_row:
         title: Access to justice for men (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether men have access to justice or not.
+        description_short: << estimate.title() >> estimate whether men have access to justice.
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
 
@@ -828,7 +828,7 @@ tables:
       # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
       accessjust_w_row:
         title: Access to justice for women (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether women have access to justice or not.
+        description_short: << estimate.title() >> estimate whether women have access to justice.
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
 
@@ -855,7 +855,7 @@ tables:
       civsoc_particip_vdem:
         title: Civil society participation index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which major civil society organization are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
+          << estimate.title() >> estimate of the extent to which major civil society organizations are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
 
@@ -1013,7 +1013,7 @@ tables:
       electmulpar_row:
         title: Multiparty elections (<< estimate >> estimate) (re-estimate)
         description_short: |-
-          << estimate.title() >> estimate of whether national multi-party elections were held or not.
+          << estimate.title() >> estimate whether national multi-party elections were held.
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
 
@@ -1089,7 +1089,7 @@ tables:
       equal_res_vdem:
         title: Equal resource distribution index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state.
+          << estimate.title() >> estimate of the extent to which all social groups benefit from public spending and have equal access to education, healthcare, and the welfare state.
         description_from_producer: |-
           Question: How equal is the distribution of resources?
 
@@ -1104,7 +1104,7 @@ tables:
       freeassoc_vdem:
         title: Freedom of association thick index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections, and the extent to which civil society organizations are allowed to form and operate freely.
+          << estimate.title() >> estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections and the extent to which civil society organizations are allowed to form and operate freely.
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
@@ -1117,7 +1117,7 @@ tables:
       freeexpr_vdem:
         title: Freedom of Expression and Alternative Sources of Information index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people can discuss political matters at home and in the public sphere, the press and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
+          << estimate.title() >> estimate of the extent to which people can discuss political matters at home and in the public sphere, the press, and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
         description_from_producer: |-
           Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
 
@@ -1132,7 +1132,7 @@ tables:
       indiv_libs_vdem:
         title: Equality before the law and individual liberty index (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent and public administration is impartial.
+          << estimate.title() >> estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent, and public administration is impartial.
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 
@@ -1158,7 +1158,7 @@ tables:
       justcomgd_polch_vdem:
         title: Common good justifications (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people, or as helping the least advantaged people in society when considering important policy changes.
+          << estimate.title() >> estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people or as helping the least advantaged people in society when considering important policy changes.
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
 
@@ -1241,7 +1241,7 @@ tables:
       locelect_vdem:
         title: Elected local governments (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which elected local governments exist and they operate without interference from local unelected bodies.
+          << estimate.title() >> estimate of the extent to which elected local governments exist, and they operate without interference from local unelected bodies.
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
 
@@ -1272,7 +1272,7 @@ tables:
       regelect_vdem:
         title: Elected regional governments (<< estimate >> estimate)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which elected regional governments exist and they operate without interference from regional unelected bodies.
+          << estimate.title() >> estimate of the extent to which elected regional governments exist, and they operate without interference from regional unelected bodies.
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
 
@@ -1287,7 +1287,7 @@ tables:
       soccons_polch_vdem:
         title: "Engaged society (<< estimate >> estimate)"
         description_short: |-
-          << estimate.title() >> estimate of the extent to which ordinary people independently discuss considered important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
+          << estimate.title() >> estimate of the extent to which ordinary people independently discuss important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
 
