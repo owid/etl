@@ -7,6 +7,7 @@ definitions:
         - Eradication of Diseases
     unit: "current US$"
     short_unit: "$"
+    processing_level: minor
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -47,7 +48,7 @@ tables:
         display:
           numDecimalPlaces: 0
       total:
-        title: Total
+        title: Total funding for Global Polio Eradication Initiative
         description_short: "Total funding for polio eradication."
         display:
           numDecimalPlaces: 0

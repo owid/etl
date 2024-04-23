@@ -6,6 +6,16 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+CONTRIBUTORS = [
+    "domestic_resources",
+    "g7_countries__and__european_commission",
+    "multilateral_sector",
+    "non_g7_oecd_countries",
+    "other_donor_countries",
+    "private_sector__non_governmental_donors",
+]
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -18,16 +28,8 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    tb["total"] = tb[
-        [
-            "domestic_resources",
-            "g7_countries__and__european_commission",
-            "multilateral_sector",
-            "non_g7_oecd_countries",
-            "other_donor_countries",
-            "private_sector__non_governmental_donors",
-        ]
-    ].sum(axis=1)
+    assert all(col in tb.columns for col in CONTRIBUTORS), "Missing columns in the table."
+    tb["total"] = tb[CONTRIBUTORS].sum(axis=1)
     tb["total"] = tb["total"].copy_metadata(tb["domestic_resources"])
     tb = tb.format(["country", "year"])
 

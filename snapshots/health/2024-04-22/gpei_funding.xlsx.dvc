@@ -4,14 +4,14 @@ meta:
   origin:
     # Data product / Snapshot
     title: GPEI Historical Contributions
-    date_published: "2022-12-31"
+    description: This dataset shows an overall summary of the financial contributions to the Global Polio Eradication Initiative received over the last 35 years.
+    date_published: "2023-11-01"
 
     # Citation
     producer: Global Polio Eradication Initiative
     citation_full: |-
       Historical Contributions, Global Polio Eradication Initiative (2022)
     attribution_short: GPEI
-
     # Files
     url_main: https://polioeradication.org/financing/donors/historical-contributions/
     date_accessed: 2024-04-22
