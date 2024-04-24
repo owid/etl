@@ -29,7 +29,8 @@ def run(dest_dir: str) -> None:
         tb_pop_filter = tb_pop_filter.dropna()
         tb_pop_filter = tb_pop_filter.reset_index(drop=True)
         tb_pop_filter = tb_pop_filter.set_index(["location", "year"], verify_integrity=True)
-        tb_pop_filter.metadata.shortname = f"population_{age_group}_year_age_groups"
+        tb_pop_filter = tb_pop_filter.copy_metadata(tb_pop)
+        tb_pop_filter.metadata.short_name = f"population_{age_group}_year_age_groups"
         tb_list.append(tb_pop_filter)
     # Save outputs.
     #
@@ -65,6 +66,7 @@ def create_ten_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.age != "0-4") & (tb.age != "5-9") & (tb.age != "10-14") & (tb.age != "15-19")]
     # Concatenate the 0-9 and 10-19 age groups with the original table
     tb = pr.concat([tb, tb_0_9, tb_10_19])
+    tb = tb.rename(columns={"age": "age_group"})
     tb = tb.reset_index(drop=True)
     return tb
 
