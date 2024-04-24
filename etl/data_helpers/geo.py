@@ -315,7 +315,9 @@ def add_region_aggregates(
     countries_in_region : list or None
         List of countries that are members of this region. None to load them from countries-regions dataset.
     index_columns : Optional[List[str]], default: None
-        Names of index columns (usually ["country", "year"]) to group by.
+        Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
+        columns (excluding the country column). A country and a year column should always be included.
+        But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
     countries_that_must_have_data : list or None or str
         * If a list of countries is passed, those countries must have data for a particular variable and year. If any of
           those countries is not informed on a particular variable and year, the region will have nan for that particular
@@ -440,7 +442,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)
 
     # If the original was Table, copy metadata
     if isinstance(df, Table):
@@ -1075,7 +1077,9 @@ def add_regions_to_table(
           only nans for "column_4".
         * If None, "sum" will be assumed to all variables.
     index_columns : Optional[List[str]], default: None
-        Names of index columns (usually ["country", "year"]) to group by.
+        Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
+        columns (excluding the country column). A country and a year column should always be included.
+        But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
     num_allowed_nans_per_year : Optional[int], default: None
         * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
           year. If that number of nans is exceeded, the aggregate will be nan.
