@@ -17,6 +17,7 @@ def run(dest_dir: str) -> None:
 
     age_group_size = [5, 10]
     tb_list = []
+    tb_pop_filter = Table()
     for age_group in age_group_size:
         # filter data for just sex = all, metrics = population, variant = estimates
         if age_group == 5:
