@@ -162,3 +162,5 @@ steps:
     - snapshot://fasttrack/2024-04-17/qubits.csv
   data://grapher/fasttrack/latest/pig_production_bartlett:
     - snapshot://fasttrack/latest/pig_production_bartlett.csv
+  data://grapher/fasttrack/2024-04-22/supercomputers:
+    - snapshot://fasttrack/2024-04-22/supercomputers.csv

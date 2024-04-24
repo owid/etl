@@ -218,7 +218,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             # Show only first 100 variables to map (otherwise app crashes)
             if len(suggestions) > LIMIT_VARS_TO_MAP:
                 st.warning(
-                    f"Too many variables to map! Showing only the first {LIMIT_VARS_TO_MAP}. If you want to map more variables, do it in batches. That is, first map this batch and approve the generated chart revisions in admin. Once you are done, run this app again. Make sure you have approved the previously generated revisions!"
+                    f"Too many variables to map ({len(suggestions)})! Showing only the first {LIMIT_VARS_TO_MAP}. If you want to map more variables, do it in batches. That is, first map this batch and approve the generated chart revisions in admin. Once you are done, run this app again. Make sure you have approved the previously generated revisions!"
                 )
                 suggestions = suggestions[:LIMIT_VARS_TO_MAP]
 
@@ -313,6 +313,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
 def show_explore_df(df_data, variable_old, variable_new, variable_id_to_display, element_check) -> None:
     if element_check:  # type: ignore
         with st.container(border=True):
+            # plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
             try:
                 plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
             except Exception:
@@ -363,9 +364,15 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
     df_variables.loc[:, "value"] = df_variables.value.astype(float)
     # Reshape dataframe
     df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
-    df_variables["Relative difference (abs, %)"] = (
-        (100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]).round(2)
+    mask = df_variables[variable_old] == 0
+    df_variables.loc[~mask, "Relative difference (abs, %)"] = (
+        (
+            100
+            * (df_variables.loc[~mask, variable_old] - df_variables.loc[~mask, variable_new])
+            / df_variables.loc[~mask, variable_old]
+        ).round(2)
     ).abs()
+    df_variables.loc[mask, "Relative difference (abs, %)"] = float("inf")
     df_variables = df_variables.rename(columns=var_id_to_display).sort_values(
         "Relative difference (abs, %)", ascending=False
     )
@@ -386,13 +393,15 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     # st.write(countries)
     # if countries:
     #     df_variables = df_variables[df_variables["entityName"].isin(countries)]
-    score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 1)
+    relative_diff = df_variables["Relative difference (abs, %)"]
+    relative_diff.loc[relative_diff == float("inf")] = float("nan")
+    score = round(100 - relative_diff.mean(), 1)
     if score == 100:
-        score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 2)
+        score = round(100 - relative_diff.mean(), 2)
         if score == 100:
-            score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 3)
+            score = round(100 - relative_diff.mean(), 3)
             if score == 100:
-                score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 4)
+                score = round(100 - relative_diff.mean(), 4)
     num_nan_score = df_variables["Relative difference (abs, %)"].isna().sum()
 
     nrows_0 = df_variables.shape[0]

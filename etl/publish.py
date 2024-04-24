@@ -299,7 +299,6 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
 
 def connect_s3(s3_config: Optional[Config] = None) -> Any:
     session = boto3.Session()
-    # if R2_ACCESS_KEY and R2_SECRET_KEY are null, we use credentials from ~/.aws/config
     return session.client(
         "s3",
         region_name=config.R2_REGION_NAME,

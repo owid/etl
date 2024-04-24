@@ -25,6 +25,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 YEAR = 2024
 
 TB_REGIONS = find(table="regions", dataset="regions").iloc[0].load().reset_index()
+TB_REGIONS = TB_REGIONS[TB_REGIONS.defined_by == "owid"]
 COUNTRIES = {code: name for code, name in zip(TB_REGIONS["code"], TB_REGIONS["name"])}
 
 GWIS_SPECIFIC = {
