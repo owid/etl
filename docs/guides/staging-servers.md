@@ -13,7 +13,7 @@ Dedicated staging servers are automatically created from every ETL pull request.
 
     For more details, refer to the [python code](https://github.com/owid/etl/blob/master/apps/staging_sync/cli.py#L284) generating `<branch>` from the branch name.
 
-Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 24 hours after the PR is merged, then the staging server will be destroyed.
+Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 7 days after the PR is merged, then the staging server will be destroyed.
 
 ```mermaid
 sequenceDiagram
@@ -26,15 +26,47 @@ sequenceDiagram
     PR ->>+ SSB: New Commit
     SSB -->>- SSB: Bake & run ETL
     PR ->> SSB: Merge PR
-    Note right of PR: Schedule Destruction in 1 day
+    Note right of PR: Schedule Destruction in 7 days
     SSB ->> live: etl chart-sync
     Note left of live: Sync all charts
     PR ->> SSB: Destroy server
 ```
 
-## Staging Sync Workflow
+## Creating a new dataset
 
-Once the work is merged, data manager should run `etl chart-sync` to migrate all charts to the live site. This command will sync all charts from staging to live as either draft charts or revisions.
+When creating a new dataset, the manager creates a PR with a staging server and then creates charts on it. Once the work is done and merged, the manager should sync all charts to production.
+
+
+```mermaid
+sequenceDiagram
+    Local ->> Staging: New dataset
+    Staging ->> Charts staging: create charts
+    Staging ->> Prod: Merge
+    Charts staging ->> Charts prod: chart-sync
+```
+
+
+## Updating a dataset
+
+When updating a dataset, the workflow is slightly more complex. In addition to creating a PR with a staging server, data manager has to map variables from the old dataset to the new one in staging, which will create revisions. These revisions have to be approved then. After merging, running `chart-sync` would sync all changes to production where the charts must be approved again (or you could automatically approve them).
+
+```mermaid
+sequenceDiagram
+    Local ->> Staging: New dataset version
+    Staging ->> Charts staging: chart-upgrader
+    Note right of Staging: Map variables from old to new charts
+    Charts staging ->> Charts staging: chart-revisions
+    Note right of Charts staging: Approve revisions
+    Staging ->> Prod: Merge
+    Charts staging ->> Charts prod: chart-sync
+    Charts prod ->> Charts prod: chart-revisions
+    Note right of Charts prod: Approve revisions
+```
+
+
+## chart-sync
+
+`etl chart-sync` tool is used to sync charts from staging to production. It's gonna take all changed charts from the staging server and migrate them to production as either draft charts or revisions.
 
 ```mermaid
 sequenceDiagram
@@ -42,7 +74,7 @@ sequenceDiagram
     participant NewChart as New Chart
     participant UpdatedChart as Updated Chart
     end
-    box Live
+    box Production
     participant ChartRevision as Suggested Chart Revisions
     participant Draft as Draft
     participant PublishedChart as Published Chart
@@ -54,12 +86,12 @@ sequenceDiagram
 
     # Updated charts process
     UpdatedChart->>ChartRevision: Updates added as revisions
-    Note over UpdatedChart, ChartRevision: Warn if chart has been modified on live
+    Note over UpdatedChart, ChartRevision: Warn if chart has been modified in prod
     ChartRevision->>PublishedChart: Approve revision (manual)
 
     # Updated charts with revisions, useful for population updates
     UpdatedChart->>PublishedChart: Updates with approved revision on staging are applied directly (with --approve-revisions flag)
-    Note over UpdatedChart, PublishedChart: Submit revision if chart has been modified on live
+    Note over UpdatedChart, PublishedChart: Submit revision if chart has been modified in prod
 ```
 
 !!! info "Run `etl chart-sync --help` for more details"

@@ -228,11 +228,4 @@ This will list all the folders and directories in the project. Find a brief expl
 | `tests/`    | ETL library tests. |
 | `lib/`    | Other OWID sub-packages. |
 | `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
-| `.dvc/`, `.dvcignore`       | DVC config folder and file.  |
 | `Makefile`, `default.mk`    | `make`-related files. |
-
-*[DVC]: Data Version Control
-
-## Grapher
-
-To test import datasets to the Grapher locally, you need to set your Grapher working environment first. For this, follow this [guide](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
