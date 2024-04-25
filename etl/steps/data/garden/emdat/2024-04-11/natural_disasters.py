@@ -24,12 +24,14 @@ paths = PathFinder(__file__)
 # We therefore ignore Extra-terrestrial (of which there is just one meteorite impact event) and Biological subgroups.
 # For completeness, add all existing types here, and rename them as np.nan if they should not be used.
 # If new types are included on a data update, simply add them here.
+EARTHQUAKES_TYPE = "Earthquake"
+EXTREME_TEMPERATURE_TYPE = "Extreme temperature"
 EXPECTED_DISASTER_TYPES = {
     "Animal incident": np.nan,
     "Drought": "Drought",
-    "Earthquake": "Earthquake",
+    "Earthquake": EARTHQUAKES_TYPE,
     "Epidemic": np.nan,
-    "Extreme temperature": "Extreme temperature",
+    "Extreme temperature": EXTREME_TEMPERATURE_TYPE,
     "Flood": "Flood",
     "Fog": "Fog",
     "Glacial lake outburst flood": "Glacial lake outburst flood",
@@ -81,8 +83,10 @@ COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 # Variables to calculate per 100,000 people.
 VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not in COST_VARIABLES] + ["n_events"]
 
-# New natural disaster type corresponding to the sum of all disasters.
+# New natural disaster types corresponding to the sum of all disasters, and the sum of all disasters excluding certain types.
 ALL_DISASTERS_TYPE = "all_disasters"
+ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE = "all_disasters_excluding_earthquakes"
+ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE = "all_disasters_excluding_extreme_temperature"
 
 # Aggregate regions to add, following OWID definitions.
 REGIONS = {
@@ -414,15 +418,45 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
 
 
 def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
-    """Add a new disaster type that has the impact of all other disasters combined."""
+    """Add a new disaster type that has the impact of all other disasters combined.
+
+    Among big disaster years, the majority of deaths are the result of earthquakes.
+    Hence, we create an indicator of deaths from all disasters excluding earthquakes.
+
+    EM-DAT may not be very complete or accurate when counting extreme heat deaths.
+    It's almost exclusively Europe that is covered.
+    Hence, we create an additional indicator excluding extreme heat, so comparisons across regions are more equal.
+
+    """
+    # Add indicators for all disasters combined.
     all_disasters = (
-        tb.groupby(["country", "year"], observed=True)
+        tb.groupby(["country", "year"], observed=True, as_index=False)
         .sum(numeric_only=True, min_count=1)
         .assign(**{"type": ALL_DISASTERS_TYPE})
-        .reset_index()
     )
+
+    # Add indicators for all disasters combined excluding earthquakes.
+    all_disasters_excluding_earthquakes = (
+        tb[tb["type"] != EARTHQUAKES_TYPE]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE})
+    )
+
+    # Add indicators for all disasters combined excluding extreme temperature.
+    all_disasters_excluding_extreme_temperature = (
+        tb[tb["type"] != EXTREME_TEMPERATURE_TYPE]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE})
+    )
+
+    # Concatenate original data with new indicators.
     tb = (
-        pr.concat([tb, all_disasters], ignore_index=True)
+        pr.concat(
+            [tb, all_disasters, all_disasters_excluding_earthquakes, all_disasters_excluding_extreme_temperature],
+            ignore_index=True,
+        )
         .sort_values(["country", "year", "type"])
         .reset_index(drop=True)
     )
@@ -517,11 +551,15 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
         "List of expected disaster types has changed. "
         "Consider updating EXPECTED_DISASTER_TYPES (or renaming ALL_DISASTERS_TYPE)."
     )
-    expected_disaster_types = [ALL_DISASTERS_TYPE] + [
-        utils.underscore(EXPECTED_DISASTER_TYPES[disaster])
-        for disaster in EXPECTED_DISASTER_TYPES
-        if not pd.isna(EXPECTED_DISASTER_TYPES[disaster])
-    ]
+    expected_disaster_types = (
+        [ALL_DISASTERS_TYPE]
+        + [
+            utils.underscore(EXPECTED_DISASTER_TYPES[disaster])
+            for disaster in EXPECTED_DISASTER_TYPES
+            if not pd.isna(EXPECTED_DISASTER_TYPES[disaster])
+        ]
+        + [ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE, ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE]
+    )
     assert set(tb["type"]) == set(expected_disaster_types), error
 
     columns_that_should_not_have_nans = [
@@ -557,7 +595,19 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
             (tb["country"] == "World") & (tb["year"] == year_to_check) & (tb["type"] == ALL_DISASTERS_TYPE)
         ].reset_index(drop=True)
         all_disasters_check = (
-            tb[(tb["country"].isin(all_countries)) & (tb["year"] == year_to_check) & (tb["type"] != ALL_DISASTERS_TYPE)]
+            tb[
+                (tb["country"].isin(all_countries))
+                & (tb["year"] == year_to_check)
+                & (
+                    ~tb["type"].isin(
+                        [
+                            ALL_DISASTERS_TYPE,
+                            ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE,
+                            ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE,
+                        ]
+                    )
+                )
+            ]
             .groupby("year")
             .sum(numeric_only=True)
             .reset_index()
