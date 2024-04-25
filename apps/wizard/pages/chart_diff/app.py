@@ -17,7 +17,7 @@ CURRENT_DIR = Path(__file__).resolve().parent
 SOURCE_ENV = "staging-site-mojmir"
 TARGET_ENV = "staging-site-mojmir"
 
-st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
+# st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
 
 
 ########################################
@@ -38,7 +38,7 @@ def get_modified_chart_ids():
         2001,
         2002,
         2003,
-        2005,
+        4005,
     ]
     return chart_ids
 
@@ -49,6 +49,10 @@ def get_new_chart_ids():
         3001,
     ]
     return chart_ids
+
+
+def get_modified_explorers():
+    return []
 
 
 def compare_charts(
@@ -62,15 +66,15 @@ def compare_charts(
 
     with col1:
         # st.selectbox(label="version", options=["Source"], key=f"selectbox-left-{identifier}")
-        if not prod_is_newer:
+        if prod_is_newer:
             st.markdown("Production :red[(⚠️was modified)]")
         else:
-            st.markdown("Production")
+            st.markdown(f"Production   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
         chart_html(source_chart.config)
 
     with col2:
         # st.selectbox(label="version", options=["Target"], key=f"selectbox-right-{identifier}")
-        st.markdown("New version")
+        st.markdown(f"New version   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
         chart_html(target_chart.config)
 
 
@@ -95,12 +99,27 @@ def update_expander(chart_id, title):
     }
 
 
+def update_revision_state(chart_id, slug):
+    # TODO: Update approval status (in database)
+
+    # Update expander display
+    update_expander(
+        chart_id=chart_id,
+        title=slug,
+    )
+
+
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
 
     source_engine, target_engine = get_engines()
 
     chart_ids_modified = get_modified_chart_ids()
+    chart_ids_new = get_new_chart_ids()
+    # explorers_modified = get_modified_explorers()
+
+    st.markdown(f"There are {len(chart_ids_modified)} chart updates, {len(chart_ids_new)} new charts.")
+
     st.session_state.expanders = st.session_state.get(
         "expanders",
         {
@@ -108,14 +127,15 @@ def main():
                 "label": "",
                 "expanded": True,
             }
-            for chart_id in chart_ids_modified
+            for chart_id in [*chart_ids_modified, *chart_ids_new]
         },
     )
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # MODIFIED CHARTS
-            st.markdown(f"{len(chart_ids_modified)} charts modified in {SOURCE_ENV}")
+            st.header("Modified charts")
+            st.markdown(f"{len(chart_ids_modified)} charts modified in `{SOURCE_ENV}`")
             for chart_id in chart_ids_modified:
                 with st.expander(
                     label=st.session_state.expanders[chart_id]["label"],
@@ -125,12 +145,10 @@ def main():
                     source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
                     target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
 
-                    # with st.expander(label=f"## {slug}", expanded=True):
-
                     st.toggle(
-                        label="Approve chart",
+                        label="Approve new chart version",
                         key=f"toggle-{chart_id}",
-                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(
+                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_revision_state(
                             chart_id=chart_id,
                             title=target_chart.config["slug"],
                         ),
@@ -139,19 +157,32 @@ def main():
                     compare_charts(source_chart, target_chart)
 
                     # Update list
-                    st.session_state.chart_approval_list.append(
-                        {
-                            "id": target_chart.id,
-                            "approved": False,
-                            "updated": target_chart.updatedAt,
-                        }
-                    )
+                    # st.session_state.chart_approval_list.append(
+                    #     {
+                    #         "id": target_chart.id,
+                    #         "approved": False,
+                    #         "updated": target_chart.updatedAt,
+                    #     }
+                    # )
 
             # NEW CHARTS
-            st.markdown(f"{len(chart_ids_modified)} new charts in {SOURCE_ENV}")
+            st.header("New charts")
+            st.markdown(f"{len(chart_ids_new)} new charts in `{SOURCE_ENV}`")
             chart_ids_new = get_new_chart_ids()
             for chart_id in chart_ids_new:
-                chart_html(source_chart.config)
+                with st.expander(
+                    label=st.session_state.expanders[chart_id]["label"],
+                    expanded=st.session_state.expanders[chart_id]["expanded"],
+                ):
+                    st.toggle(
+                        label="Approve new chart",
+                        key=f"toggle-{chart_id}",
+                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(
+                            chart_id=chart_id,
+                            title=target_chart.config["slug"],
+                        ),
+                    )
+                    chart_html(source_chart.config)
 
 
 # if __name__ == "__main__":
