@@ -1,0 +1,35 @@
+dataset:
+  title: DRAFT Joe PhD matching_wid_pip_estimates_1993_2018
+  description: ''
+  licenses:
+    - {}
+tables:
+  joe_phd_short_period:
+    variables:
+      region:
+        title: region
+        unit: ''
+      gini_pip_disposable_percapita:
+        title: gini_pip_disposable_perCapita
+        unit: ''
+      gini_wid_pretaxnational_peradult:
+        title: gini_wid_pretaxNational_perAdult
+        unit: ''
+      headcountratio50median_pip_disposable_percapita:
+        title: headcountRatio50Median_pip_disposable_perCapita
+        unit: ''
+      headcountratio50median_wid_pretaxnational_peradult:
+        title: headcountRatio50Median_wid_pretaxNational_perAdult
+        unit: ''
+      p90p100share_pip_disposable_percapita:
+        title: p90p100Share_pip_disposable_perCapita
+        unit: ''
+      p90p100share_wid_pretaxnational_peradult:
+        title: p90p100Share_wid_pretaxNational_perAdult
+        unit: ''
+      p99p100share_pip_disposable_percapita:
+        title: p99p100Share_pip_disposable_perCapita
+        unit: ''
+      p99p100share_wid_pretaxnational_peradult:
+        title: p99p100Share_wid_pretaxNational_perAdult
+        unit: ''

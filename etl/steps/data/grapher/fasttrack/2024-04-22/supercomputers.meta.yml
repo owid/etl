@@ -1,0 +1,21 @@
+dataset:
+  title: TOP500 Supercomputer Database
+  description: ''
+  licenses:
+    - {}
+  update_period_days: '365'
+tables:
+  supercomputers:
+    variables:
+      gigaflops:
+        title: Floating-Point Operations per Second (GFLOPS)
+        unit: gigaFLOPS
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          The Top500 list the 500 fastest computer system being used today. In 1993 the collection was started and has been updated every 6 months since then. The report lists the sites that have the 500 most powerful computer systems installed. The best Linpack benchmark performance achieved is used as a performance measure in ranking the computers. The TOP500 list has been updated twice a year since June 1993.
+
+          The Linpack Benchmark is a measure of a computer’s floating-point rate of execution. It is determined by running a computer program that solves a dense system of linear equations. The paper “The LINPACK Benchmark: Past, Present, and Future” by Jack Dongarra, Piotr Luszczek, and Antoine Petitet provides a look at the details of the benchmark and provides performance data in graphics form for a number of machines on basic operations. A copy of the paper is available at http://www.netlib.org/utk/people/JackDongarra/PAPERS/hpl.pdf
+        processing_level: minor
+        description: |-
+          The number of floating-point operations carried out per second by the fastest supercomputer in any given year. This is expressed in gigaFLOPS, equivalent to 10⁹ floating-point operations per second.
