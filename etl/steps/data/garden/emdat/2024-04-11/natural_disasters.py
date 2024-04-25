@@ -12,8 +12,6 @@ from owid.catalog import Dataset, Table, Variable, utils
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
-
-# Temporary imports (while add_regions_to_table is not directly imported from geo).
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
