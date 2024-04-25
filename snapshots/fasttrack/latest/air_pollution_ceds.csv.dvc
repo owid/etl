@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Community Emissions Data System (CEDS) 2024.
+    title: air_pollution_ceds
+    citation_full: Community Emissions Data System (CEDS) based on Hoesly et al. (2018)
+    version_producer: Google Sheet
+    url_main: https://github.com/JGCRI/CEDS/tree/master
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_JxvLykZk1u5cL9yorygGDm8_oqsyO9uyxHM1HUbMJS35n3gIeMrXUTPnSBgHM5FbkaL2x_ajQ5ta/pub?output=csv
+    date_accessed: '2024-04-25'
+  name: Air pollution emissions (CEDS, 2024)
+  description: Emissions of air pollutants since 1750.
+  license: {}
+outs:
+  - md5: e7e3a7bc5b19d675892113b90aa504f1
+    size: 7352448
+    path: air_pollution_ceds.csv

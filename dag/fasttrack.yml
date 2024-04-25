@@ -166,3 +166,5 @@ steps:
     - snapshot://fasttrack/2024-04-22/supercomputers.csv
   data-private://grapher/fasttrack/2024-04-25/joe_phd_short_period:
     - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds:
+    - snapshot://fasttrack/latest/air_pollution_ceds.csv

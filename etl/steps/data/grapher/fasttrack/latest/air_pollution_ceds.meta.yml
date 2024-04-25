@@ -1,0 +1,106 @@
+dataset:
+  title: Air pollution emissions (CEDS, 2024)
+  description: Emissions of air pollutants since 1750.
+  licenses:
+    - {}
+tables:
+  air_pollution_ceds:
+    variables:
+      nox:
+        title: NOx
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Nitrogen oxides (NOx) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOx gases can have negative impacts on respiratory health. NOx gases can also lead to the formation of ozone – another air pollutant.
+      so2:
+        title: SO2
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
+      co:
+        title: CO
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
+      oc:
+        title: OC
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Organic carbon molecules are formed from the incomplete burning of organic materials. This can come from the burning of fossil fuels (which are carbon-based organic material) or biomass. Organic carbon aerosols can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon molecules can contribute to particulate matter pollution, with negative impacts on human health.
+      nmvoc:
+        title: NMVOC
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
+      bc:
+        title: BC
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
+      nh3:
+        title: NH3
+        unit: tonnes
+        short_unit: t
+        description: |-
+          Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
+      nox_per_capita:
+        title: nox_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: NOx
+        description: |-
+          Nitrogen oxides (NOx) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOx gases can have negative impacts on respiratory health. NOx gases can also lead to the formation of ozone – another air pollutant.
+      so2_per_capita:
+        title: so2_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: SO2
+        description: |-
+          Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
+      co_per_capita:
+        title: co_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: CO
+        description: |-
+          Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
+      oc_per_capita:
+        title: oc_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: OC
+        description: |-
+          Organic carbon molecules are formed from the incomplete burning of organic materials. This can come from the burning of fossil fuels (which are carbon-based organic material) or biomass. Organic carbon aerosols can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon molecules can contribute to particulate matter pollution, with negative impacts on human health.
+      nmvoc_per_capita:
+        title: nmvoc_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: NMVOC
+        description: |-
+          Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
+      bc_per_capita:
+        title: bc_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: BC
+        description: |-
+          Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
+      nh3_per_capita:
+        title: nh3_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          name: NH3
+        description: |-
+          Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
