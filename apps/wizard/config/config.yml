@@ -93,10 +93,10 @@ sections:
       - title: "Chart Diff"
         alias: chart_diff
         entrypoint: pages/chart_diff/app.py
-        description: Chart diff.
+        description: Chart differences
         maintainer: "@mojmir"
-        emoji: "🔄"
-        image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+        emoji: "⚡"
+        image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
 
   - title: "Dashboard"
     description: |-
