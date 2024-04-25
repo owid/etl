@@ -590,32 +590,28 @@ def enable_bugsnag_for_streamlit():
 
 
 def chart_html(chart_config: Dict[str, Any], height=500, **kwargs):
-    HTML = """
+    HTML = f"""
     <!DOCTYPE html>
     <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link
-        href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-        rel="stylesheet"
-        />
-        <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    </head>
-    <body class="StandaloneGrapherOrExplorerPage">
-        <main>
-        <figure data-grapher-src>
-        </figure>
-        </main>
-        <div class="site-tools"></div>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6,fetch,URL,IntersectionObserver,IntersectionObserverEntry"></script>
-        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-        <script type="module">
-            var jsonConfig =
-            window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-        </script>
-    </body>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link
+            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+            rel="stylesheet"
+            />
+            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+        </head>
+        <body class="StandaloneGrapherOrExplorerPage">
+            <main>
+                <figure data-grapher-src></figure>
+            </main>
+            <div class="site-tools"></div>
+            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+            <script type="module">
+                var jsonConfig = {json.dumps(chart_config)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            </script>
+        </body>
     </html>
     """
 
-    chart_html = HTML.replace("var jsonConfig =", f"var jsonConfig = {json.dumps(chart_config)}")
-    components.html(chart_html, height=height, **kwargs)
+    components.html(HTML, height=height, **kwargs)
