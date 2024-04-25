@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: World Bank and World Inequality Lab
+    title: A combined dataset of inequality data from the World Bank and the World Inequality Lab
+    version_producer: Google Sheet
+    url_download: |-
+      gAAAAABmKm9grq5vW0uovbePCvGUU3mIGJmMucpnI21id9dEIIUEsQ6mmDgg8lbtiMxBjtZo0e5r_j1p-tP9LX20n69NLNllDjkxSWWswVp_j3ZD7uqEqytTXVNSKztjvANBl02hS3vj1C6xigvT-czSo4rxLYMfWT9H1Lvpjg17IzNPb4i7UVf9cxv9USgk-shxIT3cnt-UYuNOrt5n4yvejwTwpj-vKajPbNuqHsZSSuIAOtTjXdzjJk-doXfli7tZpBmqGzIA
+    date_accessed: '2024-04-25'
+  name: DRAFT Joe PhD matching_wid_pip_estimates_1993_2018
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 3892459cd5d23d00234c677d680338be
+    size: 16537
+    path: joe_phd_short_period.csv
