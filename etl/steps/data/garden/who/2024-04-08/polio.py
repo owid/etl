@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -32,7 +33,7 @@ def run(dest_dir: str) -> None:
     snap_cvdpv = paths.load_snapshot("gpei.csv")
     tb_cvdpv = snap_cvdpv.read()
     # Dropping this as the total_cvdpv is also in the polio_afp table and has more historical data
-    tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
+    # tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     tb_regions = ds_regions["regions"].reset_index()
@@ -51,13 +52,18 @@ def run(dest_dir: str) -> None:
     # Remove values > 100% for "Adequate stool collection".
     tb = clean_adequate_stool_collection(tb)
     # Add total cases
-    tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
+    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
+    # for years after 2016 use GPEI cvdpv data
+    tb["combined_cvdpv"] = np.where((tb["year"] >= 2016), tb["total_cvdpv"], tb["cvdpv_cases"])
+    tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
+
+    tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["combined_cvdpv"]
     # Need to deal with overlapping years
     tb = pr.concat([tb_hist, tb], axis=0)
     tb = harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
+
     # Add region aggregates.
     tb_reg = add_regions_to_table(
         tb[
@@ -66,7 +72,7 @@ def run(dest_dir: str) -> None:
                 "year",
                 "afp_cases",
                 "wild_poliovirus_cases",
-                "cvdpv_cases",
+                "combined_cvdpv",
                 "total_cases",
                 "cvdpv1",
                 "cvdpv2",
@@ -111,7 +117,7 @@ def add_cases_per_million(tb: Table, tb_population: Table) -> Table:
     cols_to_divide = [
         "afp_cases",
         "wild_poliovirus_cases",
-        "cvdpv_cases",
+        "combined_cvdpv",
         "total_cases",
         "estimated_cases",
         "cvdpv1",
