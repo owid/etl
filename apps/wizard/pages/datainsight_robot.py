@@ -18,8 +18,7 @@ st.set_page_config(page_title="Data insight robot", page_icon="🪄")
 add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("Data insight robot 🤖")
-st.markdown("This robot can generate data insights, given a chart url")
-st.write("hello!")
+st.markdown("Generate data insights, given a chart url")
 # %%
 # OpenAI API Keyprint
 api_key = os.getenv("OPENAI_API_KEY")
@@ -113,7 +112,7 @@ Every year, 300,000 women die from pregnancy-related causes.
 Fortunately, the world has made continuous progress, and such tragic deaths have become much rarer, as the chart shows. The WHO has published data since 1985. Since then, the number of maternal deaths has halved.
 --
 
-Please write a data insight for the given chart.
+Please write a data insight for the given chart. Use simple language and short paragraphs.
 """
 grapher_url = st.text_input(
     "For which grapher url should the insight be generated? (Query parameters work!)", key="url"

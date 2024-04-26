@@ -155,10 +155,10 @@ sections:
         entrypoint: pages/owidle.py
         emoji: "👾"
         image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
-      - title: "data-insight robot"
-        alias: dirobot
+      - title: "data-insight boy"
+        alias: diboy
         description: "Create a data insight from a grapher url with GPT"
         maintainer: "@daniel"
         entrypoint: pages/datainsight_robot.py
-        emoji: "🤖"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
+        emoji: "👦"
+        image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
