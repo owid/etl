@@ -117,6 +117,8 @@ grapher_url = st.text_input(
 )
 confirmed = st.button("Generate insight")
 if confirmed:
+    thumb_url = get_thumbnail_url(grapher_url)
+    st.image(thumb_url)
     resp = infer_chart_content(grapher_url, prompt)
     st.write(resp)
 
