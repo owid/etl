@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Cases with Highly Pathogenic Avian Influenza A/H5N1
+    description: |-
+      This dataset contains all human infections with HPAI A(H5N1​​​​​) bird flu virus reported to the World Health Organization (WHO), since the first human cases in 1997.
+
+      A(H5N1​​​​​) bird flu viruses first emerged in southern China in 1996. Those viruses caused large poultry outbreaks in Hong Kong in 1997, which resulted in 18 human infections. The 1997 bird outbreak was controlled, but the A(H5N1​​​​​) bird flu viruses were not eradicated in birds and re-surfaced in 2003 to spread widely in birds throughout Asia, and later in Africa, Europe, and the Middle East, causing poultry outbreaks and sporadic human infections. Since 2003, more than 23 countries have reported more than 880 sporadic human infections with A(H5N1​​​​​) bird flu viruses to WHO.
+
+      A(H5N1​​​​​) bird flu viruses that are currently circulating in wild birds and poultry in much of the world are genetically different from earlier versions of the virus and emerged to become the predominant subtype of HPAI H5 in the fall of 2021. These viruses have caused sporadic wild bird infections and poultry outbreaks in many countries, including the United States, with spillover to mammals in some countries. In contrast to previous A(H5N1​​​​​) viruses, which still circulate to a lesser extent in several countries, at this time, a small number of sporadic human cases with current A(H5N1​​​​​) bird flu viruses have been reported globally. However, illness in humans from all bird flu virus infections has ranged in severity from no symptoms or mild illness to severe disease that resulted in death.
+    date_published: "2024-04-03"
+
+    # Citation
+    producer: WHO, Global Influenza Programme
+    citation_full: |-
+      Human Cases with Highly Pathogenic Avian Influenza A/H5N1. World Health Organization, Global Influenza Programme; 2024. Licence: CC BY-NC-SA 3.0 IGO. Retrieved from CDC April 3, 2024.
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.cdc.gov/flu/avianflu/chart-epi-curve-ah5n1.html
+    date_accessed: 2024-04-26
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 7545f91c6e1717dff87a5d97e39d9ccf
+    size: 23156
+    path: avian_influenza_ah5n1.csv

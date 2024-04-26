@@ -556,3 +556,12 @@ steps:
     - data://meadow/who/2024-04-22/polio_vaccine_schedule
   data://grapher/who/2024-04-22/polio_vaccine_schedule:
     - data://garden/who/2024-04-22/polio_vaccine_schedule
+
+    # WHO Avian Influenza H5N1
+  data://meadow/who/2024-04-26/avian_influenza_ah5n1:
+    - snapshot://who/2024-04-26/avian_influenza_ah5n1.csv
+  data://garden/who/2024-04-26/avian_influenza_ah5n1:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2024-04-26/avian_influenza_ah5n1
+  data://grapher/who/2024-04-26/avian_influenza_ah5n1:
+    - data://garden/who/2024-04-26/avian_influenza_ah5n1
