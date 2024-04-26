@@ -559,7 +559,7 @@ steps:
 
     # WHO Avian Influenza H5N1
   data://meadow/who/2024-04-26/avian_influenza_ah5n1:
-    - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
+    - snapshot://who/2024-04-26/avian_influenza_ah5n1.csv
   data://garden/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
