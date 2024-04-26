@@ -24,9 +24,10 @@ def run(dest_dir: str) -> None:
 
     ##### Temporary fix - we remove West Bank and Gaza as there is both data for West Bank and Gaza _and_ Palestine N.A (national authority).
     ##### I'm not sure how we should treat these but for now I will just stick with the entity that has the latest value, so Palestine N.A.
+    ###### Confirmed that the value for Palestine NA is the correct one with GPEI
 
     tb = tb[tb["country"] != "West Bank and Gaza"]
-    ##### There are also two values for Somalia, I will drop the least recent one
+    ##### There are also two values for Somalia, I will drop the least recent one - confirmed with GPEI that Somalia's last wild polio case was in 2002
     tb = tb[~((tb["country"] == "Somalia") & (tb["year"] == "2000"))]
 
     # Loading the polio status data for WHO regions
