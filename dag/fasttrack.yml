@@ -168,3 +168,5 @@ steps:
     - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
   data://grapher/fasttrack/latest/air_pollution_ceds:
     - snapshot://fasttrack/latest/air_pollution_ceds.csv
+  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
+    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
