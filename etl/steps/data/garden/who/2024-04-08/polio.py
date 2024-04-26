@@ -14,7 +14,8 @@ paths = PathFinder(__file__)
 # Year to use for the screening and testing rates.
 # Should be the most recent year of complete data.
 SCREENING_YEAR = 2023
-
+# The year to use for the GPEI data on circulating vaccine derived polio cases
+GPEI_YEAR_CVDPV = 2016
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
@@ -54,7 +55,7 @@ def run(dest_dir: str) -> None:
     # Add total cases
     tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
     # for years after 2016 use GPEI cvdpv data
-    tb["combined_cvdpv"] = np.where((tb["year"] >= 2016), tb["total_cvdpv"], tb["cvdpv_cases"])
+    tb["combined_cvdpv"] = np.where((tb["year"] >= GPEI_YEAR_CVDPV), tb["total_cvdpv"], tb["cvdpv_cases"])
     tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
 
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["combined_cvdpv"]
