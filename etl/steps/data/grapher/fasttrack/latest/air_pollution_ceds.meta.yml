@@ -7,100 +7,128 @@ tables:
   air_pollution_ceds:
     variables:
       nox:
-        title: NOx
+        title: Nitrogen oxides (NOx) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Nitrogen oxides (NOx)
+          numDecimalPlaces: 0
         description: |-
           Nitrogen oxides (NOx) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOx gases can have negative impacts on respiratory health. NOx gases can also lead to the formation of ozone – another air pollutant.
       so2:
-        title: SO2
+        title: Sulphur dioxide (SO₂) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Sulphur dioxide (SO₂)
+          numDecimalPlaces: 0
         description: |-
           Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
       co:
-        title: CO
+        title: Carbon monoxide (CO) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Carbon monoxide (CO)
+          numDecimalPlaces: 0
         description: |-
           Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
       oc:
-        title: OC
+        title: Organic carbon (OC) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Organic carbon (OC)
+          numDecimalPlaces: 0
         description: |-
           Organic carbon molecules are formed from the incomplete burning of organic materials. This can come from the burning of fossil fuels (which are carbon-based organic material) or biomass. Organic carbon aerosols can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon molecules can contribute to particulate matter pollution, with negative impacts on human health.
       nmvoc:
-        title: NMVOC
+        title: Non-methane volatile organic compounds (NMVOC) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Non-methane volatile organic compounds (NMVOCs)
+          numDecimalPlaces: 0
         description: |-
           Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
       bc:
-        title: BC
+        title: Black carbon (BC) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Black carbon (BC)
+          numDecimalPlaces: 0
         description: |-
           Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
       nh3:
-        title: NH3
+        title: Ammonia (NH₃) emissions
         unit: tonnes
         short_unit: t
+        display:
+          name: Ammonia (NH₃)
+          numDecimalPlaces: 0
         description: |-
           Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
       nox_per_capita:
-        title: nox_per_capita
+        title: Nitrogen oxide emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: NOx
+          name: Nitrogen oxides (NOx)
+          numDecimalPlaces: 0
         description: |-
           Nitrogen oxides (NOx) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOx gases can have negative impacts on respiratory health. NOx gases can also lead to the formation of ozone – another air pollutant.
       so2_per_capita:
-        title: so2_per_capita
+        title: Sulphur dioxide emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: SO2
+          name: Sulphur dioxide (SO₂)
+          numDecimalPlaces: 0
         description: |-
           Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
       co_per_capita:
-        title: co_per_capita
+        title: Carbon monoxide emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: CO
+          name: Carbon monoxide (CO)
+          numDecimalPlaces: 0
         description: |-
           Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
       oc_per_capita:
-        title: oc_per_capita
+        title: Organic carbon emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: OC
+          name: Organic carbon (OC)
+          numDecimalPlaces: 0
         description: |-
           Organic carbon molecules are formed from the incomplete burning of organic materials. This can come from the burning of fossil fuels (which are carbon-based organic material) or biomass. Organic carbon aerosols can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon molecules can contribute to particulate matter pollution, with negative impacts on human health.
       nmvoc_per_capita:
-        title: nmvoc_per_capita
+        title: Non-methane volatile organic compound emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: NMVOC
+          name: Non-methane volatile organic compounds (NMVOCs)
+          numDecimalPlaces: 0
         description: |-
           Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
       bc_per_capita:
-        title: bc_per_capita
+        title: Black carbon emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: BC
+          name: Black carbon (BC)
+          numDecimalPlaces: 0
         description: |-
           Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
       nh3_per_capita:
-        title: nh3_per_capita
+        title: Ammonia emissions per person
         unit: kilograms
         short_unit: kg
         display:
-          name: NH3
+          name: Ammonia (NH₃)
+          numDecimalPlaces: 0
         description: |-
           Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
