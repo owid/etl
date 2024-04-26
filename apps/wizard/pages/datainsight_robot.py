@@ -113,7 +113,7 @@ Every year, 300,000 women die from pregnancy-related causes.
 Fortunately, the world has made continuous progress, and such tragic deaths have become much rarer, as the chart shows. The WHO has published data since 1985. Since then, the number of maternal deaths has halved.
 --
 
-Please write a data insight for the given chart. You can use markdown for formatting.
+Please write a data insight for the given chart.
 """
 grapher_url = st.text_input(
     "For which grapher url should the insight be generated? (Query parameters work!)", key="url"
@@ -154,5 +154,4 @@ if confirmed:
         response = cast(str, st.write_stream(stream))
 
 # TODÖ: continue the conversation
-# TODÖ: ztream the output
 # %%
