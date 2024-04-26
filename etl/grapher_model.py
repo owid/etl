@@ -1473,6 +1473,17 @@ class Origin(SQLModel, table=True):
         return origin
 
 
+class ChartDiffApprovals(SQLModel, table=True):
+    __tablename__: str = "chart_diff_approvals"
+    __table_args__ = (Index("chart_id_ix", "chartId"), {"extend_existing": True})
+
+    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
+    sourceUpdatedAt: datetime = Field(sa_column=Column("sourceUpdatedAt", DateTime, nullable=False))
+    targetUpdatedAt: datetime = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=False))
+    status: str = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+
+
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
     """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
     if val is None:
