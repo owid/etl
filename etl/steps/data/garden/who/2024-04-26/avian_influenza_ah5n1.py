@@ -48,16 +48,17 @@ def run(dest_dir: str) -> None:
     date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")
     tb_month["date"] = date_1.fillna(date_2).fillna(date_3)
     assert tb_month["date"].notna().all(), "Some dates could not be parsed."
-
-    # Drop columns
     tb_month = tb_month.drop(columns=["month"])
 
-    for table in [tb_month, tb_year]:
-        # Harmonize country names
-        table = geo.harmonize_countries(df=table, countries_file=paths.country_mapping_path)
-        # Add aggregates
-        table = add_regions(table, ds_regions)
-        table = add_world(table)
+    # Harmonize country names
+    tb_month = geo.harmonize_countries(df=tb_month, countries_file=paths.country_mapping_path)
+    tb_year = geo.harmonize_countries(df=tb_year, countries_file=paths.country_mapping_path)
+
+    # Add aggregates
+    tb_month = add_regions(tb_month, ds_regions)
+    tb_month = add_world(tb_month)
+    tb_year = add_regions(tb_year, ds_regions)
+    tb_year = add_world(tb_year)
 
     # Rename columns
     tb_year = tb_year.rename(
@@ -110,7 +111,7 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         # Add region
         tb_region = tb[tb["country"].isin(countries_in_region)]
         tb_region = tb_region.assign(country=region)
-        tb_region = tb_region.groupby(["date", "country"], as_index=False)["avian_cases"].sum()
+        tb_region = tb_region.groupby(["date", "country"], as_index=False, observed=True)["avian_cases"].sum()
 
         # Combine
         tb = pr.concat([tb, tb_region], ignore_index=True)
@@ -124,11 +125,11 @@ def add_world(tb: Table) -> Table:
     tb_world = tb[~tb["country"].isin(REGIONS)].copy()
 
     # Aggregate
-    tb_world = tb_world.groupby("date", as_index=False)["avian_cases"].sum()
+    tb_world = tb_world.groupby("date", as_index=False, observed=True)["avian_cases"].sum()
     tb_world = tb_world.assign(country="World")
 
     # Combine
-    tb = pd.concat(
+    tb = pr.concat(
         [
             tb,
             tb_world,
