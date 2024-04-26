@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Load meadow acute flaccid paralysis dataset.
     ds_meadow = paths.load_dataset("polio_afp")
     # Load historical polio dataset
-    ds_historical = paths.load_dataset("polio_historical")
+    ds_historical = paths.load_dataset("polio_historical", channel="garden")
     # Load population data to calculate cases per million population
     ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index()
@@ -43,6 +43,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["polio_afp"].reset_index()
+    tb = harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     tb_hist = ds_historical["polio_historical"].reset_index()
     tb_hist = tb_hist.rename(columns={"cases": "total_cases"})
     # Only need this for data prior to 2001
@@ -60,12 +63,8 @@ def run(dest_dir: str) -> None:
     tb["combined_cvdpv"] = tb["combined_cvdpv"].replace({np.nan: 0})
     tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
 
-    tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["combined_cvdpv"]
-    # Need to deal with overlapping years
+    tb["total_cases"] = tb["wild_poliovirus_cases"].replace({np.nan: 0}) + tb["combined_cvdpv"]
     tb = pr.concat([tb_hist, tb], axis=0)
-    tb = harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
 
     # Add region aggregates.
     tb_reg = add_regions_to_table(

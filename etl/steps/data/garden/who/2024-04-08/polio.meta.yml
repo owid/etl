@@ -64,6 +64,7 @@ tables:
       combined_cvdpv:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year.
+        description_processing: "For values in the years 2016 and earlier we use data from the WHO, for more recent years we use data from the Global Polio Eradication Initiative (GPEI)."
         unit: cases
         display:
           numDecimalPlaces: 0
