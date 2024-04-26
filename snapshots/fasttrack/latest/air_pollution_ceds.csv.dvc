@@ -12,6 +12,6 @@ meta:
   description: Emissions of air pollutants since 1750.
   license: {}
 outs:
-  - md5: e7e3a7bc5b19d675892113b90aa504f1
-    size: 7352448
+  - md5: c90544da7bb66aaf0f228c9f3759fce2
+    size: 7352090
     path: air_pollution_ceds.csv
