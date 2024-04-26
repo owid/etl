@@ -177,12 +177,12 @@ def main():
                     st.toggle(
                         label="Approve new chart",
                         key=f"toggle-{chart_id}",
-                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(
+                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(  # type: ignore
                             chart_id=chart_id,
                             title=target_chart.config["slug"],
                         ),
                     )
-                    chart_html(source_chart.config)
+                    chart_html(source_chart.config)  # type: ignore
 
 
 # if __name__ == "__main__":
