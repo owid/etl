@@ -61,13 +61,13 @@ tables:
         unit: cases per million
         display:
           numDecimalPlaces: 2
-      cvdpv_cases:
+      combined_cvdpv:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year.
         unit: cases
         display:
           numDecimalPlaces: 0
-      cvdpv_cases_per_million:
+      combined_cvdpv_per_million:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases per million
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year per million people.
         unit: cases per million
