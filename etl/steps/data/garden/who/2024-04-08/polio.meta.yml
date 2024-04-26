@@ -46,7 +46,7 @@ tables:
         unit: "%"
         short_unit: "%"
       pending:
-        title: Pending
+        title: Pending cases
         description_short: The number of acute flaccid paralysis (AFP) cases pending classification by the WHO.
         unit: cases
       wild_poliovirus_cases:
