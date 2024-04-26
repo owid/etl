@@ -56,6 +56,7 @@ def run(dest_dir: str) -> None:
     tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
     # for years after 2016 use GPEI cvdpv data
     tb["combined_cvdpv"] = np.where((tb["year"] >= GPEI_YEAR_CVDPV), tb["total_cvdpv"], tb["cvdpv_cases"])
+    tb["combined_cvdpv"] = tb["combined_cvdpv"].copy_metadata(tb["cvdpv_cases"])
     tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
 
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["combined_cvdpv"]
