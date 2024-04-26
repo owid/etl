@@ -190,22 +190,7 @@ def cli(
                     continue
 
                 # try getting chart with the same slug
-                try:
-                    target_chart = gm.Chart.load_chart(target_session, slug=source_chart.config["slug"])
-                except NoResultFound:
-                    target_chart = None
-
-                # it's possible that slug is different, but chart id is the same
-                if target_chart is None:
-                    try:
-                        target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-
-                        # make sure createdAt matches and double check with createdAt
-                        if target_chart.createdAt != source_chart.createdAt:
-                            log.warning("staging_sync.different_chart_with_same_id", chart_id=chart_id)
-                            target_chart = None
-                    except NoResultFound:
-                        target_chart = None
+                target_chart = _match_target_chart(target_session, source_chart, chart_id)
 
                 if target_chart:
                     if _charts_configs_are_equal(target_chart.config, migrated_chart.config):
@@ -316,6 +301,25 @@ def cli(
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
     print("[green]1.[/green] New charts were created as drafts, don't forget to publish them")
     print("[green]2.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
+
+
+def _match_target_chart(target_session: Session, source_chart: gm.Chart, chart_id: int) -> Optional[gm.Chart]:
+    try:
+        target_chart = gm.Chart.load_chart(target_session, slug=source_chart.config["slug"])
+    except NoResultFound:
+        return None
+
+    # it's possible that slug is different, but chart id is the same
+    if target_chart is None:
+        try:
+            target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+
+            # make sure createdAt matches and double check with createdAt
+            if target_chart.createdAt != source_chart.createdAt:
+                log.warning("staging_sync.different_chart_with_same_id", chart_id=chart_id)
+                return None
+        except NoResultFound:
+            return None
 
 
 def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> dt.datetime:
