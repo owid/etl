@@ -99,13 +99,13 @@ def update_expander(chart_id, title):
     }
 
 
-def update_revision_state(chart_id, slug):
+def update_revision_state(chart_id, title):
     # TODO: Update approval status (in database)
 
     # Update expander display
     update_expander(
         chart_id=chart_id,
-        title=slug,
+        title=title,
     )
 
 
