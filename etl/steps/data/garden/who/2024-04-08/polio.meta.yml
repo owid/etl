@@ -46,7 +46,7 @@ tables:
         unit: "%"
         short_unit: "%"
       pending:
-        title: Pending
+        title: Pending cases
         description_short: The number of acute flaccid paralysis (AFP) cases pending classification by the WHO.
         unit: cases
       wild_poliovirus_cases:
@@ -61,13 +61,14 @@ tables:
         unit: cases per million
         display:
           numDecimalPlaces: 2
-      cvdpv_cases:
+      combined_cvdpv:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year.
+        description_processing: "For values in the years 2016 and earlier we use data from the WHO, for more recent years we use data from the Global Polio Eradication Initiative (GPEI)."
         unit: cases
         display:
           numDecimalPlaces: 0
-      cvdpv_cases_per_million:
+      combined_cvdpv_per_million:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases per million
         description_short: The number of cases of circulating vaccine-derived poliovirus detected in a given year per million people.
         unit: cases per million
