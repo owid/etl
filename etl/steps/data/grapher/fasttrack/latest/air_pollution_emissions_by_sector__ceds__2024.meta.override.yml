@@ -3,4 +3,4 @@ tables:
     variables:
       energy_so2:
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
