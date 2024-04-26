@@ -14,12 +14,12 @@ tables:
           name: NOx emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_nox:
-        title: NOx emissions from domestic aviation
+      aviation_nox:
+        title: NOx emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from domestic aviation
+          name: NOx emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_nox:
@@ -46,28 +46,20 @@ tables:
           name: NOx emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_nox:
-        title: NOx emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: NOx emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_nox:
-        title: NOx emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: NOx emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_nox:
         title: NOx emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: NOx emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nox:
+        title: NOx emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nox:
@@ -94,12 +86,12 @@ tables:
           name: SO₂ emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_so2:
-        title: SO₂ emissions from domestic aviation
+      aviation_so2:
+        title: SO₂ emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from domestic aviation
+          name: SO₂ emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_so2:
@@ -126,28 +118,20 @@ tables:
           name: SO₂ emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_so2:
-        title: SO₂ emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: SO₂ emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_so2:
-        title: SO₂ emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: SO₂ emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_so2:
         title: SO₂ emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: SO₂ emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_so2:
+        title: SO₂ emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_so2:
@@ -174,12 +158,12 @@ tables:
           name: CO emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_co:
-        title: CO emissions from domestic aviation
+      aviation_co:
+        title: CO emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from domestic aviation
+          name: CO emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_co:
@@ -206,28 +190,20 @@ tables:
           name: CO emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_co:
-        title: CO emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: CO emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_co:
-        title: CO emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: CO emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_co:
         title: CO emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: CO emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_co:
+        title: CO emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_co:
@@ -254,12 +230,12 @@ tables:
           name: OC emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_oc:
-        title: OC emissions from domestic aviation
+      aviation_oc:
+        title: OC emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from domestic aviation
+          name: OC emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_oc:
@@ -286,28 +262,20 @@ tables:
           name: OC emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_oc:
-        title: OC emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: OC emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_oc:
-        title: OC emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: OC emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_oc:
         title: OC emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: OC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_oc:
+        title: OC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_oc:
@@ -334,12 +302,12 @@ tables:
           name: NMVOC emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_nmvoc:
-        title: NMVOC emissions from domestic aviation
+      aviation_nmvoc:
+        title: NMVOC emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from domestic aviation
+          name: NMVOC emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_nmvoc:
@@ -366,28 +334,20 @@ tables:
           name: NMVOC emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_nmvoc:
-        title: NMVOC emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: NMVOC emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_nmvoc:
-        title: NMVOC emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: NMVOC emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_nmvoc:
         title: NMVOC emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: NMVOC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nmvoc:
+        title: NMVOC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nmvoc:
@@ -414,12 +374,12 @@ tables:
           name: BC emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_bc:
-        title: BC emissions from domestic aviation
+      aviation_bc:
+        title: BC emissions from aviation
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from domestic aviation
+          name: BC emissions from aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_bc:
@@ -446,28 +406,20 @@ tables:
           name: BC emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_bc:
-        title: BC emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: BC emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_bc:
-        title: BC emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: BC emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_bc:
         title: BC emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: BC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_bc:
+        title: BC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_bc:
@@ -494,7 +446,7 @@ tables:
           name: Ammonia emissions from agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
-      domestic_aviation_nh3:
+      aviation_nh3:
         title: Ammonia emissions from domestic aviation
         unit: tonnes
         short_unit: t
@@ -526,28 +478,20 @@ tables:
           name: Ammonia emissions from industry
           numDecimalPlaces: 0
           conversionFactor: 1000
-      international_aviation_nh3:
-        title: Ammonia emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          name: Ammonia emissions from international aviation
-          numDecimalPlaces: 0
-          conversionFactor: 1000
-      international_shipping_nh3:
-        title: Ammonia emissions from international shipping
-        unit: tonnes
-        short_unit: t
-        display:
-          name: Ammonia emissions from international shipping
-          numDecimalPlaces: 0
-          conversionFactor: 1000
       other_nh3:
         title: Ammonia emissions from other sectors
         unit: tonnes
         short_unit: t
         display:
           name: Ammonia emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nh3:
+        title: Ammonia emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nh3:
