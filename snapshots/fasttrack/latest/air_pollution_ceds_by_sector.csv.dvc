@@ -12,6 +12,6 @@ meta:
   description: Emissions of air pollutants since 1750 by sector.
   license: {}
 outs:
-  - md5: fa580b352c8881afdb19441060581fd1
-    size: 31770915
+  - md5: be680e2444bf2025192c6674b5495586
+    size: 21639633
     path: air_pollution_ceds_by_sector.csv
