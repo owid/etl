@@ -2,12 +2,15 @@
 import base64
 import os
 from pathlib import Path
+from typing import cast
 from urllib import parse
 
 import requests
 import streamlit as st
 from dotenv import load_dotenv
 from st_pages import add_indentation
+
+from apps.utils.gpt import OpenAIWrapper
 
 load_dotenv()
 
@@ -116,10 +119,40 @@ grapher_url = st.text_input(
     "For which grapher url should the insight be generated? (Query parameters work!)", key="url"
 )
 confirmed = st.button("Generate insight")
+api = OpenAIWrapper()
 if confirmed:
     thumb_url = get_thumbnail_url(grapher_url)
     st.image(thumb_url)
-    resp = infer_chart_content(grapher_url, prompt)
-    st.write(resp)
+    hex = get_grapher_thumbnail(grapher_url)
 
+    messages = [
+        {
+            "role": "system",
+            "content": [
+                {"type": "text", "text": prompt},
+            ],
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": hex},
+                }
+            ],
+        },
+    ]
+
+    with st.chat_message("assistant"):
+        # Ask GPT (stream)
+        stream = api.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=messages,  # type: ignore
+            max_tokens=3000,
+            stream=True,
+        )
+        response = cast(str, st.write_stream(stream))
+
+# TODÖ: continue the conversation
+# TODÖ: ztream the output
 # %%
