@@ -1,0 +1,302 @@
+dataset:
+  title: Air pollution emissions by sector
+  description: Emissions of air pollutants since 1750 by sector.
+  licenses:
+    - {}
+tables:
+  air_pollution_ceds_by_sector:
+    variables:
+      agriculture_nox:
+        title: agriculture_nox
+        unit: ''
+      cement_minerals_nox:
+        title: cement_minerals_nox
+        unit: ''
+      chemical_production_nox:
+        title: chemical_production_nox
+        unit: ''
+      chemicals_nox:
+        title: chemicals_nox
+        unit: ''
+      energy_nox:
+        title: energy_nox
+        unit: ''
+      fugitive_emissions_nox:
+        title: fugitive_emissions_nox
+        unit: ''
+      indirect_emissions_nox:
+        title: indirect_emissions_nox
+        unit: ''
+      other_nox:
+        title: other_nox
+        unit: ''
+      pulp_paper_food_nox:
+        title: pulp_paper_food_nox
+        unit: ''
+      transport_nox:
+        title: transport_nox
+        unit: ''
+      waste_nox:
+        title: waste_nox
+        unit: ''
+      agriculture_so2:
+        title: agriculture_so2
+        unit: ''
+      cement_minerals_so2:
+        title: cement_minerals_so2
+        unit: ''
+      chemical_production_so2:
+        title: chemical_production_so2
+        unit: ''
+      chemicals_so2:
+        title: chemicals_so2
+        unit: ''
+      energy_so2:
+        title: energy_so2
+        unit: ''
+      fugitive_emissions_so2:
+        title: fugitive_emissions_so2
+        unit: ''
+      indirect_emissions_so2:
+        title: indirect_emissions_so2
+        unit: ''
+      other_so2:
+        title: other_so2
+        unit: ''
+      pulp_paper_food_so2:
+        title: pulp_paper_food_so2
+        unit: ''
+      transport_so2:
+        title: transport_so2
+        unit: ''
+      waste_so2:
+        title: waste_so2
+        unit: ''
+      agriculture_co:
+        title: agriculture_co
+        unit: ''
+      cement_minerals_co:
+        title: cement_minerals_co
+        unit: ''
+      chemical_production_co:
+        title: chemical_production_co
+        unit: ''
+      chemicals_co:
+        title: chemicals_co
+        unit: ''
+      energy_co:
+        title: energy_co
+        unit: ''
+      fugitive_emissions_co:
+        title: fugitive_emissions_co
+        unit: ''
+      indirect_emissions_co:
+        title: indirect_emissions_co
+        unit: ''
+      other_co:
+        title: other_co
+        unit: ''
+      pulp_paper_food_co:
+        title: pulp_paper_food_co
+        unit: ''
+      transport_co:
+        title: transport_co
+        unit: ''
+      waste_co:
+        title: waste_co
+        unit: ''
+      agriculture_oc:
+        title: agriculture_oc
+        unit: ''
+      cement_minerals_oc:
+        title: cement_minerals_oc
+        unit: ''
+      chemical_production_oc:
+        title: chemical_production_oc
+        unit: ''
+      chemicals_oc:
+        title: chemicals_oc
+        unit: ''
+      energy_oc:
+        title: energy_oc
+        unit: ''
+      fugitive_emissions_oc:
+        title: fugitive_emissions_oc
+        unit: ''
+      indirect_emissions_oc:
+        title: indirect_emissions_oc
+        unit: ''
+      other_oc:
+        title: other_oc
+        unit: ''
+      pulp_paper_food_oc:
+        title: pulp_paper_food_oc
+        unit: ''
+      transport_oc:
+        title: transport_oc
+        unit: ''
+      waste_oc:
+        title: waste_oc
+        unit: ''
+      agriculture_nmvoc:
+        title: agriculture_nmvoc
+        unit: ''
+      cement_minerals_nmvoc:
+        title: cement_minerals_nmvoc
+        unit: ''
+      chemical_production_nmvoc:
+        title: chemical_production_nmvoc
+        unit: ''
+      chemicals_nmvoc:
+        title: chemicals_nmvoc
+        unit: ''
+      energy_nmvoc:
+        title: energy_nmvoc
+        unit: ''
+      fugitive_emissions_nmvoc:
+        title: fugitive_emissions_nmvoc
+        unit: ''
+      indirect_emissions_nmvoc:
+        title: indirect_emissions_nmvoc
+        unit: ''
+      other_nmvoc:
+        title: other_nmvoc
+        unit: ''
+      pulp_paper_food_nmvoc:
+        title: pulp_paper_food_nmvoc
+        unit: ''
+      transport_nmvoc:
+        title: transport_nmvoc
+        unit: ''
+      waste_nmvoc:
+        title: waste_nmvoc
+        unit: ''
+      agriculture_bc:
+        title: agriculture_bc
+        unit: ''
+      cement_minerals_bc:
+        title: cement_minerals_bc
+        unit: ''
+      chemical_production_bc:
+        title: chemical_production_bc
+        unit: ''
+      chemicals_bc:
+        title: chemicals_bc
+        unit: ''
+      energy_bc:
+        title: energy_bc
+        unit: ''
+      fugitive_emissions_bc:
+        title: fugitive_emissions_bc
+        unit: ''
+      indirect_emissions_bc:
+        title: indirect_emissions_bc
+        unit: ''
+      other_bc:
+        title: other_bc
+        unit: ''
+      pulp_paper_food_bc:
+        title: pulp_paper_food_bc
+        unit: ''
+      transport_bc:
+        title: transport_bc
+        unit: ''
+      waste_bc:
+        title: waste_bc
+        unit: ''
+      agriculture_nh3:
+        title: agriculture_nh3
+        unit: ''
+      cement_minerals_nh3:
+        title: cement_minerals_nh3
+        unit: ''
+      chemical_production_nh3:
+        title: chemical_production_nh3
+        unit: ''
+      chemicals_nh3:
+        title: chemicals_nh3
+        unit: ''
+      energy_nh3:
+        title: energy_nh3
+        unit: ''
+      fugitive_emissions_nh3:
+        title: fugitive_emissions_nh3
+        unit: ''
+      indirect_emissions_nh3:
+        title: indirect_emissions_nh3
+        unit: ''
+      other_nh3:
+        title: other_nh3
+        unit: ''
+      pulp_paper_food_nh3:
+        title: pulp_paper_food_nh3
+        unit: ''
+      transport_nh3:
+        title: transport_nh3
+        unit: ''
+      waste_nh3:
+        title: waste_nh3
+        unit: ''
+      domestic_aviation_nox:
+        title: domestic_aviation_nox
+        unit: ''
+      intl_aviation_nox:
+        title: intl_aviation_nox
+        unit: ''
+      intl_shipping_nox:
+        title: intl_shipping_nox
+        unit: ''
+      domestic_aviation_so2:
+        title: domestic_aviation_so2
+        unit: ''
+      intl_aviation_so2:
+        title: intl_aviation_so2
+        unit: ''
+      intl_shipping_so2:
+        title: intl_shipping_so2
+        unit: ''
+      domestic_aviation_co:
+        title: domestic_aviation_co
+        unit: ''
+      intl_aviation_co:
+        title: intl_aviation_co
+        unit: ''
+      intl_shipping_co:
+        title: intl_shipping_co
+        unit: ''
+      domestic_aviation_bc:
+        title: domestic_aviation_bc
+        unit: ''
+      intl_aviation_bc:
+        title: intl_aviation_bc
+        unit: ''
+      intl_shipping_bc:
+        title: intl_shipping_bc
+        unit: ''
+      domestic_aviation_oc:
+        title: domestic_aviation_oc
+        unit: ''
+      intl_aviation_oc:
+        title: intl_aviation_oc
+        unit: ''
+      intl_shipping_oc:
+        title: intl_shipping_oc
+        unit: ''
+      domestic_aviation_nmvoc:
+        title: domestic_aviation_nmvoc
+        unit: ''
+      intl_aviation_nmvoc:
+        title: intl_aviation_nmvoc
+        unit: ''
+      intl_shipping_nmvoc:
+        title: intl_shipping_nmvoc
+        unit: ''
+      domestic_aviation_nh3:
+        title: domestic_aviation_nh3
+        unit: ''
+      intl_aviation_nh3:
+        title: intl_aviation_nh3
+        unit: ''
+      intl_shipping_nh3:
+        title: intl_shipping_nh3
+        unit: ''
