@@ -57,6 +57,7 @@ def run(dest_dir: str) -> None:
     # for years after 2016 use GPEI cvdpv data
     tb["combined_cvdpv"] = np.where((tb["year"] >= GPEI_YEAR_CVDPV), tb["total_cvdpv"], tb["cvdpv_cases"])
     tb["combined_cvdpv"] = tb["combined_cvdpv"].copy_metadata(tb["cvdpv_cases"])
+    tb["combined_cvdpv"] = tb["combined_cvdpv"].replace({np.nan: 0})
     tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
 
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["combined_cvdpv"]
