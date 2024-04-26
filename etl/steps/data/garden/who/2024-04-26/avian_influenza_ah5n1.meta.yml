@@ -1,11 +1,23 @@
 tables:
-  avian_influenza_ah5n1:
+  avian_influenza_ah5n1_month:
     variables:
-      avian_cases:
+      avian_cases_month:
         title: Human cases with highly pathogenic avian influenza A/H5N1 (monthly)
         unit: cases
         description_short: |-
           Monthly number of human cases with highly pathogenic avian influenza A/H5N1.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+  avian_influenza_ah5n1_year:
+    variables:
+      avian_cases_year:
+        title: Human cases with highly pathogenic avian influenza A/H5N1 (yearly)
+        unit: cases
+        description_short: |-
+          Yearly number of human cases with highly pathogenic avian influenza A/H5N1.
         processing_level: minor
         display:
           numDecimalPlaces: 0

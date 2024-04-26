@@ -1,8 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
-
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -15,24 +13,28 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("avian_influenza_ah5n1"))
+    ds_garden = paths.load_dataset("avian_influenza_ah5n1")
 
     # Read table from garden dataset.
-    tb = ds_garden["avian_influenza_ah5n1"].reset_index()
+    tb_month = ds_garden["avian_influenza_ah5n1_month"].reset_index()
+    tb_year = ds_garden["avian_influenza_ah5n1_year"]
 
     #
     # Process data.
     #
     # Get zeroDay as the minimum date in the dataset and set it to zeroDay
-    tb = add_num_days(tb)
-
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb_month = add_num_days(tb_month)
+    tb_month = tb_month.format(["country", "year"])
 
     #
     # Save outputs.
     #
+    tables = [
+        tb_month,
+        tb_year,
+    ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=tables, default_metadata=ds_garden.metadata)
 
     #
     # Checks.
@@ -48,7 +50,7 @@ def add_num_days(tb: Table) -> Table:
 
     Also, drop `date` column.
     """
-    column_indicator = "avian_cases"
+    column_indicator = "avian_cases_month"
 
     if tb[column_indicator].metadata.display is None:
         tb[column_indicator].metadata.display = {}

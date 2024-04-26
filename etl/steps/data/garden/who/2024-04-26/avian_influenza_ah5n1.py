@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -27,41 +26,76 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("avian_influenza_ah5n1"))
-
+    ds_meadow = paths.load_dataset("avian_influenza_ah5n1")
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
-
+    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["avian_influenza_ah5n1"].reset_index()
 
     #
     # Process data.
     #
-    # To date
-    tb["date"] = pd.to_datetime(tb["month"]).astype("datetime64[ns]")
+    mask = tb["range"] == "All"
+    tb_year = tb[mask].drop(columns=["range"])
+    tb_month = tb[~mask].drop(columns=["range"])
+
+    # Obtain date
+    ## Yearly data
+    tb_year = tb_year.rename(columns={"month": "date"})
+    ## Monthly data
+    date_1 = pd.to_datetime(tb_month["month"], format="%b-%y", errors="coerce")
+    date_2 = pd.to_datetime(tb_month["month"], format="%y-%b", errors="coerce")
+    date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")
+    tb_month["date"] = date_1.fillna(date_2).fillna(date_3)
+    assert tb_month["date"].notna().all(), "Some dates could not be parsed."
 
     # Drop columns
-    tb = tb.drop(columns=["range", "month"])
+    tb_month = tb_month.drop(columns=["month"])
 
-    # Harmonize country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    for table in [tb_month, tb_year]:
+        # Harmonize country names
+        table = geo.harmonize_countries(df=table, countries_file=paths.country_mapping_path)
+        # Add aggregates
+        table = add_regions(table, ds_regions)
+        table = add_world(table)
 
-    # Add aggregates
-    tb = add_regions(tb, ds_regions)
-    tb = add_world(tb)
+    # Rename columns
+    tb_year = tb_year.rename(
+        columns={
+            "date": "year",
+            "avian_cases": "avian_cases_year",
+        }
+    )
+    tb_month = tb_month.rename(
+        columns={
+            "avian_cases": "avian_cases_month",
+        }
+    )
+
+    # Set dtype to numeric
+    tb_year["year"] = tb_year["year"].astype(str).astype(int)
+
+    # Sanity check
+    assert tb_year["year"].max() == 2024
+    assert tb_year["year"].min() == 1997
 
     # Set index
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    tb_month = tb_month.format(["country", "date"])
+    tb_year = tb_year.format(["country", "year"])
 
     # Set short_name
-    tb.metadata.short_name = paths.short_name
+    tb_month.metadata.short_name = f"{tb_month.metadata.short_name}_month"
+    tb_year.metadata.short_name = f"{tb_year.metadata.short_name}_year"
 
     #
     # Save outputs.
     #
+    tables = [
+        tb_month,
+        tb_year,
+    ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=tables, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
