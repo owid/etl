@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
     # Remove values > 100% for "Adequate stool collection".
     tb = clean_adequate_stool_collection(tb)
     # Add total cases
-    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
+    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="outer")
     # for years after 2016 use GPEI cvdpv data
     tb["combined_cvdpv"] = np.where((tb["year"] >= GPEI_YEAR_CVDPV), tb["total_cvdpv"], tb["cvdpv_cases"])
     tb["combined_cvdpv"] = tb["combined_cvdpv"].copy_metadata(tb["cvdpv_cases"])
