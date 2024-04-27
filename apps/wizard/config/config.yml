@@ -95,6 +95,13 @@ sections:
     description: |-
       Create chart revisions, and synchronize aproved revisions between servers.
     apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: pages/charts_v2/__main__.py
+      description: Update indicator references in charts
+      maintainer: "@lucas"
+      emoji: "🌟"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
     - title: "Chart Diff"
       alias: chart_diff
       entrypoint: pages/chart_diff/app.py
