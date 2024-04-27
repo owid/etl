@@ -1,0 +1,512 @@
+dataset:
+  title: Air pollution emissions by sector (CEDS, 2024)
+  description: Emissions of air pollutants since 1750 by sector.
+  licenses:
+    - {}
+tables:
+  air_pollution_ceds_by_sector:
+    variables:
+      agriculture_nox:
+        title: NOx emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_nox:
+        title: NOx emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_nox:
+        title: NOx emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_nox:
+        title: Fugitive NOx emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive NOx emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_nox:
+        title: NOx emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_nox:
+        title: NOx emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nox:
+        title: NOx emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_nox:
+        title: NOx emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_nox:
+        title: NOx emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NOx emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_so2:
+        title: SO₂ emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_so2:
+        title: SO₂ emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_so2:
+        title: SO₂ emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_so2:
+        title: Fugitive SO₂ emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive SO₂ emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_so2:
+        title: SO₂ emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_so2:
+        title: SO₂ emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_so2:
+        title: SO₂ emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_so2:
+        title: SO₂ emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_so2:
+        title: SO₂ emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: SO₂ emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_co:
+        title: CO emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_co:
+        title: CO emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_co:
+        title: CO emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_co:
+        title: Fugitive CO emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive CO emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_co:
+        title: CO emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_co:
+        title: CO emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_co:
+        title: CO emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_co:
+        title: CO emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_co:
+        title: CO emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: CO emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_oc:
+        title: OC emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_oc:
+        title: OC emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_oc:
+        title: OC emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_oc:
+        title: Fugitive OC emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive OC emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_oc:
+        title: OC emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_oc:
+        title: OC emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_oc:
+        title: OC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_oc:
+        title: OC emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_oc:
+        title: OC emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: OC emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_nmvoc:
+        title: NMVOC emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_nmvoc:
+        title: NMVOC emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_nmvoc:
+        title: NMVOC emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_nmvoc:
+        title: Fugitive NMVOC emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive NMVOC emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_nmvoc:
+        title: NMVOC emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_nmvoc:
+        title: NMVOC emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nmvoc:
+        title: NMVOC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_nmvoc:
+        title: NMVOC emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_nmvoc:
+        title: NMVOC emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: NMVOC emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_bc:
+        title: BC emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_bc:
+        title: BC emissions from aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_bc:
+        title: BC emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_bc:
+        title: Fugitive BC emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive BC emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_bc:
+        title: BC emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_bc:
+        title: BC emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_bc:
+        title: BC emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_bc:
+        title: BC emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_bc:
+        title: BC emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: BC emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      agriculture_nh3:
+        title: Ammonia emissions from agriculture
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from agriculture
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      aviation_nh3:
+        title: Ammonia emissions from domestic aviation
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from domestic aviation
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      energy_nh3:
+        title: Ammonia emissions from energy
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from energy
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      fugitive_emissions_nh3:
+        title: Fugitive ammonia emissions
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Fugitive ammonia emissions
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      industry_nh3:
+        title: Ammonia emissions from industry
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from industry
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      other_nh3:
+        title: Ammonia emissions from other sectors
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from other sectors
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      shipping_nh3:
+        title: Ammonia emissions from shipping
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from shipping
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      transport_nh3:
+        title: Ammonia emissions from transport
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from transport
+          numDecimalPlaces: 0
+          conversionFactor: 1000
+      waste_nh3:
+        title: Ammonia emissions from waste
+        unit: tonnes
+        short_unit: t
+        display:
+          name: Ammonia emissions from waste
+          numDecimalPlaces: 0
+          conversionFactor: 1000
