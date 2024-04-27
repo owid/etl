@@ -514,18 +514,13 @@ class StepUpdater:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
-        # Skip steps that are already archived.
-        if step_info["update_state"] == UpdateState.ARCHIVABLE.value:
-            log.info(f"Skipping already archivable step: {step}")
-            return
-
         # Skip non-archivable steps.
         if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
             log.info(f"Skipping non-archivable step: {step}")
             return
 
         # Skip snapshots (since they do not appear as steps in the dag).
-        if step_info["channel"] == "snapshot":
+        if step_info["channel"] in ["snapshot", "walden"]:
             log.info(f"Skipping snapshot: {step}")
             return
 
