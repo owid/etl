@@ -379,15 +379,16 @@ class StepUpdater:
         # Create the dag_part that needs to be written to the archive file.
         dag_part = {step: set(step_info["direct_dependencies"])}
 
-        # Add the new step and its dependencies to the archive dag.
-        write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
+        if not self.dry_run:
+            # Add the new step and its dependencies to the archive dag.
+            write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
 
-        # Delete the step from the active dag.
-        # TODO: Create unit tests for this function.
-        remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
+            # Delete the step from the active dag.
+            # TODO: Create unit tests for this function.
+            remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
 
-        # Reload steps dataframe.
-        self._load_version_tracker()
+            # Reload steps dataframe.
+            self._load_version_tracker()
 
     def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
         """Move one or more steps from their active to their archive dag."""
@@ -539,5 +540,61 @@ def cli(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
+        include_usages=include_usages,
+    )
+
+
+@click.command(name="archive", cls=RichCommand, help=__doc__)
+@click.argument("steps", type=str or List[str], nargs=-1)
+@click.option(
+    "--include-usages",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Archive also steps that are directly using the given steps. Default: False.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Do not write to dag. Default: False.",
+)
+@click.option(
+    "--interactive/--non-interactive",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
+)
+def archive_cli(
+    steps: Union[str, List[str]],
+    include_usages: bool = False,
+    dry_run: bool = False,
+    interactive: bool = True,
+) -> None:
+    """Archive one or more steps.
+
+    This tool lets you move one or more data steps from their active to their archive dag.
+
+    **Examples:**
+
+    **Note:** Remove the --dry-run if you want to actually write to the dag.
+
+    * To archive a single step:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --dry-run
+        ```
+
+        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+
+    * To archive not only that step, but also the steps that use it:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --include-usages --dry-run
+        ```
+    """
+    # Initialize step updater and run update.
+    StepUpdater(dry_run=dry_run, interactive=interactive).archive_steps(
+        steps=steps,
         include_usages=include_usages,
     )
