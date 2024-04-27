@@ -940,8 +940,9 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
                 new_lines.append(line)
                 continue
             elif line.strip().startswith(step):
-                # Remove the previous comment lines and ignore the current line.
-                new_lines = new_lines[:-_number_of_comment_lines]
+                if _number_of_comment_lines > 0:
+                    # Remove the previous comment lines and ignore the current line.
+                    new_lines = new_lines[:-_number_of_comment_lines]
                 # Find the number of spaces on the left of the step name.
                 # We need this to know if the next comments are indented (as comments within dependencies).
                 num_spaces_indent = len(line) - len(line.lstrip())
