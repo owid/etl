@@ -155,7 +155,7 @@ class ChartDiffModified:
         self.approval_status = "approved" if self.approval_status == "rejected" else "rejected"
 
         # Update approval status (in database)
-        st.toast(f"Updating state for chart {self.chart_id} to {self.approval_status}")
+        st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
         approval = gm.ChartDiffApprovals(
             chartId=self.chart_id,
             sourceUpdatedAt=self.source_chart.updatedAt,
@@ -170,8 +170,9 @@ class ChartDiffModified:
         # update_expander(chart_id=chart_id, title=title, expanded=not self.approved)
 
     def show(self, session):
+        label = f"✅ {self.source_chart.config['slug']}" if self.approved else ""
         with st.expander(
-            label=self.source_chart.config["slug"],
+            label=label,
             expanded=not self.approved,
         ):
             st.toggle(
