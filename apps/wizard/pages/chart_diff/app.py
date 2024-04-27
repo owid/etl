@@ -7,10 +7,9 @@ from st_pages import add_indentation
 from streamlit_extras.stylable_container import stylable_container
 
 from apps.staging_sync.cli import _get_engine_for_env, _validate_env
+from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.utils import chart_html
 from etl import grapher_model as gm
-
-from .chart_diff import ChartDiffModified
 
 # from apps.wizard import utils as wizard_utils
 
@@ -18,7 +17,7 @@ from .chart_diff import ChartDiffModified
 
 CURRENT_DIR = Path(__file__).resolve().parent
 SOURCE_ENV = "staging-site-mojmir"
-TARGET_ENV = "live"
+TARGET_ENV = "staging-site-master"
 
 # st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
 
@@ -193,7 +192,7 @@ def main():
         with Session(target_engine) as target_engine:
             for chart_diff in chart_diffs:
                 assert chart_diff.source_chart.id
-                chart_diff.show(source_session, target_engine)
+                show(chart_diff, source_session, target_engine)
 
 
 main()
