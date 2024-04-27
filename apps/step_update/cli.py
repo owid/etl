@@ -389,8 +389,39 @@ class StepUpdater:
         # Reload steps dataframe.
         self._load_version_tracker()
 
-    def archive_steps(self, steps: List[str]) -> None:
+    def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
         """Move one or more steps from their active to their archive dag."""
+
+        # If a single step is given, convert it to a list.
+        if isinstance(steps, str):
+            steps = [steps]
+
+        # Archivable steps should be archived in groups.
+        # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
+        # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
+        # dependency in the dag).
+        for step in steps:
+            if include_usages:
+                # Add direct usages of current step to the list of steps to update (if not already in the list).
+                usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
+
+                # Select only active usages (that are not already archived).
+                # Note that in principle this is not necessary, since StepUpdater works only with active steps.
+                # But we may eventually let StepUpdater handle archive steps, so we include this for safety.
+                active_usages = self.steps_df[
+                    (self.steps_df["step"].isin(usages)) & (self.steps_df["state"] == "active")
+                ]["step"].tolist()
+
+                steps += [usage for usage in active_usages if usage not in steps]
+
+        if self.interactive:
+            message = "The following steps will be archived:"
+            for step in steps:
+                message += f"\n  {step}"
+            log.info(message)
+            if self.interactive:
+                input("Press enter to continue.")
+
         for step in steps:
             log.info(f"Archiving step: {step}")
             self._archive_step(step=step)
