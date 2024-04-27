@@ -562,6 +562,9 @@ tables:
           Foreign policymaking free from foreign influence (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which foreign policy is free from the interference of other states.
+        presentation:
+          <<: *common_ppt
+          title_public: Foreign policymaking free from foreign influence
         description_from_producer: |-
           Question: Is the state autonomous from the control of other states with respect to the conduct of its foreign policy?
 
@@ -572,9 +575,6 @@ tables:
 
           Indicator name: `v2svinlaut`
         unit: ''
-        presentation:
-          <<: *common_ppt
-          title_public: Foreign policymaking free from foreign influence
 
       ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
@@ -582,6 +582,9 @@ tables:
           Territory under state control (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the percentage of territory controlled by the government.
+        presentation:
+          <<: *common_ppt
+          title_public: Territory under state control
         description_from_producer: |-
           Question: Over what percentage (%) of the territory does the state have effective control?
 
@@ -599,6 +602,9 @@ tables:
           Equality of political power across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics or have similar political power.
+        presentation:
+          <<: *common_ppt
+          title_public: Equality of political power across social groups
         description_from_producer: |-
           Question: Is political power distributed according to social groups?
 
@@ -620,6 +626,9 @@ tables:
           Presidentialism index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral management body, and other oversight.
+        presentation:
+          <<: *common_ppt
+          title_public: Presidentialism index
         description_from_producer: |-
           Question: To what extent is the regime characterized by presidentialism?
 
@@ -637,6 +646,9 @@ tables:
           Civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
+        presentation:
+          <<: *common_ppt
+          title_public: Civil liberties index
         description_from_producer: |-
           Question: To what extent is civil liberty respected?
 
@@ -653,6 +665,9 @@ tables:
           Private civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate the extent to which people are free from forced labor, have property rights, and enjoy freedom of movement and religion.
+        presentation:
+          <<: *common_ppt
+          title_public: Private civil liberties index
         description_from_producer: |-
           Question: To what extent are private liberties respected?
 
@@ -669,6 +684,9 @@ tables:
           Political civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which people enjoy the freedoms of expression and association.
+        presentation:
+          <<: *common_ppt
+          title_public: Political civil liberties index
         description_from_producer: |-
           Question: To what extent are political liberties respected?
 
@@ -685,6 +703,9 @@ tables:
           Physical violence index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which people are free from government torture and political killings.
+        presentation:
+          <<: *common_ppt
+          title_public: Physical violence index
         description_from_producer: |-
           Question: To what extent is physical integrity respected?
 
@@ -701,6 +722,9 @@ tables:
           Political corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which a country is affected by political corruption.
+        presentation:
+          <<: *common_ppt
+          title_public: Political corruption index
         description_from_producer: |-
           Question: How pervasive is political corruption?
 
@@ -715,6 +739,9 @@ tables:
       corr_publsec_vdem:
         title: |-
           Public sector corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+        presentation:
+          <<: *common_ppt
+          title_public: Public sector corruption index
         description_from_producer: |-
           Question: To what extent do public sector employees grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -729,6 +756,9 @@ tables:
       corr_exec_vdem:
         title: |-
           Executive corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+        presentation:
+          <<: *common_ppt
+          title_public: Executive corruption index
         description_from_producer: |-
           Question: How routinely do members of the executive, or their agents grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -745,6 +775,9 @@ tables:
           Women's political empowerment index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
+        presentation:
+          <<: *common_ppt
+          title_public: Women's political empowerment index
         description_from_producer: |-
           Question: How politically empowered are women?
 
@@ -761,6 +794,9 @@ tables:
           Women's civil rights index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+        presentation:
+          <<: *common_ppt
+          title_public: Women's civil rights index
         description_from_producer: |-
           Question: Do women have the ability to make meaningful decisions in key areas of their lives?
 
@@ -777,6 +813,9 @@ tables:
           Women's civil society participation index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+        presentation:
+          <<: *common_ppt
+          title_public: Women's civil society participation index
         description_from_producer: |-
           Question: Do women have the ability to express themselves and to form and participate in groups?
 
@@ -851,14 +890,16 @@ tables:
     common:
       display:
           numDecimalPlaces: 2
+      presentation: &common_ppt_2
+        title_variant: (<< estimate >> estimate)
     variables:
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
       accessjust_m_row:
         title: Access to justice for men (<< estimate >> estimate) (re-estimate)
         description_short: << estimate.title() >> estimate whether men have access to justice.
         presentation:
+          <<: *common_ppt_2
           title_public: "Access to justice for men"
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
 
@@ -886,8 +927,8 @@ tables:
         title: Access to justice for women (<< estimate >> estimate) (re-estimate)
         description_short: << estimate.title() >> estimate whether women have access to justice.
         presentation:
+          <<: *common_ppt_2
           title_public: "Access to justice for women"
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
 
@@ -916,8 +957,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which major civil society organizations are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
         presentation:
+          <<: *common_ppt_2
           title_public: Civil society participation index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
 
@@ -938,8 +979,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites acknowledge and respect counterarguments when considering important policy changes.
         presentation:
+          <<: *common_ppt_2
           title_public: Respect for counterarguments
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
 
@@ -963,8 +1004,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         presentation:
+          <<: *common_ppt_2
           title_public: Deliberative political institutions index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
 
@@ -987,7 +1028,7 @@ tables:
           << estimate.title() >> estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
         presentation:
           title_public: Egalitarian political institutions index
-          title_variant: (<< estimate >> estimate)
+          <<: *common_ppt_2
         description_from_producer: |-
           Question: To what extent is the egalitarian principle achieved?
 
@@ -1005,7 +1046,7 @@ tables:
           << estimate.title() >> estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         presentation:
           title_public: Electoral democracy
-          title_variant: (<< estimate >> estimate)
+          <<: *common_ppt_2
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
@@ -1021,7 +1062,7 @@ tables:
         description_short: << estimate.title() >> estimate of whether national elections were free and fair or not.
         presentation:
           title_public: Free and fair elections
-          title_variant: (<< estimate >> estimate)
+          <<: *common_ppt_2
         description_from_producer: |-
           Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
 
@@ -1050,7 +1091,7 @@ tables:
           << estimate.title() >> estimate of the extent to which registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence are absent, and the election management body is autonomous and has enough staff and resources.
         presentation:
           title_public: Clean elections index
-          title_variant: (<< estimate >> estimate)
+          <<: *common_ppt_2
         description_from_producer: |-
           Question: To what extent are elections free and fair?
 
@@ -1067,8 +1108,8 @@ tables:
         description_short: |-
 
         presentation:
+          <<: *common_ppt_2
           title_public: Multi-party elections for government's chief executive
-          title_variant: (<< estimate >> estimate)
         unit: ''
         description_processing: |-
           {definitions.auxiliary.description_processing_row}
@@ -1087,8 +1128,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of whether multi-party elections for the national legislature were held or not.
         presentation:
+          <<: *common_ppt_2
           title_public: Multiparty elections for legislature
-          title_variant: (<< estimate >> estimate)
         description_processing: |-
           Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
         unit: ''
@@ -1101,8 +1142,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate whether national multi-party elections were held.
         presentation:
+          <<: *common_ppt_2
           title_public: Multiparty elections
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
 
@@ -1128,8 +1169,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites consult other elites across the political spectrum and from relevant sectors of society and business when considering important policy changes.
         presentation:
+          <<: *common_ppt_2
           title_public: Elite consultation
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
 
@@ -1153,8 +1194,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which access to power is equal across socioeconomic position, social group, and gender.
         presentation:
+          <<: *common_ppt_2
           title_public: Equal access to power index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: How equal is access to power?
 
@@ -1171,8 +1212,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which the state protects the rights and freedoms across social groups equally.
         presentation:
+          <<: *common_ppt_2
           title_public: Equal rights protection index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: How equal is the protection of rights and freedoms across social groups by the state?
 
@@ -1189,8 +1230,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which all social groups benefit from public spending and have equal access to education, healthcare, and the welfare state.
         presentation:
+          <<: *common_ppt_2
           title_public: Equal resource distribution index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: How equal is the distribution of resources?
 
@@ -1207,8 +1248,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections and the extent to which civil society organizations are allowed to form and operate freely.
         presentation:
+          <<: *common_ppt_2
           title_public: Freedom of association thick index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
@@ -1223,8 +1264,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which people can discuss political matters at home and in the public sphere, the press, and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
         presentation:
+          <<: *common_ppt_2
           title_public: Freedom of Expression and Alternative Sources of Information index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
 
@@ -1241,8 +1282,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent, and public administration is impartial.
         presentation:
+          <<: *common_ppt_2
           title_public: Equality before the law and individual liberty index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 
@@ -1257,8 +1298,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which the executive respects the constitution, complies with the judiciary and high courts, and higher and lower courts are independent.
         presentation:
+          <<: *common_ppt_2
           title_public: Judicial constraints on the executive index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
 
@@ -1273,8 +1314,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people or as helping the least advantaged people in society when considering important policy changes.
         presentation:
+          <<: *common_ppt_2
           title_public: Common good justifications
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
 
@@ -1296,8 +1337,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites provide complex, nuanced, and complete justifications for their views when considering important policy changes.
         presentation:
+          <<: *common_ppt_2
           title_public: Justified political positions
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
 
@@ -1319,8 +1360,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which the legislature, including opposition parties, questions executive officials and oversees and investigates the executive.
         presentation:
+          <<: *common_ppt_2
           title_public: Legislative constraints on the executive index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
 
@@ -1337,8 +1378,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
         presentation:
+          <<: *common_ppt_2
           title_public: Liberal component index
-          title_variant: (<< estimate >> estimate)
         description_from_producer: &description_prod_lib_vdem |-
           Question: To what extent is the liberal principle of democracy achieved?
 
@@ -1354,8 +1395,8 @@ tables:
         title: Liberal political institutions (<< estimate >> estimate) (re-estimate)
         description_short: << estimate.title() >> estimate of whether the country has meaningfully liberal political institutions
         presentation:
+          <<: *common_ppt_2
           title_public: Liberal political institutions
-          title_variant: (<< estimate >> estimate)
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
@@ -1371,8 +1412,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which elected local governments exist, and they operate without interference from local unelected bodies.
         presentation:
+          <<: *common_ppt_2
           title_public: Elected local governments
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
 
@@ -1389,8 +1430,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         presentation:
+          <<: *common_ppt_2
           title_public: Participatory political institutions
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: To what extent is the participatory principle achieved?
 
@@ -1408,8 +1449,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which elected regional governments exist, and they operate without interference from regional unelected bodies.
         presentation:
+          <<: *common_ppt_2
           title_public: Elected regional governments
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
 
@@ -1426,8 +1467,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which ordinary people independently discuss important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
         presentation:
+          <<: *common_ppt_2
           title_public: Engaged society
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
 
@@ -1452,8 +1493,8 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
         presentation:
+          <<: *common_ppt_2
           title_public: Transparent laws with predictable enforcement
-          title_variant: (<< estimate >> estimate)
         description_from_producer: |-
           Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?
 
