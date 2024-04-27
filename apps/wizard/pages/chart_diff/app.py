@@ -99,120 +99,127 @@ def update_expander(chart_id, title, expanded: bool):
     }
 
 
-def update_revision_state(chart_id, title, source_session, source_chart: gm.Chart, target_chart: gm.Chart):
-    status = st.session_state[f"toggle-{chart_id}"]
+class ChartDiffModified:
+    def __init__(self, source_chart, target_chart, approval_status):
+        self.source_chart = source_chart
+        self.target_chart = target_chart
+        self.approval_status = approval_status
+        assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
+        self.chart_id = source_chart.id
 
-    # Update approval status (in database)
-    approval = gm.ChartDiffApprovals(
-        chartId=chart_id,
-        sourceUpdatedAt=source_chart.updatedAt,
-        targetUpdatedAt=target_chart.updatedAt,
-        status="approved" if status else "rejected",
-    )
+    @property
+    def approved(self):
+        return self.approval_status == "approved"
 
-    source_session.add(approval)
-    source_session.commit()
+    @classmethod
+    def from_chart_id(cls, chart_id, source_session, target_session):
+        """Get chart diff from chart id.
 
-    # Update expander display
-    update_expander(chart_id=chart_id, title=title, expanded=status == "rejected")
+        - Get charts from source and target
+        - Get its approval state
+        - Build diff object
+        """
+        # Get charts
+        source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
+        target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+        # Get approval status
+        approval_status = gm.ChartDiffApprovals.latest_chart_status(
+            source_session,
+            chart_id,
+            source_chart.updatedAt,
+            target_chart.updatedAt,
+        )
+
+        # Build object
+        chart_diff = cls(source_chart, target_chart, approval_status)
+
+        return chart_diff
+
+    def sync_approval_status(self, session) -> None:
+        """Get approval status of chart diff."""
+        approval_status = gm.ChartDiffApprovals.latest_chart_status(
+            session,
+            self.source_chart.id,
+            self.source_chart.updatedAt,
+            self.target_chart.updatedAt,
+        )
+        self.approval_status = approval_status
+
+    def sync(self):
+        """Sync chart diff."""
+        if self.approval_status == "approved":
+            update_expander(self.source_chart, self.target_chart.config["slug"], expanded=False)
+
+    def update_state(self, session) -> None:
+        # Update status variable
+        self.approval_status = "approved" if self.approval_status == "rejected" else "rejected"
+
+        # Update approval status (in database)
+        st.toast(f"Updating state for chart {self.chart_id} to {self.approval_status}")
+        approval = gm.ChartDiffApprovals(
+            chartId=self.chart_id,
+            sourceUpdatedAt=self.source_chart.updatedAt,
+            targetUpdatedAt=self.target_chart.updatedAt,
+            status="approved" if self.approved else "rejected",
+        )
+
+        session.add(approval)
+        session.commit()
+
+        # Update expander display
+        # update_expander(chart_id=chart_id, title=title, expanded=not self.approved)
+
+    def show(self, session):
+        with st.expander(
+            label=self.source_chart.config["slug"],
+            expanded=not self.approved,
+        ):
+            st.toggle(
+                label="Approved new chart version",
+                key=f"toggle-{self.chart_id}",
+                value=self.approved,
+                on_change=lambda session=session: self.update_state(session),
+            )
+            compare_charts(self.source_chart, self.target_chart)
 
 
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
 
+    # Get stuff from DB
     source_engine, target_engine = get_engines()
-
     # TODO: this should be created via migration in owid-grapher!!!!!
     # create chart_diff_approvals table if it doesn't exist
     SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])
-
-    chart_ids_modified = get_modified_chart_ids()
-    chart_ids_new = get_new_chart_ids()
+    # Get IDs from modified charts
+    charts_modified_ids = get_modified_chart_ids()
+    # chart_ids_new = get_new_chart_ids()
     # explorers_modified = get_modified_explorers()
+    # Get actual charts
+    import datetime as dt
 
-    st.markdown(f"There are {len(chart_ids_modified)} chart updates, {len(chart_ids_new)} new charts.")
-
-    st.session_state.expanders = st.session_state.get(
-        "expanders",
-        {
-            chart_id: {
-                "label": "",
-                "expanded": True,
-            }
-            for chart_id in [*chart_ids_modified, *chart_ids_new]
-        },
-    )
-
+    st.write(dt.datetime.now())
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
-            # MODIFIED CHARTS
-            st.header("Modified charts")
-            st.markdown(f"{len(chart_ids_modified)} charts modified in `{SOURCE_ENV}`")
-            for chart_id in chart_ids_modified:
-                # Get charts
-                source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
-                target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-
-                assert source_chart.id
-
-                # Get existing approvals
-                # TODO: should we highlight if the chart has been explicitly rejected?
-                approval_status = gm.ChartDiffApprovals.latest_chart_status(
-                    source_session, source_chart.id, source_chart.updatedAt, target_chart.updatedAt
+            chart_diffs = [
+                ChartDiffModified.from_chart_id(
+                    chart_id=chart_id,
+                    source_session=source_session,
+                    target_session=target_session,
                 )
+                for chart_id in charts_modified_ids
+            ]
 
-                if approval_status == "approved":
-                    update_expander(chart_id, target_chart.config["slug"], expanded=False)
+    # Show information
+    st.info(f"There are {len(charts_modified_ids)} chart updates")
 
-                with st.expander(
-                    label=st.session_state.expanders[chart_id]["label"],
-                    expanded=st.session_state.expanders[chart_id]["expanded"],
-                ):
-                    st.toggle(
-                        label="Approve new chart version",
-                        key=f"toggle-{chart_id}",
-                        value=approval_status == "approved",
-                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_revision_state(
-                            chart_id=chart_id,
-                            title=target_chart.config["slug"],
-                            source_session=source_session,
-                            source_chart=source_chart,
-                            target_chart=target_chart,
-                        ),
-                    )
-
-                    compare_charts(source_chart, target_chart)
-
-                    # Update list
-                    # st.session_state.chart_approval_list.append(
-                    #     {
-                    #         "id": target_chart.id,
-                    #         "approved": False,
-                    #         "updated": target_chart.updatedAt,
-                    #     }
-                    # )
-
-            # NEW CHARTS
-            # TODO: fix approvals for new charts
-            st.header("New charts")
-            st.markdown(f"{len(chart_ids_new)} new charts in `{SOURCE_ENV}`")
-            chart_ids_new = get_new_chart_ids()
-            for chart_id in chart_ids_new:
-                with st.expander(
-                    label=st.session_state.expanders[chart_id]["label"],
-                    expanded=st.session_state.expanders[chart_id]["expanded"],
-                ):
-                    st.toggle(
-                        label="Approve new chart",
-                        key=f"toggle-{chart_id}",
-                        on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(  # type: ignore
-                            chart_id=chart_id,
-                            title=target_chart.config["slug"],
-                            expanded=st.session_state[f"toggle-{chart_id}"],
-                        ),
-                    )
-                    chart_html(source_chart.config)  # type: ignore
+    # MODIFIED CHARTS
+    st.header("Modified charts")
+    st.markdown(f"{len(charts_modified_ids)} charts modified in `{SOURCE_ENV}`")
+    with Session(source_engine) as session:
+        for chart_diff in chart_diffs:
+            assert chart_diff.source_chart.id
+            chart_diff.show(session)
 
 
-# if __name__ == "__main__":
 main()

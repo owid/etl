@@ -90,13 +90,18 @@ sections:
         maintainer: "@mojmir"
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
-      - title: "Chart Diff"
-        alias: chart_diff
-        entrypoint: pages/chart_diff/app.py
-        description: Chart differences
-        maintainer: "@mojmir"
-        emoji: "⚡"
-        image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+
+  - title: "Charts v2"
+    description: |-
+      Create chart revisions, and synchronize aproved revisions between servers.
+    apps:
+    - title: "Chart Diff"
+      alias: chart_diff
+      entrypoint: pages/chart_diff/app.py
+      description: Chart differences
+      maintainer: "@mojmir"
+      emoji: "⚡"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
 
   - title: "Dashboard"
     description: |-
