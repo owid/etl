@@ -1480,7 +1480,7 @@ class ChartDiffApprovals(SQLModel, table=True):
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
     chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
     sourceUpdatedAt: datetime = Field(sa_column=Column("sourceUpdatedAt", DateTime, nullable=False))
-    targetUpdatedAt: datetime = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=False))
+    targetUpdatedAt: Optional[datetime] = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=True))
     updatedAt: datetime = Field(
         default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
     )

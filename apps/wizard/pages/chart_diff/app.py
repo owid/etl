@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Set
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
@@ -6,7 +7,7 @@ from sqlmodel import Session, SQLModel
 from st_pages import add_indentation
 from streamlit_extras.stylable_container import stylable_container
 
-from apps.staging_sync.cli import _get_engine_for_env, _validate_env
+from apps.staging_sync.cli import _get_engine_for_env, _modified_chart_ids_by_admin, _validate_env
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.utils import chart_html
 from etl import grapher_model as gm
@@ -34,23 +35,13 @@ st.set_page_config(
 add_indentation()
 
 
-def get_modified_chart_ids():
-    chart_ids = [
-        2000,
-        2001,
-        2002,
-        2003,
-        4005,
-    ]
-    return chart_ids
+def get_modified_chart_ids(source_session) -> Set[int]:
+    # These contain both updated and new charts!!!
+    return _modified_chart_ids_by_admin(source_session)
 
 
 def get_new_chart_ids():
-    chart_ids = [
-        3000,
-        3001,
-    ]
-    return chart_ids
+    raise NotImplementedError()
 
 
 def get_modified_explorers():
@@ -165,14 +156,15 @@ def main():
     # TODO: this should be created via migration in owid-grapher!!!!!
     # create chart_diff_approvals table if it doesn't exist
     SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])
-    # Get IDs from modified charts
-    charts_modified_ids = get_modified_chart_ids()
     # chart_ids_new = get_new_chart_ids()
     # explorers_modified = get_modified_explorers()
     # Get actual charts
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
+            # Get IDs from modified charts
+            charts_modified_ids = get_modified_chart_ids(source_session)
+
             chart_diffs = [
                 ChartDiffModified.from_chart_id(
                     chart_id=chart_id,
@@ -191,8 +183,12 @@ def main():
     with Session(source_engine) as source_engine:
         with Session(target_engine) as target_engine:
             for chart_diff in chart_diffs:
-                assert chart_diff.source_chart.id
-                show(chart_diff, source_session, target_engine)
+                if chart_diff.is_modified:
+                    show(chart_diff, source_session, target_engine)
+
+                # TODO
+                if chart_diff.is_new:
+                    pass
 
 
 main()

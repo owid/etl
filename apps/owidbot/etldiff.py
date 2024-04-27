@@ -52,8 +52,11 @@ def cli(
     """
     t = time.time()
 
-    lines = call_etl_diff(include)
-    diff, result = format_etl_diff(lines)
+    chart_diff = call_chart_diff()
+
+    # lines = call_etl_diff(include)
+    # data_diff, data_diff_summary = format_etl_diff(lines)
+    data_diff, data_diff_summary = "", ""
 
     container_name = _get_container_name(branch) if branch else "dry-run"
 
@@ -73,10 +76,16 @@ def cli(
 
 <details>
 
-<summary><b>etl diff</b>: {result}</summary>
+<summary><b>Chart diff</b>: </summary>
+{chart_diff}
+</details>
+
+<details>
+
+<summary><b>etl diff</b>: {data_diff_summary}</summary>
 
 ```diff
-{diff}
+{data_diff}
 ```
 
 Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
@@ -194,6 +203,12 @@ def call_etl_diff(include: str) -> list[str]:
 
     return [str(line) for line in AnsiDecoder().decode(stdout)]
 
+
+def call_chart_diff() -> str:
+    return """
+    - 3 new charts (3 approved)
+    - 2 modified charts (1 approved)
+    """.strip()
 
 if __name__ == "__main__":
     cli()

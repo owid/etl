@@ -21,15 +21,7 @@ class ChartDiffModified:
 
     @property
     def is_modified(self) -> bool:
-        # chart with ID doesn't exist
-        if not self.target_chart:
-            return False
-
-        # chart exists, but was created independently and has different slug
-        if self.source_chart.slug != self.target_chart.slug:
-            return False
-
-        return True
+        return self.target_chart is not None
 
     @classmethod
     def from_chart_id(cls, chart_id, source_session, target_session):
@@ -42,12 +34,18 @@ class ChartDiffModified:
         # Get charts
         source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
         target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+
+        # It can happen that both charts have the same ID, but are completely different (this
+        # happens when two charts are created independently and have different slugs)
+        if target_chart and source_chart.slug != target_chart.slug:
+            target_chart = None
+
         # Get approval status
         approval_status = gm.ChartDiffApprovals.latest_chart_status(
             source_session,
             chart_id,
             source_chart.updatedAt,
-            target_chart.updatedAt,
+            target_chart.updatedAt if target_chart else None,
         )
 
         # Build object
