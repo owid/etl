@@ -988,3 +988,23 @@ def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> No
     """
     for step in steps_to_remove:
         _remove_step_from_dag_file(dag_file=dag_file, step=step)
+
+
+def create_dag_archive_file(dag_file_archive: Path) -> None:
+    # Create new dag archive file (and add it to the main dag archive file).
+
+    # Create a new archive dag file.
+    dag_file_archive.write_text("steps:\n")
+    # Find the number of spaces in the indentation of the main dag archive file.
+    n_spaces_include_section = 2
+    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
+        lines = file.readlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("include"):
+            n_spaces_include_section = [
+                len(_line) - len(_line.lstrip()) for _line in lines[i + 1 :] if _line.strip().startswith("- ")
+            ][0]
+    # Add this archive dag file to the main dag archive file.
+    dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
+    with open(paths.DAG_ARCHIVE_FILE, "a") as file:
+        file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")

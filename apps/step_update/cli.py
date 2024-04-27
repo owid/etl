@@ -10,8 +10,13 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import get_comments_above_step_in_dag, remove_steps_from_dag_file, write_to_dag_file
-from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
+from etl.helpers import (
+    create_dag_archive_file,
+    get_comments_above_step_in_dag,
+    remove_steps_from_dag_file,
+    write_to_dag_file,
+)
+from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
@@ -509,6 +514,11 @@ class StepUpdater:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
+        # Skip steps that are already archived.
+        if step_info["update_state"] == UpdateState.ARCHIVABLE.value:
+            log.info(f"Skipping already archivable step: {step}")
+            return
+
         # Skip non-archivable steps.
         if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
             log.info(f"Skipping non-archivable step: {step}")
@@ -523,12 +533,15 @@ class StepUpdater:
         dag_file_active = step_info["dag_file_path"]
 
         # Get archive dag file for this step.
-        # TODO: Write the logic of path changes based on etl.paths.
-        dag_file_archive = Path(dag_file_active.as_posix().replace("dag", "dag/archive"))
+        dag_file_archive = Path(
+            dag_file_active.as_posix().replace(
+                DAG_DIR.relative_to(BASE_DIR).as_posix(), DAG_ARCHIVE_FILE.parent.relative_to(BASE_DIR).as_posix()
+            )
+        )
 
         # If the archive dag file does not exist, create it.
         if not dag_file_archive.exists():
-            raise NotImplementedError("Archive dag file does not exist. Add logic to create it.")
+            create_dag_archive_file(dag_file_archive=dag_file_archive)
 
         # Get header from the comment lines right above the current step in the dag.
         step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file_active)
