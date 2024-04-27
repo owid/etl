@@ -73,6 +73,8 @@ class ChartDiffModified:
 
         # Update approval status (in database)
         st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
+        assert self.chart_id
+        assert self.target_chart
         approval = gm.ChartDiffApprovals(
             chartId=self.chart_id,
             sourceUpdatedAt=self.source_chart.updatedAt,

@@ -10,7 +10,6 @@ from pathlib import Path
 
 import click
 import pandas as pd
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 

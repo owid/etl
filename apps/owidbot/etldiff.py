@@ -57,8 +57,8 @@ def cli(
 
     chart_diff = format_chart_diff(call_chart_diff(branch))
 
-    # lines = call_etl_diff(include)
-    # data_diff, data_diff_summary = format_etl_diff(lines)
+    lines = call_etl_diff(include)
+    data_diff, data_diff_summary = format_etl_diff(lines)
     data_diff, data_diff_summary = "", ""
 
     container_name = _get_container_name(branch) if branch else "dry-run"
