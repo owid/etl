@@ -589,7 +589,10 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
+    chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
+    chart_config["adminBaseUrl"] = "https://admin.owid.io/admin/"
+
     HTML = f"""
     <!DOCTYPE html>
     <html>
@@ -606,6 +609,9 @@ def chart_html(chart_config: Dict[str, Any], height=500, **kwargs):
                 <figure data-grapher-src></figure>
             </main>
             <div class="site-tools"></div>
+            <script>
+                document.cookie = "isAdmin=true;max-age=31536000;SameSite=None;"
+            </script>
             <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
             <script type="module">
                 var jsonConfig = {json.dumps(chart_config)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
@@ -613,5 +619,6 @@ def chart_html(chart_config: Dict[str, Any], height=500, **kwargs):
         </body>
     </html>
     """
-
+    st.write(chart_config)
+    st.code(HTML)
     components.html(HTML, height=height, **kwargs)

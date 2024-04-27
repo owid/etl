@@ -4,6 +4,7 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, SQLModel
 from st_pages import add_indentation
+from streamlit_extras.stylable_container import stylable_container
 
 from apps.staging_sync.cli import _get_engine_for_env, _validate_env
 from apps.wizard.utils import chart_html
@@ -15,7 +16,7 @@ from etl import grapher_model as gm
 
 CURRENT_DIR = Path(__file__).resolve().parent
 SOURCE_ENV = "staging-site-mojmir"
-TARGET_ENV = "staging-site-mojmir"
+TARGET_ENV = "live"
 
 # st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
 
@@ -70,12 +71,13 @@ def compare_charts(
             st.markdown("Production :red[(⚠️was modified)]")
         else:
             st.markdown(f"Production   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
-        chart_html(source_chart.config)
+        chart_html(source_chart.config, base_url=TARGET_ENV)
 
     with col2:
         # st.selectbox(label="version", options=["Target"], key=f"selectbox-right-{identifier}")
         st.markdown(f"New version   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
-        chart_html(target_chart.config)
+        # st.write(target_chart.config)
+        chart_html(target_chart.config, base_url=SOURCE_ENV)
 
 
 @st.cache_resource
@@ -135,22 +137,18 @@ class ChartDiffModified:
 
         return chart_diff
 
-    def sync_approval_status(self, session) -> None:
-        """Get approval status of chart diff."""
-        approval_status = gm.ChartDiffApprovals.latest_chart_status(
-            session,
-            self.source_chart.id,
-            self.source_chart.updatedAt,
-            self.target_chart.updatedAt,
-        )
-        self.approval_status = approval_status
-
-    def sync(self):
+    def sync(self, source_session, target_session):
         """Sync chart diff."""
-        if self.approval_status == "approved":
-            update_expander(self.source_chart, self.target_chart.config["slug"], expanded=False)
+
+        # Synchronize with latest chart from source environment
+        self = self.from_chart_id(
+            chart_id=self.chart_id,
+            source_session=source_session,
+            target_session=target_session,
+        )
 
     def update_state(self, session) -> None:
+        """Update the state of the chart diff."""
         # Update status variable
         self.approval_status = "approved" if self.approval_status == "rejected" else "rejected"
 
@@ -169,23 +167,63 @@ class ChartDiffModified:
         # Update expander display
         # update_expander(chart_id=chart_id, title=title, expanded=not self.approved)
 
-    def show(self, session):
-        label = f"✅ {self.source_chart.config['slug']}" if self.approved else ""
-        with st.expander(
-            label=label,
-            expanded=not self.approved,
-        ):
+    def show(self, source_session, target_session) -> None:
+        # Define label
+        emoji = "✅" if self.approved else "⏳"
+        label = f"{emoji} {self.source_chart.config['slug']}"
+
+        with st.expander(label, not self.approved):
+            # Approval toggle
             st.toggle(
                 label="Approved new chart version",
                 key=f"toggle-{self.chart_id}",
                 value=self.approved,
-                on_change=lambda session=session: self.update_state(session),
+                on_change=lambda session=source_session: self.update_state(session),
             )
+
+            # Refresh button (get updated chart from source environment)
+            with stylable_container(
+                key=f"test-{self.chart_id}",
+                css_styles="""
+                    button {
+                        margin-left: auto;
+                        margin-right: 0;
+                        text-align: end;
+                        text-align: right;
+                        flex-direction: row-reverse;
+
+                    }
+                    """,
+            ):
+                st.button(
+                    "🔄 Refresh",
+                    key=f"refresh-btn-{self.chart_id}",
+                    on_click=lambda source_session=source_session, target_session=target_session: self.sync(
+                        source_session, target_session
+                    ),
+                    help="Click on this button to get the latest version of the chart from the source environment.",
+                )
+
+            # Chart comparison
             compare_charts(self.source_chart, self.target_chart)
+
+
+def show_help_text():
+    with st.popover("How does this work?"):
+        st.markdown(
+            """
+        **Chart diff** is a living page that compares all ongoing charts between `PRODUCTION` and your `STAGING` environment.
+
+        It lists all those charts that have been modified in the `STAGING` environment.
+
+        If you want any of the modified charts in `STAGING` to be migrated to `PRODUCTION`, you can approve them by clicking on the toggle button.
+        """
+        )
 
 
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
+    show_help_text()
 
     # Get stuff from DB
     source_engine, target_engine = get_engines()
@@ -197,9 +235,7 @@ def main():
     # chart_ids_new = get_new_chart_ids()
     # explorers_modified = get_modified_explorers()
     # Get actual charts
-    import datetime as dt
 
-    st.write(dt.datetime.now())
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             chart_diffs = [
@@ -217,10 +253,11 @@ def main():
     # MODIFIED CHARTS
     st.header("Modified charts")
     st.markdown(f"{len(charts_modified_ids)} charts modified in `{SOURCE_ENV}`")
-    with Session(source_engine) as session:
-        for chart_diff in chart_diffs:
-            assert chart_diff.source_chart.id
-            chart_diff.show(session)
+    with Session(source_engine) as source_engine:
+        with Session(target_engine) as target_engine:
+            for chart_diff in chart_diffs:
+                assert chart_diff.source_chart.id
+                chart_diff.show(source_session, target_engine)
 
 
 main()
