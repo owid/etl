@@ -913,3 +913,77 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    _number_of_comment_lines = 0
+    _step_detected = False
+    _continue_until_the_end = False
+    num_spaces_indent = 0
+    for line in lines:
+        if line.startswith(("steps:", "include:")):
+            # These are special lines, store them and move on.
+            new_lines.append(line)
+            continue
+
+        if _continue_until_the_end:
+            new_lines.append(line)
+            continue
+
+        if not _step_detected:
+            if line.strip().startswith("#") or line.strip() == "":
+                _number_of_comment_lines += 1
+                new_lines.append(line)
+                continue
+            elif line.strip().startswith(step):
+                # Remove the previous comment lines and ignore the current line.
+                new_lines = new_lines[:-_number_of_comment_lines]
+                # Find the number of spaces on the left of the step name.
+                # We need this to know if the next comments are indented (as comments within dependencies).
+                num_spaces_indent = len(line) - len(line.lstrip())
+                _step_detected = True
+                continue
+            else:
+                # This line corresponds to any other step or step dependency.
+                new_lines.append(line)
+                _number_of_comment_lines = 0
+                continue
+        else:
+            if line.strip().startswith("- "):
+                # Ignore the dependencies of the step.
+                continue
+            elif (line.strip().startswith("#")) and (len(line) - len(line.lstrip()) > num_spaces_indent):
+                # Ignore comments that are indented (as comments within dependencies).
+                continue
+            elif line.strip() == "":
+                # Ignore empty lines.
+                continue
+            else:
+                # The step dependencies have ended. Append current line and continue until the end of the dag file.
+                new_lines.append(line)
+                _continue_until_the_end = True
+                continue
+
+    # Write the new content to the active dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(new_lines)
+
+
+def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
+    """Remove specific steps from a dag file, including their comments.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    steps_to_remove : List[str]
+        List of steps to be removed from the DAG file.
+        Their dependencies do not need to be specified (they will also be removed).
+
+    """
+    for step in steps_to_remove:
+        _remove_step_from_dag_file(dag_file=dag_file, step=step)

@@ -9,7 +9,7 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import get_comments_above_step_in_dag, write_to_dag_file
+from etl.helpers import get_comments_above_step_in_dag, remove_steps_from_dag_file, write_to_dag_file
 from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
@@ -387,7 +387,8 @@ class StepUpdater:
         write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
 
         # Delete the step from the active dag.
-        # TODO.
+        # TODO: Create unit tests for this function.
+        remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
 
         # Reload steps dataframe.
         self._load_version_tracker()
