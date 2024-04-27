@@ -10,6 +10,8 @@ from apps.staging_sync.cli import _get_engine_for_env, _validate_env
 from apps.wizard.utils import chart_html
 from etl import grapher_model as gm
 
+from .chart_diff import ChartDiffModified
+
 # from apps.wizard import utils as wizard_utils
 
 # wizard_utils.enable_bugsnag_for_streamlit()
@@ -56,6 +58,47 @@ def get_modified_explorers():
     return []
 
 
+def show(diff: ChartDiffModified, source_session, target_session) -> None:
+    # Define label
+    emoji = "✅" if diff.approved else "⏳"
+    label = f"{emoji} {diff.source_chart.config['slug']}"
+
+    with st.expander(label, not diff.approved):
+        # Approval toggle
+        st.toggle(
+            label="Approved new chart version",
+            key=f"toggle-{diff.chart_id}",
+            value=diff.approved,
+            on_change=lambda session=source_session: diff.update_state(session),
+        )
+
+        # Refresh button (get updated chart from source environment)
+        with stylable_container(
+            key=f"test-{diff.chart_id}",
+            css_styles="""
+                    button {
+                        margin-left: auto;
+                        margin-right: 0;
+                        text-align: end;
+                        text-align: right;
+                        flex-direction: row-reverse;
+
+                    }
+                    """,
+        ):
+            st.button(
+                "🔄 Refresh",
+                key=f"refresh-btn-{diff.chart_id}",
+                on_click=lambda source_session=source_session, target_session=target_session: diff.sync(
+                    source_session, target_session
+                ),
+                help="Click on this button to get the latest version of the chart from the source environment.",
+            )
+
+        # Chart comparison
+        compare_charts(diff.source_chart, diff.target_chart)
+
+
 def compare_charts(
     source_chart,
     target_chart,
@@ -99,113 +142,6 @@ def update_expander(chart_id, title, expanded: bool):
         "label": f"✅ {title}" if st.session_state.expanders[chart_id]["label"] == "" else "",
         "expanded": expanded,
     }
-
-
-class ChartDiffModified:
-    def __init__(self, source_chart, target_chart, approval_status):
-        self.source_chart = source_chart
-        self.target_chart = target_chart
-        self.approval_status = approval_status
-        assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
-        self.chart_id = source_chart.id
-
-    @property
-    def approved(self):
-        return self.approval_status == "approved"
-
-    @classmethod
-    def from_chart_id(cls, chart_id, source_session, target_session):
-        """Get chart diff from chart id.
-
-        - Get charts from source and target
-        - Get its approval state
-        - Build diff object
-        """
-        # Get charts
-        source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
-        target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-        # Get approval status
-        approval_status = gm.ChartDiffApprovals.latest_chart_status(
-            source_session,
-            chart_id,
-            source_chart.updatedAt,
-            target_chart.updatedAt,
-        )
-
-        # Build object
-        chart_diff = cls(source_chart, target_chart, approval_status)
-
-        return chart_diff
-
-    def sync(self, source_session, target_session):
-        """Sync chart diff."""
-
-        # Synchronize with latest chart from source environment
-        self = self.from_chart_id(
-            chart_id=self.chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
-
-    def update_state(self, session) -> None:
-        """Update the state of the chart diff."""
-        # Update status variable
-        self.approval_status = "approved" if self.approval_status == "rejected" else "rejected"
-
-        # Update approval status (in database)
-        st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
-        approval = gm.ChartDiffApprovals(
-            chartId=self.chart_id,
-            sourceUpdatedAt=self.source_chart.updatedAt,
-            targetUpdatedAt=self.target_chart.updatedAt,
-            status="approved" if self.approved else "rejected",
-        )
-
-        session.add(approval)
-        session.commit()
-
-        # Update expander display
-        # update_expander(chart_id=chart_id, title=title, expanded=not self.approved)
-
-    def show(self, source_session, target_session) -> None:
-        # Define label
-        emoji = "✅" if self.approved else "⏳"
-        label = f"{emoji} {self.source_chart.config['slug']}"
-
-        with st.expander(label, not self.approved):
-            # Approval toggle
-            st.toggle(
-                label="Approved new chart version",
-                key=f"toggle-{self.chart_id}",
-                value=self.approved,
-                on_change=lambda session=source_session: self.update_state(session),
-            )
-
-            # Refresh button (get updated chart from source environment)
-            with stylable_container(
-                key=f"test-{self.chart_id}",
-                css_styles="""
-                    button {
-                        margin-left: auto;
-                        margin-right: 0;
-                        text-align: end;
-                        text-align: right;
-                        flex-direction: row-reverse;
-
-                    }
-                    """,
-            ):
-                st.button(
-                    "🔄 Refresh",
-                    key=f"refresh-btn-{self.chart_id}",
-                    on_click=lambda source_session=source_session, target_session=target_session: self.sync(
-                        source_session, target_session
-                    ),
-                    help="Click on this button to get the latest version of the chart from the source environment.",
-                )
-
-            # Chart comparison
-            compare_charts(self.source_chart, self.target_chart)
 
 
 def show_help_text():
