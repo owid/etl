@@ -2,7 +2,7 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session
+from sqlmodel import Session, SQLModel
 from st_pages import add_indentation
 
 from apps.staging_sync.cli import _get_engine_for_env, _validate_env
@@ -92,27 +92,39 @@ def get_engines() -> tuple[Engine, Engine]:
     return source_engine, target_engine
 
 
-def update_expander(chart_id, title):
+def update_expander(chart_id, title, expanded: bool):
     st.session_state.expanders[chart_id] = {
         "label": f"✅ {title}" if st.session_state.expanders[chart_id]["label"] == "" else "",
-        "expanded": not st.session_state.expanders[chart_id]["expanded"],
+        "expanded": expanded,
     }
 
 
-def update_revision_state(chart_id, title):
-    # TODO: Update approval status (in database)
+def update_revision_state(chart_id, title, source_session, source_chart: gm.Chart, target_chart: gm.Chart):
+    status = st.session_state[f"toggle-{chart_id}"]
+
+    # Update approval status (in database)
+    approval = gm.ChartDiffApprovals(
+        chartId=chart_id,
+        sourceUpdatedAt=source_chart.updatedAt,
+        targetUpdatedAt=target_chart.updatedAt,
+        status="approved" if status else "rejected",
+    )
+
+    source_session.add(approval)
+    source_session.commit()
 
     # Update expander display
-    update_expander(
-        chart_id=chart_id,
-        title=title,
-    )
+    update_expander(chart_id=chart_id, title=title, expanded=status == "rejected")
 
 
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
 
     source_engine, target_engine = get_engines()
+
+    # TODO: this should be created via migration in owid-grapher!!!!!
+    # create chart_diff_approvals table if it doesn't exist
+    SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])
 
     chart_ids_modified = get_modified_chart_ids()
     chart_ids_new = get_new_chart_ids()
@@ -137,20 +149,35 @@ def main():
             st.header("Modified charts")
             st.markdown(f"{len(chart_ids_modified)} charts modified in `{SOURCE_ENV}`")
             for chart_id in chart_ids_modified:
+                # Get charts
+                source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
+                target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+
+                assert source_chart.id
+
+                # Get existing approvals
+                # TODO: should we highlight if the chart has been explicitly rejected?
+                approval_status = gm.ChartDiffApprovals.latest_chart_status(
+                    source_session, source_chart.id, source_chart.updatedAt, target_chart.updatedAt
+                )
+
+                if approval_status == "approved":
+                    update_expander(chart_id, target_chart.config["slug"], expanded=False)
+
                 with st.expander(
                     label=st.session_state.expanders[chart_id]["label"],
                     expanded=st.session_state.expanders[chart_id]["expanded"],
                 ):
-                    # Get charts
-                    source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
-                    target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-
                     st.toggle(
                         label="Approve new chart version",
                         key=f"toggle-{chart_id}",
+                        value=approval_status == "approved",
                         on_change=lambda chart_id=chart_id, target_chart=target_chart: update_revision_state(
                             chart_id=chart_id,
                             title=target_chart.config["slug"],
+                            source_session=source_session,
+                            source_chart=source_chart,
+                            target_chart=target_chart,
                         ),
                     )
 
@@ -166,6 +193,7 @@ def main():
                     # )
 
             # NEW CHARTS
+            # TODO: fix approvals for new charts
             st.header("New charts")
             st.markdown(f"{len(chart_ids_new)} new charts in `{SOURCE_ENV}`")
             chart_ids_new = get_new_chart_ids()
@@ -180,6 +208,7 @@ def main():
                         on_change=lambda chart_id=chart_id, target_chart=target_chart: update_expander(  # type: ignore
                             chart_id=chart_id,
                             title=target_chart.config["slug"],
+                            expanded=st.session_state[f"toggle-{chart_id}"],
                         ),
                     )
                     chart_html(source_chart.config)  # type: ignore

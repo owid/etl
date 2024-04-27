@@ -1481,7 +1481,30 @@ class ChartDiffApprovals(SQLModel, table=True):
     chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
     sourceUpdatedAt: datetime = Field(sa_column=Column("sourceUpdatedAt", DateTime, nullable=False))
     targetUpdatedAt: datetime = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=False))
+    updatedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
     status: str = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+
+    @classmethod
+    def latest_chart_status(
+        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
+    ) -> Literal["approved", "rejected"]:
+        """Load the latest approval of the chart. If there's none, return 'rejected'."""
+        result = session.exec(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                cls.sourceUpdatedAt == source_updated_at,
+                cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+            .limit(1)
+        ).first()
+        if result:
+            return result.status
+        else:
+            return "rejected"
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
