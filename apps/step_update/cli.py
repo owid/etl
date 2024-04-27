@@ -509,7 +509,10 @@ class StepUpdater:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
-        # TODO: Raise error if step is not archivable.
+        # Skip non-archivable steps.
+        if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
+            log.info(f"Skipping non-archivable step: {step}")
+            return
 
         # Get active dag file for this step.
         dag_file_active = step_info["dag_file_path"]
@@ -528,6 +531,7 @@ class StepUpdater:
         # Create the dag_part that needs to be written to the archive file.
         dag_part = {step: set(step_info["direct_dependencies"])}
 
+        log.info(f"Archiving step: {step}")
         if not self.dry_run:
             # Add the new step and its dependencies to the archive dag.
             write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
@@ -568,7 +572,6 @@ class StepUpdater:
                 input("Press enter to continue.")
 
         for step in steps:
-            log.info(f"Archiving step: {step}")
             self._archive_step(step=step)
 
 
