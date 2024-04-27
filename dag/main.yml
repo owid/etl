@@ -229,6 +229,7 @@ steps:
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/latest/regions:
     - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -666,7 +667,6 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/who_md_suicides:
     - data://garden/missing_data/2024-03-26/who_md_suicides
-
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
