@@ -396,6 +396,8 @@ class StepUpdater:
         # If a single step is given, convert it to a list.
         if isinstance(steps, str):
             steps = [steps]
+        elif isinstance(steps, tuple):
+            steps = list(steps)
 
         # Archivable steps should be archived in groups.
         # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
