@@ -138,8 +138,8 @@ steps:
   data://explorers/emdat/2023-09-20/natural_disasters:
     - data://garden/emdat/2023-09-20/natural_disasters
 
-# Include all active steps plus all archive steps.
 include:
+  # Include all active steps plus all archive steps.
   - dag/main.yml
   - dag/archive/animal_welfare.yml
   - dag/archive/agriculture.yml

@@ -354,6 +354,44 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
+    def archive_step(self, step: str) -> None:
+        # Move a certain step from its active dag to its corresponding archive dag.
+        ################################################################################################################
+        # TODO: Temp, remove.
+        step = "data://meadow/aviation_safety_network/2022-10-12/aviation_statistics"
+        ################################################################################################################
+
+        # Get info for step to be updated.
+        step_info = self.get_step_info(step=step)
+
+        # TODO: Raise error if step is not archivable.
+
+        # Get active dag file for this step.
+        dag_file_active = step_info["dag_file_path"]
+
+        # Get archive dag file for this step.
+        # TODO: Write the logic of path changes based on etl.paths.
+        dag_file_archive = Path(dag_file_active.as_posix().replace("dag", "dag/archive"))
+
+        # If the archive dag file does not exist, create it.
+        if not dag_file_archive.exists():
+            raise NotImplementedError("Archive dag file does not exist. Add logic to create it.")
+
+        # Get header from the comment lines right above the current step in the dag.
+        step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file_active)
+
+        # Create the dag_part that needs to be written to the archive file.
+        dag_part = {step: set(step_info["direct_dependencies"])}
+
+        # Add the new step and its dependencies to the archive dag.
+        write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
+
+        # Delete the step from the active dag.
+        # TODO.
+
+        # Reload steps dataframe.
+        self._load_version_tracker()
+
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
     # The temporary step in the temporary dag depends on the latest version of each newly created snapshot, before
