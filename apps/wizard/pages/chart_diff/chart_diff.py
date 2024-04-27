@@ -24,7 +24,7 @@ class ChartDiffModified:
         return self.target_chart is not None
 
     @classmethod
-    def from_chart_id(cls, chart_id, source_session, target_session):
+    def from_chart_id(cls, chart_id, source_session, target_session=None):
         """Get chart diff from chart id.
 
         - Get charts from source and target
@@ -33,8 +33,10 @@ class ChartDiffModified:
         """
         # Get charts
         source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
-        target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-
+        if target_session is not None:
+            target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+        else:
+            target_chart = None
         # It can happen that both charts have the same ID, but are completely different (this
         # happens when two charts are created independently and have different slugs)
         if target_chart and source_chart.slug != target_chart.slug:
@@ -53,7 +55,7 @@ class ChartDiffModified:
 
         return chart_diff
 
-    def sync(self, source_session, target_session):
+    def sync(self, source_session, target_session=None):
         """Sync chart diff."""
 
         # Synchronize with latest chart from source environment

@@ -63,54 +63,92 @@ def show(diff: ChartDiffModified, source_session, target_session) -> None:
         )
 
         # Refresh button (get updated chart from source environment)
-        with stylable_container(
-            key=f"test-{diff.chart_id}",
-            css_styles="""
-                    button {
-                        margin-left: auto;
-                        margin-right: 0;
-                        text-align: end;
-                        text-align: right;
-                        flex-direction: row-reverse;
+        st.button(
+            "🔄 Refresh",
+            key=f"refresh-btn-{diff.chart_id}",
+            on_click=lambda source_session=source_session, target_session=target_session: diff.sync(
+                source_session, target_session
+            ),
+            help="Get the latest version of the chart from the staging server.",
+        )
 
-                    }
-                    """,
-        ):
+        # Chart comparison
+        compare_charts(diff.source_chart, diff.target_chart)
+
+
+def show_new(diff: ChartDiffModified, source_session, target_session=None) -> None:
+    # Define label
+    emoji = "✅" if diff.approved else "⏳"
+    label = f"{emoji} {diff.source_chart.config['slug']}"
+
+    with st.expander(label, not diff.approved):
+        # Approval Toggle
+        if diff.is_modified:
+            label = "Approved new chart version"
+        elif diff.is_new:
+            label = "Approved new chart"
+        else:
+            raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
+
+        st.toggle(
+            label=label,
+            key=f"toggle-{diff.chart_id}",
+            value=diff.approved,
+            on_change=lambda session=source_session: diff.update_state(session),
+        )
+
+        # Refresh button (get updated chart from source environment)
+        if diff.is_modified:
             st.button(
                 "🔄 Refresh",
                 key=f"refresh-btn-{diff.chart_id}",
                 on_click=lambda source_session=source_session, target_session=target_session: diff.sync(
                     source_session, target_session
                 ),
-                help="Click on this button to get the latest version of the chart from the source environment.",
+                help="Get the latest version of the chart from the staging server.",
             )
+        elif diff.is_new:
+            st.button(
+                "🔄 Refresh",
+                key=f"refresh-btn-{diff.chart_id}",
+                on_click=lambda source_session=source_session: diff.sync(source_session),
+                help="Get the latest version of the chart from the staging server.",
+            )
+        else:
+            raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
 
         # Chart comparison
-        compare_charts(diff.source_chart, diff.target_chart)
+        compare_charts(diff.source_chart)
 
 
 def compare_charts(
     source_chart,
-    target_chart,
+    target_chart=None,
 ):
     # Create two columns for the iframes
     col1, col2 = st.columns(2)
 
     prod_is_newer = source_chart.updatedAt > target_chart.updatedAt
 
-    with col1:
-        # st.selectbox(label="version", options=["Source"], key=f"selectbox-left-{identifier}")
-        if prod_is_newer:
-            st.markdown("Production :red[(⚠️was modified)]")
-        else:
-            st.markdown(f"Production   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
-        chart_html(source_chart.config, base_url=TARGET_ENV)
-
-    with col2:
+    if target_chart is None:
         # st.selectbox(label="version", options=["Target"], key=f"selectbox-right-{identifier}")
         st.markdown(f"New version   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
         # st.write(target_chart.config)
         chart_html(target_chart.config, base_url=SOURCE_ENV)
+    else:
+        with col1:
+            # st.selectbox(label="version", options=["Source"], key=f"selectbox-left-{identifier}")
+            if prod_is_newer:
+                st.markdown("Production :red[(⚠️was modified)]")
+            else:
+                st.markdown(f"Production   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
+            chart_html(source_chart.config, base_url=TARGET_ENV)
+
+        with col2:
+            # st.selectbox(label="version", options=["Target"], key=f"selectbox-right-{identifier}")
+            st.markdown(f"New version   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
+            # st.write(target_chart.config)
+            chart_html(target_chart.config, base_url=SOURCE_ENV)
 
 
 @st.cache_resource
@@ -151,20 +189,23 @@ def main():
     st.title("Chart ⚡ **:gray[Diff]**")
     show_help_text()
 
+    st.button(
+        "🔄 Refresh all charts",
+        key="refresh-btn-general",
+        on_click=lambda _: print("refresh"),
+        help="Get the latest chart versions, both from the staging and production servers.",
+    )
+
     # Get stuff from DB
     source_engine, target_engine = get_engines()
     # TODO: this should be created via migration in owid-grapher!!!!!
     # create chart_diff_approvals table if it doesn't exist
     SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])
-    # chart_ids_new = get_new_chart_ids()
-    # explorers_modified = get_modified_explorers()
     # Get actual charts
-
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # Get IDs from modified charts
             charts_modified_ids = get_modified_chart_ids(source_session)
-
             chart_diffs = [
                 ChartDiffModified.from_chart_id(
                     chart_id=chart_id,
@@ -174,21 +215,22 @@ def main():
                 for chart_id in charts_modified_ids
             ]
 
-    # Show information
-    st.info(f"There are {len(charts_modified_ids)} chart updates")
-
     # MODIFIED CHARTS
-    st.header("Modified charts")
-    st.markdown(f"{len(charts_modified_ids)} charts modified in `{SOURCE_ENV}`")
+    chart_diffs_modified = [chart_diff for chart_diff in chart_diffs if chart_diff.is_modified]
+    chart_diffs_new = [chart_diff for chart_diff in chart_diffs if chart_diff.is_new]
     with Session(source_engine) as source_engine:
         with Session(target_engine) as target_engine:
-            for chart_diff in chart_diffs:
-                if chart_diff.is_modified:
+            if charts_modified_ids:
+                st.header("Modified charts")
+                st.markdown(f"{len(charts_modified_ids)} charts modified in `{SOURCE_ENV}`")
+                for chart_diff in chart_diffs_modified:
                     show(chart_diff, source_session, target_engine)
 
-                # TODO
-                if chart_diff.is_new:
-                    pass
+            if chart_diffs_new:
+                st.header("New charts")
+                st.markdown(f"{len(chart_diffs_new)} new charts in `{SOURCE_ENV}`")
+                for chart_diff in chart_diffs_new:
+                    show_new(chart_diff, source_session, target_engine)
 
 
 main()
