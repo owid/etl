@@ -218,7 +218,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             # Show only first 100 variables to map (otherwise app crashes)
             if len(suggestions) > LIMIT_VARS_TO_MAP:
                 st.warning(
-                    f"Too many variables to map! Showing only the first {LIMIT_VARS_TO_MAP}. If you want to map more variables, do it in batches. That is, first map this batch and approve the generated chart revisions in admin. Once you are done, run this app again. Make sure you have approved the previously generated revisions!"
+                    f"Too many indicators to map! Showing only the first {LIMIT_VARS_TO_MAP}. If you want to map more variables, do it in batches. That is, first map this batch and approve the generated chart revisions in admin. Once you are done, run this app again. Make sure you have approved the previously generated revisions!"
                 )
                 suggestions = suggestions[:LIMIT_VARS_TO_MAP]
 

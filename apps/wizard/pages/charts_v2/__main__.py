@@ -103,10 +103,13 @@ if st.session_state.submitted_datasets and st.session_state.submitted_variables:
     # st.write(variable_config)
     if variable_config is not None:
         if not variable_config.variable_mapping:
-            msg_error = "No variables selected! Please select at least one variable."
+            msg_error = "No indicators selected! Please select at least one indicator."
             st.error(msg_error)
         elif variable_config.is_valid:
-            submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)
+            submission_config = create_submission(
+                variable_config,
+                SCHEMA_CHART_CONFIG,
+            )
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #003001")
 
@@ -124,6 +127,5 @@ if (
         if submission_config.is_valid:
             # st.write(st.session_state.gpt_tweaks)
             push_submission(submission_config)
-            # TODO: We should also push the variable mapping to the database! But where?
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #004001")

@@ -83,7 +83,7 @@ sections:
         maintainer: "@lucas"
         emoji: "🌟"
         image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync"
+      - title: "Chart Sync (deprecated)"
         alias: staging_sync
         entrypoint: ../staging_sync/app.py
         description: Sync charts between servers.
