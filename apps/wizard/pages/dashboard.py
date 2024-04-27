@@ -126,7 +126,7 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
     # For convenience, convert days to an arbitrarily big number.
     # Otherwise when sorting, nans are placed before negative numbers, and hence it's not easy to first see steps that
     # need to be updated more urgently.
-    steps_df["days_to_update"] = steps_df["days_to_update"].fillna(9999)
+    steps_df["days_to_update"] = steps_df["days_to_update"].fillna("9999")
 
     # For convenience, combine dataset name and url in a single column.
     # This will be useful when creating cells with the name of the dataset as a clickable link.
