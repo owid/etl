@@ -514,6 +514,11 @@ class StepUpdater:
             log.info(f"Skipping non-archivable step: {step}")
             return
 
+        # Skip snapshots (since they do not appear as steps in the dag).
+        if step_info["channel"] == "snapshot":
+            log.info(f"Skipping snapshot: {step}")
+            return
+
         # Get active dag file for this step.
         dag_file_active = step_info["dag_file_path"]
 
