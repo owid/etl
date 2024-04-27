@@ -1498,11 +1498,11 @@ class ChartDiffApprovals(SQLModel, table=True):
                 cls.sourceUpdatedAt == source_updated_at,
                 cls.targetUpdatedAt == target_updated_at,
             )
-            .order_by(cls.updatedAt.desc())
+            .order_by(cls.updatedAt.desc())  # type: ignore
             .limit(1)
         ).first()
         if result:
-            return result.status
+            return result.status  # type: ignore
         else:
             return "rejected"
 

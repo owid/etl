@@ -1,14 +1,17 @@
+from typing import Optional
+
 import streamlit as st
 
 from etl import grapher_model as gm
 
 
 class ChartDiffModified:
-    def __init__(self, source_chart, target_chart, approval_status):
+    def __init__(self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval_status = approval_status
-        assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
+        if target_chart:
+            assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
 
     @property
@@ -72,6 +75,8 @@ class ChartDiffModified:
 
         # Update approval status (in database)
         st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
+        assert self.chart_id
+        assert self.target_chart
         approval = gm.ChartDiffApprovals(
             chartId=self.chart_id,
             sourceUpdatedAt=self.source_chart.updatedAt,

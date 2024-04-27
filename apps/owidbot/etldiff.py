@@ -4,13 +4,16 @@ import time
 from typing import Tuple
 
 import click
+import pandas as pd
 import structlog
 from github import Auth, Github
 from rich import print
 from rich.ansi import AnsiDecoder
 from rich_click.rich_command import RichCommand
+from sqlmodel import Session
 
-from apps.staging_sync.cli import _get_container_name
+from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _modified_chart_ids_by_admin
+from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -52,10 +55,10 @@ def cli(
     """
     t = time.time()
 
-    chart_diff = call_chart_diff()
+    chart_diff = format_chart_diff(call_chart_diff(branch))
 
-    # lines = call_etl_diff(include)
-    # data_diff, data_diff_summary = format_etl_diff(lines)
+    lines = call_etl_diff(include)
+    data_diff, data_diff_summary = format_etl_diff(lines)
     data_diff, data_diff_summary = "", ""
 
     container_name = _get_container_name(branch) if branch else "dry-run"
@@ -65,19 +68,16 @@ def cli(
     # - **Site-screenshots**: https://github.com/owid/site-screenshots/compare/{nbranch}
 
     body = f"""
-<details>
-
-<summary><b>Staging server</b>: </summary>
+<b>Staging server</b>:
 
 - **Admin**: http://{container_name}/admin/login
 - **Site**: http://{container_name}/
 - **Login**: `ssh owid@{container_name}`
-</details>
 
 <details>
-
 <summary><b>Chart diff</b>: </summary>
 {chart_diff}
+[Details](http://{container_name}/etl/wizard/Chart%20Diff)
 </details>
 
 <details>
@@ -204,11 +204,41 @@ def call_etl_diff(include: str) -> list[str]:
     return [str(line) for line in AnsiDecoder().decode(stdout)]
 
 
-def call_chart_diff() -> str:
-    return """
-    - 3 new charts (3 approved)
-    - 2 modified charts (1 approved)
+def call_chart_diff(branch: str) -> pd.DataFrame:
+    source_engine = _get_engine_for_env(branch)
+    # TODO: this should be live
+    target_engine = _get_engine_for_env("master")
+
+    df = []
+    with Session(source_engine) as source_session:
+        with Session(target_engine) as target_session:
+            modified_chart_ids = _modified_chart_ids_by_admin(source_session)
+
+            for chart_id in modified_chart_ids:
+                diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
+                df.append(
+                    {
+                        "chart_id": diff.chart_id,
+                        "approved": diff.approved,
+                        "is_new": diff.is_new,
+                    }
+                )
+
+    return pd.DataFrame(df)
+
+
+def format_chart_diff(df: pd.DataFrame) -> str:
+    if df.empty:
+        return "No new or modified charts."
+
+    new = df[df.is_new]
+    modified = df[~df.is_new]
+
+    return f"""
+- {len(new)} new charts ({new.approved.sum()} approved)
+- {len(modified)} modified charts ({modified.approved.sum()} approved)
     """.strip()
+
 
 if __name__ == "__main__":
     cli()

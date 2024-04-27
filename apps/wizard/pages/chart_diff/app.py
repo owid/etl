@@ -17,7 +17,10 @@ from etl import grapher_model as gm
 # wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-SOURCE_ENV = "staging-site-mojmir"
+# TODO: unhardcode this
+SOURCE_ENV = "staging-site-streamlit-chart-approval"
+
+# TODO: switch to production once we are ready
 TARGET_ENV = "staging-site-master"
 
 # st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
@@ -200,7 +203,9 @@ def main():
     source_engine, target_engine = get_engines()
     # TODO: this should be created via migration in owid-grapher!!!!!
     # create chart_diff_approvals table if it doesn't exist
-    SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])
+    SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
+    # chart_ids_new = get_new_chart_ids()
+    # explorers_modified = get_modified_explorers()
     # Get actual charts
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
