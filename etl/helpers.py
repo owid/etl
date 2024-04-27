@@ -925,8 +925,12 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
     _continue_until_the_end = False
     num_spaces_indent = 0
     for line in lines:
-        if line.startswith(("steps:", "include:")):
-            # These are special lines, store them and move on.
+        if line.startswith("include"):
+            # Nothing should be removed from here onwards, so, skip until the end of the file.
+            _continue_until_the_end = True
+
+        if line.startswith("steps:"):
+            # Store this special line and move on.
             new_lines.append(line)
             continue
 
@@ -991,8 +995,14 @@ def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> No
 
 
 def create_dag_archive_file(dag_file_archive: Path) -> None:
-    # Create new dag archive file (and add it to the main dag archive file).
+    """Create an empty dag archive file, and add it to the main dag archive file.
 
+    Parameters
+    ----------
+    dag_file_archive : Path
+        Path to a specific dag archive file that does not exist yet.
+
+    """
     # Create a new archive dag file.
     dag_file_archive.write_text("steps:\n")
     # Find the number of spaces in the indentation of the main dag archive file.

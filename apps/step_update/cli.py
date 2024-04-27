@@ -555,7 +555,6 @@ class StepUpdater:
             write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
 
             # Delete the step from the active dag.
-            # TODO: Create unit tests for this function.
             remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
 
             # Reload steps dataframe.

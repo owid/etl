@@ -13,6 +13,7 @@ from etl.helpers import (
     create_dataset,
     get_comments_above_step_in_dag,
     isolated_env,
+    remove_steps_from_dag_file,
     write_to_dag_file,
 )
 
@@ -527,3 +528,455 @@ def test__validate_description_key():
         _validate_description_key(description_key, col)
     except AssertionError:
         assert False, f"AssertionError raised for valid description_key: {description_key}"
+
+
+def _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = Path(temp_dir) / "temp.yml"
+        # Create a dag file inside a temporary folder.
+        temp_file.write_text(old_content)
+        # Update dag file with the given dag part.
+        remove_steps_from_dag_file(
+            dag_file=temp_file,
+            steps_to_remove=steps_to_remove,
+        )
+        # Assert that the file content is the same as before.
+        with open(temp_file, "r") as updated_file:
+            new_content = updated_file.read()
+    assert new_content == expected_content
+
+
+def test_remove_steps_from_dag_file_empty_list_of_steps():
+    old_content = """\
+steps:
+    meadow_a:
+    - snapshot_a
+    meadow_b:
+    - snapshot_b
+"""
+    expected_content = old_content
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=[])
+
+
+def test_remove_steps_from_dag_file_various_examples():
+    old_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    # NOTE: This is not necessarily desired behavior, but it is the one to be expected.
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    - snapshot_b
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
+
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
+
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+
+    # Comment for snapshot_b.
+
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
+
+    # Test unusual (and undesired) case where the comment of a dependency is not properly indented.
+    # NOTE: In this case, the function will assign the dependencies of the removed step to the previous step.
+    # This test exists to document the behavior. It is not desired (but it's an edge case that should not happen).
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+  # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
+
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+
+    # Comment for snapshot_b.
+
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a", "meadow_b"])
+
+    # Case where all steps are removed.
+    old_content = """\
+steps:
+
+  # Comment for meadow_a.
+
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+
+    # Comment for snapshot_b.
+
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(
+        old_content, expected_content, steps_to_remove=["meadow_c", "meadow_a", "meadow_b"]
+    )
+
+    # Case where step has no dependencies.
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    # Another case where step has no dependencies.
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    # Comment for snapshot_b.
+    - snapshot_b
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
