@@ -1,31 +1,25 @@
-# %%
 import base64
-import os
 from pathlib import Path
 from typing import cast
 from urllib import parse
 
 import requests
 import streamlit as st
-from dotenv import load_dotenv
 from st_pages import add_indentation
 
 from apps.utils.gpt import OpenAIWrapper
 
-load_dotenv()
-
-st.set_page_config(page_title="Data insight robot", page_icon="🪄")
+# CONFIG
+st.set_page_config(
+    page_title="Data insight robot",
+    page_icon="🪄",
+)
 add_indentation()
-# st.title("🏐 Metadata playground")
-st.title("Data insight robot 🤖")
-st.markdown("Generate data insights, given a chart url")
-# %%
-# OpenAI API Keyprint
-api_key = os.getenv("OPENAI_API_KEY")
-
-# %%
+st.title("💡 Data insighter")
+st.markdown("Generate data insights from a chart view.")
 
 
+# FUNCTIONS
 def get_thumbnail_url(grapher_url: str) -> str:
     """
     Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
@@ -37,53 +31,13 @@ def get_thumbnail_url(grapher_url: str) -> str:
     return f"{parts.scheme}://{parts.netloc}/grapher/thumbnail/{Path(parts.path).name}.png?{parts.query}"
 
 
-# %%
-
-
 def get_grapher_thumbnail(grapher_url: str) -> str:
     url = get_thumbnail_url(grapher_url)
     data = requests.get(url).content
     return f"data:image/png;base64,{base64.b64encode(data).decode('utf8')}"
 
 
-# %%
-
-
-def infer_chart_content(grapher_url, prompt):
-    hex = get_grapher_thumbnail(grapher_url)
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
-
-    payload = {
-        "model": "gpt-4-turbo",
-        "messages": [
-            {
-                "role": "system",
-                "content": [
-                    {"type": "text", "text": prompt},
-                ],
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": hex},
-                    }
-                ],
-            },
-        ],
-        "max_tokens": 300,
-    }
-
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-    response_json = response.json()
-    if "choices" not in response_json:
-        return response_json
-    return response_json["choices"][0]["message"]["content"]
-
-
-# %%
-
+# PROMPT
 prompt = """This is a chart from Our World In Data.
 
 I'd like you to write a data insight for me. Data insights are a short format that explains the main point of a chart. They are usually a title sentence and then three concise paragraphs that are written in a way that is easy to understand for a general audience.
@@ -112,18 +66,30 @@ Every year, 300,000 women die from pregnancy-related causes.
 Fortunately, the world has made continuous progress, and such tragic deaths have become much rarer, as the chart shows. The WHO has published data since 1985. Since then, the number of maternal deaths has halved.
 --
 
-Please write a data insight for the given chart. Use simple language and short paragraphs.
+Please write a data insight for the given chart. Use simple language and short paragraphs. Provide the title as a markdown header-2.
 """
+# Ask user for URL & commit
 grapher_url = st.text_input(
-    "For which grapher url should the insight be generated? (Query parameters work!)", key="url"
+    label="Grapher URL",
+    placeholder="https://ourworldindata.org/grapher/life-expectancy?country=~CHN",
+    help="Introduce the URL to a Grapher URL. Query parameters work!",
+    key="url",
 )
 confirmed = st.button("Generate insight")
-api = OpenAIWrapper()
+
+# Action if user clicks on 'generate'
 if confirmed:
+    # Opena AI (do first to catch possible errors in ENV)
+    api = OpenAIWrapper()
+
+    # Get thumbnail for chart
     thumb_url = get_thumbnail_url(grapher_url)
-    st.image(thumb_url)
     hex = get_grapher_thumbnail(grapher_url)
 
+    # Show image
+    st.image(thumb_url)
+
+    # Prepare messages for Insighter
     messages = [
         {
             "role": "system",
@@ -151,6 +117,3 @@ if confirmed:
             stream=True,
         )
         response = cast(str, st.write_stream(stream))
-
-# TODÖ: continue the conversation
-# %%
