@@ -354,12 +354,8 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
-    def archive_step(self, step: str) -> None:
+    def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.
-        ################################################################################################################
-        # TODO: Temp, remove.
-        step = "data://meadow/aviation_safety_network/2022-10-12/aviation_statistics"
-        ################################################################################################################
 
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -392,6 +388,12 @@ class StepUpdater:
 
         # Reload steps dataframe.
         self._load_version_tracker()
+
+    def archive_steps(self, steps: List[str]) -> None:
+        """Move one or more steps from their active to their archive dag."""
+        for step in steps:
+            log.info(f"Archiving step: {step}")
+            self._archive_step(step=step)
 
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
