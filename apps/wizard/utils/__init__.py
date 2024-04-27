@@ -591,7 +591,7 @@ def enable_bugsnag_for_streamlit():
 
 def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
     chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
-    chart_config["adminBaseUrl"] = "https://admin.owid.io/admin/"
+    chart_config["adminBaseUrl"] = f"http://{base_url}"
 
     HTML = f"""
     <!DOCTYPE html>
@@ -610,7 +610,7 @@ def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
             </main>
             <div class="site-tools"></div>
             <script>
-                document.cookie = "isAdmin=true;max-age=31536000;SameSite=None;"
+                document.cookie = "isAdmin=true;max-age=31536000"
             </script>
             <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
             <script type="module">
@@ -619,6 +619,5 @@ def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
         </body>
     </html>
     """
-    st.write(chart_config)
-    st.code(HTML)
+
     components.html(HTML, height=height, **kwargs)
