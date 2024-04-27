@@ -2,8 +2,6 @@
 Load a meadow dataset and create a garden dataset.
 
 When running this step in an update, be sure to check all the outputs and logs to ensure the data is correct.
-Also check the manual fix of Polish data to avoid weird drop in the income/consumption levels from 2020 onwards.
-(Remove metadata about this when the fix is no longer needed in inc_cons_dict["income_consumption"]["processing_description"], shared.py script)
 
 NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
     nohup poetry run etl run world_bank_pip > output.log 2>&1 &
@@ -48,6 +46,94 @@ REGIONS_LIST = [
     "World",
     "World (excluding China)",
     "World (excluding India)",
+]
+
+# Define columns that are not poverty (mostly inequality)
+NON_POVERTY_COLS = [
+    "country",
+    "year",
+    "reporting_level",
+    "welfare_type",
+    "gini",
+    "mld",
+    "decile1_share",
+    "decile2_share",
+    "decile3_share",
+    "decile4_share",
+    "decile5_share",
+    "decile6_share",
+    "decile7_share",
+    "decile8_share",
+    "decile9_share",
+    "decile10_share",
+    "bottom50_share",
+    "middle40_share",
+    "headcount_40_median",
+    "headcount_50_median",
+    "headcount_60_median",
+    "headcount_ratio_40_median",
+    "headcount_ratio_50_median",
+    "headcount_ratio_60_median",
+    "income_gap_ratio_40_median",
+    "income_gap_ratio_50_median",
+    "income_gap_ratio_60_median",
+    "poverty_gap_index_40_median",
+    "poverty_gap_index_50_median",
+    "poverty_gap_index_60_median",
+    "avg_shortfall_40_median",
+    "avg_shortfall_50_median",
+    "avg_shortfall_60_median",
+    "total_shortfall_40_median",
+    "total_shortfall_50_median",
+    "total_shortfall_60_median",
+    "poverty_severity_40_median",
+    "poverty_severity_50_median",
+    "poverty_severity_60_median",
+    "waits_40_median",
+    "waits_50_median",
+    "waits_60_median",
+    "palma_ratio",
+    "s80_s20_ratio",
+    "p90_p10_ratio",
+    "p90_p50_ratio",
+    "p50_p10_ratio",
+]
+
+# Define countries expected to have both income and consumption data
+COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
+    "Albania",
+    "Armenia",
+    "Belarus",
+    "Belize",
+    "Bulgaria",
+    "China",
+    "China (rural)",
+    "China (urban)",
+    "Croatia",
+    "Estonia",
+    "Haiti",
+    "Hungary",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Latvia",
+    "Lithuania",
+    "Montenegro",
+    "Namibia",
+    "Nepal",
+    "Nicaragua",
+    "North Macedonia",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Romania",
+    "Russia",
+    "Saint Lucia",
+    "Serbia",
+    "Seychelles",
+    "Slovakia",
+    "Slovenia",
+    "Turkey",
+    "Ukraine",
 ]
 
 # Set table format when printing
@@ -148,16 +234,16 @@ def run(dest_dir: str) -> None:
     # Define index cols
     index_cols = ["country", "year"]
     index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
-    tb_inc_2011 = set_index_and_sort(tb=tb_inc_2011, index_cols=index_cols)
-    tb_cons_2011 = set_index_and_sort(tb=tb_cons_2011, index_cols=index_cols)
-    tb_inc_or_cons_2011 = set_index_and_sort(tb=tb_inc_or_cons_2011, index_cols=index_cols)
+    tb_inc_2011 = tb_inc_2011.format(keys=index_cols)
+    tb_cons_2011 = tb_cons_2011.format(keys=index_cols)
+    tb_inc_or_cons_2011 = tb_inc_or_cons_2011.format(keys=index_cols)
 
-    tb_inc_2017 = set_index_and_sort(tb=tb_inc_2017, index_cols=index_cols)
-    tb_cons_2017 = set_index_and_sort(tb=tb_cons_2017, index_cols=index_cols)
-    tb_inc_or_cons_2017 = set_index_and_sort(tb=tb_inc_or_cons_2017, index_cols=index_cols)
+    tb_inc_2017 = tb_inc_2017.format(keys=index_cols)
+    tb_cons_2017 = tb_cons_2017.format(keys=index_cols)
+    tb_inc_or_cons_2017 = tb_inc_or_cons_2017.format(keys=index_cols)
 
-    tb_percentiles_2011 = set_index_and_sort(tb=tb_percentiles_2011, index_cols=index_cols_percentiles)
-    tb_percentiles_2017 = set_index_and_sort(tb=tb_percentiles_2017, index_cols=index_cols_percentiles)
+    tb_percentiles_2011 = tb_percentiles_2011.format(keys=index_cols_percentiles)
+    tb_percentiles_2017 = tb_percentiles_2017.format(keys=index_cols_percentiles)
 
     # Create spell tables to separate different survey spells in the explorers
     spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
@@ -753,26 +839,174 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
 
     # If both inc and cons are available in a given year, drop inc
 
-    # Flag duplicates – indicating multiple welfare_types
-    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
-    tb_inc_or_cons = tb_inc_or_cons.sort_values(
-        by=["ppp_version", "country", "year", "reporting_level", "welfare_type"], ignore_index=True
-    )
-    tb_inc_or_cons["duplicate_flag"] = tb_inc_or_cons.duplicated(
-        subset=["ppp_version", "country", "year", "reporting_level"]
-    )
-
-    # Drop income where income and consumption are available
-    tb_inc_or_cons = tb_inc_or_cons[
-        (~tb_inc_or_cons["duplicate_flag"]) | (tb_inc_or_cons["welfare_type"] == "consumption")
-    ]
-    tb_inc_or_cons.drop(columns=["duplicate_flag"], inplace=True)
+    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons)
 
     tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
 
-    tb_inc_or_cons = remove_confusing_datapoints_in_grapher_dataset(tb_inc_or_cons)
-
     return tb_inc, tb_cons, tb_inc_or_cons
+
+
+def create_smooth_inc_cons_series(tb: Table) -> Table:
+    """
+    Construct an income and consumption series that is a combination of the two.
+    """
+
+    tb = tb.copy()
+
+    # Flag duplicates per year – indicating multiple welfare_types
+    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
+    tb = tb.sort_values(by=["country", "year", "welfare_type"], ignore_index=True)
+    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year"], keep=False)
+
+    # Create a boolean column that is true if each ppp_version, country, reporting_level has only income or consumption
+    tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
+
+    # Select only the rows with only income or consumption
+    tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+
+    # Create a table with the rest
+    tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+
+    # Create a list of the countries with both income and consumption in the series
+    countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
+
+    # Assert that the countries with both income and consumption are expected
+    assert countries_inc_cons == COUNTRIES_WITH_INCOME_AND_CONSUMPTION, log.fatal(
+        f"Unexpected countries with both income and consumption: {countries_inc_cons}."
+    )
+
+    # Define empty table to store the smoothed series
+    tb_both_inc_and_cons_smoothed = Table()
+    for country in countries_inc_cons:
+        # Filter country
+        tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True).copy()
+
+        # Save the max_year for the country
+        max_year = tb_country["year"].max()
+
+        # Define welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
+        last_welfare_type = list(tb_country[tb_country["year"] == max_year]["welfare_type"].unique())
+        last_welfare_type.sort()
+
+        # Count how many times welfare_type switches from income to consumption and vice versa
+        number_of_welfare_series = (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).cumsum().max()
+
+        # If there are only two welfare series, use both, except for countries where we have to choose one
+        if number_of_welfare_series == 2:
+            # assert if last_welfare type values are expected
+            if country in ["Armenia", "Belarus", "Kyrgyzstan", "North Macedonia", "Peru"]:
+                if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
+                    welfare_expected = ["consumption"]
+                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                    )
+
+                elif country in ["North Macedonia", "Peru"]:
+                    assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
+                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
+                    )
+
+                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+
+        # With Turkey I also want to keep both series, but there are duplicates for some years
+        elif country in ["Turkey"]:
+            welfare_expected = ["income"]
+            assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
+            )
+
+            tb_country = tb_country[
+                (~tb_country["duplicate_flag"]) | (tb_country["welfare_type"].isin(last_welfare_type))
+            ].reset_index(drop=True)
+
+        elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
+            welfare_expected = ["consumption", "income"]
+            assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
+                f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
+            )
+            if country in ["Haiti", "Romania", "Saint Lucia"]:
+                tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
+            else:
+                tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
+
+        else:
+            if country in ["Albania", "Russia", "Ukraine"]:
+                welfare_expected = ["consumption"]
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
+            else:
+                welfare_expected = ["income"]
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
+
+            tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+
+        tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
+
+    tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
+
+    # Drop the columns created in this function
+    tb_inc_or_cons = tb_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+
+    return tb_inc_or_cons
+
+
+def check_jumps_in_grapher_dataset(tb: Table) -> Table:
+    """
+    Check for jumps in the dataset, which can be caused by combining income and consumption estimates for one country series.
+    """
+    # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
+
+    # Define columns to check: all the headcount ratio columns
+    cols_to_check = [
+        col for col in tb.columns if "headcount_ratio" in col and "above" not in col and "between" not in col
+    ]
+
+    for col in cols_to_check:
+        # Create a new column, shift_col, that is the same as col but shifted one row down for each country, year, welfare_type and reporting_level
+        tb["shift_col"] = tb.groupby(["country", "reporting_level"])[col].shift(1)
+
+        # Create shift_year column
+        tb["shift_year"] = tb.groupby(["country", "reporting_level"])["year"].shift(1)
+
+        # Create shift_welfare_type column
+        tb["shift_welfare_type"] = tb.groupby(["country", "reporting_level"])["welfare_type"].shift(1)
+
+        # Calculate the difference between col and shift_col
+        tb["check_diff_column"] = tb[col] - tb["shift_col"]
+
+        # Calculate the difference between years
+        tb["check_diff_year"] = tb["year"] - tb["shift_year"]
+
+        # Calculate if the welfare type is the same
+        tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
+
+        # Check if the difference is too high
+        mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
+        tb_error = tb[mask].reset_index(drop=True).copy()
+
+        if not tb_error.empty:
+            log.warning(
+                f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
+                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
+            # tb = tb[~mask].reset_index(drop=True)
+
+    # Drop the columns created for the check
+    tb = tb.drop(
+        columns=[
+            "shift_col",
+            "shift_year",
+            "shift_welfare_type",
+            "check_diff_column",
+            "check_diff_year",
+            "check_diff_welfare_type",
+        ]
+    )
+
+    return tb
 
 
 def regional_headcount(tb: Table) -> Table:
@@ -806,7 +1040,7 @@ def regional_headcount(tb: Table) -> Table:
     tb_out = tb_regions[mask].reset_index()
     if len(tb_out) > 0:
         log.info(
-            f"""There are {len(tb_out)} years with more than one null region value and will be deleted:
+            f"""There are {len(tb_out)} years with more than one null region value so we can't extract regional data for them. Years are:
             {list(tb_out.year.unique())}"""
         )
         tb_regions = tb_regions[~mask].reset_index()
@@ -897,16 +1131,6 @@ def survey_count(tb: Table) -> Table:
 
     # Merge with original table
     tb = pr.merge(tb_survey, tb, on=["country", "year"], how="outer")
-
-    return tb
-
-
-def set_index_and_sort(tb: Table, index_cols: list) -> Table:
-    """
-    Add index and sort
-    """
-
-    tb = tb.set_index(index_cols, verify_integrity=True).sort_index()
 
     return tb
 
@@ -1011,8 +1235,8 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
     tb_inc_or_cons_2017_spells = pr.concat([tb_inc, tb_cons], ignore_index=True, short_name="income_consumption_2017")
 
     # Set index and sort
-    tb_inc_or_cons_2017_spells = set_index_and_sort(
-        tb=tb_inc_or_cons_2017_spells, index_cols=["country", "year", "reporting_level", "welfare_type"]
+    tb_inc_or_cons_2017_spells = tb_inc_or_cons_2017_spells.format(
+        keys=["country", "year", "reporting_level", "welfare_type"]
     )
 
     # Create spells
@@ -1092,123 +1316,4 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
-    return tb
-
-
-def check_jumps_in_grapher_dataset(tb: Table) -> Table:
-    """
-    Check for jumps in the dataset, which can be caused by combining income and consumption estimates for one country series.
-    """
-    # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
-
-    # Define columns to check: all the headcount ratio columns
-    cols_to_check = [
-        col for col in tb.columns if "headcount_ratio" in col and "above" not in col and "between" not in col
-    ]
-
-    for col in cols_to_check:
-        # Create a new column, shift_col, that is the same as col but shifted one row down for each country, year, welfare_type and reporting_level
-        tb["shift_col"] = tb.groupby(["country", "reporting_level"])[col].shift(1)
-
-        # Create shift_year column
-        tb["shift_year"] = tb.groupby(["country", "reporting_level"])["year"].shift(1)
-
-        # Create shift_welfare_type column
-        tb["shift_welfare_type"] = tb.groupby(["country", "reporting_level"])["welfare_type"].shift(1)
-
-        # Calculate the difference between col and shift_col
-        tb["check_diff_column"] = tb[col] - tb["shift_col"]
-
-        # Calculate the difference between years
-        tb["check_diff_year"] = tb["year"] - tb["shift_year"]
-
-        # Calculate if the welfare type is the same
-        tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
-
-        # Check if the difference is too high
-        mask = (abs(tb["check_diff_column"]) > 20) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
-        tb_error = tb[mask].reset_index(drop=True).copy()
-
-        if not tb_error.empty:
-            log.warning(
-                f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-            )
-            # tb = tb[~mask].reset_index(drop=True)
-
-    # Drop the columns created for the check
-    tb = tb.drop(
-        columns=[
-            "shift_col",
-            "shift_year",
-            "shift_welfare_type",
-            "check_diff_column",
-            "check_diff_year",
-            "check_diff_welfare_type",
-        ]
-    )
-
-    return tb
-
-
-def remove_confusing_datapoints_in_grapher_dataset(tb: Table) -> Table:
-    """
-    Remove datapoints that are confusing when we are showing a unique series for both income and consumption.
-    """
-
-    # Define columns to keep data. Inequality is mostly not affected by the income/consumption choice
-    cols_to_keep = [
-        "country",
-        "year",
-        "reporting_level",
-        "welfare_type",
-        "gini",
-        "mld",
-        "decile1_share",
-        "decile2_share",
-        "decile3_share",
-        "decile4_share",
-        "decile5_share",
-        "decile6_share",
-        "decile7_share",
-        "decile8_share",
-        "decile9_share",
-        "decile10_share",
-        "bottom50_share",
-        "middle40_share",
-        "headcount_40_median",
-        "headcount_50_median",
-        "headcount_60_median",
-        "headcount_ratio_40_median",
-        "headcount_ratio_50_median",
-        "headcount_ratio_60_median",
-        "income_gap_ratio_40_median",
-        "income_gap_ratio_50_median",
-        "income_gap_ratio_60_median",
-        "poverty_gap_index_40_median",
-        "poverty_gap_index_50_median",
-        "poverty_gap_index_60_median",
-        "avg_shortfall_40_median",
-        "avg_shortfall_50_median",
-        "avg_shortfall_60_median",
-        "total_shortfall_40_median",
-        "total_shortfall_50_median",
-        "total_shortfall_60_median",
-        "poverty_severity_40_median",
-        "poverty_severity_50_median",
-        "poverty_severity_60_median",
-        "waits_40_median",
-        "waits_50_median",
-        "waits_60_median",
-        "palma_ratio",
-        "s80_s20_ratio",
-        "p90_p10_ratio",
-        "p90_p50_ratio",
-        "p50_p10_ratio",
-    ]
-
-    # Make nan the data for Poland from 2020 onwards, except for columns in cols_to_keep
-    mask = (tb["country"] == "Poland") & (tb["year"] >= 2020)
-    tb.loc[mask, tb.columns.difference(cols_to_keep)] = np.nan
-
     return tb

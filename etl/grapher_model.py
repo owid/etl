@@ -176,7 +176,6 @@ class Tag(SQLModel, table=True):
     slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
     parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
 

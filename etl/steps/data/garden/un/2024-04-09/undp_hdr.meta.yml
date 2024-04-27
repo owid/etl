@@ -102,7 +102,7 @@ tables:
         title: Human Development Index (female)
         unit: ""
         description_short: |-
-          The HDI is a summary measure of key dimensions of human development (only females): a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.
+          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only male population is considered.
         description_key: *description_key_hdi
         description_from_producer: *description_prod_hdi
         display:
@@ -117,7 +117,7 @@ tables:
         title: Human Development Index (male)
         unit: ""
         description_short: |-
-          The HDI is a summary measure of key dimensions of human development (only males): a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.
+          The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development. Only female population is considered.
         description_key: *description_key_hdi
         description_from_producer: *description_prod_hdi
         display:
@@ -156,6 +156,7 @@ tables:
           topic_tags:
               - Human Development Index (HDI)
               - Global Education
+
       # Inequality in income
       ineq_inc:
         title: Inequality in income
@@ -169,6 +170,7 @@ tables:
           topic_tags:
               - Human Development Index (HDI)
               - Economic Growth
+              - Economic Inequality
       # Inequality in life expectancy
       ineq_le:
         title: Inequality in Life expectancy
@@ -218,7 +220,7 @@ tables:
         title: Gender Development Index
         unit: ""
         description_short: |-
-          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. The groups below define the level of equality in these achievements as the absolute deviation of GDI from gender parity.
+          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living.
         description_key:
           - "The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income."
           - Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
@@ -230,7 +232,7 @@ tables:
         title: GDI Group
         unit: ""
         description_short: |-
-          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. The groups below define the level of equality in these achievements as the absolute deviation of GDI from gender parity.
+          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. This indicator defines the level of equality in these achievements as the absolute deviation of GDI from gender parity.
         description_key:
           - The GDI groups are based on the absolute deviation of GDI from gender parity, 100 ∙ |GDI - 1|.
           - "Group 1: Countries with absolute deviation from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and men."
@@ -284,14 +286,14 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Difference in ranks on the PHDI and the HDI is calculated only for countries for which both an IHDI value and an HDI value are calculated. Due to data limitations, PHDI values are calculated for a smaller set of countries.
+          Difference in ranks on the PHDI and the HDI is calculated only for countries for which both an PHDI value and an HDI value are calculated. Due to data limitations, PHDI values are calculated for a smaller set of countries.
         display:
           numDecimalPlaces: 2
       rankdiff_hdi_phdi:
         title: Difference from HDI rank
         unit: ""
         description_short: |-
-          To calculate the IHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an IHDI value is calculated.
+          To calculate the PHDI rank difference from the HDI rank, HDI ranks are recalculated for the set of countries for which an PHDI value is calculated.
         display:
           numDecimalPlaces: 0
 
@@ -346,7 +348,7 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          Number of years a child of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child’s years of schooling.
+          Number of years a child of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's years of schooling.
         description_from_producer: &description_prod_eys |-
           UNDP relies on: CEDLAS and World Bank (2023), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2023) and United Nations Children's Fund (UNICEF) Multiple Indicator Cluster Surveys (various years).
 
@@ -355,7 +357,7 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          Number of years a child (female) of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child’s years of schooling.
+          Number of years a female child of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's years of schooling.
         description_from_producer: *description_prod_eys
 
       eys_m:
@@ -363,7 +365,7 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          Number of years a child (male) of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child’s years of schooling.
+          Number of years a male child of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's years of schooling.
         description_from_producer: *description_prod_eys
 
       ## Mean years of schooling
@@ -384,7 +386,7 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          Average number of years (excluding years spent repeating individual grades) adults over 25 years participated in formal education.
+          Average number of years (excluding years spent repeating individual grades) female adults over 25 years participated in formal education.
         description_key: *description_key_mys
         description_from_producer: *description_prod_mys
 
@@ -393,7 +395,7 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          Average number of years (excluding years spent repeating individual grades) adults over 25 years participated in formal education.
+          Average number of years (excluding years spent repeating individual grades) male adults over 25 years participated in formal education.
         description_key: *description_key_mys
         description_from_producer: *description_prod_mys
 
@@ -404,19 +406,27 @@ tables:
         unit: international-$ in 2017 prices
         description_short: |-
           Measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
-        description_key: &description_key_gnipc
-          - GNI per capita (formerly GNP per capita) is the gross national income, converted to U.S. dollars using the World Bank Atlas method, divided by the midyear population. GNI is the sum of value added by all resident producers plus any product taxes (less subsidies) not included in the valuation of output plus net receipts of primary income (compensation of employees and property income) from abroad (World Bank).
-          - GNI, calculated in national currency, is usually converted to U.S. dollars at official exchange rates for comparisons across economies, although an alternative rate is used when the official exchange rate is judged to diverge by an exceptionally large margin from the rate actually applied in international transactions (World Bank).
         description_from_producer: &description_prod_gnipc |-
           UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
 
+          The World Bank's 2023 World Development Indicators database contains estimates of GNI per capita in constant 2017 purchasing power parity (PPP) terms for many countries. For countries missing this indicator (entirely or partly), the Human Development Report Office calculates it by converting GNI per capita in local currency from current to constant terms using two steps. First, the value of GNI per capita in current terms is converted into PPP terms for the base year (2017). Second, a time series of GNI per capita in 2017 PPP constant terms is constructed by applying the real growth rates to the GNI per capita in PPP terms for the base year. The real growth rate is implied by the ratio of the nominal growth of GNI per capita in current local currency terms to the GDP deflator.
+
+          For several countries without a value of GNI per capita in constant 2017 PPP terms for 20 22 reported in the World Development Indicators database, real growth rates of GDP per capita available in the World Development Indicators database or in the International Monetary Fund's Economic Outlook database are applied to the most recent GNI values in constant PPP terms.
+
+          Official PPP conversion rates are produced by the International Comparison Program, whose surveys periodically collect thousands of prices of matched goods and services in many countries. The last round of this exercise refers to 2017 and covered 176 economies.
       gni_pc_m:
         title: Gross national income per capita (male)
         short_unit: $
         unit: international-$ in 2017 prices
         description_short: |-
-          Measures the total income earned by male residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
-        description_key: *description_key_gnipc
+          Measures the total estimated income earned by male residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
+        description_key: # *description_key_gnipc
+          - |-
+            The estimated male earned income per capita (_GNIpcm_) is obtained from GNI per capita (_GNIpc_), first by multiplying it by the male share of the wage bill (_Sm_), and then rescaling it by the male share of the population that is male (_Pm): _GNIpcm = GNIpc * Sm/Pm_
+          - |-
+            The male share of the wage bill is calculated as _Sm = 1 - Sf_, where _Sf_ is the female wage bill.
+          - |-
+            The female share o the wage bill is calculated as _Sf = (Wf/Wm * EAf) / (Wf/Wm * EAf + EAm)_, where _Wf/Wm_ is the ratio of female to male wage, _EAf_ is the female share of the economically active population and _Eam_ is the male share.
         description_from_producer: *description_prod_gnipc
 
       gni_pc_f:
@@ -424,8 +434,12 @@ tables:
         short_unit: $
         unit: international-$ in 2017 prices
         description_short: |-
-          Measures the total income earned by female residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
-        description_key: *description_key_gnipc
+          Measures the total estimated income earned by female residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
+        description_key:
+          - |-
+            The estimated female earned income per capita (_GNIpcm_) is obtained from GNI per capita (_GNIpc_), first by multiplying it by the female share of the wage bill (_Sf_), and then rescaling it by the female share of the population that is female (_Pf_): _GNIpcm = GNIpc * Sf/Pf_
+          - |-
+            The female share of the wage bill is calculated as _Sf = (Wf/Wm * EAf) / (Wf/Wm * EAf + EAm)_, where _Wf/Wm_ is the ratio of female to male wage, _EAf_ is the female share of the economically active population and _Eam_ is the male share.
         description_from_producer: *description_prod_gnipc
 
       ###########################################################

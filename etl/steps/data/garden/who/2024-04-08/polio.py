@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -13,7 +14,8 @@ paths = PathFinder(__file__)
 # Year to use for the screening and testing rates.
 # Should be the most recent year of complete data.
 SCREENING_YEAR = 2023
-
+# The year to use for the GPEI data on circulating vaccine derived polio cases
+GPEI_YEAR_CVDPV = 2016
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
@@ -24,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Load meadow acute flaccid paralysis dataset.
     ds_meadow = paths.load_dataset("polio_afp")
     # Load historical polio dataset
-    ds_historical = paths.load_dataset("polio_historical")
+    ds_historical = paths.load_dataset("polio_historical", channel="garden")
     # Load population data to calculate cases per million population
     ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index()
@@ -32,7 +34,7 @@ def run(dest_dir: str) -> None:
     snap_cvdpv = paths.load_snapshot("gpei.csv")
     tb_cvdpv = snap_cvdpv.read()
     # Dropping this as the total_cvdpv is also in the polio_afp table and has more historical data
-    tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
+    # tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     tb_regions = ds_regions["regions"].reset_index()
@@ -41,6 +43,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["polio_afp"].reset_index()
+    tb = harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     tb_hist = ds_historical["polio_historical"].reset_index()
     tb_hist = tb_hist.rename(columns={"cases": "total_cases"})
     # Only need this for data prior to 2001
@@ -51,13 +56,16 @@ def run(dest_dir: str) -> None:
     # Remove values > 100% for "Adequate stool collection".
     tb = clean_adequate_stool_collection(tb)
     # Add total cases
-    tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
-    # Need to deal with overlapping years
+    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="outer")
+    # for years after 2016 use GPEI cvdpv data
+    tb["combined_cvdpv"] = np.where((tb["year"] >= GPEI_YEAR_CVDPV), tb["total_cvdpv"], tb["cvdpv_cases"])
+    tb["combined_cvdpv"] = tb["combined_cvdpv"].copy_metadata(tb["cvdpv_cases"])
+    tb["combined_cvdpv"] = tb["combined_cvdpv"].replace({np.nan: 0})
+    tb = tb.drop(columns=["cvdpv_cases", "total_cvdpv"])
+
+    tb["total_cases"] = tb["wild_poliovirus_cases"].replace({np.nan: 0}) + tb["combined_cvdpv"]
     tb = pr.concat([tb_hist, tb], axis=0)
-    tb = harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
+
     # Add region aggregates.
     tb_reg = add_regions_to_table(
         tb[
@@ -66,7 +74,7 @@ def run(dest_dir: str) -> None:
                 "year",
                 "afp_cases",
                 "wild_poliovirus_cases",
-                "cvdpv_cases",
+                "combined_cvdpv",
                 "total_cases",
                 "cvdpv1",
                 "cvdpv2",
@@ -86,6 +94,7 @@ def run(dest_dir: str) -> None:
     # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb, tb_regions, ds_regions)
     tb = add_cases_per_million(tb, tb_population)
+    tb = tb[tb["year"] <= SCREENING_YEAR]
     tb = tb.format(short_name="polio")
 
     #
@@ -110,7 +119,7 @@ def add_cases_per_million(tb: Table, tb_population: Table) -> Table:
     cols_to_divide = [
         "afp_cases",
         "wild_poliovirus_cases",
-        "cvdpv_cases",
+        "combined_cvdpv",
         "total_cases",
         "estimated_cases",
         "cvdpv1",

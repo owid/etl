@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Unknown
+    url: ''
+    source_data_url: gAAAAABmKk5P8Z1J8-oDRYPbBELas08giS7rMbfJ2-Y2x-1rNAM6aGDeywz9OGIJRHphWpgPRxCW9qLs_E04N_6CRRr9g_LgX0NLD8B8Oggk0dj8IrfZef4=
+    date_accessed: '2024-04-25'
+  name: DRAFT short_period_owid_upload
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 3892459cd5d23d00234c677d680338be
+    size: 16537
+    path: short_period_owid_upload.csv

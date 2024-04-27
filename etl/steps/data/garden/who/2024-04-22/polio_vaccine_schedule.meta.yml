@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+        - Eradication of Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+  title: Vaccination schedule for Poliomyelitis
+tables:
+  polio_vaccine_schedule:
+    variables:
+      vaccine_schedule:
+        title: Polio vaccine schedule
+        description_short: "The type of polio vaccines used in the national immunization schedule in each country: only inactivated poliovirus vaccines (IPV), oral poliovirus vaccines (OPV), or both."
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Vaccination
+            - Eradication of Diseases

@@ -1,0 +1,6 @@
+tables:
+  air_pollution_emissions_by_sector__ceds__2024:
+    variables:
+      energy_so2:
+        display:
+          numDecimalPlaces: 2

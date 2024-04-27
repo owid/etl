@@ -7,9 +7,11 @@ The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
 
+import configparser
 import os
 import pwd
 from os import environ as env
+from typing import Dict
 
 import bugsnag
 import pandas as pd
@@ -47,9 +49,28 @@ ENV_IS_REMOTE = ENV in ("production", "staging")
 R2_BUCKET = "owid-catalog"
 R2_REGION_NAME = "auto"
 R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL", "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com")
-# if R2_ACCESS_KEY and R2_SECRET_KEY are null, we use credentials from ~/.aws/config
 R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
 R2_SECRET_KEY = env.get("R2_SECRET_KEY")
+
+
+# if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
+def _read_owid_rclone_config() -> Dict[str, str]:
+    # Create a ConfigParser object
+    config = configparser.ConfigParser()
+
+    # Read the configuration file
+    config.read(os.path.expanduser("~/.config/rclone/rclone.conf"))
+
+    return dict(config["owid-r2"].items())
+
+
+if not R2_ACCESS_KEY or not R2_SECRET_KEY:
+    try:
+        rclone_config = _read_owid_rclone_config()
+        R2_ACCESS_KEY = R2_ACCESS_KEY or rclone_config.get("access_key_id")
+        R2_SECRET_KEY = R2_SECRET_KEY or rclone_config.get("secret_access_key")
+    except KeyError:
+        pass
 
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
 R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
@@ -149,7 +170,7 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
-ADMIN_HOST = env.get("ADMIN_HOST", "http://localhost:3030")
+ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 

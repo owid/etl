@@ -12,6 +12,8 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 LATEST_YEAR = 2023
+AFFECTED_COUNTRIES = ["Mozambique", "Malawi"]
+ENDEMIC_COUNTRIES = ["Afghanistan", "Pakistan"]
 
 
 def run(dest_dir: str) -> None:
@@ -21,12 +23,15 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("polio_free_countries")
     tb = ds_meadow["polio_free_countries"].reset_index()
-
-    ##### Temporary fix - we remove West Bank and Gaza as there is both data for West Bank and Gaza _and_ Palestine N.A (national authority).
-    ##### I'm not sure how we should treat these but for now I will just stick with the entity that has the latest value, so Palestine N.A.
+    tb = tb[["country", "year"]]
+    # Adding south sudan value
+    south_sudan = {"country": "South Sudan", "year": 2004}
+    tb.loc[len(tb)] = south_sudan
+    tb = tb.reset_index(drop=True)
+    ###### Confirmed that the value for Palestine NA is the correct one with GPEI
 
     tb = tb[tb["country"] != "West Bank and Gaza"]
-    ##### There are also two values for Somalia, I will drop the least recent one
+    ##### There are also two values for Somalia, I will drop the least recent one - confirmed with GPEI that Somalia's last wild polio case was in 2002
     tb = tb[~((tb["country"] == "Somalia") & (tb["year"] == "2000"))]
 
     # Loading the polio status data for WHO regions
@@ -42,8 +47,9 @@ def run(dest_dir: str) -> None:
 
     # Assign polio free countries.
     tb = define_polio_free(tb, latest_year=LATEST_YEAR)
-
     tb = add_polio_region_certification(tb, tb_region_status, who_regions, ds_regions)
+    tb = add_affected_and_endemic_countries(tb)
+    tb = tb[tb["year"] <= LATEST_YEAR]
     # Set an index and sort.
     tb = tb.format()
     #
@@ -52,6 +58,16 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
+
+
+def add_affected_and_endemic_countries(tb: Table) -> Table:
+    """
+    We'll code affected countries as 3000 and endemic countries as 4000, so that we can continue to use this variable in the same way in grapher (numeric)
+    """
+    tb.loc[(tb["country"].isin(AFFECTED_COUNTRIES)) & (tb["year"] == LATEST_YEAR), "latest_year_wild_polio_case"] = 3000
+    tb.loc[(tb["country"].isin(ENDEMIC_COUNTRIES)) & (tb["year"] == LATEST_YEAR), "latest_year_wild_polio_case"] = 4000
+
+    return tb
 
 
 def add_polio_region_certification(
@@ -105,7 +121,7 @@ def define_polio_free(tb: Table, latest_year: int) -> Table:
     # Define polio status based on the year comparison
     tb_prod["status"] = tb_prod.apply(
         lambda row: "Endemic"
-        if row["year"] < tb[tb["country"] == row["country"]]["latest_year_wild_polio_case"].min()
+        if row["year"] <= tb[tb["country"] == row["country"]]["latest_year_wild_polio_case"].min()
         else "Polio-free (not certified)",
         axis=1,
     )
