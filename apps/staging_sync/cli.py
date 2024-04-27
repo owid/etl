@@ -2,7 +2,7 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional, Set
+from typing import Any, Dict, Literal, Optional, Set, Union
 
 import click
 import pandas as pd
@@ -362,9 +362,9 @@ def _validate_env(env: Path) -> None:
         raise click.BadParameter(f"File {env} does not exist")
 
 
-def _get_engine_for_env(env: Path) -> Engine:
+def _get_engine_for_env(env: Union[Path, str]) -> Engine:
     # env exists as a path
-    if _is_env(env):
+    if _is_env(Path(env)):
         config = dotenv_values(str(env))
     # env could be server name
     else:

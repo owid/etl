@@ -17,7 +17,10 @@ from etl import grapher_model as gm
 # wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-SOURCE_ENV = "staging-site-mojmir"
+# TODO: unhardcode this
+SOURCE_ENV = "staging-site-streamlit-chart-approval"
+
+# TODO: switch to production once we are ready
 TARGET_ENV = "staging-site-master"
 
 # st.session_state.chart_approval_list = st.session_state.get("chart_approval_list", [])
