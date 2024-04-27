@@ -81,7 +81,7 @@ class ChartDiffModified:
         approval = gm.ChartDiffApprovals(
             chartId=self.chart_id,
             sourceUpdatedAt=self.source_chart.updatedAt,
-            targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,
+            targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
             status="approved" if self.approved else "rejected",
         )
 

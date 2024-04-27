@@ -130,7 +130,10 @@ def compare_charts(
         with col1:
             # st.selectbox(label="version", options=["Source"], key=f"selectbox-left-{identifier}")
             if prod_is_newer:
-                st.markdown("Production :red[(⚠️was modified after your staging edits!)]")
+                st.markdown(
+                    f"Production   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}` :red[conflict]",
+                    help="⚠️ The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
+                )
             else:
                 st.markdown(f"Production   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
             chart_html(target_chart.config, base_url=TARGET_ENV)
