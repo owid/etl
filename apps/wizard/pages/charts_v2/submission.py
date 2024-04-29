@@ -55,9 +55,9 @@ def create_submission(indicator_config: IndicatorConfig, schema_chart_config: Di
     with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
         try:
             log.info("chart_revision: building updaters and getting charts!")
-            st.session_state.variable_mapping = indicator_config.variable_mapping
+            st.session_state.indicator_mapping = indicator_config.indicator_mapping
             updaters, charts = build_updaters_and_get_charts_cached(
-                variable_mapping=indicator_config.variable_mapping,
+                indicator_mapping=indicator_config.indicator_mapping,
                 schema_chart_config=schema_chart_config,
             )
         except (URLError, RemoteDisconnected) as e:
@@ -82,7 +82,7 @@ def create_submission(indicator_config: IndicatorConfig, schema_chart_config: Di
                 st.info(f"""Number of charts to be updated: {num_charts}""")
             with col2:
                 with st.expander("🔎  Show variable id mapping"):
-                    st.write(indicator_config.variable_mapping)
+                    st.write(indicator_config.indicator_mapping)
 
             # 2.2/ Display charts. Allow for GPT tweaks.
             if num_charts > NUM_CHARTS_LIMIT:
@@ -251,13 +251,13 @@ def push_submission(submission_config: "SubmissionConfig") -> None:
 
 
 @st.cache_data(show_spinner="Querying ChatGPT...")
-def build_updaters_and_get_charts_cached(variable_mapping, schema_chart_config):
-    # st.write(variable_mapping)
-    if not variable_mapping:
+def build_updaters_and_get_charts_cached(indicator_mapping, schema_chart_config):
+    # st.write(indicator_mapping)
+    if not indicator_mapping:
         msg_error = "No variables selected! Please select at least one variable."
         st.error(msg_error)
     return build_updaters_and_get_charts(
-        variable_mapping=variable_mapping,
+        variable_mapping=indicator_mapping,
         schema_chart_config=schema_chart_config,
     )
 

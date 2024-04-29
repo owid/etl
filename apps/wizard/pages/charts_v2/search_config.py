@@ -13,9 +13,9 @@ from apps.wizard.utils import set_states
 log = get_logger()
 
 # Set to True to select good initial default dataset selections
-DEBUG = False
-dataset_old_debug = "Population (various sources, 2023.1)"
-dataset_new_debug = "Population (Experimental)"
+DEBUG = True
+dataset_old_debug = "Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World"
+dataset_new_debug = "Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World"
 
 
 def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "SearchConfigForm":
@@ -107,7 +107,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     return SearchConfigForm(
         dataset_old_id=dataset_old_id,
         dataset_new_id=dataset_new_id,
-        map_identical_variables=map_identical,
+        map_identical_indicators=map_identical,
         similarity_function_name=similarity_name,
         enable_explore_mode=enable_explore,
     )
@@ -118,7 +118,7 @@ class SearchConfigForm(BaseModel):
 
     dataset_old_id: str
     dataset_new_id: str
-    map_identical_variables: bool
+    map_identical_indicators: bool
     similarity_function_name: str
     enable_explore_mode: bool
 

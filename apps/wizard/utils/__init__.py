@@ -519,7 +519,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -527,7 +527,10 @@ def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        st.session_state[key] = value
+        if only_if_not_exists:
+            st.session_state[key] = st.session_state.get(key, value)
+        else:
+            st.session_state[key] = value
 
 
 def st_page_link(alias: str, border: bool = False, **kwargs) -> None:

@@ -26,10 +26,10 @@ We use various session state indicators to control the flow of the app:
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.pages.charts_v2.indicator_config import ask_and_get_variable_mapping
+from apps.wizard.pages.charts_v2.indicator_config import ask_and_get_indicator_mapping
 from apps.wizard.pages.charts_v2.init_config import init_app, set_session_states
 from apps.wizard.pages.charts_v2.search_config import build_dataset_form
-from apps.wizard.pages.charts_v2.submission import create_submission, push_submission
+from apps.wizard.pages.charts_v2.submission import push_submission
 from apps.wizard.pages.charts_v2.utils import get_datasets, get_schema
 from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
@@ -56,7 +56,7 @@ ignore_selectbox = []
 charts = []
 updaters = []
 num_charts = 0
-variable_mapping = {}
+indicator_mapping = {}
 indicator_config = None
 submission_config = None
 
@@ -69,7 +69,7 @@ submission_config = None
 #
 # Presents the user with a form to select the old and new datasets. Additionally,
 # some search paramterers can be configured. The dataset IDs are used to retrieve the
-# relevant variables from the database/S3
+# relevant indicators from the database/S3
 #
 ##########################################################################################
 with st.form("form-datasets"):
@@ -77,37 +77,38 @@ with st.form("form-datasets"):
 
 
 ##########################################################################################
-# 2 VARIABLE MAPPING
+# 2 INDICATORS MAPPING
 #
-# We present the user with the variables from the old and the new dataset.
+# We present the user with the indicators from the old and the new dataset.
 # The user is asked to define the mapping between these, so that we can create the submission.
 #
 ##########################################################################################
 if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
-    indicator_config = ask_and_get_variable_mapping(search_form)
-    # log.info(f"VARIABLE CONFIG (2): {indicator_config}")
+    indicator_config = ask_and_get_indicator_mapping(search_form)
+    # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
 
 
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
 #
-# Once the variable mapping is done, we create the revisions. We store these under what we
+# Once the indicator mapping is done, we create the revisions. We store these under what we
 # call the "submission_config". This is a dataclass that holds the charts and updaters.
 #
 ##########################################################################################
 if st.session_state.submitted_datasets and st.session_state.submitted_indicators:
-    # log.info(f"VARIABLE CONFIG (3): {indicator_config}")
+    # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
     # st.write(reset_indicator_form)
     if indicator_config is not None:
-        if not indicator_config.variable_mapping:
+        if not indicator_config.indicator_mapping:
             msg_error = "No indicators selected! Please select at least one indicator."
             st.error(msg_error)
         elif indicator_config.is_valid:
-            submission_config = create_submission(
-                indicator_config,
-                SCHEMA_CHART_CONFIG,
-            )
+            st.write(indicator_config.indicator_mapping)
+            # submission_config = create_submission(
+            #     indicator_config,
+            #     SCHEMA_CHART_CONFIG,
+            # )
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #003001")
 

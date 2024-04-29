@@ -49,6 +49,7 @@ def set_session_states() -> None:
             "submitted_datasets": False,
             "submitted_indicators": False,
             "submitted_revisions": False,
-            "variable_mapping": {},
-        }
+            "indicator_mapping": {},
+        },
+        only_if_not_exists=True,
     )
