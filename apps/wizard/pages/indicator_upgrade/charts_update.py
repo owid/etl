@@ -94,32 +94,29 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
     # Update charts
     progress_text = "Submitting chart revisions..."
     bar = st.progress(0, progress_text)
-    for i, chart in enumerate(charts):
-        log.info(f"chart_revision: creating comparison for chart {chart.id}")
-        # Update chart config
-        config_new = update_chart_config(
-            chart.config,
-            st.session_state.indicator_mapping,
-            schema_chart_config,
-        )
-        # Push new chart to DB
-        if chart.id:
-            chart_id = chart.id
-        elif "id" in chart.config:
-            chart_id = chart.config["id"]
-        else:
-            raise ValueError(f"Chart {chart} does not have an ID in config.")
-        api.update_chart(
-            chart_id=chart_id,
-            chart_config=config_new,
-        )
-        # Show progress bar
-        percent_complete = int(100 * (i + 1) / len(charts))
-        bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
-
-    # Push new charts to live
     try:
-        st.write("Push new charts to the database")
+        for i, chart in enumerate(charts):
+            log.info(f"chart_revision: creating comparison for chart {chart.id}")
+            # Update chart config
+            config_new = update_chart_config(
+                chart.config,
+                st.session_state.indicator_mapping,
+                schema_chart_config,
+            )
+            # Push new chart to DB
+            if chart.id:
+                chart_id = chart.id
+            elif "id" in chart.config:
+                chart_id = chart.config["id"]
+            else:
+                raise ValueError(f"Chart {chart} does not have an ID in config.")
+            api.update_chart(
+                chart_id=chart_id,
+                chart_config=config_new,
+            )
+            # Show progress bar
+            percent_complete = int(100 * (i + 1) / len(charts))
+            bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
     except Exception as e:
         st.error(f"Something went wrong! {e}")
     else:

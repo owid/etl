@@ -203,20 +203,25 @@ def main():
     chart_diffs_modified = [
         chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_modified
     ]
-    chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_new]
-    with Session(source_engine) as source_session:
-        with Session(target_engine) as target_session:
-            if chart_diffs_modified:
-                st.header("Modified charts")
-                st.markdown(f"{len(chart_diffs_modified)} charts modified in `{SOURCE_ENV}`")
-                for chart_diff in chart_diffs_modified:
-                    st_show(chart_diff, source_session, target_session)
 
-            if chart_diffs_new:
-                st.header("New charts")
-                st.markdown(f"{len(chart_diffs_new)} new charts in `{SOURCE_ENV}`")
-                for chart_diff in chart_diffs_new:
-                    st_show(chart_diff, source_session, target_session)
+    if len(chart_diffs_modified) == 0:
+        st.warning("No chart modifications found in the staging environment.")
+    else:
+        # Show modified/new charts
+        chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_new]
+        with Session(source_engine) as source_session:
+            with Session(target_engine) as target_session:
+                if chart_diffs_modified:
+                    st.header("Modified charts")
+                    st.markdown(f"{len(chart_diffs_modified)} charts modified in `{SOURCE_ENV}`")
+                    for chart_diff in chart_diffs_modified:
+                        st_show(chart_diff, source_session, target_session)
+
+                if chart_diffs_new:
+                    st.header("New charts")
+                    st.markdown(f"{len(chart_diffs_new)} new charts in `{SOURCE_ENV}`")
+                    for chart_diff in chart_diffs_new:
+                        st_show(chart_diff, source_session, target_session)
 
 
 main()
