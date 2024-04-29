@@ -667,6 +667,14 @@ steps:
   data://grapher/missing_data/2024-03-26/who_md_suicides:
     - data://garden/missing_data/2024-03-26/who_md_suicides
 
+  # Maddison Project Database
+  data://meadow/ggdc/2024-04-26/maddison_project_database:
+    - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
+  data://garden/ggdc/2024-04-26/maddison_project_database:
+    - data://meadow/ggdc/2024-04-26/maddison_project_database
+  data://grapher/ggdc/2024-04-26/maddison_project_database:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -729,10 +737,6 @@ steps:
 
   ######################################################################################################################
 
-  data://meadow/ggdc/2024-04-26/maddison_project_database:
-    - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
-  data://garden/ggdc/2024-04-26/maddison_project_database:
-    - data://meadow/ggdc/2024-04-26/maddison_project_database
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
