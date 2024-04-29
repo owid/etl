@@ -296,17 +296,6 @@ steps:
     - data://garden/oecd/2018-03-11/road_deaths_and_injuries
   data://grapher/oecd/2023-08-11/road_accidents:
     - data://garden/oecd/2023-08-11/road_accidents
-
-  # WHO Avian Influenza H5N1
-
-  data://meadow/who/2023-08-14/avian_influenza_ah5n1:
-    - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
-  data://garden/who/2023-08-14/avian_influenza_ah5n1:
-    - data://meadow/who/2023-08-14/avian_influenza_ah5n1
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/who/2023-08-14/avian_influenza_ah5n1:
-    - data://garden/who/2023-08-14/avian_influenza_ah5n1
-
   # Kucharski
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
