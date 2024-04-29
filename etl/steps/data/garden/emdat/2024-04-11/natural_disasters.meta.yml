@@ -19,7 +19,7 @@ definitions:
   definition_affected: &definition-affected |-
     Affected people are those requiring immediate assistance due to the disaster.
   definition_total_affected: &definition-total-affected |-
-    The total number of affected people is the sum of injured, affected, and left homeless after a disaster.
+    The total number of affected people is the sum of those injured, affected, and left homeless after a disaster.
   definition_reconstruction_costs: &definition-reconstruction-costs |-
     Reconstruction cost is defined as the money needed to replace lost assets, unadjusted for inflation.
   definition_insured_damage: &definition-insured-damage |-
@@ -56,7 +56,7 @@ definitions:
   definition_glacial_lake_outburst_flood: &definition-glacial-lake-outburst-flood |-
     Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
   definition_fog: &definition-fog |-
-    Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground.
+    Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground. Currently, the only fog disaster recorded in EM-DAT is the Great Smog of London in 1952.
   # definition_extreme_weather: &definition-extreme-weather |-
   # I couldn't find any precise definition of extreme weather in the EM-DAT documentation: https://doc.emdat.be/docs/
   # Common description key of all disasters.
@@ -108,7 +108,7 @@ tables:
         title: Homeless
         unit: 'people'
         description_short: |-
-          People whose house is destroyed or heavily damaged and therefore need shelter after an event.
+          People whose houses are destroyed or heavily damaged and therefore need shelter after an event.
         description_key:
           - *definition-homeless
           - *description-key-common
@@ -162,35 +162,35 @@ tables:
         unit: 'people'
       total_dead_per_100k_people:
         title: Total number of deaths per 100,000 people
-        unit: 'deaths per 100k people'
+        unit: 'deaths per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-dead
           - *description-key-common
       injured_per_100k_people:
         title: Number of injured persons per 100,000 people
-        unit: 'injured per 100k people'
+        unit: 'injured per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
           - *description-key-common
       affected_per_100k_people:
         title: Number of affected persons per 100,000 people
-        unit: 'affected per 100k people'
+        unit: 'affected per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-affected
           - *description-key-common
       homeless_per_100k_people:
         title: Number of homeless persons per 100,000 people
-        unit: 'homeless per 100k people'
+        unit: 'homeless per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-homeless
           - *description-key-common
       total_affected_per_100k_people:
         title: Total number of affected persons per 100,000 people
-        unit: 'affected per 100k people'
+        unit: 'affected per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
@@ -200,7 +200,7 @@ tables:
           - *description-key-common
       n_events_per_100k_people:
         title: Number of events per 100,000 people
-        unit: 'events per 100k people'
+        unit: 'events per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *description-key-common
