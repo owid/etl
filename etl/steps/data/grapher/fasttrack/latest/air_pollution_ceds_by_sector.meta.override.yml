@@ -1,0 +1,7 @@
+tables:
+  air_pollution_ceds_by_sector:
+    variables:
+      agriculture_so2:
+        title: SO₂ emissions from agriculture
+        display:
+          name: Agriculture

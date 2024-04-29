@@ -12,6 +12,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 LATEST_YEAR = 2023
+# Due to relatively recent cases in Mozambique and Malawi, they are considered affected countries. This was confirmed with Vikram from GPEI in April 2024.
 AFFECTED_COUNTRIES = ["Mozambique", "Malawi"]
 ENDEMIC_COUNTRIES = ["Afghanistan", "Pakistan"]
 
@@ -89,9 +90,15 @@ def add_polio_region_certification(
         # Check if there is a valid year of certification
         if not year_certified.empty and year_certified.notna().all():
             year_certified_int = int(year_certified.iloc[0])
+            print(year_certified_int)
+            tb_who_region = Table(
+                product(country_list, range(year_certified_int, LATEST_YEAR + 1)), columns=["country", "year"]
+            )
+            # tb_who_region["status"] = "WHO Region certified polio-free"
+            tb = pr.merge(tb, tb_who_region, on=["country", "year"], how="outer")
             # Set the status for all relevant countries and years
             tb.loc[
-                (tb["country"].isin(country_list)) & (tb["year"] >= year_certified_int), "status"
+                tb["country"].isin(country_list) & (tb["year"] >= year_certified_int), "status"
             ] = "WHO Region certified polio-free"
 
     return tb

@@ -11,7 +11,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_nox:
@@ -19,7 +19,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_nox:
@@ -27,7 +27,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nox:
@@ -35,7 +35,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive NOx emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_nox:
@@ -43,7 +43,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_nox:
@@ -51,7 +51,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_nox:
@@ -59,7 +59,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nox:
@@ -67,7 +67,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_nox:
@@ -75,7 +75,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NOx emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_so2:
@@ -83,7 +83,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_so2:
@@ -91,7 +91,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_so2:
@@ -99,7 +99,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_so2:
@@ -107,7 +107,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive SO₂ emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_so2:
@@ -115,7 +115,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_so2:
@@ -123,7 +123,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_so2:
@@ -131,7 +131,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_so2:
@@ -139,7 +139,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_so2:
@@ -147,7 +147,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: SO₂ emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_co:
@@ -155,7 +155,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_co:
@@ -163,7 +163,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_co:
@@ -171,7 +171,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_co:
@@ -179,7 +179,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive CO emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_co:
@@ -187,7 +187,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_co:
@@ -195,7 +195,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_co:
@@ -203,7 +203,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_co:
@@ -211,7 +211,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_co:
@@ -219,7 +219,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: CO emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_oc:
@@ -227,7 +227,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_oc:
@@ -235,7 +235,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_oc:
@@ -243,7 +243,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_oc:
@@ -251,7 +251,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive OC emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_oc:
@@ -259,7 +259,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_oc:
@@ -267,7 +267,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_oc:
@@ -275,7 +275,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_oc:
@@ -283,7 +283,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_oc:
@@ -291,7 +291,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: OC emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_nmvoc:
@@ -299,7 +299,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_nmvoc:
@@ -307,7 +307,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_nmvoc:
@@ -315,7 +315,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nmvoc:
@@ -323,7 +323,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive NMVOC emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_nmvoc:
@@ -331,7 +331,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_nmvoc:
@@ -339,7 +339,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_nmvoc:
@@ -347,7 +347,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nmvoc:
@@ -355,7 +355,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_nmvoc:
@@ -363,7 +363,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: NMVOC emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_bc:
@@ -371,7 +371,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_bc:
@@ -379,7 +379,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_bc:
@@ -387,7 +387,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_bc:
@@ -395,7 +395,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive BC emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_bc:
@@ -403,7 +403,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_bc:
@@ -411,7 +411,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_bc:
@@ -419,7 +419,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_bc:
@@ -427,7 +427,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_bc:
@@ -435,7 +435,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: BC emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000
       agriculture_nh3:
@@ -443,7 +443,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from agriculture
+          name: Agriculture
           numDecimalPlaces: 0
           conversionFactor: 1000
       aviation_nh3:
@@ -451,7 +451,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from domestic aviation
+          name: Aviation
           numDecimalPlaces: 0
           conversionFactor: 1000
       energy_nh3:
@@ -459,7 +459,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from energy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nh3:
@@ -467,7 +467,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Fugitive ammonia emissions
+          name: Fugitive
           numDecimalPlaces: 0
           conversionFactor: 1000
       industry_nh3:
@@ -475,7 +475,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from industry
+          name: Industry
           numDecimalPlaces: 0
           conversionFactor: 1000
       other_nh3:
@@ -483,7 +483,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from other sectors
+          name: Other sectors
           numDecimalPlaces: 0
           conversionFactor: 1000
       shipping_nh3:
@@ -491,7 +491,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from shipping
+          name: Shipping
           numDecimalPlaces: 0
           conversionFactor: 1000
       transport_nh3:
@@ -499,7 +499,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from transport
+          name: Transport
           numDecimalPlaces: 0
           conversionFactor: 1000
       waste_nh3:
@@ -507,6 +507,6 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Ammonia emissions from waste
+          name: Waste
           numDecimalPlaces: 0
           conversionFactor: 1000

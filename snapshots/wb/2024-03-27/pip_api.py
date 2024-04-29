@@ -48,6 +48,7 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
+from owid.catalog import connect_r2_cached
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
@@ -55,7 +56,6 @@ from tenacity.wait import wait_random_exponential
 
 from etl.files import checksum_str
 from etl.paths import CACHE_DIR
-from etl.publish import connect_s3_cached
 
 # Initialize logger.
 log = get_logger()
@@ -250,7 +250,7 @@ def _get_request(url: str) -> requests.Response:
 
 @memory.cache
 def _fetch_csv(url: str) -> pd.DataFrame:
-    r2 = connect_s3_cached()
+    r2 = connect_r2_cached()
     r2_bucket = "owid-private"
     r2_key = "cache/pip_api/" + checksum_str(url)
 
