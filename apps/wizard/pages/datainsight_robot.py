@@ -76,7 +76,7 @@ grapher_url = st.text_input(
     key="url",
 )
 with st.expander("Edit the prompt"):
-    prompt = st.text_input(
+    prompt = st.text_area(
         label="Prompt",
         value=default_prompt,
         key="prompt",
