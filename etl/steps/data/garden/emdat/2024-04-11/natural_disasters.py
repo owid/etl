@@ -415,6 +415,42 @@ def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
     )
     fig.show()
 
+    # Calculate the share of small and big events every decade.
+    tb_ = tb.copy()
+    tb_["decade"] = (tb_["year"] // 10) * 10
+    # Count the total number of events per decade.
+    tb_counts_all = (
+        tb_.groupby("decade", as_index=False, observed=True)["country"].count().rename(columns={"country": "n_events"})
+    )
+    # A "small" event is defined as having <= 5 deaths, <=1500 people affected, or <= 8 million US$ in damages.
+    # tb_counts_small = tb_[(tb_["total_dead"] <= 5) | (tb_["total_affected"] <= 1500) | (tb_["total_damages"] <= 8e6)].groupby("decade", as_index=False, observed=True)["total_dead"].count()
+    # A "large" event is defined as having >= 50 deaths, >= 150000 people affected, or > 200 million US$ in damages.
+    tb_counts_large = (
+        tb_[(tb_["total_dead"] >= 50) | (tb_["total_affected"] >= 150000) | (tb_["total_damages"] >= 200e6)]
+        .groupby("decade", as_index=False, observed=True)["country"]
+        .count()
+        .rename(columns={"country": "n_large_events"})
+    )
+    # Create a table with the counts of small, large, and all events per decade.
+    tb_counts = tb_counts_all.merge(tb_counts_large, on="decade", how="left").fillna(0)
+    # Calculate the share of large events.
+    tb_counts["Large events"] = 100 * tb_counts["n_large_events"] / tb_counts["n_events"]
+    tb_counts["Other events"] = 100 - tb_counts["Large events"]
+    # Plot the share of large events as a bar chart.
+    tb_plot = tb_counts[["decade", "Large events", "Other events"]].melt(
+        id_vars="decade", var_name="event_size", value_name="share"
+    )
+    fig = px.bar(
+        tb_plot,
+        x="decade",
+        y="share",
+        color="event_size",
+        color_discrete_map={"Other events": "blue", "Large events": "red"},
+        title="Share of large events (>= 50 deaths or >= 150,000 affected or > US$ 200 M in damages)",
+        labels={"decade": "Decade", "share": "Share of events (%)", "event_size": "Event size"},
+    )
+    fig.show()
+
 
 def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     """Get the total count of impacts in the year, ignoring the individual events.
@@ -721,7 +757,7 @@ def run(dest_dir: str) -> None:
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
     tb = calculate_yearly_impacts(tb=tb)
 
-    # Calculate the number of events over a certain threshold of casualties.
+    # Calculate the number of events over a certain threshold of casualties, as well as the share of "large" events.
     # This is useful to notice a possible underestimate of small events in early data.
     # For now, we are not exporting this data and simply inspecting it visually.
     # calculate_n_events_over_a_threshold_of_deaths(tb=tb)
