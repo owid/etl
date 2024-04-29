@@ -97,10 +97,10 @@ sections:
     apps:
     - title: "Indicator Upgrader"
       alias: indicator-upgrade
-      entrypoint: pages/charts_v2/__main__.py
+      entrypoint: pages/indicator_upgrade/app.py
       description: Update indicator references in charts
       maintainer: "@lucas"
-      emoji: "🌟"
+      emoji: "🧬"
       image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
     - title: "Chart Diff"
       alias: chart_diff

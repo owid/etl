@@ -6,7 +6,7 @@ import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
 
-from etl.chart_revision.v2.schema import get_schema_chart_config
+from etl.chart_revision.v3.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
 
 # Logger
@@ -30,7 +30,7 @@ def get_datasets() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def get_schema() -> Dict[str, Any]:
     """Load datasets."""
-    with st.spinner("Retrieving chart config schema..."):
+    with st.spinner("Retrieving schema..."):
         try:
             schema = get_schema_chart_config()
         except OperationalError as e:

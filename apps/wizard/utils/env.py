@@ -91,5 +91,12 @@ class OWIDEnv:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
 
+    def thumb_url(self, slug: str):
+        """
+        Turn https://ourworldindata.org/grapher/life-expectancy"
+        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        """
+        return f"{self.site}/grapher/thumbnail/{slug}.png"
+
 
 OWID_ENV = OWIDEnv()

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.pages.charts_v2.indicator_config import reset_indicator_form
+from apps.wizard.pages.indicator_upgrade.indicator_mapping import reset_indicator_form
 from apps.wizard.utils import set_states
 
 log = get_logger()
@@ -94,7 +94,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             {
                 "submitted_datasets": True,  # This means that the user has submitted the datasets
                 "submitted_indicators": False,
-                "submitted_revisions": False,
+                "submitted_charts": False,
             },
             logging=True,
         )

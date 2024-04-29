@@ -16,7 +16,7 @@ from etl import grapher_model as gm
 
 CURRENT_DIR = Path(__file__).resolve().parent
 # TODO: unhardcode this
-SOURCE_ENV = "staging-site-streamlit-chart-approval"
+SOURCE_ENV = "staging-site-streamlit-chart-approval-indicator-upgrade"
 # TODO: switch to production once we are ready
 TARGET_ENV = "staging-site-master"
 

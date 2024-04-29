@@ -4,9 +4,9 @@ The code is structured as follows:
 
 - `__main__.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
 - `init_config.py`: Other app Initial configuration of the app. This includes setting up the session states andsettings.
-- `search_config.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating?"
-- `indicator_config.py`: Indicator mapping form. Map indicators from the old dataset to indicators in the new dataset.
-- `submission.py`: Find out the charts affected by the submitted indicator mapping. Create the submission.
+- `dataset_selection.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating?"
+- `indicator_mapping.py`: Indicator mapping form. Map indicators from the old dataset to indicators in the new dataset.
+- `charts_update.py`: Find out the charts affected by the submitted indicator mapping. Create the submission.
 - `utils.py`: Utility functions.
 
 
@@ -15,40 +15,64 @@ We use various session state indicators to control the flow of the app:
 - `submitted_datasets` [default False]: Whether the user has clicked on the first form (dataset form). Shows/hides the steps after the first form.
     - Set to True: When the user submits the first form (Old dataset -> New dataset)
     - Set to False: Never. Once is submitted, something will be shown below. This can be done here bc it is an actual form and changing its fields won't trigger re-runs!
-- `submitted_indicators` [default False]: Whether the user has submitted the second form (indicator mapping form). Controls the creation and preview of the chart revisions.
+- `submitted_indicators` [default False]: Whether the user has submitted the second form (indicator mapping form). Controls the creation and preview of the updated charts.
     - Set to True: When user submits indicator mapping form.
     - Set to False: When user submits dataset form. When the user interacts with the indicator form changing the mapping (i.e. ignore checkboxes, new indicator selectboxes, but NOT the explore toggle)
-- `submitted_revisions` [default False]: Whether the user has submitted the chart revisions.
+- `submitted_charts` [default False]: Whether the user has submitted the updated charts.
     - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
 """
 
 import streamlit as st
+from st_pages import add_indentation
 from structlog import get_logger
 
-from apps.wizard.pages.charts_v2.indicator_config import ask_and_get_indicator_mapping
-from apps.wizard.pages.charts_v2.init_config import init_app, set_session_states
-from apps.wizard.pages.charts_v2.search_config import build_dataset_form
-from apps.wizard.pages.charts_v2.submission import push_submission
-from apps.wizard.pages.charts_v2.utils import get_datasets, get_schema
+from apps.wizard import utils
+from apps.wizard.pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
+from apps.wizard.pages.indicator_upgrade.dataset_selection import build_dataset_form
+from apps.wizard.pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
+from apps.wizard.pages.indicator_upgrade.utils import get_datasets, get_schema
 from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
 log = get_logger()
 
-
 # Main app settings
-init_app()
-# Get datasets (might take some time)
+st.set_page_config(
+    page_title="Wizard: Indicator Upgrader",
+    layout="wide",
+    page_icon="🪄",
+    initial_sidebar_state="collapsed",
+    menu_items={
+        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
+        "About": """
+    After a new dataset has been added to our database, we need to update the affected charts. These are the steps:
+    - Select the _old dataset_ and the _new dataset_.
+    - Map old indicators in the _old dataset_ to their corresponding new versions in the _new dataset_. This mapping tells Grapher how to "replace" old indicators with new ones.
+    - Review the mapping.
+    - Update all chart references
+    """,
+    },
+)
+add_indentation()
+st.title("Indicator 🧬 **:gray[Upgrader]**")
+st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
 DATASETS = get_datasets()
 # Get schema
 SCHEMA_CHART_CONFIG = get_schema()
 # OWID Env
 owid_env = OWIDEnv()
 # Session states
-set_session_states()
-
+utils.set_states(
+    {
+        "submitted_datasets": False,
+        "submitted_indicators": False,
+        "submitted_charts": False,
+        "indicator_mapping": {},
+    },
+    only_if_not_exists=True,
+)
 # Avoid "unbound" errors
 old_var_selectbox = []
 new_var_selectbox = []
@@ -63,7 +87,7 @@ submission_config = None
 # DEBUGGING
 # st.write(f"SUBMITTED DATASETS: {st.session_state.submitted_datasets}")
 # st.write(f"SUBMITTED VARIALBES: {st.session_state.submitted_indicators}")
-# st.write(f"SUBMITTED REVISIONS: {st.session_state.submitted_revisions}")
+# st.write(f"SUBMITTED REVISIONS: {st.session_state.submitted_charts}")
 ##########################################################################################
 # 1 DATASET MAPPING
 #
@@ -90,9 +114,10 @@ if st.session_state.submitted_datasets:
 
 
 ##########################################################################################
-# 3 CHART REVISIONS BAKING
+# 3 GET CHARTS
 #
-# Once the indicator mapping is done, we create the revisions. We store these under what we
+# Once the indicator mapping is done, we retrieve the affected charts (those that rely on
+# the indicators in the mapping. create the revisions. We store these under what we
 # call the "submission_config". This is a dataclass that holds the charts and updaters.
 #
 ##########################################################################################
@@ -104,27 +129,22 @@ if st.session_state.submitted_datasets and st.session_state.submitted_indicators
             msg_error = "No indicators selected! Please select at least one indicator."
             st.error(msg_error)
         elif indicator_config.is_valid:
-            st.write(indicator_config.indicator_mapping)
-            # submission_config = create_submission(
-            #     indicator_config,
-            #     SCHEMA_CHART_CONFIG,
-            # )
+            charts = get_affected_charts_and_preview(
+                indicator_config.indicator_mapping,
+            )
         else:
-            st.error("Something went wrong with the submission. Please try again. Report the error #003001")
+            "Something went wrong when trying to update the charts and pushing them to the database. Please try again or report the error #003001"
 
 ##########################################################################################
-# 4 CHART REVISIONS SUBMISSION
+# 4 UPDATE CHARTS
 #
 # TODO: add description
 ##########################################################################################
-if (
-    st.session_state.submitted_datasets
-    and st.session_state.submitted_indicators
-    and st.session_state.submitted_revisions
-):
-    if submission_config is not None:
-        if submission_config.is_valid:
-            # st.write(st.session_state.gpt_tweaks)
-            push_submission(submission_config)
-        else:
-            st.error("Something went wrong with the submission. Please try again. Report the error #004001")
+if st.session_state.submitted_datasets and st.session_state.submitted_indicators and st.session_state.submitted_charts:
+    if isinstance(charts, list) and len(charts) > 0:
+        # st.write(st.session_state.gpt_tweaks)
+        push_new_charts(charts, SCHEMA_CHART_CONFIG)
+    else:
+        st.error(
+            "Something went wrong when trying to update the charts and pushing them to the database. Please try again or report the error #004001"
+        )
