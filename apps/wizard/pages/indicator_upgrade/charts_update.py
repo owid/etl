@@ -36,49 +36,52 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
             st.session_state.indicator_mapping = indicator_mapping
             # Get charts
             charts = find_charts_from_variable_ids(set(indicator_mapping.keys()))
-            # Review schema
         except (URLError, RemoteDisconnected) as e:
             st.error(e.__traceback__)
+            charts = []
 
     ########################################################
     # 2/ Preview submission
     ########################################################
-    num_charts = len(charts)
     # 2.1/ Display details
-    with st.container(border=True):
-        ## Number of charts being updated and variable mapping
-        with st.popover(f"{num_charts} charts affected!"):
-            # Build Series with slugs
-            slugs = pd.DataFrame(
-                {
-                    "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],
-                    "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],
-                }
-            )
-            st.dataframe(
-                slugs,
-                column_config={
-                    "url": st.column_config.LinkColumn(
-                        label="Chart",
-                        help="Link to affected chart (as-is)",
-                        display_text=r"https?://.*?/grapher/(.*)",
-                    ),
-                    "thumbnail": st.column_config.ImageColumn(
-                        "Image",
-                        help="Chart thumbnail",
-                    ),
-                },
-            )
-        with st.popover("Show variable id mapping"):
-            st.write(indicator_mapping)
+    if num_charts := len(charts) > 0:
+        with st.container(border=True):
+            ## Number of charts being updated and variable mapping
+            with st.popover(f"{num_charts} charts affected!"):
+                # Build Series with slugs
+                slugs = pd.DataFrame(
+                    {
+                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],
+                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],
+                    }
+                )
+                st.dataframe(
+                    slugs,
+                    column_config={
+                        "url": st.column_config.LinkColumn(
+                            label="Chart",
+                            help="Link to affected chart (as-is)",
+                            display_text=r"https?://.*?/grapher/(.*)",
+                        ),
+                        "thumbnail": st.column_config.ImageColumn(
+                            "Image",
+                            help="Chart thumbnail",
+                        ),
+                    },
+                )
+            with st.popover("Show variable id mapping"):
+                st.write(indicator_mapping)
 
-        # Button to finally submit the revisions
-        st.button(
-            label="🚀 Submit chart revisions (3/3)",
-            use_container_width=True,
-            type="primary",
-            on_click=lambda: set_states({"submitted_charts": True}),
-        )
+            # Button to finally submit the revisions
+            st.button(
+                label="🚀 Update charts (3/3)",
+                use_container_width=True,
+                type="primary",
+                on_click=lambda: set_states({"submitted_charts": True}),
+            )
+    else:
+        st.warning("No charts found to update with the given variable mapping.")
+        charts = []
 
     return charts
 
