@@ -17,6 +17,8 @@ CONTRIBUTORS = [
     "other_donor_countries",
     "private_sector__non_governmental_donors",
 ]
+# WDI only has data up to 2021, so adding this manually until we have the data for 2022
+CPI_2022 = 134.21
 
 
 def run(dest_dir: str) -> None:
@@ -58,6 +60,9 @@ def adjust_for_inflation(tb: Table, tb_wdi: Table, inflation_base_year: int) -> 
         (tb_wdi["country"] == "United States"),
         ["country", "year", "fp_cpi_totl"],
     ]
+    if tb_cpi_us["year"].max() < 2022:
+        tb_cpi_2022 = Table({"country": "United States", "year": 2022, "fp_cpi_totl": CPI_2022}, index=[0])
+        tb_cpi_us = pr.concat([tb_cpi_us, tb_cpi_2022]).reset_index(drop=True)
     # Adjust CPI values so that 2021 is the reference year (2021 = 1)
     cpi_base = tb_cpi_us.loc[tb_cpi_us["year"] == inflation_base_year, "fp_cpi_totl"].values[0]
     # Divide the base year by the other years to get the inflation factor
