@@ -14,3 +14,11 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://grapher/health/2022-12-28/deaths_karlinsky:
     - data://garden/health/2022-12-28/deaths_karlinsky
+  # WHO Avian Influenza H5N1
+  data://meadow/who/2023-08-14/avian_influenza_ah5n1:
+    - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
+  data://garden/who/2023-08-14/avian_influenza_ah5n1:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2023-08-14/avian_influenza_ah5n1
+  data://grapher/who/2023-08-14/avian_influenza_ah5n1:
+    - data://garden/who/2023-08-14/avian_influenza_ah5n1
