@@ -978,6 +978,7 @@ def rename_columns(tb: Table) -> Table:
             "v2xcs_ccsi_codehigh": "civ_soc_str_vdem_high",
             "v2xcs_ccsi_codelow": "civ_soc_str_vdem_low",
             "v2eltrnout": "turnout_vdem",
+            "v2elvaptrn": "turnout_total_vdem",
             "e_wbgi_gee": "goveffective_vdem_wbgi",
         }
     )
