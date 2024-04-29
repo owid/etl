@@ -163,7 +163,7 @@ tables:
 
       ## 3.1.3.3 Election turnout
       turnout_vdem:
-        title: Voter turnout
+        title: Voter turnout of registered voters
         description_short: |-
           Denotes the voter turnout as a share of all registered voters in the national election according to official results.
 
@@ -171,6 +171,19 @@ tables:
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
           Indicator name: `v2eltrnout`
+        unit: '%'
+        display:
+          numDecimalPlaces: 2
+
+      turnout_total_vdem:
+        title: Voter turnout of voting-age population
+        description_short: |-
+          Denotes the voter turnout as a share of the voting age population in the national election according to official results.
+
+        description_from_producer: |-
+          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
+
+          Indicator name: `v2elvaptrn`
         unit: '%'
         display:
           numDecimalPlaces: 2
