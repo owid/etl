@@ -1,37 +1,15 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
-NOTES:
-1. We don't have population for some historical regions (e.g. East Germany, or North Yemen).
-2. Some issues in the data were detected (see below, we may report them to EM-DAT). Some of them could not be fixed.
-   Namely, some disasters affect, in one year, a number of people that is larger than the entire population.
-   For example, the number of people affected by one drought event in Botswana 1981 is 1037300 while population
-   was 982753. I suppose this could be due to inaccuracies in the estimates of affected people or in the population
-   (which may not include people living temporarily in the country or visitors).
-3. There are some potential issues that can't be fixed:
-   * On the one hand, we may be underestimating the real impacts of events. The reason is that the original data does
-   not include zeros. Therefore we can't know if the impacts of a certain event were zero, or unknown. Our only option
-   is to treat missing data as zeros.
-   * On the other hand, we may overestimate the real impacts on a given country-year, because events may affect the same
-   people multiple times during the same year. This can't be fixed, but I suppose it's not common.
-   * Additionally, it is understandable that some values are rough estimates, that some events are not recorded, and
-   that there may be duplicated events.
-
 """
 
 import datetime
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, Variable, utils
 from owid.datautils.dataframes import map_series
-from shared import (
-    HISTORIC_TO_CURRENT_REGION,
-    REGIONS,
-    add_region_aggregates,
-    correct_data_points,
-    get_last_day_of_month,
-)
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -44,12 +22,14 @@ paths = PathFinder(__file__)
 # We therefore ignore Extra-terrestrial (of which there is just one meteorite impact event) and Biological subgroups.
 # For completeness, add all existing types here, and rename them as np.nan if they should not be used.
 # If new types are included on a data update, simply add them here.
+EARTHQUAKES_TYPE = "Earthquake"
+EXTREME_TEMPERATURE_TYPE = "Extreme temperature"
 EXPECTED_DISASTER_TYPES = {
     "Animal incident": np.nan,
     "Drought": "Drought",
-    "Earthquake": "Earthquake",
+    "Earthquake": EARTHQUAKES_TYPE,
     "Epidemic": np.nan,
-    "Extreme temperature": "Extreme temperature",
+    "Extreme temperature": EXTREME_TEMPERATURE_TYPE,
     "Flood": "Flood",
     "Fog": "Fog",
     "Glacial lake outburst flood": "Glacial lake outburst flood",
@@ -101,14 +81,98 @@ COST_VARIABLES = ["reconstruction_costs", "insured_damages", "total_damages"]
 # Variables to calculate per 100,000 people.
 VARIABLES_PER_100K_PEOPLE = [column for column in IMPACT_COLUMNS if column not in COST_VARIABLES] + ["n_events"]
 
-# New natural disaster type corresponding to the sum of all disasters.
+# New natural disaster types corresponding to the sum of all disasters, and the sum of all disasters excluding certain types.
 ALL_DISASTERS_TYPE = "all_disasters"
+ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE = "all_disasters_excluding_earthquakes"
+ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE = "all_disasters_excluding_extreme_temperature"
+
+# Aggregate regions to add, following OWID definitions.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "European Union (27)": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    "World": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+}
+
+# Overlaps found between historical regions and successor countries, that we accept in the data.
+# We accept them either because they happened close to the transition, or to avoid needing to introduce new
+# countries for which we do not have data (like the Russian Empire).
+ACCEPTED_OVERLAPS = [{1911: {"USSR", "Kazakhstan"}}, {1991: {"Georgia", "USSR"}}, {1991: {"West Germany", "Germany"}}]
 
 # List issues found in the data:
 # Each element is a tuple with a dictionary that fully identifies the wrong row,
 # and another dictionary that specifies the changes.
 # Note: Countries here should appear as in the raw data (i.e. not harmonized).
 DATA_CORRECTIONS = []
+
+
+def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
+    """Make individual corrections to data points in a table.
+
+    Parameters
+    ----------
+    tb : Table
+        Data to be corrected.
+    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
+        Corrections.
+
+    Returns
+    -------
+    tb_corrected : Table
+        Corrected data.
+
+    """
+    tb_corrected = tb.copy()
+
+    for correction in corrections:
+        wrong_row, corrected_row = correction
+
+        # Select the row in the table where the wrong data point is.
+        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
+        selection = tb_corrected.loc[(tb_corrected[list(wrong_row)] == Variable(wrong_row)).fillna(False).all(axis=1)]
+        # Sanity check.
+        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
+        assert len(selection) == 1, error
+
+        # Replace wrong fields by the corrected ones.
+        # Note: Changes to categorical fields will not work.
+        tb_corrected.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
+
+    return tb_corrected
+
+
+def get_last_day_of_month(year: int, month: int):
+    """Get the number of days in a specific month of a specific year.
+
+    Parameters
+    ----------
+    year : int
+        Year.
+    month : int
+        Month.
+
+    Returns
+    -------
+    last_day
+        Number of days in month.
+
+    """
+    if month == 12:
+        last_day = 31
+    else:
+        last_day = (datetime.datetime.strptime(f"{year:04}-{month + 1:02}", "%Y-%m") + datetime.timedelta(days=-1)).day
+
+    return last_day
 
 
 def prepare_input_data(tb: Table) -> Table:
@@ -322,6 +386,72 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
+    # Calculate the number of events with more than a certain threshold of deaths.
+    # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
+    # However, "small events" (with less than 200 victims) have been increasing over the years.
+    # This suggests that small events are underrepresented in early data, and the increase is due to better reporting.
+    tb_ = tb.sort_values(["year"])[["year"]].drop_duplicates().reset_index(drop=True)
+    for threshold in [200, 500, 1000, 2000, 5000]:
+        tb_counts = (
+            tb[tb["total_dead"] > threshold].groupby("year", as_index=False, observed=True)["total_dead"].count()
+        )
+        # tb_counts = tb_counts.rename(columns={"total_dead": f"n_events_with_over_{threshold}_deaths"}, errors="raise")
+        tb_counts = tb_counts.rename(columns={"total_dead": f"{threshold} deaths"}, errors="raise")
+        tb_ = tb_.merge(tb_counts, on="year", how="left")
+    tb_ = tb_.fillna(0)
+    # NOTE: It would be better to calculate this after creating an aggregate for "World" (to ensure there are no double
+    # counts in historical regions). However, this requires some refactoring, and we already know that the overlap is
+    # minimal (defined in ACCEPTED_OVERLAPS).
+    import plotly.express as px
+
+    fig = px.line(
+        tb_.melt(id_vars="year", var_name="threshold", value_name="n_events"),
+        x="year",
+        y="n_events",
+        color="threshold",
+        title="Number of events causing more than a certain threshold of deaths",
+        labels={"year": "Year", "n_events": "Number of events", "threshold": "Threshold"},
+    )
+    fig.show()
+
+    # Calculate the share of small and big events every decade.
+    tb_ = tb.copy()
+    tb_["decade"] = (tb_["year"] // 10) * 10
+    # Count the total number of events per decade.
+    tb_counts_all = (
+        tb_.groupby("decade", as_index=False, observed=True)["country"].count().rename(columns={"country": "n_events"})
+    )
+    # A "small" event is defined as having <= 5 deaths, <=1500 people affected, or <= 8 million US$ in damages.
+    # tb_counts_small = tb_[(tb_["total_dead"] <= 5) | (tb_["total_affected"] <= 1500) | (tb_["total_damages"] <= 8e6)].groupby("decade", as_index=False, observed=True)["total_dead"].count()
+    # A "large" event is defined as having >= 50 deaths, >= 150000 people affected, or > 200 million US$ in damages.
+    tb_counts_large = (
+        tb_[(tb_["total_dead"] >= 50) | (tb_["total_affected"] >= 150000) | (tb_["total_damages"] >= 200e6)]
+        .groupby("decade", as_index=False, observed=True)["country"]
+        .count()
+        .rename(columns={"country": "n_large_events"})
+    )
+    # Create a table with the counts of small, large, and all events per decade.
+    tb_counts = tb_counts_all.merge(tb_counts_large, on="decade", how="left").fillna(0)
+    # Calculate the share of large events.
+    tb_counts["Large events"] = 100 * tb_counts["n_large_events"] / tb_counts["n_events"]
+    tb_counts["Other events"] = 100 - tb_counts["Large events"]
+    # Plot the share of large events as a bar chart.
+    tb_plot = tb_counts[["decade", "Large events", "Other events"]].melt(
+        id_vars="decade", var_name="event_size", value_name="share"
+    )
+    fig = px.bar(
+        tb_plot,
+        x="decade",
+        y="share",
+        color="event_size",
+        color_discrete_map={"Other events": "blue", "Large events": "red"},
+        title="Share of large events (>= 50 deaths or >= 150,000 affected or > US$ 200 M in damages)",
+        labels={"decade": "Decade", "share": "Share of events (%)", "event_size": "Event size"},
+    )
+    fig.show()
+
+
 def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     """Get the total count of impacts in the year, ignoring the individual events.
 
@@ -352,15 +482,45 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
 
 
 def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
-    """Add a new disaster type that has the impact of all other disasters combined."""
+    """Add a new disaster type that has the impact of all other disasters combined.
+
+    Among big disaster years, the majority of deaths are the result of earthquakes.
+    Hence, we create an indicator of deaths from all disasters excluding earthquakes.
+
+    EM-DAT may not be very complete or accurate when counting extreme heat deaths.
+    It's almost exclusively Europe that is covered.
+    Hence, we create an additional indicator excluding extreme heat, so comparisons across regions are more equal.
+
+    """
+    # Add indicators for all disasters combined.
     all_disasters = (
-        tb.groupby(["country", "year"], observed=True)
+        tb.groupby(["country", "year"], observed=True, as_index=False)
         .sum(numeric_only=True, min_count=1)
         .assign(**{"type": ALL_DISASTERS_TYPE})
-        .reset_index()
     )
+
+    # Add indicators for all disasters combined excluding earthquakes.
+    all_disasters_excluding_earthquakes = (
+        tb[tb["type"] != EARTHQUAKES_TYPE]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE})
+    )
+
+    # Add indicators for all disasters combined excluding extreme temperature.
+    all_disasters_excluding_extreme_temperature = (
+        tb[tb["type"] != EXTREME_TEMPERATURE_TYPE]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .sum(numeric_only=True, min_count=1)
+        .assign(**{"type": ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE})
+    )
+
+    # Concatenate original data with new indicators.
     tb = (
-        pr.concat([tb, all_disasters], ignore_index=True)
+        pr.concat(
+            [tb, all_disasters, all_disasters_excluding_earthquakes, all_disasters_excluding_extreme_temperature],
+            ignore_index=True,
+        )
         .sort_values(["country", "year", "type"])
         .reset_index(drop=True)
     )
@@ -402,7 +562,7 @@ def create_decade_data(tb: Table) -> Table:
     tb_decadal = tb.copy()
 
     # Ensure each country has data for all years (and fill empty rows with zeros).
-    # Otherwise, the average would only be performed only across years for which we have data.
+    # Otherwise, the average would be performed only across years for which we have data.
     # For example, if we have data only for 1931 (and no other year in the 1930s) we want that data point to be averaged
     # over all years in the decade (assuming they are all zero).
     # Note that, for the current decade, since it's not complete, we want to average over the number of current years
@@ -434,7 +594,7 @@ def create_decade_data(tb: Table) -> Table:
     return tb_decadal
 
 
-def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
+def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) -> None:
     """Run sanity checks on output (yearly or decadal) data.
 
     Parameters
@@ -443,6 +603,8 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
         Output (yearly or decadal) data.
     is_decade : bool
         True if tb is decadal data; False if it is yearly data.
+    ds_regions : Dataset
+        Regions dataset.
 
     """
     # Common sanity checks for yearly and decadal data.
@@ -453,11 +615,15 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
         "List of expected disaster types has changed. "
         "Consider updating EXPECTED_DISASTER_TYPES (or renaming ALL_DISASTERS_TYPE)."
     )
-    expected_disaster_types = [ALL_DISASTERS_TYPE] + [
-        utils.underscore(EXPECTED_DISASTER_TYPES[disaster])
-        for disaster in EXPECTED_DISASTER_TYPES
-        if not pd.isna(EXPECTED_DISASTER_TYPES[disaster])
-    ]
+    expected_disaster_types = (
+        [ALL_DISASTERS_TYPE]
+        + [
+            utils.underscore(EXPECTED_DISASTER_TYPES[disaster])
+            for disaster in EXPECTED_DISASTER_TYPES
+            if not pd.isna(EXPECTED_DISASTER_TYPES[disaster])
+        ]
+        + [ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE, ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE]
+    )
     assert set(tb["type"]) == set(expected_disaster_types), error
 
     columns_that_should_not_have_nans = [
@@ -477,9 +643,13 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
     error = "There are unexpected nans in data."
     assert tb[columns_that_should_not_have_nans].notnull().all(axis=1).all(), error
 
+    # Get names of historical regions in the data.
+    regions = ds_regions["regions"].reset_index()
+    historical_regions_in_data = set(regions[regions["is_historical"]]["name"]) & set(tb["country"])
+
     # Sanity checks only for yearly data.
     if not is_decade:
-        all_countries = sorted(set(tb["country"]) - set(REGIONS) - set(HISTORIC_TO_CURRENT_REGION))
+        all_countries = sorted(set(tb["country"]) - set(REGIONS) - historical_regions_in_data)
 
         # Check that the aggregate of all countries and disasters leads to the same numbers we have for the world.
         # This check would not pass when adding historical regions (since we know there are some overlaps between data
@@ -489,7 +659,19 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
             (tb["country"] == "World") & (tb["year"] == year_to_check) & (tb["type"] == ALL_DISASTERS_TYPE)
         ].reset_index(drop=True)
         all_disasters_check = (
-            tb[(tb["country"].isin(all_countries)) & (tb["year"] == year_to_check) & (tb["type"] != ALL_DISASTERS_TYPE)]
+            tb[
+                (tb["country"].isin(all_countries))
+                & (tb["year"] == year_to_check)
+                & (
+                    ~tb["type"].isin(
+                        [
+                            ALL_DISASTERS_TYPE,
+                            ALL_DISASTERS_EXCLUDING_EARTHQUAKES_TYPE,
+                            ALL_DISASTERS_EXCLUDING_EXTREME_TEMPERATURE_TYPE,
+                        ]
+                    )
+                )
+            ]
             .groupby("year")
             .sum(numeric_only=True)
             .reset_index()
@@ -575,6 +757,11 @@ def run(dest_dir: str) -> None:
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
     tb = calculate_yearly_impacts(tb=tb)
 
+    # Calculate the number of events over a certain threshold of casualties, as well as the share of "large" events.
+    # This is useful to notice a possible underestimate of small events in early data.
+    # For now, we are not exporting this data and simply inspecting it visually.
+    # calculate_n_events_over_a_threshold_of_deaths(tb=tb)
+
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
 
@@ -582,12 +769,13 @@ def run(dest_dir: str) -> None:
     tb = create_a_new_type_for_all_disasters_combined(tb=tb)
 
     # Add region aggregates.
-    tb = add_region_aggregates(
-        data=tb,
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=REGIONS,
         index_columns=["country", "year", "type"],
-        regions_to_add=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
     # Add damages per GDP, and rates per 100,000 people.
@@ -600,25 +788,23 @@ def run(dest_dir: str) -> None:
     tb_decadal = create_decade_data(tb=tb)
 
     # Run sanity checks on output yearly data.
-    sanity_checks_on_outputs(tb=tb, is_decade=False)
+    sanity_checks_on_outputs(tb=tb, is_decade=False, ds_regions=ds_regions)
 
     # Run sanity checks on output decadal data.
-    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
+    sanity_checks_on_outputs(tb=tb_decadal, is_decade=True, ds_regions=ds_regions)
 
     # Set an appropriate index to yearly data and sort conveniently.
-    tb = tb.format(keys=["country", "year", "type"], sort_columns=True)
+    tb = tb.format(keys=["country", "year", "type"], sort_columns=True, short_name="natural_disasters_yearly")
 
     # Set an appropriate index to decadal data and sort conveniently.
-    tb_decadal = tb_decadal.format(keys=["country", "year", "type"], sort_columns=True)
-
-    # Rename yearly and decadal tables.
-    tb.metadata.short_name = "natural_disasters_yearly"
-    tb_decadal.metadata.short_name = "natural_disasters_decadal"
+    tb_decadal = tb_decadal.format(
+        keys=["country", "year", "type"], sort_columns=True, short_name="natural_disasters_decadal"
+    )
 
     #
     # Save outputs.
     #
-    # Create new Garden dataset.
+    # Create new garden dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb, tb_decadal], default_metadata=ds_meadow.metadata, check_variables_metadata=True
     )
