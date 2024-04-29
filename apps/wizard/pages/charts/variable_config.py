@@ -457,7 +457,7 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
 
 
 def reset_variable_form() -> None:
-    """ "Reset variable form."""
+    """Reset variable form."""
     # Create dictionary with checkboxes set to False
     checks = {
         str(k): False
