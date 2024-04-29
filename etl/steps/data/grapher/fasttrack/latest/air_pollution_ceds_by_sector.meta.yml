@@ -27,7 +27,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nox:
@@ -99,7 +99,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_so2:
@@ -171,7 +171,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_co:
@@ -243,7 +243,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_oc:
@@ -315,7 +315,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nmvoc:
@@ -387,7 +387,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_bc:
@@ -459,7 +459,7 @@ tables:
         unit: tonnes
         short_unit: t
         display:
-          name: Anergy
+          name: Energy
           numDecimalPlaces: 0
           conversionFactor: 1000
       fugitive_emissions_nh3:
