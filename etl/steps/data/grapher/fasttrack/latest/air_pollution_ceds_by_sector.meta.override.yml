@@ -3,3 +3,5 @@ tables:
     variables:
       agriculture_so2:
         title: Agriculture
+        display:
+          name: SO₂ emissions from agriculture
