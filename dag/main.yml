@@ -191,13 +191,7 @@ steps:
     - data://garden/energy/2023-12-12/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Global GDP in the long run
-  data://garden/growth/2024-01-04/gdp_historical:
-    - data://grapher/worldbank_wdi/2023-05-29/wdi
-    - data://grapher/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/ggdc/2022-12-23/maddison_database
-  data://grapher/growth/2024-01-04/gdp_historical:
-    - data://garden/growth/2024-01-04/gdp_historical
+  # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
     - snapshot://ggdc/2022-12-23/maddison_database.xlsx
   data://garden/ggdc/2022-12-23/maddison_database:
@@ -674,6 +668,14 @@ steps:
     - data://meadow/ggdc/2024-04-26/maddison_project_database
   data://grapher/ggdc/2024-04-26/maddison_project_database:
     - data://garden/ggdc/2024-04-26/maddison_project_database
+
+  # Global GDP in the long run
+  data://grapher/growth/2024-04-29/gdp_historical:
+    - data://garden/growth/2024-04-29/gdp_historical
+  data://garden/growth/2024-04-29/gdp_historical:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/ggdc/2022-12-23/maddison_database
+    - data://grapher/worldbank_wdi/2023-05-29/wdi
 
 
   ######################################################################################################################
