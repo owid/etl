@@ -7,7 +7,7 @@ meta:
     url_main: https://github.com/JGCRI/CEDS/tree/master
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRBJskNjwpmTbOvMzK4-NazTcaTuSAgczm-VkbAa82qJUGPVk1LqjI07bM96CcKZarYU7QehAQMHrxP/pub?output=csv
-    date_accessed: '2024-04-26'
+    date_accessed: '2024-04-29'
   name: Air pollution emissions by sector (CEDS, 2024)
   description: Emissions of air pollutants since 1750 by sector.
   license: {}
