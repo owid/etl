@@ -929,9 +929,15 @@ def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
             # Nothing should be removed from here onwards, so, skip until the end of the file.
             _continue_until_the_end = True
 
+            # Ensure there is a space before the include section starts.
+            if new_lines[-1].strip() != "":
+                new_lines.append("\n")
+
         if line.startswith("steps:"):
             # Store this special line and move on.
             new_lines.append(line)
+            # If there were comments above "steps", keep them.
+            _number_of_comment_lines = 0
             continue
 
         if _continue_until_the_end:

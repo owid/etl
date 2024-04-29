@@ -896,6 +896,7 @@ include:
 """
     expected_content = """\
 steps:
+
 include:
   - some_file.yml
 """
@@ -975,6 +976,67 @@ steps:
     # Comment for snapshot_b.
     - snapshot_b
     - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_b"])
+
+    # Ensure comments at the beginning of the file are kept.
+    old_content = """\
+# Random comments before steps section starts.
+# More random comments.
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+# Random comments before steps section starts.
+# More random comments.
+steps:
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    _assert_remove_steps_from_dag_file(old_content, expected_content, steps_to_remove=["meadow_a"])
+
+    # Ensure there is a space before the include section.
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
+  # Comment for meadow_b.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+    # Comment for snapshot_c.
+    - snapshot_c
+
+include:
+  - some_file.yml
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    - snapshot_a
 
 include:
   - some_file.yml
