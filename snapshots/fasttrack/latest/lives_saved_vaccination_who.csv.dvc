@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: |-
+      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization.
+    title: lives_saved_vaccination_who
+    citation_full: |-
+      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
+    version_producer: Google Sheet
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSP20L-mjOB7xZ73EGhXyjZSdC_CBwWZAKkCs_T4iCRgwXKNXBb0K2H8L8mI7rnLIol8MqYAyG5YMHq/pub?output=csv
+    date_accessed: '2024-04-28'
+  name: Lives saved by vaccinations (WHO, 2024)
+  description: Estimates of the number of lives saved by vaccination over the last 50 years (from 1974 to 2024).
+  license: {}
+outs:
+  - md5: 2b0f85dec741032eea08b20e3cb91180
+    size: 983
+    path: lives_saved_vaccination_who.csv

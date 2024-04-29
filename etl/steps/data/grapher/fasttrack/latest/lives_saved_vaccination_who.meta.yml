@@ -1,0 +1,72 @@
+dataset:
+  title: Lives saved by vaccinations (WHO, 2024)
+  description: Estimates of the number of lives saved by vaccination over the last 50 years (from 1974 to 2024).
+  licenses:
+    - {}
+tables:
+  lives_saved_vaccination_who:
+    variables:
+      diptheria:
+        title: Diphtheria
+        unit: lives saved
+        description: The number of lives saved from diphtheria over the last 50 years as a result of vaccination efforts.
+      influenza_b:
+        title: Haemophilus influenzae type B
+        unit: lives saved
+        description: The number of lives saved from Haemophilus influenzae type B over the last 50 years as a result of vaccination
+          efforts.
+      hepatitus_b:
+        title: Hepatitis B
+        unit: lives saved
+        description: The number of lives saved from hepatitis B over the last 50 years as a result of vaccination efforts.
+      japanese_encephalitis:
+        title: Japanese encephalitis
+        unit: lives saved
+        description: The number of lives saved from Japanese encephalitis over the last 50 years as a result of vaccination
+          efforts.
+      measles:
+        title: Measles
+        unit: lives saved
+        description: The number of lives saved from measles over the last 50 years as a result of vaccination efforts.
+      meningitis_a:
+        title: Neisseria meningitidis A
+        unit: lives saved
+        description: The number of lives saved from Neisseria meningitidis A over the last 50 years as a result of vaccination
+          efforts.
+      pertussis:
+        title: Whooping cough (Pertussis)
+        unit: lives saved
+        description: The number of lives saved from whooping cough over the last 50 years as a result of vaccination efforts.
+      polio:
+        title: Polio
+        unit: lives saved
+        description: The number of lives saved from polio over the last 50 years as a result of vaccination efforts.
+      rotavirus:
+        title: Rotavirus
+        unit: lives saved
+        description: The number of lives saved from rotavirus over the last 50 years as a result of vaccination efforts.
+      rubella:
+        title: Rubella
+        unit: lives saved
+        description: The number of lives saved from rubella over the last 50 years as a result of vaccination efforts.
+      streptococcus_pneumoniae:
+        title: Streptococcus pneumoniae
+        unit: lives saved
+        description: The number of lives saved from Streptococcus pneumoniae over the last 50 years as a result of vaccination
+          efforts.
+      tetanus:
+        title: Tetanus
+        unit: lives saved
+        description: The number of lives saved from tetanus over the last 50 years as a result of vaccination efforts.
+      tuberculosis:
+        title: Tuberculosis
+        unit: lives saved
+        description: The number of lives saved from tuberculosis over the last 50 years as a result of vaccination efforts.
+      yellow_fever:
+        title: Yellow fever
+        unit: lives saved
+        description: The number of lives saved from yellow fever over the last 50 years as a result of vaccination efforts.
+      all_diseases:
+        title: Total
+        unit: lives saved
+        description: The number of lives saved over the last 50 years as a result of vaccination efforts.

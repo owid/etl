@@ -12,6 +12,9 @@ tables:
       nonstate_deaths:
         title: nonstate_deaths
         unit: ''
+      extrastate_deaths:
+        title: extrastate_deaths
+        unit: ''
       intrastate_deaths:
         title: intrastate_deaths
         unit: ''
