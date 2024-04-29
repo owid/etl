@@ -1,5 +1,5 @@
 dataset:
-  title: Electric car sales (IEA, 2023)
+  title: Electric car sales (IEA, 2024)
   description: Electric car sales and stocks data from the International Energy Agency.
   licenses:
     - {}

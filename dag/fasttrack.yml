@@ -162,3 +162,15 @@ steps:
     - snapshot://fasttrack/2024-04-17/qubits.csv
   data://grapher/fasttrack/latest/pig_production_bartlett:
     - snapshot://fasttrack/latest/pig_production_bartlett.csv
+  data://grapher/fasttrack/2024-04-22/supercomputers:
+    - snapshot://fasttrack/2024-04-22/supercomputers.csv
+  data-private://grapher/fasttrack/2024-04-25/joe_phd_short_period:
+    - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds:
+    - snapshot://fasttrack/latest/air_pollution_ceds.csv
+  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
+    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
+    - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv
+  data://grapher/fasttrack/latest/lives_saved_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_vaccination_who.csv

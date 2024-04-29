@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Dongarra et al.
+    title: TOP 500
+    title_snapshot: Performance development
+    citation_full: Jack Dongarra, Martin Meuer, Horst Simon, Erich Strohmaier. TOP500, Performance Development
+    version_producer: Google Sheet
+    url_main: https://www.top500.org/statistics/perfdevel/
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRRFJBsgBDtah3Eavq4euW0vqgpMGmjVMq0P-H3Z5KrG_iyzsC9Oub4zH64kwSPtxlTLXP4Ua4TxHPW/pub?output=csv
+    date_accessed: '2024-04-22'
+    date_published: '2023'
+  name: TOP500 Supercomputer Database
+  description: ''
+  license: {}
+outs:
+  - md5: 6ba504b70cbf97b9c29a367ab865feaf
+    size: 593
+    path: supercomputers.csv

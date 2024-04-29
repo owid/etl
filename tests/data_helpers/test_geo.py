@@ -1048,7 +1048,7 @@ class TestAddRegionsToTable(unittest.TestCase):
         assert "typo_excluded_member" in captured_logs[0]["event"]
         assert dataframes.are_equal(tb_out, tb_expected)[0]
 
-    def test_aggregates_with_income_groupos(self):
+    def test_aggregates_with_income_groups(self):
         tb_in = Table.from_records(
             [("France", 2020, 1, 5), ("France", 2021, 2, 6), ("Italy", 2021, 3, 7), ("Italy", 2022, 4, 8)],
             columns=["country", "year", "a", "b"],
@@ -1515,3 +1515,47 @@ class TestAddRegionsToTable(unittest.TestCase):
                 ds_income_groups=ds_income_groups,
                 countries_that_must_have_data={"Unknown region": ["Random"]},
             )
+
+    def test_aggregates_with_multiple_dimensions(self):
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, "red", 1, 5),
+                ("France", 2020, "red", 2, 6),
+                ("France", 2020, "blue", 3, 7),
+                ("Italy", 2022, "blue", 4, 8),
+                ("Belarus", 2022, "blue", 5, 9),
+            ],
+            columns=["country", "year", "color", "a", "b"],
+        )
+        tb_expected = (
+            Table.from_records(
+                [
+                    ("Belarus", 2022, "blue", 5, 9),
+                    ("Europe", 2020, "blue", 3, 7),
+                    ("Europe", 2020, "red", 3, 11),
+                    ("Europe", 2022, "blue", 9, 17),
+                    ("High-income countries", 2020, "blue", 3, 7),
+                    ("High-income countries", 2020, "red", 3, 11),
+                    ("High-income countries", 2022, "blue", 4, 8),
+                    ("France", 2020, "red", 1, 5),
+                    ("France", 2020, "red", 2, 6),
+                    ("France", 2020, "blue", 3, 7),
+                    ("Italy", 2022, "blue", 4, 8),
+                    ("Upper-middle-income countries", 2022, "blue", 5, 9),
+                ],
+                columns=["country", "year", "color", "a", "b"],
+            )
+            .sort_values(["country", "year", "color"])
+            .reset_index(drop=True)
+        )
+        tb_out = (
+            geo.add_regions_to_table(
+                tb=tb_in,
+                index_columns=["country", "year", "color"],
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+            )
+            .sort_values(["country", "year", "color"])
+            .reset_index(drop=True)
+        )
+        assert tb_out.equals(tb_expected)

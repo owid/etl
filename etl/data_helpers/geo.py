@@ -267,6 +267,7 @@ def add_region_aggregates(
     df: TableOrDataFrame,
     region: str,
     countries_in_region: Optional[List[str]] = None,
+    index_columns: Optional[List[str]] = None,
     countries_that_must_have_data: Optional[Union[List[str], Literal["auto"]]] = None,
     num_allowed_nans_per_year: Optional[int] = None,
     frac_allowed_nans_per_year: Optional[float] = None,
@@ -313,6 +314,10 @@ def add_region_aggregates(
         Region to add.
     countries_in_region : list or None
         List of countries that are members of this region. None to load them from countries-regions dataset.
+    index_columns : Optional[List[str]], default: None
+        Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
+        columns (excluding the country column). A country and a year column should always be included.
+        But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
     countries_that_must_have_data : list or None or str
         * If a list of countries is passed, those countries must have data for a particular variable and year. If any of
           those countries is not informed on a particular variable and year, the region will have nan for that particular
@@ -371,10 +376,12 @@ def add_region_aggregates(
             population=population,
         )
 
+    if index_columns is None:
+        index_columns = [country_col, year_col]
+
     # If aggregations are not defined for each variable, assume 'sum'.
-    fixed_columns = [country_col, year_col]
     if aggregations is None:
-        aggregations = {variable: "sum" for variable in df.columns if variable not in fixed_columns}
+        aggregations = {variable: "sum" for variable in df.columns if variable not in index_columns}
     variables = list(aggregations)
 
     # Initialise dataframe of added regions, and add variables one by one to it.
@@ -384,7 +391,7 @@ def add_region_aggregates(
 
     df_region = groupby_agg(
         df=df_countries,
-        groupby_columns=year_col,
+        groupby_columns=[column for column in index_columns if column != country_col],
         aggregations=dict(
             **aggregations,
             **{country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x)))},
@@ -427,7 +434,7 @@ def add_region_aggregates(
         # just certain columns. However, the expected behavior would be to just replace the region data for the
         # specified column.
         # For now, simply warn that the original data for the region for those columns was deleted.
-        columns_without_aggregate = set(df.drop(columns=fixed_columns).columns) - set(aggregations)
+        columns_without_aggregate = set(df.drop(columns=index_columns).columns) - set(aggregations)
         if (len(columns_without_aggregate) > 0) and (len(df[df[country_col] == region]) > 0):
             log.warning(
                 f"Region {region} already has data for columns that do not have a defined aggregation method: "
@@ -435,7 +442,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)
 
     # If the original was Table, copy metadata
     if isinstance(df, Table):
@@ -1009,6 +1016,7 @@ def add_regions_to_table(
     ds_income_groups: Optional[Dataset] = None,
     regions: Optional[Union[List[str], Dict[str, Any]]] = None,
     aggregations: Optional[Dict[str, str]] = None,
+    index_columns: Optional[List[str]] = None,
     num_allowed_nans_per_year: Optional[int] = None,
     frac_allowed_nans_per_year: Optional[float] = None,
     min_num_values_per_year: Optional[int] = None,
@@ -1068,6 +1076,10 @@ def add_regions_to_table(
           If there is a "column_4" in the data, for which no aggregation is defined, then the e.g. "Europe" will have
           only nans for "column_4".
         * If None, "sum" will be assumed to all variables.
+    index_columns : Optional[List[str]], default: None
+        Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
+        columns (excluding the country column). A country and a year column should always be included.
+        But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
     num_allowed_nans_per_year : Optional[int], default: None
         * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
           year. If that number of nans is exceeded, the aggregate will be nan.
@@ -1129,6 +1141,9 @@ def add_regions_to_table(
     """
     df_with_regions = pd.DataFrame(tb).copy()
 
+    if index_columns is None:
+        index_columns = [country_col, year_col]
+
     if check_for_region_overlaps:
         # Find overlaps between regions and its members.
 
@@ -1149,7 +1164,7 @@ def add_regions_to_table(
             regions_and_members=regions_and_members,
             country_col=country_col,
             year_col=year_col,
-            index_columns=[country_col, year_col],
+            index_columns=index_columns,
             ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
         )
         # Example of accepted_overlaps:
@@ -1165,7 +1180,7 @@ def add_regions_to_table(
 
     if aggregations is None:
         # Create region aggregates for all columns (with a simple sum) except for index columns.
-        aggregations = {column: "sum" for column in df_with_regions.columns if column not in [country_col, year_col]}
+        aggregations = {column: "sum" for column in df_with_regions.columns if column not in index_columns}
 
     if regions is None:
         regions = REGIONS
@@ -1216,6 +1231,7 @@ def add_regions_to_table(
             df=df_with_regions,
             region=region,
             aggregations=aggregations,
+            index_columns=index_columns,
             countries_in_region=members,
             countries_that_must_have_data=countries_that_must_have_data[region],
             num_allowed_nans_per_year=num_allowed_nans_per_year,
