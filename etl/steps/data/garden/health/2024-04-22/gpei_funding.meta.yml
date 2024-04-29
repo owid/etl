@@ -5,9 +5,10 @@ definitions:
       topic_tags:
         - Polio
         - Eradication of Diseases
-    unit: "current US$"
+    unit: "constant 2021 US$"
     short_unit: "$"
-    processing_level: minor
+    description_processing: We adjusted the original data for inflation and converted it to constant 2021 US dollars.
+    processing_level: major
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -19,36 +20,36 @@ tables:
     variables:
       domestic_resources:
         title: Domestic resources
-        description_short: "Domestic resources for polio eradication, including government contributions and other domestic funding."
+        description_short: "Domestic resources for polio eradication, including government contributions and other domestic funding. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       g7_countries__and__european_commission:
         title: G7 countries and European Commission
-        description_short: "Funding from G7 countries and the European Commission for polio eradication."
+        description_short: "Funding from G7 countries and the European Commission for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       multilateral_sector:
         title: Multilateral sector
-        description_short: "Funding from multilateral organizations for polio eradication."
+        description_short: "Funding from multilateral organizations for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       non_g7_oecd_countries:
         title: Non-G7 OECD countries
-        description_short: "Funding from non-G7 OECD countries for polio eradication."
+        description_short: "Funding from non-G7 OECD countries for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       other_donor_countries:
         title: Other donor countries
-        description_short: "Funding from other donor countries for polio eradication."
+        description_short: "Funding from other donor countries for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       private_sector__non_governmental_donors:
         title: Private sector & non-governmental donors
-        description_short: "Funding from the private sector and non-governmental donors for polio eradication."
+        description_short: "Funding from the private sector and non-governmental donors for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
       total:
         title: Total funding for Global Polio Eradication Initiative
-        description_short: "Total funding for polio eradication."
+        description_short: "Total funding for polio eradication. This data is expressed in US dollars, adjusted for inflation."
         display:
           numDecimalPlaces: 0
