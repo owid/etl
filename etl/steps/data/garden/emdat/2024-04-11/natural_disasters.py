@@ -386,6 +386,36 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
+    # Calculate the number of events with more than a certain threshold of deaths.
+    # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
+    # However, "small events" (with less than 200 victims) have been increasing over the years.
+    # This suggests that small events are underrepresented in early data, and the increase is due to better reporting.
+    tb_ = tb.sort_values(["year"])[["year"]].drop_duplicates().reset_index(drop=True)
+    for threshold in [200, 500, 1000, 2000, 5000]:
+        tb_counts = (
+            tb[tb["total_dead"] > threshold].groupby("year", as_index=False, observed=True)["total_dead"].count()
+        )
+        # tb_counts = tb_counts.rename(columns={"total_dead": f"n_events_with_over_{threshold}_deaths"}, errors="raise")
+        tb_counts = tb_counts.rename(columns={"total_dead": f"{threshold} deaths"}, errors="raise")
+        tb_ = tb_.merge(tb_counts, on="year", how="left")
+    tb_ = tb_.fillna(0)
+    # NOTE: It would be better to calculate this after creating an aggregate for "World" (to ensure there are no double
+    # counts in historical regions). However, this requires some refactoring, and we already know that the overlap is
+    # minimal (defined in ACCEPTED_OVERLAPS).
+    import plotly.express as px
+
+    fig = px.line(
+        tb_.melt(id_vars="year", var_name="threshold", value_name="n_events"),
+        x="year",
+        y="n_events",
+        color="threshold",
+        title="Number of events causing more than a certain threshold of deaths",
+        labels={"year": "Year", "n_events": "Number of events", "threshold": "Threshold"},
+    )
+    fig.show()
+
+
 def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     """Get the total count of impacts in the year, ignoring the individual events.
 
@@ -690,6 +720,11 @@ def run(dest_dir: str) -> None:
 
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
     tb = calculate_yearly_impacts(tb=tb)
+
+    # Calculate the number of events over a certain threshold of casualties.
+    # This is useful to notice a possible underestimate of small events in early data.
+    # For now, we are not exporting this data and simply inspecting it visually.
+    # calculate_n_events_over_a_threshold_of_deaths(tb=tb)
 
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
