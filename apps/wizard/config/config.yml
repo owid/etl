@@ -79,14 +79,14 @@ sections:
       - title: "Chart Upgrader"
         alias: charts
         entrypoint: pages/charts/__main__.py
-        description: Prepare chart revisions.
+        description: Prepare chart revisions
         maintainer: "@lucas"
         emoji: "🌟"
         image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
       - title: "Chart Sync (deprecated)"
         alias: staging_sync
         entrypoint: ../staging_sync/app.py
-        description: Sync charts between servers.
+        description: Sync charts between servers
         maintainer: "@mojmir"
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
@@ -110,24 +110,39 @@ sections:
       emoji: "⚡"
       image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
 
-  - title: "Dashboard"
+  - title: "Data tools"
     description: |-
       Control panel for ETL steps.
     apps:
-      - title: "ETL Dashboard"
+      - title: "Dashboard"
         alias: dashboard
         entrypoint: pages/dashboard.py
-        description: Control panel for ETL steps.
+        description: Control panel for ETL steps
         maintainer: "@pablo"
         emoji: "📋"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
-      - title: "Dataset Explorer"
+      - title: "Datasets"
         alias: dataexp
-        description: "Explore datasets and their metadata."
+        description: "Explore datasets and their metadata"
         maintainer: "@lucas"
         entrypoint: pages/dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      - title: "Harmonizer"
+        alias: harmonizer
+        description: "Harmonize a column of a table"
+        maintainer: "@lucas"
+        entrypoint: pages/harmonizer.py
+        emoji: "🎶"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+      - title: "Insighter"
+        alias: insighter
+        description: "Data insights with GPT"
+        maintainer: "@daniel"
+        entrypoint: pages/datainsight_robot.py
+        emoji: "💡"
+        image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+
   - title: "Metadata"
     description: |-
       Tools to improve our metadata or learn how to use it.
@@ -153,13 +168,6 @@ sections:
     description: |-
       Other helpful tools in the ETL ecosystem.
     apps:
-      - title: "Entity Harmonizer"
-        alias: harmonizer
-        description: "Harmonize a column of a table."
-        maintainer: "@lucas"
-        entrypoint: pages/harmonizer.py
-        emoji: "🎶"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
       - title: "News"
         alias: news
         description: "Latest ETL news"
