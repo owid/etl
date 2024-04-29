@@ -1,3 +1,5 @@
+import difflib
+import json
 from pathlib import Path
 
 import streamlit as st
@@ -52,6 +54,30 @@ def get_chart_diffs(source_engine, target_engine):
                 for chart_id in chart_ids
             }
     return chart_diffs
+
+
+def process_diff(diff):
+    processed_diff = []
+    for line in diff:
+        if line.startswith("+"):
+            # Additions in green
+            processed_diff.append(f":green[{line}]")
+        elif line.startswith("-"):
+            # Deletions in red
+            processed_diff.append(f":red[{line}]")
+        else:
+            # Unchanged lines
+            processed_diff.append(line)
+    return processed_diff
+
+
+def st_show_diff(config_1, config_2):
+    config_1 = json.dumps(config_1, indent=4)
+    config_2 = json.dumps(config_2, indent=4)
+    diff = difflib.ndiff(config_1.splitlines(keepends=True), config_2.splitlines(keepends=True))
+    processed_diff = process_diff(diff)
+    with st.container(border=True):
+        st.markdown("<br>".join(processed_diff), unsafe_allow_html=True)
 
 
 def st_show(diff: ChartDiffModified, source_session, target_session=None) -> None:
@@ -112,8 +138,16 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
             help="Get the latest version of the chart from the staging server.",
         )
 
-        # Chart diff
-        compare_charts(**kwargs_diff)
+        if diff.is_modified:
+            tab1, tab2 = st.tabs(["Charts", "Config diff"])
+            with tab1:
+                # Chart diff
+                compare_charts(**kwargs_diff)
+            with tab2:
+                assert diff.target_chart is not None
+                st_show_diff(diff.source_chart.config, diff.target_chart.config)
+        elif diff.is_new:
+            compare_charts(**kwargs_diff)
 
 
 def compare_charts(
