@@ -10,7 +10,7 @@ from streamlit_extras.grid import grid
 from structlog import get_logger
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
-from apps.wizard.pages.charts.utils import get_variables_from_datasets
+from apps.wizard.pages.charts_v2.utils import get_variables_from_datasets
 from apps.wizard.utils import set_states
 from apps.wizard.utils.env import OWID_ENV
 from etl.db import get_engine
@@ -31,9 +31,9 @@ def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
     )  # type: ignore
 
 
-def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
+def ask_and_get_variable_mapping(search_form) -> "IndicatorConfig":
     """Ask and get variable mapping."""
-    variable_config = VariableConfig()
+    indicator_config = IndicatorConfig()
 
     ###########################################################################
     # 1/ PROCESSING: Get variables, find similarities and suggestions, etc.
@@ -144,7 +144,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             grid_variables_header.checkbox(
                 "All",
                 help="Check to ignore all mappings.",
-                on_change=lambda: set_states({"submitted_variables": False}),
+                on_change=lambda: set_states({"submitted_indicators": False}),
                 key="ignore-all",
             )
 
@@ -182,7 +182,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     key=f"auto-ignore-{i}",
                     label_visibility="collapsed",
                     value=st.session_state.get("ignore-all", st.session_state.get(f"auto-ignore-{i}", False)),
-                    on_change=lambda: set_states({"submitted_variables": False}),
+                    on_change=lambda: set_states({"submitted_indicators": False}),
                 )
                 ignore_selectbox.append(element)
                 # New variable selectbox
@@ -249,7 +249,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     key=f"manual-ignore-{i}",
                     label_visibility="collapsed",
                     value=check,
-                    on_change=lambda: set_states({"submitted_variables": False}),
+                    on_change=lambda: set_states({"submitted_indicators": False}),
                 )
                 ignore_selectbox.append(element_ignore)
                 # New variable selectbox
@@ -259,7 +259,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     disabled=False,
                     label_visibility="collapsed",
                     format_func=variable_id_to_display.get,
-                    on_change=lambda: set_states({"submitted_variables": False}),
+                    on_change=lambda: set_states({"submitted_indicators": False}),
                 )
                 new_var_selectbox.append(variable_new_manual)
                 # Score
@@ -299,15 +299,15 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                 on_click=set_states_after_submitting,
             )
 
-            if st.session_state.submitted_variables:
+            if st.session_state.submitted_indicators:
                 # BUILD MAPPING
                 variable_mapping = _build_variable_mapping(
                     old_var_selectbox,
                     new_var_selectbox,
                     ignore_selectbox,
                 )
-                variable_config = VariableConfig(variable_mapping=variable_mapping)
-    return variable_config
+                indicator_config = IndicatorConfig(variable_mapping=variable_mapping)
+    return indicator_config
 
 
 def show_explore_df(df_data, variable_old, variable_new, variable_id_to_display, element_check) -> None:
@@ -323,7 +323,7 @@ def show_explore_df(df_data, variable_old, variable_new, variable_id_to_display,
         st.empty()
 
 
-class VariableConfig(BaseModel):
+class IndicatorConfig(BaseModel):
     is_valid: bool = False
     variable_mapping: Dict[int, int] = {}
 
@@ -447,7 +447,7 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     st.plotly_chart(fig, use_container_width=True)
 
 
-def reset_variable_form() -> None:
+def reset_indicator_form() -> None:
     """ "Reset variable form."""
     # Create dictionary with checkboxes set to False
     checks = {
@@ -473,7 +473,7 @@ def reset_variable_form() -> None:
 def set_states_after_submitting():
     set_states(
         {
-            "submitted_variables": True,
+            "submitted_indicators": True,
             "submitted_revisions": False,
         },
         logging=True,

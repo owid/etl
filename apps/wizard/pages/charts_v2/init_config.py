@@ -17,19 +17,17 @@ def init_app() -> None:
         menu_items={
             "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
             "About": """
-    After the new dataset has been correctly upserted into the database, we need to update the affected charts. This step helps with that. These are the steps (this is all automated):
+    After a new dataset has been added to our database, we need to update the affected charts. These are the steps:
 
-    - The user is asked to choose the _old dataset_ and the _new dataset_.
-    - The user has to establish a mapping between variables in the _old dataset_ and in the _new dataset_. This mapping tells Grapher how to "replace" old variables with new ones.
-    - The tool creates chart revisions for all the public charts using variables in the _old dataset_ that have been mapped to variables in the _new dataset_.
-    - Once the chart revisions are created, you can review these and submit them to the database so that they become available on the _Approval tool_.
-
-    Note that this step is equivalent to running `etl variable-match` and `etcli chart-upgrade` commands in terminal. Call them in terminal with option `--help` for more details.
+    - Select the _old dataset_ and the _new dataset_.
+    - Map old indicators in the _old dataset_ to their corresponding new versions in the _new dataset_. This mapping tells Grapher how to "replace" old indicators with new ones.
+    - Review the mapping.
+    - Update all chart references
     """,
         },
     )
     st.title("Charts 🌟 **:gray[Upgrader]**")
-    st.markdown("Replace the usage from the variables in a dataset with the variables from another dataset..")
+    st.markdown("Update indicators to their new versions.")
     add_indentation()
 
     # CONFIGURATION SIDEBAR
@@ -46,7 +44,11 @@ def init_app() -> None:
 def set_session_states() -> None:
     """Initiate session states."""
     # Session states
-    st.session_state.submitted_datasets = st.session_state.get("submitted_datasets", False)
-    st.session_state.submitted_variables = st.session_state.get("submitted_variables", False)
-    st.session_state.submitted_revisions = st.session_state.get("submitted_revisions", False)
-    st.session_state.variable_mapping = st.session_state.get("variable_mapping", {})
+    utils.set_states(
+        {
+            "submitted_datasets": False,
+            "submitted_indicators": False,
+            "submitted_revisions": False,
+            "variable_mapping": {},
+        }
+    )

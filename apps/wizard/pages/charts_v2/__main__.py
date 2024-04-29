@@ -1,25 +1,23 @@
 """Streamlit-based tool for chart upgrader.
 
-Run as `wizard charts` or python -m wizard.pages.charts
-
 The code is structured as follows:
 
 - `__main__.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
-- `init_config.py`: Initial configuration of the app. This includes setting up the session states and other app settings.
-- `search_config.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating to which dataset?"
-- `variable_config.py`: Variable mapping form. Map variables from the old dataset to variables in the new dataset.
-- `submission.py`: Find out the charts affected by the submitted variable mapping. Create the submission.
+- `init_config.py`: Other app Initial configuration of the app. This includes setting up the session states andsettings.
+- `search_config.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating?"
+- `indicator_config.py`: Indicator mapping form. Map indicators from the old dataset to indicators in the new dataset.
+- `submission.py`: Find out the charts affected by the submitted indicator mapping. Create the submission.
 - `utils.py`: Utility functions.
 
 
-We use various session state variables to control the flow of the app:
+We use various session state indicators to control the flow of the app:
 
 - `submitted_datasets` [default False]: Whether the user has clicked on the first form (dataset form). Shows/hides the steps after the first form.
     - Set to True: When the user submits the first form (Old dataset -> New dataset)
     - Set to False: Never. Once is submitted, something will be shown below. This can be done here bc it is an actual form and changing its fields won't trigger re-runs!
-- `submitted_variables` [default False]: Whether the user has submitted the second form (variable mapping form). Controls the creation and preview of the chart revisions.
-    - Set to True: When user submits variable mapping form.
-    - Set to False: When user submits dataset form. When the user interacts with the variable form changing the mapping (i.e. ignore checkboxes, new variable selectboxes, but NOT the explore toggle)
+- `submitted_indicators` [default False]: Whether the user has submitted the second form (indicator mapping form). Controls the creation and preview of the chart revisions.
+    - Set to True: When user submits indicator mapping form.
+    - Set to False: When user submits dataset form. When the user interacts with the indicator form changing the mapping (i.e. ignore checkboxes, new indicator selectboxes, but NOT the explore toggle)
 - `submitted_revisions` [default False]: Whether the user has submitted the chart revisions.
     - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
@@ -28,11 +26,11 @@ We use various session state variables to control the flow of the app:
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.pages.charts.init_config import init_app, set_session_states
-from apps.wizard.pages.charts.search_config import build_dataset_form
-from apps.wizard.pages.charts.submission import create_submission, push_submission
-from apps.wizard.pages.charts.utils import get_datasets, get_schema
-from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
+from apps.wizard.pages.charts_v2.indicator_config import ask_and_get_variable_mapping
+from apps.wizard.pages.charts_v2.init_config import init_app, set_session_states
+from apps.wizard.pages.charts_v2.search_config import build_dataset_form
+from apps.wizard.pages.charts_v2.submission import create_submission, push_submission
+from apps.wizard.pages.charts_v2.utils import get_datasets, get_schema
 from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 
@@ -59,17 +57,17 @@ charts = []
 updaters = []
 num_charts = 0
 variable_mapping = {}
-variable_config = None
+indicator_config = None
 submission_config = None
 
 # DEBUGGING
 # st.write(f"SUBMITTED DATASETS: {st.session_state.submitted_datasets}")
-# st.write(f"SUBMITTED VARIALBES: {st.session_state.submitted_variables}")
+# st.write(f"SUBMITTED VARIALBES: {st.session_state.submitted_indicators}")
 # st.write(f"SUBMITTED REVISIONS: {st.session_state.submitted_revisions}")
 ##########################################################################################
 # 1 DATASET MAPPING
 #
-# Presents the user with the a form to select the old and new datasets. Additionally,
+# Presents the user with a form to select the old and new datasets. Additionally,
 # some search paramterers can be configured. The dataset IDs are used to retrieve the
 # relevant variables from the database/S3
 #
@@ -87,8 +85,8 @@ with st.form("form-datasets"):
 ##########################################################################################
 if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
-    variable_config = ask_and_get_variable_mapping(search_form)
-    # log.info(f"VARIABLE CONFIG (2): {variable_config}")
+    indicator_config = ask_and_get_variable_mapping(search_form)
+    # log.info(f"VARIABLE CONFIG (2): {indicator_config}")
 
 
 ##########################################################################################
@@ -98,16 +96,16 @@ if st.session_state.submitted_datasets:
 # call the "submission_config". This is a dataclass that holds the charts and updaters.
 #
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_variables:
-    # log.info(f"VARIABLE CONFIG (3): {variable_config}")
-    # st.write(variable_config)
-    if variable_config is not None:
-        if not variable_config.variable_mapping:
+if st.session_state.submitted_datasets and st.session_state.submitted_indicators:
+    # log.info(f"VARIABLE CONFIG (3): {indicator_config}")
+    # st.write(reset_indicator_form)
+    if indicator_config is not None:
+        if not indicator_config.variable_mapping:
             msg_error = "No indicators selected! Please select at least one indicator."
             st.error(msg_error)
-        elif variable_config.is_valid:
+        elif indicator_config.is_valid:
             submission_config = create_submission(
-                variable_config,
+                indicator_config,
                 SCHEMA_CHART_CONFIG,
             )
         else:
@@ -120,7 +118,7 @@ if st.session_state.submitted_datasets and st.session_state.submitted_variables:
 ##########################################################################################
 if (
     st.session_state.submitted_datasets
-    and st.session_state.submitted_variables
+    and st.session_state.submitted_indicators
     and st.session_state.submitted_revisions
 ):
     if submission_config is not None:

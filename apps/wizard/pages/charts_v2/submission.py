@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from apps.wizard.pages.charts.variable_config import VariableConfig
+from apps.wizard.pages.charts_v2.indicator_config import IndicatorConfig
 from apps.wizard.utils import set_states
 
 # from etl.chart_revision.v2.base import ChartUpdater
@@ -43,7 +43,7 @@ def suggest_new_config_fields_cached(config, num_suggestions, model_name) -> Tup
     return configs, cast(float, response.cost)
 
 
-def create_submission(variable_config: VariableConfig, schema_chart_config: Dict[str, Any]) -> "SubmissionConfig":
+def create_submission(indicator_config: IndicatorConfig, schema_chart_config: Dict[str, Any]) -> "SubmissionConfig":
     """Create submission config."""
     # Get updaters and charts to update
 
@@ -55,9 +55,9 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
     with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
         try:
             log.info("chart_revision: building updaters and getting charts!")
-            st.session_state.variable_mapping = variable_config.variable_mapping
+            st.session_state.variable_mapping = indicator_config.variable_mapping
             updaters, charts = build_updaters_and_get_charts_cached(
-                variable_mapping=variable_config.variable_mapping,
+                variable_mapping=indicator_config.variable_mapping,
                 schema_chart_config=schema_chart_config,
             )
         except (URLError, RemoteDisconnected) as e:
@@ -82,7 +82,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
                 st.info(f"""Number of charts to be updated: {num_charts}""")
             with col2:
                 with st.expander("🔎  Show variable id mapping"):
-                    st.write(variable_config.variable_mapping)
+                    st.write(indicator_config.variable_mapping)
 
             # 2.2/ Display charts. Allow for GPT tweaks.
             if num_charts > NUM_CHARTS_LIMIT:
