@@ -575,6 +575,18 @@ class StepUpdater:
 
                 steps += [usage for usage in usages if usage not in steps]
 
+        # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
+        # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
+        # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
+        # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
+        steps = to_dependency_order(
+            dag=self.tracker.dag_active,
+            includes=steps,  # type: ignore
+            excludes=[],
+            downstream=False,
+            only=True,
+        )
+
         if self.interactive:
             message = "The following steps will be archived:"
             for step in steps:
