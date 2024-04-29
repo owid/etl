@@ -7,20 +7,18 @@ import concurrent.futures
 import re
 import sys
 from collections.abc import Iterable
-from functools import lru_cache
 from http.client import IncompleteRead
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
 
-import boto3
 import pandas as pd
 import rich_click as click
 from botocore.client import ClientError
-from botocore.config import Config
 from owid.catalog import CHANNEL, LocalCatalog
 from owid.catalog.catalogs import INDEX_FORMATS
 from owid.catalog.datasets import FileFormat
+from owid.catalog.s3_utils import connect_r2
 
 from etl import config, files
 from etl.paths import DATA_DIR
@@ -100,7 +98,7 @@ def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
 
 
 def sync_catalog_to_s3(bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False) -> None:
-    s3 = connect_s3()
+    s3 = connect_r2()
     if is_catalog_up_to_date(s3, bucket, catalog, channel):
         print(f"Catalog's channel {channel} is up to date!")
         return
@@ -295,25 +293,6 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
         raise
 
     return object_md5(s3, bucket, path, obj)
-
-
-def connect_s3(s3_config: Optional[Config] = None) -> Any:
-    session = boto3.Session()
-    return session.client(
-        "s3",
-        region_name=config.R2_REGION_NAME,
-        endpoint_url=config.R2_ENDPOINT_URL,
-        aws_access_key_id=config.R2_ACCESS_KEY,
-        aws_secret_access_key=config.R2_SECRET_KEY,
-        config=s3_config,
-    )
-
-
-@lru_cache(maxsize=None)
-def connect_s3_cached(s3_config: Optional[Config] = None) -> Any:
-    """Connect to S3, but cache the connection for subsequent calls. This is more efficient than
-    creating a new connection for every request."""
-    return connect_s3(s3_config=s3_config)
 
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
