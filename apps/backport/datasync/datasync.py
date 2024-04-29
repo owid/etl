@@ -11,7 +11,6 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
 
 from etl import config
-from etl.publish import connect_s3_cached
 
 log = structlog.get_logger()
 
@@ -24,7 +23,7 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> 
 
     bucket, key = s3_utils.s3_bucket_key(s3_path)
 
-    client = connect_s3_cached()
+    client = s3_utils.connect_r2_cached()
 
     assert not private, "r2 does not support private files yet"
     extra_args = {}
