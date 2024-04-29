@@ -9,9 +9,9 @@ meta:
     date_published: "2023"
 
     # Citation
-    producer: World Health Oragnization
+    producer: World Health Organization
     citation_full: |-
-      Vaccination schedule for Poliomyelitis, World Health Oragnization (2023)
+      Vaccination schedule for Poliomyelitis, World Health Organization (2023)
     attribution_short: WHO
 
     # Files

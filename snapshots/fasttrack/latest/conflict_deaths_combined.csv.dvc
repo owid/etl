@@ -2,13 +2,13 @@ meta:
   source:
     name: Unknown
     url: ''
-    source_data_url: gAAAAABmHRSaP_x2DAk2mJbIu3t0K1qg0C5hYhRTgMa6gF8O32w49j8YI13vwsllJ0cbUDM38yH9wMiXjVID6LWrSb8QgiKpiOO6c-JM5uc-4ZnKFV_oFR0=
-    date_accessed: '2024-04-15'
+    source_data_url: gAAAAABmL1lEzUVLcy2C2i110dgfNWcHA6blyCqw0ouh8kq_IkTT_9LF_IP6Hi9a8PpkXqeeD9YFxba8wkLN5MkciVbiPX4zMhUk3mQFVjZ2ldcI7ybG3qc=
+    date_accessed: '2024-04-29'
   name: DRAFT conflict_deaths_combined
   description: ''
   license: {}
   is_public: false
 outs:
-  - md5: 76da540ac83b8df947ffa30f7655b9cb
-    size: 377
+  - md5: 8549e5e0296c5f0a5f025fa8bc4d2c3b
+    size: 407
     path: conflict_deaths_combined.csv

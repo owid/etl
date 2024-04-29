@@ -4,6 +4,7 @@ from typing import Any, Dict
 import pandas as pd
 import streamlit as st
 from pydantic import BaseModel
+from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.wizard.pages.charts.variable_config import reset_variable_form
@@ -29,10 +30,18 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         help="Variable mapping will be done from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts.",
     )
 
+    # Sort datasets by updatedAt
+    df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
+
     # For debugging
     if DEBUG:
         index_old = list(df["name"]).index(dataset_old_debug)
         index_new = list(df["name"]).index(dataset_new_debug)
+    # Pick the newest dataset as a default and the one matching the new dataset
+    # as the default
+    else:
+        index_new = 0
+        index_old = int(df["name"].iloc[1:].apply(lambda n: fuzz.ratio(n, df.loc[index_new, "name"])).idxmax())
 
     # Dataset selectboxes
     col1, col2 = st.columns(2)
@@ -42,7 +51,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             label="Old dataset",
             options=df["display_name"],
             help="Dataset containing variables to be replaced in our charts.",
-            index=index_old if DEBUG else 0,  # type: ignore , Debugging
+            index=index_old,
         )
     with col2:
         ## New dataset
@@ -50,7 +59,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             label="New dataset",
             options=df["display_name"],
             help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
-            index=index_new if DEBUG else 0,  # type: ignore , Debugging
+            index=index_new,
         )
 
     # Parameters
