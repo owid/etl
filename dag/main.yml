@@ -731,6 +731,8 @@ steps:
 
   data://meadow/ggdc/2024-04-26/maddison_project_database:
     - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
+  data://garden/ggdc/2024-04-26/maddison_project_database:
+    - data://meadow/ggdc/2024-04-26/maddison_project_database
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

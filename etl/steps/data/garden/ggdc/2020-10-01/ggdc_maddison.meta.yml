@@ -26,7 +26,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            title: GDP per ccapita
+            title: GDP per capita
             subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
             note: 'This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.'
             hideRelativeToggle: false
