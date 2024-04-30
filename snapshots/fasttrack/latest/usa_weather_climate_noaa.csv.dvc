@@ -3,7 +3,6 @@ meta:
     producer: National Oceanic and Atmospheric Administration via the US EPA
     title: usa_weather_climate_noaa
     citation_full: National Oceanic and Atmospheric Administration via the US EPA
-    version_producer: Google Sheet
     url_main: https://www.epa.gov/climate-indicators/view-indicators
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSDHxZsuT6bFCjqagPqRQCAuSKbUvf9ag8A6BQVZU2POn6nDOh0VIo_fUfNtfI4vuQtAbqhBzSHQEMC/pub?output=csv

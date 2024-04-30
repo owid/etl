@@ -5,7 +5,6 @@ meta:
     title: lives_saved_vaccination_who
     citation_full: |-
       Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
-    version_producer: Google Sheet
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSP20L-mjOB7xZ73EGhXyjZSdC_CBwWZAKkCs_T4iCRgwXKNXBb0K2H8L8mI7rnLIol8MqYAyG5YMHq/pub?output=csv
     date_accessed: '2024-04-28'

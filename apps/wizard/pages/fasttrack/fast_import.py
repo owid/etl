@@ -114,11 +114,8 @@ class FasttrackImport:
             source = None
             origin = self.origin
             origin.date_accessed = str(dt.date.today())
-
-            # Misuse the version field and url_download fields to store info about the spreadsheet
-            origin.version_producer = "Google Sheet" if self.is_gsheet else "Local CSV"
             origin.url_download = dataset_uri
-            license = self.meta.licenses[0]
+            license = self.meta.licenses[0] if self.meta.licenses else None
         else:
             raise ValueError("Dataset must have either one source or one origin")
 
