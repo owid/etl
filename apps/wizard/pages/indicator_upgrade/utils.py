@@ -6,7 +6,7 @@ import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
 
-from etl.chart_revision.v2.schema import get_schema_chart_config
+from etl.chart_revision.v3.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
 
 # Logger
@@ -30,7 +30,7 @@ def get_datasets() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def get_schema() -> Dict[str, Any]:
     """Load datasets."""
-    with st.spinner("Retrieving chart config schema..."):
+    with st.spinner("Retrieving schema..."):
         try:
             schema = get_schema_chart_config()
         except OperationalError as e:
@@ -41,25 +41,26 @@ def get_schema() -> Dict[str, Any]:
             return schema
 
 
-def get_variables_from_datasets(
+@st.cache_data
+def get_indicators_from_datasets(
     dataset_id_1: int, dataset_id_2: int, show_new_not_in_old: int = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Get variables from two datasets."""
+    """Get indicators from two datasets."""
     with get_connection() as db_conn:
-        # Get variables from old dataset that have been used in at least one chart.
-        old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_1, only_used_in_charts=True)
-        # Get all variables from new dataset.
-        new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_2, only_used_in_charts=False)
+        # Get indicators from old dataset that have been used in at least one chart.
+        old_indictors = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_1, only_used_in_charts=True)
+        # Get all indicators from new dataset.
+        new_indictors = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_2, only_used_in_charts=False)
         if show_new_not_in_old:
             # Unsure why this was done, but it seems to be wrong.
-            # Remove variables in the new dataset that are not in the old dataset.
+            # Remove indicators in the new dataset that are not in the old dataset.
             # This can happen if we are matching a dataset to itself in case of renaming variables.
-            new_variables = new_variables[~new_variables["id"].isin(old_variables["id"])]
-    return old_variables, new_variables
+            new_indictors = new_indictors[~new_indictors["id"].isin(old_indictors["id"])]
+    return old_indictors, new_indictors
 
 
 def _check_env() -> bool:
-    """Check if environment variables are set correctly."""
+    """Check if environment indicators are set correctly."""
     ok = True
     for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
         if getattr(config, env_name) is None:
@@ -72,8 +73,8 @@ def _check_env() -> bool:
 
 
 def _show_environment() -> None:
-    """Show environment variables (streamlit)."""
-    # show variables (from .env)
+    """Show environment indicators (streamlit)."""
+    # show indicators (from .env)
     st.info(
         f"""
     * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
@@ -86,7 +87,7 @@ def _show_environment() -> None:
 
 @st.cache_resource
 def _check_env_and_environment() -> None:
-    """Check if environment variables are set correctly."""
+    """Check if environment indicators are set correctly."""
     ok = _check_env()
     if ok:
         # check that you can connect to DB

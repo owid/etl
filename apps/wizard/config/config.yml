@@ -91,25 +91,6 @@ sections:
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
 
-  - title: "Charts v2"
-    description: |-
-      Create chart revisions, and synchronize aproved revisions between servers.
-    apps:
-    - title: "Indicator Upgrader"
-      alias: indicator-upgrade
-      entrypoint: pages/charts_v2/__main__.py
-      description: Update indicator references in charts
-      maintainer: "@lucas"
-      emoji: "🌟"
-      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
-    - title: "Chart Diff"
-      alias: chart_diff
-      entrypoint: pages/chart_diff/app.py
-      description: Chart differences
-      maintainer: "@mojmir"
-      emoji: "⚡"
-      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
-
   - title: "Data tools"
     description: |-
       Control panel for ETL steps.
@@ -142,6 +123,26 @@ sections:
         entrypoint: pages/datainsight_robot.py
         emoji: "💡"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+
+  - title: "Charts v2"
+    description: |-
+      Create chart revisions, and synchronize aproved revisions between servers.
+    apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: pages/indicator_upgrade/app.py
+      description: Update indicator references in charts
+      maintainer: "@lucas"
+      emoji: "🧬"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+    - title: "Chart Diff"
+      alias: chart_diff
+      entrypoint: pages/chart_diff/app.py
+      description: Chart differences
+      maintainer: "@mojmir"
+      emoji: "⚡"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+
 
   - title: "Metadata"
     description: |-
