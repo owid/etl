@@ -7,9 +7,8 @@ meta:
 
       More details by the WHO: https://www.who.int/health-topics/smallpox#tab=tab_1.
     citation_full: World Health Organisation
-    version_producer: Google Sheet
     url_main: http://www.earth-policy.org/data_highlights/2011/highlights19
-    url_download: 
+    url_download:
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTdzSim9woEMb9zZNDCihyD5nr6YWpfDxLftbn-qS1SEoJjRNwv8vyJ5EaSnwJEiD5KAfFro3c79Dp-/pub?output=csv
     date_accessed: '2023-09-28'
     date_published: '2011'

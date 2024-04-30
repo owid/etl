@@ -5,7 +5,6 @@ meta:
     title: weather_spending_georgeson
     citation_full: |-
       Georgeson, L., Maslin, M., & Poessinouw, M. (2017). Global disparity in the supply of commercial weather and climate information services. Science Advances, 3(5), e1602632.
-    version_producer: Google Sheet
     url_main: https://www.science.org/doi/10.1126/sciadv.1602632
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTnfEl1Gxmsy41EzPd4PywKXeX4qNznWaqcG94Df38mq-IRd_o8tEdx_XR3eyTV8qmVau7hPF1IIMOB/pub?output=csv

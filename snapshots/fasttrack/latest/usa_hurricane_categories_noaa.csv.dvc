@@ -11,7 +11,6 @@ meta:
 
       The NOAA notes that because of the sparseness of towns and cities before 1900 in some coastal locations along the United States, the data prior to 1900 may not be complete for all states.
     citation_full: HURDAT, National Oceanic and Atmospheric Administration (2024)
-    version_producer: Google Sheet
     url_main: https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTDPiNpIyEFu5UIu-FsD31SX8HVW2LKFZUr9QOovfV4irJxRrGNTHN5-fLZRcgvXqwVQ88cpdpJ8kVy/pub?output=csv

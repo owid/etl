@@ -16,9 +16,8 @@ meta:
     citation_full: 'Lyall, Jason. Divided Armies: Inequality and Battlefield Performance
       in Modern War (Princeton, NJ: Princeton University Press, 2020)'
     attribution: Jason Lyall - Project Mars (2020)
-    version_producer: Google Sheet
     url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
-    url_download: 
+    url_download:
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRbq_yaMbSCxeoKNr5u4nUk6iUrRXJjlv81JTCfIRve3hJFuQl4OJMlQOEjTZ909OzwYs3Na3IHTS-b/pub?output=csv
     date_accessed: '2024-01-29'
     date_published: '2020-10-26'
