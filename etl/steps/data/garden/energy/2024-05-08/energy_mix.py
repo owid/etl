@@ -267,13 +267,13 @@ def calculate_share_of_primary_energy(primary_energy: Table) -> Table:
 
 
 def calculate_primary_energy_annual_change(
-    primary_energy: Table,
+    tb: Table,
 ) -> Table:
     """Calculate annual change of (direct or direct and input-equivalent) primary energy for each energy source.
 
     Parameters
     ----------
-    primary_energy : Table
+    tb : Table
         Primary energy data.
 
     Returns
@@ -282,30 +282,38 @@ def calculate_primary_energy_annual_change(
         Data after adding annual changes.
 
     """
-    primary_energy = primary_energy.reset_index()
+    primary_energy = tb.reset_index()
 
     # Calculate annual change in each source.
     primary_energy = primary_energy.sort_values(["country", "year"]).reset_index(drop=True)
     for source in ONLY_DIRECT_ENERGY:
         # Create column for source percentage growth as a function of direct primary energy.
-        primary_energy[f"{source} (% growth)"] = primary_energy.groupby("country")[f"{source} (TWh)"].pct_change() * 100
+        primary_energy[f"{source} (% growth)"] = (
+            primary_energy.groupby("country", observed=True)[f"{source} (TWh)"].ffill().pct_change(fill_method=None)
+            * 100
+        )
 
         # Create column for source absolute growth as a function of direct primary energy.
-        primary_energy[f"{source} (TWh growth)"] = primary_energy.groupby("country")[f"{source} (TWh)"].diff()
+        primary_energy[f"{source} (TWh growth)"] = primary_energy.groupby("country", observed=True)[
+            f"{source} (TWh)"
+        ].diff()
 
     for source in DIRECT_AND_EQUIVALENT_ENERGY:
         # Create column for source percentage growth as a function of primary energy
         # (as a percentage, it is irrelevant whether it is direct or equivalent).
         primary_energy[f"{source} (% growth)"] = (
-            primary_energy.groupby("country")[f"{source} (TWh - direct)"].pct_change() * 100
+            primary_energy.groupby("country", observed=True)[f"{source} (TWh - direct)"]
+            .ffill()
+            .pct_change(fill_method=None)
+            * 100
         )
 
         # Create column for source absolute growth as a function of direct primary energy.
-        primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.groupby("country")[
+        primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.groupby("country", observed=True)[
             f"{source} (TWh - direct)"
         ].diff()
         # Create column for source absolute growth as a function of input-equivalent primary energy.
-        primary_energy[f"{source} (TWh growth - equivalent)"] = primary_energy.groupby("country")[
+        primary_energy[f"{source} (TWh growth - equivalent)"] = primary_energy.groupby("country", observed=True)[
             f"{source} (TWh - equivalent)"
         ].diff()
 
@@ -394,23 +402,23 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Select necessary data from the Statistical Review.
-    primary_energy = get_statistical_review_data(tb_review=tb_review)
+    tb = get_statistical_review_data(tb_review=tb_review)
 
     # Calculate direct and primary energy using the substitution method.
-    primary_energy = calculate_direct_primary_energy(primary_energy=primary_energy)
-    primary_energy = calculate_equivalent_primary_energy(primary_energy=primary_energy)
+    tb = calculate_direct_primary_energy(primary_energy=tb)
+    tb = calculate_equivalent_primary_energy(primary_energy=tb)
 
     # Calculate share of (direct and sub-method) primary energy.
-    primary_energy = calculate_share_of_primary_energy(primary_energy=primary_energy)
+    tb = calculate_share_of_primary_energy(primary_energy=tb)
 
     # Calculate annual change of primary energy.
-    primary_energy = calculate_primary_energy_annual_change(primary_energy)
+    tb = calculate_primary_energy_annual_change(tb)
 
     # Add per-capita variables.
-    primary_energy = add_per_capita_variables(primary_energy=primary_energy, ds_population=ds_population)
+    tb = add_per_capita_variables(primary_energy=tb, ds_population=ds_population)
 
     # Prepare output data in a convenient way.
-    table = prepare_output_table(primary_energy)
+    table = prepare_output_table(tb)
 
     #
     # Save outputs.
