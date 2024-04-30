@@ -209,9 +209,6 @@ def reject_chart_diffs(engine):
     with Session(engine) as session:
         for _, chart_diff in st.session_state.chart_diffs.items():
             chart_diff.reject(session)
-        # st.session_state.chart_diffs = {
-        #     chart_id: chart_diff.reject(session) for chart_id, chart_diff in st.session_state.chart_diffs.items()
-        # }
 
     ########################################
 
