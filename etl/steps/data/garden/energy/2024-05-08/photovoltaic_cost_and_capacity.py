@@ -151,11 +151,8 @@ def run(dest_dir: str) -> None:
     # Add column for region.
     tb_combined = tb_combined.assign(**{"country": "World"})
 
-    # Set an appropriate index and sort conveniently.
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    # Rename table.
-    tb_combined.metadata.short_name = paths.short_name
+    # Format table conveniently.
+    tb_combined = tb_combined.format(short_name=paths.short_name)
 
     #
     # Save outputs.

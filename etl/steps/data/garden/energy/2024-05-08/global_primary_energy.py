@@ -131,7 +131,7 @@ def combine_statistical_review_and_smil_data(tb_review: Table, tb_smil: Table) -
     ].ffill()
 
     # Create an index and sort conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    combined = combined.format(sort_columns=True)
 
     return combined
 

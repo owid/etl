@@ -149,8 +149,8 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
         df1=tb_elec, df2=tb_beis, index_columns=["country", "year"]
     )
 
-    # Add an index and sort conveniently.
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Format table conveniently.
+    tb_combined = tb_combined.format(sort_columns=True)
 
     return tb_combined
 

@@ -133,7 +133,7 @@ def combine_tables_data_and_metadata(
     assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
 
     # Set index and sort conveniently.
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_combined = tb_combined.format()
 
     return tb_combined
 

@@ -57,16 +57,8 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
     tb_review["oil_left"] = tb_review["oil_reserves"] / tb_review["oil_production"]
     tb_review["gas_left"] = tb_review["gas_reserves"] / tb_review["gas_production"]
 
-    # Set index, drop rows that only have nans, and sort conveniently.
-    tb_review = (
-        tb_review.set_index(["country", "year"], verify_integrity=True)
-        .dropna(how="all")
-        .sort_index()
-        .sort_index(axis=1)
-    )
-
-    # Update metadata.
-    tb_review.metadata.short_name = paths.short_name
+    # Format table conveniently.
+    tb_review = tb_review.dropna(how="all").format(sort_columns=True, short_name=paths.short_name)
 
     return tb_review
 

@@ -373,11 +373,8 @@ def prepare_output_table(primary_energy: Table) -> Table:
     # Replace spurious inf values by nan.
     table = primary_energy.replace([np.inf, -np.inf], np.nan)
 
-    # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
-    table = table.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    # Set a new table short name.
-    table.metadata.short_name = paths.short_name
+    # Format table conveniently.
+    table = table.format(short_name=paths.short_name)
 
     return table
 

@@ -277,8 +277,8 @@ def run(dest_dir: str) -> None:
     # Remove outliers.
     tb = remove_outliers(tb=tb)
 
-    # Create an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Format table conveniently.
+    tb = tb.format()
 
     #
     # Save outputs.

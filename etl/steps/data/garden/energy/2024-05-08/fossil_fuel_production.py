@@ -244,7 +244,7 @@ def run(dest_dir: str) -> None:
     tb = remove_spurious_values(tb=tb)
 
     # Create an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format()
 
     #
     # Save outputs.
