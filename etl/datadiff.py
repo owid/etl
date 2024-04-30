@@ -744,8 +744,9 @@ def _local_catalog_datasets(
     catalog_dir = catalog_path
 
     # it is possible to use subset of a data catalog
-    while not (catalog_dir / "catalog.meta.json").exists() and catalog_dir != catalog_dir.parent:
-        catalog_dir = catalog_dir.parent
+    if catalog_dir.name != "data":
+        while catalog_dir != catalog_dir.parent:
+            catalog_dir = catalog_dir.parent
 
     if catalog_dir != catalog_path:
         assert include is None, "Include pattern is not supported for subset of a catalog"
