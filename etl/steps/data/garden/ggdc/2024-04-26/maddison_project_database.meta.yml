@@ -192,6 +192,9 @@ tables:
         unit: ""
         short_unit: ""
         description_short: "World regions according to Maddison Project Database."
+        processing_level: major
+        description_processing: |-
+          In order to display a clear map with Maddison Project Database regions, we keep region compositions only for years when the source calculates World aggregates.
         display:
           name: Region
           <<: *common-display

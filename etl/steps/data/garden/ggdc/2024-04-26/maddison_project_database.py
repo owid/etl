@@ -86,6 +86,12 @@ def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
     # Rename columns
     tb = tb.rename(columns=MPD_COLUMNS, errors="raise")
 
+    # Extract years where we have data for "World"
+    years_with_world_data = list(tb.loc[tb["country"] == "World", "year"].unique())
+
+    # Make all the rows of region different from years_with_world_data None
+    tb.loc[~tb["year"].isin(years_with_world_data), "region"] = None
+
     return tb
 
 
