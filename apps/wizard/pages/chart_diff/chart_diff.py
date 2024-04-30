@@ -23,6 +23,14 @@ class ChartDiffModified:
         return not self.is_modified
 
     @property
+    def latest_update(self):
+        """Get latest time of change (either be staging or live)."""
+        if self.target_chart is None:
+            return self.source_chart.updatedAt
+        else:
+            return max([self.source_chart.updatedAt, self.target_chart.updatedAt])
+
+    @property
     def is_modified(self) -> bool:
         return self.target_chart is not None
 
@@ -68,22 +76,40 @@ class ChartDiffModified:
             target_session=target_session,
         )
 
+    def approve(self, session) -> None:
+        """Approve chart diff."""
+        # Update status variable
+        self.set_status(session, "approve")
+
+    def reject(self, session) -> None:
+        """Reject chart diff."""
+        # Update status variable
+        self.set_status(session, "rejected")
+
     def update_state(self, session) -> None:
         """Update the state of the chart diff."""
         # Update status variable
-        self.approval_status = "approved" if self.approval_status == "rejected" else "rejected"
+        status = "approved" if self.approval_status == "rejected" else "rejected"
+        self.set_status(session, status)
 
-        # Update approval status (in database)
-        st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
-        assert self.chart_id
-        if self.is_modified:
-            assert self.target_chart
-        approval = gm.ChartDiffApprovals(
-            chartId=self.chart_id,
-            sourceUpdatedAt=self.source_chart.updatedAt,
-            targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-            status="approved" if self.approved else "rejected",
-        )
+    def set_status(self, session, status) -> None:
+        """Update the state of the chart diff."""
+        # Only perform action if status changes!
+        if self.approval_status != status:
+            # Update status variable
+            self.approval_status = status
 
-        session.add(approval)
-        session.commit()
+            # Update approval status (in database)
+            st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
+            assert self.chart_id
+            if self.is_modified:
+                assert self.target_chart
+            approval = gm.ChartDiffApprovals(
+                chartId=self.chart_id,
+                sourceUpdatedAt=self.source_chart.updatedAt,
+                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
+                status="approved" if self.approved else "rejected",
+            )
+
+            session.add(approval)
+            session.commit()

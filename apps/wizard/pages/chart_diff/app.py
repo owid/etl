@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -129,33 +130,51 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
             compare_charts(**kwargs_diff)
 
 
+def pretty_date(chart):
+    """Obtain prettified date from a chart.
+
+    Format is:
+        - Previous years: `Jan 10, 2020 10:15`
+        - This year: `Mar 15, 10:15` (no need to explicitly show the year)
+    """
+    if chart.updatedAt.year == datetime.now().date().year:
+        return chart.updatedAt.strftime("%b %d, %H:%M")
+    else:
+        return chart.updatedAt.strftime("%b %d, %Y %H:%M")
+
+
 def compare_charts(
     source_chart,
     target_chart=None,
 ) -> None:
+    # Only one chart: new chart
     if target_chart is None:
-        st.markdown(f"New version   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
+        st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
         chart_html(source_chart.config, base_url=SOURCE_ENV)
+    # Two charts, actual diff
     else:
         # Create two columns for the iframes
         col1, col2 = st.columns(2)
         prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
-        with col1:
-            # st.selectbox(label="version", options=["Source"], key=f"selectbox-left-{identifier}")
-            if prod_is_newer:
+        # Standard diff
+        if not prod_is_newer:
+            with col1:
+                st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
+                chart_html(target_chart.config, base_url=TARGET_ENV)
+            with col2:
+                st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
+                chart_html(source_chart.config, base_url=SOURCE_ENV)
+        # Conflict with live
+        else:
+            with col1:
                 st.markdown(
-                    f"Production   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}` :red[conflict]",
-                    help="⚠️ The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
+                    f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
+                    help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
                 )
-            else:
-                st.markdown(f"Production   |   `{target_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
-            chart_html(target_chart.config, base_url=TARGET_ENV)
-
-        with col2:
-            # st.selectbox(label="version", options=["Target"], key=f"selectbox-right-{identifier}")
-            st.markdown(f"New version   |   `{source_chart.updatedAt.strftime('%Y-%m-%d %H:%M:%S')}`")
-            # st.write(target_chart.config)
-            chart_html(source_chart.config, base_url=SOURCE_ENV)
+                chart_html(target_chart.config, base_url=TARGET_ENV)
+            with col2:
+                st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
+                chart_html(source_chart.config, base_url=SOURCE_ENV)
 
 
 @st.cache_resource
@@ -186,7 +205,17 @@ def show_help_text():
         )
 
 
-########################################
+def reject_chart_diffs(engine):
+    with Session(engine) as session:
+        for _, chart_diff in st.session_state.chart_diffs.items():
+            chart_diff.reject(session)
+        # st.session_state.chart_diffs = {
+        #     chart_id: chart_diff.reject(session) for chart_id, chart_diff in st.session_state.chart_diffs.items()
+        # }
+
+    ########################################
+
+
 # MAIN
 ########################################
 def main():
@@ -205,24 +234,39 @@ def main():
         help="Get the latest chart versions, both from the staging and production servers.",
     )
 
+    # Other options
+    # with st.popover("Other options"):
+    st.button(
+        "🔙 Unapprove all charts",
+        key="unapprove-all-charts",
+        on_click=lambda e=source_engine: reject_chart_diffs(e),
+    )
+
     # TODO: this should be created via migration in owid-grapher!!!!!
-    # create chart_diff_approvals table if it doesn't exist
+    # Create chart_diff_approvals table if it doesn't exist
     SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
+
     # Get actual charts
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database..."):
             st.session_state.chart_diffs = get_chart_diffs(source_engine, target_engine)
 
+    # Sort charts
+    st.session_state.chart_diffs = dict(
+        sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
+    )
+
     # Modified / New charts
     chart_diffs_modified = [
         chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_modified
     ]
+    chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_new]
 
-    if len(chart_diffs_modified) == 0:
+    # Show diffs
+    if len(st.session_state.chart_diffs) == 0:
         st.warning("No chart modifications found in the staging environment.")
     else:
         # Show modified/new charts
-        chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_new]
         with Session(source_engine) as source_session:
             with Session(target_engine) as target_session:
                 if chart_diffs_modified:
@@ -230,12 +274,15 @@ def main():
                     st.markdown(f"{len(chart_diffs_modified)} charts modified in [{OWID_ENV.name}]({OWID_ENV.site})")
                     for chart_diff in chart_diffs_modified:
                         st_show(chart_diff, source_session, target_session)
-
+                else:
+                    st.warning("No chart modifications found in the staging environment.")
                 if chart_diffs_new:
                     st.header("New charts")
                     st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
                     for chart_diff in chart_diffs_new:
                         st_show(chart_diff, source_session, target_session)
+                else:
+                    st.warning("No chart new charts found in the staging environment.")
 
 
 main()
