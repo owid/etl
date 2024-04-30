@@ -86,12 +86,6 @@ def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
     # Rename columns
     tb = tb.rename(columns=MPD_COLUMNS, errors="raise")
 
-    # Extract maximum year in the dataset
-    max_year = tb["year"].max()
-
-    # Make all the rows of region less than max_year null
-    tb.loc[tb["year"] < max_year, "region"] = None
-
     return tb
 
 
