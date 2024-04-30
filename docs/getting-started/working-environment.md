@@ -27,7 +27,7 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     Then install Python 3.9+, MySQL client and [poetry](https://python-poetry.org/). Poetry is our preferred python packaging and dependency management tool.
 
     ```bash
-    brew install python mysql-client poetry
+    brew install python mysql-client poetry pkg-config
     ```
 
     You then need to inform Python where to find MySQL by adding some lines to your `~/.zshrc` file (or `~/.bash_profile`, depends on your shell). Run `brew info mysql-client` to see what's needed. For example, on an M1/M2 Mac where Homebrew installs to `/opt/homebrew`, you would need to add:
