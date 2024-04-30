@@ -1,9 +1,9 @@
 meta:
-  name: FluID, World Health Oragnization (2023)
+  name: FluID, World Health Organization (2023)
   publication_year: 2023
   publication_date: 2023-02-16
-  source_name: FluID, World Health Oragnization (2023)
-  source_published_by: FluID, World Health Oragnization (2023)
+  source_name: FluID, World Health Organization (2023)
+  source_published_by: FluID, World Health Organization (2023)
   url: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
   source_data_url: https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FID?&$format=csv
   license_url: https://www.who.int/about/policies/publishing/copyright
