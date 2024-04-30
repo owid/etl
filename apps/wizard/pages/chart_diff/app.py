@@ -37,7 +37,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 add_indentation()
-
+st.session_state.hide_approved_charts = st.session_state.get("hide_approved_charts", False)
 
 ########################################
 # FUNCTIONS
@@ -222,23 +222,33 @@ def main():
     # Get stuff from DB
     source_engine, target_engine = get_engines()
 
-    st.button(
-        "🔄 Refresh all charts",
-        key="refresh-btn-general",
-        on_click=lambda source_engine=source_engine, target_engine=target_engine: set_states(
-            {"chart_diffs": get_chart_diffs(source_engine, target_engine)}
-        ),
-        help="Get the latest chart versions, both from the staging and production servers.",
-    )
+    with st.popover("Options"):
+        st.button(
+            "🔄 Refresh all charts",
+            key="refresh-btn-general",
+            on_click=lambda source_engine=source_engine, target_engine=target_engine: set_states(
+                {"chart_diffs": get_chart_diffs(source_engine, target_engine)}
+            ),
+            help="Get the latest chart versions, both from the staging and production servers.",
+        )
 
-    # Other options
-    # with st.popover("Other options"):
-    st.button(
-        "🔙 Unapprove all charts",
-        key="unapprove-all-charts",
-        on_click=lambda e=source_engine: reject_chart_diffs(e),
-    )
+        # Other options
+        # with st.popover("Other options"):
+        st.button(
+            "🔙 Unapprove all charts",
+            key="unapprove-all-charts",
+            on_click=lambda e=source_engine: reject_chart_diffs(e),
+        )
 
+        st.toggle(
+            "Hide appoved charts",
+            key="hide-approved-charts",
+            on_change=lambda: set_states(
+                {
+                    "hide_approved_charts": not st.session_state.hide_approved_charts,
+                }
+            ),
+        )
     # TODO: this should be created via migration in owid-grapher!!!!!
     # Create chart_diff_approvals table if it doesn't exist
     SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
@@ -253,15 +263,25 @@ def main():
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
     )
 
+    # Hide approved (if option selected)
+    if st.session_state.hide_approved_charts:
+        st.session_state.chart_diffs_filtered = {
+            k: v for k, v in st.session_state.chart_diffs.items() if not v.approved
+        }
+    else:
+        st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
+
     # Modified / New charts
     chart_diffs_modified = [
-        chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_modified
+        chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
     ]
-    chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs.values() if chart_diff.is_new]
+    chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new]
 
     # Show diffs
     if len(st.session_state.chart_diffs) == 0:
         st.warning("No chart modifications found in the staging environment.")
+    elif len(st.session_state.chart_diffs_filtered) == 0:
+        st.warning("All charts are approved. To view them, uncheck the 'Hide approved charts' toggle.")
     else:
         # Show modified/new charts
         with Session(source_engine) as source_session:
@@ -272,14 +292,18 @@ def main():
                     for chart_diff in chart_diffs_modified:
                         st_show(chart_diff, source_session, target_session)
                 else:
-                    st.warning("No chart modifications found in the staging environment.")
+                    st.warning(
+                        "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                    )
                 if chart_diffs_new:
                     st.header("New charts")
                     st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
                     for chart_diff in chart_diffs_new:
                         st_show(chart_diff, source_session, target_session)
                 else:
-                    st.warning("No chart new charts found in the staging environment.")
+                    st.warning(
+                        "No chart new charts found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                    )
 
 
 main()
