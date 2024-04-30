@@ -191,12 +191,12 @@ tables:
         title: Maddison Project Database region
         unit: ""
         short_unit: ""
-        description_short: "Regions as defined by the Maddison Project Database."
+        description_short: "World regions according to Maddison Project Database."
         display:
           name: Region
           <<: *common-display
         presentation:
-          title_public: Region
+          title_public: World regions according to Maddison Project Database
           title_variant: Historical data
           attribution_short: Maddison Project Database
 
