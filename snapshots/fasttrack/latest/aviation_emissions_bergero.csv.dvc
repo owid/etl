@@ -4,7 +4,6 @@ meta:
     title: aviation_emissions_bergero
     citation_full: |-
       Bergero, C., Gosnell, G., Gielen, D., Kang, S., Bazilian, M., & Davis, S. J. (2023). Pathways to net-zero emissions from aviation. Nature Sustainability.
-    version_producer: Google Sheet
     url_main: https://www.nature.com/articles/s41893-022-01046-9
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRWoePX6ndPLsiS-nIS4Nz4ax_bEdf9YrWl6WVKv7hGFfcVUdMh1nW0QmhFFHPvlYNcUtE9vOX6GwcJ/pub?output=csv

@@ -4,7 +4,6 @@ meta:
     title: Circulating Vaccine Derived Polio Virus
     attribution: Global Polio Eradication Initiative
     attribution_short: GPEI
-    version_producer: Google Sheet
     url_main: |-
       https://polioeradication.org/wp-content/uploads/2024/04/weekly-polio-analyses-cVDPV-20240402.pdf; https://polioeradication.org/wp-content/uploads/2022/04/weekly-polio-analyses-cVDPV-20220405.pdf
     url_download: |-

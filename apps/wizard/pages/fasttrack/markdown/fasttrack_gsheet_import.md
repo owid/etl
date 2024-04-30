@@ -1,8 +1,8 @@
 #### Create Google Sheets
 
-1. Copy [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit?usp=sharing), ideally to a shared [OWID Fast-track](https://drive.google.com/drive/folders/0AAjVjD6_217sUk9PVA) folder. Then in the sheet, copy your data into `raw_data` or `data` sheet. (**Don't create a new document!** You have to make a copy of the template, then you can remove sheets that you don't need.)
+1. Copy [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit?usp=sharing), ideally to a shared [OWID Fast-track](https://drive.google.com/drive/folders/0AAjVjD6_217sUk9PVA) folder. Give it the same title as your dataset. If you're still experimenting, it's good practice to add **DRAFT** prefix. Then in the sheet, copy your data into `raw_data` or `data` sheet. (**Don't create a new document!** You have to make a copy of the template, then you can remove sheets that you don't need.)
 
-2. In sheet `dataset_meta`, fill in **title**, **short_name** and **version** of your dataset. If you're still experimenting, it's good practice to add **DRAFT** prefix to the title. You can remove the prefix it once your dataset is ready (just make sure not to change `short_name`, otherwise new dataset would be created)
+2. In sheet `dataset_meta`, fill in **title**, **short_name** and **version** of your dataset. You can remove the prefix it once your dataset is ready (just make sure not to change `short_name`, otherwise new dataset would be created)
 
 3. You can **optionally** fill metadata of your source or variables, but it's gonna work even if you don't touch variables metadata and use non-underscored titles. Simply copy your data into `data` sheet, set **title**, **short_name**, **version** and you're good to go.
 

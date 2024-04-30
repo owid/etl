@@ -3,7 +3,6 @@ meta:
     producer: Hurricane forecasting error (National Hurricane Center, 2023)
     title: hurricane_forecasts_nhc
     citation_full: NHC (2023), National Hurricane Center Forecast Verification.
-    version_producer: Google Sheet
     url_main: https://www.nhc.noaa.gov/verification/verify5.shtml
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTICnsHZmDS07FBiNgp-ek3krJFCIPQupMGjqZjBba7Nwz9bUjf15vY9feeHgASuLZv8LRB3m68M5db/pub?output=csv

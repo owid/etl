@@ -2,7 +2,6 @@ meta:
   origin:
     producer: test
     title: test
-    version_producer: Google Sheet
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQhtl94r0xZs0RlnhKsUe6kun5iDhcVDcOenS3UauHs-IJpuPwSRrRqAL4t8m0xEyEnybvmcneb4hMc/pub?output=csv
     date_accessed: '2024-04-25'

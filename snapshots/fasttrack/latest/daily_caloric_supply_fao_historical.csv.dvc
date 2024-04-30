@@ -10,7 +10,6 @@ meta:
       Pre-1961 data is available for some countries, based on a range of historical reconstructions.
 
       We provide further details of all of these sources, and how this dataset is constructed here: https://ourworldindata.org/calorie-supply-sources
-    version_producer: Google Sheet
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0RuD5-axqDW3PdFizuHnIfsye7CKZqe8wxIUWfKwaLfvPOOnv82KXOVltSOiSlpPXQEzktCQ15-p/pub?output=csv
     date_accessed: '2024-04-03'
