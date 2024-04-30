@@ -78,7 +78,7 @@ def cli(
 <details>
     <summary><b>Chart diff</b>: </summary>
     {chart_diff}
-    <a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a
+    <a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a>
 </details>
 
 <details>
@@ -238,7 +238,6 @@ def format_chart_diff(df: pd.DataFrame) -> str:
 <ul>
     <li>{len(new)} new charts ({new.approved.sum()} approved)</li>
     <li>{len(modified)} modified charts ({modified.approved.sum()} approved)</li>
-    <li>Item 3</li>
 </ul>
     """.strip()
 
