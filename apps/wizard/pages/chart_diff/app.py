@@ -217,6 +217,7 @@ def reject_chart_diffs(engine):
 ########################################
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
+    st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
     show_help_text()
 
     # Get stuff from DB

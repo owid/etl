@@ -56,7 +56,10 @@ st.set_page_config(
 )
 add_indentation()
 st.title("Indicator 🧬 **:gray[Upgrader]**")
+st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
+
+# Get all datasets
 DATASETS = get_datasets()
 # Get schema
 SCHEMA_CHART_CONFIG = get_schema()
