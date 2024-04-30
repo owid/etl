@@ -6,7 +6,7 @@ from typing import Literal
 
 import yaml
 
-from etl.config import ENV_IS_REMOTE
+from etl.config import ENV
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
@@ -22,16 +22,24 @@ def load_wizard_config():  # -> Any:
     # Some transformations
 
     def _get_enable(props):
-        # Default for `disable_on_remote` is False
-        disable_on_remote = props.get("disable_on_remote", False)
-        # Default for `enable` is True
-        enable = props.get("enable", True)
+        # Default for `disable` is False
+        if "disable" not in props:
+            return True
+        else:
+            disable = props.get("disable", False)
+            # Disable in *all* settings
+            if isinstance(disable, bool):
+                return not disable
+            # Disable in some settings
+            elif isinstance(disable, dict):
+                if ENV == "staging":
+                    return not disable.get("staging", False)
+                if ENV == "production":
+                    return not disable.get("production", False)
+                elif ENV == "dev":
+                    return not disable.get("dev", False)
 
-        # If `disable_on_remote` is set, then disable if we are on remote (i.e. staging or production)
-        if ENV_IS_REMOTE:
-            enable = (not disable_on_remote) and enable
-
-        return enable
+        raise ValueError(f"Invalid disable property: {disable}")
 
     ## ETL steps
     for _, step in config["etl"]["steps"].items():
