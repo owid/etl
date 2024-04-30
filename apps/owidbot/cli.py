@@ -105,6 +105,7 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 <b>Quick links (staging server)</b>:
 [Site](http://{container_name}/) | [Admin](http://{container_name}/admin/login) | [Wizard](http://{container_name}/etl/wizard/)
 |--------------------------------|---|---|
+
 **Login**: `ssh owid@{container_name}`
 
 <!--grapher-start-->
