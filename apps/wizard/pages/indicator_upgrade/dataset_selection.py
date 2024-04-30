@@ -13,7 +13,7 @@ from apps.wizard.utils import set_states
 log = get_logger()
 
 # Set to True to select good initial default dataset selections
-DEBUG = True
+DEBUG = False
 dataset_old_debug = "Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World"
 dataset_new_debug = "Democracy and Human rights - OWID based on Varieties of Democracy (v13) and Regimes of the World"
 
