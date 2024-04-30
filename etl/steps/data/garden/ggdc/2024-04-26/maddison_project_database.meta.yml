@@ -187,3 +187,16 @@ tables:
           title_variant: Historical data
           attribution_short: Maddison Project Database
 
+      region:
+        title: Maddison Project Database Region
+        unit: ""
+        short_unit: ""
+        description_short: "Regions as defined by the Maddison Project Database."
+        display:
+          name: Region
+          <<: *common-display
+        presentation:
+          title_public: Region
+          title_variant: Historical data
+          attribution_short: Maddison Project Database
+
