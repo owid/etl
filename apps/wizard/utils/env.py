@@ -52,6 +52,19 @@ class OWIDEnv:
         return None
 
     @property
+    def name(self) -> str:
+        """Get site."""
+        if self.env_type_id == "live":
+            return "production"
+        elif self.env_type_id == "staging":
+            return "staging"
+        elif self.env_type_id == "local":
+            return "local"
+        elif self.env_type_id == "remote-staging":
+            return f"{config.DB_HOST}"
+        raise ValueError("Unknown env_type_id")
+
+    @property
     def base_site(self) -> str | None:
         """Get site."""
         if self.env_type_id == "live":

@@ -32,7 +32,6 @@ from apps.wizard.pages.indicator_upgrade.charts_update import get_affected_chart
 from apps.wizard.pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
 from apps.wizard.pages.indicator_upgrade.utils import get_datasets, get_schema
-from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
@@ -61,8 +60,6 @@ st.markdown("Update indicators to their new versions.")  # Get datasets (might t
 DATASETS = get_datasets()
 # Get schema
 SCHEMA_CHART_CONFIG = get_schema()
-# OWID Env
-owid_env = OWIDEnv()
 # Session states
 utils.set_states(
     {
