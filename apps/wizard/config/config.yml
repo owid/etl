@@ -83,7 +83,7 @@ sections:
         maintainer: "@lucas"
         emoji: "🌟"
         image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync"
+      - title: "Chart Sync (deprecated)"
         alias: staging_sync
         entrypoint: ../staging_sync/app.py
         description: Sync charts between servers
@@ -123,6 +123,26 @@ sections:
         entrypoint: pages/datainsight_robot.py
         emoji: "💡"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+
+  - title: "Charts v2"
+    description: |-
+      Create chart revisions, and synchronize aproved revisions between servers.
+    apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: pages/indicator_upgrade/app.py
+      description: Update indicator references in charts
+      maintainer: "@lucas"
+      emoji: "🧬"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+    - title: "Chart Diff"
+      alias: chart_diff
+      entrypoint: pages/chart_diff/app.py
+      description: Chart differences
+      maintainer: "@mojmir"
+      emoji: "⚡"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+
 
   - title: "Metadata"
     description: |-

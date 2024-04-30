@@ -261,6 +261,7 @@ class Chart(SQLModel, table=True):
     )
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     config: Dict[Any, Any] = Field(sa_column=Column("config", JSON, nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
@@ -283,7 +284,7 @@ class Chart(SQLModel, table=True):
         if chart_id:
             cond = cls.id == chart_id
         elif slug:
-            cond = _json_is(cls.config, "slug", slug)
+            cond = cls.slug == slug
         else:
             raise ValueError("Either chart_id or slug must be provided")
         charts = session.exec(select(cls).where(cond)).all()
@@ -1469,6 +1470,40 @@ class Origin(SQLModel, table=True):
             origin = origins[0]
 
         return origin
+
+
+class ChartDiffApprovals(SQLModel, table=True):
+    __tablename__: str = "chart_diff_approvals"
+    __table_args__ = (Index("chart_id_ix", "chartId"), {"extend_existing": True})
+
+    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
+    chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
+    sourceUpdatedAt: datetime = Field(sa_column=Column("sourceUpdatedAt", DateTime, nullable=False))
+    targetUpdatedAt: Optional[datetime] = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=True))
+    updatedAt: datetime = Field(
+        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+    )
+    status: str = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+
+    @classmethod
+    def latest_chart_status(
+        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
+    ) -> Literal["approved", "rejected"]:
+        """Load the latest approval of the chart. If there's none, return 'rejected'."""
+        result = session.exec(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                cls.sourceUpdatedAt == source_updated_at,
+                cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())  # type: ignore
+            .limit(1)
+        ).first()
+        if result:
+            return result.status  # type: ignore
+        else:
+            return "rejected"
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

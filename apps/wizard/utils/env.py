@@ -52,6 +52,19 @@ class OWIDEnv:
         return None
 
     @property
+    def name(self) -> str:
+        """Get site."""
+        if self.env_type_id == "live":
+            return "production"
+        elif self.env_type_id == "staging":
+            return "staging"
+        elif self.env_type_id == "local":
+            return "local"
+        elif self.env_type_id == "remote-staging":
+            return f"{config.DB_HOST}"
+        raise ValueError("Unknown env_type_id")
+
+    @property
     def base_site(self) -> str | None:
         """Get site."""
         if self.env_type_id == "live":
@@ -90,6 +103,13 @@ class OWIDEnv:
     def chart_site(self, slug: str) -> str:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
+
+    def thumb_url(self, slug: str):
+        """
+        Turn https://ourworldindata.org/grapher/life-expectancy"
+        Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
+        """
+        return f"{self.site}/grapher/thumbnail/{slug}.png"
 
 
 OWID_ENV = OWIDEnv()
