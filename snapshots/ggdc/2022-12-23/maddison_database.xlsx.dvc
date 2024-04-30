@@ -8,8 +8,8 @@ meta:
       The final database version provided by Angus Maddison, covering world population, GDP and per capita GDP from 1-2008 AD.
     date_published: '2009'
     version_producer: 2010
-    attribution: Maddison Database 2010 (Maddison, 2009)
-    attribution_short: Maddison Database
+    attribution: Maddison (2009) - Maddison Database 2010
+    attribution_short: Maddison Database 2010
 
     # Citation
     producer: Angus Maddison

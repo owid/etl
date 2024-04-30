@@ -266,6 +266,7 @@ meta:
       Population sources
       1990 onward Total Economy Database the Conference Board for all countries included in TED. Otherwise UN national accounts statistics.
     attribution: Bolt and van Zanden (2024) - Maddison Project Database 2023
+    attribution_short: Maddison Project Database 2023
 
     # Files
     url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023
