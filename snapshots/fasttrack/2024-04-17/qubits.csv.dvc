@@ -4,7 +4,6 @@ meta:
     title: List of quantum processors
     title_snapshot: Circuit-based quantum processors
     citation_full: Wikipedia, List of quantum processors, Circuit-based quantum processors
-    version_producer: Google Sheet
     url_main: https://en.wikipedia.org/wiki/List_of_quantum_processors
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSVB8MqM1U7xLUV68Fd8TUeMiv2jWWGeT8EteyP-0Nvi4getanr9gxxlM0V1JhIlRkhfruB7vjfBTIy/pub?output=csv
