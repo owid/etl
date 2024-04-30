@@ -57,12 +57,12 @@ def update_chart_config(
 
     The chart config contains some fields that point to the indicators in use. In the attempt to migrating these, we should update all references to the new indicators.
     """
-    updater = ChartVariableUpdater(indicator_mapping, schema)
+    updater = ChartIndicatorUpdater(indicator_mapping, schema)
     config_new = updater.run(deepcopy(config))
     return config_new
 
 
-class ChartVariableUpdater:
+class ChartIndicatorUpdater:
     """Handle chart updates when there are updates on variables."""
 
     def __init__(
@@ -74,13 +74,10 @@ class ChartVariableUpdater:
 
         Parameters
         ----------
-        variable_mapping : Dict[int, int]
-            Mapping between old and new variable IDs.
+        indicator_mapping : Dict[int, int]
+            Mapping between old and new indicator IDs.
         schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
-        skip_slider_check_limit : int
-            If the number of variables to be updated is greater than this value, the slider range check is disabled. That is, no changes to the slider are performed.
-            This is to avoid errors when updating charts with many variables. Defaults to None.
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.indicator_mapping = indicator_mapping
