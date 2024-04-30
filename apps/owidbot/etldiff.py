@@ -82,13 +82,13 @@ def cli(
 </details>
 
 <details>
-    <summary><b>etl diff</b>: {data_diff_summary}</summary>
+<summary><b>etl diff</b>: {data_diff_summary}</summary>
 
-    ```diff
-    {data_diff}
-    ```
+```diff
+{data_diff}
+```
 
-    Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
+Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
