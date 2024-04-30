@@ -13,13 +13,13 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot and read its data.
     snap = paths.load_snapshot("yearly_electricity.csv")
-    tb = snap.read(underscore=True)
+    tb = snap.read()
 
     #
     # Process data.
     #
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["area", "year", "variable", "unit"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Format table conveniently.
+    tb = tb.format(keys=["area", "year", "variable", "unit"], sort_columns=True)
 
     #
     # Save outputs.

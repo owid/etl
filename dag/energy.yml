@@ -88,10 +88,10 @@ steps:
   #
   # Ember - Yearly electricity data.
   #
-  data://meadow/ember/2024-05-08/yearly_electricity:
-    - snapshot://ember/2024-05-08/yearly_electricity.csv
-  data://garden/ember/2024-05-08/yearly_electricity:
-    - data://meadow/ember/2024-05-08/yearly_electricity
+  data-private://meadow/ember/2024-05-08/yearly_electricity:
+    - snapshot-private://ember/2024-05-08/yearly_electricity.csv
+  data-private://garden/ember/2024-05-08/yearly_electricity:
+    - data-private://meadow/ember/2024-05-08/yearly_electricity
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
@@ -142,20 +142,20 @@ steps:
   #
   # Energy - Electricity mix (EI & Ember).
   #
-  data://garden/energy/2024-05-08/electricity_mix:
+  data-private://garden/energy/2024-05-08/electricity_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
-    - data://garden/ember/2024-05-08/yearly_electricity
+    - data-private://garden/ember/2024-05-08/yearly_electricity
     - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2024-05-08/electricity_mix:
-    - data://garden/energy/2024-05-08/electricity_mix
+  data-private://grapher/energy/2024-05-08/electricity_mix:
+    - data-private://garden/energy/2024-05-08/electricity_mix
   #
   # Energy - UK historical electricity.
   #
-  data://garden/energy/2024-05-08/uk_historical_electricity:
+  data-private://garden/energy/2024-05-08/uk_historical_electricity:
     - data://garden/uk_beis/2023-12-12/uk_historical_electricity
-    - data://garden/energy/2024-05-08/electricity_mix
-  data://grapher/energy/2024-05-08/uk_historical_electricity:
-    - data://garden/energy/2024-05-08/uk_historical_electricity
+    - data-private://garden/energy/2024-05-08/electricity_mix
+  data-private://grapher/energy/2024-05-08/uk_historical_electricity:
+    - data-private://garden/energy/2024-05-08/uk_historical_electricity
   #
   # Energy - Energy mix.
   #
@@ -168,11 +168,11 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  data://garden/energy/2024-05-08/owid_energy:
+  data-private://garden/energy/2024-05-08/owid_energy:
     - data://garden/energy/2024-05-08/energy_mix
     - data://garden/energy/2024-05-08/fossil_fuel_production
     - data://garden/energy/2024-05-08/primary_energy_consumption
-    - data://garden/energy/2024-05-08/electricity_mix
+    - data-private://garden/energy/2024-05-08/electricity_mix
     - data://garden/demography/2023-03-31/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions

@@ -27,6 +27,8 @@ meta:
       name: CC BY 4.0
       url: https://ember-climate.org/creative-commons/
 
+  is_public: false
+
 wdir: ../../../data/snapshots/ember/2024-05-08
 outs:
   - md5: 70a91d7301f9e3e25871421264cb71ea
