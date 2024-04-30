@@ -3,7 +3,7 @@ import datetime as dt
 import json
 import random
 import string
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import requests
 from sqlmodel import Session
@@ -14,9 +14,12 @@ from etl.db import Engine
 
 
 class AdminAPI(object):
-    def __init__(self, engine: Engine):
+    def __init__(self, engine: Engine, grapher_user_id: Optional[int] = None):
         with Session(engine) as session:
-            user = session.get(gm.User, GRAPHER_USER_ID)
+            if grapher_user_id:
+                user = session.get(gm.User, grapher_user_id)
+            else:
+                user = session.get(gm.User, GRAPHER_USER_ID)
             assert user
             self.session_id = _create_user_session(session, user.email)
             session.commit()

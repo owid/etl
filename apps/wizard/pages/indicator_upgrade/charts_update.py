@@ -90,7 +90,8 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
     """Push submissions to the database."""
     # API to interact with the admin tool
     engine = get_engine()
-    api = AdminAPI(engine)
+    # HACK: Forcing grapher user to be Admin so that it is detected by staging sync.
+    api = AdminAPI(engine, grapher_user_id=1)
     # Update charts
     progress_text = "Submitting chart revisions..."
     bar = st.progress(0, progress_text)
