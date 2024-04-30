@@ -54,7 +54,6 @@ tables:
             yAxis:
               min: 0
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
@@ -104,7 +103,6 @@ tables:
             yAxis:
               min: 0
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
@@ -153,7 +151,6 @@ tables:
             yAxis:
               min: 0
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
@@ -199,7 +196,6 @@ tables:
             yAxis:
               min: 0
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
@@ -246,7 +242,6 @@ tables:
             colorScale:
               baseColorScheme: OwidDistinctLines
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
@@ -288,7 +283,6 @@ tables:
             colorScale:
               baseColorScheme: OwidDistinctLines
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
@@ -332,7 +326,6 @@ tables:
             colorScale:
               baseColorScheme: OwidDistinctLines
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
@@ -381,7 +374,6 @@ tables:
             yAxis:
               min: 0
             map:
-              time: 2019
               colorScale:
                 baseColorScheme: Oranges
                 binningStrategy: manual

@@ -913,3 +913,114 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    _number_of_comment_lines = 0
+    _step_detected = False
+    _continue_until_the_end = False
+    num_spaces_indent = 0
+    for line in lines:
+        if line.startswith("include"):
+            # Nothing should be removed from here onwards, so, skip until the end of the file.
+            _continue_until_the_end = True
+
+            # Ensure there is a space before the include section starts.
+            if new_lines[-1].strip() != "":
+                new_lines.append("\n")
+
+        if line.startswith("steps:"):
+            # Store this special line and move on.
+            new_lines.append(line)
+            # If there were comments above "steps", keep them.
+            _number_of_comment_lines = 0
+            continue
+
+        if _continue_until_the_end:
+            new_lines.append(line)
+            continue
+
+        if not _step_detected:
+            if line.strip().startswith("#") or line.strip() == "":
+                _number_of_comment_lines += 1
+                new_lines.append(line)
+                continue
+            elif line.strip().startswith(step):
+                if _number_of_comment_lines > 0:
+                    # Remove the previous comment lines and ignore the current line.
+                    new_lines = new_lines[:-_number_of_comment_lines]
+                # Find the number of spaces on the left of the step name.
+                # We need this to know if the next comments are indented (as comments within dependencies).
+                num_spaces_indent = len(line) - len(line.lstrip())
+                _step_detected = True
+                continue
+            else:
+                # This line corresponds to any other step or step dependency.
+                new_lines.append(line)
+                _number_of_comment_lines = 0
+                continue
+        else:
+            if line.strip().startswith("- "):
+                # Ignore the dependencies of the step.
+                continue
+            elif (line.strip().startswith("#")) and (len(line) - len(line.lstrip()) > num_spaces_indent):
+                # Ignore comments that are indented (as comments within dependencies).
+                continue
+            elif line.strip() == "":
+                # Ignore empty lines.
+                continue
+            else:
+                # The step dependencies have ended. Append current line and continue until the end of the dag file.
+                new_lines.append(line)
+                _continue_until_the_end = True
+                continue
+
+    # Write the new content to the active dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(new_lines)
+
+
+def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
+    """Remove specific steps from a dag file, including their comments.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    steps_to_remove : List[str]
+        List of steps to be removed from the DAG file.
+        Their dependencies do not need to be specified (they will also be removed).
+
+    """
+    for step in steps_to_remove:
+        _remove_step_from_dag_file(dag_file=dag_file, step=step)
+
+
+def create_dag_archive_file(dag_file_archive: Path) -> None:
+    """Create an empty dag archive file, and add it to the main dag archive file.
+
+    Parameters
+    ----------
+    dag_file_archive : Path
+        Path to a specific dag archive file that does not exist yet.
+
+    """
+    # Create a new archive dag file.
+    dag_file_archive.write_text("steps:\n")
+    # Find the number of spaces in the indentation of the main dag archive file.
+    n_spaces_include_section = 2
+    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
+        lines = file.readlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("include"):
+            n_spaces_include_section = [
+                len(_line) - len(_line.lstrip()) for _line in lines[i + 1 :] if _line.strip().startswith("- ")
+            ][0]
+    # Add this archive dag file to the main dag archive file.
+    dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
+    with open(paths.DAG_ARCHIVE_FILE, "a") as file:
+        file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")

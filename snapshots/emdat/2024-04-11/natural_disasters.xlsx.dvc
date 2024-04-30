@@ -3,7 +3,7 @@ meta:
     producer: EM-DAT, CRED / UCLouvain
     title: Natural disasters
     description: |-
-      EM-DAT contains data on the occurrence and impacts of mass disasters worldwide from 1900 to the present day. EM-DAT data includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from drought, earthquakes, extreme temperatures, extreme weather, floods, fogs, glacial lake outbursts, landslide, dry mass movements, volcanic activity, and wildfires.
+      EM-DAT contains data on the occurrence and impacts of mass disasters worldwide from 1900 to the present day. EM-DAT data includes all categories classified as "natural disasters" (distinguished from technological disasters, such as oil spills and industrial accidents). This includes those from drought, earthquakes, extreme temperatures, extreme weather, floods, glacial lake outburst floods, mass movements, volcanic activity, and wildfires.
     citation_full: |-
       EM-DAT, CRED / UCLouvain, Brussels, Belgium - www.emdat.be
     url_main: https://emdat.be/

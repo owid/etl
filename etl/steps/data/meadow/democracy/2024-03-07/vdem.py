@@ -53,6 +53,7 @@ COLUMNS_KEEP = [
     "v2elmulpar_osp_codehigh",
     "v2elmulpar_osp_codelow",
     "v2eltrnout",
+    "v2elvaptrn",
     # What type of election was held on this date?
     "v2eltype_0",  # Legislative; lower, sole, or both chambers, first or only round.
     "v2eltype_1",  # Legislative; lower, sole, or both chambers, second or later round.

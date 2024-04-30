@@ -1,6 +1,7 @@
 import difflib
 import sys
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -9,8 +10,13 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import get_comments_above_step_in_dag, write_to_dag_file
-from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
+from etl.helpers import (
+    create_dag_archive_file,
+    get_comments_above_step_in_dag,
+    remove_steps_from_dag_file,
+    write_to_dag_file,
+)
+from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
@@ -19,6 +25,90 @@ log = structlog.get_logger()
 
 # If a new version is not specified, assume current date.
 STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
+
+
+# Define labels for update states.
+class UpdateState(Enum):
+    UNKNOWN = "Unknown"
+    UP_TO_DATE = "No updates known"
+    OUTDATED = "Outdated"
+    MINOR_UPDATE = "Minor update possible"
+    MAJOR_UPDATE = "Major update possible"
+    ARCHIVABLE = "Archivable"
+
+
+# List of identifiers of steps that should be considered as non-updateable.
+# NOTE: The identifier is the step name without the version (and without the "data://").
+NON_UPDATEABLE_IDENTIFIERS = [
+    # All population-related datasets.
+    "garden/demography/population",
+    "garden/gapminder/population",
+    "garden/hyde/baseline",
+    "garden/un/un_wpp",
+    "meadow/gapminder/population",
+    "meadow/hyde/baseline",
+    "meadow/hyde/general_files",
+    "meadow/un/un_wpp",
+    "open_numbers/open_numbers/gapminder__systema_globalis",
+    "open-numbers/ddf--gapminder--systema_globalis",
+    "snapshot/hyde/general_files.zip",
+    "snapshot/hyde/baseline.zip",
+    "snapshot/gapminder/population.xlsx",
+    "snapshot/un/un_wpp.zip",
+    # Regions dataset.
+    "garden/regions/regions",
+    # Old WB income groups.
+    "garden/wb/wb_income",
+    "meadow/wb/wb_income",
+    "walden/wb/wb_income",
+    # New WB income groups.
+    "garden/wb/income_groups",
+    "meadow/wb/income_groups",
+    "snapshot/wb/income_groups.xlsx",
+    # World Bank country shapes.
+    "snapshot/countries/world_bank.zip",
+    # World Bank WDI.
+    "snapshot/worldbank_wdi/wdi.zip",
+    "meadow/worldbank_wdi/wdi",
+    "garden/worldbank_wdi/wdi",
+    # Other steps we don't want to update (because the underlying data does not get updated).
+    # TODO: We need a better way to achieve this, for example adding update_period_days to all steps and snapshots.
+    #  A simpler alternative would be to move these steps to a separate file in a meaningful place.
+    #  Another option is to have "playlists", e.g. "climate_change_explorer" with the identifiers of steps to update.
+    "meadow/epa/ocean_heat_content",
+    "snapshot/epa/ocean_heat_content_annual_world_700m.csv",
+    "snapshot/epa/ocean_heat_content_annual_world_2000m.csv",
+    "garden/epa/ocean_heat_content",
+    "meadow/epa/ocean_heat_content",
+    "meadow/epa/ice_sheet_mass_balance",
+    "snapshot/epa/ice_sheet_mass_balance.csv",
+    "garden/epa/ice_sheet_mass_balance",
+    "meadow/epa/ice_sheet_mass_balance",
+    "meadow/epa/ghg_concentration",
+    "snapshot/epa/co2_concentration.csv",
+    "snapshot/epa/ch4_concentration.csv",
+    "snapshot/epa/n2o_concentration.csv",
+    "garden/epa/ghg_concentration",
+    "meadow/epa/ghg_concentration",
+    "meadow/epa/mass_balance_us_glaciers",
+    "snapshot/epa/mass_balance_us_glaciers.csv",
+    "garden/epa/mass_balance_us_glaciers",
+    "meadow/epa/mass_balance_us_glaciers",
+    "meadow/climate/antarctic_ice_core_co2_concentration",
+    "snapshot/climate/antarctic_ice_core_co2_concentration.xls",
+    "garden/climate/antarctic_ice_core_co2_concentration",
+    "meadow/climate/antarctic_ice_core_co2_concentration",
+    "meadow/climate/global_sea_level",
+    "snapshot/climate/global_sea_level.csv",
+    "garden/climate/global_sea_level",
+    "meadow/climate/global_sea_level",
+]
+
+# List of dependencies to ignore when calculating the update state.
+# This is done to avoid a certain common dependency (e.g. hyde) to make all steps appear as needing a major update.
+DEPENDENCIES_TO_IGNORE = [
+    "snapshot://hyde/2017/general_files.zip",
+]
 
 
 class StepUpdater:
@@ -45,6 +135,70 @@ class StepUpdater:
         self.steps_df = self.tracker.steps_df.copy()
         # Select only active steps.
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
+        # Add steps update state.
+        self.add_steps_update_state()
+
+    def add_steps_update_state(self) -> None:
+        # To speed up calculations, create a dictionary with all info in steps_df.
+        steps_dict = self.steps_df.set_index("step").to_dict(orient="index")
+
+        # Add a column with the dependencies that are not their latest version.
+        self.steps_df["updateable_dependencies"] = [
+            [
+                dependency
+                for dependency in dependencies
+                if (dependency not in DEPENDENCIES_TO_IGNORE) and (not steps_dict[dependency]["is_latest"])
+            ]
+            for dependencies in self.steps_df["all_active_dependencies"]
+        ]
+
+        # Add a column with the total number of dependencies that are not their latest version.
+        self.steps_df["n_updateable_dependencies"] = [
+            len(dependencies) for dependencies in self.steps_df["updateable_dependencies"]
+        ]
+        # Number of snapshot dependencies that are not their latest version.
+        self.steps_df["n_updateable_snapshot_dependencies"] = [
+            sum(
+                [
+                    not steps_dict[dependency]["is_latest"]
+                    if steps_dict[dependency]["channel"] == "snapshot"
+                    else False
+                    for dependency in dependencies
+                    if dependency not in DEPENDENCIES_TO_IGNORE
+                ]
+            )
+            for dependencies in self.steps_df["all_active_dependencies"]
+        ]
+
+        # Add a column with the update state.
+        # By default, the state is unknown.
+        self.steps_df["update_state"] = UpdateState.UNKNOWN.value
+        # If there is a newer version of the step, it is outdated.
+        self.steps_df.loc[~self.steps_df["is_latest"], "update_state"] = UpdateState.OUTDATED.value
+        # If there are any dependencies that are not their latest version, it needs a minor update.
+        # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
+        self.steps_df.loc[
+            (self.steps_df["is_latest"]) & (self.steps_df["n_updateable_dependencies"] > 0), "update_state"
+        ] = UpdateState.MINOR_UPDATE.value
+        # If there are any snapshot dependencies that are not their latest version, it needs a major update.
+        self.steps_df.loc[
+            (self.steps_df["is_latest"]) & (self.steps_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
+        ] = UpdateState.MAJOR_UPDATE.value
+        # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
+        # then the step is up to date (in other words, we are not aware of any possible update).
+        self.steps_df.loc[
+            (self.steps_df["update_period_days"] == 0)
+            | (
+                (self.steps_df["is_latest"])
+                & (self.steps_df["n_updateable_snapshot_dependencies"] == 0)
+                & (self.steps_df["n_updateable_dependencies"] == 0)
+            ),
+            "update_state",
+        ] = UpdateState.UP_TO_DATE.value
+        # If a step has no charts and is not the latest version, it is archivable.
+        self.steps_df.loc[
+            (self.steps_df["n_charts"] == 0) & (~self.steps_df["is_latest"]), "update_state"
+        ] = UpdateState.ARCHIVABLE.value
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
@@ -354,6 +508,96 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
+    def _archive_step(self, step: str) -> None:
+        # Move a certain step from its active dag to its corresponding archive dag.
+
+        # Get info for step to be updated.
+        step_info = self.get_step_info(step=step)
+
+        # Skip non-archivable steps.
+        if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
+            log.info(f"Skipping non-archivable step: {step}")
+            return
+
+        # Skip snapshots (since they do not appear as steps in the dag).
+        if step_info["channel"] in ["snapshot", "walden"]:
+            log.info(f"Skipping snapshot: {step}")
+            return
+
+        # Get active dag file for this step.
+        dag_file_active = step_info["dag_file_path"]
+
+        # Get archive dag file for this step.
+        dag_file_archive = Path(
+            dag_file_active.as_posix().replace(
+                DAG_DIR.relative_to(BASE_DIR).as_posix(), DAG_ARCHIVE_FILE.parent.relative_to(BASE_DIR).as_posix()
+            )
+        )
+
+        # If the archive dag file does not exist, create it.
+        if not dag_file_archive.exists():
+            create_dag_archive_file(dag_file_archive=dag_file_archive)
+
+        # Get header from the comment lines right above the current step in the dag.
+        step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file_active)
+
+        # Create the dag_part that needs to be written to the archive file.
+        dag_part = {step: set(step_info["direct_dependencies"])}
+
+        log.info(f"Archiving step: {step}")
+        if not self.dry_run:
+            # Add the new step and its dependencies to the archive dag.
+            write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
+
+            # Delete the step from the active dag.
+            remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
+
+            # Reload steps dataframe.
+            self._load_version_tracker()
+
+    def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
+        """Move one or more steps from their active to their archive dag."""
+
+        # If a single step is given, convert it to a list.
+        if isinstance(steps, str):
+            steps = [steps]
+        elif isinstance(steps, tuple):
+            steps = list(steps)
+
+        # Archivable steps should be archived in groups.
+        # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
+        # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
+        # dependency in the dag).
+        for step in steps:
+            if include_usages:
+                # Add all active usages of current step to the list of steps to update (if not already in the list).
+                usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
+
+                steps += [usage for usage in usages if usage not in steps]
+
+        # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
+        # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
+        # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
+        # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
+        steps = to_dependency_order(
+            dag=self.tracker.dag_active,
+            includes=steps,  # type: ignore
+            excludes=[],
+            downstream=False,
+            only=True,
+        )
+
+        if self.interactive:
+            message = "The following steps will be archived:"
+            for step in steps:
+                message += f"\n  {step}"
+            log.info(message)
+            if self.interactive:
+                input("Press enter to continue.")
+
+        for step in steps:
+            self._archive_step(step=step)
+
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
     # The temporary step in the temporary dag depends on the latest version of each newly created snapshot, before
@@ -474,5 +718,61 @@ def cli(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
+        include_usages=include_usages,
+    )
+
+
+@click.command(name="archive", cls=RichCommand, help=__doc__)
+@click.argument("steps", type=str or List[str], nargs=-1)
+@click.option(
+    "--include-usages",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Archive also steps that are directly using the given steps. Default: False.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Do not write to dag. Default: False.",
+)
+@click.option(
+    "--interactive/--non-interactive",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
+)
+def archive_cli(
+    steps: Union[str, List[str]],
+    include_usages: bool = False,
+    dry_run: bool = False,
+    interactive: bool = True,
+) -> None:
+    """Archive one or more steps.
+
+    This tool lets you move one or more data steps from their active to their archive dag.
+
+    **Examples:**
+
+    **Note:** Remove the --dry-run if you want to actually write to the dag.
+
+    * To archive a single step:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --dry-run
+        ```
+
+        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+
+    * To archive not only that step, but also the steps that use it:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --include-usages --dry-run
+        ```
+    """
+    # Initialize step updater and run update.
+    StepUpdater(dry_run=dry_run, interactive=interactive).archive_steps(
+        steps=steps,
         include_usages=include_usages,
     )

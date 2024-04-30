@@ -413,7 +413,11 @@ def _get_data_url(dataset_meta: pd.DataFrame, url: str) -> str:
     if data_url and not pd.isnull(data_url):
         # files on Google Drive need modified link for downloading raw csv
         if "drive.google.com" in data_url:
-            data_url = data_url.replace("file/d/", "uc?id=").replace("/view?usp=share_link", "&export=download")
+            data_url = (
+                data_url.replace("file/d/", "uc?id=")
+                .replace("/view?usp=share_link", "&export=download")
+                .replace("/view?usp=sharing", "&export=download")
+            )
     else:
         # use data sheet
         data_url = f"{url}&gid={SHEET_TO_GID['data']}"
