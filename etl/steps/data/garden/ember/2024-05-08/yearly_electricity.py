@@ -1,9 +1,13 @@
 """Garden step for Ember's Yearly Electricity Data.
 
+NOTE: Some of the processing in this step could be simplified (it inherited some of the complexity from the previous
+version, where data needed to be combined with the European Electricity Review).
+
 """
+from typing import Dict
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, utils
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -282,6 +286,76 @@ def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_
     return table
 
 
+def combine_yearly_electricity_data(tables: Dict[str, Table]) -> Table:
+    """Combine all tables in Ember's Yearly Electricity Data into one table.
+
+    Parameters
+    ----------
+    tables : List[Table]
+        Yearly Electricity data (containing tables for capacity, electricity demand, generation, imports and
+        emissions).
+
+    Returns
+    -------
+    tb_combined : Table
+        Combined table containing all data in the Yearly Electricity dataset.
+
+    """
+    category_renaming = {
+        "capacity": "Capacity - ",
+        "electricity_demand": "",
+        "electricity_generation": "Generation - ",
+        "electricity_imports": "",
+        "power_sector_emissions": "Emissions - ",
+    }
+    error = "Tables in yearly electricity dataset have changed"
+    assert set(category_renaming) == set(tables), error
+    index_columns = ["country", "year"]
+    for table_name in list(tables):
+        tables[table_name] = (
+            tables[table_name]
+            .reset_index()
+            .rename(
+                columns={
+                    column: utils.underscore(category_renaming[table_name] + column)
+                    for column in tables[table_name].columns
+                    if column not in index_columns
+                },
+                errors="raise",
+            )
+        )
+
+    # Merge all tables into one, with an appropriate short name.
+    tb_combined = pr.multi_merge(list(tables.values()), on=index_columns, how="outer", short_name=paths.short_name)  # type: ignore
+
+    # Rename certain columns for consistency.
+    tb_combined = tb_combined.rename(
+        columns={
+            "net_imports__twh": "imports__total_net_imports__twh",
+            "demand__twh": "demand__total_demand__twh",
+            "demand_per_capita__kwh": "demand__total_demand_per_capita__kwh",
+        },
+        errors="raise",
+    )
+
+    # Sanity check.
+    error = "Total generation column in emissions and generation tables are not identical."
+    assert all(
+        tb_combined["emissions__total_generation__twh"].fillna(-1)
+        == tb_combined["generation__total_generation__twh"].fillna(-1)
+    ), error
+
+    # Remove unnecessary columns and any possible rows with no data.
+    tb_combined = tb_combined.drop(columns=["population", "emissions__total_generation__twh"], errors="raise").dropna(
+        how="all"
+    )
+
+    # Set a convenient index and sort rows and columns conveniently.
+    tb_combined = tb_combined.format(sort_columns=True)
+
+    return tb_combined
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -355,9 +429,12 @@ def run(dest_dir: str) -> None:
                 tables[table_name].loc[(region, latest_year), column] = None
     ####################################################################################################################
 
+    # Combine all tables into one.
+    tb_combined = combine_yearly_electricity_data(tables=tables)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=tables.values(), check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
     ds_garden.save()

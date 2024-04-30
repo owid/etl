@@ -1,5 +1,5 @@
-"""Garden step that combines EI's statistical review with Ember's combined electricity data (combination of the European
-Electricity Review and the Yearly Electricity Data) to create the Electricity Mix (EI & Ember) dataset.
+"""Garden step that combines EI's statistical review with Ember's yearly electricity data to create the Electricity Mix
+(EI & Ember) dataset.
 
 """
 
@@ -100,17 +100,17 @@ def process_statistical_review_data(tb_review: Table) -> Table:
 
 
 def process_ember_data(tb_ember: Table) -> Table:
-    """Load necessary columns from the Combined Electricity dataset and prepare a table with the required variables.
+    """Load necessary columns from the Yearly Electricity dataset and prepare a table with the required variables.
 
     Parameters
     ----------
     table_ember : Table
-        Combined Electricity (combination of Ember's Yearly Electricity Data and European Electricity Review).
+        Yearly Electricity Data.
 
     Returns
     -------
     df_ember : Table
-        Processed Combined Electricity data.
+        Processed Yearly Electricity data.
 
     """
     # Columns to load from Ember dataset.
@@ -160,7 +160,7 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
     Parameters
     ----------
     combined : Table
-        Combination of EI's Statistical Review and Ember's Combined Electricity.
+        Combination of EI's Statistical Review and Ember's Yearly Electricity Data.
     ds_population: Dataset
         Population dataset.
 
@@ -213,7 +213,7 @@ def add_share_variables(combined: Table) -> Table:
     Parameters
     ----------
     combined : Table
-        Combination of EI's Statistical Review and Ember's Combined Electricity.
+        Combination of EI's Statistical Review and Ember's Yearly Electricity Data.
 
     Returns
     -------
@@ -337,9 +337,9 @@ def run(dest_dir: str) -> None:
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
-    # Load Ember's combined electricity dataset and read its main table.
-    ds_ember = paths.load_dataset("combined_electricity")
-    tb_ember = ds_ember["combined_electricity"]
+    # Load Ember's yearly electricity dataset and read its main table.
+    ds_ember = paths.load_dataset("yearly_electricity")
+    tb_ember = ds_ember["yearly_electricity"]
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -391,11 +391,8 @@ def run(dest_dir: str) -> None:
     # Add "share" variables.
     combined = add_share_variables(combined=combined)
 
-    # Set an appropriate index and sort rows and columns conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    # Update table's short name.
-    combined.metadata.short_name = paths.short_name
+    # Format table conveniently.
+    combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
     #
     # Save outputs.

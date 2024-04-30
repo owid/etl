@@ -24,6 +24,8 @@ tables:
         unit: 2021 US$ per Watt
         description_key:
           - IRENA presents solar PV module price series for a number of different module technologies. Here we use the series for thin film a-Si/u-Si or Global Index (from Q4 2013).
+        presentation:
+          title_public: Solar photovoltaic module price
       cost_source:
         title: Source for each value of cost data
         unit: ''
@@ -31,6 +33,8 @@ tables:
         title: Solar photovoltaic cumulative capacity
         short_unit: MW
         unit: megawatts
+        presentation:
+          title_public: Solar photovoltaic cumulative capacity
       cumulative_capacity_source:
         title: Source for each value of cumulative capacity data
         unit: ''

@@ -234,6 +234,8 @@ tables:
         description_short: *description_short_pct_direct
         display:
           name: Modern biofuels
+        presentation:
+          title_public: Share of direct primary energy from biofuels
       biofuels__pct_of_substituted_energy:
         title: Biofuels (%, substituted energy)
         short_unit: "%"
