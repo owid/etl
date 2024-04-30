@@ -28,10 +28,10 @@ def load_wizard_config():  # -> Any:
         else:
             disable = props.get("disable", False)
             # Disable in *all* settings
-            if isinstance(bool, disable):
+            if isinstance(disable, bool):
                 return not disable
             # Disable in some settings
-            elif isinstance(dict, disable):
+            elif isinstance(disable, dict):
                 if ENV == "staging":
                     return not disable.get("staging", False)
                 if ENV == "production":
