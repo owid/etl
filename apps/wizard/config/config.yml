@@ -16,9 +16,10 @@
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
 # - emoji (str): Emoji to show in the sidebar menu.
-# - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all. Default is True.
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
-# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`. If it's not `staging` or `production`, the app will be disabled and overwrites the value of `enabled`.
+# - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
+#     bool: Whether the app is disabled in all settings.
+#     dict: Whether the app is disabled in certain settings. The key is the setting and the value is a boolean. Available settings (keys) are 'production', 'staging', 'dev'. 'dev' stands for local environments.
 
 # Main pages
 main:
@@ -45,25 +46,33 @@ etl:
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
       image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
-      disable_on_remote: True
+      disable:
+        "production": True
+        "staging": True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py
       emoji: "2️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-      disable_on_remote: True
+      disable:
+        "production": True
+        "staging": True
     garden:
       title: "Garden"
       entrypoint: etl_steps/garden.py
       emoji: "3️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-      disable_on_remote: True
+      disable:
+        "production": True
+        "staging": True
     grapher:
       title: "Grapher"
       entrypoint: etl_steps/grapher.py
       emoji: "4️⃣"
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-      disable_on_remote: True
+      disable:
+        "production": True
+        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -135,6 +144,8 @@ sections:
       maintainer: "@lucas"
       emoji: "🧬"
       image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+      disable:
+        production: True
     - title: "Chart Diff"
       alias: chart_diff
       entrypoint: pages/chart_diff/app.py
@@ -142,6 +153,8 @@ sections:
       maintainer: "@mojmir"
       emoji: "⚡"
       image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+      disable:
+        production: True
 
 
   - title: "Metadata"
@@ -155,7 +168,9 @@ sections:
         emoji: "🌟"
         alias: metagpt
         image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-        disable_on_remote: True
+        disable:
+          "production": True
+          "staging": True
       - title: "Meta Playground"
         alias: metaplay
         description: "How is metadata presented in data pages?"
@@ -163,7 +178,9 @@ sections:
         entrypoint: pages/metaplay.py
         emoji: "🏐"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-        disable_on_remote: True
+        disable:
+          "production": True
+          "staging": True
 
   - title: "Others"
     description: |-
