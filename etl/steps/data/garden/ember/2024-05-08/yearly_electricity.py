@@ -337,12 +337,8 @@ def run(dest_dir: str) -> None:
     }
 
     for table_name in tables:
-        # Set a table short name.
-        tables[table_name].metadata.short_name = table_name
-        # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
-        tables[table_name] = (
-            tables[table_name].underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-        )
+        # Prepare table's format.
+        tables[table_name] = tables[table_name].format(short_name=table_name)
 
     ####################################################################################################################
     # The data for many regions presents a big drop in the last year, simply because many countries are not informed.
@@ -356,7 +352,6 @@ def run(dest_dir: str) -> None:
         latest_year = tables[table_name].reset_index()["year"].max()
         for column in tables[table_name].columns:
             for region in geo.REGIONS:
-                # tables[table_name] = tables[table_name].copy()
                 tables[table_name].loc[(region, latest_year), column] = None
     ####################################################################################################################
 
@@ -364,7 +359,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables.values(), default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir, tables=tables.values(), check_variables_metadata=True)
     ds_garden.save()

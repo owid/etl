@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot.
+    # Load snapshot and read its data.
     snap = paths.load_snapshot("yearly_electricity.csv")
     tb = snap.read(underscore=True)
 

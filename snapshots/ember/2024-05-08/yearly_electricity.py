@@ -1,8 +1,7 @@
 """Ingest script for Ember's Yearly electricity data.
 
 Ember's recommendation is to use the Yearly electricity data by default (which is more regularly updated than the Global
-Electricity Review). However, some data from the European Electricity Review is missing in the current Yearly
-electricity data. That is why we currently combine both in the combined_electricity step.
+and European Electricity Reviews).
 
 """
 
@@ -15,6 +14,12 @@ from etl.snapshot import Snapshot
 # Version of current snapshot.
 SNAPSHOT_VERSION = pathlib.Path(__file__).parent.name
 
+########################################################################################################################
+# TODO: Temporarily using a local file. Fetch data directly using the yearly electricity data url after publication.
+#  The download url should still be the same:
+#  https://ember-climate.org/app/uploads/2022/07/yearly_full_release_long_format.csv
+########################################################################################################################
+
 
 @click.command()
 @click.option(
@@ -23,10 +28,10 @@ SNAPSHOT_VERSION = pathlib.Path(__file__).parent.name
     type=bool,
     help="Upload Snapshot",
 )
-def main(upload: bool) -> None:
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def main(path_to_file: str, upload: bool) -> None:
     snap = Snapshot(f"ember/{SNAPSHOT_VERSION}/yearly_electricity.csv")
-    snap.download_from_source()
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(upload=upload, filename=path_to_file)
 
 
 if __name__ == "__main__":
