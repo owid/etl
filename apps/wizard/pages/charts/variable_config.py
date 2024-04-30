@@ -61,8 +61,8 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
     else:
         match_identical_vars = search_form.map_identical_variables
     mapping, missing_old, missing_new = preliminary_mapping(
-        old_variables=old_variables,
-        new_variables=new_variables,
+        old_indicators=old_variables,
+        new_indicators=new_variables,
         match_identical=match_identical_vars,
     )
     if not mapping.empty:
@@ -457,7 +457,7 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
 
 
 def reset_variable_form() -> None:
-    """ "Reset variable form."""
+    """Reset variable form."""
     # Create dictionary with checkboxes set to False
     checks = {
         str(k): False

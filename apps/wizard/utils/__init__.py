@@ -11,6 +11,7 @@ TODO: Should probably re-order this file and split it into multiple files.
 """
 import argparse
 import datetime as dt
+import json
 import os
 import re
 import sys
@@ -19,6 +20,7 @@ from typing import Any, Callable, Dict, List, Optional, cast
 
 import bugsnag
 import streamlit as st
+import streamlit.components.v1 as components
 from MySQLdb import OperationalError
 from owid.catalog import Dataset
 from structlog import get_logger
@@ -517,7 +519,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -525,7 +527,10 @@ def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        st.session_state[key] = value
+        if only_if_not_exists:
+            st.session_state[key] = st.session_state.get(key, value)
+        else:
+            st.session_state[key] = value
 
 
 def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
@@ -585,3 +590,37 @@ def enable_bugsnag_for_streamlit():
         return original_handler(exception)
 
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
+
+
+def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
+    chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
+    chart_config["adminBaseUrl"] = f"http://{base_url}"
+
+    HTML = f"""
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link
+            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+            rel="stylesheet"
+            />
+            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+        </head>
+        <body class="StandaloneGrapherOrExplorerPage">
+            <main>
+                <figure data-grapher-src></figure>
+            </main>
+            <div class="site-tools"></div>
+            <script>
+                document.cookie = "isAdmin=true;max-age=31536000"
+            </script>
+            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+            <script type="module">
+                var jsonConfig = {json.dumps(chart_config)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            </script>
+        </body>
+    </html>
+    """
+
+    components.html(HTML, height=height, **kwargs)
