@@ -38,7 +38,7 @@ def get_grapher_thumbnail(grapher_url: str) -> str:
 
 
 # PROMPT
-prompt = """This is a chart from Our World In Data.
+default_prompt = """This is a chart from Our World In Data.
 
 I'd like you to write a data insight for me. Data insights are a short format that explains the main point of a chart. They are usually a title sentence and then three concise paragraphs that are written in a way that is easy to understand for a general audience.
 
@@ -75,6 +75,12 @@ grapher_url = st.text_input(
     help="Introduce the URL to a Grapher URL. Query parameters work!",
     key="url",
 )
+with st.expander("Edit the prompt"):
+    prompt = st.text_area(
+        label="Prompt",
+        value=default_prompt,
+        key="prompt",
+    )
 confirmed = st.button("Generate insight")
 
 # Action if user clicks on 'generate'
