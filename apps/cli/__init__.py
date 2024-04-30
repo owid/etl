@@ -2,6 +2,7 @@
 
 If you want to add a new service, make sure to add it to the `GROUPS` list. If it is part of a subgroup, add it to the corresponding subgroup in the  `SUBGROUPS` list.
 """
+
 import importlib
 
 import rich_click as click
@@ -180,6 +181,12 @@ GROUPS = (
                 "chart-sync": "apps.staging_sync.cli.cli",
                 "chart-gpt": "etl.chart_revision.v2.chartgpt.cli",
                 "chart-upgrade": "etl.chart_revision.cli.main_cli",
+            },
+        },
+        {
+            "name": "Owidbot",
+            "commands": {
+                "owidbot": "apps.owidbot.cli.cli",
             },
         },
     ]
