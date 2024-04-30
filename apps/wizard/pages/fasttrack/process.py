@@ -49,16 +49,6 @@ def processing_part_1(import_method, dataset_uris, infer_metadata, is_private, _
     if infer_metadata:
         st.write("Inferring metadata...")
         data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
-        # add unknown source if we have neither sources nor origins
-        if not dataset_meta.sources and not origin:
-            dataset_meta.sources = [
-                Source(
-                    name="Unknown",
-                    published_by="Unknown",
-                    publication_year=dt.date.today().year,
-                    date_accessed=str(dt.date.today()),
-                )
-            ]
 
     # VALIDATION
     st.write("Validating data and metadata...")
