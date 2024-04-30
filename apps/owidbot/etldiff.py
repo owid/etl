@@ -68,27 +68,27 @@ def cli(
     # - **Site-screenshots**: https://github.com/owid/site-screenshots/compare/{nbranch}
 
     body = f"""
-<b>Staging server</b>:
+<b>Quick links (staging server)</b>:
 
-- **Admin**: http://{container_name}/admin/login
-- **Site**: http://{container_name}/
-- **Login**: `ssh owid@{container_name}`
+[Site](http://{container_name}/) | [Admin](http://{container_name}/admin/login) | [Wizard](http://{container_name}/etl/wizard/)
+|--------------------------------|---|---|
+
+**Login**: `ssh owid@{container_name}`
 
 <details>
-<summary><b>Chart diff</b>: </summary>
-{chart_diff}
-[Details](http://{container_name}/etl/wizard/Chart%20Diff)
+    <summary><b>Chart diff</b>: </summary>
+    {chart_diff}
+    <a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a
 </details>
 
 <details>
+    <summary><b>etl diff</b>: {data_diff_summary}</summary>
 
-<summary><b>etl diff</b>: {data_diff_summary}</summary>
+    ```diff
+    {data_diff}
+    ```
 
-```diff
-{data_diff}
-```
-
-Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
+    Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
@@ -235,8 +235,11 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     modified = df[~df.is_new]
 
     return f"""
-- {len(new)} new charts ({new.approved.sum()} approved)
-- {len(modified)} modified charts ({modified.approved.sum()} approved)
+<ul>
+    <li>{len(new)} new charts ({new.approved.sum()} approved)</li>
+    <li>{len(modified)} modified charts ({modified.approved.sum()} approved)</li>
+    <li>Item 3</li>
+</ul>
     """.strip()
 
 
