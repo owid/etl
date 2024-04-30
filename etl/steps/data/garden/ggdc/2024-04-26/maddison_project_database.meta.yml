@@ -188,7 +188,7 @@ tables:
           attribution_short: Maddison Project Database
 
       region:
-        title: Maddison Project Database Region
+        title: Maddison Project Database region
         unit: ""
         short_unit: ""
         description_short: "Regions as defined by the Maddison Project Database."
