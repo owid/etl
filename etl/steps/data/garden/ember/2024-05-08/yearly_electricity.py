@@ -445,21 +445,15 @@ def run(dest_dir: str) -> None:
         "renewables__twh"
     ]
     assert 100 * (renewables_lmic_2000 - renewables_lmic_1999) / renewables_lmic_1999 > 1000, error
-    affected_regions = [
-        "Africa",
-        "Asia",
-        "North America",
-        "South America",
-        "Low-income countries",
-        "Lower-middle-income countries",
-        "Upper-middle-income countries",
-        "High-income countries",
-        "Oceania",
-    ]
+    # We could still create European aggregates. However, certain European countries are also missing data
+    # (namely Albania and Iceland).
+    # In principle, we could keep the aggregate of EU27 (since it's not affected), but, under these circumstances,
+    # it seems safer to simply relay on the Statistical Review aggregates prior to 2000.
+    # Therefore, we make nan all aggregate data in all yearly electricity tables prior to 2000.
     for table_name in tables:
         for column in tables[table_name].columns:
             tables[table_name][
-                (tables[table_name].index.get_level_values(0).isin(affected_regions))
+                (tables[table_name].index.get_level_values(0).isin(geo.REGIONS))
                 & (tables[table_name].index.get_level_values(1) < 2000)
             ] = None
     ####################################################################################################################
