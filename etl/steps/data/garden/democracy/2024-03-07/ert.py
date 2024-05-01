@@ -44,14 +44,26 @@ def run(dest_dir: str) -> None:
     column = "regime_ert"
     assert set(tb["dem_ep"]) == {0, 1}, "`dem_ep` must only contain values {0,1}"
     assert set(tb["aut_ep"]) == {0, 1}, "`aut_ep` must only contain values {0,1}"
-    tb.loc[(tb["regime_dich_ert"] == 0) & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 0), column] = "hardening autocracy"
-    tb.loc[(tb["regime_dich_ert"] == 0) & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 0), column] = "stable autocracy"
-    tb.loc[(tb["regime_dich_ert"] == 0) & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 1), column] = "liberalizing autocracy"
-    tb.loc[(tb["regime_dich_ert"] == 1) & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 0), column] = "eroding democracy"
-    tb.loc[(tb["regime_dich_ert"] == 1) & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 0), column] = "stable democracy"
-    tb.loc[(tb["regime_dich_ert"] == 1) & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 1), column] = "deepening democracy"
-    tb.loc[(tb["regime_dich_ert"] == 0) & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 1), column] = float("nan")
-    tb.loc[(tb["regime_dich_ert"] == 1) & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 1), column] = float("nan")
+    tb.loc[
+        (tb["regime_dich_ert"] == "autocracy") & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 0), column
+    ] = "hardening autocracy"
+    tb.loc[
+        (tb["regime_dich_ert"] == "autocracy") & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 0), column
+    ] = "stable autocracy"
+    tb.loc[
+        (tb["regime_dich_ert"] == "autocracy") & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 1), column
+    ] = "liberalizing autocracy"
+    tb.loc[
+        (tb["regime_dich_ert"] == "democracy") & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 0), column
+    ] = "eroding democracy"
+    tb.loc[
+        (tb["regime_dich_ert"] == "democracy") & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 0), column
+    ] = "stable democracy"
+    tb.loc[
+        (tb["regime_dich_ert"] == "democracy") & (tb["aut_ep"] == 0) & (tb["dem_ep"] == 1), column
+    ] = "deepening democracy"
+    tb.loc[(tb["regime_dich_ert"] == "autocracy") & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 1), column] = float("nan")
+    tb.loc[(tb["regime_dich_ert"] == "democracy") & (tb["aut_ep"] == 1) & (tb["dem_ep"] == 1), column] = float("nan")
     tb[column] = tb[column].copy_metadata(tb["regime_dich_ert"])
 
     # Add regime_trich_ert
