@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -116,3 +116,109 @@ def add_population_in_dummies(
         tb[col].metadata = meta[col]
 
     return tb
+
+
+def make_table_with_dummies(tb: Table, indicators: List[Dict[str, Any]]) -> Table:
+    """Format table to have dummy indicators.
+
+    From a table with categorical indicators, create a new table with dummy indicator for each indicator-category pair.
+
+    Example input:
+
+    | year | country |  regime   | regime_amb |
+    |------|---------|-----------|------------|
+    | 2000 |   USA   |     1     |      0     |
+    | 2000 |   CAN   |     0     |      1     |
+    | 2000 |   DEU   |    NaN    |      NaN   |
+
+
+    Example output:
+
+    | year | country | regime_0 | regime_1 | regime_-1 | regime_amb_0 | regime_amb_0 | regime_amb_-1 |
+    |------|---------|----------|----------|-----------|--------------|--------------|---------------|
+    | 2000 |   USA   |    0     |    1     |     0     |      1       |      0       |       0       |
+    | 2000 |   CAN   |    1     |    0     |     0     |      0       |      1       |       0       |
+    | 2000 |   DEU   |    0     |    0     |     1     |      0       |      0       |       1       |
+
+    Note that '-1' denotes NA (missing value) category.
+
+    The argument `indicators` contains the indicators for which we will create dummies, along with other associated paramters. Example:
+
+    {
+        "name": "regime_amb_row_owid",
+        "name_new": "num_countries_regime_amb",
+        # "values_expected": set(map(str, range(10))),
+        "values_expected": {
+            "0": "closed autocracy",
+            "1": "closed (maybe electoral) autocracy",
+            "2": "electoral (maybe closed) autocracy",
+            "3": "electoral autocracy",
+            "4": "electoral autocracy (maybe electoral democracy)",
+            "5": "electoral democracy (maybe electoral autocracy)",
+            "6": "electoral democracy",
+            "7": "electoral democracy (maybe liberal democracy)",
+            "8": "liberal democracy (maybe electoral democracy)",
+            "9": "liberal democracy",
+        },
+        "has_na": True,
+    }
+    """
+    tb_ = tb.copy()
+
+    # Convert to string
+    indicator_names = [indicator["name"] for indicator in indicators]
+    tb_[indicator_names] = tb_[indicator_names].astype("string")
+
+    # Sanity check that the categories for each indicator are as expected
+    for indicator in indicators:
+        values_expected = indicator["values_expected"]
+        # Check and fix NA (convert NAs to -1 category)
+        if indicator["has_na"]:
+            # Assert that there are actually NaNs
+            assert tb_[indicator["name"]].isna().any(), "No NA found!"
+            # If NA, we should not have category '-1', otherwise these would get merged!
+            assert "-1" not in set(
+                tb_[indicator["name"]].unique()
+            ), f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
+            tb_[indicator["name"]] = tb_[indicator["name"]].fillna("-1")
+            # Add '-1' as a possible category
+            if isinstance(values_expected, dict):
+                indicator["values_expected"]["-1"] = "-1"
+            else:
+                values_expected |= {"-1"}
+        else:
+            assert not tb_[indicator["name"]].isna().any(), "NA found!"
+
+        values_found = set(tb_[indicator["name"]].unique())
+        assert values_found == set(
+            values_expected
+        ), f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
+
+        # Rename dimension values
+        if isinstance(values_expected, dict):
+            tb_[indicator["name"]] = tb_[indicator["name"]].map(indicator["values_expected"])
+
+    ## Rename columns
+    tb_ = tb_.rename(columns={indicator["name"]: indicator["name_new"] for indicator in indicators})
+    indicator_names = [indicator["name_new"] for indicator in indicators]
+
+    ## Get dummy indicator table
+    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int))
+
+    ## Add missing metadata to dummy indicators
+    dummy_cols = []
+    for indicator in indicators:
+        ## get list of dummy indicator column names
+        if isinstance(indicator["values_expected"], dict):
+            dummy_columns = [f"{indicator['name_new']}_{v}" for v in indicator["values_expected"].values()]
+        else:
+            dummy_columns = [f"{indicator['name_new']}_{v}" for v in indicator["values_expected"]]
+        ## assign metadata to dummy column indicators
+        for col in dummy_columns:
+            tb_[col].metadata = tb[indicator["name"]].metadata
+        dummy_cols.extend(dummy_columns)
+
+    ### Select subset of columns
+    tb_ = tb_.loc[:, ["year", "country"] + dummy_cols]
+
+    return tb_
