@@ -131,8 +131,7 @@ def add_annual_change(tb: Table) -> Table:
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
     for cat in ("Coal", "Oil", "Gas"):
         combined[f"Annual change in {cat.lower()} production (%)"] = (
-            combined.groupby("country", observed=True)[f"{cat} production (TWh)"].ffill().pct_change(fill_method=None)
-            * 100
+            combined.groupby("country", observed=True)[f"{cat} production (TWh)"].pct_change(fill_method=None) * 100
         )
         combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby("country", observed=True)[
             f"{cat} production (TWh)"

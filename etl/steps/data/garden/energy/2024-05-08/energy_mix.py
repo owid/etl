@@ -289,8 +289,7 @@ def calculate_primary_energy_annual_change(
     for source in ONLY_DIRECT_ENERGY:
         # Create column for source percentage growth as a function of direct primary energy.
         primary_energy[f"{source} (% growth)"] = (
-            primary_energy.groupby("country", observed=True)[f"{source} (TWh)"].ffill().pct_change(fill_method=None)
-            * 100
+            primary_energy.groupby("country", observed=True)[f"{source} (TWh)"].pct_change(fill_method=None) * 100
         )
 
         # Create column for source absolute growth as a function of direct primary energy.
@@ -302,9 +301,7 @@ def calculate_primary_energy_annual_change(
         # Create column for source percentage growth as a function of primary energy
         # (as a percentage, it is irrelevant whether it is direct or equivalent).
         primary_energy[f"{source} (% growth)"] = (
-            primary_energy.groupby("country", observed=True)[f"{source} (TWh - direct)"]
-            .ffill()
-            .pct_change(fill_method=None)
+            primary_energy.groupby("country", observed=True)[f"{source} (TWh - direct)"].pct_change(fill_method=None)
             * 100
         )
 
