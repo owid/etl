@@ -18,11 +18,51 @@ tables:
       regime_ert:
         title: Political regime
         unit: ""
+        description_short: |-
+          Political regime of a country using the classification by the Episodes of Regime Transformation-project. It distinguishes between hardening autocracies (score 0), stable autocracies (score 1), liberalizing autocracies (score 2), eroding democracies (score 3), stable democracies (score 4), and deepening democracies (score 5).
+        presentation:
+          grapher_config:
+            subtitle: |-
+              Based on the [classification](#dod:regimes-episodes-regime-transformation-expanded) by Episodes of Regime Transformation and the estimates by [V-Dem](#dod:v-dem)'s experts.
+            note: |-
+              Numeric values range from 0 for hardening autocracies to 5 for deepening democracies.
+            hasMapTab: true
+            tab: map
+            selectedFacetStrategy: entity
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: RdBu
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                customNumericLabels:
+                  - Hardening autocracy
+                  - Stable autocracy
+                  - Liberalizing autocracy
+                  - Eroding democracy
+                  - Stable democracy
+                  - Deepening democracy
+                customNumericColors:
+                  - "#d7191c"
+                  - "#bc8e5a"
       regime_dich_ert:
         title: Political regime (dichotomous)
         unit: ""
       regime_trich_ert:
         title: Political regime (trichotomous)
+        unit: ""
+      regime_trep_outcome_ert:
+        title: Political regime (transition outcome)
         unit: ""
       dem_ep:
         title: dem_ep
@@ -30,16 +70,3 @@ tables:
       aut_ep:
         title: aut_ep
         unit: ""
-      dem_ep_outcome:
-        title: dem_ep_outcome
-        unit: ""
-      dem_ep_end_year:
-        title: dem_ep_end_year
-        unit: ""
-      aut_ep_outcome:
-        title: aut_ep_outcome
-        unit: ""
-      aut_ep_end_year:
-        title: aut_ep_end_year
-        unit: ""
-
