@@ -3,8 +3,51 @@ from typing import Any, Callable, Dict, List, Optional, cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.processing import concat
 
 from etl.data_helpers import geo
+
+SEPARATOR = "."
+# REGION AGGREGATES
+REGIONS = {
+    "Africa": {
+        "additional_members": [
+            "Somaliland",
+            "Zanzibar",
+        ]
+    },
+    "Asia": {
+        "additional_members": [
+            "Palestine/Gaza",
+            "Palestine/West Bank",
+        ]
+    },
+    "North America": {},
+    "South America": {},
+    "Europe": {
+        "additional_members": [
+            "Baden",
+            "Bavaria",
+            "Brunswick",
+            "Duchy of Nassau",
+            "Hamburg",
+            "Hanover",
+            "Hesse Electoral",
+            "Hesse Grand Ducal",
+            "Mecklenburg Schwerin",
+            "Modena",
+            "Oldenburg",
+            "Parma",
+            "Piedmont-Sardinia",
+            "Saxe-Weimar-Eisenach",
+            "Saxony",
+            "Tuscany",
+            "Two Sicilies",
+            "Wurttemberg",
+        ]
+    },
+    "Oceania": {},
+}
 
 
 def from_wide_to_long(
@@ -12,6 +55,7 @@ def from_wide_to_long(
     indicator_name_callback: Optional[Callable] = None,
     indicator_category_callback: Optional[Callable] = None,
     column_dimension_name: str = "category",
+    separator: str = SEPARATOR,
 ) -> Table:
     """Format a particular shape of table from wide to long format.
 
@@ -33,38 +77,42 @@ def from_wide_to_long(
     | 2000 | USA     | category_1 |      1      |       3     |
     | 2000 | USA     | category_2 |      2      |       4     |
     """
+    tb_ = tb.copy()
+
     # Melt the DataFrame to long format
-    tb = tb.melt(id_vars=["year", "country"], var_name="indicator_type", value_name="value")
+    tb_ = tb_.melt(id_vars=["year", "country"], var_name="indicator_type", value_name="value")
 
     # Get callables
     if indicator_name_callback is None:
 
         def default_indicator_name(x):
-            return "_".join(x.split("_")[:-1])
+            assert len(x.split(separator)) == 2
+            return x.split(separator)[0]
 
         indicator_name_callback = default_indicator_name
 
     if indicator_category_callback is None:
 
         def default_indicator_category(x):
-            return x.split("_")[-1]
+            assert len(x.split(separator)) == 2
+            return x.split(separator)[-1]
 
         indicator_category_callback = default_indicator_category
 
     # Extract indicator names and types
-    tb["indicator"] = tb["indicator_type"].apply(indicator_name_callback)
-    tb[column_dimension_name] = tb["indicator_type"].apply(indicator_category_callback)
+    tb_["indicator"] = tb_["indicator_type"].apply(indicator_name_callback)
+    tb_[column_dimension_name] = tb_["indicator_type"].apply(indicator_category_callback)
 
     # Drop the original 'indicator_type' column as it's no longer needed
-    tb.drop("indicator_type", axis=1, inplace=True)
+    tb_.drop("indicator_type", axis=1, inplace=True)
 
     # Pivot the table to get 'indicator_a' and 'indicator_b' as separate columns
-    tb = tb.pivot(index=["year", "country", column_dimension_name], columns="indicator", values="value").reset_index()
+    tb_ = tb_.pivot(index=["year", "country", column_dimension_name], columns="indicator", values="value").reset_index()
 
     # Rename the columns to match your requirements
-    tb.columns.name = None  # Remove the hierarchy
+    tb_.columns.name = None  # Remove the hierarchy
 
-    return tb
+    return tb_
 
 
 def expand_observations(tb: Table) -> Table:
@@ -118,7 +166,11 @@ def add_population_in_dummies(
     return tb
 
 
-def make_table_with_dummies(tb: Table, indicators: List[Dict[str, Any]]) -> Table:
+def make_table_with_dummies(
+    tb: Table,
+    indicators: List[Dict[str, Any]],
+    separator: str = SEPARATOR,
+) -> Table:
     """Format table to have dummy indicators.
 
     From a table with categorical indicators, create a new table with dummy indicator for each indicator-category pair.
@@ -134,7 +186,7 @@ def make_table_with_dummies(tb: Table, indicators: List[Dict[str, Any]]) -> Tabl
 
     Example output:
 
-    | year | country | regime_0 | regime_1 | regime_-1 | regime_amb_0 | regime_amb_0 | regime_amb_-1 |
+    | year | country | regime.0 | regime.1 | regime.-1 | regime_amb.0 | regime_amb.0 | regime_amb.-1 |
     |------|---------|----------|----------|-----------|--------------|--------------|---------------|
     | 2000 |   USA   |    0     |    1     |     0     |      1       |      0       |       0       |
     | 2000 |   CAN   |    1     |    0     |     0     |      0       |      1       |       0       |
@@ -199,20 +251,23 @@ def make_table_with_dummies(tb: Table, indicators: List[Dict[str, Any]]) -> Tabl
             tb_[indicator["name"]] = tb_[indicator["name"]].map(indicator["values_expected"])
 
     ## Rename columns
-    tb_ = tb_.rename(columns={indicator["name"]: indicator["name_new"] for indicator in indicators})
-    indicator_names = [indicator["name_new"] for indicator in indicators]
+    tb_ = tb_.rename(
+        columns={indicator["name"]: indicator.get("name_new", indicator["name"]) for indicator in indicators}
+    )
+    indicator_names = [indicator.get("name_new", indicator["name"]) for indicator in indicators]
 
     ## Get dummy indicator table
-    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int))
+    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int, prefix_sep=separator))
 
     ## Add missing metadata to dummy indicators
     dummy_cols = []
     for indicator in indicators:
+        name_new = indicator.get("name_new", indicator["name"])
         ## get list of dummy indicator column names
         if isinstance(indicator["values_expected"], dict):
-            dummy_columns = [f"{indicator['name_new']}_{v}" for v in indicator["values_expected"].values()]
+            dummy_columns = [f"{name_new}{separator}{v}" for v in indicator["values_expected"].values()]
         else:
-            dummy_columns = [f"{indicator['name_new']}_{v}" for v in indicator["values_expected"]]
+            dummy_columns = [f"{name_new}{separator}{v}" for v in indicator["values_expected"]]
         ## assign metadata to dummy column indicators
         for col in dummy_columns:
             tb_[col].metadata = tb[indicator["name"]].metadata
@@ -222,3 +277,40 @@ def make_table_with_dummies(tb: Table, indicators: List[Dict[str, Any]]) -> Tabl
     tb_ = tb_.loc[:, ["year", "country"] + dummy_cols]
 
     return tb_
+
+
+def add_regions_and_global_aggregates(
+    tb: Table,
+    ds_regions: Dataset,
+    regions: Optional[Dict[str, Any]] = None,
+    aggregations: Optional[Dict[str, str]] = None,
+    min_num_values_per_year: Optional[int] = None,
+    aggregations_world: Optional[Dict[str, str]] = None,
+    short_name: str = "region_counts",
+) -> Table:
+    """Add regions, and world aggregates."""
+    # Copy
+    tb_ = tb.copy()
+
+    # Regions considered
+    if regions is None:
+        regions = REGIONS
+
+    # Add regions
+    tb_regions = geo.add_regions_to_table(
+        tb_.copy(),
+        ds_regions,
+        regions=regions,
+        aggregations=aggregations,
+        min_num_values_per_year=min_num_values_per_year,
+    )
+    tb_regions = tb_regions.loc[tb_regions["country"].isin(regions.keys())]
+
+    # Add world
+    if aggregations_world is None:
+        tb_world = tb.groupby("year", as_index=False).sum(numeric_only=True, min_count=1).assign(country="World")
+    else:
+        tb_world = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
+    tb = concat([tb_regions, tb_world], ignore_index=True, short_name="region_counts")
+
+    return tb

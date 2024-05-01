@@ -64,3 +64,26 @@ tables:
       regime_trep_outcome_ert:
         title: Political regime (transition outcome)
         unit: ""
+
+  region_aggregates:
+    variables:
+      num_regime_ert:
+        title: "Number of countries in regime"
+        unit: ""
+        description_short: |-
+          Number of countries under certain regime.
+      num_regime_trich_ert:
+        title: "Number of countries in regime (trich)"
+        unit: ""
+        description_short: |-
+          Number of countries under certain regime (trich).
+      pop_regime_ert:
+        title: "People living in regime"
+        unit: ""
+        description_short: |-
+          People living in countries under certain regime.
+      pop_regime_trich_ert:
+        title: "People living in regime (trich)"
+        unit: ""
+        description_short: |-
+          People living in countries under certain regime (trich).

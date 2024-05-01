@@ -18,9 +18,13 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-03-07/vdem:
     - data://garden/democracy/2024-03-07/vdem
+
+  # Episodes of Regime Transition (2024)
   data://meadow/democracy/2024-05-01/ert:
     - snapshot://democracy/2024-05-01/ert.csv
   data://garden/democracy/2024-03-07/ert:
     - data://meadow/democracy/2024-05-01/ert
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-01/ert:
     - data://garden/democracy/2024-03-07/ert
