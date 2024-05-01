@@ -445,20 +445,23 @@ def run(dest_dir: str) -> None:
         "renewables__twh"
     ]
     assert 100 * (renewables_lmic_2000 - renewables_lmic_1999) / renewables_lmic_1999 > 1000, error
+    affected_regions = [
+        "Africa",
+        "Asia",
+        "North America",
+        "South America",
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+        "High-income countries",
+        "Oceania",
+    ]
     for table_name in tables:
         for column in tables[table_name].columns:
-            for region in [
-                "Africa",
-                "Asia",
-                "North America",
-                "South America",
-                "Low-income countries",
-                "Lower-middle-income countries",
-                "Upper-middle-income countries",
-                "High-income countries",
-                "Oceania",
-            ]:
-                tables[table_name][tables[table_name].index.get_level_values(1) < 2000] = None
+            tables[table_name][
+                (tables[table_name].index.get_level_values(0).isin(affected_regions))
+                & (tables[table_name].index.get_level_values(1) < 2000)
+            ] = None
     ####################################################################################################################
 
     # Combine all tables into one.
