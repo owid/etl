@@ -89,6 +89,9 @@ def run(dest_dir: str) -> None:
     # NOTE: It would be better to do this in garden.
     tb_regions.metadata.title = "Definitions of world regions"
 
+    # Format table conveniently.
+    tb_regions = tb_regions.format()
+
     #
     # Save outputs.
     #
