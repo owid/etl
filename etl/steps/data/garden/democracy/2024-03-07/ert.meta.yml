@@ -68,22 +68,14 @@ tables:
   region_aggregates:
     variables:
       num_regime_ert:
-        title: "Number of countries in regime"
-        unit: ""
-        description_short: |-
-          Number of countries under certain regime.
+        title: Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
+        unit: "countries"
       num_regime_trich_ert:
-        title: "Number of countries in regime (trich)"
-        unit: ""
-        description_short: |-
-          Number of countries under certain regime (trich).
+        title: Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >> (trich)
+        unit: "countries"
       pop_regime_ert:
-        title: "People living in regime"
-        unit: ""
-        description_short: |-
-          People living in countries under certain regime.
+        title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
+        unit: "people"
       pop_regime_trich_ert:
-        title: "People living in regime (trich)"
-        unit: ""
-        description_short: |-
-          People living in countries under certain regime (trich).
+        title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >> (trich)
+        unit: "people"
