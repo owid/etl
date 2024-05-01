@@ -33,6 +33,18 @@ def run(dest_dir: str) -> None:
     # Add regime_ert
     tb = add_regime_indicators(tb)
 
+    # Drop columns
+    tb = tb.drop(
+        columns=[
+            "aut_ep_end_year",
+            "dem_ep_end_year",
+            "dem_ep_outcome",
+            "aut_ep_outcome",
+            "dem_ep",
+            "aut_ep",
+        ]
+    )
+
     # Harmonize country names
     tb = geo.harmonize_countries(
         df=tb,
@@ -105,9 +117,6 @@ def add_regime_indicators(tb: Table) -> Table:
 
     choices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     tb["regime_trep_outcome_ert"] = np.select(conditions, choices, default=np.nan)
-
-    # Drop unused columns
-    tb = tb.drop(columns=["aut_ep_end_year", "dem_ep_end_year", "dem_ep_outcome", "aut_ep_outcome"])
 
     # Copy metadata from original indicator `regime_dich_ert`
     for column in ["regime_ert", "regime_trich_ert", "regime_trep_outcome_ert"]:

@@ -64,9 +64,3 @@ tables:
       regime_trep_outcome_ert:
         title: Political regime (transition outcome)
         unit: ""
-      dem_ep:
-        title: dem_ep
-        unit: ""
-      aut_ep:
-        title: aut_ep
-        unit: ""
