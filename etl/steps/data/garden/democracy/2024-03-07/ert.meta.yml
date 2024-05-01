@@ -73,9 +73,15 @@ tables:
       num_regime_trich_ert:
         title: Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >> (trich)
         unit: "countries"
+        display:
+          name: |-
+            Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
       pop_regime_ert:
         title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
         unit: "people"
       pop_regime_trich_ert:
         title: People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >> (trich)
         unit: "people"
+        display:
+          name: |-
+            People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('regime', 'regimes') >>
