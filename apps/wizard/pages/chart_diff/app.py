@@ -125,7 +125,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
                 compare_charts(**kwargs_diff)
             with tab2:
                 assert diff.target_chart is not None
-                st_show_diff(diff.source_chart.config, diff.target_chart.config)
+                st_show_diff(diff.target_chart.config, diff.source_chart.config)
         elif diff.is_new:
             compare_charts(**kwargs_diff)
 
