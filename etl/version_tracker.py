@@ -434,7 +434,7 @@ class VersionTracker:
         if channel == "snapshot":
             path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
             path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
-        elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples"]:
+        elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
             path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
             path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
         elif channel == "walden":
