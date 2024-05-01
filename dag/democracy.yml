@@ -18,3 +18,7 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-03-07/vdem:
     - data://garden/democracy/2024-03-07/vdem
+  data://meadow/democracy/2024-05-01/ert:
+    - snapshot://democracy/2024-05-01/ert.csv
+  data://garden/democracy/2024-03-07/ert:
+    - data://meadow/democracy/2024-05-01/ert
