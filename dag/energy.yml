@@ -168,7 +168,7 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  data-private://garden/energy/2024-05-08/owid_energy:
+  data-private://garden/energy/latest/owid_energy:
     - data://garden/energy/2024-05-08/energy_mix
     - data://garden/energy/2024-05-08/fossil_fuel_production
     - data://garden/energy/2024-05-08/primary_energy_consumption
