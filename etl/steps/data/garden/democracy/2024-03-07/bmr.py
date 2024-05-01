@@ -576,7 +576,7 @@ def make_table_with_dummies(
         assert set(tb_[indicator["name"]]) == indicator["values_expected"]
 
     ## Get dummy indicator table
-    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names))
+    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int))
 
     ## Add missing metadata to dummy indicators
     dummy_cols = []
