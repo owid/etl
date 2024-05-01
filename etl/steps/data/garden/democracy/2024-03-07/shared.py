@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.processing import concat
+from owid.catalog.tables import concat
 
 from etl.data_helpers import geo
 

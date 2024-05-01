@@ -5,7 +5,7 @@ from typing import Dict, Optional, Tuple, cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.processing import concat
+from owid.catalog.tables import concat
 from shared import add_population_in_dummies, expand_observations, from_wide_to_long
 
 from etl.data_helpers import geo

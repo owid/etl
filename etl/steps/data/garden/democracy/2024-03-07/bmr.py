@@ -404,7 +404,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
 
     ## Long format
-    tb_ = from_wide_to_long(tb_, "_")
+    tb_ = from_wide_to_long(tb_)
 
     # Generate two columns (1: in democracy, 2: age of democracy)
     tb_num_countries, tb_num_countries_years_consec = split_into_two_tables(
