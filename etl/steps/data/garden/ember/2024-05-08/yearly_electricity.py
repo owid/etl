@@ -427,6 +427,38 @@ def run(dest_dir: str) -> None:
         for column in tables[table_name].columns:
             for region in geo.REGIONS:
                 tables[table_name].loc[(region, latest_year), column] = None
+
+    # Similarly, data prior to 2000 exists only for European countries.
+    # This can cause spurious jump in aggregate data.
+    # For example, there is a spurious jump from 1999 to 2000 for Lower-middle-income countries
+    # (see e.g. "Renewables - TWh"), because prior to 2000 only Ukraine has data.
+    # Assert that this jump exists, and remove aggregate data prior to 2000 (except European aggregates).
+    error = (
+        "Expected a big jump (>1000%) (in e.g. renewable generation) between 1999 and 2000 for Lower-middle-income "
+        "countries (because prior to 2000 only Ukraine has data). If that is no longer the case (because not only "
+        "European countries are informed prior to 2000), remove this part of the code."
+    )
+    renewables_lmic_1999 = tables["electricity_generation"].loc["Lower-middle-income countries", 1999][
+        "renewables__twh"
+    ]
+    renewables_lmic_2000 = tables["electricity_generation"].loc["Lower-middle-income countries", 2000][
+        "renewables__twh"
+    ]
+    assert 100 * (renewables_lmic_2000 - renewables_lmic_1999) / renewables_lmic_1999 > 1000, error
+    for table_name in tables:
+        for column in tables[table_name].columns:
+            for region in [
+                "Africa",
+                "Asia",
+                "North America",
+                "South America",
+                "Low-income countries",
+                "Lower-middle-income countries",
+                "Upper-middle-income countries",
+                "High-income countries",
+                "Oceania",
+            ]:
+                tables[table_name][tables[table_name].index.get_level_values(1) < 2000] = None
     ####################################################################################################################
 
     # Combine all tables into one.
