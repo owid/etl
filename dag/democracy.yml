@@ -22,3 +22,5 @@ steps:
     - snapshot://democracy/2024-05-01/ert.csv
   data://garden/democracy/2024-03-07/ert:
     - data://meadow/democracy/2024-05-01/ert
+  data://grapher/democracy/2024-05-01/ert:
+    - data://garden/democracy/2024-03-07/ert
