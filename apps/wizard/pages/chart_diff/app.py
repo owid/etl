@@ -19,10 +19,12 @@ from etl.config import DB_HOST
 # wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-# TODO: unhardcode this
+# TODO: simplify this
 SOURCE_ENV = DB_HOST  # "staging-site-streamlit-chart-approval"
+SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
 # TODO: switch to production once we are ready
 TARGET_ENV = "staging-site-master"
+TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
 
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 
@@ -150,7 +152,7 @@ def compare_charts(
     # Only one chart: new chart
     if target_chart is None:
         st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-        chart_html(source_chart.config, base_url=SOURCE_ENV)
+        chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
     # Two charts, actual diff
     else:
         # Create two columns for the iframes
@@ -160,10 +162,10 @@ def compare_charts(
         if not prod_is_newer:
             with col1:
                 st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
-                chart_html(target_chart.config, base_url=TARGET_ENV)
+                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
             with col2:
                 st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
-                chart_html(source_chart.config, base_url=SOURCE_ENV)
+                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
         # Conflict with live
         else:
             with col1:
@@ -171,10 +173,10 @@ def compare_charts(
                     f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
                     help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
                 )
-                chart_html(target_chart.config, base_url=TARGET_ENV)
+                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
             with col2:
                 st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-                chart_html(source_chart.config, base_url=SOURCE_ENV)
+                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
 
 
 @st.cache_resource
