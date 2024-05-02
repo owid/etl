@@ -20,9 +20,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["country", "year", "drug_combination__pre_sac", "drug_combination__sac"], verify_integrity=True)
-    # tb = tb.format(["country", "year", "drug_combination__sac"])
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

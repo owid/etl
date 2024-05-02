@@ -4,14 +4,14 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-
+        # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
+  title: Preventive Chemotherapy (PC) Data Portal
 tables:
   soil_transmitted_helminthiases:
     variables:
@@ -49,5 +49,93 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
-      {}
-
+      region:
+        unit: ""
+        presentation:
+          topic_tags:
+            - Global Health
+      population_requiring_pc_for_sth__pre_sac:
+        title: Population requiring PC for STH, Pre-SAC
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      number_of_pre_sac_targeted:
+        title: Number of Pre-SAC targeted
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      reported_number_of_pre_sac_treated:
+        title: Reported number of Pre-SAC treated
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      programme_coverage__pre_sac__pct:
+        title: Programme coverage, Pre-SAC (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      national_coverage__pre_sac__pct:
+        title: National coverage, Pre-SAC (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      population_requiring_pc_for_sth__sac:
+        title: Population requiring PC for STH, SAC
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      number_of_sac_targeted:
+        title: Number of SAC targeted
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      reported_number_of_sac_treated:
+        title: Reported number of SAC treated
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      programme_coverage__sac__pct:
+        title: Programme coverage, SAC (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      national_coverage__sac__pct:
+        title: National coverage, SAC (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Global Health
+      country_code:
+        unit: ""
+        presentation:
+          topic_tags:
+            - Global Health
