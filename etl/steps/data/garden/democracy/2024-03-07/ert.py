@@ -188,6 +188,11 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
         - People living under certain regime
     """
     tb_ = tb.copy()
+
+    # Expand observations
+    tb_ = expand_observations_without_duplicates(tb_)
+
+    # Get aggregates
     indicators = [
         {
             "name": "regime_ert",
@@ -213,45 +218,7 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
     ]
     indicator_names = [indicator["name"] for indicator in indicators]
     # Make dummies
-    tb_ = make_table_with_dummies(tb, indicators)
-    tb_ = expand_observations(tb_)
-    YEARS_YEMEN = (1918, 1990)
-    YEARS_GERMANY = (1945, 1990)
-    YEARS_VIETNAM = (1945, 1975)
-    tb_ = tb_.loc[
-        ~(
-            # Yemen
-            (
-                (tb_["country"] == "Yemen Arab Republic")
-                & ((tb_["year"] > YEARS_YEMEN[1]) | (tb_["year"] < YEARS_YEMEN[0]))
-            )
-            | (
-                (tb_["country"] == "Yemen People's Republic")
-                & ((tb_["year"] > YEARS_YEMEN[1]) | (tb_["year"] < YEARS_YEMEN[0]))
-            )
-            | ((tb_["country"] == "Yemen") & (tb_["year"] >= YEARS_YEMEN[0]) & (tb_["year"] <= YEARS_YEMEN[1]))
-            # Germany
-            | (
-                (tb_["country"] == "West Germany")
-                & ((tb_["year"] > YEARS_GERMANY[1]) | (tb_["year"] < YEARS_GERMANY[0]))
-            )
-            | (
-                (tb_["country"] == "East Germany")
-                & ((tb_["year"] > YEARS_GERMANY[1]) | (tb_["year"] < YEARS_GERMANY[0]))
-            )
-            | ((tb_["country"] == "Germany") & (tb_["year"] >= YEARS_GERMANY[0]) & (tb_["year"] <= YEARS_GERMANY[1]))
-            # Vietnam
-            | (
-                (tb_["country"] == "Republic of Vietnam")
-                & ((tb_["year"] > YEARS_VIETNAM[1]) | (tb_["year"] < YEARS_VIETNAM[0]))
-            )
-            | (
-                (tb_["country"] == "Democratic Republic of Vietnam")
-                & ((tb_["year"] > YEARS_VIETNAM[1]) | (tb_["year"] < YEARS_VIETNAM[0]))
-            )
-            | ((tb_["country"] == "Vietnam") & (tb_["year"] >= YEARS_VIETNAM[0]) & (tb_["year"] <= YEARS_VIETNAM[1]))
-        )
-    ]
+    tb_ = make_table_with_dummies(tb_, indicators)
 
     # 1) numbers
     tb_num = add_regions_and_global_aggregates(tb_, ds_regions, regions=REGIONS)
@@ -271,3 +238,39 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
     tb_regions.loc[tb_regions["category"] == "-1", ["num_regime_ert", "num_regime_trich_ert"]] = float("nan")
 
     return tb_regions
+
+
+def expand_observations_without_duplicates(tb: Table):
+    """Remove duplicate country entries."""
+    tb = expand_observations(tb)
+
+    # There are some duplicates in the data. We remove them.
+    YEARS_YEMEN = (1918, 1990)
+    YEARS_GERMANY = (1945, 1990)
+    YEARS_VIETNAM = (1945, 1975)
+    tb = tb.loc[
+        ~(
+            # Yemen
+            ((tb["country"] == "Yemen Arab Republic") & ((tb["year"] > YEARS_YEMEN[1]) | (tb["year"] < YEARS_YEMEN[0])))
+            | (
+                (tb["country"] == "Yemen People's Republic")
+                & ((tb["year"] > YEARS_YEMEN[1]) | (tb["year"] < YEARS_YEMEN[0]))
+            )
+            | ((tb["country"] == "Yemen") & (tb["year"] >= YEARS_YEMEN[0]) & (tb["year"] <= YEARS_YEMEN[1]))
+            # Germany
+            | ((tb["country"] == "West Germany") & ((tb["year"] > YEARS_GERMANY[1]) | (tb["year"] < YEARS_GERMANY[0])))
+            | ((tb["country"] == "East Germany") & ((tb["year"] > YEARS_GERMANY[1]) | (tb["year"] < YEARS_GERMANY[0])))
+            | ((tb["country"] == "Germany") & (tb["year"] >= YEARS_GERMANY[0]) & (tb["year"] <= YEARS_GERMANY[1]))
+            # Vietnam
+            | (
+                (tb["country"] == "Republic of Vietnam")
+                & ((tb["year"] > YEARS_VIETNAM[1]) | (tb["year"] < YEARS_VIETNAM[0]))
+            )
+            | (
+                (tb["country"] == "Democratic Republic of Vietnam")
+                & ((tb["year"] > YEARS_VIETNAM[1]) | (tb["year"] < YEARS_VIETNAM[0]))
+            )
+            | ((tb["country"] == "Vietnam") & (tb["year"] >= YEARS_VIETNAM[0]) & (tb["year"] <= YEARS_VIETNAM[1]))
+        )
+    ]
+    return tb
