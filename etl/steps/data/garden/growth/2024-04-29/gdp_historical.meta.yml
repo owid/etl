@@ -1,0 +1,105 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    processing_level: major
+
+    description_processing: |-
+      The data presented here from 1820 onwards is from Maddison Project Database. Data before 1820 is constructed using the 1820 Maddison Project Database observation and applying the growth rates implied by the Maddison Database. These steps are necessary because the two datasets estimate GDP with different prices.
+
+      The adjusted results before 1820 have been rounded to address uncertainty in the underlying data. GDP data is rounded to the nearest million, and GDP is rounded to the nearest hundred.
+
+  description_adjustment: This data is adjusted for inflation and for differences in the cost of living between countries.
+  description_unit_merge: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, merging data from Maddison Project Database, backwards extended with growth rates from Maddison Database.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+  title: Global economic growth in the long run
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  gdp_historical:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      gdp:
+        title: GDP
+        unit: international-$ in 2011 prices
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+        description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
+          of living between countries.
+        description_key:
+          - This GDP indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+          - "{definitions.description_adjustment}"
+          - "{definitions.description_unit_merge}"
+        presentation:
+          title_public: Global GDP over the long run
+          title_variant: Historical data
+          attribution_short: Maddison Project Database, Maddison Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Global GDP over the long run
+            subtitle: Total output of the world economy. This data is adjusted for inflation and differences in the cost of
+              living between countries.
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            selectedEntityNames:
+              - World
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
+            hideLegend: true
+
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 2011 prices
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_key:
+          - This GDP per capita indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+          - "{definitions.description_adjustment}"
+          - "{definitions.description_unit_merge}"
+        presentation:
+          title_public: Global average GDP per capita over the long run
+          title_variant: Historical data
+          attribution_short: World Bank, Maddison Project Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Global average GDP per capita over the long run
+            subtitle: This data is adjusted for inflation and differences in the cost of living between countries.
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            selectedEntityNames:
+              - World
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
+            hideLegend: true
+

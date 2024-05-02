@@ -44,7 +44,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     # 2/ Preview submission
     ########################################################
     # 2.1/ Display details
-    if num_charts := len(charts) > 0:
+    if (num_charts := len(charts)) > 0:
         with st.container(border=True):
             ## Number of charts being updated and variable mapping
             with st.popover(f"{num_charts} charts affected!"):

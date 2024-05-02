@@ -34,14 +34,14 @@ Some additional files are provided to help out in the processing:
 """
 
 import json
-from typing import Any, Dict, List, Set, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
 import yaml
 from owid.catalog import Dataset, Variable
 from owid.catalog.tables import Table, concat
-from shared import add_population_in_dummies, expand_observations, from_wide_to_long
+from shared import add_population_in_dummies, expand_observations
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -576,7 +576,7 @@ def make_table_with_dummies(
         assert set(tb_[indicator["name"]]) == indicator["values_expected"]
 
     ## Get dummy indicator table
-    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names))
+    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int))
 
     ## Add missing metadata to dummy indicators
     dummy_cols = []
@@ -698,3 +698,63 @@ def split_into_two_tables(
     tb_2 = tb_2.drop(index="-1", level="category")
 
     return tb_1, tb_2
+
+
+def from_wide_to_long(
+    tb: Table,
+    indicator_name_callback: Optional[Callable] = None,
+    indicator_category_callback: Optional[Callable] = None,
+    column_dimension_name: str = "category",
+) -> Table:
+    """Format a particular shape of table from wide to long format.
+
+    tb: Table with wide format.
+    indicator_name_callback: Function to extract the indicator name from the column name.
+    indicator_category_callback: Function to extract the indicator category from the column name.
+
+    If no `indicator_name_callback` and `indicator_category_callback` are provided, it proceed expects the following input:
+
+    | year | country | indicator_a_1 | indicator_a_2 | indicator_b_1 | indicator_b_2 |
+    |------|---------|---------------|---------------|---------------|---------------|
+    | 2000 |   USA   |       1       |       2       |       3       |       4       |
+    | 2000 |   CAN   |       5       |       6       |       7       |       8       |
+
+    and then generates the output:
+
+    | year | country |  category  | indicator_a | indicator_b |
+    |------|---------|------------|-------------|-------------|
+    | 2000 | USA     | category_1 |      1      |       3     |
+    | 2000 | USA     | category_2 |      2      |       4     |
+    """
+    # Melt the DataFrame to long format
+    tb = tb.melt(id_vars=["year", "country"], var_name="indicator_type", value_name="value")
+
+    # Get callables
+    if indicator_name_callback is None:
+
+        def default_indicator_name(x):
+            return "_".join(x.split("_")[:-1])
+
+        indicator_name_callback = default_indicator_name
+
+    if indicator_category_callback is None:
+
+        def default_indicator_category(x):
+            return x.split("_")[-1]
+
+        indicator_category_callback = default_indicator_category
+
+    # Extract indicator names and types
+    tb["indicator"] = tb["indicator_type"].apply(indicator_name_callback)
+    tb[column_dimension_name] = tb["indicator_type"].apply(indicator_category_callback)
+
+    # Drop the original 'indicator_type' column as it's no longer needed
+    tb.drop("indicator_type", axis=1, inplace=True)
+
+    # Pivot the table to get 'indicator_a' and 'indicator_b' as separate columns
+    tb = tb.pivot(index=["year", "country", column_dimension_name], columns="indicator", values="value").reset_index()
+
+    # Rename the columns to match your requirements
+    tb.columns.name = None  # Remove the hierarchy
+
+    return tb

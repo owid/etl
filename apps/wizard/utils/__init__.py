@@ -592,9 +592,10 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], base_url, height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], base_url, base_api_url, height=500, **kwargs):
     chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
     chart_config["adminBaseUrl"] = f"http://{base_url}"
+    chart_config["dataApiUrl"] = base_api_url
 
     HTML = f"""
     <!DOCTYPE html>
