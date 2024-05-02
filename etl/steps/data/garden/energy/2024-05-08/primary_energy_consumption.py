@@ -248,7 +248,7 @@ def run(dest_dir: str) -> None:
     tb_eia = ds_eia["energy_consumption"]
 
     # Load GDP dataset.
-    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_gdp = paths.load_dataset("maddison_project_database")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")

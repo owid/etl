@@ -747,7 +747,7 @@ def add_gdp_to_table(
     tb_with_gdp = tb.copy()
 
     # Read main table from GDP dataset.
-    tb_gdp = ds_gdp["maddison_gdp"].reset_index()
+    tb_gdp = ds_gdp["maddison_project_database"].reset_index()
 
     # Add metadata sources and licenses to the main GDP variable.
     tb_gdp["gdp"].metadata.sources = ds_gdp.metadata.sources

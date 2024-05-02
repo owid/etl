@@ -249,7 +249,7 @@ def run(dest_dir: str) -> None:
     ds_primary_energy = paths.load_dataset("primary_energy_consumption")
     ds_electricity_mix = paths.load_dataset("electricity_mix")
     ds_population = paths.load_dataset("population")
-    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_gdp = paths.load_dataset("maddison_project_database")
     ds_regions = paths.load_dataset("regions")
 
     # Gather all required tables from all datasets.
