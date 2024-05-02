@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Preventive Chemotherapy (PC) Data Portal
+    description: |-
+      Progress towards achieving the Roadmap targets for control and elimination of the Neglected Tropical Diseases
+
+    date_published: "2024-03-14"
+    title_snapshot: PCT Databank - Lymphatic filariasis
+    description_snapshot: |-
+      Lymphatic filariasis situational analyses, core implementation data and trend data are provided through direct access to the interactive reports.
+
+    # Citation
+    producer: World Health Organization (2024)
+    citation_full: |-
+      PCT Databank - Lymphatic filariasis, World Health Organization (2024)
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.who.int/teams/control-of-neglected-tropical-diseases/data-platforms/pct-databank/lymphatic-filariasis
+    url_download: https://apps.who.int/neglected_diseases/ntddata/data/LF_data.xlsx?ua=1
+    date_accessed: 2024-05-02
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 698b0341d985d5a568893f63dee4d5bd
+    size: 134496
+    path: lymphatic_filariasis.xlsx

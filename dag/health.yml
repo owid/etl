@@ -562,3 +562,7 @@ steps:
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
+  data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis

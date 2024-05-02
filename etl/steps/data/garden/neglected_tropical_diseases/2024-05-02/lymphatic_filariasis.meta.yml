@@ -1,0 +1,63 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+  title: Preventive Chemotherapy (PC) Data Portal
+tables:
+  lymphatic_filariasis:
+    variables:
+      region:
+        title: Region
+        unit: ""
+      population_requiring_pc_for_lf:
+        title: Population requiring PC for LF
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      mapping_status:
+        title: Mapping status
+        unit: ""
+      current_status_of_mda:
+        title: Current status of MDA
+        unit: ""
+      number_of_ius_covered:
+        title: Number of IUs covered
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+      geographical_coverage__pct:
+        title: Geographical coverage (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      total_population_of_ius:
+        title: Total population of IUs
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      reported_number_of_people_treated:
+        title: Reported number of people treated
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      programme__drug__coverage__pct:
+        title: Programme (drug) coverage (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      national_coverage__pct:
+        title: National coverage (%)
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      country_code:
+        unit: ""
