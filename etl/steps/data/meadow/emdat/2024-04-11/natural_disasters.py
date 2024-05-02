@@ -29,6 +29,7 @@ COLUMNS = {
     "End Year": "end_year",
     "End Month": "end_month",
     "End Day": "end_day",
+    "CPI": "cpi",
 }
 
 

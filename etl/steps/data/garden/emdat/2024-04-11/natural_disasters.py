@@ -61,6 +61,7 @@ COLUMNS = {
     "end_year": "end_year",
     "end_month": "end_month",
     "end_day": "end_day",
+    "cpi": "cpi",
 }
 
 # Columns of values related to natural disaster impacts.
@@ -387,6 +388,22 @@ def calculate_yearly_impacts(tb: Table) -> Table:
 
 
 def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
+    # We can try to replicate the chart from Guha-Sapir et al. (2004).
+    # According to them:
+    # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
+    #   or equal to five, the number of people affected was lower than or equal to 1,500, or the amount of reported
+    #   economic damages was lower than or equal to US$8 million, adjusted to 2003 dollars.
+    # * The human impact of a natural disaster was considered "large" when the number of deaths was greater than or
+    #   equal to 50, the number of people affected was greater than or equal to 150,000, or the amount of reported
+    #   economic damages was greater than or equal to US$200 million, adjusted to 2003 dollars.
+    # I suppose that "medium" would be any disaster that falls in between these two categories.
+    # Their economic cost thresholds, in 2003 dollars, should be converted to the inflation-adjusted equivalent.
+    # Given that they include CPI in their original data, we use that to adjust for inflation.
+    # Their latest CPI value is for 2022. We can use that as a reference.
+    # Note that they include a column "Entry Date" in their original data. We could use it to try to replicate the
+    # original chart.
+    # TODO: Implement this.
+
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.
