@@ -13,6 +13,9 @@ steps:
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
+  # Create a step with a simplified countries-regions file used by the notebooks repository.
+  data://external/notebooks/latest/regions:
+    - data://grapher/regions/2023-01-01/regions
 
   # Gapminder
   data://meadow/gapminder/2019-12-10/population:
