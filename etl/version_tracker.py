@@ -526,9 +526,7 @@ class VersionTracker:
             # Create a mask that selects all steps with the same identifier.
             select_same_identifier = df_n["identifier"] == row["identifier"]
             # Find all forward versions of the current step.
-            versions_forward = sorted(set(
-                df_n[select_same_identifier & (df_n["version"] > row["version"])]["step"]
-            ))
+            versions_forward = sorted(set(df_n[select_same_identifier & (df_n["version"] > row["version"])]["step"]))
             other_versions_forward.append(versions_forward)
             # Find all backward versions of the current step.
             other_versions_backward.append(
@@ -673,83 +671,6 @@ class VersionTracker:
         steps_df = steps_df.drop(
             steps_df[(steps_df["db_archived"]) & (steps_df["n_charts"] == 0) & (steps_df["kind"].isnull())].index
         ).reset_index(drop=True)
-
-        return steps_df
-
-    def _create_steps_df_2(self) -> pd.DataFrame:
-        # Create a dataframe where each row correspond to one step.
-        steps_df = pd.DataFrame({"step": self.all_steps.copy()})
-        # Add relevant information about each step.
-
-        steps_df["step"].apply(self.get_direct_step_dependencies)
-
-        steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
-        steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
-        steps_df["all_active_dependencies"] = [
-            self.get_all_step_dependencies(step=step, only_active=True) for step in self.all_steps
-        ]
-        steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
-        steps_df["all_active_usages"] = [
-            self.get_all_step_usages(step=step, only_active=True) for step in self.all_steps
-        ]
-        steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
-        steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
-        steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
-        steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
-
-        # Add column for the total number of all dependencies and usges.
-        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
-        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
-
-        # Add attributes to steps.
-        steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
-
-        if self.connect_to_db:
-            # Add info from DB.
-            steps_df = self._add_info_from_db(steps_df=steps_df)
-
-            # Add columns with the date and the number of days until the next update.
-            steps_df = add_days_to_update_columns(steps_df=steps_df)
-        else:
-            # Add empty columns.
-            for column in (
-                [
-                    "chart_ids",
-                    "chart_slugs",
-                    "db_dataset_id",
-                    "db_dataset_name",
-                    "db_private",
-                    "db_archived",
-                    "update_period_days",
-                    "date_of_next_update",
-                    "days_to_update",
-                    "all_chart_ids",
-                    "all_chart_slugs",
-                    "n_charts",
-                ]
-                + [f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
-                + [f"n_chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
-            ):
-                steps_df[column] = None
-
-        # Add columns with the list of forward and backwards versions for each step.
-        steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
-
-        # For convenience, add full local path to dag files to steps dataframe.
-        steps_df["dag_file_path"] = [
-            (paths.DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
-            for dag_file_name in steps_df["dag_file_name"].fillna("")
-        ]
-        # For convenience, add full local path to script files.
-        steps_df["full_path_to_script"] = [
-            paths.BASE_DIR / script_file_name if script_file_name else None
-            for script_file_name in steps_df["path_to_script"].fillna("")
-        ]
-
-        # Add column that is true if the step is the latest version.
-        steps_df["is_latest"] = False
-        steps_df.loc[steps_df["version"] == steps_df["latest_version"], "is_latest"] = True
 
         return steps_df
 
