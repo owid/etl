@@ -1,4 +1,4 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot of Maddison Database and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 

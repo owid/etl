@@ -82,7 +82,7 @@ tables:
         presentation:
           title_public: Global average GDP per capita over the long run
           title_variant: Historical data
-          attribution_short: World Bank, Maddison Project Database
+          attribution_short: Maddison Project Database, Maddison Database
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
