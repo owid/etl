@@ -22,6 +22,9 @@ We use various session state indicators to control the flow of the app:
     - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
 """
+import os
+
+os.environ["STAGING"] = "enhance-indicator-upgrade-2"
 
 import streamlit as st
 from st_pages import add_indentation
@@ -84,6 +87,18 @@ indicator_mapping = {}
 indicator_config = None
 submission_config = None
 
+# Get step df
+
+
+# merged = steps_df.merge(DATASETS, left_on="db_dataset_id", right_on="id", how="outer")
+
+# print(f"{len(merged)} datasets detected")
+# print(f"{len(merged[merged.db_dataset_id.isna() & merged.id.isna()])} no ID [non-grapher steps]")
+# print(f"{len(merged[merged.db_dataset_id.isna() & merged.id.notna()])} no ID in ETL, with ID in DB [old datasets]")
+# print(f"{len(merged[merged.db_dataset_id.notna() & merged.id.isna()])} with ID in ETL, no ID in DB [unsure]")
+# print(f"{len(merged[merged.db_dataset_id.notna() & merged.id.notna()])} with ID! [new grapher steps]")
+
+# Build dataframe: namespace | name | uri | id | updatedAt
 # DEBUGGING
 # st.write(f"SUBMITTED DATASETS: {st.session_state.submitted_datasets}")
 # st.write(f"SUBMITTED VARIALBES: {st.session_state.submitted_indicators}")
@@ -96,7 +111,8 @@ submission_config = None
 # relevant indicators from the database/S3
 #
 ##########################################################################################
-with st.form("form-datasets"):
+# with st.form("form-datasets"):
+with st.container(border=True):
     search_form = build_dataset_form(DATASETS, SIMILARITY_NAMES)
 
 

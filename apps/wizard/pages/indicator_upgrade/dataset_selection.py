@@ -19,7 +19,12 @@ dataset_new_debug = "Democracy and Human rights - OWID based on Varieties of Dem
 
 
 def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "SearchConfigForm":
-    """Form to input dataset 1 and dataset 2."""
+    """Form to input dataset 1 and dataset 2.
+
+    TODO:
+        - Change dataset old based on selection of dataset new
+        - Reset `submitted_datasets` in session_state to False whenever the user changes anything in the form (maybe other variables need to be changed too)
+    """
     # Build dataset display name
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
@@ -31,7 +36,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     )
 
     # Sort datasets by updatedAt
-    df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
+    # df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
+    df = df.reset_index(drop=True)
 
     # For debugging
     if DEBUG:
@@ -56,7 +62,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         ## New dataset
         dataset_new = st.selectbox(
             label="New dataset",
-            options=df["display_name"],
+            options=df.loc[df["migration"], "display_name"],
             help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
             index=index_new,
         )
@@ -82,7 +88,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             )
 
     # Submit button
-    submitted_datasets = st.form_submit_button(
+    submitted_datasets = st.button(
         "Next (1/3)",
         type="primary",
         use_container_width=True,

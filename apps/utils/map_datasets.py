@@ -63,32 +63,7 @@ def get_changed_files(
     return changes
 
 
-def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[str, Dict[str, Any]]]:
-    """Get grapher dataset pairs that need to be (manually) given to the chart upgrader, based on the committed changes
-    in the current git branch.
-
-    Parameters
-    ----------
-    files_changed : Dict[str, Dict[str, str]]
-        Dictionary of files that have been modified in the current branch compared to the base (master) branch.
-
-    Returns
-    -------
-    grapher_changes : List[Dict[str, Dict[str, Any]]]
-        List of (old and new) grapher datasets that need to be mapped.
-
-    """
-    # List all files that have been modified in the current branch compared to the base branch.
-    # files_changed = get_changed_files(base_branch="update-electricity-mix-data-reference")
-    files_changed = get_changed_files()
-
-    # Load dataframe of steps.
-    steps_df = VersionTracker().steps_df
-
-    # In the end we want all useful info for:
-    #  * New grapher datasets created by changed steps.
-    #  * Existing grapher datasets that need to be replaced by new ones.
-    #  * Existing grapher datasets that do not have replacement, but that may be affected by changed steps.
+def get_grapher_changes(files_changed, steps_df):
     steps_affected = []
     files_unidentified = []
     grapher_changes = []
@@ -136,6 +111,36 @@ def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[s
                             "old": {"id": old_grapher_id, "name": old_grapher_name, "step": previous_grapher_step},
                         }
                     )
+    return grapher_changes
+
+
+def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[str, Dict[str, Any]]]:
+    """Get grapher dataset pairs that need to be (manually) given to the chart upgrader, based on the committed changes
+    in the current git branch.
+
+    Parameters
+    ----------
+    files_changed : Dict[str, Dict[str, str]]
+        Dictionary of files that have been modified in the current branch compared to the base (master) branch.
+
+    Returns
+    -------
+    grapher_changes : List[Dict[str, Dict[str, Any]]]
+        List of (old and new) grapher datasets that need to be mapped.
+
+    """
+    # List all files that have been modified in the current branch compared to the base branch.
+    # files_changed = get_changed_files(base_branch="update-electricity-mix-data-reference")
+    files_changed = get_changed_files()
+
+    # Load dataframe of steps.
+    steps_df = VersionTracker().steps_df
+
+    # In the end we want all useful info for:
+    #  * New grapher datasets created by changed steps.
+    #  * Existing grapher datasets that need to be replaced by new ones.
+    #  * Existing grapher datasets that do not have replacement, but that may be affected by changed steps.
+    grapher_changes = get_grapher_changes(files_changed, steps_df)
 
     # To get all info of the affected steps:
     # steps_df_affected = steps_df[steps_df["step"].isin(steps_affected) & (steps_df["db_dataset_name"].notnull())].reset_index(drop=True)

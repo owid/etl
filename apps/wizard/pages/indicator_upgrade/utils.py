@@ -6,25 +6,80 @@ import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
 
+from apps.utils.map_datasets import get_changed_files, get_grapher_changes
 from etl.chart_revision.v3.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
+from etl.version_tracker import VersionTracker
 
 # Logger
 log = get_logger()
 
 
-@st.cache_data(show_spinner=False)
-def get_datasets() -> pd.DataFrame:
-    """Load datasets."""
+# @st.cache_data(show_spinner=False)
+def get_datasets(new_mode=False) -> pd.DataFrame:
+    """Load datasets.
+
+    new_mode: Use VersionTracker
+    """
     with st.spinner("Retrieving datasets..."):
-        try:
-            datasets = get_all_datasets(archived=False)
-        except OperationalError as e:
-            raise OperationalError(
-                f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
-            )
+        if new_mode:
+            return get_datasets_from_db()
         else:
-            return datasets.sort_values("name")
+            return get_datasets_new()
+
+
+def get_datasets_new() -> pd.DataFrame:
+    steps_df_grapher, grapher_changes = get_datasets_new_()
+
+    # Combine with datasets from database that are not present in ETL
+    # Get datasets from Database
+    datasets_db = get_datasets_from_db()
+    steps_df_grapher = pd.concat([steps_df_grapher, datasets_db], ignore_index=True)
+    steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
+
+    # Add column marking migrations
+    steps_df_grapher["migration"] = False
+    steps_df_grapher.loc[steps_df_grapher["id"].isin([g["old"]["id"] for g in grapher_changes]), "migration"] = True
+    return steps_df_grapher
+
+
+@st.cache_data(show_spinner=False)
+def get_datasets_new_() -> pd.DataFrame:
+    # Get steps_df
+    vt = VersionTracker()
+    assert vt.connect_to_db
+    steps_df = vt.steps_df
+
+    # Get file changes -> Infer dataset migrations
+    files_changed = get_changed_files()
+    grapher_changes = get_grapher_changes(files_changed, steps_df)
+
+    steps_df_grapher = steps_df.loc[
+        steps_df["channel"] == "grapher", ["namespace", "identifier", "step", "db_dataset_name", "db_dataset_id"]
+    ]
+    ## Keep only those that are in DB (we need them to be in DB, otherwise indicator upgrade won't work since charts wouldn't be able to reference to non-db-existing indicator IDs)
+    steps_df_grapher = steps_df_grapher.dropna(subset="db_dataset_id")
+    assert steps_df_grapher.isna().sum().sum() == 0
+    ## Column rename
+    steps_df_grapher = steps_df_grapher.rename(
+        columns={
+            "db_dataset_name": "name",
+            "db_dataset_id": "id",
+        }
+    )
+    return steps_df_grapher, grapher_changes
+
+
+def get_datasets_from_db() -> pd.DataFrame:
+    """Load datasets."""
+    try:
+        datasets = get_all_datasets(archived=False)
+    except OperationalError as e:
+        raise OperationalError(
+            f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
+        )
+    else:
+        return datasets.sort_values("name")
 
 
 @st.cache_data(show_spinner=False)
