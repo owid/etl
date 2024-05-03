@@ -562,3 +562,6 @@ steps:
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
+
+  data://grapher/who/2024-05-03/avian_influenza_ah5n1:
+    - data://garden/who/2024-04-26/avian_influenza_ah5n1
