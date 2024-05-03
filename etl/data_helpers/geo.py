@@ -730,7 +730,7 @@ def add_gdp_to_table(
     tb : Table
         Original table that contains a column of country names and years.
     ds_gdp : Dataset
-        Population dataset.
+        GDP dataset (either the old ggdc_maddison or the new maddison_project_database step).
     country_col : str
         Name of column in original table with country names.
     year_col : str
@@ -740,27 +740,29 @@ def add_gdp_to_table(
 
     Returns
     -------
-    tb_with_gdo : Table
+    tb_with_gdp : Table
         Original table after adding a column with GDP values.
 
     """
     tb_with_gdp = tb.copy()
 
     # Read main table from GDP dataset.
-    tb_gdp = ds_gdp["maddison_gdp"].reset_index()
+    error = (
+        "GDP dataset is expected to have a table called either 'maddison_gdp' (old dataset) or "
+        "'maddison_project_database' (new dataset)."
+    )
+    assert (ds_gdp.table_names == ["maddison_gdp"]) or (ds_gdp.table_names == ["maddison_project_database"]), error
+    tb_gdp = ds_gdp[ds_gdp.table_names[0]].reset_index()
 
-    # Add metadata sources and licenses to the main GDP variable.
-    tb_gdp["gdp"].metadata.sources = ds_gdp.metadata.sources
-    tb_gdp["gdp"].metadata.licenses = ds_gdp.metadata.licenses
-
+    # Adapt GDP table to the column naming of the original table.
     gdp_columns = {
         "country": country_col,
         "year": year_col,
         "gdp": gdp_col,
     }
-    tb_gdp = tb_gdp[list(gdp_columns)].rename(columns=gdp_columns)
+    tb_gdp = tb_gdp[list(gdp_columns)].rename(columns=gdp_columns, errors="raise")
 
-    # Drop rows with missing values.
+    # Drop rows with missing values in the GDP table.
     tb_gdp = tb_gdp.dropna(how="any").reset_index(drop=True)
 
     # Add GDP column to original table.
