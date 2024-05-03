@@ -54,5 +54,5 @@ def run(dest_dir: str) -> None:
         check_variables_metadata=True,
     )
 
-    ds_grapher.metadata.title = "Natural disasters sizes"
+    ds_grapher.metadata.title = "Natural disasters by impact"
     ds_grapher.save()
