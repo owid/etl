@@ -796,12 +796,10 @@ class VersionTracker:
         steps_df["all_active_usages"] = [
             self.get_all_step_usages(step=step, only_active=True) for step in self.all_steps
         ]
-        # TODO
         steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        # TODO
         steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
 
         # Add column for the total number of all dependencies and usges.
