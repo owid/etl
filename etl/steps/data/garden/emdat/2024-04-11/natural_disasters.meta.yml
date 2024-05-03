@@ -270,6 +270,10 @@ tables:
           Reported disasters for which there is no data about the number of deaths, affected people, or economic damages.
         description_key:
           - *description-key-sizes
+        display:
+          name: Unknown
+        presentation:
+          title_public: Number of reported natural disasters with unknown impacts
       n_small_events:
         title: Number of reported natural disasters with a small impact
         unit: events
@@ -277,6 +281,10 @@ tables:
         description_short: *definition-small-event
         description_key:
           - *description-key-sizes
+        display:
+          name: Small
+        presentation:
+          title_public: Number of reported natural disasters with a small impact
       n_medium_events:
         title: Number of reported natural disasters with a medium impact
         unit: events
@@ -285,6 +293,10 @@ tables:
           Reported disasters that do not fall under the categories of "small" or "large".
         description_key:
           - *description-key-sizes
+        display:
+          name: Medium
+        presentation:
+          title_public: Number of reported natural disasters with a medium impact
       n_large_events:
         title: Number of reported natural disasters with a large impact
         unit: events
@@ -293,6 +305,10 @@ tables:
           Reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
         description_key:
           - *description-key-sizes
+        display:
+          name: Large
+        presentation:
+          title_public: Number of reported natural disasters with a large impact
       n_events:
         title: Number of reported natural disasters
         unit: events
@@ -301,6 +317,10 @@ tables:
           Total number of reported events, even when their impact, i.e. number of deaths, affected people, and economic damages, is unknown.
         description_key:
           - *description-key-sizes
+        display:
+          name: Total
+        presentation:
+          title_public: Number of reported natural disasters
       share_unknown_events:
         title: Share of reported natural disasters with unknown impacts
         unit: events
@@ -309,6 +329,10 @@ tables:
           Share of reported natural disasters for which there is no data about the number of deaths, affected people, or economic damages.
         description_key:
           - *description-key-sizes
+        display:
+          name: Unknown
+        presentation:
+          title_public: Share of reported natural disasters with unknown impacts
       share_small_events:
         title: Share of reported natural disasters with a small impact
         unit: events
@@ -317,6 +341,10 @@ tables:
           Share of reported disasters that cause no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not larger than 13 million of today's US dollars.
         description_key:
           - *description-key-sizes
+        display:
+          name: Small
+        presentation:
+          title_public: Share of reported natural disasters with a small impact
       share_medium_events:
         title: Share of reported natural disasters with a medium impact
         unit: events
@@ -325,6 +353,10 @@ tables:
           Share of reported disasters that do not fall under the categories of "small" or "large".
         description_key:
           - *description-key-sizes
+        display:
+          name: Medium
+        presentation:
+          title_public: Share of reported natural disasters with a medium impact
       share_large_events:
         title: Share of reported natural disasters with a large impact
         unit: events
@@ -333,6 +365,10 @@ tables:
           Share of reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
         description_key:
           - *description-key-sizes
+        display:
+          name: Large
+        presentation:
+          title_public: Share of reported natural disasters with a large impact
   natural_disasters_decadal_sizes:
     title: Natural disasters sizes, decadal data
     variables: *variables-sizes
