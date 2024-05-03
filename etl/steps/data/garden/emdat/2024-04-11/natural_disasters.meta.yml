@@ -85,8 +85,8 @@ definitions:
     These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on the Centre for Research on the Epidemiology of Disasters (CRED).
   description_key_sizes: &description-key-sizes
     - *definition-small-event
-    - *definition-medium-event
     - *definition-large-event
+    - *definition-medium-event
     - *definition-unknown-event
     - *definition-size-origin
 
@@ -268,14 +268,15 @@ tables:
         short_unit: ''
         description_short: |-
           Reported disasters for which there is no data about the number of deaths, affected people, or economic damages.
+        description_key:
+          - *description-key-sizes
       n_small_events:
         title: Number of reported natural disasters with a small impact
         unit: events
         short_unit: ''
         description_short: *definition-small-event
         description_key:
-          - *definition-small-event
-          - This definition is adapted from Guha-Sapir et al. (2004).
+          - *description-key-sizes
       n_medium_events:
         title: Number of reported natural disasters with a medium impact
         unit: events
