@@ -1,9 +1,10 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 import streamlit as st
 from MySQLdb import OperationalError
+from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.utils.map_datasets import get_changed_files, get_grapher_changes
@@ -23,13 +24,13 @@ def get_datasets(new_mode=False) -> pd.DataFrame:
     """
     with st.spinner("Retrieving datasets..."):
         if new_mode:
-            return get_datasets_from_db()
-        else:
             return get_datasets_new()
+        else:
+            return get_datasets_from_db()
 
 
 def get_datasets_new() -> pd.DataFrame:
-    steps_df_grapher, grapher_changes = get_datasets_new_()
+    steps_df_grapher, grapher_changes = get_datasets_from_version_tracker()
 
     # Combine with datasets from database that are not present in ETL
     # Get datasets from Database
@@ -38,25 +39,46 @@ def get_datasets_new() -> pd.DataFrame:
     steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
 
     # Add column marking migrations
-    steps_df_grapher["migration"] = False
-    steps_df_grapher.loc[steps_df_grapher["id"].isin([g["old"]["id"] for g in grapher_changes]), "migration"] = True
+    steps_df_grapher["migration_new"] = False
+    if grapher_changes:
+        dataset_ids = [g["new"]["id"] for g in grapher_changes]
+        steps_df_grapher.loc[steps_df_grapher["id"].isin(dataset_ids), "migration_new"] = True
+        # Add column ranking possible old datasets
+        ## Criteria:
+        for g in grapher_changes:
+            col_name = f"score_{g['new']['id']}"
+            ##  - First options should be those detected by grapher_changes ('old' keyword)
+            if "old" in g:
+                steps_df_grapher.loc[steps_df_grapher["id"] == g["old"]["id"], col_name] = 200
+            ##  - Then, we should just fuzzy match the step short_names (and names to account for old datasets not in ETL)
+            score_step = steps_df_grapher["step"].apply(lambda x: fuzz.ratio(g["new"]["step"], x))
+            score_name = steps_df_grapher["name"].apply(lambda x: fuzz.ratio(g["new"]["name"], x))
+            steps_df_grapher[col_name] = (score_step + score_name) / 2
+
+            ## Set own dataset as last
+            steps_df_grapher.loc[steps_df_grapher["id"] == g["new"]["id"], col_name] = -1
+    st.session_state.is_any_migration = steps_df_grapher["migration_new"].any()
     return steps_df_grapher
 
 
 @st.cache_data(show_spinner=False)
-def get_datasets_new_() -> pd.DataFrame:
+def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
     # Get steps_df
     vt = VersionTracker()
-    assert vt.connect_to_db
+    assert vt.connect_to_db, "Can't connnect to database! You need to be connected to run indicator upgrader"
     steps_df = vt.steps_df
 
     # Get file changes -> Infer dataset migrations
     files_changed = get_changed_files()
     grapher_changes = get_grapher_changes(files_changed, steps_df)
 
+    # Only keep grapher steps
     steps_df_grapher = steps_df.loc[
         steps_df["channel"] == "grapher", ["namespace", "identifier", "step", "db_dataset_name", "db_dataset_id"]
     ]
+    # Remove unneded text from 'step' (e.g. '*/grapher/'), no need for fuzzymatch!
+    steps_df_grapher["step_reduced"] = steps_df_grapher["step"].str.split("grapher/").str[-1]
+
     ## Keep only those that are in DB (we need them to be in DB, otherwise indicator upgrade won't work since charts wouldn't be able to reference to non-db-existing indicator IDs)
     steps_df_grapher = steps_df_grapher.dropna(subset="db_dataset_id")
     assert steps_df_grapher.isna().sum().sum() == 0

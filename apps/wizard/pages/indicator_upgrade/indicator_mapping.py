@@ -548,19 +548,3 @@ def set_states_after_submitting():
         },
         logging=True,
     )
-    reset_gpt_form()
-
-
-def reset_gpt_form() -> None:
-    """Reset indicator form.
-
-    Whenever we change the indicator form, we want to disable showing the gpt forms in the next steps.
-    """
-    # Create dictionary to set gpt forms to False (i.e. not visible)
-    settings = {str(k): False for k in st.session_state.keys() if str(k).startswith("chart-experimental-")}
-    settings = {
-        **settings,
-        "gpt_tweaks": {},
-    }
-    # Set states
-    set_states(settings)
