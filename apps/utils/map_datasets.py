@@ -1,0 +1,166 @@
+"""Temporary script that prints the grapher dataset pairs that need to be (manually) given to the chart upgrader, based
+on the committed changes in your current git branch.
+
+NOTE:
+ * This script should eventually be part of the new indicator upgrader, but for now it can be helpful as a CLI.
+ * The logic may be more complicated than needed. It may suffice to find the newly created grapher datasets that do not
+   yet have charts, and then attempt to find their corresponding previous version. But some of the code can be useful
+   for other reasons (for example in the new chart diff tool).
+
+"""
+
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import click
+from git import Repo
+from rich_click.rich_command import RichCommand
+from structlog import get_logger
+
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.version_tracker import VersionTracker
+
+# Initialize logger.
+log = get_logger()
+
+
+def get_changed_files(
+    current_branch: Optional[str] = None, base_branch: str = "master", repo_path: Union[Path, str] = BASE_DIR
+) -> Dict[str, Dict[str, str]]:
+    """Return files that are different between the current branch and the specified base branch."""
+    # Initialize a git repository object.
+    repo = Repo(repo_path)
+
+    if current_branch is None:
+        # If not specified, use the current branch.
+        current_branch = repo.active_branch.name
+    else:
+        # Otherwise, switch to the given branch to compare from.
+        repo.git.checkout(current_branch)
+
+    # Fetch latest changes from the remote to ensure diffs are accurate
+    repo.remotes.origin.fetch()
+
+    # Get the diff between the current branch and the base branch, corrected command
+    diff_index = repo.git.diff(f"{base_branch}..{current_branch}", name_status=True, no_renames=True)
+
+    # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
+    # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
+    # * diff_content shows the difference between files.
+    changes = {}
+    if diff_index:
+        for line in diff_index.splitlines():
+            parts = line.split("\t")
+            if len(parts) == 2:
+                status, file_path = parts
+                # Fetching diff content.
+                diff_content = repo.git.diff(f"{base_branch}...{current_branch}", "--", file_path, p=True)
+                changes[file_path] = {"status": status, "diff": diff_content}
+            else:
+                # Not sure if this could happen.
+                log.error(f"Could not parse diff line: {line}")
+
+    return changes
+
+
+def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[str, Dict[str, Any]]]:
+    """Get grapher dataset pairs that need to be (manually) given to the chart upgrader, based on the committed changes
+    in the current git branch.
+
+    Parameters
+    ----------
+    files_changed : Dict[str, Dict[str, str]]
+        Dictionary of files that have been modified in the current branch compared to the base (master) branch.
+
+    Returns
+    -------
+    grapher_changes : List[Dict[str, Dict[str, Any]]]
+        List of (old and new) grapher datasets that need to be mapped.
+
+    """
+    # List all files that have been modified in the current branch compared to the base branch.
+    # files_changed = get_changed_files(base_branch="update-electricity-mix-data-reference")
+    files_changed = get_changed_files()
+
+    # Load dataframe of steps.
+    steps_df = VersionTracker().steps_df
+
+    # In the end we want all useful info for:
+    #  * New grapher datasets created by changed steps.
+    #  * Existing grapher datasets that need to be replaced by new ones.
+    #  * Existing grapher datasets that do not have replacement, but that may be affected by changed steps.
+    steps_affected = []
+    files_unidentified = []
+    grapher_changes = []
+    for file_path in files_changed:
+        file_status = files_changed[file_path]["status"]
+        if file_status == "D":
+            # Skip deleted files.
+            continue
+        if file_path.startswith(SNAPSHOTS_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".dvc"):
+            parts = Path(file_path).with_suffix("").as_posix().split("/")[1:]
+            version = parts.pop(-2)
+            identifier = "snapshot/" + "/".join(parts)
+        elif file_path.startswith(STEP_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".py"):
+            parts = Path(file_path).with_suffix("").as_posix().split("/")[-4:]
+            version = parts.pop(-2)
+            identifier = "/".join(parts)
+        else:
+            files_unidentified.append(file_path)
+            continue
+        candidate = steps_df[(steps_df["identifier"] == identifier) & (steps_df["version"] == version)]
+        if len(candidate) == 0:
+            # This could happen with non-etl step files, like "shared.py". Ignore them
+            continue
+        elif len(candidate) > 1:
+            # Unknown error.
+            log.error(f"Could not identify a step matching file {file_path}")
+        else:
+            steps_affected.append(candidate["step"].item())
+            steps_affected.extend(candidate["all_usages"].item())
+
+            if (candidate["channel"].item() == "grapher") & (file_status == "A"):
+                current_grapher_step = candidate["step"].item()
+                new_grapher_id = int(steps_df[steps_df["step"] == current_grapher_step]["db_dataset_id"].item())
+                new_grapher_name = steps_df[steps_df["step"] == current_grapher_step]["db_dataset_name"].item()
+                # If there is any, get the info of the previous grapher step.
+                previous_grapher_steps = candidate["same_steps_backward"].item()
+                if len(previous_grapher_steps) > 0:
+                    previous_grapher_step = previous_grapher_steps[-1]
+                    # Get grapher dataset id for the old dataset.
+                    old_grapher_id = int(steps_df[steps_df["step"] == previous_grapher_step]["db_dataset_id"].item())
+                    old_grapher_name = steps_df[steps_df["step"] == previous_grapher_step]["db_dataset_name"].item()
+                    grapher_changes.append(
+                        {
+                            "new": {"id": new_grapher_id, "name": new_grapher_name, "step": current_grapher_step},
+                            "old": {"id": old_grapher_id, "name": old_grapher_name, "step": previous_grapher_step},
+                        }
+                    )
+
+    # To get all info of the affected steps:
+    # steps_df_affected = steps_df[steps_df["step"].isin(steps_affected) & (steps_df["db_dataset_name"].notnull())].reset_index(drop=True)
+
+    # Consider warning about unidentified files.
+
+    return grapher_changes
+
+
+@click.command(name="map-datasets", cls=RichCommand, help=__doc__)
+def cli() -> None:
+    """Print grapher dataset pairs that need to be (manually) given to the chart upgrader, based on the committed
+    changes in the current git branch.
+
+    """
+    files_changed = get_changed_files()
+    changes = get_datasets_mapped(files_changed=files_changed)
+
+    print(
+        f"Based on the changes committed to the current git branch, "
+        f"{len(changes)} grapher dataset pairs need to be mapped.\n"
+    )
+    for change in changes:
+        print(f'[{change["old"]["id"]}] {change["old"]["name"]}')
+        print(f'    Step: {change["old"]["step"]}')
+        print(f'[{change["new"]["id"]}] {change["new"]["name"]}')
+        print(f'    Step: {change["new"]["step"]}')
+        print()
