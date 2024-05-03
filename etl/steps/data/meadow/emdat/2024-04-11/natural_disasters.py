@@ -29,7 +29,10 @@ COLUMNS = {
     "End Year": "end_year",
     "End Month": "end_month",
     "End Day": "end_day",
+    # Column Consumer Price Index (CPI) is kept for the analysis on the share of small, medium and large events.
     "CPI": "cpi",
+    # Column Entry Date is kept for the analysis on the share of small, medium and large events.
+    "Entry Date": "entry_date",
 }
 
 

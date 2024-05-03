@@ -61,7 +61,9 @@ COLUMNS = {
     "end_year": "end_year",
     "end_month": "end_month",
     "end_day": "end_day",
+    # The following columns are kept for the analysis on the share of small, medium and large events.
     "cpi": "cpi",
+    "entry_date": "entry_date",
 }
 
 # Columns of values related to natural disaster impacts.
@@ -202,6 +204,20 @@ def prepare_input_data(tb: Table) -> Table:
     # Drop rows for disaster types that are not relevant.
     tb = tb.dropna(subset="type").reset_index(drop=True)
 
+    # Ensure "CPI" column is not empty. Currently it is missing the last year and a half
+    # (and so is CPI data from World Bank). We forward fill the last rows of data.
+    tb_cpi = (
+        tb[["year", "cpi"]]
+        .sort_values("year")
+        .drop_duplicates(subset="year", keep="last")
+        .reset_index(drop=True)
+        .ffill()
+    )
+    tb = tb.drop(columns=["cpi"]).merge(tb_cpi, on="year", how="left")
+
+    # Make "entry_date" a datetime column.
+    tb["entry_date"] = pd.to_datetime(tb["entry_date"], errors="coerce")
+
     return tb
 
 
@@ -227,6 +243,18 @@ def sanity_checks_on_inputs(tb: Table) -> None:
 
     error = "Some rows have end_day specified, but not end_month."
     assert tb[(tb["end_month"].isnull()) & (tb["end_day"].notnull())].empty, error
+
+    error = "CPI should be monotonically increasing (at most 11% percentage decreasing, 1% since 1940)."
+    _tb = (
+        tb[["year", "cpi"]]
+        .sort_values("year")
+        .drop_duplicates(subset="year", keep="last")
+        .reset_index(drop=True)
+        .fillna(0)
+    )
+    _tb["pct_change"] = _tb["cpi"].pct_change().fillna(0) * 100
+    assert (_tb["pct_change"] > -11).all(), error
+    assert (_tb[_tb["year"] > 1940]["pct_change"] > -1).all(), error
 
 
 def fix_faulty_dtypes(tb: Table) -> Table:
@@ -266,7 +294,7 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
 
     # When end day is not given, assume the last day of the month.
     last_day_of_month = pd.Series(
-        [get_last_day_of_month(year=row["end_year"], month=row["end_month"]) for i, row in tb.iterrows()]
+        [get_last_day_of_month(year=row["end_year"], month=row["end_month"]) for _, row in tb.iterrows()]
     )
     tb["end_day"] = tb["end_day"].fillna(last_day_of_month)
 
@@ -293,9 +321,6 @@ def calculate_start_and_end_dates(tb: Table) -> Table:
 
     error = "Events can't have an end_date prior to start_date."
     assert (tb["end_date"] >= tb["start_date"]).all(), error
-
-    # Drop unnecessary columns.
-    tb = tb.drop(columns=["start_year", "start_month", "start_day", "end_year", "end_month", "end_day"])
 
     return tb
 
@@ -387,11 +412,11 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     return tb_yearly
 
 
-def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
+def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Tuple[Table, Table]:
     # We can try to replicate the chart from Guha-Sapir et al. (2004).
     # According to them:
     # * The human impact of a natural disaster is considered by CRED as "small" when the number of deaths was lower than
-    #   or equal to five, the number of people affected was lower than or equal to 1,500, or the amount of reported
+    #   or equal to 5, the number of people affected was lower than or equal to 1,500, or the amount of reported
     #   economic damages was lower than or equal to US$8 million, adjusted to 2003 dollars.
     # * The human impact of a natural disaster was considered "large" when the number of deaths was greater than or
     #   equal to 50, the number of people affected was greater than or equal to 150,000, or the amount of reported
@@ -402,8 +427,152 @@ def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
     # Their latest CPI value is for 2022. We can use that as a reference.
     # Note that they include a column "Entry Date" in their original data. We could use it to try to replicate the
     # original chart.
-    # TODO: Implement this.
+    tb_yearly = tb[["country", "year", "total_dead", "total_affected", "total_damages", "entry_date", "cpi"]].copy()
+    # To try to replicate the original chart in the paper, we could select the data that was in the database at the time
+    # of publication. However, I can't fully replicate their results.
+    # tb_yearly = tb_yearly[tb_yearly["entry_date"] <= "2004-01-01"].reset_index(drop=True)
 
+    # For this study, the three relevant impact columns are "total_dead", "total_affected", and "total_damages".
+    # Only about 23% of the events have all of those impact columns informed.
+    # 100 * len(tb[(tb["total_dead"].notnull()) & (tb["total_affected"].notnull()) & (tb["total_damages"].notnull())]) / len(tb)
+    # This means that we can't fill with zeros. Even events with 3 million deaths may have "total_damages" empty.
+    # tb[(tb["total_damages"].isnull())]["total_dead"].max()
+    # So empty rows do not mean "insignificant": They simply mean "not informed" (and can be small or large).
+    # Therefore, we can't fill with zeros.
+
+    # On top of that, there is about a 6% of events that have no information about impact metrics.
+    # 100 * len(tb[(tb["total_dead"].isnull()) & (tb["total_affected"].isnull()) & (tb["total_damages"].isnull())]) / len(tb)
+    # This happens, e.g. in Spain 1991, where there is a "Wildfire" event without any impact metric.
+    # We can assign a special label to those events, e.g. "unknown".
+    event_sizes = ["unknown", "small", "medium", "large"]
+
+    # Add column for the threshold of small and large economic damages, adjusted for inflation.
+    cpi_2003 = tb_yearly[tb_yearly["year"] == 2003]["cpi"].unique()
+    assert len(cpi_2003) == 1
+    cpi_2003 = cpi_2003[0]
+    tb_yearly["small_economic_threshold"] = 8e6 * tb_yearly["cpi"] / cpi_2003
+    tb_yearly["large_economic_threshold"] = 200e6 * tb_yearly["cpi"] / cpi_2003
+    # Create a column for each kind of event depending on its size.
+    for event_size in event_sizes:
+        new_column = f"is_{event_size}_event"
+        tb_yearly[new_column] = False
+        tb_yearly[new_column] = tb_yearly[new_column].copy_metadata(tb_yearly["total_dead"])
+    # Create a column that identifies unknown (uninformed) events.
+    tb_yearly["is_unknown_event"] = (
+        (tb_yearly["total_dead"].isnull())
+        & (tb_yearly["total_affected"].isnull())
+        & (tb_yearly["total_damages"].isnull())
+    )
+    # Create a column that identifies large events.
+    # These are any informed event for which either there were many deaths, or many affected, or many damages (with the
+    # thresholds defined above).
+    tb_yearly["is_large_event"] = (~tb_yearly["is_unknown_event"]) & (
+        (tb_yearly["total_dead"].fillna(0) >= 50)
+        | (tb_yearly["total_affected"].fillna(0) >= 150000)
+        | (tb_yearly["total_damages"].fillna(0) >= tb_yearly["large_economic_threshold"])
+    )
+    # Create a column that identifies small events.
+    # These are informed events for which none of the impact metrics is above certain thresholds (defined above).
+    tb_yearly["is_small_event"] = (
+        (~tb_yearly["is_unknown_event"])
+        & (tb_yearly["total_dead"].fillna(0) <= 5)
+        & (tb_yearly["total_affected"].fillna(0) <= 1500)
+        & (tb_yearly["total_damages"].fillna(0) <= tb_yearly["small_economic_threshold"])
+    )
+    # Create a column that identifies medium events.
+    # These are events that do not fall in any of the other categories.
+    tb_yearly["is_medium_event"] = ~(
+        tb_yearly["is_unknown_event"] | tb_yearly["is_small_event"] | tb_yearly["is_large_event"]
+    )
+    # Check that each event is classified in at least one event type.
+    assert (
+        tb_yearly["is_unknown_event"]
+        | tb_yearly["is_small_event"]
+        | tb_yearly["is_medium_event"]
+        | tb_yearly["is_large_event"]
+    ).all()
+    # Check that each event is classified in only one event type.
+    assert set(tb_yearly[["is_unknown_event", "is_small_event", "is_medium_event", "is_large_event"]].sum(axis=1)) == {
+        1
+    }
+
+    # Group by country and year to get the total number of small, medium and large events for each country and year.
+    tb_yearly = tb_yearly.groupby(["country", "year"], as_index=False, observed=True).agg(
+        {f"is_{event_size}_event": "sum" for event_size in event_sizes}
+    )
+    tb_yearly = tb_yearly.rename(
+        columns={f"is_{event_size}_event": f"n_{event_size}_events" for event_size in event_sizes}, errors="raise"
+    )
+    # Add a column for the total number of events each country-year.
+    tb_yearly["n_events"] = tb_yearly[[f"n_{event_size}_events" for event_size in event_sizes]].sum(axis=1)
+    # Add a column with the global total.
+    _tb_global = (
+        tb_yearly.drop(columns="country")
+        .groupby("year", as_index=False, observed=True)
+        .sum()
+        .assign(**{"country": "World"})
+    )
+    tb_yearly = pr.concat([tb_yearly, _tb_global], ignore_index=True)
+
+    # Add region aggregates.
+    tb_yearly = geo.add_regions_to_table(
+        tb=tb_yearly,
+        regions=REGIONS,
+        index_columns=["country", "year"],
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+    )
+
+    # Create a table with the decadal count of events.
+    tb_decadal = tb_yearly.copy()
+    tb_decadal["decade"] = (tb_decadal["year"] // 10) * 10
+    tb_decadal = (
+        tb_decadal.groupby(["country", "decade"], as_index=False, observed=True)
+        .sum()
+        .drop(columns="year")
+        .rename(columns={"decade": "year"}, errors="raise")
+    )
+
+    # On both yearly and decadal tables, create columns for the share of each event type.
+    for event_size in event_sizes:
+        tb_yearly[f"share_{event_size}_events"] = 100 * tb_yearly[f"n_{event_size}_events"] / tb_yearly["n_events"]
+        tb_decadal[f"share_{event_size}_events"] = 100 * tb_decadal[f"n_{event_size}_events"] / tb_decadal["n_events"]
+
+    # Sanity checks.
+    error = "The sum of the shares of events should be 100% (or within 1%)."
+    assert (
+        abs(tb_yearly[[column for column in tb_yearly.columns if "share" in column]].sum(axis=1) - 100) < 1
+    ).all(), error
+    assert (
+        abs(tb_decadal[[column for column in tb_decadal.columns if "share" in column]].sum(axis=1) - 100) < 1
+    ).all(), error
+
+    # Format new tables conveniently.
+    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_sizes")
+    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_sizes")
+
+    # Plot the share of large events as a bar chart.
+    # import plotly.express as px
+    # columns_sorted = ["year", "share_unknown_events", "share_large_events", "share_medium_events", "share_small_events"]
+    # tb_plot = tb_decadal[tb_decadal["country"]=="World"][columns_sorted].melt(
+    #     id_vars="year", var_name="event_size", value_name="share"
+    # )
+    # fig = px.bar(
+    #     tb_plot,
+    #     x="year",
+    #     y="share",
+    #     color="event_size",
+    #     color_discrete_map={"share_unknown_events": "grey", "share_small_events": "yellow", "share_medium_events": "orange", "share_large_events": "red"},
+    #     title="Share of unknown, small, medium, and large events",
+    #     labels={"year": "Year", "share": "Share of events (%)", "event_size": "Event size"},
+    # )
+    # fig.show()
+
+    return tb_yearly, tb_decadal
+
+
+def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.
@@ -429,42 +598,6 @@ def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
         color="threshold",
         title="Number of events causing more than a certain threshold of deaths",
         labels={"year": "Year", "n_events": "Number of events", "threshold": "Threshold"},
-    )
-    fig.show()
-
-    # Calculate the share of small and big events every decade.
-    tb_ = tb.copy()
-    tb_["decade"] = (tb_["year"] // 10) * 10
-    # Count the total number of events per decade.
-    tb_counts_all = (
-        tb_.groupby("decade", as_index=False, observed=True)["country"].count().rename(columns={"country": "n_events"})
-    )
-    # A "small" event is defined as having <= 5 deaths, <=1500 people affected, or <= 8 million US$ in damages.
-    # tb_counts_small = tb_[(tb_["total_dead"] <= 5) | (tb_["total_affected"] <= 1500) | (tb_["total_damages"] <= 8e6)].groupby("decade", as_index=False, observed=True)["total_dead"].count()
-    # A "large" event is defined as having >= 50 deaths, >= 150000 people affected, or > 200 million US$ in damages.
-    tb_counts_large = (
-        tb_[(tb_["total_dead"] >= 50) | (tb_["total_affected"] >= 150000) | (tb_["total_damages"] >= 200e6)]
-        .groupby("decade", as_index=False, observed=True)["country"]
-        .count()
-        .rename(columns={"country": "n_large_events"})
-    )
-    # Create a table with the counts of small, large, and all events per decade.
-    tb_counts = tb_counts_all.merge(tb_counts_large, on="decade", how="left").fillna(0)
-    # Calculate the share of large events.
-    tb_counts["Large events"] = 100 * tb_counts["n_large_events"] / tb_counts["n_events"]
-    tb_counts["Other events"] = 100 - tb_counts["Large events"]
-    # Plot the share of large events as a bar chart.
-    tb_plot = tb_counts[["decade", "Large events", "Other events"]].melt(
-        id_vars="decade", var_name="event_size", value_name="share"
-    )
-    fig = px.bar(
-        tb_plot,
-        x="decade",
-        y="share",
-        color="event_size",
-        color_discrete_map={"Other events": "blue", "Large events": "red"},
-        title="Share of large events (>= 50 deaths or >= 150,000 affected or > US$ 200 M in damages)",
-        labels={"decade": "Decade", "share": "Share of events (%)", "event_size": "Event size"},
     )
     fig.show()
 
@@ -768,16 +901,27 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, warn_on_missing_countries=True, warn_on_unused_countries=True
     )
 
-    # Calculate start and end dates of disasters.
-    tb = calculate_start_and_end_dates(tb=tb)
-
-    # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
-    tb = calculate_yearly_impacts(tb=tb)
+    # Create a (yearly and decadal) table with the number and share of small, medium and large events.
+    tb_yearly_sizes, tb_decadal_sizes = create_tables_of_event_sizes(
+        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+    )
 
     # Calculate the number of events over a certain threshold of casualties, as well as the share of "large" events.
     # This is useful to notice a possible underestimate of small events in early data.
     # For now, we are not exporting this data and simply inspecting it visually.
     # calculate_n_events_over_a_threshold_of_deaths(tb=tb)
+
+    # Calculate start and end dates of disasters.
+    tb = calculate_start_and_end_dates(tb=tb)
+
+    # Drop unnecessary columns.
+    tb = tb.drop(
+        columns=["start_year", "start_month", "start_day", "end_year", "end_month", "end_day", "entry_date", "cpi"],
+        errors="raise",
+    )
+
+    # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
+    tb = calculate_yearly_impacts(tb=tb)
 
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
@@ -823,6 +967,9 @@ def run(dest_dir: str) -> None:
     #
     # Create new garden dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_decadal], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+        dest_dir,
+        tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes],
+        default_metadata=ds_meadow.metadata,
+        check_variables_metadata=True,
     )
     ds_garden.save()

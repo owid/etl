@@ -79,6 +79,7 @@ dataset:
 
 tables:
   natural_disasters_decadal:
+    title: Natural disasters, decadal data
     variables: &variables-default
       total_dead:
         title: Total deaths
@@ -239,4 +240,56 @@ tables:
           - *definition-total-damage
           - *description-key-common
   natural_disasters_yearly:
+    title: Natural disasters, yearly data
     variables: *variables-default
+  natural_disasters_yearly_sizes:
+    title: Natural disasters sizes, yearly data
+    variables: &variables-sizes
+      n_unknown_events:
+        title: Number of reported natural disasters with unknown impacts
+        unit: events
+        short_unit: ''
+        description_short: ''
+      n_small_events:
+        title: Number of reported natural disasters with a small impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+      n_medium_events:
+        title: Number of reported natural disasters with a medium impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+      n_large_events:
+        title: Number of reported natural disasters with a large impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+      n_events:
+        title: Number of reported natural disasters
+        unit: events
+        short_unit: ''
+        description_short: ''
+      share_unknown_events:
+        title: Share of reported natural disasters with unknown impacts
+        unit: events
+        short_unit: ''
+        description_short: ''
+      share_small_events:
+        title: Share of reported natural disasters with a small impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+      share_medium_events:
+        title: Share of reported natural disasters with a medium impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+      share_large_events:
+        title: Share of reported natural disasters with a large impact
+        unit: events
+        short_unit: ''
+        description_short: ''
+  natural_disasters_decadal_sizes:
+    title: Natural disasters sizes, decadal data
+    variables: *variables-sizes

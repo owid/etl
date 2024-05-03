@@ -728,6 +728,10 @@ steps:
   data://grapher/emdat/2024-04-11/natural_disasters_global_by_type:
     - data://garden/emdat/2024-04-11/natural_disasters
 
+  # The following dataset has all (yearly and decadal) variables, and counts number (and share) of events by event size.
+  data://grapher/emdat/2024-04-11/natural_disasters_sizes:
+    - data://garden/emdat/2024-04-11/natural_disasters
+
   # Natural disasters explorer.
   data://explorers/emdat/latest/natural_disasters:
     - data://garden/emdat/2024-04-11/natural_disasters
