@@ -1,0 +1,14 @@
+dataset:
+  title: Infant mortality with and without vaccinations (Shattock et al, 2024)
+  description: Estimates of the infant mortality rates with and without vital vaccinations.
+  licenses:
+    - {}
+tables:
+  infant_mortality_vaccination_shattock:
+    variables:
+      infant_mortality_rate:
+        title: Infant mortality rate
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Infant mortality rate measures the share of newborns who die before reaching their first birthday. This is shown in a hypothetical scenario without vaccinations.
