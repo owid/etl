@@ -148,33 +148,6 @@ def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
-def get_all_step_usages_ndim(steps) -> List[str]:
-    """Get all dependencies for a given step in a dag.
-
-    This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
-    are also dependencies, and so on. In the end, the result contains all datasets that use, directly or indirectly, the
-    given step.
-
-    Parameters
-    ----------
-    dag_reverse : Dict[str, Any]
-        Dag reversed (a dictionary where each item is step: set of usages).
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    dependencies : List[str]
-        All usages of a given step in a dag.
-
-    """
-    # A simple solution is to simply reverse the graph, and apply the already existing function that finds all
-    # dependencies.
-    dependencies = get_all_step_dependencies(dag=dag_reverse, step=step)
-
-    return dependencies
-
-
 def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Set[str] = set()) -> Set[str]:
     # Find active meadow/garden steps for which there is a newer version.
     new_unused_steps = set(
