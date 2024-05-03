@@ -72,6 +72,23 @@ definitions:
     - *definition-wet-mass-movement
     - *definition-glacial-lake-outburst-flood
     - *definition-fog
+  # Definitions of event sizes, adapted from Guha-Sapir et al. (2004).
+  definition_small_event: &definition-small-event |-
+    A disaster is considered to have a "small" impact if it causes no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not larger than 13 million of today's US dollars. The economic threshold for previous years is appropriately adjusted for inflation.
+  definition_large_event: &definition-large-event |-
+    A disaster is considered to have a "large" impact if it causes more than 50 deaths, affects more than 150,000 people, or causes economic damages larger than 320 million of today's US dollars. The economic threshold for previous years is appropriately adjusted for inflation.
+  definition_medium_event: &definition-medium-event |-
+    A disaster is considered to have a "medium" impact if it has does not fall under the categories of "small" or "large".
+  definition_unknown_event: &definition-unknown-event |-
+    A disaster is considered to have an "unknown" impact if there is no data available on the number of deaths, affected people, or economic damages.
+  definition_size_origin: &definition-size-origin |-
+    These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on the Centre for Research on the Epidemiology of Disasters (CRED).
+  description_key_sizes: &description-key-sizes
+    - *definition-small-event
+    - *definition-medium-event
+    - *definition-large-event
+    - *definition-unknown-event
+    - *definition-size-origin
 
 dataset:
   title: Natural disasters
@@ -249,47 +266,72 @@ tables:
         title: Number of reported natural disasters with unknown impacts
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Reported disasters for which there is no data about the number of deaths, affected people, or economic damages.
       n_small_events:
         title: Number of reported natural disasters with a small impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: *definition-small-event
+        description_key:
+          - *definition-small-event
+          - This definition is adapted from Guha-Sapir et al. (2004).
       n_medium_events:
         title: Number of reported natural disasters with a medium impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Reported disasters that do not fall under the categories of "small" or "large".
+        description_key:
+          - *description-key-sizes
       n_large_events:
         title: Number of reported natural disasters with a large impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
+        description_key:
+          - *description-key-sizes
       n_events:
         title: Number of reported natural disasters
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Total number of reported events, even when their impact, i.e. number of deaths, affected people, and economic damages, is unknown.
+        description_key:
+          - *description-key-sizes
       share_unknown_events:
         title: Share of reported natural disasters with unknown impacts
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Share of reported natural disasters for which there is no data about the number of deaths, affected people, or economic damages.
+        description_key:
+          - *description-key-sizes
       share_small_events:
         title: Share of reported natural disasters with a small impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Share of reported disasters that cause no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not larger than 13 million of today's US dollars.
+        description_key:
+          - *description-key-sizes
       share_medium_events:
         title: Share of reported natural disasters with a medium impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Share of reported disasters that do not fall under the categories of "small" or "large".
+        description_key:
+          - *description-key-sizes
       share_large_events:
         title: Share of reported natural disasters with a large impact
         unit: events
         short_unit: ''
-        description_short: ''
+        description_short: |-
+          Share of reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
+        description_key:
+          - *description-key-sizes
   natural_disasters_decadal_sizes:
     title: Natural disasters sizes, decadal data
     variables: *variables-sizes
