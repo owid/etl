@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import click
+import numpy as np
+import pandas as pd
 from git import Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
@@ -68,10 +70,16 @@ def get_grapher_changes(files_changed, steps_df):
     files_unidentified = []
     grapher_changes = []
     for file_path in files_changed:
+        """Get list of new grapher steps (submitted to the database) with their corresponding old steps."""
+        # Get status: D (deleted), A (added), M (modified)
         file_status = files_changed[file_path]["status"]
+
+        # If deleted, skip loop iteration
         if file_status == "D":
             # Skip deleted files.
             continue
+
+        # Get identify file (if applicable). Obtain its parts (version, identifier, etc.)
         if file_path.startswith(SNAPSHOTS_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".dvc"):
             parts = Path(file_path).with_suffix("").as_posix().split("/")[1:]
             version = parts.pop(-2)
@@ -83,35 +91,59 @@ def get_grapher_changes(files_changed, steps_df):
         else:
             files_unidentified.append(file_path)
             continue
+        # Obtain row in steps_df that corresponds to the file.
         candidate = steps_df[(steps_df["identifier"] == identifier) & (steps_df["version"] == version)]
+
+        # Obtain old version
+        ## This could happen with non-etl step files, like "shared.py". Ignore them
         if len(candidate) == 0:
-            # This could happen with non-etl step files, like "shared.py". Ignore them
-            continue
+            log.error("No candidate in steps_df was found! Working with old datasets (non-ETL)?")
+        ## Unknown error.
         elif len(candidate) > 1:
-            # Unknown error.
             log.error(f"Could not identify a step matching file {file_path}")
+        ## Get candidate's info (old version)
         else:
             steps_affected.append(candidate["step"].item())
             steps_affected.extend(candidate["all_usages"].item())
 
             if (candidate["channel"].item() == "grapher") & (file_status == "A"):
                 current_grapher_step = candidate["step"].item()
-                new_grapher_id = int(steps_df[steps_df["step"] == current_grapher_step]["db_dataset_id"].item())
-                new_grapher_name = steps_df[steps_df["step"] == current_grapher_step]["db_dataset_name"].item()
-                # If there is any, get the info of the previous grapher step.
-                previous_grapher_steps = candidate["same_steps_backward"].item()
-                if len(previous_grapher_steps) > 0:
-                    previous_grapher_step = previous_grapher_steps[-1]
-                    # Get grapher dataset id for the old dataset.
-                    old_grapher_id = int(steps_df[steps_df["step"] == previous_grapher_step]["db_dataset_id"].item())
-                    old_grapher_name = steps_df[steps_df["step"] == previous_grapher_step]["db_dataset_name"].item()
-                    grapher_changes.append(
-                        {
-                            "new": {"id": new_grapher_id, "name": new_grapher_name, "step": current_grapher_step},
-                            "old": {"id": old_grapher_id, "name": old_grapher_name, "step": previous_grapher_step},
-                        }
-                    )
+
+                ## Get grapher dataset id and name of the new dataset.
+                ## If no ID is detected, we can assume that this is not a migration we want to do!
+                new = _get_dataset_name(steps_df, current_grapher_step)
+                if new:
+                    grapher_changes_ = {
+                        "new": new,
+                    }
+
+                    # If there is any, get the info of the previous grapher step.
+                    previous_grapher_steps = candidate["same_steps_backward"].item()
+                    if len(previous_grapher_steps) > 0:
+                        previous_grapher_step = previous_grapher_steps[-1]
+                        # Get grapher dataset id for the old dataset.
+                        old = _get_dataset_name(steps_df, previous_grapher_step)
+                        if old:
+                            grapher_changes_["old"] = old
+
+                    grapher_changes.append(grapher_changes_)
+
     return grapher_changes
+
+
+def _get_dataset_name(steps_df: pd.DataFrame, step: str) -> Dict[str, Any] | None:
+    identifier = steps_df.loc[steps_df["step"] == step, "db_dataset_id"].item()
+    if np.isnan(identifier):
+        log.error(f"Grapher dataset ({step}) in ETL detected that was not submitted to the database! Ignoring it.")
+        return None
+    else:
+        identifier = int(identifier)
+        name = steps_df.loc[steps_df["step"] == step, "db_dataset_name"].item()
+    return {
+        "id": identifier,
+        "name": name,
+        "step": step,
+    }
 
 
 def get_datasets_mapped(files_changed: Dict[str, Dict[str, str]]) -> List[Dict[str, Dict[str, Any]]]:
