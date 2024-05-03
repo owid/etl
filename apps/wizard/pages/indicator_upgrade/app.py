@@ -22,10 +22,6 @@ We use various session state indicators to control the flow of the app:
     - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
 """
-import os
-
-os.environ["STAGING"] = "enhance-indicator-upgrade-2"
-
 import streamlit as st
 from st_pages import add_indentation
 from structlog import get_logger
