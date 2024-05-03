@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import click
 import numpy as np
@@ -148,6 +148,33 @@ def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
+def get_all_step_usages_ndim(steps) -> List[str]:
+    """Get all dependencies for a given step in a dag.
+
+    This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
+    are also dependencies, and so on. In the end, the result contains all datasets that use, directly or indirectly, the
+    given step.
+
+    Parameters
+    ----------
+    dag_reverse : Dict[str, Any]
+        Dag reversed (a dictionary where each item is step: set of usages).
+    step : str
+        Step (as it appears in the dag).
+
+    Returns
+    -------
+    dependencies : List[str]
+        All usages of a given step in a dag.
+
+    """
+    # A simple solution is to simply reverse the graph, and apply the already existing function that finds all
+    # dependencies.
+    dependencies = get_all_step_dependencies(dag=dag_reverse, step=step)
+
+    return dependencies
+
+
 def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Set[str] = set()) -> Set[str]:
     # Find active meadow/garden steps for which there is a newer version.
     new_unused_steps = set(
@@ -241,6 +268,29 @@ def _recursive_get_all_step_dependencies(dag: Dict[str, Any], step: str, depende
     return dependencies
 
 
+def _recursive_get_all_step_dependencies_ndim(
+    dag: Dict[str, Any], step: str, memo: Dict[str, Set[str]]
+) -> Tuple[Set[str], Dict[str, Set[str]]]:
+    """Optimised version of `_recursive_get_all_step_dependencies` using `memo` to store already computed dependencies."""
+    if step in memo:
+        # Return already computed dependencies immediately
+        return memo[step], memo
+
+    dependencies = set()
+    if step in dag:
+        substeps = dag[step]
+        # Update dependencies by adding the substeps
+        dependencies.update(substeps)
+        # Recursively gather dependencies for each substep
+        for substep in substeps:
+            _dependencies, memo = _recursive_get_all_step_dependencies_ndim(dag, substep, memo)
+            dependencies.update(_dependencies)
+
+    # Store the computed dependencies in memo before returning
+    memo[step] = dependencies
+    return dependencies, memo
+
+
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
@@ -329,6 +379,22 @@ class VersionTracker:
 
         return dependencies
 
+    def get_direct_step_uses_ndim(self):
+        # Initialize a dictionary to hold sets of direct usages
+        # key: step in use, value: list of steps directly using key
+        direct_usages_dict = {step: set() for step in self.all_steps}
+
+        # Iterate over all the DAG
+        for _step, dependencies in self.dag_all.items():
+            # Detect step being used
+            for step in dependencies:
+                if step in direct_usages_dict:
+                    direct_usages_dict[step].add(_step)
+
+        # Convert sets back to sorted lists (if needed) and store in direct_usages
+        direct_usages = [sorted(direct_usages_dict[step]) for step in self.all_steps]
+        return direct_usages
+
     def get_all_step_dependencies(self, step: str, only_active: bool = False) -> List[str]:
         """Get all dependencies for a given step in the dag (including dependencies of dependencies)."""
         if only_active:
@@ -344,6 +410,24 @@ class VersionTracker:
             dependencies = get_all_step_usages(dag_reverse=self.dag_active_reverse, step=step)
         else:
             dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
+
+        return dependencies
+
+    def get_all_step_usages_ndim(self, only_active: bool = False) -> List[str]:
+        """Get all usages for a given step in the dag (including usages of usages)."""
+        dependencies = []
+        memo = {}
+        for step in self.all_steps:
+            # Pass the memo dictionary to store already computed dependencies
+            if only_active:
+                dependencies_, memo = _recursive_get_all_step_dependencies_ndim(
+                    dag=self.dag_active_reverse, step=step, memo=memo
+                )
+            else:
+                dependencies_, memo = _recursive_get_all_step_dependencies_ndim(
+                    dag=self.dag_all_reverse, step=step, memo=memo
+                )
+            dependencies.append(sorted(dependencies_))
 
         return dependencies
 
@@ -675,30 +759,8 @@ class VersionTracker:
         return steps_df
 
     def _create_steps_df(self) -> pd.DataFrame:
-        # Create a dataframe where each row correspond to one step.
-        steps_df = pd.DataFrame({"step": self.all_steps.copy()})
-        # Add relevant information about each step.
-        steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
-        steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
-        steps_df["all_active_dependencies"] = [
-            self.get_all_step_dependencies(step=step, only_active=True) for step in self.all_steps
-        ]
-        steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
-        steps_df["all_active_usages"] = [
-            self.get_all_step_usages(step=step, only_active=True) for step in self.all_steps
-        ]
-        steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
-        steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
-        steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
-        steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
-
-        # Add column for the total number of all dependencies and usges.
-        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
-        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
-
-        # Add attributes to steps.
-        steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
+        # Initialise steps_df with core columns
+        steps_df = self._init_steps_df_ndim()
 
         if self.connect_to_db:
             # Add info from DB.
@@ -745,6 +807,64 @@ class VersionTracker:
         # Add column that is true if the step is the latest version.
         steps_df["is_latest"] = False
         steps_df.loc[steps_df["version"] == steps_df["latest_version"], "is_latest"] = True
+
+        return steps_df
+
+    def _init_steps_df(self) -> pd.DataFrame:
+        # Create a dataframe where each row correspond to one step.
+        steps_df = pd.DataFrame({"step": self.all_steps.copy()})
+        # Add relevant information about each step.
+        steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
+        steps_df["all_active_dependencies"] = [
+            self.get_all_step_dependencies(step=step, only_active=True) for step in self.all_steps
+        ]
+        steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["all_active_usages"] = [
+            self.get_all_step_usages(step=step, only_active=True) for step in self.all_steps
+        ]
+        # TODO
+        steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
+        steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
+        steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
+        steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
+        # TODO
+        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
+
+        # Add column for the total number of all dependencies and usges.
+        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
+        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
+
+        # Add attributes to steps.
+        steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
+
+        return steps_df
+
+    def _init_steps_df_ndim(self) -> pd.DataFrame:
+        """Optimised version of the _init_steps_df method (loop-opimisation)."""
+        # Create a dataframe where each row correspond to one step.
+        steps_df = pd.DataFrame({"step": self.all_steps.copy()})
+        # Add relevant information about each step.
+        steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["direct_usages"] = self.get_direct_step_uses_ndim()
+        steps_df["all_active_dependencies"] = [
+            self.get_all_step_dependencies(step=step, only_active=True) for step in self.all_steps
+        ]
+        steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["all_active_usages"] = self.get_all_step_usages_ndim(only_active=True)
+        steps_df["all_usages"] = self.get_all_step_usages_ndim()
+        steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
+        steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
+        steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
+        # TODO
+        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
+
+        # Add column for the total number of all dependencies and usges.
+        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
+        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
+
+        # Add attributes to steps.
+        steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
 
         return steps_df
 
