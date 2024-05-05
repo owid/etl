@@ -716,7 +716,7 @@ class SnapshotStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        return Snapshot(self.path).m.outs[0]["md5"]
+        return files.checksum_file(self._dvc_path)
 
     @property
     def _dvc_path(self) -> str:
