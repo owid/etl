@@ -314,7 +314,7 @@ def run(dest_dir: str) -> None:
     # Create a map: Region name -> Region code
     regions_by_name = regions.reset_index().set_index("name")["code"]
 
-    # Keep only the most recent classification for each country.
+    # Add entity codes to countries in tb_income_groups.
     tb_income_groups["code"] = tb_income_groups["country"].map(regions_by_name.to_dict())
 
     # Check that all countries in the WB dataset have a code.
