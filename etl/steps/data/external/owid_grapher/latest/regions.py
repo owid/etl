@@ -8,16 +8,20 @@ import ast
 import re
 
 import pandas as pd
-from owid.catalog import Dataset, Table
-from structlog import get_logger
+from owid.catalog import Table
+from owid.catalog.processing import concat
 
 from etl.helpers import PathFinder, create_dataset
 
-# Initialize logger.
-log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+INCOME_GROUPS_ENTITY_CODES = {
+    "Low-income countries": "OWID_LIC",
+    "Lower-middle-income countries": "OWID_LMC",
+    "Upper-middle-income countries": "OWID_UMC",
+    "High-income countries": "OWID_HIC",
+}
 
 
 # Countries that are mappable in Grapher.
@@ -254,17 +258,11 @@ NO_COUNTRY_PAGE = [
 
 
 def run(dest_dir: str) -> None:
-    log.warning(
-        "This step exists for backward compatibility and should eventually be removed. "
-        "Consider using external/owid_grapher/latest/regions instead."
-    )
-
     #
     # Load inputs.
     #
-    # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("regions")
-
+    # Load regions dataset.
+    ds_garden = paths.load_dataset("regions")
     # Read tables from regions dataset.
     regions = ds_garden["regions"][["name", "short_name", "region_type", "is_historical", "defined_by"]]
     members = ds_garden["regions"][["members"]]
@@ -286,11 +284,15 @@ def run(dest_dir: str) -> None:
         ]
     ]
 
+    # Load income groups dataset and read table of latest income group classifications.
+    ds_income_groups = paths.load_dataset("income_groups")
+    tb_income_groups = ds_income_groups["income_groups_latest"].reset_index()
+
     #
     # Process data.
     #
     # Drop unneeded columns
-    regions: Table = regions.drop(columns=["defined_by"])  # type: ignore
+    regions = regions.drop(columns=["defined_by"], errors="raise")
 
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)
@@ -309,15 +311,48 @@ def run(dest_dir: str) -> None:
         members["members"].astype(object).apply(lambda x: ";".join(ast.literal_eval(x)) if pd.notna(x) else "")
     )
 
+    # Create a map: Region name -> Region code
+    regions_by_name = regions.reset_index().set_index("name")["code"]
+
+    # Keep only the most recent classification for each country.
+    tb_income_groups["code"] = tb_income_groups["country"].map(regions_by_name.to_dict())
+
+    # Check that all countries in the WB dataset have a code.
+    assert len(tb_income_groups[tb_income_groups["code"].isna()]) == 0
+
+    # Check that there are exactly these 4 income groups.
+    assert set(tb_income_groups["classification"].unique()) == set(INCOME_GROUPS_ENTITY_CODES.keys())
+
+    # Create a regions-like table for income groups.
+    income_group_rows = []
+    for income_group_name, income_group_code in INCOME_GROUPS_ENTITY_CODES.items():
+        income_group_rows.append(
+            {
+                "code": income_group_code,
+                "name": income_group_name,
+                "short_name": income_group_name,
+                "region_type": "income_group",
+                "is_historical": False,
+                "slug": slugify(income_group_name),
+                "is_mappable": False,
+                "is_unlisted": False,
+                "short_code": None,
+                "members": ";".join(tb_income_groups[tb_income_groups["classification"] == income_group_name]["code"]),
+            }
+        )
+    tb_income_groups_as_regions = Table.from_records(income_group_rows)
+
+    # Add rows for income groups to the regions table.
+    tb = concat([regions.reset_index(), tb_income_groups_as_regions])
+
+    # Set an appropriate index.
+    tb = tb.set_index("code", verify_integrity=True)
+
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[regions], default_metadata=ds_garden.metadata, formats=["csv"], run_grapher_checks=False
-    )
-
-    # Save changes in the new grapher dataset.
+    # Create a new external dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb], formats=["csv"])
     ds_grapher.save()
 
 
