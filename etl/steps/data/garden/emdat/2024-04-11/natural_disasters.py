@@ -572,34 +572,75 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     return tb_yearly, tb_decadal
 
 
-def calculate_n_events_over_a_threshold_of_deaths(tb: Table) -> None:
+def calculate_n_events_over_a_threshold_of_deaths(
+    tb: Table, ds_regions: Dataset, ds_income_groups: Dataset
+) -> Tuple[Table, Table]:
     # Calculate the number of events with more than a certain threshold of deaths.
     # With this, we can notice that "big events" (with over 5000 victims) have been roughly constant over the years.
     # However, "small events" (with less than 200 victims) have been increasing over the years.
     # This suggests that small events are underrepresented in early data, and the increase is due to better reporting.
-    tb_ = tb.sort_values(["year"])[["year"]].drop_duplicates().reset_index(drop=True)
-    for threshold in [200, 500, 1000, 2000, 5000]:
-        tb_counts = (
-            tb[tb["total_dead"] > threshold].groupby("year", as_index=False, observed=True)["total_dead"].count()
-        )
-        # tb_counts = tb_counts.rename(columns={"total_dead": f"n_events_with_over_{threshold}_deaths"}, errors="raise")
-        tb_counts = tb_counts.rename(columns={"total_dead": f"{threshold} deaths"}, errors="raise")
-        tb_ = tb_.merge(tb_counts, on="year", how="left")
-    tb_ = tb_.fillna(0)
-    # NOTE: It would be better to calculate this after creating an aggregate for "World" (to ensure there are no double
-    # counts in historical regions). However, this requires some refactoring, and we already know that the overlap is
-    # minimal (defined in ACCEPTED_OVERLAPS).
-    import plotly.express as px
 
-    fig = px.line(
-        tb_.melt(id_vars="year", var_name="threshold", value_name="n_events"),
-        x="year",
-        y="n_events",
-        color="threshold",
-        title="Number of events causing more than a certain threshold of deaths",
-        labels={"year": "Year", "n_events": "Number of events", "threshold": "Threshold"},
+    # For each threshold of deaths, create a table counting the number of events with more than that threshold
+    # for each country-year.
+    tb_counts = [
+        tb[tb["total_dead"].fillna(0) > threshold]
+        .groupby(["country", "year"], as_index=False, observed=True)["total_dead"]
+        .count()
+        .rename(columns={"total_dead": f"n_events_with_over_{threshold}_deaths"}, errors="raise")
+        for threshold in [200, 500, 1000, 2000, 5000]
+    ]
+    # Add a table with the number of events for which total_dead is unknown.
+    tb_unknown = (
+        tb[tb["total_dead"].isnull()]
+        .groupby(["country", "year"], as_index=False, observed=True)["total_dead"]
+        .size()
+        .rename(columns={"size": "n_events_with_unknown_deaths"}, errors="raise")
     )
-    fig.show()
+    tb_counts.append(tb_unknown)
+    # Merge all tables into one.
+    tb_yearly = pr.multi_merge(tb_counts, on=["country", "year"], how="outer")
+
+    # Fill missing values with zeros.
+    for column in tb_yearly.drop(columns=["country", "year"]).columns:
+        tb_yearly[column] = tb_yearly[column].fillna(0)
+
+    # Add region aggregates.
+    tb_yearly = geo.add_regions_to_table(
+        tb=tb_yearly,
+        regions=REGIONS,
+        index_columns=["country", "year"],
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+    )
+
+    # Create a table with the decadal count of events.
+    tb_decadal = tb_yearly.copy()
+    tb_decadal["decade"] = (tb_decadal["year"] // 10) * 10
+    tb_decadal = (
+        tb_decadal.groupby(["country", "decade"], as_index=False, observed=True)
+        .sum()
+        .drop(columns="year")
+        .rename(columns={"decade": "year"}, errors="raise")
+    )
+
+    # Plot the curves of the number of global events causing more than a certain threshold of deaths.
+    # import plotly.express as px
+    # fig = px.line(
+    #     tb_by_deaths[tb_by_deaths["country"]=="World"].drop(columns="country").melt(id_vars="year", var_name="threshold", value_name="n_events"),
+    #     x="year",
+    #     y="n_events",
+    #     color="threshold",
+    #     title="Number of events causing more than a certain threshold of deaths",
+    #     labels={"year": "Year", "n_events": "Number of events", "threshold": "Threshold"},
+    # )
+    # fig.show()
+
+    # Format tables conveniently.
+    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_deaths")
+    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_deaths")
+
+    return tb_yearly, tb_decadal
 
 
 def get_total_count_of_yearly_impacts(tb: Table) -> Table:
@@ -906,10 +947,11 @@ def run(dest_dir: str) -> None:
         tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
     )
 
-    # Calculate the number of events over a certain threshold of casualties, as well as the share of "large" events.
+    # Calculate the number of events over a certain threshold of casualties.
     # This is useful to notice a possible underestimate of small events in early data.
-    # For now, we are not exporting this data and simply inspecting it visually.
-    # calculate_n_events_over_a_threshold_of_deaths(tb=tb)
+    tb_yearly_deaths, tb_decadal_deaths = calculate_n_events_over_a_threshold_of_deaths(
+        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+    )
 
     # Calculate start and end dates of disasters.
     tb = calculate_start_and_end_dates(tb=tb)
@@ -968,7 +1010,7 @@ def run(dest_dir: str) -> None:
     # Create new garden dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes],
+        tables=[tb, tb_decadal, tb_yearly_sizes, tb_decadal_sizes, tb_yearly_deaths, tb_decadal_deaths],
         default_metadata=ds_meadow.metadata,
         check_variables_metadata=True,
     )

@@ -84,11 +84,24 @@ definitions:
   definition_size_origin: &definition-size-origin |-
     These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on the Centre for Research on the Epidemiology of Disasters (CRED).
   description_key_sizes: &description-key-sizes
+    - *definition-disaster
+    - *definition-dead
+    - *definition-injured
+    - *definition-affected
+    - *definition-homeless
+    - *definition-total-affected
+    - *definition-total-damage
     - *definition-small-event
     - *definition-large-event
     - *definition-medium-event
     - *definition-unknown-event
     - *definition-size-origin
+  definition_unknown_deaths: &definition-unknown-deaths |-
+    A disaster is considered to have an "unknown" number of deaths if there is no data available on the number of deaths for that reported event.
+  description_key_deaths: &description-key-deaths
+    - *definition-disaster
+    - *definition-dead
+    - *definition-unknown-deaths
 
 dataset:
   title: Natural disasters
@@ -260,7 +273,7 @@ tables:
     title: Natural disasters, yearly data
     variables: *variables-default
   natural_disasters_yearly_sizes:
-    title: Natural disasters sizes, yearly data
+    title: Natural disasters by yearly impact
     variables: &variables-sizes
       n_unknown_events:
         title: Number of reported natural disasters with unknown impacts
@@ -370,5 +383,83 @@ tables:
         presentation:
           title_public: Share of reported natural disasters with a large impact
   natural_disasters_decadal_sizes:
-    title: Natural disasters sizes, decadal data
+    title: Natural disasters by decadal impact
     variables: *variables-sizes
+  natural_disasters_yearly_deaths:
+    title: Natural disasters by yearly deaths
+    variables: &variables-deaths
+      n_events_with_over_200_deaths:
+        title: Number of reported natural disasters with over 200 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 200 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 200 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 200 deaths
+      n_events_with_over_500_deaths:
+        title: Number of reported natural disasters with over 500 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 500 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 500 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 500 deaths
+      n_events_with_over_1000_deaths:
+        title: Number of reported natural disasters with over 1000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 1000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 1000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 1000 deaths
+      n_events_with_over_2000_deaths:
+        title: Number of reported natural disasters with over 2000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 2000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 2000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 2000 deaths
+      n_events_with_over_5000_deaths:
+        title: Number of reported natural disasters with over 5000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 5000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 5000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 5000 deaths
+      n_events_with_unknown_deaths:
+        title: Number of reported natural disasters with unknown deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters for which there is no data available on the number of deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Unknown
+        presentation:
+          title_public: Number of reported natural disasters with unknown deaths
+  natural_disasters_decadal_deaths:
+    title: Natural disasters by decadal deaths
+    variables: *variables-deaths
