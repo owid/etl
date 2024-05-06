@@ -29,6 +29,14 @@ class AdminAPI(object):
         else:
             self.base_url = f"http://{engine.url.host}"
 
+    def _json_from_response(self, resp: requests.Response) -> dict:
+        resp.raise_for_status()
+        try:
+            js = resp.json()
+        except json.JSONDecodeError as e:
+            raise AdminAPIError(resp.text) from e
+        return js
+
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.base_url}/admin/api/charts/{chart_id}.config.json",
@@ -43,8 +51,7 @@ class AdminAPI(object):
             cookies={"sessionid": self.session_id},
             json=chart_config,
         )
-        resp.raise_for_status()
-        js = resp.json()
+        js = self._json_from_response(resp)
         assert js["success"]
         return js
 
@@ -54,8 +61,7 @@ class AdminAPI(object):
             cookies={"sessionid": self.session_id},
             json=chart_config,
         )
-        resp.raise_for_status()
-        js = resp.json()
+        js = self._json_from_response(resp)
         assert js["success"]
         return js
 
@@ -65,8 +71,7 @@ class AdminAPI(object):
             cookies={"sessionid": self.session_id},
             json={"tags": tags},
         )
-        resp.raise_for_status()
-        js = resp.json()
+        js = self._json_from_response(resp)
         assert js["success"]
         return js
 
@@ -101,3 +106,7 @@ def _create_user_session(session: Session, user_email: str, expiration_seconds=3
     )
 
     return session_key
+
+
+class AdminAPIError(Exception):
+    pass

@@ -26,6 +26,8 @@ SIMILARITY_NAMES = {
     "partial_token_set_ratio": fuzz.partial_token_set_ratio,
     "partial_token_sort_ratio": fuzz.partial_token_sort_ratio,
     "ratio": fuzz.ratio,
+    "quick_ratio": fuzz.QRatio,
+    "weighted_ratio": fuzz.WRatio,
 }
 log = get_logger()
 
