@@ -9,12 +9,12 @@ definitions:
     Measured in gigawatts.
   description_short_twh: &description_short_twh |-
     Measured in terawatt-hours.
-  description_short_kwh: &description_short_kwh |-
-    Measured in kilowatt-hours.
   description_short_pct: &description_short_pct |-
     Measured as a percentage of total electricity.
   description_short_mtco2: &description_short_mtco2 |-
     Measured in megatonnes of CO₂ equivalents.
+  description_short_low_carbon: &description_short_low_carbon |-
+    Low-carbon sources correspond to renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels.
 
 dataset:
   title: Yearly Electricity Data
@@ -29,10 +29,10 @@ tables:
         short_unit: GW
         unit: gigawatts
         display:
-          name: Clean
-        description_short: *description_short_gw
+          name: Low-carbon
+        description_short: *description_short_low_carbon
         presentation:
-          title_public: Electricity capacity from clean sources
+          title_public: Electricity capacity from low-carbon sources
       capacity__fossil__gw:
         title: Fossil - GW
         short_unit: GW
@@ -165,7 +165,8 @@ tables:
         unit: terawatt-hours
         display:
           name: Demand
-        description_short: *description_short_twh
+        description_short: |-
+          Sum of power production and net imports, measured in TWh.
         presentation:
           title_public: Total electricity demand
       demand__total_demand_per_capita__kwh:
@@ -174,7 +175,8 @@ tables:
         unit: kilowatt-hours
         display:
           name: Demand per capita
-        description_short: *description_short_kwh
+        description_short: |-
+          Sum of power production and net imports divided by the population, measured in kWh.
         presentation:
           title_public: Total electricity demand per person
       generation__clean__pct:
@@ -182,10 +184,10 @@ tables:
         short_unit: "%"
         unit: "%"
         display:
-          name: Clean
-        description_short: *description_short_pct
+          name: Low-carbon
+        description_short: *description_short_low_carbon
         presentation:
-          title_public: Share of electricity generated from clean sources
+          title_public: Share of electricity generated from low-carbon sources
       generation__fossil__pct:
         title: Fossil - %
         short_unit: "%"
@@ -236,10 +238,10 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Clean
-        description_short: *description_short_twh
+          name: Low-carbon
+        description_short: *description_short_low_carbon
         presentation:
-          title_public: Electricity generation from clean sources
+          title_public: Electricity generation from low-carbon sources
       generation__fossil__twh:
         title: Fossil - TWh
         short_unit: TWh
@@ -462,7 +464,8 @@ tables:
         unit: terawatt-hours
         display:
           name: Net imports
-        description_short: *description_short_twh
+        description_short: |-
+          Electricity imports minus exports, measured in TWh.
         presentation:
           title_public: Net electricity imports
       emissions__clean__mtco2:
@@ -470,10 +473,10 @@ tables:
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Clean
-        description_short: *description_short_mtco2
+          name: Low-carbon
+        description_short: *description_short_low_carbon
         presentation:
-          title_public: CO₂ emissions from electricity generation from clean sources
+          title_public: CO₂ emissions from electricity generation from low-carbon sources
       emissions__fossil__mtco2:
         title: Fossil - mtCO2eq
         short_unit: mtCO₂eq
@@ -609,21 +612,13 @@ tables:
         description_short: *description_short_mtco2
         presentation:
           title_public: Total CO₂ emissions from electricity generation
-      # total_generation__twh:
-      #   title: Total generation - TWh
-      #   short_unit: TWh
-      #   unit: terawatt-hours
-      #   display:
-      #     name: Total generation
-      #   description_short: *description_short_twh
-      #   presentation:
-      #     title_public: Total electricity generation
       emissions__co2_intensity__gco2_kwh:
         title: CO2 intensity - gCO2eq/kWh
         short_unit: gCO₂eq/kWh
         unit: grams of CO₂ equivalents per kilowatt-hour
         display:
           name: CO₂ intensity
-        description_short: Measured in grams of CO₂ equivalents per kilowatt-hour.
+        description_short: |-
+          Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
         presentation:
           title_public: CO₂ intensity of electricity generation
