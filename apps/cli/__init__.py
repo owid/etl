@@ -71,6 +71,7 @@ SUBGROUPS = {
             "publish": "etl.publish.publish_cli",
             "reindex": "etl.reindex.reindex_cli",
             "run-python-step": "etl.run_python_step.main",
+            "map-datasets": "apps.utils.map_datasets.cli",
         },
     },
     "b": {
