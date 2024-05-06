@@ -65,3 +65,6 @@ DEFAULT_DAG_FILE = DAG_FILE
 
 # Hidden ETL file that will keep the time it took to execute each step.
 EXECUTION_TIME_FILE = BASE_DIR / ".execution_time.json"
+
+# Special ENV file for production
+ENV_FILE_PROD = Path(os.environ.get("ENV_FILE_PROD", BASE_DIR / ".env.prod"))

@@ -3,8 +3,10 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import OperationalError
 from sqlmodel import Session, SQLModel
 from st_pages import add_indentation
+from structlog import get_logger
 
 from apps.staging_sync.cli import _get_engine_for_env, _modified_chart_ids_by_admin, _validate_env
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
@@ -13,6 +15,9 @@ from apps.wizard.utils import chart_html, set_states
 from apps.wizard.utils.env import OWID_ENV
 from etl import grapher_model as gm
 from etl.config import DB_HOST
+from etl.paths import ENV_FILE_PROD
+
+log = get_logger()
 
 # from apps.wizard import utils as wizard_utils
 
@@ -22,8 +27,12 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # TODO: simplify this
 SOURCE_ENV = DB_HOST  # "staging-site-streamlit-chart-approval"
 SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
-# TODO: switch to production once we are ready
-TARGET_ENV = "staging-site-master"
+
+if ENV_FILE_PROD.exists():
+    TARGET_ENV = ENV_FILE_PROD
+else:
+    log.warning(f"Production env file {ENV_FILE_PROD} not found, comparing against staging-site-master")
+    TARGET_ENV = "staging-site-master"
 TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
 
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
@@ -254,7 +263,13 @@ def main():
         )
     # TODO: this should be created via migration in owid-grapher!!!!!
     # Create chart_diff_approvals table if it doesn't exist
-    SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
+    try:
+        SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
+    except OperationalError as e:
+        if "Table 'chart_diff_approvals' already exists" in str(e):
+            pass
+        else:
+            raise e
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:
