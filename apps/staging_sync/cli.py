@@ -321,6 +321,8 @@ def _match_target_chart(target_session: Session, source_chart: gm.Chart, chart_i
         except NoResultFound:
             return None
 
+    return target_chart
+
 
 def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> dt.datetime:
     if staging_created_at is None:
@@ -445,6 +447,17 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
         select id from charts where publishedAt is not null
     )
     """
+
+    # all charts
+    q = """
+    -- modified charts
+    select
+        id as chartId
+    from charts
+    where publishedAt is not null
+    limit 10
+    """
+
     return set(read_sql(q, session.bind).chartId.tolist())  # type: ignore
 
 
