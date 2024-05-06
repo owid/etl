@@ -448,16 +448,6 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     )
     """
 
-    # all charts
-    q = """
-    -- modified charts
-    select
-        id as chartId
-    from charts
-    where publishedAt is not null
-    limit 10
-    """
-
     return set(read_sql(q, session.bind).chartId.tolist())  # type: ignore
 
 
