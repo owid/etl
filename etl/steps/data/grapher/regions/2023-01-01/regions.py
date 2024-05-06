@@ -48,9 +48,13 @@ def run(dest_dir: str) -> None:
     # Create a new regions table with a more convenient format.
     tb_regions = tb[(tb["region_type"] == "country")].copy()
     for institution in set(tb["defined_by"]):
+        if institution == "owid":
+            region_type = "continent"
+        else:
+            region_type = "aggregate"
         # Select rows of regions as defined by the current institution.
         region_members = (
-            tb[(tb["defined_by"] == institution) & (tb["region_type"].isin(["aggregate", "continent"]))]
+            tb[(tb["defined_by"] == institution) & (tb["region_type"] == region_type)]
             .set_index("country")["members"]
             .to_dict()
         )
@@ -60,9 +64,12 @@ def run(dest_dir: str) -> None:
             for region, members in region_members.items()
         }
         # Invert that dictionary.
-        countries_to_region = {
-            country: region for region, countries in region_to_countries.items() for country in countries
-        }
+        countries_to_region = {}
+        for region, countries in region_to_countries.items():
+            for country in countries:
+                if country in countries_to_region:
+                    log.warning(f"Country {country} belongs to multiple regions.")
+                countries_to_region[country] = region
         # Create a temporary table for the current regions.
         _tb_regions = (
             Table.from_dict(countries_to_region, orient="index", columns=[f"{institution}_region"])
