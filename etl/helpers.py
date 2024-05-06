@@ -499,7 +499,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
