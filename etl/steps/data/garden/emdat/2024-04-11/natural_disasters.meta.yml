@@ -352,7 +352,7 @@ tables:
         unit: events
         short_unit: ''
         description_short: |-
-          Share of reported disasters that cause no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not larger than 13 million of today's US dollars.
+          Share of reported disasters that result in no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
         description_key:
           - *description-key-sizes
         display:
@@ -376,7 +376,7 @@ tables:
         unit: events
         short_unit: ''
         description_short: |-
-          Share of reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
+          Share of reported disasters that result in more than 50 deaths, affect more than 150,000 people, or cause economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
         description_key:
           - *description-key-sizes
         display:
