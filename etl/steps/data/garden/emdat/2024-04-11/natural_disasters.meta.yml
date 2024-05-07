@@ -74,15 +74,15 @@ definitions:
     - *definition-fog
   # Definitions of event sizes, adapted from Guha-Sapir et al. (2004).
   definition_small_event: &definition-small-event |-
-    A disaster is considered to have a "small" impact if it causes no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not larger than 13 million of today's US dollars. The economic threshold for previous years is appropriately adjusted for inflation.
+    A disaster is considered to have a "small" impact if it results in no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
   definition_large_event: &definition-large-event |-
-    A disaster is considered to have a "large" impact if it causes more than 50 deaths, affects more than 150,000 people, or causes economic damages larger than 320 million of today's US dollars. The economic threshold for previous years is appropriately adjusted for inflation.
+    A disaster is considered to have a "large" impact if it results in more than 50 deaths, affects more than 150,000 people, or causes economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
   definition_medium_event: &definition-medium-event |-
-    A disaster is considered to have a "medium" impact if it has does not fall under the categories of "small" or "large".
+    A disaster is considered to have a "medium" impact if it does not fall under the categories of "small" or "large".
   definition_unknown_event: &definition-unknown-event |-
     A disaster is considered to have an "unknown" impact if there is no data available on the number of deaths, affected people, or economic damages.
   definition_size_origin: &definition-size-origin |-
-    These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on the Centre for Research on the Epidemiology of Disasters (CRED).
+    These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on definitions by the Centre for Research on the Epidemiology of Disasters (CRED).
   description_key_sizes: &description-key-sizes
     - *definition-disaster
     - *definition-dead
@@ -291,7 +291,8 @@ tables:
         title: Number of reported natural disasters with a small impact
         unit: events
         short_unit: ''
-        description_short: *definition-small-event
+        description_short: |-
+          Reported disasters that result in no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
         description_key:
           - *description-key-sizes
         display:
@@ -315,7 +316,7 @@ tables:
         unit: events
         short_unit: ''
         description_short: |-
-          Reported disasters that cause more than 50 deaths, affect more than 150,000 people, or cause economic damages larger than 320 million of today's US dollars.
+          Reported disasters that result in more than 50 deaths, affect more than 150,000 people, or cause economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
         description_key:
           - *description-key-sizes
         display:

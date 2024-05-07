@@ -611,7 +611,7 @@ def calculate_n_events_over_a_threshold_of_deaths(
         index_columns=["country", "year"],
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
-        accepted_overlaps=ACCEPTED_OVERLAPS,
+        accepted_overlaps=[],
     )
 
     # Create a table with the decadal count of events.
