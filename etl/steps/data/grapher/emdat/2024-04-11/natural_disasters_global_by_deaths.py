@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     # Transform the table to long format, with a "country" column (called this way for compatibility with grapher).
     tb_global = tb_global.melt(id_vars=["year"], var_name="country", value_name="n_events")
 
-    tb_global["n_events"].metadata.title = "Number of events"
+    tb_global["n_events"].metadata.title = "Global number of reported natural disasters"
 
     # Set an appropriate index.
     tb_global = tb_global.format()
