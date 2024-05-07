@@ -549,8 +549,8 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     ).all(), error
 
     # Format new tables conveniently.
-    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_sizes")
-    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_sizes")
+    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_impact")
+    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_impact")
 
     # Plot the share of large events as a bar chart.
     # import plotly.express as px

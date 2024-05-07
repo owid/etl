@@ -737,7 +737,7 @@ steps:
     - data://garden/emdat/2024-04-11/natural_disasters
 
   # The following dataset has yearly and decadal count (and share) of events by impacts.
-  data://grapher/emdat/2024-04-11/natural_disasters_sizes:
+  data://grapher/emdat/2024-04-11/natural_disasters_impact:
     - data://garden/emdat/2024-04-11/natural_disasters
 
   # The following dataset has yearly and decadal count of events by number of deaths.

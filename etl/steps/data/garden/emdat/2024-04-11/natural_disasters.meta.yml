@@ -272,9 +272,9 @@ tables:
   natural_disasters_yearly:
     title: Natural disasters, yearly data
     variables: *variables-default
-  natural_disasters_yearly_sizes:
+  natural_disasters_yearly_impact:
     title: Natural disasters by yearly impact
-    variables: &variables-sizes
+    variables: &variables-impact
       n_unknown_events:
         title: Number of reported natural disasters with unknown impacts
         unit: events
@@ -382,9 +382,9 @@ tables:
           name: Large
         presentation:
           title_public: Share of reported natural disasters with a large impact
-  natural_disasters_decadal_sizes:
+  natural_disasters_decadal_impact:
     title: Natural disasters by decadal impact
-    variables: *variables-sizes
+    variables: *variables-impact
   natural_disasters_yearly_deaths:
     title: Natural disasters by yearly deaths
     variables: &variables-deaths
