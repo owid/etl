@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 import time
 from typing import Any, Dict, List, Literal, Optional, get_args
 
@@ -82,8 +83,22 @@ def cli(
     else:
         if not comment:
             pr.create_issue_comment(body=body)
+        elif strip_appendix(comment.body) == strip_appendix(body):
+            log.info("No changes detected, skipping.", repo=repo, branch=branch, services=services)
         else:
+            log.info("Updating comment.", repo=repo, branch=branch, services=services)
             comment.edit(body=body)
+
+
+def strip_appendix(body: str) -> str:
+    """Strip variable parts of the body so that we can compare two different comments."""
+    # replace line with _Edited: 2024-05-06 11:21:29 UTC_
+    body = re.sub(r"_Edited:.*UTC_", "", body)
+
+    # replace line with _Execution time: 1.78 seconds_
+    body = re.sub(r"_Execution time:.*seconds_", "", body)
+
+    return body
 
 
 def services_from_comment(comment: Any) -> Dict[str, str]:

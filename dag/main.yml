@@ -392,12 +392,12 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-11-02/world_economic_outlook:
-    - snapshot://imf/2023-11-02/world_economic_outlook.xls
-  data://garden/imf/2023-11-02/world_economic_outlook:
-    - data://meadow/imf/2023-11-02/world_economic_outlook
-  data://grapher/imf/2023-11-02/world_economic_outlook:
-    - data://garden/imf/2023-11-02/world_economic_outlook
+  data://meadow/imf/2024-05-02/world_economic_outlook:
+    - snapshot://imf/2024-05-02/world_economic_outlook.xls
+  data://garden/imf/2024-05-02/world_economic_outlook:
+    - data://meadow/imf/2024-05-02/world_economic_outlook
+  data://grapher/imf/2024-05-02/world_economic_outlook:
+    - data://garden/imf/2024-05-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
@@ -732,8 +732,16 @@ steps:
   data://grapher/emdat/2024-04-11/natural_disasters:
     - data://garden/emdat/2024-04-11/natural_disasters
 
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
+  # The following dataset has only global yearly data, and entity corresponds to the type of disaster.
   data://grapher/emdat/2024-04-11/natural_disasters_global_by_type:
+    - data://garden/emdat/2024-04-11/natural_disasters
+
+  # The following dataset has only global yearly data, and entity corresponds to the threshold of deaths.
+  data://grapher/emdat/2024-04-11/natural_disasters_global_by_deaths:
+    - data://garden/emdat/2024-04-11/natural_disasters
+
+  # The following dataset has yearly and decadal count (and share) of events by impacts.
+  data://grapher/emdat/2024-04-11/natural_disasters_impact:
     - data://garden/emdat/2024-04-11/natural_disasters
 
   # Natural disasters explorer.
