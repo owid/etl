@@ -1,8 +1,12 @@
 import pandas as pd
 from sqlmodel import Session
+from structlog import get_logger
 
 from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
+from etl import config
+
+log = get_logger()
 
 
 def run(branch: str) -> str:
@@ -11,7 +15,7 @@ def run(branch: str) -> str:
     chart_diff = format_chart_diff(call_chart_diff(branch))
 
     body = f"""
-<details>
+<details open>
 <summary><b>Chart diff</b>: </summary>
 {chart_diff}
 <a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a>
@@ -23,8 +27,12 @@ def run(branch: str) -> str:
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
     source_engine = _get_engine_for_env(branch)
-    # TODO: this should be live
-    target_engine = _get_engine_for_env("master")
+
+    if config.DB_IS_PRODUCTION:
+        target_engine = _get_engine_for_env(config.ENV_FILE)
+    else:
+        log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
+        target_engine = _get_engine_for_env("staging-site-master")
 
     df = []
     with Session(source_engine) as source_session:

@@ -17,6 +17,8 @@ from dotenv import load_dotenv
 
 from etl.paths import BASE_DIR
 
+ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
+
 
 def get_username():
     return pwd.getpwuid(os.getuid())[0]
@@ -26,7 +28,6 @@ def load_env():
     if env.get("ENV", "").startswith("."):
         raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
 
-    ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
     load_dotenv(ENV_FILE, override=True)
 
 
@@ -57,6 +58,8 @@ DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
 
+DB_IS_PRODUCTION = DB_NAME == "live_grapher"
+
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
 else:
@@ -64,9 +67,9 @@ else:
 
 # Production checks
 if DATA_API_ENV == "production":
-    assert DB_NAME == "live_grapher", "DB_NAME must be set to live_grapher when publishing to production"
+    assert DB_IS_PRODUCTION, "DB_NAME must be set to live_grapher when publishing to production"
 
-if DB_NAME == "live_grapher":
+if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
