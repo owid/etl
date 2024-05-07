@@ -16,8 +16,8 @@ I see two main downsides from my current approach:
     - Getting the value for web-title for each country needs some manual work, since country names have often different variations. For instance, we use "Saint Helena" and "Czechia but you use "St Helena" and "Czech Republic", respectively.
 
 
-CODE TO GET THE DATA
---------------------
+CODE TO GET THE DATA 1/2
+------------------------
 
 # Get summary data, save it
 >>> get_summary_data(output_file="news.csv")
@@ -27,6 +27,10 @@ CODE TO GET THE DATA
 >>> df["tags"] = df["tags"].apply(ast.literal_eval)
 >>> COUNTRY_TAGS = df.set_index("country")["tags"].to_dict()
 
+NOTE: Need to manually review the country tags and make sure they are correct. For instance, "ukraine"-related tags appear for "UK".
+
+CODE TO GET THE DATA 2/2
+------------------------
 # Get values for each country and year
 >>> get_data(output_file="news_yearly.csv")
 
@@ -82,7 +86,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # FILE TO COUNTRY FILES
-COUNTRY_TAGS_FILE = pathlib.Path(__file__).parent / "countries_tags.yaml"
+COUNTRY_TAGS_FILE = pathlib.Path(__file__).parent / "country_tags.yaml"
 
 # Year range
 YEAR_START = 2016
@@ -90,13 +94,15 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
+API_KEY = ""
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 
 
 # Load YAML file with country tags
-with open("data.yaml", "r") as file:
+with open(COUNTRY_TAGS_FILE, "r") as file:
     COUNTRY_TAGS = yaml.safe_load(file)
+COUNTRIES = list(COUNTRY_TAGS.keys())
 
 
 @click.command()
@@ -110,7 +116,7 @@ def main(path_to_file: str, upload: bool) -> None:
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
-def get_data(output_file, country_tags=COUNTRY_TAGS):
+def get_data(output_file, country_tags, year_range=None):
     """Get number of pages for each country and year.
 
     country_tags: tags used for each country
@@ -123,9 +129,11 @@ def get_data(output_file, country_tags=COUNTRY_TAGS):
     """
     data = []
 
+    if year_range is None:
+        year_range = range(YEAR_START, YEAR_END)
     # Iterate over years
     data = []
-    for year in range(YEAR_START, YEAR_END):
+    for year in year_range:
         print(f"-- {year}")
         # Iterate over countries
         for i, (country, tags) in enumerate(country_tags.items()):
@@ -234,7 +242,7 @@ def _get_page_ids(api_url: str, params: Dict[str, Any], response: Dict["str", An
 ###########################################################################
 
 
-def get_country_tags(output_file: str = COUNTRY_TAGS_FILE):
+def get_country_tags(output_file: str | Path = COUNTRY_TAGS_FILE):
     """Get and save the list of tags by country."""
     # Get summary data (tags and number of pages for each country over year period)
     get_summary_data(output_file="news.csv")
@@ -374,5 +382,81 @@ def get_guardian_country_names():
     return countries
 
 
+##############################################################################
+# Get missing data: We might reach rate limits and need to fill in the gaps. #
+##############################################################################
+
+
+def get_missing_data(input_file, output_file):
+    """Get missing entries in input_file.
+
+    This is done by getting the country-year pairs that have NaN values in the number of pages.
+    """
+    # Read collected data
+    df = pd.read_csv(input_file)
+
+    # Make sure we have an entry for each country-year
+    regions = set(df["country"])
+    years = np.arange(df["year"].min(), df["year"].max() + 1)
+    new_idx = pd.MultiIndex.from_product([years, regions], names=["year", "country"])
+    df = df.set_index(["year", "country"]).reindex(new_idx).reset_index()
+    df["year"] = df["year"].astype("int")
+
+    # Get missing country-year pairs
+    missing_entries = df.loc[df.num_pages.isna(), ["country", "year"]].values
+
+    # Get country -> tags mapping
+    with open(COUNTRY_TAGS_FILE, "r") as file:
+        COUNTRY_TAGS = yaml.safe_load(file)
+
+    # Get missing data
+    data = []
+    for missing in missing_entries:
+        country = missing[0]
+        year = missing[1]
+
+        print(f"{country} @ {year}")
+
+        # init
+        data_ = {
+            "country": country,
+            "year": year,
+        }
+
+        tags = COUNTRY_TAGS.get(country, [])
+
+        if tags != []:
+            try:
+                num_pages, pages_ids = get_pages_from_tags(tags, year=year)
+            except KeyError:
+                print(f"> Error for {country} (getting num_pages)")
+            else:
+                data_["num_pages"] = num_pages
+                if pages_ids:
+                    data_["page_ids"] = pages_ids
+
+            data.append(data_)
+
+        time.sleep(1)
+
+    # Export data
+    df_data = pd.DataFrame(data)
+    df_data.to_csv(output_file, index=False)
+
+
+def combine_files(input_files, output_file):
+    """Combine multiple files into one.
+
+    Drop NaN and keep the latest entry if there are duplicates for any country-year pair.
+    """
+    df = pd.concat([pd.read_csv(f) for f in input_files], ignore_index=True)
+    df = df.dropna(subset="num_pages").drop_duplicates(subset=["country", "year"], keep="last")
+
+    df.to_csv(output_file, index=False)
+
+
+########################################
+# MAIN                                 #
+########################################
 if __name__ == "__main__":
     main()
