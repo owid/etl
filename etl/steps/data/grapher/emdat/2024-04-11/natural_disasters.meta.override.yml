@@ -1,6 +1,0 @@
-dataset:
-  update_period_days: 365
-tables:
-  natural_disasters_decadal:
-    variables:
-      total_dead_per_100k_people_drought_decadal: {}
