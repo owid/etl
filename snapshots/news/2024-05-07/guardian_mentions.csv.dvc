@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Attention to each country in The Guardian's articles
+    description: |-
+      Aggregate estimates on the number of entries that talk about each country and year.
+      
+      The data was obtained by querying The Guardian's Open Platform.
+    date_published: "2024"
+
+    # Citation
+    producer: The Guardian
+    citation_full: |-
+      The Guardian, Open Platform
+
+    # Files
+    url_main: https://open-platform.theguardian.com/access/
+    date_accessed: 2024-05-07
+
+    # License
+    license:
+      name: The Guardian terms of service
+      url: https://www.theguardian.com/help/terms-of-service
+
+  
