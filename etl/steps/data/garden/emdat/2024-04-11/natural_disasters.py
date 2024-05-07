@@ -624,10 +624,10 @@ def calculate_n_events_over_a_threshold_of_deaths(
         .rename(columns={"decade": "year"}, errors="raise")
     )
 
-    # Plot the curves of the number of global events causing more than a certain threshold of deaths.
+    # # Plot the curves of the number of global events causing more than a certain threshold of deaths.
     # import plotly.express as px
     # fig = px.line(
-    #     tb_by_deaths[tb_by_deaths["country"]=="World"].drop(columns="country").melt(id_vars="year", var_name="threshold", value_name="n_events"),
+    #     tb_yearly[tb_yearly["country"]=="World"].drop(columns="country").melt(id_vars="year", var_name="threshold", value_name="n_events"),
     #     x="year",
     #     y="n_events",
     #     color="threshold",

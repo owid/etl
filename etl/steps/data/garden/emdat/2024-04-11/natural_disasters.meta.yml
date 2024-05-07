@@ -97,7 +97,7 @@ definitions:
     - *definition-unknown-event
     - *definition-size-origin
   definition_unknown_deaths: &definition-unknown-deaths |-
-    A disaster is considered to have an "unknown" number of deaths if there is no data available on the number of deaths for that reported event.
+    A disaster has an unknown number of deaths if there is no data available on the number of total deaths for that reported event.
   description_key_deaths: &description-key-deaths
     - *definition-disaster
     - *definition-dead
@@ -457,7 +457,7 @@ tables:
         description_key:
           - *description-key-deaths
         display:
-          name: Unknown
+          name: Unknown number of deaths
         presentation:
           title_public: Number of reported natural disasters with unknown deaths
   natural_disasters_decadal_deaths:
