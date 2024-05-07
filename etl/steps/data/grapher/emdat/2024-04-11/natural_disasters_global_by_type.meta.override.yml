@@ -1,6 +1,0 @@
-tables:
-  natural_disasters_global_by_type:
-    variables:
-      total_affected:
-        display:
-          shortUnit: people
