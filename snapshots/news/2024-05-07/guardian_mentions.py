@@ -86,7 +86,7 @@ COUNTRY_TAGS_FILE = pathlib.Path(__file__).parent / "countries_tags.yaml"
 
 # Year range
 YEAR_START = 2016
-YEAR_END = 2023
+YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
