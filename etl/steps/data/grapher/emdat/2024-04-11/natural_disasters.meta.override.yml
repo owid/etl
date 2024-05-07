@@ -1,5 +1,5 @@
 dataset:
-  update_period_days: 60
+  update_period_days: 365
 tables:
   natural_disasters_decadal:
     variables:
