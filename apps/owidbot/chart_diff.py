@@ -4,7 +4,7 @@ from structlog import get_logger
 
 from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from etl.paths import ENV_FILE_PROD
+from etl import config
 
 log = get_logger()
 
@@ -27,10 +27,11 @@ def run(branch: str) -> str:
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
     source_engine = _get_engine_for_env(branch)
-    if ENV_FILE_PROD.exists():
-        target_engine = _get_engine_for_env(ENV_FILE_PROD)
+
+    if config.DB_IS_PRODUCTION:
+        target_engine = _get_engine_for_env(config.ENV_FILE)
     else:
-        log.warning(f"Production env file {ENV_FILE_PROD} not found, comparing against staging-site-master")
+        log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
         target_engine = _get_engine_for_env("staging-site-master")
 
     df = []

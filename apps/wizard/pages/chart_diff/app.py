@@ -13,9 +13,8 @@ from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
 from apps.wizard.utils import chart_html, set_states
 from apps.wizard.utils.env import OWID_ENV
+from etl import config
 from etl import grapher_model as gm
-from etl.config import DB_HOST
-from etl.paths import ENV_FILE_PROD
 
 log = get_logger()
 
@@ -24,16 +23,6 @@ log = get_logger()
 # wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-# TODO: simplify this
-SOURCE_ENV = DB_HOST  # "staging-site-streamlit-chart-approval"
-SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
-
-if ENV_FILE_PROD.exists():
-    TARGET_ENV = ENV_FILE_PROD
-else:
-    log.warning(f"Production env file {ENV_FILE_PROD} not found, comparing against staging-site-master")
-    TARGET_ENV = "staging-site-master"
-TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
 
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 
@@ -49,6 +38,25 @@ st.set_page_config(
 )
 add_indentation()
 st.session_state.hide_approved_charts = st.session_state.get("hide_approved_charts", False)
+
+
+########################################
+# LOAD ENVS
+########################################
+# TODO: simplify this
+SOURCE_ENV = config.DB_HOST  # "staging-site-streamlit-chart-approval"
+SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
+
+if config.DB_IS_PRODUCTION:
+    TARGET_ENV = config.ENV_FILE
+    TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
+else:
+    warning_msg = "ENV file doesn't connect to production DB, comparing against staging-site-master"
+    log.warning(warning_msg)
+    st.warning(warning_msg)
+    TARGET_ENV = "staging-site-master"
+    TARGET_API = f"https://api-staging.owid.io/{TARGET_ENV}/v1/indicators/"
+
 
 ########################################
 # FUNCTIONS
