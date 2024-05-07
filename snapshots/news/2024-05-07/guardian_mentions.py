@@ -64,6 +64,7 @@ United States -> US
 
 import ast
 import os
+import pathlib
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -80,19 +81,22 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
+# FILE TO COUNTRY FILES
+COUNTRY_TAGS_FILE = pathlib.Path(__file__).parent / "countries_tags.yaml"
+
 # Year range
 YEAR_START = 2016
 YEAR_END = 2023
 
 # Guardian API
-API_KEY = os.environ["GUARDIAN_API_KEY"]
+API_KEY = os.environ.get("GUARDIAN_API_KEY")
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 
 
-# Countries
-COUNTRIES = []
-COUNTRY_TAGS = {}
+# Load YAML file with country tags
+with open("data.yaml", "r") as file:
+    COUNTRY_TAGS = yaml.safe_load(file)
 
 
 @click.command()
@@ -230,7 +234,7 @@ def _get_page_ids(api_url: str, params: Dict[str, Any], response: Dict["str", An
 ###########################################################################
 
 
-def get_country_tags(output_file: str = "country_tags.yaml"):
+def get_country_tags(output_file: str = COUNTRY_TAGS_FILE):
     """Get and save the list of tags by country."""
     # Get summary data (tags and number of pages for each country over year period)
     get_summary_data(output_file="news.csv")
