@@ -467,3 +467,21 @@ tables:
           numDecimalPlaces: 0
           <<: *display_common
 
+      national_strategy:
+        title: National strategy to address homelessness
+        unit: ""
+        short_unit: ""
+        description_short: Defines whether the country has a national strategy to address homelessness, a regional or local strategy, or no strategy at all.
+        processing_level: minor
+        presentation:
+          title_public: National strategy to address homelessness
+        display:
+          name: National strategy to address homelessness
+          numDecimalPlaces: 0
+          <<: *display_common
+        # type: ordinal
+        # sort:
+        #   - Have an active national strategy
+        #   - Have regional or local strategies
+        #   - No strategy
+

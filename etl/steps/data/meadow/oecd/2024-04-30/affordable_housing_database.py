@@ -14,6 +14,55 @@ paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
 
+# Define national strategies for homelessness
+NATIONAL_STRATEGIES_YEAR = 2023
+NATIONAL_STRATEGIES = {
+    "Have an active national strategy": [
+        "Belgium",
+        "Canada",
+        "Chile",
+        "Colombia",
+        "Costa Rica",
+        "Czechia",
+        "Denmark",
+        "Finland",
+        "France",
+        "Germany",
+        "Greece",
+        "Ireland",
+        "Italy",
+        "Japan",
+        "Korea",
+        "Netherlands",
+        "New Zealand",
+        "Norway",
+        "Poland",
+        "Portugal",
+        "Romania",
+        "Slovak Republic",
+        "Spain",
+        "Sweden",
+        "United States",
+    ],
+    "Have regional or local strategies": ["Australia", "Austria", "Estonia", "Iceland", "United Kingdom"],
+    "No strategy": [
+        "Bulgaria",
+        "Croatia",
+        "Cyprus",
+        "Hungary",
+        "Israel",
+        "Latvia",
+        "Lithuania",
+        "Luxembourg",
+        "Malta",
+        "Mexico",
+        "Slovenia",
+        "Switzerland",
+        "Türkiye",
+    ],
+}
+
+
 # Column names and their new names.
 COLUMNS_POINT_IN_TIME = {
     "Unnamed: 11": "country",
@@ -148,6 +197,9 @@ def run(dest_dir: str) -> None:
     tb_number = clean_numbers_and_make_long(tb_number)
     tb_number = rename_columns_drop_rows_and_format(tb_number, columns=COLUMNS_NUMBER, short_name="number", year=True)
 
+    # Add national strategies to the table
+    tb_national_strategies = add_national_strategies(NATIONAL_STRATEGIES, tb_number)
+
     #
     # Save outputs.
     #
@@ -161,6 +213,7 @@ def run(dest_dir: str) -> None:
             tb_index,
             tb_share,
             tb_number,
+            tb_national_strategies,
         ],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
@@ -282,3 +335,29 @@ def add_count_and_type_of_homelessness_to_women_data(tb: Table) -> Table:
     tb = tb.format(["country"])
 
     return tb
+
+
+def add_national_strategies(national_strategies: Dict[str, list], tb: Table) -> Table:
+    """
+    Create a table with national strategies for homelessness.
+    """
+    # Create table with national strategies
+    tb_national_strategies = Table(
+        pd.DataFrame(national_strategies.items(), columns=["national_strategy", "country"]),
+        short_name="national_strategies",
+    )
+
+    # Explode country (each country has a row for each national strategy)
+    tb_national_strategies = tb_national_strategies.explode("country")
+
+    # Assign year to all rows
+    tb_national_strategies["year"] = NATIONAL_STRATEGIES_YEAR
+
+    # Add metadata from any column in tb (in this case number)
+    for col in tb_national_strategies.columns:
+        tb_national_strategies[col] = tb_national_strategies[col].copy_metadata(tb["number"])
+
+    # Format
+    tb_national_strategies = tb_national_strategies.format(["country", "year"])
+
+    return tb_national_strategies
