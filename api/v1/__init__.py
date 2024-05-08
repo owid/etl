@@ -142,7 +142,8 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
     origin.fetch()
-    repo.git.rebase("origin/master")
+
+    repo.git.rebase(f"origin/{repo.active_branch.name}")
     push_info_list = origin.push()
 
     # Check each PushInfo result for errors or rejections

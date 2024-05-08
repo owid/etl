@@ -6,6 +6,7 @@ from st_pages import add_indentation
 
 from apps.utils import run_command
 from apps.wizard import utils as wizard_utils
+from etl import config
 
 wizard_utils.enable_bugsnag_for_streamlit()
 
@@ -60,6 +61,7 @@ def main():
 
     # Live uses `.env` file which points to the live database in production
     if target == "live":
+        assert config.DB_IS_PRODUCTION, "chart-sync must be run in production with .env pointing to live DB."
         target = ".env"
 
     # Button to show text
