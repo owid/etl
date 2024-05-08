@@ -15,7 +15,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = pathlib.Path(__file__).parent.name
 
 ########################################################################################################################
-# TODO: Temporarily using a local file. Fetch data directly using the yearly electricity data url after publication.
+# TODO: Temporarily using a local file. Fetch data directly using the yearly electricity data url after next update.
 #  The download url should still be the same:
 #  https://ember-climate.org/app/uploads/2022/07/yearly_full_release_long_format.csv
 ########################################################################################################################
