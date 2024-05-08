@@ -48,6 +48,13 @@ etl:
       image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
       disable:
         "production": True
+    express:
+      title: "Express"
+      entrypoint: etl_steps/express.py
+      emoji: "️🔥"
+      image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+      disable:
+        "production": True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py

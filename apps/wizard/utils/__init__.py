@@ -142,13 +142,15 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
         "garden": None,
         "grapher": None,
+        "express": None,
     }
+    _previous_step: str | None = None
 
     def __init__(self: "AppState") -> None:
         """Construct variable."""
@@ -246,8 +248,8 @@ class AppState:
         if value_step is not None:
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
-        key = key.replace(f"{self.step}.", f"{self.previous_step}.")
-        value_previous_step = st.session_state["steps"][self.previous_step].get(key)
+        key = key.replace(f"{self.step}.", f"{previous_step}.")
+        value_previous_step = st.session_state["steps"][previous_step].get(key)
         # st.write(f"value_previous_step: {value_previous_step}")
         if value_previous_step is not None:
             return value_previous_step
@@ -272,14 +274,19 @@ class AppState:
                 st.error(msg)
 
     @property
-    def previous_step(self: "AppState") -> str:
+    def previous_step(self: "AppState") -> str | None:
         """Get the name of the previous step.
 
         E.g. 'snapshot' is the step prior to 'meadow', etc.
         """
-        self._check_step()
-        idx = max(self.steps.index(self.step) - 1, 0)
-        return self.steps[idx]
+        if self._previous_step is None:
+            self._check_step()
+            if self.step not in {"explorer", "express"}:
+                idx = max(self.steps.index(self.step) - 1, 0)
+                self._previous_step = self.steps[idx]
+            elif self.step == "express":
+                self._previous_step = "snapshot"
+        return self._previous_step
 
     def st_widget(
         self: "AppState",
