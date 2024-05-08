@@ -21,9 +21,11 @@ tables:
       cost:
         title: Solar photovoltaic module price
         short_unit: $/W
-        unit: 2021 US$ per Watt
+        unit: constant {definitions.latest_year} US$ per Watt
         description_key:
           - IRENA presents solar PV module price series for a number of different module technologies. Here we use the series for thin film a-Si/u-Si or Global Index (from Q4 2013).
+        presentation:
+          title_public: Solar photovoltaic module price
       cost_source:
         title: Source for each value of cost data
         unit: ''
