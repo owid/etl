@@ -34,8 +34,7 @@ tables:
           For mor details, please refer to the snapshot script.
       num_pages_relative:
         title: Share of pages in The Guardian with focus on a country
-        unit: "%"
-        short_unit: "%"
+        unit: "pages per 100,000 pages"
         description_short: Share of pages in The Guardian that are tagged with a country-related label.
         description_processing: *desc_proc_1
 

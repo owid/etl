@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     ## Get relative values
     tb["num_pages_total"] = tb.groupby("year")["num_pages"].transform(sum)
-    tb["num_pages_relative"] = tb["num_pages"] / tb["num_pages_total"]
+    tb["num_pages_relative"] = tb["num_pages"] / tb["num_pages_total"] * 100_000
     tb = tb.drop(columns=["num_pages_total"])
 
     ## Harmonize countries
