@@ -29,6 +29,7 @@ tables:
           - This GDP indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
           - This data is adjusted for inflation and for differences in the cost of living between countries.
           - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
+          - Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
           - For more regularly updated estimates of GDP, see the [World Bank's indicator](https://ourworldindata.org/grapher/national-gdp-wb).
         processing_level: major
         description_processing: Estimates of GDP are not provided directly from the source, so we obtained them by multiplying GDP per capita by population.
@@ -93,6 +94,7 @@ tables:
           - This GDP per capita indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
           - This data is adjusted for inflation and for differences in the cost of living between countries.
           - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
+          - Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
           - For more regularly updated estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
         description_from_producer: |-
           Real GDP per capita in 2011$
