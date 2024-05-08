@@ -1,6 +1,8 @@
 """Getting the snapshot data requires interaction with The Guardian's Open Platform API (https://open-platform.theguardian.com/access/).
 
-Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. Our strategy has revolved around first getting all the tags for a country, and then getting the number of articles that have those tags.
+MAIN STRATEGY
+=============
+Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. Our strategy has revolved around first getting all the tags for a country, and then getting the number of articles that have those tags. We have an alternative strategy, detailed in "ALTERNATIVE STRATEGY" section below.
 
 
 Our strategy in detail:
@@ -129,6 +131,34 @@ OTHER COMMENTS:
 ---------------
 
 - We combine Palestine = Palestine + Gaza
+
+ALTERNATIVE STRATEGY
+====================
+
+We get all pages that mention a country. That is, we use '?q=' parameter. We exclude certain words sometimes to avoid false positives (i.e. exclude 'guinea-bissau' when searching for 'guinea').
+
+>>> data = get_country_data_by_raw_mention(year_range=[2016, 2017])
+
+WHAT IF THERE IS MISSING DATA?
+------------------------------
+
+1) CERTAIN COUNTRIES ARE MISSING
+
+>>> # Define dictionary mapping country to tags. Only data for countries listed will be retrieved.
+>>> country_tags = {"country": ["tag1", "tag2", ...], ...}
+>>> get_country_data_by_raw_mention(output_file="news_yearly-X.csv", country_tags=country_tags)
+
+OR
+
+>>> # Get current tags for subset of countries.
+>>> country_tags = {c: t for c, t in COUNTRY_NAMES.items() if c in {"country1", "country2"}}
+>>> get_country_data_by_raw_mention(output_file="news_yearly-Y.csv", country_tags=country_tags)
+
+2) CERTAIN YEAR IS MISSING
+
+>>> # Use 'year_range' to get data for a specific year(s)
+>>> get_country_data_by_raw_mention(output_file="news-yearly-Z.csv", year_range=[2023])
+
 """
 
 import ast
@@ -160,7 +190,6 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
-API_KEY = ""
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 
@@ -527,6 +556,159 @@ def combine_files(input_files, output_file):
     df = df.dropna(subset="num_pages").drop_duplicates(subset=["country", "year"], keep="last")
 
     df.to_csv(output_file, index=False)
+
+
+########################################
+# GET DATA FROM RAW MENTIONS           #
+########################################
+
+# Define exceptions (words not include, words to exclude)
+COUNTRY_EXCEPTIONS = {
+    "Central African Republic": {
+        "remove": {"CAR"},
+    },
+    "Cocos Islands": {
+        "add": {"Cocos Island"},
+    },
+    "Congo": {
+        "avoid": {
+            "Kinshasa",
+            "Democratic Republic of Congo",
+            "Democratic Republic of the Congo",
+            "DR Congo",
+        }  # No news with Congo & DR Congo
+    },
+    "Cote d'Ivoire": {"remove": {"CÃ´te D'Ivoire", "Côte d'Ivoire", "Côte d’Ivoire", "Cote d'Ivoire"}},
+    "Curacao": {"remove": {"Curaçao", "CuraÃ§ao"}},
+    "Falkland Islands": {"add": {"Malvinas"}},
+    "Georgia": {
+        "avoid": {"United States", "US", "State", "America"},  # No news with Georgia & America
+    },
+    "Guinea": {
+        "avoid": {
+            "Papua New Guinea",
+            "Papua New Guinea",
+            "Guinea-Bissau",
+            "Guinea-Bissau",
+            "Eq. Guinea",
+            "Equatorial Guinea",
+        }
+    },
+    "Ireland": {"remove": {"Northern Ireland"}},
+    "Jersey": {
+        "avoid": {"United States", "US", "State", "America", "New Jersey"},  # No news with Jersey & America
+    },
+    "Northern Mariana Islands": {"add": {"Northern Marianas Islands"}},
+    "Niger": {"avoid": {"Nigeria"}},
+    "Palestine": {"add": ["Gaza"]},
+    "Saint Helena": {
+        "add": {"St Helena"},
+    },
+    "Saint Kitts and Nevis": {"add": {"Kitts and Nevis"}},
+    "Saint Lucia": {
+        "add": {"St Lucia"},
+    },
+    "Saint Martin (French part)": {
+        "add": {"St Martin", "Saint Martin", "St. Martin"},
+    },
+    "Samoa": {"avoid": {"American Samoa"}},
+    "Sint Maarten (Dutch part)": {
+        "add": {"Sint Maarten", "St Maarten", "St. Maarten"},
+    },
+    "Sudan": {"avoid": {"South Sudan"}},
+    "Tanzania": {"remove": {"U.R. of Tanzania: Mainland"}},
+    "United States Virgin Islands": {"add": {"US Virgin Islands"}},
+}
+
+
+def get_country_name_variations():
+    # Load regions table from disk
+    tb_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
+    # Extract list with country names
+    tb_regions = tb_regions[~tb_regions["is_historical"] & (tb_regions["region_type"] == "country")]
+    # Prettify
+    tb_regions["aliases"] = tb_regions["aliases"].astype(str).apply(lambda x: ast.literal_eval(x) if x != "nan" else [])
+    mapping = tb_regions.set_index("name")["aliases"].to_dict()
+    name_variations = {k: set(v + [k]) for k, v in mapping.items()}
+
+    # Sort
+    names_sorted = sorted(name_variations)  # type: ignore
+    name_variations = {k: name_variations[k] for k in names_sorted}
+
+    return name_variations
+
+
+def _list_of_items_to_or_strict(values) -> str:
+    # Remove those with parents
+    values = [c for c in values if not (("(" in c) | (")" in c))]
+    values = [f'"{v}"' for v in values]
+    return f"({' '.join(values)})"
+
+
+def get_country_queries(country_names=None):
+    if country_names is None:
+        country_names = get_country_name_variations()
+
+    queries = []
+    for country, names_all in country_names.items():
+        avoid = set()
+        if country in COUNTRY_EXCEPTIONS:
+            add = COUNTRY_EXCEPTIONS[country].get("add", set())
+            remove = COUNTRY_EXCEPTIONS[country].get("remove", set())
+            avoid = COUNTRY_EXCEPTIONS[country].get("avoid", set())
+
+            country_names_ = [c for c in set(set(names_all) | set(add)) if c not in remove]
+        else:
+            country_names_ = names_all
+
+        query = _list_of_items_to_or_strict(country_names_)
+
+        if avoid != set():
+            query += f" AND NOT {_list_of_items_to_or_strict(avoid)}"
+
+        query = {
+            "country": country,
+            "query": query,
+        }
+        queries.append(query)
+
+    return queries
+
+
+def get_country_data_by_raw_mention(country_names=None, year_range=None, output_file_base=None):
+    # Get query
+    queries = get_country_queries(country_names)
+    if year_range is None:
+        year_range = range(YEAR_START, YEAR_END)
+
+    DATA = []
+    for year in year_range:
+        for i, country in enumerate(queries):
+            if i % 10 == 0:
+                print(country["country"])
+            params = {
+                "api-key": API_KEY,
+                "q": country["query"],
+                "page-size": 200,
+                "from-date": f"{year}-01-01",
+                "to-date": f"{year}-12-31",
+            }
+            data = requests.get(API_CONTENT_URL, params=params).json()
+            data_ = {
+                "country": country["country"],
+                "year": year,
+            }
+            if "response" in data:
+                if "total" in data["response"]:
+                    data_["num_pages"] = data["response"]["total"]
+                else:
+                    print(f"> Error {country['country']}: {country['query']}!")
+            DATA.append(data_)
+
+        if output_file_base:
+            pd.DataFrame(DATA).to_csv(f"{output_file_base}-{year}.csv", index=False)
+
+    return DATA
 
 
 ########################################
