@@ -78,7 +78,6 @@ def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
     """
     Remove rows with empty values for all the indicators.
     MPD keeps ~100,000 rows with empty values for all indicators (probably for aggregation purposes).
-    I also keep region data only for years where we have data for "World".
     """
 
     # Drop rows with empty values for all indicators.
