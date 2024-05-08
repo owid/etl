@@ -67,6 +67,9 @@ To get the missing data, there are various strategies depending on what is missi
 >>> # Use 'year_range' to get data for a specific year(s)
 >>> get_data(output_file="news-yearly-4.csv", year_range=[2023])
 
+LAST) COMBINE MULTIPLE FILES
+
+>>> combine_files(["news_yearly-123.csv", "news_yearly-124.csv"], "news_yearly_combined.csv")
 
 COMMENTS ON THE TITLES USED TO GET THE TAGS
 -------------------------------------------
@@ -88,6 +91,12 @@ Sint Maarten (Dutch part) -> Sint Maarten
 United States Virgin Islands -> Us Virgin Islands
 United Kingdom -> UK (watch for 'Ukraine' tags and remove them)
 United States -> US
+
+OTHER COMMENTS ON TAGS PER COUNTRY AND MODIFICATIONS
+----------------------------------------------------
+
+Congo, DR Congo: Needed manual review to avoid duplicates and ensure tags are correct for both entities.
+
 
 """
 
@@ -120,7 +129,7 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
-# API_KEY = ""
+API_KEY = "41277bb5-41e0-4662-9c41-3bde7fe082d3"
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 

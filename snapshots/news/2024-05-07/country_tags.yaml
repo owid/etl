@@ -629,12 +629,9 @@ Comoros:
 - weather/comoros
 - world/comoros
 Congo:
-- football/dr-congo-football-team
 - global-development/series/defenders--saving-congo-s-parks
 - travel/congobrazzaville
-- travel/democraticrepublicofcongo
 - weather/congobrazzaville
-- weather/democraticrepublicofcongo
 - world/congo
 - world/congo-brazzaville
 Cook Islands:
@@ -685,7 +682,9 @@ Czech Republic:
 - travel/offers/czechrepublic
 - weather/czechrepublic
 - world/czech-republic
-Democratic Republic of Congo:
+Democratic Republic of the Congo:
+- football/dr-congo-football-team
+- travel/democraticrepublicofcongo
 - weather/democraticrepublicofcongo
 Denmark:
 - football/denmark
