@@ -448,7 +448,6 @@ Belize:
 - weather/belize
 - world/belize
 Benin:
-- film/annette-bening
 - football/benin
 - travel/benin
 - weather/benin
@@ -562,8 +561,6 @@ Central African Republic:
 - weather/centralafricanrepublic
 - world/central-african-republic
 Chad:
-- film/chadwick-boseman
-- film/gurinder-chadha
 - travel/chad
 - weather/chad
 - world/chad
@@ -791,25 +788,18 @@ Finland:
 - weather/finland
 - world/finland
 France:
-- books/francesca-simon
-- business/air-france-klm
 - campaign/callout/callout-france-protests
 - campaign/callout/callout-france-protests-june-2023
 - childrens-books-site/frances-hardinge
 - culture/frances-barber
 - experience-france/experience-france
-- film/frances-ha
-- film/frances-mcdormand
-- film/journal-de-france
 - football/france
 - football/france-women
 - music/series/sounds-of-europe-france
-- politics/frances-o-grady
 - sport/france-olympic-team
 - sport/france-rugby-league-team
 - sport/france-rugby-union-team
 - sport/france-womens-rugby-union-team
-- sport/francesco-molinari
 - sport/series/guardian-guide-to-the-100th-tour-de-france
 - sport/series/philippa-york-s-team-by-team-guide-to-the-tour-de-france
 - sport/series/tour-de-france-2011-video-highlights
@@ -845,8 +835,6 @@ France:
 - sport/tourdefrance2006
 - sport/tourdefrance2007
 - sport/tourdefrance2008
-- stage/francesca-hayward
-- stage/francesca-moody
 - theguardian/guardian-guide-to-the-100th-tour-de-france
 - theguardian/guardian-guide-to-the-100th-tour-de-france/guardian-guide-to-the-100th-tour-de-france
 - travel/france
@@ -854,7 +842,6 @@ France:
 - weather/france
 - world/france
 - world/france-train-attack
-- world/francesco-schettino
 - world/series/new-europe-france
 French Guiana:
 - travel/frenchguiana
@@ -872,33 +859,13 @@ Gambia:
 - travel/gambia
 - weather/gambia
 - world/gambia
-Gaza:
-- campaign/callout/callout-gaza
-- campaign/callout/callout-gaza-oct-2023
-- campaign/callout/callout-israel-and-gaza
-- campaign/callout/callout-israel-and-gaza-embed
-- global-development/series/gaza-diary
-- insidegaza
-- world/gaza
-- world/gaza-flotilla
-- world/israel-hamas-war
-- world/series/aweekingaza
-- world/series/gaza-live
-- world/series/gaza-war-crimes-investigation
-- world/series/israeli-election-from-gaza-to-jerusalem
-- world/series/return-to-gaza
 Georgia:
 - artanddesign/series/a-guide-to-georgian-architecture-in-britain
 - campaign/callout/callout-georgia
-- culture/georgia-o-keeffe
-- film/the-haunting-of-connecticut-2-the-ghosts-of-georgia
 - football/georgia
-- music/georgia
-- sport/georgia-hall
 - sport/georgia-rugby-union-team
 - the-report/georgia
 - travel/georgia
-- us-news/state-of-georgia
 - weather/georgia
 - world/georgia-news
 Germany:
@@ -964,23 +931,11 @@ Guernsey:
 - uk-news/guernsey
 - weather/guernsey
 Guinea:
-- football/equitorial-guinea
-- football/guinea-bissau-football-team
 - football/guinea-football-team
-- sport/1000-guineas
-- sport/2000-guineas
-- sport/papua-new-guinea-rugby-league-team
 - travel/equatorialguinea
 - travel/guinea
-- travel/guinea-bissau
-- travel/papuanewguinea
 - weather/guinea
-- weather/guineabissau
-- weather/papuanewguinea
-- world/equatorial-guinea
 - world/guinea
-- world/guinea-bissau
-- world/papua-new-guinea
 Guinea-Bissau:
 - football/guinea-bissau-football-team
 - travel/guinea-bissau
@@ -993,7 +948,6 @@ Guyana:
 Haiti:
 - football/haiti-womens-football-team
 - global-development/series/rebuilding-haiti
-- music/bernard-haitink
 - travel/haiti
 - weather/haiti
 - world/haiti
@@ -1032,12 +986,8 @@ Iceland:
 - world/iceland-volcano-grimsvotn
 India:
 - campaign/callout/callout-india-election-2024
-- campaign/callout/callout-indiana-teachers
-- culture/indiana-jones
 - environment/india-untamed
 - environment/terra-india
-- film/india-s-daughter
-- film/indiana-jones-and-the-kingdom-of-the-crystal-skull
 - film/series/100-years-of-indian-cinema
 - food/indian
 - global-development/series/2004-indian-ocean-tsunami-10-years-on
@@ -1054,24 +1004,18 @@ India:
 - sport/englandinindia200506
 - sport/englandinindia200809
 - sport/englandvindia2007
-- sport/force-india
 - sport/india-australia-2008
 - sport/india-in-england-2011
 - sport/india-in-england-2014
 - sport/india-women-s-cricket-team
 - sport/indiacricketteam
 - sport/indiainengland2002
-- sport/indiana-pacers
-- sport/indianapolis-colts
 - travel/india
 - travel/offers/india
 - tv-and-radio/indian-summers
 - tv-and-radio/series/indian-summers-episode-by-episode
-- us-news/indiana
-- us-news/indianapolis
 - weather/hyderabadindia
 - weather/india
-- weather/indianapolis
 - world/india
 - world/india-elections-2019
 - world/india-elections-2024
@@ -1129,21 +1073,14 @@ Ireland:
 - business/ireland-bailout
 - business/ireland-business-blog-with-lisa-ocarroll
 - campaign/callout/callout-irelands-new-taoiseach
-- campaign/callout/callout-northern-ireland-trade-deal
 - culture/scotlandandirelandlistings
 - discover-ireland/discover-ireland
-- extra/scotland-northern-ireland-extra
 - football/footballinireland
-- football/northern-ireland-womens-football-team
-- football/northernireland
 - football/republic-of-ireland-women-s-football-team
 - football/republicofireland
-- healthcare-network/northern-ireland
 - my-ireland/my-ireland
 - origin-green-ireland-partner-zone/origin-green-ireland-partner-zone
 - politics/northern-ireland-elections-2011
-- social-care-network/northern-ireland
-- society/series/abortion-in-northern-ireland
 - sport/ireland-cricket-team
 - sport/ireland-rugby-league-team
 - sport/ireland-rugby-union-team
@@ -1153,10 +1090,7 @@ Ireland:
 - technology/series/guardian-technology-in-ireland
 - tourism-ireland/tourism-ireland
 - travel/ireland
-- travel/northern-ireland
 - travel/offers/ireland
-- travel/series/visit-britain-and-northern-ireland
-- uk/northernireland
 - unwindireland/acrossireland
 - unwindireland/unwindireland
 - weather/ireland
@@ -1230,30 +1164,15 @@ Japan:
 - world/series/japan-disaster-one-year-on
 - world/series/the-guardian-in-japanese
 Jersey:
-- film/jersey-boys
-- film/jersey-girl
-- sport/new-jersey-devils
-- uk-news/new-jersey
 - uk/jersey
-- us-news/new-york-and-new-jersey-bombings
 - weather/jersey
 Jordan:
-- books/jordan-peterson
 - campaign/callout/callout-jim-jordan-speakership
 - discover-jordan/discover-jordan
-- film/jordan-peele
-- film/michael-b-jordan
-- film/neil-jordan
 - football/jordan
-- football/jordan-pickford
-- sport/jordan-spieth
-- sport/michael-jordan
-- stage/jordan-brookes
 - travel/jordan
 - travel/offers/jordan
 - travel/petra
-- us-news/jim-jordan
-- us-news/jordan-neely
 - weather/jordan
 - world/jordan
 Kazakhstan:
@@ -1337,7 +1256,6 @@ Luxembourg:
 - world/luxembourg
 Macau:
 - experience-macau/experience-macau
-- film/macaulay-culkin
 - travel/macau
 - visit-macau/visit-macau
 - weather/macau
@@ -1365,16 +1283,10 @@ Maldives:
 - travel/maldives
 - world/maldives
 Mali:
-- australia-news/peter-malinauskas
-- film/terrence-malick
 - football/mali
-- music/zayn-malik
-- politics/shahid-malik
-- stage/russellmaliphant
 - travel/mali
 - weather/mali
 - world/mali
-- world/nouri-al-maliki
 Malta:
 - football/malta
 - travel/malta
@@ -1545,15 +1457,9 @@ Nicaragua:
 - world/nicaragua
 Niger:
 - football/niger
-- football/nigeria-football-team
-- football/nigeria-womens-football-team
-- global-development/series/crisis-nigeria
 - travel/niger
-- travel/nigeria
 - weather/niger
-- weather/nigeria
 - world/niger
-- world/nigeria
 Nigeria:
 - football/nigeria-football-team
 - football/nigeria-womens-football-team
@@ -1624,6 +1530,22 @@ Palestine:
 - travel/palestine
 - world/palestine-papers
 - world/series/palestine-papers-documents
+
+# Gaza
+- campaign/callout/callout-gaza
+- campaign/callout/callout-gaza-oct-2023
+- campaign/callout/callout-israel-and-gaza
+- campaign/callout/callout-israel-and-gaza-embed
+- global-development/series/gaza-diary
+- insidegaza
+- world/gaza
+- world/gaza-flotilla
+- world/israel-hamas-war
+- world/series/aweekingaza
+- world/series/gaza-live
+- world/series/gaza-war-crimes-investigation
+- world/series/israeli-election-from-gaza-to-jerusalem
+- world/series/return-to-gaza
 Panama:
 - football/panama
 - football/panama-women-s-football-team
@@ -1753,7 +1675,6 @@ Saint Vincent and the Grenadines:
 Samoa:
 - sport/samoa-rugby-union-team
 - sport/samoarugbyleagueteam
-- travel/americansamoa
 - travel/samoa
 - weather/samoa
 - world/samoa
@@ -1917,13 +1838,11 @@ Sudan:
 - campaign/callout/callout-brits-in-sudan
 - campaign/callout/callout-sudan-clashes
 - football/sudan
-- global-development/series/south-sudan-one-year-on
 - travel/sudan
 - weather/portsudan
 - weather/sudan
 - world/series/the-sudans-after-the-divide
 - world/series/the-sudans-takeover
-- world/south-sudan
 - world/sudan
 Suriname:
 - travel/surinam

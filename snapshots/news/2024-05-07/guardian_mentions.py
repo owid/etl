@@ -60,12 +60,18 @@ To get the missing data, there are various strategies depending on what is missi
 
 >>> # Define dictionary mapping country to tags. Only data for countries listed will be retrieved.
 >>> country_tags = {"country": ["tag1", "tag2", ...], ...}
->>> get_data(output_file="news_yearly-2.csv", country_tags=country_tags)
+>>> get_data(output_file="news_yearly-X.csv", country_tags=country_tags)
+
+OR
+
+>>> # Get current tags for subset of countries.
+>>> country_tags = {c: t for c, t in COUNTRY_TAGS.items() if c in {"country1", "country2"}}
+>>> get_data(output_file="news_yearly-Y.csv", country_tags=country_tags)
 
 3) CERTAIN YEAR IS MISSING
 
 >>> # Use 'year_range' to get data for a specific year(s)
->>> get_data(output_file="news-yearly-4.csv", year_range=[2023])
+>>> get_data(output_file="news-yearly-Z.csv", year_range=[2023])
 
 LAST) COMBINE MULTIPLE FILES
 
@@ -92,12 +98,37 @@ United States Virgin Islands -> Us Virgin Islands
 United Kingdom -> UK (watch for 'Ukraine' tags and remove them)
 United States -> US
 
+England
+Wales
+Scotland
+Northern Ireland: campaign/callout/callout-northern-ireland-trade-deal
+
 OTHER COMMENTS ON TAGS PER COUNTRY AND MODIFICATIONS
 ----------------------------------------------------
 
-Congo, DR Congo: Needed manual review to avoid duplicates and ensure tags are correct for both entities.
+- Congo, DR Congo: Needed manual review to avoid duplicates and ensure tags are correct for both entities.
+- Palestine: Integrate tags from "Gaza"
 
+Tags removal (wrongly assigned to the country):
+- Benin: "film/annette-bening"
+- Chad: "film/chadwick-boseman", "film/gurinder-chadha"
+- France: "books/francesca-simon", "business/air-france-klm", "childrens-books-site/frances-hardinge", "film/journal-de-france", "film/frances-ha", "film/frances-mcdormand", "politics/frances-o-grady", "sport/francesco-molinari", "stage/francesca-hayward", "stage/francesca-moody", "world/francesco-schettino"
+- Georgia: "culture/georgia-o-keeffe", "film/the-haunting-of-connecticut-2-the-ghosts-of-georgia", "music/georgia", "sport/georgia-hall", "us-news/state-of-georgia"
+- Guinea: "football/equitorial-guinea", "football/guinea-bissau-football-team", "sport/1000-guineas", "sport/2000-guineas", "sport/papua-new-guinea-rugby-league-team", "travel/guinea-bissau", "travel/papuanewguinea", "weather/guineabissau", "weather/papuanewguinea", "world/equatorial-guinea", "world/guinea-bissau", "world/papua-new-guinea"
+- Haiti: "music/bernard-haitink",
+- India: Remove: "culture/indiana-jones", "film/india-s-daughter", "film/indiana-jones-and-the-kingdom-of-the-crystal-skull", "sport/force-india", "weather/indianapolis", "us-news/indiana","us-news/indianapolis", "sport/indiana-pacers", "sport/indianapolis-colts", "campaign/callout/callout-indiana-teachers"
+- Ireland: "campaign/callout/callout-northern-ireland-trade-deal", "extra/scotland-northern-ireland-extra", "football/northern-ireland-womens-football-team", "football/northernireland", "uk/northernireland", "travel/northern-ireland", "society/series/abortion-in-northern-ireland", "healthcare-network/northern-ireland", "social-care-network/northern-ireland", "travel/series/visit-britain-and-northern-ireland"
+- Jersey: "film/jersey-boys", "film/jersey-girl", "sport/new-jersey-devils", "uk-news/new-jersey", "us-news/new-york-and-new-jersey-bombings"
+- Jordan: Remove: "books/jordan-peterson", "film/jordan-peele", "film/michael-b-jordan", "film/neil-jordan", "football/jordan-pickford", "sport/jordan-spieth", "sport/michael-jordan", "stage/jordan-brookes", "us-news/jim-jordan", "us-news/jordan-neely", "film/macaulay-culkin"
+- Mali: "music/zayn-malik", "australia-news/peter-malinauskas', "politics/shahid-malik", "stage/russellmaliphant", "world/nouri-al-maliki", "film/terrence-malick"
+- Niger: "football/nigeria-football-team", "football/nigeria-womens-football-team", "global-development/series/crisis-nigeria", "travel/nigeria", "weather/nigeria", "world/nigeria"
+- Samoa: "travel/americansamoa"
+- Sudan: "world/south-sudan", "global-development/series/south-sudan-one-year-on",
 
+OTHER COMMENTS:
+---------------
+
+- We combine Palestine = Palestine + Gaza
 """
 
 import ast
@@ -129,7 +160,7 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
-API_KEY = "41277bb5-41e0-4662-9c41-3bde7fe082d3"
+API_KEY = ""
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 

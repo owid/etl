@@ -25,6 +25,6 @@ meta:
       url: https://www.theguardian.com/help/terms-of-service
 
 outs:
-  - md5: d57c7c5a2262bc1a54bf4e6356157ee0
-    size: 37257
+  - md5: 2eb1d94a05f261ecfb6305b17d7478cd
+    size: 37251
     path: guardian_mentions.csv
