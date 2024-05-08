@@ -6,7 +6,7 @@ meta:
     title: Attention to each country in The Guardian's articles
     description: |-
       Aggregate estimates on the number of entries that talk about each country and year.
-      
+
       The data was obtained by querying The Guardian's Open Platform.
     date_published: "2024"
 
@@ -24,4 +24,7 @@ meta:
       name: The Guardian terms of service
       url: https://www.theguardian.com/help/terms-of-service
 
-  
+outs:
+  - md5: d57c7c5a2262bc1a54bf4e6356157ee0
+    size: 37257
+    path: guardian_mentions.csv
