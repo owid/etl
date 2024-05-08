@@ -740,11 +740,20 @@ steps:
   data://explorers/emdat/latest/natural_disasters:
     - data://garden/emdat/2024-04-11/natural_disasters
 
+  # Attention in Media: The Guardian
+  data://meadow/news/2024-05-08/guardian_mentions:
+    - snapshot://news/2024-05-07/guardian_mentions.csv
+
+
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
 
   ######################################################################################################################
 
+  data://garden/news/2024-05-08/guardian_mentions:
+    - data://meadow/news/2024-05-08/guardian_mentions
+  data://grapher/news/2024-05-08/guardian_mentions:
+    - data://garden/news/2024-05-08/guardian_mentions
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
