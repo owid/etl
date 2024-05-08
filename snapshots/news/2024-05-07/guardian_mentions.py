@@ -1,13 +1,17 @@
 """Getting the snapshot data requires interaction with The Guardian's Open Platform API (https://open-platform.theguardian.com/access/).
 
-Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. Our strategy has revolved around first getting all the tags for a country, and then getting the number of articles that have those tags. In detail:
+Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. Our strategy has revolved around first getting all the tags for a country, and then getting the number of articles that have those tags.
 
 
-1. Get all tags that concert a country.
-    - For this, I get all the tag pages that start with the country name: something like "https://content.guardianapis.com/tags?web-title=spain", for Spain. As a result I obtain a mapping that tells me for each country the list of tags (e.g. "Spain: [world/spain, travel/spain, etc.]").
+Our strategy in detail:
+
+
+1. Get all tags that concern a country. Steps:
+    - Obtain all the tag pages that start with the country name: a query like "https://content.guardianapis.com/tags?web-title=spain", for Spain. As a result we obtain a mapping that tells us for each country the list of tags (e.g. "Spain: [world/spain, travel/spain, etc.]") in use.
     - We work with a list of ~240 countries, so this has a cost of 240 calls.
 
-2. For each country and year (currently working for range 2016-2023) I get all content: something like "https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31". And then I save the value from response.total.
+2. For each country, get the number of pages using each set of tags. Steps:
+    - For each country and year (currently working for range 2016-2023) we get all content metadata: a query like "https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31". And then I save the value from response.total.
     - Since the year range is of 8 years, this has a cost of ca. 8 x 240 = 1920 calls
     - Year range is controlled by YEAR_START and YEAR_END variables.
 
@@ -16,8 +20,10 @@ I see two main downsides from my current approach:
     - Getting the value for web-title for each country needs some manual work, since country names have often different variations. For instance, we use "Saint Helena" and "Czechia but you use "St Helena" and "Czech Republic", respectively.
 
 
-CODE TO GET THE DATA 1/2
-------------------------
+CODE TO GET THE DATA
+--------------------
+
+1) GET SUMMARY DATA: Get tags and number of pages for each country over year period.
 
 # Get summary data, save it
 >>> get_summary_data(output_file="news.csv")
@@ -29,16 +35,37 @@ CODE TO GET THE DATA 1/2
 
 NOTE: Need to manually review the country tags and make sure they are correct. For instance, "ukraine"-related tags appear for "UK".
 
-CODE TO GET THE DATA 2/2
-------------------------
+2) GET DATA FOR EACH COUNTRY AND YEAR
+
 # Get values for each country and year
 >>> get_data(output_file="news_yearly.csv")
 
 
-COMMENTS ON THE CODE
---------------------
+WHAT IF SOME DATA IS MISSING?
+-----------------------------
 
 The call to `get_data` might exceed the API rate limits. You will see this bc you will start to get Error messages printed. If you get them, don't stop the script! Otherwise you will loose all the data. Instead, wait until it finishes and then try running it again for the failed countries (or years)
+
+To get the missing data, there are various strategies depending on what is missing.
+
+1) CERTAIN COUNTRY-YEARS ARE MISSING
+
+>>> # Get list of country-year pairs that are missing in the data (API rate limit exceeded most probably)
+>>> missing_entries = get_missing_entries("news_yearly.csv")
+
+>>> # Get data for the missing country-year pairs
+>>> get_data_from_tuples(missing_entries, "news_yearly-1.csv")
+
+2) CERTAIN COUNTRIES ARE MISSING
+
+>>> # Define dictionary mapping country to tags. Only data for countries listed will be retrieved.
+>>> country_tags = {"country": ["tag1", "tag2", ...], ...}
+>>> get_data(output_file="news_yearly-2.csv", country_tags=country_tags)
+
+3) CERTAIN YEAR IS MISSING
+
+>>> # Use 'year_range' to get data for a specific year(s)
+>>> get_data(output_file="news-yearly-4.csv", year_range=[2023])
 
 
 COMMENTS ON THE TITLES USED TO GET THE TAGS
@@ -59,9 +86,7 @@ Saint Lucia -> St Lucia
 Saint Martin (French part) -> Saint Martin
 Sint Maarten (Dutch part) -> Sint Maarten
 United States Virgin Islands -> Us Virgin Islands
-
-?
-United Kingdom -> UK
+United Kingdom -> UK (watch for 'Ukraine' tags and remove them)
 United States -> US
 
 """
@@ -74,6 +99,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import click
+import numpy as np
 import pandas as pd
 import requests
 import yaml
@@ -94,7 +120,7 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
-API_KEY = ""
+# API_KEY = ""
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 
@@ -116,10 +142,10 @@ def main(path_to_file: str, upload: bool) -> None:
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
-def get_data(output_file, country_tags, year_range=None):
+def get_data(output_file, country_tags=COUNTRY_TAGS, year_range=None):
     """Get number of pages for each country and year.
 
-    country_tags: tags used for each country
+    country_tags: tags used for each country. Only these countries will be downloaded!
         key: country name
         value: list of tags
 
@@ -262,7 +288,7 @@ def get_summary_data(countries: List[str] = COUNTRIES, output_file: str | None =
     data_all = []
     # For each country, get tags and number of pages
     for i, country in enumerate(countries):
-        data_ = {
+        data_: Dict[str, Any] = {
             "country": country,
         }
         if i % 10 == 0:
@@ -301,7 +327,7 @@ def get_summary_data(countries: List[str] = COUNTRIES, output_file: str | None =
     return df
 
 
-def get_tags_for_title(title: str, verbose: bool = False, year: Optional[int] = None) -> List[Any]:
+def get_tags_for_title(title: str, verbose: bool = False, year: Optional[int] = None) -> List[str]:
     """Get the list of tags for a given title.
 
     For our purposes, "title" is the name of a country. For instance, for "Spain" there are various tags like "world/spain", "travel/spain", etc.
@@ -387,10 +413,10 @@ def get_guardian_country_names():
 ##############################################################################
 
 
-def get_missing_data(input_file, output_file):
+def get_missing_entries(input_file):
     """Get missing entries in input_file.
 
-    This is done by getting the country-year pairs that have NaN values in the number of pages.
+    That is, obtain the country-year pairs that have NaN values in the number of pages.
     """
     # Read collected data
     df = pd.read_csv(input_file)
@@ -405,13 +431,21 @@ def get_missing_data(input_file, output_file):
     # Get missing country-year pairs
     missing_entries = df.loc[df.num_pages.isna(), ["country", "year"]].values
 
+    return missing_entries
+
+
+def get_data_from_tuples(country_year_pairs, output_file) -> None:
+    """Get data for the given country-year pairs.
+
+    Country-year pairs are given as a list of (country, year) tuples.
+    """
     # Get country -> tags mapping
     with open(COUNTRY_TAGS_FILE, "r") as file:
         COUNTRY_TAGS = yaml.safe_load(file)
 
     # Get missing data
     data = []
-    for missing in missing_entries:
+    for missing in country_year_pairs:
         country = missing[0]
         year = missing[1]
 
