@@ -19,7 +19,7 @@ tables:
         title: Number of pages in the Guardian with focus on a country
         unit: pages
         description_short: Number of pages in the Guardian that are tagged with a country-related label.
-        description_processing: |-
+        description_processing: &desc_proc_1 |-
           Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. Our strategy has revolved around first getting all the tags for a country, and then getting the number of articles that have those tags.
 
 
@@ -32,4 +32,10 @@ tables:
             - For each country and year (currently working for range 2016-2023) we get all content metadata: a query like "https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31" for year 2020. The count of pages is in the property `response.total`.
 
           For mor details, please refer to the snapshot script.
+      num_pages_relative:
+        title: Share of pages in The Guardian with focus on a country
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of pages in The Guardian that are tagged with a country-related label.
+        description_processing: *desc_proc_1
 
