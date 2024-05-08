@@ -192,6 +192,9 @@ steps:
   data://grapher/un/2024-04-09/undp_hdr:
     - data://garden/un/2024-04-09/undp_hdr
 
+  data://grapher/un/2024-05-08/undp_hdr:
+    - data://garden/un/2024-04-09/undp_hdr
+
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
     - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
