@@ -479,9 +479,4 @@ tables:
           name: National strategy to address homelessness
           numDecimalPlaces: 0
           <<: *display_common
-        # type: ordinal
-        # sort:
-        #   - Have an active national strategy
-        #   - Have regional or local strategies
-        #   - No strategy
 
