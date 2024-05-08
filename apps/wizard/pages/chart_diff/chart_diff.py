@@ -1,12 +1,18 @@
-from typing import Optional
+from typing import Optional, get_args
 
 import streamlit as st
+from sqlalchemy.exc import NoResultFound
+from sqlmodel import Session
 
 from etl import grapher_model as gm
 
 
 class ChartDiffModified:
-    def __init__(self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status):
+    source_chart: gm.Chart
+    target_chart: Optional[gm.Chart]
+    approval_status: gm.CHART_DIFF_STATUS
+
+    def __init__(self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval_status = approval_status
@@ -15,8 +21,12 @@ class ChartDiffModified:
         self.chart_id = source_chart.id
 
     @property
-    def approved(self):
+    def approved(self) -> bool:
         return self.approval_status == "approved"
+
+    @property
+    def unapproved(self) -> bool:
+        return self.approval_status == "unapproved"
 
     @property
     def is_new(self):
@@ -35,7 +45,7 @@ class ChartDiffModified:
         return self.target_chart is not None
 
     @classmethod
-    def from_chart_id(cls, chart_id, source_session, target_session=None):
+    def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
         """Get chart diff from chart id.
 
         - Get charts from source and target
@@ -45,13 +55,20 @@ class ChartDiffModified:
         # Get charts
         source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
         if target_session is not None:
-            target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+            try:
+                target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
+            except NoResultFound:
+                target_chart = None
         else:
             target_chart = None
         # It can happen that both charts have the same ID, but are completely different (this
         # happens when two charts are created independently and have different slugs)
         if target_chart and source_chart.slug != target_chart.slug:
             target_chart = None
+
+        # Checks
+        if target_chart:
+            assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
 
         # Get approval status
         approval_status = gm.ChartDiffApprovals.latest_chart_status(
@@ -66,7 +83,7 @@ class ChartDiffModified:
 
         return chart_diff
 
-    def sync(self, source_session, target_session=None):
+    def sync(self, source_session: Session, target_session: Optional[Session] = None):
         """Sync chart diff."""
 
         # Synchronize with latest chart from source environment
@@ -76,23 +93,24 @@ class ChartDiffModified:
             target_session=target_session,
         )
 
-    def approve(self, session) -> None:
+    def approve(self, session: Session) -> None:
         """Approve chart diff."""
         # Update status variable
-        self.set_status(session, "approve")
+        self.set_status(session, "approved")
 
-    def reject(self, session) -> None:
-        """Reject chart diff."""
+    def unapprove(self, session: Session) -> None:
+        """Unapprove chart diff."""
         # Update status variable
-        self.set_status(session, "rejected")
+        self.set_status(session, "unapproved")
 
-    def update_state(self, session) -> None:
-        """Update the state of the chart diff."""
+    def switch_state(self, session: Session) -> None:
+        """Switch the state of the chart diff. This will work only with two states: approved and unapproved."""
         # Update status variable
-        status = "approved" if self.approval_status == "rejected" else "rejected"
+        assert get_args(gm.CHART_DIFF_STATUS) == ("approved", "unapproved")
+        status = "approved" if self.unapproved else "unapproved"
         self.set_status(session, status)
 
-    def set_status(self, session, status) -> None:
+    def set_status(self, session: Session, status: gm.CHART_DIFF_STATUS) -> None:
         """Update the state of the chart diff."""
         # Only perform action if status changes!
         if self.approval_status != status:
@@ -108,8 +126,16 @@ class ChartDiffModified:
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
                 targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status="approved" if self.approved else "rejected",
+                status="approved" if self.approved else "unapproved",
             )
 
             session.add(approval)
             session.commit()
+
+    def configs_are_equal(self) -> bool:
+        """Compare two chart configs, ignoring version, id and isPublished."""
+        assert self.target_chart is not None, "Target chart is None!"
+        exclude_keys = ("version", "id", "isPublished")
+        config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
+        config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
+        return config_1 == config_2
