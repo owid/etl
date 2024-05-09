@@ -360,6 +360,12 @@ def export_metadata() -> None:
         st.success(f"Metadata exported to `{output_path}`.")
 
 
+def remove_notebook(dataset_dir):
+    notebook_path = dataset_dir / "playground.ipynb"
+    if notebook_path.is_file():
+        os.remove(notebook_path)
+
+
 #########################################################
 # MAIN ##################################################
 #########################################################
@@ -533,6 +539,7 @@ if submitted:
                 "channel": "meadow",
             }
         )
+        remove_notebook(DATASET_DIR)
 
         #######################
         # GARDEN ##############
@@ -567,6 +574,7 @@ if submitted:
                 "channel": "garden",
             }
         )
+        remove_notebook(DATASET_DIR)
 
         #######################
         # GRAPHER #############
@@ -581,8 +589,11 @@ if submitted:
                 "channel": "grapher",
             }
         )
+        remove_notebook(DATASET_DIR)
 
-        # Add to DAG
+        #######################
+        # DAG #################
+        #######################
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
             dag_content = add_to_dag(
