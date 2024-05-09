@@ -495,4 +495,11 @@ tables:
           name: Housing First strategy
           numDecimalPlaces: 0
           <<: *display_common
+        # type: ordinal
+        # sort:
+        #   - Housing First or housing-led strategies at the national level
+        #   - Regional or municipal strategies
+        #   - No strategy
+
+
 
