@@ -25,7 +25,7 @@ st.set_page_config(page_title="Wizard: Create a all steps", page_icon="🪄")
 add_indentation()
 
 # Available namespaces
-OPTIONS_NAMESPACES = []  # utils.get_namespaces("express")
+OPTIONS_NAMESPACES = utils.get_namespaces("all")
 
 
 # Get current directory
@@ -41,7 +41,7 @@ dummy_values = {
     "namespace": "dummy",
     "version": utils.DATE_TODAY,
     "short_name": "dummy",
-    "meadow_version": "2020-01-01",
+    "snapshot_version": "2020-01-01",
     "topic_tags": ["Uncategorized"],
 }
 
@@ -190,26 +190,28 @@ except OperationalError:
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_GARDEN, mode="r") as f:
+    with open(file=utils.MD_EXPRESS, mode="r") as f:
         return f.read()
 
 
 class ExpressForm(utils.StepForm):
-    """Garden step form."""
+    """express step form."""
 
-    step_name: str = "garden"
+    step_name: str = "express"
 
-    short_name: str
     namespace: str
+    short_name: str
     version: str
-    meadow_version: str
-    add_to_dag: bool
-    dag_file: str
-    include_metadata_yaml: bool
-    generate_notebook: bool
-    is_private: bool
     update_period_days: int
     topic_tags: List[str]
+    add_to_dag: bool
+    dag_file: str
+    # Others
+    include_metadata_yaml: bool
+    is_private: bool
+    # Snapshot
+    snapshot_version: str
+    file_extension: str
 
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
@@ -228,9 +230,9 @@ class ExpressForm(utils.StepForm):
         - Return True if all fields are valid, False otherwise.
         """
         # Check other fields (non meta)
-        fields_required = ["namespace", "version", "short_name", "meadow_version", "topic_tags"]
+        fields_required = ["namespace", "short_name", "version", "topic_tags", "snapshot_version", "file_extension"]
         fields_snake = ["namespace", "short_name"]
-        fields_version = ["version", "meadow_version"]
+        fields_version = ["version", "snapshot_version"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
@@ -239,6 +241,19 @@ class ExpressForm(utils.StepForm):
         # Check tags
         if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
             self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
+
+    def meadow_dict(self):
+        """Get meadow dictionary."""
+        return {
+            "namespace": self.namespace,
+            "short_name": self.short_name,
+            "version": self.version,
+            "add_to_dag": self.add_to_dag,
+            "dag_file": self.dag_file,
+            "is_private": self.is_private,
+            "snapshot_version": self.snapshot_version,
+            "file_extension": self.file_extension,
+        }
 
 
 def update_state() -> None:
@@ -252,10 +267,10 @@ def update_state() -> None:
 def _check_dataset_in_meadow(form: ExpressForm) -> None:
     private_suffix = "-private" if form.is_private else ""
 
-    dataset_uri = f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"
+    dataset_uri = f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
 
     try:
-        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.meadow_version / form.short_name)
+        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.version / form.short_name)
         if form.short_name not in ds.table_names:
             st.warning(f"Table `{form.short_name}` not found in Meadow dataset. Available tables are {ds.table_names}.")
         else:
@@ -339,13 +354,13 @@ def export_metadata() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Create step  **:gray[Express]**")
+st.title("Create step 🔥 **:gray[Express]**")
 
 # SIDEBAR
 with st.sidebar:
     # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
-        text = load_instructions()
+        text = load_instructions()  # TODO: which instructions?
         st.markdown(text)
 
 # FORM
@@ -358,27 +373,9 @@ with form_widget.form("express"):
         default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
     # Namespace
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="Namespace",
-        help="Institution or topic name",
-        placeholder="Example: 'emdat', 'health'",
-        key="namespace",
-        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    )
-    # Namespace
     namespace_field = [st.empty(), st.container()]
 
-    # Garden version
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="version",
-        help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
-        key="version",
-        default_last=default_version,
-        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
-    )
-    # Garden short name
+    # Short name (meadow, garden, grapher)
     APP_STATE.st_widget(
         st_widget=st.text_input,
         label="short name",
@@ -388,18 +385,17 @@ with form_widget.form("express"):
         value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
-    st.markdown("#### Dataset")
-    # Update frequency
+    # Version (meadow, garden, grapher)
     APP_STATE.st_widget(
-        st_widget=st.number_input,
-        label="Dataset update frequency (days)",
-        help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
-        key="update_period_days",
-        step=1,
-        min_value=0,
-        default_last=365,
+        st_widget=st.text_input,
+        label="version",
+        help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
+        key="version",
+        default_last=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
     )
 
+    # Indicator tags
     label = "Indicators tag"
     if USING_TAGS_DEFAULT:
         label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
@@ -421,18 +417,6 @@ with form_widget.form("express"):
         default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else None,
     )
 
-    st.markdown("#### Dependencies")
-    # Meadow version
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="Meadow version",
-        help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
-        key="meadow_version",
-        default_last=default_version,
-        value=dummy_values["meadow_version"] if APP_STATE.args.dummy_data else None,
-    )
-
-    st.markdown("#### Others")
     # Add to DAG
     APP_STATE.st_widget(
         st.selectbox,
@@ -441,23 +425,50 @@ with form_widget.form("express"):
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
+
+    # Update frequency
     APP_STATE.st_widget(
-        st.toggle,
-        label="Include *.meta.yaml file with metadata",
-        key="include_metadata_yaml",
-        default_last=True,
+        st_widget=st.number_input,
+        label="Dataset update frequency (days)",
+        help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
+        key="update_period_days",
+        step=1,
+        min_value=0,
+        default_last=365,
     )
+
+    with st.popover("Other parameters"):
+        APP_STATE.st_widget(
+            st.toggle,
+            label="Include *.meta.yaml file with metadata",
+            key="include_metadata_yaml",
+            default_last=True,
+        )
+        APP_STATE.st_widget(
+            st.toggle,
+            label="Make dataset private",
+            key="is_private",
+            default_last=False,
+        )
+
+    st.markdown("#### Snapshot")
+    # Snapshot version
     APP_STATE.st_widget(
-        st.toggle,
-        label="Generate playground notebook",
-        key="generate_notebook",
-        default_last=False,
+        st.text_input,
+        label="Snapshot version",
+        help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+        # placeholder=f"Example: {DATE_TODAY}",
+        key="snapshot_version",
+        value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
     )
+    # File extension
     APP_STATE.st_widget(
-        st.toggle,
-        label="Make dataset private",
-        key="is_private",
-        default_last=False,
+        st.text_input,
+        label="File extension",
+        help="File extension (without the '.') of the file to be downloaded.",
+        placeholder="Example: 'csv', 'xls', 'zip'",
+        key="file_extension",
+        value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
     )
 
     # Submit
@@ -468,20 +479,18 @@ with form_widget.form("express"):
         on_click=update_state,
     )
 
-
 # Render responsive namespace field
-# utils.render_responsive_field_in_form(
-#     key="namespace",
-#     display_name="Namespace",
-#     field_1=namespace_field[0],
-#     field_2=namespace_field[1],
-#     options=OPTIONS_NAMESPACES,
-#     custom_label="Custom namespace...",
-#     help_text="Institution or topic name",
-#     app_state=APP_STATE,
-#     default_value=dummy_values["namespace"],  # if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-# )
-
+utils.render_responsive_field_in_form(
+    key="namespace",
+    display_name="Namespace",
+    field_1=namespace_field[0],
+    field_2=namespace_field[1],
+    options=OPTIONS_NAMESPACES,
+    custom_label="Custom namespace...",
+    help_text="Institution or topic name",
+    app_state=APP_STATE,
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+)
 
 #########################################################
 # SUBMISSION ############################################
@@ -497,6 +506,24 @@ if submitted:
         # Private dataset?
         private_suffix = "-private" if form.is_private else ""
 
+        # Meadow
+        ## Create files
+        DATASET_DIR = generate_step_to_channel(
+            cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.meadow_dict(), channel="meadow")
+        )
+        step_path = DATASET_DIR / (form.short_name + ".py")
+        st.write(step_path)
+        ## DAG
+
+        # Garden
+        ## Create files
+        ## DAG
+
+        # Grapher
+        ## Create files
+        ## DAG
+
+    if False:
         # Run checks on dependency
         if APP_STATE.args.run_checks:
             _check_dataset_in_meadow(form)
@@ -504,7 +531,7 @@ if submitted:
         # Add to dag
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
-            deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
+            deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"]
             dag_content = add_to_dag(
                 dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
                 dag_path=dag_path,
@@ -527,11 +554,7 @@ if submitted:
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
-        notebook_path = DATASET_DIR / "playground.ipynb"
         metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
-
-        if (not form.generate_notebook) and (notebook_path.is_file()):
-            os.remove(notebook_path)
 
         if (not form.include_metadata_yaml) and (metadata_path.is_file()):
             os.remove(metadata_path)
@@ -545,9 +568,6 @@ if submitted:
         if form.include_metadata_yaml:
             utils.preview_file(metadata_path, "yaml")
         utils.preview_file(step_path, "python")
-        if form.generate_notebook:
-            with st.expander(f"File: `{notebook_path}`", expanded=False):
-                st.markdown("Open the file to see the generated notebook.")
         utils.preview_dag_additions(dag_content, dag_path)
 
         # Display next steps
@@ -576,11 +596,6 @@ if submitted:
             # 3/ Optional shit
             with st.container(border=True):
                 st.markdown("**(Optional)**")
-                # A/ Playground notebook
-                st.markdown("#### Playground notebook")
-                st.markdown(
-                    f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
-                )
                 # B/ Generate metadata
                 st.session_state[
                     "garden.dataset_path"

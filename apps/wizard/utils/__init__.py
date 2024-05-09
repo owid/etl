@@ -84,6 +84,7 @@ MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
+MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
 
 # Dummy data
 DUMMY_DATA = {
@@ -115,6 +116,12 @@ def get_namespaces(step_type: str) -> List[str]:
             folders = sorted(item for item in STEPS_GARDEN_DIR.iterdir() if item.is_dir())
         case "grapher":
             folders = sorted(item for item in STEPS_GRAPHER_DIR.iterdir() if item.is_dir())
+        case "all":
+            folders = sorted(
+                item
+                for item in [*STEPS_MEADOW_DIR.iterdir(), *STEPS_GARDEN_DIR.iterdir(), *STEPS_GRAPHER_DIR.iterdir()]
+                if item.is_dir()
+            )
         case _:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
     namespaces = [folder.name for folder in folders]
@@ -172,6 +179,9 @@ class AppState:
         # Add defaults (these are used when not value is found in current or previous step)
         self.default_steps["snapshot"]["snapshot_version"] = DATE_TODAY
         self.default_steps["snapshot"]["origin.date_accessed"] = DATE_TODAY
+
+        self.default_steps["express"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["express"]["version"] = DATE_TODAY
 
         self.default_steps["meadow"]["version"] = DATE_TODAY
         self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
@@ -246,23 +256,27 @@ class AppState:
         value_step = self.state_step.get(key)
         # st.write(f"value_step: {value_step}")
         if value_step is not None:
+            # st.code(1)
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
         key = key.replace(f"{self.step}.", f"{previous_step}.")
         value_previous_step = st.session_state["steps"][previous_step].get(key)
         # st.write(f"value_previous_step: {value_previous_step}")
         if value_previous_step is not None:
+            # st.code(2)
             return value_previous_step
         # (3) If none, use self.default_steps
         value_defaults = self.default_steps[self.step].get(key)
         # st.write(f"value_defaults: {value_defaults}")
         if value_defaults is not None:
+            # st.code(3)
             return value_defaults
         # (4) Use default_last as last resource
         if default_last is None:
             raise ValueError(
                 f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
             )
+        # st.code(4)
         return cast(str | bool | int, default_last)
 
     def display_error(self: "AppState", key: str) -> None:
