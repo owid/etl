@@ -29,6 +29,15 @@ steps:
   #
   # NOAA/NCEI Natural Hazards Data
   #
+  data://meadow/noaa_ncei/2024-05-09/natural_hazards:
+    - snapshot://noaa_ncei/2024-05-09/natural_hazards_earthquakes.csv
+    - snapshot://noaa_ncei/2024-05-09/natural_hazards_tsunamis.csv
+    - snapshot://noaa_ncei/2024-05-09/natural_hazards_volcanoes.csv
+  data://garden/noaa_ncei/2024-05-09/natural_hazards:
+    - data://meadow/noaa_ncei/2024-05-09/natural_hazards
+  data://grapher/noaa_ncei/2024-05-09/natural_hazards:
+    - data://garden/noaa_ncei/2024-05-09/natural_hazards
+
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
 

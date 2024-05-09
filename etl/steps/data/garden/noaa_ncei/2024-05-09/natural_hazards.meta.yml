@@ -1,0 +1,36 @@
+definitions:
+  common:
+    unit: events
+    short_unit: ""
+    presentation:
+      topic_tags:
+        - Natural Disasters
+
+dataset:
+  update_period_days: 365
+
+tables:
+  natural_hazards:
+    title: Natural Hazards Data
+    variables:
+      earthquakes:
+        title: Number of reported earthquakes
+        display:
+          name: Earthquakes
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of reported earthquakes
+      tsunamis:
+        title: Number of reported tsunamis
+        display:
+          name: Tsunamis
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of reported tsunamis
+      volcanoes:
+        title: Number of reported volcanoes
+        display:
+          name: Volcanoes
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of reported volcanoes
