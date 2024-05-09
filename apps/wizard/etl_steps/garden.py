@@ -570,7 +570,7 @@ if submitted:
                 f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                 "shellSession",
             )
-            # 3/ Optional shit
+            # 3/ Optional stuff
             with st.container(border=True):
                 st.markdown("**(Optional)**")
                 # A/ Playground notebook
