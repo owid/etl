@@ -6,7 +6,7 @@ meta:
     title: Lexical Index of Electoral Democracy (LIED)
     description: |-
       LIED is the most comprehensive dataset on democracy in terms of country-years. It covers all
-      independent countries and most semi-sovereign polities and overseas colonies, protectorates, etc. within the 1789 to 2020 timespan. Scores have also been assigned to the units in the case of short-term foreign occupation. Scores for each indicator reflect the status of a country on the last day of the calendar year (31 December) and are not intended to reflect the mean value of an indicator across the previous 364 days. Coding decisions are based on country-specific sources. 
+      independent countries and most semi-sovereign polities and overseas colonies, protectorates, etc. within the 1789 to 2020 timespan. Scores have also been assigned to the units in the case of short-term foreign occupation. Scores for each indicator reflect the status of a country on the last day of the calendar year (31 December) and are not intended to reflect the mean value of an indicator across the previous 364 days. Coding decisions are based on country-specific sources.
 
       All original coding has been done by Svend-Erik Skaaning. Svend-Erik Skaaning has developed the conceptual distinctions and cumulative logic associated with the lexical index in collaboration with John Gerring. The distinctions regarding modes of democratic transition and breakdown have been developed by Svend-Erik Skaaning, 1 who has also developed the turnover variables. Henrikas Bartusevicius was in charge of empirical analyses and the coding linked to the inter-coder reliability test presented in the dataset paper (see below).
 
@@ -21,7 +21,6 @@ meta:
 
     # Files
     url_main: https://ps.au.dk/en/research/research-projects/dedere/datasets
-    url_download: https://dataverse.harvard.edu/file.xhtml?fileId=7266277&version=3.0#
     date_accessed: 2024-05-09
 
     # License
@@ -30,6 +29,6 @@ meta:
       url: https://creativecommons.org/publicdomain/zero/1.0/
 
 outs:
-  - md5: 6f18955d84bb3a64316cce58c8bfc100
-    size: 96351
+  - md5: 3956d28a242f0e9e4f3e789bfdf605fc
+    size: 2293527
     path: lexical_index.xlsx
