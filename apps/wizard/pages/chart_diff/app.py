@@ -3,8 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.exc import OperationalError
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
@@ -14,7 +13,6 @@ from apps.wizard.pages.chart_diff.config_diff import st_show_diff
 from apps.wizard.utils import chart_html, set_states
 from apps.wizard.utils.env import OWID_ENV
 from etl import config
-from etl import grapher_model as gm
 
 log = get_logger()
 
@@ -88,7 +86,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
     # Define action for Toggle on change
     def tgl_on_change(diff, session) -> None:
         with st.spinner():
-            diff.update_state(session=session)
+            diff.switch_state(session=session)
 
     # Define action for Refresh on click
     def refresh_on_click(source_session=source_session, target_session=None):
@@ -269,15 +267,6 @@ def main():
                 }
             ),
         )
-    # TODO: this should be created via migration in owid-grapher!!!!!
-    # Create chart_diff_approvals table if it doesn't exist
-    try:
-        SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
-    except OperationalError as e:
-        if "Table 'chart_diff_approvals' already exists" in str(e):
-            pass
-        else:
-            raise e
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:
