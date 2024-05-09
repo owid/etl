@@ -103,7 +103,8 @@ def run(dest_dir: str) -> None:
     tb_women = ds_meadow["share_of_women"].reset_index()
     tb_share = ds_meadow["share"].reset_index()
     tb_number = ds_meadow["number"].reset_index()
-    tb_national_strategies = ds_meadow["national_strategies"].reset_index()
+    tb_national_strategies = ds_meadow["national_strategy"].reset_index()
+    tb_housing_first_strategies = ds_meadow["housing_first_strategy"].reset_index()
 
     #
     # Process data.
@@ -125,6 +126,9 @@ def run(dest_dir: str) -> None:
     )
     tb_national_strategies = geo.harmonize_countries(
         df=tb_national_strategies, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
+    tb_housing_first_strategies = geo.harmonize_countries(
+        df=tb_housing_first_strategies, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
 
     # Merge point_in_time and flow tables.
@@ -160,6 +164,9 @@ def run(dest_dir: str) -> None:
 
     # Merge national_strategies table with main table
     tb = pr.merge(tb, tb_national_strategies, on=["country", "year"], how="outer", short_name=paths.short_name)
+
+    # Merge housing_first_strategies table with main table
+    tb = pr.merge(tb, tb_housing_first_strategies, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     tb = tb.format(["country", "year"])
 

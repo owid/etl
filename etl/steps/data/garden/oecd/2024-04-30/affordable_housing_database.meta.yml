@@ -480,3 +480,19 @@ tables:
           numDecimalPlaces: 0
           <<: *display_common
 
+      housing_first_strategy:
+        title: Housing First strategy
+        unit: ""
+        short_unit: ""
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at the national level, at the regional or municipal level, or no strategy at all.
+        description_key:
+          - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
+          - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
+        processing_level: minor
+        presentation:
+          title_public: Housing First strategy
+        display:
+          name: Housing First strategy
+          numDecimalPlaces: 0
+          <<: *display_common
+

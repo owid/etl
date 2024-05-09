@@ -16,14 +16,11 @@ log = get_logger()
 
 # Define national strategies for homelessness
 NATIONAL_STRATEGIES_YEAR = 2023
+
 NATIONAL_STRATEGIES = {
-    "Have an active national strategy": [
+    "Housing First or housing-led strategies at the national level": [
         "Belgium",
-        "Canada",
         "Chile",
-        "Colombia",
-        "Costa Rica",
-        "Czechia",
         "Denmark",
         "Finland",
         "France",
@@ -31,31 +28,91 @@ NATIONAL_STRATEGIES = {
         "Greece",
         "Ireland",
         "Italy",
-        "Japan",
-        "Korea",
+        "Luxembourg",
         "Netherlands",
         "New Zealand",
         "Norway",
-        "Poland",
         "Portugal",
-        "Romania",
         "Slovak Republic",
         "Spain",
         "Sweden",
         "United States",
     ],
-    "Have regional or local strategies": ["Australia", "Austria", "Estonia", "Iceland", "United Kingdom"],
+    "Regional or municipal strategies": [
+        "Australia",
+        "Austria",
+        "Canada",
+        "Czechia",
+        "Estonia",
+        "Hungary",
+        "Latvia",
+        "Poland",
+        "Romania",
+        "United Kingdom",
+    ],
     "No strategy": [
         "Bulgaria",
+        "Colombia",
+        "Costa Rica",
         "Croatia",
-        "Cyprus",
-        "Hungary",
+        "Iceland",
         "Israel",
-        "Latvia",
+        "Japan",
+        "Korea",
         "Lithuania",
-        "Luxembourg",
-        "Malta",
         "Mexico",
+        "Peru",
+        "Slovenia",
+        "Switzerland",
+        "Türkiye",
+    ],
+}
+
+HOUSING_FIRST_STRATEGIES = {
+    "Housing First or housing-led strategies at the national level": [
+        "Belgium",
+        "Chile",
+        "Denmark",
+        "Finland",
+        "France",
+        "Germany",
+        "Greece",
+        "Ireland",
+        "Italy",
+        "Luxembourg",
+        "Netherlands",
+        "New Zealand",
+        "Norway",
+        "Portugal",
+        "Slovak Republic",
+        "Spain",
+        "Sweden",
+        "United States",
+    ],
+    "Regional or municipal strategies": [
+        "Australia",
+        "Austria",
+        "Canada",
+        "Czechia",
+        "Estonia",
+        "Hungary",
+        "Latvia",
+        "Poland",
+        "Romania",
+        "United Kingdom",
+    ],
+    "No strategy": [
+        "Bulgaria",
+        "Colombia",
+        "Costa Rica",
+        "Croatia",
+        "Iceland",
+        "Israel",
+        "Japan",
+        "Korea",
+        "Lithuania",
+        "Mexico",
+        "Peru",
         "Slovenia",
         "Switzerland",
         "Türkiye",
@@ -198,7 +255,12 @@ def run(dest_dir: str) -> None:
     tb_number = rename_columns_drop_rows_and_format(tb_number, columns=COLUMNS_NUMBER, short_name="number", year=True)
 
     # Add national strategies to the table
-    tb_national_strategies = add_national_strategies(NATIONAL_STRATEGIES, tb_number)
+    tb_national_strategies = add_national_strategies(NATIONAL_STRATEGIES, tb_number, short_name="national_strategy")
+
+    # Add housing first strategies to the table
+    tb_housing_first_strategies = add_national_strategies(
+        HOUSING_FIRST_STRATEGIES, tb_number, short_name="housing_first_strategy"
+    )
 
     #
     # Save outputs.
@@ -214,6 +276,7 @@ def run(dest_dir: str) -> None:
             tb_share,
             tb_number,
             tb_national_strategies,
+            tb_housing_first_strategies,
         ],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
@@ -337,14 +400,14 @@ def add_count_and_type_of_homelessness_to_women_data(tb: Table) -> Table:
     return tb
 
 
-def add_national_strategies(national_strategies: Dict[str, list], tb: Table) -> Table:
+def add_national_strategies(national_strategies: Dict[str, list], tb: Table, short_name: str) -> Table:
     """
     Create a table with national strategies for homelessness.
     """
     # Create table with national strategies
     tb_national_strategies = Table(
-        pd.DataFrame(national_strategies.items(), columns=["national_strategy", "country"]),
-        short_name="national_strategies",
+        pd.DataFrame(national_strategies.items(), columns=[short_name, "country"]),
+        short_name=short_name,
     )
 
     # Explode country (each country has a row for each national strategy)
