@@ -78,7 +78,6 @@ def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
     """
     Remove rows with empty values for all the indicators.
     MPD keeps ~100,000 rows with empty values for all indicators (probably for aggregation purposes).
-    I also keep region data only for years where we have data for "World".
     """
 
     # Drop rows with empty values for all indicators.
@@ -86,12 +85,6 @@ def remove_empty_rows_and_rename_columns(tb: Table) -> Table:
 
     # Rename columns
     tb = tb.rename(columns=MPD_COLUMNS, errors="raise")
-
-    # Extract years where we have data for "World"
-    years_with_world_data = list(tb.loc[tb["country"] == "World", "year"].unique())
-
-    # Make all the rows of region different from years_with_world_data None
-    tb.loc[~tb["year"].isin(years_with_world_data), "region"] = None
 
     return tb
 

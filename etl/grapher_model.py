@@ -5,7 +5,6 @@ sqlacodegen --generator sqlmodels mysql://root@localhost:3306/owid
 It has been slightly modified since then.
 """
 import json
-import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
@@ -330,13 +329,7 @@ class Chart(SQLModel, table=True):
 
         return variables
 
-    def migrate_to_db(
-        self,
-        source_session: Session,
-        target_session: Session,
-        include: Optional[str] = None,
-        exclude: Optional[str] = None,
-    ) -> Optional["Chart"]:
+    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
         """Remap variable ids from source to target session. Variable in source is uniquely identified
         by its catalogPath if available, or by name and datasetId otherwise. It is looked up
         by this identifier in the target session to get the new variable id.
@@ -346,21 +339,6 @@ class Chart(SQLModel, table=True):
         """
         assert self.id, "Chart must come from a database"
         source_variables = self.load_chart_variables(source_session)
-
-        # if chart contains a variable that is excluded, skip the whole chart
-        if exclude:
-            for source_var in source_variables.values():
-                if source_var.catalogPath and re.search(exclude, source_var.catalogPath):
-                    return None
-
-        # a chart must contain at least one variable matching include, otherwise skip it
-        if include:
-            matching = False
-            for source_var in source_variables.values():
-                if source_var.catalogPath and re.search(include, source_var.catalogPath):
-                    matching = True
-            if not matching:
-                return None
 
         remap_ids = {}
         for source_var_id, source_var in source_variables.items():
@@ -410,6 +388,24 @@ class Chart(SQLModel, table=True):
         """
         rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
         return rows
+
+    def remove_nonexisting_map_column_slug(self, session: Session) -> None:
+        """Remove map.columnSlug if the variable doesn't exist. It'd be better
+        to fix the root cause and make sure we don't have such charts in our database.
+        """
+        column_slug = self.config.get("map", {}).get("columnSlug", None)
+        if column_slug:
+            try:
+                Variable.load_variable(session, int(column_slug))
+            except NoResultFound:
+                # When there are multiple indicators in a chart and it also has a map then this field tells the map which indicator to use.
+                # If the chart doesn't have the map tab active then it can be invalid quite often
+                log.warning(
+                    "staging_sync.remove_missing_map_column_slug",
+                    chart_id=self.id,
+                    column_slug=column_slug,
+                )
+                self.config["map"].pop("columnSlug")
 
 
 class Dataset(SQLModel, table=True):
@@ -1472,6 +1468,10 @@ class Origin(SQLModel, table=True):
         return origin
 
 
+# TODO: should we also add "rejected" status and exclude such charts from chart-sync?
+CHART_DIFF_STATUS = Literal["approved", "unapproved"]
+
+
 class ChartDiffApprovals(SQLModel, table=True):
     __tablename__: str = "chart_diff_approvals"
     __table_args__ = (Index("chart_id_ix", "chartId"), {"extend_existing": True})
@@ -1483,13 +1483,13 @@ class ChartDiffApprovals(SQLModel, table=True):
     updatedAt: datetime = Field(
         default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
     )
-    status: str = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+    status: CHART_DIFF_STATUS = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
 
     @classmethod
     def latest_chart_status(
         cls, session: Session, chart_id: int, source_updated_at, target_updated_at
-    ) -> Literal["approved", "rejected"]:
-        """Load the latest approval of the chart. If there's none, return 'rejected'."""
+    ) -> CHART_DIFF_STATUS:
+        """Load the latest approval of the chart. If there's none, return 'unapproved'."""
         result = session.exec(
             select(cls)
             .where(
@@ -1503,7 +1503,7 @@ class ChartDiffApprovals(SQLModel, table=True):
         if result:
             return result.status  # type: ignore
         else:
-            return "rejected"
+            return "unapproved"
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
