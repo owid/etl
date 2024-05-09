@@ -56,7 +56,7 @@ To get the missing data, there are various strategies depending on what is missi
 >>> missing_entries = get_missing_entries("news_yearly.csv")
 
 >>> # Get data for the missing country-year pairs
->>> get_data_from_tuples(missing_entries, "news_yearly-1.csv")
+>>> get_data_by_tags_from_tuples(missing_entries, "news_yearly-1.csv")
 
 2) CERTAIN COUNTRIES ARE MISSING
 
@@ -100,10 +100,12 @@ United States Virgin Islands -> Us Virgin Islands
 United Kingdom -> UK (watch for 'Ukraine' tags and remove them)
 United States -> US
 
+Not using but could:
+
 England
 Wales
 Scotland
-Northern Ireland: campaign/callout/callout-northern-ireland-trade-deal
+Northern Ireland
 
 OTHER COMMENTS ON TAGS PER COUNTRY AND MODIFICATIONS
 ----------------------------------------------------
@@ -137,28 +139,43 @@ ALTERNATIVE STRATEGY
 
 We get all pages that mention a country. That is, we use '?q=' parameter. We exclude certain words sometimes to avoid false positives (i.e. exclude 'guinea-bissau' when searching for 'guinea').
 
->>> data = get_country_data_by_raw_mention(year_range=[2016, 2017])
+>>> data = get_data_by_raw_mention(year_range=[2016, 2017])
 
 WHAT IF THERE IS MISSING DATA?
 ------------------------------
 
-1) CERTAIN COUNTRIES ARE MISSING
+1) CERTAIN COUNTRY-YEARS ARE MISSING
+
+>>> # Get list of country-year pairs that are missing in the data (API rate limit exceeded most probably)
+>>> missing_entries = get_missing_entries("news_yearly.csv")
+
+>>> # Get data for the missing country-year pairs
+>>> get_data_by_raw_mention_from_tuples(missing_entries, "news_yearly-W.csv")
+
+
+2) CERTAIN COUNTRIES ARE MISSING
 
 >>> # Define dictionary mapping country to tags. Only data for countries listed will be retrieved.
->>> country_tags = {"country": ["tag1", "tag2", ...], ...}
->>> get_country_data_by_raw_mention(output_file="news_yearly-X.csv", country_tags=country_tags)
+>>> country_names = {"country": ["name_variation_1", "name_variation_2", ...], ...}
+>>> get_data_by_raw_mention(output_file="news_yearly-X.csv", country_names=country_names)
 
 OR
 
 >>> # Get current tags for subset of countries.
->>> country_tags = {c: t for c, t in COUNTRY_NAMES.items() if c in {"country1", "country2"}}
->>> get_country_data_by_raw_mention(output_file="news_yearly-Y.csv", country_tags=country_tags)
+>>> COUNTRY_NAMES = get_country_name_variations()
+>>> country_names = {c: t for c, t in COUNTRY_NAMES.items() if c in {"country1", "country2"}}
+>>> get_data_by_raw_mention(output_file="news_yearly-Y.csv", country_names=country_names)
 
-2) CERTAIN YEAR IS MISSING
+3) CERTAIN YEAR IS MISSING
 
 >>> # Use 'year_range' to get data for a specific year(s)
->>> get_country_data_by_raw_mention(output_file="news-yearly-Z.csv", year_range=[2023])
+>>> get_data_by_raw_mention(output_file="news-yearly-Z.csv", year_range=[2023])
 
+
+RUN SNAPSHOT STEP
+=================
+
+python snapshots/news/2024-05-07/guardian_mentions.py --path-to-file-tags snapshots/news/2024-05-07/news-yearly-combined.csv --path-to-file-mentions snapshots/news/2024-05-07/news-b-yearly-combined.csv
 """
 
 import ast
@@ -202,13 +219,23 @@ COUNTRIES = list(COUNTRY_TAGS.keys())
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def main(path_to_file: str, upload: bool) -> None:
-    # Create a new snapshot.
-    snap = Snapshot(f"news/{SNAPSHOT_VERSION}/guardian_mentions.csv")
+@click.option("--path-to-file-tags", prompt=True, type=str, help="Path to local data file.")
+@click.option("--path-to-file-mentions", prompt=True, type=str, help="Path to local data file.")
+def main(path_to_file_tags: str, path_to_file_mentions: str, upload: bool) -> None:
+    uris = [
+        f"news/{SNAPSHOT_VERSION}/guardian_mentions.csv",
+        f"news/{SNAPSHOT_VERSION}/guardian_mentions_raw.csv",
+    ]
+    path_to_files = [
+        path_to_file_tags,
+        path_to_file_mentions,
+    ]
+    for uri, path_to_file in zip(uris, path_to_files):
+        # Create a new snapshot.
+        snap = Snapshot(uri)
 
-    # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(filename=path_to_file, upload=upload)
+        # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+        snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
 def get_data(output_file, country_tags=COUNTRY_TAGS, year_range=None):
@@ -459,8 +486,9 @@ def get_guardian_country_names():
         "East Timor": "Timor-Leste",
         "Cote d'Ivoire": "Ivory Coast",
         "Czechia": "Czech Republic",
-        "Gaza strip": "Gaza",
         "Cocos Islands": "Cocos Island",
+        "Democratic Republic of Congo": "Democratic Republic of the Congo",
+        "Gaza strip": "Gaza",
         "Macao": "Macau",
         "Micronesia (country)": "Micronesia",
         "Northern Mariana Islands": "Northern Marianas Islands",
@@ -503,10 +531,12 @@ def get_missing_entries(input_file):
     return missing_entries
 
 
-def get_data_from_tuples(country_year_pairs, output_file) -> None:
+def get_data_by_tags_from_tuples(country_year_pairs, output_file) -> None:
     """Get data for the given country-year pairs.
 
     Country-year pairs are given as a list of (country, year) tuples.
+
+    Get data for a country based on tags associated to it.
     """
     # Get country -> tags mapping
     with open(COUNTRY_TAGS_FILE, "r") as file:
@@ -631,6 +661,31 @@ def get_country_name_variations():
     mapping = tb_regions.set_index("name")["aliases"].to_dict()
     name_variations = {k: set(v + [k]) for k, v in mapping.items()}
 
+    # Certain re-organisations
+    name_variations["Palestine"] |= name_variations["Gaza Strip"]
+    _ = name_variations.pop("Gaza Strip", None)
+
+    # Country name changes
+    country_names_guardian = {
+        "East Timor": "Timor-Leste",
+        "Cote d'Ivoire": "Ivory Coast",
+        "Czechia": "Czech Republic",
+        "Democratic Republic of Congo": "Democratic Republic of the Congo",
+        "Cocos Islands": "Cocos Island",
+        "Gaza strip": "Gaza",
+        "Macao": "Macau",
+        "Micronesia (country)": "Micronesia",
+        "Northern Mariana Islands": "Northern Marianas Islands",
+        "Saint Helena": "St Helena",
+        "Saint Lucia": "St Lucia",
+        "Saint Martin (French part)": "Saint Martin",
+        "Sint Maarten (Dutch part)": "Sint Maarten",
+        "United States Virgin Islands": "Us Virgin Islands",
+        "United Kingdom": "UK",
+        "United States": "US",
+    }
+    name_variations = {country_names_guardian.get(c, c): names for c, names in name_variations.items()}
+
     # Sort
     names_sorted = sorted(name_variations)  # type: ignore
     name_variations = {k: name_variations[k] for k in names_sorted}
@@ -675,7 +730,11 @@ def get_country_queries(country_names=None):
     return queries
 
 
-def get_country_data_by_raw_mention(country_names=None, year_range=None, output_file_base=None):
+def get_data_by_raw_mention(country_names=None, year_range=None, output_file=None, output_file_base_year=None):
+    """Get data for country-year using mentions.
+
+    It loops over countries and years.
+    """
     # Get query
     queries = get_country_queries(country_names)
     if year_range is None:
@@ -686,29 +745,79 @@ def get_country_data_by_raw_mention(country_names=None, year_range=None, output_
         for i, country in enumerate(queries):
             if i % 10 == 0:
                 print(country["country"])
-            params = {
-                "api-key": API_KEY,
-                "q": country["query"],
-                "page-size": 200,
-                "from-date": f"{year}-01-01",
-                "to-date": f"{year}-12-31",
-            }
-            data = requests.get(API_CONTENT_URL, params=params).json()
             data_ = {
                 "country": country["country"],
                 "year": year,
             }
-            if "response" in data:
-                if "total" in data["response"]:
-                    data_["num_pages"] = data["response"]["total"]
-                else:
-                    print(f"> Error {country['country']}: {country['query']}!")
+            num_pages = get_pages_from_mentions(country["query"], year)
+            if num_pages:
+                data_["num_pages"] = num_pages
             DATA.append(data_)
 
-        if output_file_base:
-            pd.DataFrame(DATA).to_csv(f"{output_file_base}-{year}.csv", index=False)
+        if output_file_base_year:
+            pd.DataFrame(DATA).to_csv(f"{output_file_base_year}-{year}.csv", index=False)
+
+    if output_file:
+        pd.DataFrame(DATA).to_csv(output_file, index=False)
 
     return DATA
+
+
+def get_data_by_raw_mention_from_tuples(country_year_pairs, output_file) -> None:
+    """Get data for the given country-year pairs.
+
+    Country-year pairs are given as a list of (country, year) tuples.
+
+    Get data for a country using 'raw mentions' (i.e. ?q=... parameter in the API call)
+    """
+    # Get query
+    queries_all = get_country_queries()
+    queries = {c["country"]: c["query"] for c in queries_all}
+
+    # Get missing data
+    data = []
+    for missing in country_year_pairs:
+        country = missing[0]
+        year = missing[1]
+
+        print(f"{country} @ {year}")
+
+        # init
+        data_ = {
+            "country": country,
+            "year": year,
+        }
+
+        # get query
+        query = queries.get(country)
+        if query is not None:
+            # get num pages
+            num_pages = get_pages_from_mentions(query, year)
+            if num_pages:
+                data_["num_pages"] = num_pages
+        else:
+            print(f"> Error: No query found! {country}")
+        data.append(data_)
+
+    # Export data
+    df_data = pd.DataFrame(data)
+    df_data.to_csv(output_file, index=False)
+
+
+def get_pages_from_mentions(query, year):
+    params = {
+        "api-key": API_KEY,
+        "q": query,
+        "page-size": 200,
+        "from-date": f"{year}-01-01",
+        "to-date": f"{year}-12-31",
+    }
+    data = requests.get(API_CONTENT_URL, params=params).json()
+    if "response" in data:
+        if "total" in data["response"]:
+            return data["response"]["total"]
+        else:
+            print(f"> Error {query}!")
 
 
 ########################################

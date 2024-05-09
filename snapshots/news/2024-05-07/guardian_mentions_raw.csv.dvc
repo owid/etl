@@ -3,13 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Attention to each country in The Guardian's articles (tags)
+    title: Attention to each country in The Guardian's articles (raw mentions)
     description: |-
       Aggregate estimates on the number of entries that talk about each country and year.
 
       The data was obtained by querying The Guardian's Open Platform.
 
-      An entry or page in The Guardian is considered to be about a certain country if that particular country if it is tagged with a country-related label. To this end, we have used a set of tags for each country. Nonetheless, this is not a perfect method and some entries might be missed.
+      An entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.
     date_published: "2024"
 
     # Citation
@@ -27,6 +27,6 @@ meta:
       url: https://www.theguardian.com/help/terms-of-service
 
 outs:
-  - md5: 2eb1d94a05f261ecfb6305b17d7478cd
-    size: 37251
-    path: guardian_mentions.csv
+  - md5: c4717f04f05266b50d1f8746ff9b4e28
+    size: 41292
+    path: guardian_mentions_raw.csv

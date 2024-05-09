@@ -20,16 +20,21 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    ## Get relative values
-    tb["num_pages_total"] = tb.groupby("year")["num_pages"].transform(sum)
-    tb["num_pages_relative"] = tb["num_pages"] / tb["num_pages_total"] * 100_000
-    tb = tb.drop(columns=["num_pages_total"])
-
     ## Harmonize countries
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
     )
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+    )
+
+    ## Get relative values
+    tb = add_relative_indicator(tb, "num_pages_tags")
+    tb = add_relative_indicator(tb, "num_pages_mentions")
+
+
     tb = tb.format(["country", "year"])
 
     #
@@ -42,3 +47,14 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_relative_indicator(tb, colname):
+    """Add relative indicator.
+
+    E.g. Global share of ? for a given year. Note that we use 'per 100,000' factor.
+    """
+    tb["total"] = tb.groupby("year")[colname].transform(sum)
+    tb[f"{colname}_relative"] = tb[colname] / tb["total"] * 100_000
+    tb = tb.drop(columns=["total"])
+    return tb
