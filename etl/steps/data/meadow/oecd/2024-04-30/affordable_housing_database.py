@@ -64,7 +64,7 @@ NATIONAL_STRATEGIES = {
 }
 
 HOUSING_FIRST_STRATEGIES = {
-    "Housing First or housing-led strategies at the national level": [
+    "Have a national strategy": [
         "Belgium",
         "Chile",
         "Denmark",
@@ -84,7 +84,7 @@ HOUSING_FIRST_STRATEGIES = {
         "Sweden",
         "United States",
     ],
-    "Regional or municipal strategies": [
+    "Have regional or local strategies": [
         "Australia",
         "Austria",
         "Canada",
