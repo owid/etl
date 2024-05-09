@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, cast
 
 import streamlit as st
-from owid.catalog import Dataset
 from sqlalchemy.exc import OperationalError
 from st_pages import add_indentation
 from typing_extensions import Self
@@ -15,7 +14,7 @@ from apps.wizard import utils
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
-from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
+from etl.paths import DAG_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -365,7 +364,9 @@ def export_metadata() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Create step 🔥 **:gray[Express]**")
+st.title("Create step 🐆 **:gray[Express]**")
+
+st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_! **Requires ETL expertise**.")
 
 # SIDEBAR
 with st.sidebar:

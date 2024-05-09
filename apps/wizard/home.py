@@ -21,7 +21,7 @@ Wizard is a fundamental tool for data scientists at OWID to easily create ETL st
 )
 
 with st.container(border=True):
-    st.markdown("**NEW**: Questions about the documentation? Ask the expert!")
+    st.markdown("Questions about the documentation? Ask the expert!")
     st_page_link("expert", help="Ask the expert any documentation question!", use_container_width=True)
 
 # Generic tools
@@ -82,7 +82,18 @@ if len(pages) > 0:
     for i, page in enumerate(pages):
         with columns[i]:
             create_card(**page)
-# 2/ FAST TRACK
+
+# 2 EXPRESS
+if steps["fasttrack"]["enable"]:
+    col1, col2 = st.columns([1, 3])
+    with col2:
+        create_card(
+            title=steps["express"]["title"],
+            image_url=steps["express"]["image_url"],
+            custom_styles={"height": "50px"},
+        )
+
+# 3/ FAST TRACK
 if steps["fasttrack"]["enable"]:
     create_card(
         title=steps["fasttrack"]["title"],

@@ -45,14 +45,14 @@ etl:
       title: "Snapshot"
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
-      image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
+      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
       disable:
         "production": True
     express:
       title: "Express"
       entrypoint: etl_steps/express.py
-      emoji: "️🔥"
-      image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+      emoji: "️🐆"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
       disable:
         "production": True
     meadow:
