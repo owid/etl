@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
             "competition_lied",
             "male_suffrage_lied",
             "female_suffrage_lied",
-            "poliberties_liead",
+            "poliberties_lied",
         ]
     ]
 
