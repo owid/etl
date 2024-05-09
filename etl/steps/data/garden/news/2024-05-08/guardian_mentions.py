@@ -34,7 +34,6 @@ def run(dest_dir: str) -> None:
     tb = add_relative_indicator(tb, "num_pages_tags")
     tb = add_relative_indicator(tb, "num_pages_mentions")
 
-
     tb = tb.format(["country", "year"])
 
     #
