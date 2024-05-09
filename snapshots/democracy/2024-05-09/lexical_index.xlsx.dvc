@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Lexical Index of Electoral Democracy (LIED)
+    description: |-
+      LIED is the most comprehensive dataset on democracy in terms of country-years. It covers all
+      independent countries and most semi-sovereign polities and overseas colonies, protectorates, etc. within the 1789 to 2020 timespan. Scores have also been assigned to the units in the case of short-term foreign occupation. Scores for each indicator reflect the status of a country on the last day of the calendar year (31 December) and are not intended to reflect the mean value of an indicator across the previous 364 days. Coding decisions are based on country-specific sources. 
+
+      All original coding has been done by Svend-Erik Skaaning. Svend-Erik Skaaning has developed the conceptual distinctions and cumulative logic associated with the lexical index in collaboration with John Gerring. The distinctions regarding modes of democratic transition and breakdown have been developed by Svend-Erik Skaaning, 1 who has also developed the turnover variables. Henrikas Bartusevicius was in charge of empirical analyses and the coding linked to the inter-coder reliability test presented in the dataset paper (see below).
+
+      The dataset consists of 14 original indicators and two original indices. The LIED dataset offers indicators on whether legislative elections are on track (legislative_elections), whether (direct or indirect) executive elections are on track (executive_elections), whether multiple parties are able to run for legislative elections (multi-party_legislative_elections), whether there is universal male suffrage (male_suffrage), and whether there is universal female suffrage (female_suffrage),2 whether elections are genuinely contested (competitive_elections), whether political liberties in the form of freedom of expression, assembly, and association, are respected (political_liberties), whether countries experienced democratic transition in a given year (democratic_transition), the mode of democratic transition (transition_type), whether countries experienced democratic breakdown in a given year (democratic_breakdown), the mode of democratic breakdown (breakdown_type),whether elections led to a government turnover (turnover_event), and whether a period of competitive elections has been characterized by at least one government turnover (turnover_period). Finally, the data are used to construct two indices, i.e., the Lexical Index of Electoral Democracy (lexical_index) and an extended version called Lexical Index of Electoral Democracy+ (lexical_index_plus).
+    date_published: "2023-07-31"
+    version_producer: v6.5
+
+    # Citation
+    producer: Skaaning et al.
+    citation_full: |-
+      Skaaning, Svend-Erik, John Gerring and Henrikas Bartusevičius. 2015. A Lexical Index of Electoral Democracy. Comparative Political Studies 48(12):1491-1525.
+
+    # Files
+    url_main: https://ps.au.dk/en/research/research-projects/dedere/datasets
+    url_download: https://dataverse.harvard.edu/file.xhtml?fileId=7266277&version=3.0#
+    date_accessed: 2024-05-09
+
+    # License
+    license:
+      name: CC0
+      url: https://creativecommons.org/publicdomain/zero/1.0/
+
+outs:
+  - md5: 6f18955d84bb3a64316cce58c8bfc100
+    size: 96351
+    path: lexical_index.xlsx
