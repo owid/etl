@@ -385,10 +385,10 @@ def preview_file(file_path: str | Path, language: str = "python") -> None:
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content: str, dag_path: str | Path) -> None:
+def preview_dag_additions(dag_content: str, dag_path: str | Path, expanded: bool = False) -> None:
     """Preview DAG additions."""
     if dag_content:
-        with st.expander(f"File: `{dag_path}`", expanded=False):
+        with st.expander(f"File: `{dag_path}`", expanded=expanded):
             st.code(dag_content, "yaml")
 
 

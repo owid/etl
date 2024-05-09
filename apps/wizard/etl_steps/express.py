@@ -255,6 +255,33 @@ class ExpressForm(utils.StepForm):
             "file_extension": self.file_extension,
         }
 
+    def garden_dict(self):
+        """Get meadow dictionary."""
+        return {
+            "namespace": self.namespace,
+            "short_name": self.short_name,
+            "version": self.version,
+            "meadow_version": self.version,
+            "add_to_dag": self.add_to_dag,
+            "dag_file": self.dag_file,
+            "is_private": self.is_private,
+            "update_period_days": self.update_period_days,
+            "topic_tags": self.topic_tags,
+            "include_metadata_yaml": self.include_metadata_yaml,
+        }
+
+    def grapher_dict(self):
+        """Get meadow dictionary."""
+        return {
+            "namespace": self.namespace,
+            "short_name": self.short_name,
+            "version": self.version,
+            "garden_version": self.version,
+            "add_to_dag": self.add_to_dag,
+            "dag_file": self.dag_file,
+            "is_private": self.is_private,
+        }
+
 
 def update_state() -> None:
     """Submit form."""
@@ -262,22 +289,6 @@ def update_state() -> None:
     form = ExpressForm.from_state()
     # Update states with values from form
     APP_STATE.update_from_form(form)
-
-
-def _check_dataset_in_meadow(form: ExpressForm) -> None:
-    private_suffix = "-private" if form.is_private else ""
-
-    dataset_uri = f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"
-
-    try:
-        ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.version / form.short_name)
-        if form.short_name not in ds.table_names:
-            st.warning(f"Table `{form.short_name}` not found in Meadow dataset. Available tables are {ds.table_names}.")
-        else:
-            st.success(f"Dataset ```{dataset_uri}``` found in Meadow!")
-    except FileNotFoundError:
-        # raise a warning, but continue
-        st.warning(f"Dataset not found in Meadow! Have you run ```etl {dataset_uri}```?")
 
 
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
@@ -506,77 +517,127 @@ if submitted:
         # Private dataset?
         private_suffix = "-private" if form.is_private else ""
 
-        # Meadow
-        ## Create files
+        generated_files = []
+
+        #######################
+        # MEADOW ##############
+        #######################
         DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.meadow_dict(), channel="meadow")
         )
-        step_path = DATASET_DIR / (form.short_name + ".py")
-        st.write(step_path)
-        ## DAG
+        generated_files.append(
+            {
+                "path": DATASET_DIR / (form.short_name + ".py"),
+                "language": "python",
+                "channel": "meadow",
+            }
+        )
 
-        # Garden
-        ## Create files
-        ## DAG
+        #######################
+        # GARDEN ##############
+        #######################
+        ## HOTFIX 1: filter topic_tags if empty
+        garden_dict = form.garden_dict()
+        if garden_dict.get("topic_tags") is None or garden_dict.get("topic_tags") == []:
+            garden_dict["topic_tags"] = ""
+        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
+        ## Hence we need to convert the list to an actual string
+        else:
+            garden_dict["topic_tags"] = "- " + "\n- ".join(garden_dict["topic_tags"])
+        ## Create py
+        DATASET_DIR = generate_step_to_channel(
+            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**garden_dict, channel="garden")
+        )
+        generated_files.append(
+            {
+                "path": DATASET_DIR / (form.short_name + ".py"),
+                "language": "python",
+                "channel": "garden",
+            }
+        )
+        ## Create metadata
+        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
+        if (not form.include_metadata_yaml) and (metadata_path.is_file()):
+            os.remove(metadata_path)
+        generated_files.append(
+            {
+                "path": metadata_path,
+                "language": "yaml",
+                "channel": "garden",
+            }
+        )
 
-        # Grapher
-        ## Create files
-        ## DAG
+        #######################
+        # GRAPHER #############
+        #######################
+        DATASET_DIR = generate_step_to_channel(
+            cookiecutter_path=utils.COOKIE_GRAPHER, data=dict(**form.grapher_dict(), channel="grapher")
+        )
+        generated_files.append(
+            {
+                "path": DATASET_DIR / (form.short_name + ".py"),
+                "language": "python",
+                "channel": "grapher",
+            }
+        )
 
-    if False:
-        # Run checks on dependency
-        if APP_STATE.args.run_checks:
-            _check_dataset_in_meadow(form)
-
-        # Add to dag
+        # Add to DAG
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
-            deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}"]
             dag_content = add_to_dag(
-                dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
+                dag={
+                    f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
+                        f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.file_extension}",
+                    ],
+                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": [
+                        f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}",
+                    ],
+                    f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
+                        f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}",
+                    ],
+                },
                 dag_path=dag_path,
             )
         else:
             dag_content = ""
 
-        # Create necessary files
-        ## HOTFIX 1: filter topic_tags if empty
-        form_dict = form.dict()
-        if form_dict.get("topic_tags") is None or form_dict.get("topic_tags") == []:
-            form_dict["topic_tags"] = ""
-        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
-        ## Hence we need to convert the list to an actual string
-        else:
-            form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
-
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
-        )
-
-        step_path = DATASET_DIR / (form.short_name + ".py")
-        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
-
-        if (not form.include_metadata_yaml) and (metadata_path.is_file()):
-            os.remove(metadata_path)
-
-        # Fill with dummy metadata
-        if form.namespace == "dummy":
-            _fill_dummy_metadata_yaml(metadata_path)
-
-        # Preview generated files
+        #######################
+        # PREVIEW #############
+        #######################
         st.subheader("Generated files")
-        if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
-        utils.preview_dag_additions(dag_content, dag_path)
+        utils.preview_dag_additions(dag_content, dag_path, expanded=True)
 
-        # Display next steps
-        with st.expander("⏭️ **Next steps**", expanded=True):
-            # 1/ Harmonize
-            st.markdown("####  1. Harmonize Country names")
+        tab_meadow, tab_garden, tab_grapher = st.tabs(["Meadow", "Garden", "Grapher"])
+        for f in generated_files:
+            if f["channel"] == "meadow":
+                with tab_meadow:
+                    utils.preview_file(f["path"], f["language"])
+            elif f["channel"] == "garden":
+                with tab_garden:
+                    utils.preview_file(f["path"], f["language"])
+            elif f["channel"] == "grapher":
+                with tab_grapher:
+                    utils.preview_file(f["path"], f["language"])
+
+        #######################
+        # NEXT STEPS ##########
+        #######################
+        with tab_meadow:
+            st.markdown("#### ⏭️ Next")
+            ## Run step
+            st.markdown("##### Run ETL meadow step")
+            st.code(
+                f"poetry run etl run data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                language="shellSession",
+            )
+
+        with tab_garden:
+            st.markdown("#### ⏭️ Next")
+            ## 1/ Harmonize country names
+            st.markdown("##### Harmonize country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                f"poetry run etl harmonize data/meadow/{form.namespace}/{form.version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
@@ -587,74 +648,20 @@ if submitted:
             )
 
             # 2/ Run etl step
-            st.markdown("####  2. Run ETL step")
+            st.markdown("##### Run ETL step")
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
                 f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                 "shellSession",
             )
-            # 3/ Optional shit
-            with st.container(border=True):
-                st.markdown("**(Optional)**")
-                # B/ Generate metadata
-                st.session_state[
-                    "garden.dataset_path"
-                ] = f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
-                st.markdown("#### Generate metadata")
-                st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
-                st.button(
-                    "Metadata export",
-                    help="Once clicked, the whole guideline will disappear.",
-                    on_click=export_metadata,
-                )
 
-                with st.container(border=True):
-                    st.markdown("Alternitavely you can generate the metadata with the following command:")
-                    st.code(
-                        f"poetry run etl metadata-export {st.session_state['garden.dataset_path']}",
-                        "shellSession",
-                    )
-
-                st.markdown("then manual edit it and rerun the step again with")
-                st.code(
-                    f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
-                    "shellSession",
-                )
-
-                # C/ Organize DAG
-                if dag_content:
-                    st.markdown("#### Organize the DAG")
-                    st.markdown(f"Check the DAG `{dag_path}`.")
-
-            # 4/ Final steps
-            st.markdown("####  3. Pull request")
+        with tab_grapher:
+            st.markdown("#### ⏭️ Next")
+            # 1/ PR
+            st.markdown("##### Pull request")
             st.markdown("Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.")
 
-            # D/ Load dataset from catalog
-            with st.container(border=True):
-                st.markdown("**(Optional)**")
-                st.markdown("##### Load dataset from catalog")
-                st.markdown(
-                    "Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:"
-                )
-                st.code(
-                    f"""
-                from owid.catalog import find_one
-                tab = find_one(table="{form.short_name}", namespace="{form.namespace}", dataset="{form.short_name}")
-                print(tab.metadata)
-                print(tab.head())
-                """,
-                    "python",
-                )
-
-            # 5/ Push to Grapher
-            st.markdown("####  4. Push to Grapher")
-            st.markdown(
-                "If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step."
-            )
-            utils.st_page_link("grapher", use_container_width=True, border=True)
-
-        # User message
+        # Prompt user
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
