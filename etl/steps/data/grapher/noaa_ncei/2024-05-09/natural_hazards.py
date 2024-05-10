@@ -7,6 +7,16 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Start of the description key of each disaster type.
+# We need this because, after transforming the data, we want to have only the relevant description for each disaster.
+# Note that the keys in this dictionary are not the same as the keys in the metadata of the original dataset.
+# They are chosen this way for convenience in the processing.
+DESCRIPTION_KEY_START = {
+    "earthquake": "A significant earthquake",
+    "volcan": "A significant eruption",
+    "tsunami": "Tsunamis are",
+}
+
 
 # Imported and adapted from the grapher natural_disasters step.
 def create_wide_tables(table: Table, is_decade: bool) -> Table:
@@ -34,6 +44,14 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
         origin = [origin for origin in table_wide[column].metadata.origins if disaster in origin.title.lower()]
         assert len(origin) == 1, f"Expected one origin, found {len(origin)}."
         table_wide[column].metadata.origins = origin
+        # Select the relevant key descriptions for the current type of disaster.
+        description_key = [
+            description_key
+            for description_key in table_wide[column].metadata.description_key
+            if description_key.startswith(DESCRIPTION_KEY_START[disaster])
+        ]
+        assert len(description_key) == 1, f"Expected one description key, found {len(description_key)}."
+        table_wide[column].metadata.description_key = description_key
 
         # Rename columns.
         table_wide = table_wide.rename(

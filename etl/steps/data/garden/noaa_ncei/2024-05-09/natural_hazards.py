@@ -285,7 +285,6 @@ def run(dest_dir: str) -> None:
             # 2	questionable tsunami
             # 3	probable tsunami
             # 4	definite tsunami
-            # TODO: Confirm that we should select only probable and definite tsunami, and mention it in metadata.
             tables[table_name] = tables[table_name][tables[table_name]["eventvalidity"] >= 3]
 
         # Ensure we have all columns for all tables (and also ensure all columns have origins).

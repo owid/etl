@@ -3,6 +3,10 @@ definitions:
     unit: ""
     short_unit: ""
     processing_level: major
+    description_key:
+      - "A significant eruption must meet at least one of the following criteria: caused fatalities, caused moderate damage (approximately $1 million or more), had a Volcanic Explosivity Index (VEI) of 6 or greater, generated a tsunami, or was associated with a significant earthquake."
+      - "A significant earthquake must meet at least one of the following criteria: caused deaths, caused moderate damage (approximately $1 million or more), had magnitude 7.5 or greater, had a Modified Mercalli Intensity (MMI) X or greater, or generated a tsunami."
+      - Tsunamis are only included if they were classified in the Global Historical Tsunami Database as "probable" or "definite".
     presentation:
       attribution_short: NOAA/NCEI
       topic_tags:
