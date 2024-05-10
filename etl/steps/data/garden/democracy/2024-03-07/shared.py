@@ -369,7 +369,7 @@ def add_age_groups(
     assert len(age_bins) > 1, "There should be at least two age groups."
     labels = []
     for i in range(len(age_bins) - 1):
-        labels.append(f"{age_bins[i]}-{age_bins[i+1]} years".replace("-inf", "+"))
+        labels.append(f"{age_bins[i]+1}-{age_bins[i+1]} years".replace("-inf", "+"))
 
     # Create variable for age group of electoral demcoracies
     tb[column_new] = pd.cut(

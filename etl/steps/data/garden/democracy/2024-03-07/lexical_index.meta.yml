@@ -213,7 +213,7 @@ tables:
           <% if category == '-1' %>
           Number of countries with unknown regime (democracy/autocracy)
           <% else %>
-          Number of << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "countries"
@@ -222,7 +222,7 @@ tables:
           <% if 'years' in category %>
           Number of electoral democracies aged << category >>
           <% else %>
-          Number of << category.replace('_', ' ').replace('cracy', 'cracies') >> (age groups electoral)
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups electoral)
           <% endif %>
         unit: "countries"
       num_group_age_polyarchy_lied:
@@ -230,7 +230,7 @@ tables:
           <% if 'years' in category %>
           Number of polyarchies aged << category >>
           <% else %>
-          Number of << category.replace('_', ' ').replace('cracy', 'cracies') >> (age groups polyarchy)
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups polyarchy)
           <% endif %>
         # description_short:
         unit: "countries"
@@ -239,7 +239,7 @@ tables:
           <% if category == '-1' %>
           Number of countries with unknown regime
           <% else %>
-          Number of << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "countries"
@@ -248,7 +248,7 @@ tables:
           <% if category == '-1' %>
           Number of countries with unknown suffrage
           <% else %>
-          Number of countries with << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          Number of countries with << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "countries"
@@ -258,7 +258,7 @@ tables:
           <% if category == '-1' %>
           People living in countries with unknown regime (autocracy/democracy)
           <% else %>
-          People living in << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "people"
@@ -267,7 +267,7 @@ tables:
           <% if 'years' in category %>
           People living in electoral democracies aged << category >>
           <% else %>
-          People living in << category.replace('_', ' ').replace('cracy', 'cracies') >>  (age groups electoral)
+          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups electoral)
           <% endif %>
         # description_short:
         unit: "people"
@@ -276,7 +276,7 @@ tables:
           <% if 'years' in category %>
           People living in polyarchies aged << category >>
           <% else %>
-          People living in << category.replace('_', ' ').replace('cracy', 'cracies') >>  (age groups polyarchy)
+          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups polyarchy)
           <% endif %>
         # description_short:
         unit: "people"
@@ -285,7 +285,7 @@ tables:
           <% if category == '-1' %>
           People living in countries with unknown regime
           <% else %>
-          People living in << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "people"
@@ -294,7 +294,7 @@ tables:
           <% if category == '-1' %>
           People living in countries with unknown suffrage
           <% else %>
-          People living in countries with << category.replace('_', ' ').replace('cracy', 'cracies') >>
+          People living in countries with << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <% endif %>
         # description_short:
         unit: "people"
