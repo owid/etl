@@ -467,32 +467,23 @@ tables:
           numDecimalPlaces: 0
           <<: *display_common
 
-      national_strategy:
-        title: National strategy to address homelessness
+      type_of_strategy:
+        title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Defines whether the country has a national strategy to address homelessness, a regional or local strategy, or no strategy at all.
-        processing_level: minor
-        presentation:
-          title_public: National strategy to address homelessness
-        display:
-          name: National strategy to address homelessness
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      housing_first_strategy:
-        title: Housing First strategy
-        unit: ""
-        short_unit: ""
-        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at the national level, at the regional or municipal level, or no strategy at all.
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at any administrative level, other strategy, or no strategy at all.
         description_key:
           - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
-        processing_level: minor
+        processing_level: major
+        description_processing: |-
+          The data is originally presented as two different classifications: whether countries have an active national strategy to combat homelessness, and whether Housing First or housing-led policies are in place. We combined these by considering that a Housing First or housing-led strategy exists when a national or regional strategy of that kind is in place. When there is no Housing First or housing-led strategy, but there is an active national or regional strategy, we consider that the country has another type of strategy in place (coded as "Other strategy"). When neither a national or regional strategy nor a Housing First or housing-led strategy is in place, we consider that the country has no strategy to address homelessness.
+
+          For more information about these two classifications, please refer to the OECD report [National strategies for combatting homelessness](https://www.oecd.org/els/family/HC3-2-Homeless-strategies.pdf).
         presentation:
-          title_public: Housing First strategy
+          title_public: Type of strategy to address homelessness
         display:
-          name: Housing First strategy
+          name: Type of strategy to address homelessness
           numDecimalPlaces: 0
           <<: *display_common
 

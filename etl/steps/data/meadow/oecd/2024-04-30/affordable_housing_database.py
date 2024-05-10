@@ -2,6 +2,7 @@
 
 from typing import Dict
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
@@ -14,7 +15,7 @@ paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
 
-# Define national strategies for homelessness
+# Define national strategies for homelessness, defined in https://www.oecd.org/els/family/HC3-2-Homeless-strategies.pdf
 NATIONAL_STRATEGIES_YEAR = 2023
 
 NATIONAL_STRATEGIES = {
@@ -250,12 +251,15 @@ def run(dest_dir: str) -> None:
     tb_number = rename_columns_drop_rows_and_format(tb_number, columns=COLUMNS_NUMBER, short_name="number", year=True)
 
     # Add national strategies to the table
-    tb_national_strategies = add_national_strategies(NATIONAL_STRATEGIES, tb_number, short_name="national_strategy")
+    tb_national_strategy = add_national_strategies(NATIONAL_STRATEGIES, tb_number, short_name="national_strategy")
 
     # Add housing first strategies to the table
-    tb_housing_first_strategies = add_national_strategies(
+    tb_housing_first_strategy = add_national_strategies(
         HOUSING_FIRST_STRATEGIES, tb_number, short_name="housing_first_strategy"
     )
+
+    # Create strategy table
+    tb_strategy = combine_strategy_tables(tb_national_strategy, tb_housing_first_strategy, short_name="strategy")
 
     #
     # Save outputs.
@@ -270,8 +274,7 @@ def run(dest_dir: str) -> None:
             tb_index,
             tb_share,
             tb_number,
-            tb_national_strategies,
-            tb_housing_first_strategies,
+            tb_strategy,
         ],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
@@ -415,7 +418,45 @@ def add_national_strategies(national_strategies: Dict[str, list], tb: Table, sho
     for col in tb_national_strategies.columns:
         tb_national_strategies[col] = tb_national_strategies[col].copy_metadata(tb["number"])
 
-    # Format
-    tb_national_strategies = tb_national_strategies.format(["country", "year"])
-
     return tb_national_strategies
+
+
+def combine_strategy_tables(tb_national_strategy: Table, tb_housing_first_strategy: Table, short_name: str) -> Table:
+    """
+    Combine the national strategy and housing first strategy tables to create a single table with a new variable, type_of_strategy
+    """
+    # Merge national strategies table with main table
+    tb = pr.merge(
+        tb_national_strategy,
+        tb_housing_first_strategy,
+        on=["country", "year"],
+        how="outer",
+        short_name=short_name,
+    )
+
+    # Create a new column with the type of strategy
+    tb["type_of_strategy"] = tb["housing_first_strategy"]
+
+    # Assign housing first strategy if national or regional
+    tb.loc[
+        tb["housing_first_strategy"].isin(["Have a national strategy", "Have regional or local strategies"]),
+        "type_of_strategy",
+    ] = "Housing First/housing-led strategy"
+
+    # If housing first strategy is No strategy, but national strategy is different, assign "Other strategy"
+    tb.loc[
+        (tb["housing_first_strategy"] == "No strategy")
+        & (tb["national_strategy"].isin(["Have an active national strategy", "Have regional or local strategies"])),
+        "type_of_strategy",
+    ] = "Other strategy"
+
+    # Assign "No strategy" if type_of_strategy is still missing
+    tb["type_of_strategy"] = tb["type_of_strategy"].fillna("No strategy")
+
+    # Remove housing_first_strategy and national_strategy columns
+    tb = tb.drop(columns=["housing_first_strategy", "national_strategy"])
+
+    # Format
+    tb = tb.format(["country", "year"])
+
+    return tb
