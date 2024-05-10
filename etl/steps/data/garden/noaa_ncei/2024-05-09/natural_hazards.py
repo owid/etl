@@ -4,6 +4,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from owid.datautils import dataframes
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -31,7 +32,7 @@ COLUMNS = {
     # 2	Some (~51 to 100 deaths)
     # 3	Many (~101 to 1000 deaths)
     # 4	Very many (over 1000 deaths)
-    "deathsamountorder": "deaths_estimate",
+    # "deathsamountorder": "deaths_estimate",
     # Whenever possible, numbers of missing are listed.
     "missing": "missing",
     # When a description was found in the historical literature instead of an actual number of missing, this value was coded and listed in the Missing column. If the actual number of missing was listed, a descriptor was also added for search purposes.
@@ -40,7 +41,7 @@ COLUMNS = {
     # 2	Some(~51 to 100 missing)
     # 3	Many (~101 to 1000 missing)
     # 4	Very Many (~1001 or more missing)
-    "missingamountorder": "missing_estimate",
+    # "missingamountorder": "missing_estimate",
     # Whenever possible, numbers of injuries from the disaster are listed.
     "injuries": "injuries",
     # When a description was found in the historical literature instead of an actual number of injuries, this value was coded and listed in the Injuries column. If the actual number of injuries was listed, a descriptor was also added for search purposes.
@@ -49,7 +50,7 @@ COLUMNS = {
     # 2	Some(~51 to 100 injuries)
     # 3	Many (~101 to 1000 injuries)
     # 4	Very many (over 1000 injuries)
-    "injuriesamountorder": "injuries_estimate",
+    # "injuriesamountorder": "injuries_estimate",
     # The value in the Damage column should be multiplied by 1,000,000 to obtain the actual dollar amount.
     # When a dollar amount for damage was found in the literature, it was listed in the Damage column in millions of U.S. dollars. The dollar value listed is the value at the time of the event. To convert the damage to current dollar values, please use the Consumer Price Index Calculator. Monetary conversion tables for the time of the event were used to convert foreign currency to U.S. dollars.
     "damagemillionsdollars": "damage",
@@ -61,7 +62,7 @@ COLUMNS = {
     # 4	EXTREME (~$25 million or more)
     # When possible, a rough estimate was made of the dollar amount of damage based upon the description provided, in order to choose the damage category. In many cases, only a single descriptive term was available. These terms were converted to the damage categories based upon the authors apparent use of the term elsewhere. In the absence of other information, LIMITED is considered synonymous with slight, minor, and light, SEVERE as synonymous with major, extensive, and heavy, and EXTREME as synonymous with catastrophic.
     # Note: The descriptive terms relate approximately to current dollar values.
-    "damageamountorder": "damage_estimate",
+    # "damageamountorder": "damage_estimate",
     # Whenever possible, numbers of houses destroyed are listed.
     "housesdestroyed": "houses_destroyed",
     # For those events not offering an exact number of houses damaged, the following four-level scale was used to classify the damage and was listed in the Houses Destroyed column. If the actual number of houses destroyed was listed, a descriptor was also added for search purposes.
@@ -70,7 +71,7 @@ COLUMNS = {
     # 2	Some (~51 to 100 houses)
     # 3	Many (101 to 1000 houses)
     # 4	Very Many (~over 1000 houses)
-    "housesdestroyedamountorder": "houses_destroyed_estimate",
+    # "housesdestroyedamountorder": "houses_destroyed_estimate",
     # Whenever possible, numbers of houses damaged are listed.
     "housesdamaged": "houses_damaged",
     # For those events not offering an exact number of houses damaged, the following four-level scale was used to classify the damage and was listed in the Houses Damaged column. If the actual number of houses destroyed was listed, a descriptor was also added for search purposes.
@@ -79,7 +80,7 @@ COLUMNS = {
     # 2	Some (~51 to 100 houses)
     # 3	Many (101 to 1000 houses)
     # 4	Very Many (~over 1000 houses)
-    "housesdamagedamountorder": "houses_damaged_estimate",
+    # "housesdamagedamountorder": "houses_damaged_estimate",
     # Whenever possible, total number of deaths from the disaster and secondary effects are listed.
     "deathstotal": "deaths_total",
     # When a description was found in the historical literature instead of an actual number of deaths, this value was coded and listed in the Deaths column. If the actual number of deaths was listed, a descriptor was also added for search purposes.
@@ -88,7 +89,7 @@ COLUMNS = {
     # 2	Some (~51 to 100 deaths)
     # 3	Many (~101 to 1000 deaths)
     # 4	Very many (over 1000 deaths)
-    "deathsamountordertotal": "deaths_total_estimate",
+    # "deathsamountordertotal": "deaths_total_estimate",
     # Whenever possible, total number of missing from the disaster and secondary effects are listed.
     "missingtotal": "missing_total",
     # When a description was found in the historical literature instead of an actual number of missing, this value was coded and listed in the Missing column. If the actual number of missing was listed, a descriptor was also added for search purposes.
@@ -97,7 +98,7 @@ COLUMNS = {
     # 2	Some(~51 to 100 missing)
     # 3	Many (~101 to 1000 missing)
     # 4	Very Many (~1001 or more missing)
-    "missingamountordertotal": "missing_total_estimate",
+    # "missingamountordertotal": "missing_total_estimate",
     # Whenever possible, total number of injuries from the disaster and secondary effects are listed.
     "injuriestotal": "injuries_total",
     # When a description was found in the historical literature instead of an actual number of injuries, this value was coded and listed in the Injuries column. If the actual number of injuries was listed, a descriptor was also added for search purposes.
@@ -106,7 +107,7 @@ COLUMNS = {
     # 2	Some(~51 to 100 injuries)
     # 3	Many (~101 to 1000 injuries)
     # 4	Very many (over 1000 injuries)
-    "injuriesamountordertotal": "injuries_total_estimate",
+    # "injuriesamountordertotal": "injuries_total_estimate",
     # The value in the Damage column should be multiplied by 1,000,000 to obtain the actual dollar amount.
     # When a dollar amount for damage was found in the literature, it was listed in the Damage column in millions of U.S. dollars. The dollar value listed is the value at the time of the event. To convert the damage to current dollar values, please use the Consumer Price Index Calculator. Monetary conversion tables for the time of the event were used to convert foreign currency to U.S. dollars.
     "damagemillionsdollarstotal": "damage_total",
@@ -118,7 +119,7 @@ COLUMNS = {
     # 4	EXTREME (~$25 million or more)
     # When possible, a rough estimate was made of the dollar amount of damage based upon the description provided, in order to choose the damage category. In many cases, only a single descriptive term was available. These terms were converted to the damage categories based upon the authors apparent use of the term elsewhere. In the absence of other information, LIMITED is considered synonymous with slight, minor, and light, SEVERE as synonymous with major, extensive, and heavy, and EXTREME as synonymous with catastrophic.
     # Note: The descriptive terms relate approximately to current dollar values.
-    "damageamountordertotal": "damage_total_estimate",
+    # "damageamountordertotal": "damage_total_estimate",
     # Whenever possible, numbers of houses destroyed are listed.
     # NOTE: Here I suppose it includes houses destroyed by secondary effects.
     "housesdestroyedtotal": "houses_destroyed_total",
@@ -128,7 +129,7 @@ COLUMNS = {
     # 2	Some (~51 to 100 houses)
     # 3	Many (101 to 1000 houses)
     # 4	Very Many (~over 1000 houses)
-    "housesdestroyedamountordertotal": "houses_destroyed_total_estimate",
+    # "housesdestroyedamountordertotal": "houses_destroyed_total_estimate",
     # Whenever possible, numbers of houses damaged are listed.
     # NOTE: Here I suppose it includes houses damaged by secondary effects.
     "housesdamagedtotal": "houses_damaged_total",
@@ -138,12 +139,12 @@ COLUMNS = {
     # 2	Some (~51 to 100 houses)
     # 3	Many (101 to 1000 houses)
     # 4	Very Many (~over 1000 houses)
-    "housesdamagedamountordertotal": "houses_damaged_total_estimate",
+    # "housesdamagedamountordertotal": "houses_damaged_total_estimate",
 }
 
 
-# Imported from the garden natural_disasters step.
-def create_decade_data(tb: Table) -> Table:
+# Imported and adapted from the garden natural_disasters step.
+def create_decadal_average(tb: Table) -> Table:
     """Create data of average impacts over periods of 10 years.
 
     For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column should
@@ -168,7 +169,7 @@ def create_decade_data(tb: Table) -> Table:
     new_indexes = pd.MultiIndex.from_product([countries, years, types], names=["country", "year", "type"])
 
     # Reindex data so that all countries and types have data for each year (filling with zeros when there's no data).
-    tb_decadal = tb_decadal.set_index(["country", "year", "type"]).reindex(new_indexes, fill_value=None).reset_index()
+    tb_decadal = tb_decadal.set_index(["country", "year", "type"]).reindex(new_indexes, fill_value=0).reset_index()
 
     # For each year, calculate the corresponding decade (e.g. 1951 -> 1950, 1929 -> 1920).
     tb_decadal["decade"] = (tb_decadal["year"] // 10) * 10
@@ -182,24 +183,42 @@ def create_decade_data(tb: Table) -> Table:
         .rename(columns={"decade": "year"})
     )
 
-    ####################################################################################################################
-    # Alternative approach: Instead of calculating the mean, do the total, respecting the empty values.
-    # tb_decadal = tb_decadal.drop(columns=["year"])
-    # from owid.datautils import dataframes
+    return tb_decadal
 
-    # tb_decadal = (
-    #     dataframes.groupby_agg(
-    #         df=tb_decadal,
-    #         groupby_columns=["country", "decade", "type"],
-    #         aggregations={
-    #             column: "sum" for column in tb_decadal.columns if column not in ["country", "decade", "type"]
-    #         },
-    #         min_num_values=1,
-    #     )
-    #     .reset_index()
-    #     .rename(columns={"decade": "year"})
-    # )
-    ####################################################################################################################
+
+def create_decadal_total(tb: Table) -> Table:
+    # Alternative approach: Instead of calculating the mean, do the total, respecting the empty values.
+    tb_decadal = tb.copy()
+
+    # List all countries, years and types in the data.
+    countries = sorted(set(tb_decadal["country"]))
+    years = np.arange(tb_decadal["year"].min(), tb_decadal["year"].max() + 1).tolist()
+    types = sorted(set(tb_decadal["type"]))
+
+    # Create a new index covering all combinations of countries, years and types.
+    new_indexes = pd.MultiIndex.from_product([countries, years, types], names=["country", "year", "type"])
+
+    # Reindex data so that all countries and types have data for each year (filling with zeros when there's no data).
+    # NOTE: This time (unlike in the average case) we don't want to fill with zeros, but with NaNs.
+    tb_decadal = tb_decadal.set_index(["country", "year", "type"]).reindex(new_indexes, fill_value=None).reset_index()
+
+    # For each year, calculate the corresponding decade (e.g. 1951 -> 1950, 1929 -> 1920).
+    tb_decadal["decade"] = (tb_decadal["year"] // 10) * 10
+
+    tb_decadal = tb_decadal.drop(columns=["year"])
+    tb_decadal = (
+        dataframes.groupby_agg(
+            df=tb_decadal,
+            groupby_columns=["country", "decade", "type"],
+            aggregations={
+                column: "sum" for column in tb_decadal.columns if column not in ["country", "decade", "type"]
+            },
+            min_num_values=1,
+        )
+        .reset_index()
+        .rename(columns={"decade": "year"})
+    )
+
     return tb_decadal
 
 
@@ -278,8 +297,6 @@ def run(dest_dir: str) -> None:
         # Include another aggregate which simply counts events.
         aggregates.update({"id": "count"})
         # Sum the impact of all metrics.
-        from owid.datautils import dataframes
-
         # tables[table_name] = (
         #     tables[table_name]
         #     .groupby(["country", "year"], observed=True, as_index=False)
@@ -305,6 +322,10 @@ def run(dest_dir: str) -> None:
     # Merge all tables.
     tb = pr.concat(list(tables.values()), ignore_index=True)
 
+    # For convenience, convert economic damages from millions of dollars to dollars.
+    for column in ["damage", "damage_total"]:
+        tb[column] *= 1e6
+
     # Add aggregate regions to table.
     tb = geo.add_regions_to_table(
         tb=tb,
@@ -314,18 +335,17 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a decadal table.
-    # TODO: Consider improving the following function so that decades with no data show nan instead of zero.
-    tb_decadal = create_decade_data(tb)
+    # tb_decadal = create_decadal_average(tb)
+    # NOTE: Alternatively, we could have a table with the decadal total, instead of the average.
+    # tb_decadal = create_decadal_total(tb)
 
     # Format tables conveniently.
-    tb_yearly = tb.format(keys=["country", "year", "type"], short_name="natural_hazards_yearly")
-    tb_decadal = tb_decadal.format(keys=["country", "year", "type"], short_name="natural_hazards_decadal")
+    tb_yearly = tb.format(keys=["country", "year", "type"], short_name="natural_hazards")
+    # tb_decadal = tb_decadal.format(keys=["country", "year", "type"], short_name="natural_hazards_decadal")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_yearly, tb_decadal], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb_yearly], check_variables_metadata=True)
     ds_garden.save()

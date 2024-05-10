@@ -1,8 +1,10 @@
 definitions:
   common:
-    unit: events
+    unit: ""
     short_unit: ""
+    processing_level: major
     presentation:
+      attribution_short: NOAA/NCEI
       topic_tags:
         - Natural Disasters
 
@@ -13,25 +15,44 @@ tables:
   natural_hazards:
     title: Natural Hazards Data
     variables:
-      {}
-      # earthquakes:
-      #   title: Number of reported earthquakes
-      #   display:
-      #     name: Earthquakes
-      #     numDecimalPlaces: 0
-      #   presentation:
-      #     title_public: Number of reported earthquakes
-      # tsunamis:
-      #   title: Number of reported tsunamis
-      #   display:
-      #     name: Tsunamis
-      #     numDecimalPlaces: 0
-      #   presentation:
-      #     title_public: Number of reported tsunamis
-      # volcanoes:
-      #   title: Number of reported volcanoes
-      #   display:
-      #     name: Volcanoes
-      #     numDecimalPlaces: 0
-      #   presentation:
-      #     title_public: Number of reported volcanoes
+      n_events:
+        title: Number of reported natural disasters
+        unit: events
+      deaths:
+        title: Number of reported deaths directly caused by a natural disaster
+        unit: deaths
+      missing:
+        title: Number of reported missing persons directly caused by a natural disaster
+        unit: missing
+      injuries:
+        title: Number of reported injuries directly caused by a natural disaster
+        unit: injuries
+      damage:
+        title: Economic damage directly caused by a natural disaster
+        unit: current US$
+        short_unit: '$'
+      houses_destroyed:
+        title: Number of houses destroyed directly by a natural disaster
+        unit: houses
+      houses_damaged:
+        title: Number of houses damaged directly by a natural disaster
+        unit: houses
+      deaths_total:
+        title: Total number of deaths caused by a disaster and secondary effects
+        unit: deaths
+      missing_total:
+        title: Total number of missing persons caused by a disaster and secondary effects
+        unit: missing
+      injuries_total:
+        title: Total number of injuries caused by a disaster and secondary effects
+        unit: injuries
+      damage_total:
+        title: Total economic damage caused by a disaster and secondary effects
+        unit: current US$
+        short_unit: '$'
+      houses_destroyed_total:
+        title: Total number of houses destroyed by a disaster and secondary effects
+        unit: houses
+      houses_damaged_total:
+        title: Total number of houses damaged by a disaster and secondary effects
+        unit: houses
