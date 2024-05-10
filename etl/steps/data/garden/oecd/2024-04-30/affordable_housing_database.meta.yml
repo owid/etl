@@ -486,6 +486,11 @@ tables:
           name: Type of strategy to address homelessness
           numDecimalPlaces: 0
           <<: *display_common
+        type: ordinal
+        sort:
+          - Housing First/housing-led strategy
+          - Other strategy
+          - No strategy
 
 
 
