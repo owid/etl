@@ -32,7 +32,9 @@ steps:
   # Lexcial Index (2023)
   data://meadow/democracy/2024-05-09/lexical_index:
     - snapshot://democracy/2024-05-09/lexical_index.xlsx
-  data://garden/democracy/2024-05-09/lexical_index:
+  data://garden/democracy/2024-03-07/lexical_index:
     - data://meadow/democracy/2024-05-09/lexical_index
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-09/lexical_index:
     - data://garden/democracy/2024-05-09/lexical_index
