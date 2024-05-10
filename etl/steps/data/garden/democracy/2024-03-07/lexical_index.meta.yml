@@ -67,7 +67,7 @@ tables:
           Equivalent indicator: ``
 
       regime_redux_lied:
-        title:  Politicalregime (reduced)
+        title:  Political regime (reduced)
         unit: ''
         description_short: |-
           Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6).
@@ -123,7 +123,7 @@ tables:
           7: polyarchy
 
       male_suffrage_lied:
-        title: Universal suffrage for men
+        title: Universal right to vote for men
         unit: ''
         description_short: |-
           Indicates whether all men are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
@@ -133,7 +133,7 @@ tables:
           Equivalent indicator: `male_suffrage`
 
       female_suffrage_lied:
-        title: Universal suffrage for women
+        title: Universal right to vote for women
         unit: ''
         description_short: |-
           Indicates whether all women are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
