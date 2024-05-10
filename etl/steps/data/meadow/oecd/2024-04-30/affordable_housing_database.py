@@ -342,6 +342,8 @@ def clean_numbers_and_make_long(tb: Table) -> Table:
     Clean the spaces between numbers, remove "\n(households)" and make the table long.
     """
 
+    tb = tb.copy()
+
     # Remove countries containing "United Kingdom" (they use households instead of people)
     tb = tb[~tb["Country"].str.contains("United Kingdom")]
 
