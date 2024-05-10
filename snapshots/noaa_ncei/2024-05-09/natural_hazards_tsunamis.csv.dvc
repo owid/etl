@@ -9,11 +9,11 @@ meta:
     date_published: "2024-05-09"
 
     # Citation
-    producer: NOAA National Centers for Environmental Information / World Data Service
+    producer: National Geophysical Data Center / World Data Service
     citation_full: |-
       National Geophysical Data Center / World Data Service: NCEI/WDS Global Historical Tsunami Database. NOAA National Centers for Environmental Information. doi:10.7289/V5PN93H7
       The data can be accessed via [the NCEI/WDS Global Historical Tsunami Database](https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-search/) or via [the Natural Hazards API](https://www.ngdc.noaa.gov/hazel/view/swagger#/Tsunami%20Events).
-    attribution_short: NCEI/WDS
+    attribution_short: NGDC/WDS
 
     # Files
     url_main: http://dx.doi.org/10.7289/V5PN93H7
