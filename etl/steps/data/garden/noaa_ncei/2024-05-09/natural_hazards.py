@@ -181,22 +181,25 @@ def create_decade_data(tb: Table) -> Table:
         .reset_index()
         .rename(columns={"decade": "year"})
     )
-    tb_decadal = tb_decadal.drop(columns=["year"])
-    from owid.datautils import dataframes
 
-    tb_decadal = (
-        dataframes.groupby_agg(
-            df=tb_decadal,
-            groupby_columns=["country", "decade", "type"],
-            aggregations={
-                column: "sum" for column in tb_decadal.columns if column not in ["country", "decade", "type"]
-            },
-            min_num_values=1,
-        )
-        .reset_index()
-        .rename(columns={"decade": "year"})
-    )
+    ####################################################################################################################
+    # Alternative approach: Instead of calculating the mean, do the total, respecting the empty values.
+    # tb_decadal = tb_decadal.drop(columns=["year"])
+    # from owid.datautils import dataframes
 
+    # tb_decadal = (
+    #     dataframes.groupby_agg(
+    #         df=tb_decadal,
+    #         groupby_columns=["country", "decade", "type"],
+    #         aggregations={
+    #             column: "sum" for column in tb_decadal.columns if column not in ["country", "decade", "type"]
+    #         },
+    #         min_num_values=1,
+    #     )
+    #     .reset_index()
+    #     .rename(columns={"decade": "year"})
+    # )
+    ####################################################################################################################
     return tb_decadal
 
 
