@@ -139,3 +139,13 @@ tables:
 
           Equivalent indicator: `female_suffrage`
 
+      suffrage_lied:
+        title: Universal suffrage
+        unit: ''
+        description_short: |-
+          Indicates if all citizens are allowed to vote in national elections. Score 0: "no universal suffrage", 1: "universal suffrage only for men" and 2: "universal suffrage for men and women".
+
+      democracy_lied:
+        title: "Electoral democracy"
+        unit: ''
+        description_short: TODO

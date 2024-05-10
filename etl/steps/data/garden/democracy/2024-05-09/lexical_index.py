@@ -22,6 +22,60 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Initial cleaning
+    tb = preprocess(tb)
+
+    # Format
+    tb = tb.format(["country", "year"])
+
+    ######################### WIP
+    # Create variable distinguishing between democracies and autocracies:
+    mask = tb["regime_redux_lied"] == 6
+    tb.loc[mask, "democracy_lied"] = 1
+    tb.loc[~mask, "democracy_lied"] = 0
+
+    # Create variable for age of electoral democracies
+
+    # Create variable for age of polyarchies
+
+    # Create variable for experience with electoral democracy
+
+    # Create variable for experience with polyarchy
+
+    # Create variable for age group of electoral demcoracies
+
+    # Create variable for age group of polyarchies
+
+    # Create variable for universal suffrage
+    tb.loc[(tb["male_suffrage_lied"] == 0) & (tb["female_suffrage_lied"] == 0), "suffrage_lied"] = 0
+    tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 0), "suffrage_lied"] = 1
+    tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 1.5
+    tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 2
+
+    assert (
+        (tb["suffrage_lied"] == 1.5).sum() == 0
+    ), "There are countries with women suffrage but not men suffrage! This is not expected and can lead to confusing visualisations."
+
+    # Add labels for ages of electoral democracies and polyarchies to optimize use in the OWID grapher
+    #############################
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def preprocess(tb: Table) -> Table:
+    """Pre-process data.
+
+    Includes: removing NaNs, fixing bugs, sanity checks, renaming and selecting relevant columns.
+    """
+    ## Harmonize country names
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
@@ -40,7 +94,8 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["regime_lied"] == 7), "regime_redux_lied"] = 6
 
     # Select relevant columns
-    tb = tb[
+    tb = tb.loc[
+        :,
         [
             "country",
             "year",
@@ -53,22 +108,10 @@ def run(dest_dir: str) -> None:
             "male_suffrage_lied",
             "female_suffrage_lied",
             "poliberties_lied",
-        ]
+        ],
     ]
 
-    # Format
-    tb = tb.format(["country", "year"])
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb
 
 
 def rename_columns(tb: Table) -> Table:
