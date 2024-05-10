@@ -342,7 +342,7 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
     tb_pop = tb_pop[tb_pop["year"] >= 1800]
 
     # 3) Merge
-    tb_regions = tb_num.merge(tb_pop, on=["country", "year", "category"], how="inner")
+    tb_regions = tb_num.merge(tb_pop, on=["country", "year", "category"], how="outer")
     # assert (tb_num.shape == tb_pop.shape) and (len(tb_num) == len(tb_regions))
     # tb_regions.loc[tb_regions["category"] == "-1", ["num_regime_ert", "num_regime_trich_ert"]] = float("nan")
 
