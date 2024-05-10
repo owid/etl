@@ -161,6 +161,10 @@ def run(dest_dir: str) -> None:
     # Merge strategy table with main table
     tb = pr.merge(tb, tb_strategy, on=["country", "year"], how="outer", short_name=paths.short_name)
 
+    # Fill nan in type_of_strategy with Not applicable
+    tb["type_of_strategy"] = tb["type_of_strategy"].astype(str)
+    tb.loc[tb["type_of_strategy"] == "nan", "type_of_strategy"] = "Not applicable"
+
     tb = tb.format(["country", "year"])
 
     #
