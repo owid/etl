@@ -143,6 +143,25 @@ COLUMNS = {
 }
 
 
+# Aggregate regions to add, following OWID definitions.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "European Union (27)": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    "World": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+}
+
+
 # Imported and adapted from the garden natural_disasters step.
 def create_decadal_average(tb: Table) -> Table:
     """Create data of average impacts over periods of 10 years.
@@ -269,11 +288,13 @@ def run(dest_dir: str) -> None:
             # TODO: Confirm that we should select only probable and definite tsunami, and mention it in metadata.
             tables[table_name] = tables[table_name][tables[table_name]["eventvalidity"] >= 3]
 
+        # Ensure we have all columns for all tables (and also ensure all columns have origins).
+        for column in COLUMNS:
+            if column not in tables[table_name].columns:
+                tables[table_name][column] = None
+                tables[table_name][column] = tables[table_name][column].copy_metadata(tables[table_name]["id"])
         # Select and rename columns.
-        columns_available = {column: COLUMNS[column] for column in COLUMNS if column in tables[table_name].columns}
-        tables[table_name] = tables[table_name][list(columns_available)].rename(
-            columns=columns_available, errors="raise"
-        )
+        tables[table_name] = tables[table_name][list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
         # Drop events with the same "id" within the same disaster type, (we know at least one, id 1926, for Chile 1961).
         tables[table_name] = tables[table_name].drop_duplicates(subset=["id"]).reset_index(drop=True)
@@ -329,9 +350,11 @@ def run(dest_dir: str) -> None:
     # Add aggregate regions to table.
     tb = geo.add_regions_to_table(
         tb=tb,
+        regions=REGIONS,
         index_columns=["country", "year", "type"],
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
     )
 
     # Create a decadal table.
