@@ -109,7 +109,7 @@ dataset:
 
 tables:
   natural_disasters_decadal:
-    title: Natural disasters, decadal data
+    title: Natural disasters, decadal average
     variables: &variables-default
       total_dead:
         title: Total deaths
@@ -384,7 +384,7 @@ tables:
         presentation:
           title_public: Share of reported natural disasters with a large impact
   natural_disasters_decadal_impact:
-    title: Natural disasters by decadal impact
+    title: Natural disasters by total decadal impact
     variables: *variables-impact
   natural_disasters_yearly_deaths:
     title: Natural disasters by yearly deaths
@@ -462,5 +462,5 @@ tables:
         presentation:
           title_public: Number of reported natural disasters with unknown deaths
   natural_disasters_decadal_deaths:
-    title: Natural disasters by decadal deaths
+    title: Natural disasters by total decadal deaths
     variables: *variables-deaths
