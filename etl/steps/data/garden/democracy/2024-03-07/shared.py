@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -313,4 +313,77 @@ def add_regions_and_global_aggregates(
         tb_world = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
     tb = concat([tb_regions, tb_world], ignore_index=True, short_name="region_counts")
 
+    return tb
+
+
+def add_count_years_in_regime(
+    tb: Table,
+    columns: List[Tuple[str, str, int]],
+) -> Table:
+    """Add years in a certain regime.
+
+    Two types of counters are generated:
+        - Age: Number of years consecutively with a certain regime type.
+        - Experience: Number of years with a certain regime type.
+    """
+
+    def _count_years_in_regime(tb, col, col_new, th):
+        col_th = "thresholded"
+
+        tb[col_th] = pd.cut(tb[col], bins=[-float("inf"), th, float("inf")], labels=[0, 1]).astype(int)
+        # Add age of democracy
+        tb[f"age_{col_new}"] = tb.groupby(["country", tb[col_th].fillna(0).eq(0).cumsum()])[col_th].cumsum().astype(int)
+        tb[f"age_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
+        # Add experience with democracy
+        tb[f"experience_{col_new}"] = tb.groupby("country")[col_th].cumsum().astype(int)
+        tb[f"experience_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
+        # Sanity check
+        assert (tb.loc[tb[col_th] == 1, f"age_{col_new}"] != 0).all(), "Negative age found!"
+        assert (tb.loc[tb[col_th] == 1, f"experience_{col_new}"] != 0).all(), "Negative age found!"
+        # Drop unused columns
+        tb = tb.drop(columns=[col_th])
+        return tb
+
+    if columns:
+        for col in columns:
+            assert len(col) == 3, "Columns should be a list of tuples with 3 elements: (colname, col_newname, col_th)"
+            tb = _count_years_in_regime(tb, *col)
+    return tb
+
+
+def add_age_groups(
+    tb: Table,
+    column: str,
+    column_raw: str,
+    threshold: int,
+    category_names: Dict[Any, str],
+    age_bins: List[int | float] | None = None,
+) -> Table:
+    """Create category for `column`."""
+    column_new = f"group_{column}"
+
+    if age_bins is None:
+        age_bins = [0, 18, 30, 60, 90, float("inf")]
+
+    # Create age group labels
+    assert len(age_bins) > 1, "There should be at least two age groups."
+    labels = []
+    for i in range(len(age_bins) - 1):
+        labels.append(f"{age_bins[i]}-{age_bins[i+1]} years")
+
+    # Create variable for age group of electoral demcoracies
+    tb[column_new] = pd.cut(
+        tb[column],
+        bins=age_bins,
+        labels=labels,
+    ).astype("string")
+
+    # Add additional categories
+    for regime_id, regime_name in category_names.items():
+        if regime_id > threshold:
+            break
+        tb.loc[(tb[column_raw] == regime_id) & tb[column_new].isna(), column_new] = regime_name
+
+    # Copy metadata
+    tb[column_new] = tb[column_new].copy_metadata(tb[column])
     return tb
