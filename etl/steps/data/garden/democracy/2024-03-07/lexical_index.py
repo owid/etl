@@ -277,13 +277,13 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
     indicators = [
         {
             "name": "democracy_lied",
-            "values_expected": {"0": "autorcracy", "1": "democracy"},
+            "values_expected": {"0": "autocracy", "1": "democracy"},
             "has_na": False,
         },
         {
             "name": "regime_lied",
             "values_expected": {
-                "0": "non-electoral autorcracy",
+                "0": "non-electoral autocracy",
                 "1": "one-party autocracy",
                 "2": "multi-party autocracy without elected executive",
                 "3": "multi-party autocracy",
