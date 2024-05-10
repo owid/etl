@@ -205,3 +205,46 @@ tables:
         unit: ''
         description_short: Number of total years in a polyarchy. It sums all periods of polyarchy.
         description_key: *key_poly
+
+  region_aggregates:
+    variables:
+      num_democracy_lied:
+        title: num_democracy_lied
+        # description_short:
+        unit: "countries"
+      num_group_age_electdem_lied:
+        title: num_group_age_electdem_lied
+        # description_short:
+        unit: "countries"
+      num_group_age_polyarchy_lied:
+        title: num_group_age_polyarchy_lied
+        # description_short:
+        unit: "countries"
+      num_regime_lied:
+        title: num_regime_lied
+        # description_short:
+        unit: "countries"
+      num_suffrage_lied:
+        title: num_suffrage_lied
+        # description_short:
+        unit: "countries"
+      pop_democracy_lied:
+        title: pop_democracy_lied
+        # description_short:
+        unit: "people"
+      pop_group_age_electdem_lied:
+        title: pop_group_age_electdem_lied
+        # description_short:
+        unit: "people"
+      pop_group_age_polyarchy_lied:
+        title: pop_group_age_polyarchy_lied
+        # description_short:
+        unit: "people"
+      pop_regime_lied:
+        title: pop_regime_lied
+        # description_short:
+        unit: "people"
+      pop_suffrage_lied:
+        title: pop_suffrage_lied
+        # description_short:
+        unit: "people"

@@ -227,7 +227,7 @@ def make_table_with_dummies(
         # Check and fix NA (convert NAs to -1 category)
         if indicator["has_na"]:
             # Assert that there are actually NaNs
-            assert tb_[indicator["name"]].isna().any(), "No NA found!"
+            assert tb_[indicator["name"]].isna().any(), f"No NA found in {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
             assert "-1" not in set(
                 tb_[indicator["name"]].unique()
@@ -239,7 +239,7 @@ def make_table_with_dummies(
             else:
                 values_expected |= {"-1"}
         else:
-            assert not tb_[indicator["name"]].isna().any(), "NA found!"
+            assert not tb_[indicator["name"]].isna().any(), f"NA found in {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
         assert values_found == set(
