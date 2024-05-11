@@ -221,6 +221,8 @@ tables:
         title: |-
           <% if 'years' in category %>
           Number of electoral democracies aged << category >>
+          <% elif category == '-1' %>
+          Number of countries with unknown regime (age groups electoral)
           <% else %>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups electoral)
           <% endif %>
@@ -229,6 +231,8 @@ tables:
         title: |-
           <% if 'years' in category %>
           Number of polyarchies aged << category >>
+          <% elif category == '-1' %>
+          Number of countries with unknown regime (age groups polyarchy)
           <% else %>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups polyarchy)
           <% endif %>

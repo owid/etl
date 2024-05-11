@@ -389,9 +389,9 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
             | ((tb_exp["country"] == "Georgia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
             | ((tb_exp["country"] == "Azerbaijan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1990))
             # CZECHOSLOVAKIA
-            | ((tb_exp["country"] == "Czechoslovakia") & ((tb_exp["year"] > 1992) | (tb_exp["year"] < 1943)))
-            | ((tb_exp["country"] == "Czechia") & ((tb_exp["year"] <= 1992) | (tb_exp["year"] >= 1943)))
-            | ((tb_exp["country"] == "Slovakia") & ((tb_exp["year"] <= 1992) | (tb_exp["year"] >= 1943)))
+            | ((tb_exp["country"] == "Czechoslovakia") & ((tb_exp["year"] > 1992) | (tb_exp["year"] < 1918)))
+            | ((tb_exp["country"] == "Czechia") & ((tb_exp["year"] <= 1992) | (tb_exp["year"] >= 1918)))
+            | ((tb_exp["country"] == "Slovakia") & ((tb_exp["year"] <= 1992) | (tb_exp["year"] >= 1918)))
         ),
     ]
 
