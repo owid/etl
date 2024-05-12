@@ -1,8 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import ast
 from typing import cast
 
 from owid.catalog import Dataset, Table
+from owid.catalog.processing import concat
 from shared import (
     add_age_groups,
     add_count_years_in_regime,
@@ -334,6 +336,9 @@ def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset
         ind["has_na"] = True
     tb_pop = make_table_with_dummies(tb_pop, indicators)
 
+    # Replace USSR -> current states
+    tb_pop = replace_ussr(tb_pop, ds_regions)
+
     ## Counts
     tb_pop = add_population_in_dummies(tb_pop, ds_population)
     tb_pop = add_regions_and_global_aggregates(tb_pop, ds_regions, regions=REGIONS)
@@ -396,3 +401,27 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
     ]
 
     return tb_exp
+
+
+def replace_ussr(tb: Table, ds_regions: Dataset) -> Table:
+    tb_regions = ds_regions["regions"]
+    codes = tb_regions.loc["OWID_USS", "successors"]
+    successors = set(tb_regions.loc[ast.literal_eval(codes), "name"])
+
+    # Create new rows
+    tb_succ = []
+    for successor in successors:
+        # Copy USSR data
+        tb_ = tb.loc[(tb["country"] == "USSR")].copy()
+        # Replace country name
+        tb_["country"] = successor
+        # Append
+        tb_succ.append(tb_)
+    tb_succ = concat(tb_succ, ignore_index=True)
+
+    # Concatenate tables
+    tb = concat([tb, tb_succ], ignore_index=True).sort_values(["country", "year"])
+
+    # Remove USSR
+    tb = tb.loc[~(tb["country"] == "USSR")]
+    return tb
