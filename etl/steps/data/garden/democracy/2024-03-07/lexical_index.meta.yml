@@ -13,6 +13,13 @@ dataset:
 
 tables:
   lexical_index:
+    common:
+      description_processing: |-
+        Data for former USSR member states has been obtained by imputing the values of the USSR. This includes: Russia, Ukraine, Belarus, Latvia, Lithuania, Estonia, Armenia, Azerbaijan, Georgia, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, Uzbekistan, and Moldova.
+
+        Data for former Czechoslovakia member states has been obtained by imputing the values of Czechoslovakia. This includes: Czech Republic and Slovakia.
+
+        Data for former Yugoslavia member states has been obtained by imputing the values of Yugoslavia. This includes: Slovenia, Croatia, Bosnia and Herzegovina, Serbia, Montenegro, Kosovo, and North Macedonia.
     variables:
       exelec_lied:
         title: Elections for chief executive
