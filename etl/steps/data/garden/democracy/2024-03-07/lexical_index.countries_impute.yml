@@ -67,3 +67,43 @@
   country_impute: Russia
   year_min: 1813
   year_max: 1921
+
+# Czechoslovakia
+- country:
+    - Czechia
+    - Slovakia
+  country_impute: Czechoslovakia
+  year_min: 1918
+  year_max: 1992
+
+# Yugoslavia
+- country:
+    - Croatia
+    - Bosnia and Herzegovina
+    - Slovenia
+    - North Macedonia
+  country_impute: Yugoslavia
+  year_min: 1918
+  year_max: 1989
+- country:
+    - Serbia
+    - Montenegro
+    - Kosovo
+  country_impute: Yugoslavia
+  year_min: 1918
+  year_max: 1991
+
+# Serbia and Montenegro
+- country:
+    - Serbia
+    - Montenegro
+    - Kosovo
+  country_impute: Serbia and Montenegro
+  year_min: 1992
+  year_max: 2005
+
+# Kosovo
+- country: Kosovo
+  country_impute: Serbia
+  year_min: 2006
+  year_max: 2007

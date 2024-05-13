@@ -123,14 +123,15 @@ def run(dest_dir: str) -> None:
     ) == {"Germany"}, "Other versions of Germany!"
 
     # Impute values
-    tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed="values_imputed")
+    col_flag_imputed = "values_imputed"
+    tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
 
     # Get region data
-    tb_regions = tb.loc[~tb["values_imputed"]].drop(columns=["values_imputed"]).copy()
+    tb_regions = tb.loc[~tb[col_flag_imputed]].drop(columns=[col_flag_imputed]).copy()
     tb_regions = get_region_aggregates(tb_regions, ds_regions, ds_population)
 
     # Drop is imputed flag
-    tb = tb.drop(columns=["values_imputed"])
+    tb = tb.drop(columns=[col_flag_imputed])
 
     # Format
     tb = tb.format(["country", "year"])
