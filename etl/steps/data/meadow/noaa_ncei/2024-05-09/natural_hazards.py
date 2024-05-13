@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Format tables conveniently.
     tb_earthquakes = tb_earthquakes.format(["id"])
-    # Note that there is a repeated id in the earthquakes table (id 1926, corresponding to Chile 1961).
+    # Note that there is a repeated id in the tsunamis table (id 1926, corresponding to Chile 1961).
     tb_tsunamis = tb_tsunamis.format(["id"], verify_integrity=False)
     tb_volcanoes = tb_volcanoes.format(["id"])
 

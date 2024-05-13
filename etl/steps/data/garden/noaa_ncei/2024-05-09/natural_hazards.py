@@ -285,6 +285,7 @@ def run(dest_dir: str) -> None:
             # 2	questionable tsunami
             # 3	probable tsunami
             # 4	definite tsunami
+            # NOTE: There were two events with the same id, 1926, but both had eventvalidity 1, so they are removed now.
             tables[table_name] = tables[table_name][tables[table_name]["eventvalidity"] >= 3]
 
         # Ensure we have all columns for all tables (and also ensure all columns have origins).
@@ -294,9 +295,6 @@ def run(dest_dir: str) -> None:
                 tables[table_name][column] = tables[table_name][column].copy_metadata(tables[table_name]["id"])
         # Select and rename columns.
         tables[table_name] = tables[table_name][list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
-
-        # Drop events with the same "id" within the same disaster type, (we know at least one, id 1926, for Chile 1961).
-        tables[table_name] = tables[table_name].drop_duplicates(subset=["id"]).reset_index(drop=True)
 
         # Harmonize country names.
         tables[table_name] = geo.harmonize_countries(
