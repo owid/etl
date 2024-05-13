@@ -1,7 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, cast
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
 
@@ -227,7 +229,7 @@ def make_table_with_dummies(
         # Check and fix NA (convert NAs to -1 category)
         if indicator["has_na"]:
             # Assert that there are actually NaNs
-            assert tb_[indicator["name"]].isna().any(), "No NA found!"
+            assert tb_[indicator["name"]].isna().any(), f"No NA found in {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
             assert "-1" not in set(
                 tb_[indicator["name"]].unique()
@@ -239,7 +241,7 @@ def make_table_with_dummies(
             else:
                 values_expected |= {"-1"}
         else:
-            assert not tb_[indicator["name"]].isna().any(), "NA found!"
+            assert not tb_[indicator["name"]].isna().any(), f"NA found in {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
         assert values_found == set(
@@ -314,3 +316,155 @@ def add_regions_and_global_aggregates(
     tb = concat([tb_regions, tb_world], ignore_index=True, short_name="region_counts")
 
     return tb
+
+
+def add_count_years_in_regime(
+    tb: Table,
+    columns: List[Tuple[str, str, int]],
+) -> Table:
+    """Add years in a certain regime.
+
+    Two types of counters are generated:
+        - Age: Number of years consecutively with a certain regime type.
+        - Experience: Number of years with a certain regime type.
+    """
+
+    def _count_years_in_regime(tb, col, col_new, th):
+        col_th = "thresholded"
+
+        tb[col_th] = pd.cut(tb[col], bins=[-float("inf"), th, float("inf")], labels=[0, 1]).astype(int)
+        # Add age of democracy
+        tb[f"age_{col_new}"] = tb.groupby(["country", tb[col_th].fillna(0).eq(0).cumsum()])[col_th].cumsum().astype(int)
+        tb[f"age_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
+        # Add experience with democracy
+        tb[f"experience_{col_new}"] = tb.groupby("country")[col_th].cumsum().astype(int)
+        tb[f"experience_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
+        # Sanity check
+        assert (tb.loc[tb[col_th] == 1, f"age_{col_new}"] != 0).all(), "Negative age found!"
+        assert (tb.loc[tb[col_th] == 1, f"experience_{col_new}"] != 0).all(), "Negative age found!"
+        # Drop unused columns
+        tb = tb.drop(columns=[col_th])
+        return tb
+
+    if columns:
+        for col in columns:
+            assert len(col) == 3, "Columns should be a list of tuples with 3 elements: (colname, col_newname, col_th)"
+            tb = _count_years_in_regime(tb, *col)
+    return tb
+
+
+def add_age_groups(
+    tb: Table,
+    column: str,
+    column_raw: str,
+    threshold: int,
+    category_names: Dict[Any, str],
+    age_bins: List[int | float] | None = None,
+) -> Table:
+    """Create category for `column`."""
+    column_new = f"group_{column}"
+
+    if age_bins is None:
+        age_bins = [0, 18, 30, 60, 90, float("inf")]
+
+    # Create age group labels
+    assert len(age_bins) > 1, "There should be at least two age groups."
+    labels = []
+    for i in range(len(age_bins) - 1):
+        labels.append(f"{age_bins[i]+1}-{age_bins[i+1]} years".replace("-inf", "+"))
+
+    # Create variable for age group of electoral demcoracies
+    tb[column_new] = pd.cut(
+        tb[column],
+        bins=age_bins,
+        labels=labels,
+    ).astype("string")
+
+    # Add additional categories
+    for regime_id, regime_name in category_names.items():
+        if regime_id > threshold:
+            break
+        tb.loc[(tb[column_raw] == regime_id) & tb[column_new].isna(), column_new] = regime_name
+
+    # Copy metadata
+    tb[column_new] = tb[column_new].copy_metadata(tb[column])
+    return tb
+
+
+def add_imputes(
+    tb: Table, path: Path, cols_verify: List[str] | None = None, col_flag_imputed: str | None = None
+) -> Table:
+    """Add imputed values to the table.
+
+    Imputed values are inferred from historical equivalents.
+
+    Example: Was "Eritrea" a democracy in 1993?
+
+        - We can infer this from "Ethiopia (former)" (historical equivalent). You can see all these mappings in bmr.countries_impute.yml file.
+
+        - This is useful to (i) be able to colour these world regions in grapher map charts, and (ii) to be able to count the number of people living in democracy (in `make_tables_population_counters`).
+
+        - Note that these "imputed country values" are ignored when estimating the number of countries in democracies (function `make_tables_country_counters`), since these countries did not exist at the time!
+    """
+    tb_ = tb.copy()
+
+    if col_flag_imputed is None:
+        col_flag_imputed = "values_imputed"
+
+    if cols_verify is None:
+        cols_verify = ["country", "year"]
+
+    # Load impute data
+    countries_impute = yaml.safe_load(path.read_text())
+
+    # Drop known values that are not correct
+
+    tb_imputed = []
+    for impute in countries_impute:
+        # Get relevant rows
+        tb_imp_ = tb_.loc[
+            (tb_["country"] == impute["country_impute"])
+            & (tb_["year"] >= impute.get("year_min", 99999))
+            & (tb_["year"] <= impute.get("year_max", -99999))
+        ].copy()
+        # Sanity checks
+        assert tb_imp_.shape[0] > 0, f"No data found for {impute['country_impute']}"
+        assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
+        assert tb_imp_["year"].min() == impute["year_min"], f"Missing years (min check) for {impute['country_impute']}"
+
+        # Tweak them
+        # tb_ = tb_.rename(
+        #     columns={
+        #         "country": "regime_imputed_country",
+        #     }
+        # )
+        tb_imp_[col_flag_imputed] = True
+
+        # Different behaviour depending whether we have a list of countries or a single country to impute
+        if isinstance(impute["country"], list):
+            for country in impute["country"]:
+                tb_imp_["country"] = country
+                tb_imputed.append(tb_imp_.copy())
+        else:
+            tb_imp_["country"] = impute["country"]
+            tb_imputed.append(tb_imp_)
+
+    tb_ = concat(tb_imputed + [tb_], ignore_index=True)
+
+    # Set to False by default (for non-imputed countries)
+    tb_[col_flag_imputed] = tb_[col_flag_imputed].fillna(False).astype(bool)
+
+    # Re-order columns
+    # cols = [
+    #     "country",
+    #     "year",
+    #     "regime",
+    #     "regime_womsuffr",
+    #     "regime_imputed_country",
+    #     "regime_imputed",
+    # ]
+    # tb_ = cast(Table, tb_[cols])
+
+    # Verify that there are no duplicates
+    tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
+    return tb_
