@@ -2,6 +2,8 @@
 
 
 import numpy as np
+import pandas as pd
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -18,6 +20,7 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read()
+    tb = tb.drop(columns="country_code")
 
     #
     # Process data.
@@ -40,6 +43,7 @@ def run(dest_dir: str) -> None:
 
     # Replacing the values
     tb[columns_to_check] = tb[columns_to_check].replace(values_to_replace, np.nan)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     cols = ["country", "year", "Drug combination, Pre-SAC", "Drug combination, SAC"]
     # For some reason format doesn't work here
