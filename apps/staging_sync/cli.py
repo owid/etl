@@ -16,13 +16,12 @@ from slack_sdk import WebClient
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
+from apps.staging_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from etl import config
 from etl import grapher_model as gm
 from etl.datadiff import _dict_diff
 from etl.db import Engine, get_engine, read_sql
-
-from .admin_api import AdminAPI
 
 log = structlog.get_logger()
 
