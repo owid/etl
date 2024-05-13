@@ -343,6 +343,7 @@ def add_count_years_in_regime(
         tb[col_th] = pd.cut(tb[col], bins=[-float("inf"), th, float("inf")], labels=[0, 1]).astype("Int64")
         if na_is_zero:
             tb[col_th] = tb[col_th].fillna(0)
+
         # Add age of democracy
         tb[f"age_{col_new}"] = tb.groupby(["country", tb[col_th].fillna(0).eq(0).cumsum()])[col_th].cumsum().astype(int)
         tb[f"age_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])

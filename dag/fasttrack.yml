@@ -182,3 +182,5 @@ steps:
     - snapshot://fasttrack/latest/cumulative_lives_saved_vaccination_shattock.csv
   data://grapher/fasttrack/latest/heat_deaths_climate_historical:
     - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
+  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
+    - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
