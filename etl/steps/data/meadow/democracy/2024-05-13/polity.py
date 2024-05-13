@@ -26,6 +26,20 @@ def run(dest_dir: str) -> None:
     # Ethiopia ccodes: 529, 530
     tb = correct_ethiopia_data(tb)
 
+    # Keep relevant columns
+    columns_relevant = [
+        "country",
+        "ccode",
+        "year",
+        "polity2",
+        "xrcomp",
+        "xropen",
+        "xconst",
+        "parreg",
+        "parcomp",
+    ]
+    tb = tb[columns_relevant]
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 

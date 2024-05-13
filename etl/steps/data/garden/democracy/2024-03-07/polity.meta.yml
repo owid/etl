@@ -14,40 +14,217 @@ dataset:
 
 tables:
   polity:
+    common:
+      description_processing: |-
+        Values -66, -77 and -88 are recoded as missing (NAs), as per the rules on page 17 of the Polity 5 codebook.
+
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
+
+      democracy_polity:
+        title: Democracy
+        unit: ""
+        description_short: |-
+          It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive.
+
+          It ranges from -10 to 10 (fully democratic).
+        description_from_producer: |-
+          Indicator name: `polity2`
+
+          Revised Combined Polity Score: This variable is a modified version of the POLITY variable added in order to facilitate the use of the POLITY regime measure in time-series analyses. It modifies the combined annual POLITY score by applying a simple treatment, or ““fix,” to convert instances of “standardized authority scores” (i.e., -66, -77, and -88) to conventional polity scores (i.e., within the range, -10 to +10). The values have been converted according to the following rule set:
+
+          -66: Cases of foreign “interruption” are treated as “system missing.”
+          -77 Cases of “interregnum,” or anarchy, are converted to a “neutral” Polity score of “0.”
+          -88 Cases of “transition” are prorated across the span of the transition. For example, country X has a POLITY score of -7 in 1957, followed by three years of -88 and, finally, a score of +5 in 1961. The change (+12) would be prorated over the intervening three years at a rate of per year, so that the converted scores would be as follows: 1957 -7; 1958 -4; 1959 -1; 1960 +2; and 1961 +5.
+
+          Note: Ongoing (-88) transitions in the most recent year (2018) are converted to “system missing” values. Transitions (-88) following a year of independence, interruption (-66), or interregnum (-77) are prorated from the value “0.”
+
+      exec_reccomp_polity:
+        title: Competitiveness of executive recruitment
+        unit: ""
+        description_short: |-
+          Indicates the extent to which executive recruitment is competitive. It ranges from executive power being seized (score of 0), over the executive being selected by elites (score of 1), and dual selection-election or transitional arrangements (score of 2), to the executive being elected (score of 4).
+
+        description_from_producer: |-
+          Indicator name: `xrcomp`
+
+          Competitiveness of Executive Recruitment: Competitiveness refers to the extent that prevailing modes of advancement give subordinates equal opportunities to become superordinates (Gurr 1974, 1483)." For example, selection of chief executives through popular elections matching two or more viable parties or candidates is regarded as competitive. If power transfers are coded Unregulated ("1") in the Regulation of Executive Recruitment (variable 3.1), or involve a transition to/from unregulated, Competitiveness is coded “0". Three categories are used to measure this concept:
+
+          (1) Selection: Chief executives are determined by hereditary succession, designation, or by a combination of both, as in monarchies whose chief minister is chosen by king or court. Examples of pure designative selection are rigged, unopposed elections; repeated replacement of presidents before their terms end; recurrent military selection of civilian executives; selection within an institutionalized single party; recurrent incumbent selection of successors; repeated election boycotts by the major opposition parties, etc.
+
+          (2) Dual/Transitional: Dual executives in which one is chosen by hereditary succession, the other by competitive election. Also used for transitional arrangements between selection (ascription and/or designation) and competitive election.
+
+          (3) Chief executives are typically chosen in or through competitive elections matching two or more major parties or candidates. (Elections may be popular or by an elected assembly.)
+
+      exec_recopen_polity:
+        title: Openness of executive recruitment
+        unit: ""
+        description_short: |-
+          Indicates the extent to which recruitment for the executive is open. It ranges from executive power being seized (score of 0), over hereditary succession (score of 1), dual hereditary-open arrangements with the chief minister designated (score of 2), and dual hereditary-open arrangements with the chief minister being elected (score of 3), to executive recruitment being open (score of 4).
+
+        description_from_producer: |-
+          Indicator name: `xropen`
+
+          Openness of Executive Recruitment: Recruitment of the chief executive is "open" to the extent that all the politically active population has an opportunity, in principle, to attain the position through a regularized process. If power transfers are coded Unregulated (1) in the Regulation of Executive Recruitment (variable 3.1), or involve a transition to/from Unregulated, Openness is coded 0. Four categories are used:
+
+          (1) Closed: Chief executives are determined byhereditary succession, e.g. kings, emperors,beys, emirs, etc. who assume executive powers by right of descent. An executive selectedby other means may proclaim himself a monarch but the polity he governs is notcoded "closed" unless a relative actually succeeds him as ruler.
+
+          (2) Dual Executive–Designation: Hereditary succession plus executive or court selection of an effective chief minister
+
+          (3) Dual Executive–Election: Hereditary succession plus electoral selection of an effective chief minister.
+
+          (4) Open: Chief executives are chosen by elite designation, competitive election, or transitional arrangements between designation and election.
+
+          Some examples may clarify the coding scheme outlined above. The Soviet Union's (XRREG/XRCOMP/XROPEN) profile on these variables, since the accession of Khrushchev, is Designational/Selection/Open. Victorian Britain's profile was Regulated/Transitional/Dual Executive–Election, whereas contemporaryBritain, along with other modern democracies, is coded Regulated/Election/Open. The polities of leaders who seize power by force are coded Unregulated, but there is a recurring impulse among such leaders to regularize the process of succession, usually by relying on some form of selection. A less common variant, as in modern Iran and Nicaragua under the Somozas, is one in which a Caesaristic leader attempts to establish the principle of hereditary succession. Polity codes all such attempts at regularizing succession as Transitional (under Regulation, variable 3.1) until the first chief executive chosen under the new rules takes office.
+
+          A translation of the conceptualizations of executive recruitment used in Polity IV and Polity5 into the component coding scheme outlined above is presented in Table 3.1 (see page 23 of codebook).
+
+      exec_constr_polity:
+        title: Constraints on the executive
+        unit: ""
+        description_short: |-
+          Indicates the extent to which the executive is constrained. It ranges from unconstrained executives (score of 1), over slight or moderate constraints (score of 3), and substantial constraints (score of 5), to an executive that is subordinated to or on par with other authorities (score of 7). The remaining categories are intermediate ones.
+
+        description_from_producer: |-
+          Indicator name: `xconst`
+
+          Executive Constraints (Decision Rules): According to Eckstein and Gurr, decision rules are defined in the following manner: "Superordinate structures in action make decisions concerning the direction of social units. Making such decisions requires that supers and subs be able to recognize when decision-processes have been concluded, especially "properly" concluded. An indispensable ingredient of the processes, therefore, is the existence of Decision Rules that provide basic criteria under which decisions are considered to have been taken." (Eckstein and Gurr 1975, 121).
+
+          Operationally, this variable refers to the extent of institutionalized constraints on the decisionmaking powers of chief executives, whether individuals or collectivities. Such limitations may be imposed by any "accountability groups." In Western democracies these are usually legislatures. Other kinds of accountability groups are the ruling party in a one-party state; councils of nobles or powerful advisors in monarchies; the military in coup-prone polities; and in many states a strong, independent judiciary. The concern is therefore with the checks and balances between the various parts of the decision-making process. A seven-category scale is used.
+
+          (1) Unlimited Authority: There are no regular limitations on the executive's actions (as distinct from irregular limitations such as the threat or actuality of coups and assassinations). Examples of evidence:
+
+          i. Constitutional restrictions on executive action are ignored.
+          ii. Constitution is frequently revised or suspended at the executive's initiative.
+          iii. There is no legislative assembly, or there is one but it is called and dismissed at the executive's pleasure.
+          iv. The executive appoints a majority of members of any accountability group and can remove them at will.
+          v. The legislature cannot initiate legislation or veto or suspend acts of the executive.
+          vi. Rule by decree is repeatedly used.
+
+          Note 3.4: If the executive is given limited or unlimited power by a legislature to cope with an emergency and relents this power after the emergency has passed, this is not a change to unlimited authority.
+
+          (2) Intermediate Category
+
+          (3) Slight to Moderate Limitation on Executive Authority: There are some real but limited restraints on the executive. Evidence:
+
+          i. The legislature initiates some categories of legislation.
+          ii. The legislature blocks implementation of executive acts and decrees.
+          iii. Attempts by the executive to change some constitutional restrictions, such as prohibitions on succeeding himself, or extending his term, fail and are not adopted.
+          iv. The ruling party initiates some legislation or takes some administrative action independently of the executive.
+          v. The legislature or party approves some categories of appointments nominated by the executive.
+          vi. There is an independent judiciary
+          vii. Situations in which there exists a civilian executive, but in which policy decisions, for all practical purposes, reflect the demands of the military.
+
+          (4) Intermediate Category
+
+          (5) Substantial Limitations on Executive Authority: The executive has more effective authority than any accountability group but is subject to substantial constraints by them. Examples:
+
+          i. A legislature or party council often modifies or defeats executive proposals for action.
+          ii. A council or legislature sometimes refuses funds to the executive.
+          iii. The accountability group makes important appointments to administrative posts.
+          iv. The legislature refuses the executive permission to leave the country.
+
+          (6) Intermediate Category
+
+          (7) Executive Parity or Subordination: Accountability groups have effective authority equal to or greater than the executive in most areas of activity. Examples of evidence:
+
+          i. A legislature, ruling party, or council of nobles initiates much or most important legislation.
+          ii. The executive (president, premier, king, cabinet, council) is chosen by the accountability group and is dependent on its continued support to remain in office (as in most parliamentary systems).
+          iii. In multi-party democracies, there is chronic "cabinet instability."
+
+      polpart_reg_polity:
+        title: Regulation of political participation
+        unit: ""
+        description_short: |-
+          Indicates the extent to which political participation is regulated, ranging from highly unstable political participation (score of 1), over political participation with multiple identities (score of 2), sectarian political participation (score of 3), and restricted political participation (score of 4), to unrestricted and stable political participation (score of 5).
+
+        description_from_producer: |-
+          Indicator name: `parreg`
+
+          Regulation of Participation: Participation is regulated to the extent that there are binding rules on when, whether, and how political preferences are expressed. One-party states and Western democracies both regulate participation but they do so in different ways, the former by channeling participation through a single party structure, with sharp limits on diversity of opinion; the latter by allowing relatively stable and enduring groups to compete nonviolently for political influence. The polar opposite is unregulated participation, in which there are no enduring national political organizations and no effective regime controls on political activity. In such situations political competition is fluid and often characterized by recurring coercion among shifting coalitions of partisan groups. A five-category scale is used to code this dimension:
+
+          (1) Unregulated: Political participation is fluid; there are no enduring national political organizations and no systematic regime controls on political activity. Political groupings tend to form around particular leaders, regional interests, religious or ethnic or clan groups, etc.; but the number and relative importance of such groups in national political life varies substantially over time.
+
+          (2) Multiple Identity: There are relatively stable and enduring political groups which compete for political influence at the national level–parties, regional groups, or ethnic groups, not necessarily elected–but there are few, recognized overlapping (common) interests.
+
+          (3) Sectarian: Political demands are characterized by incompatible interests and intransigent posturing among multiple identity groups and oscillate more or less regularly between intense factionalism and government favoritism, that is, when one identity group secures central power it favors group members in central allocations and restricts competing groups' political activities, until it is displaced in turn (i.e., active factionalism). Also coded here are polities in which political groups are based on restricted membership and significant portions of the population historically have been excluded from access to positions of power (latent factionalism, e.g., indigenous peoples in some South American countries).
+
+          (4) Restricted: Some organized political participation is permitted without intense factionalism but significant groups, issues, and/or types of conventional participation are regularly excluded from the political process.
+
+          (5) Regulated: Relatively stable and enduring political groups regularly compete for political influence and positions with little use of coercion. No significant groups, issues, or types of conventional political action are regularly excluded from the political process.
+
+      polpart_comp_polity:
+        title: Competitiveness of political participation
+        unit: ""
+        description_short: |-
+          Indicates the extent to which political participation is competitive. It ranges from unregulated political participation (score of 0), over repressed political participation (score of 1), suppressed political participation (score of 2), factional political participation (score of 3), and transitional arrangements (score of 4), to competitive political participation (score of 5).
+
+        description_from_producer: |-
+          Indicator name: `parcomp`
+
+          The Competitiveness of Participation: The competitiveness of participation refers to the extent to which alternative preferences for policy and leadership can be pursued in the political arena. Political competition implies a significant degree of civil interaction, so polities which are coded Unregulated (1) on Regulation of Participation (PARREG, variable 2.5) are not coded for competitiveness. Polities in transition between Unregulated and any of the regulated forms on variable 2.5 also are not coded on variable 2.6. Competitiveness is coded on a fivecategory scale:
+
+          (0) Not Applicable: This is used for polities that are coded as Unregulated, or moving to/from nthat position, in Regulation of Political Participation (variable 2.6).
+
+          (1) Repressed: No significant oppositional activity is permitted outside the ranks of the regime and ruling party. Totalitarian party systems, authoritarian military dictatorships, and despotic monarchies are typically coded here. However, the mere existence of these structures is not sufficient for a Repressed coding. The regime's institutional structure must also be matched by its demonstrated ability to repress oppositional competition.
+
+          (2) Suppressed: Some organized, political competition occurs outside government, without serious factionalism; but the regime systematically and sharply limits its form, extent, or both in ways that exclude substantial groups (20% or more of the adult population) from participation. Suppressed competition is distinguished from Factional competition (below) by the systematic, persisting nature of the restrictions: large classes of people, groups, or types of peaceful political competition are continuously excluded from the political process. As an operational rule, the banning of a political party which received more than 10% of the vote in a recent national election is sufficient evidence that competition is "suppressed." However, other information is required to determine whether the appropriate coding is (2) Suppressed or (3) Factional competition. This category is also used to characterize transitions between Factional and Repressed competition. Examples of "suppression" are:
+
+          i. Prohibiting some kinds of political organizations, either by type or group of people involved (e.g., no national political parties or no ethnic political organizations).
+          ii. Prohibiting some kinds of political action (e.g., Communist parties may organize but are prohibited from competing in elections).
+          iii. Systematic harassment of political opposition (leaders killed, jailed, or sent into exile; candidates regularly ruled off ballots; opposition media banned, etc.). This is evidence for either Factional, Suppressed, or Repressed, depending on the nature of the regime, the opposition, and the persistence of political groups.
+
+          Note 3.6: A newly enacted right to engage in political activities is most likely a change from category 1 to 2.
+
+          (3) Factional: Polities with parochial or ethnic-based political factions that regularly compete for political influence in order to promote particularist agendas and favor group members to the detriment of common, secular, or cross-cutting agendas.
+
+          (4) Transitional: Any transitional arrangement from Restricted, Suppressed, or Factional patterns to fully Competitive patterns, or vice versa. Transitional arrangements are accommodative of competing, parochial interests but have not fully linked parochial with broader, general interests. Sectarian and secular interest groups coexist.
+
+          (5) Competitive: There are relatively stable and enduring, secular political groups which regularly compete for political influence at the national level; ruling groups and coalitions regularly, voluntarily transfer central powerto competing groups. Competition among groups seldom involves coercion or disruption. Small parties or political groups may be restricted in the Competitive pattern.
+
+          By combining scores on Regulation of Political Participation (variable 3.5) and the Competitiveness of Participation (variable 3.6), a relatively detailed picture of the extent of political competition and opposition emerges. A translation of the Polity IV conceptual categories of political competition into the component coding scheme described here is presented in Table 3.2 (in codebook).
+
+      regime_polity:
+        title: Political regime
+        unit: ""
+        description_short: |-
+          Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies (score 0), anocracies (score 1), and democracies (score 2).
+        description_key:
+          - Democracies have mostly democratic characteristics, understood as open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
+          - Anocracies have neither clearly democratic nor autocratic characteristics.
+          - Autocracies have mostly autocratic/non-democratic characteristics.
+          - "It uses the conventional coding rules (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) of coding Polity regimes given here: https://www.systemicpeace.org/polityproject.html"
+
+      democracy_recod_polity:
+        title: Democracy (recoded 0-20)
+        unit: ""
+        description_short: |-
+          It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. It ranges from 0 to 20 (fully democratic).
+        description_processing:
+          It matches the variable polity2 in Polity 5 (2021), with the values rescaled to range from 0 to 20 instead of -10 to 10.
+
+      age_dem_polity:
+        title: Democracy age
+        unit: ""
+        description_short: |-
+          Number of consecutive years in a democracy.
+        description_key:
+          - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
+
+      experience_dem_polity:
+        title: Experience with democracy
+        unit: ""
+        description_short: |-
+          Number of total years in a democracy. It sums all periods of a democracy.
+        description_key:
+          - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
+
+      group_age_dem_polity:
+        title: Democracy age group
+        unit: ""
+        description_short: |-
+          Identifies the number of years a country was a democracy since 1800.
+        description_key:
+          - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
+          - Democracies are understood here as having broadly open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
+          - The variable distinguishes between autocracies (score of 0), anocracies (score of 1), democracies aged 1-18 years (score of 2), 19-30 years (score of 3), 31-60 years (score of 4), 61-90 years (score of 5), and 91+ years (score of 6).
 
