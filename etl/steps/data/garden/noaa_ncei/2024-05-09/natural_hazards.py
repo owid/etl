@@ -331,11 +331,11 @@ def run(dest_dir: str) -> None:
             .assign(**{"type": table_name})
         )
 
-    # TODO: Usually "deathstotal" is more often informed than "deaths", but there are also cases where there is
+    # NOTE: Usually "deathstotal" is more often informed than "deaths", but there are also cases where there is
     #  "deaths" but not "deathstotal". Since "deathstotal" includes all deaths (including secondary ones), it would make
     #  sense to fill empty "deathstotal" with "deaths".
     #  However, note that there are events where "deaths" > "deathstotal", which should not happen.
-    #  These are probably data issues. Contact the source about it.
+    #  These are probably data issues. I contacted the data provider to ask about it.
 
     # Merge all tables.
     tb = pr.concat(list(tables.values()), ignore_index=True)
