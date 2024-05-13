@@ -391,7 +391,9 @@ def add_age_groups(
     return tb
 
 
-def add_imputes(tb: Table, path: Path, cols_verify: List[str] | None = None) -> Table:
+def add_imputes(
+    tb: Table, path: Path, cols_verify: List[str] | None = None, col_flag_imputed: str | None = None
+) -> Table:
     """Add imputed values to the table.
 
     Imputed values are inferred from historical equivalents.
@@ -405,6 +407,9 @@ def add_imputes(tb: Table, path: Path, cols_verify: List[str] | None = None) -> 
         - Note that these "imputed country values" are ignored when estimating the number of countries in democracies (function `make_tables_country_counters`), since these countries did not exist at the time!
     """
     tb_ = tb.copy()
+
+    if col_flag_imputed is None:
+        col_flag_imputed = "values_imputed"
 
     if cols_verify is None:
         cols_verify = ["country", "year"]
@@ -433,7 +438,7 @@ def add_imputes(tb: Table, path: Path, cols_verify: List[str] | None = None) -> 
         #         "country": "regime_imputed_country",
         #     }
         # )
-        tb_imp_["values_imputed"] = True
+        tb_imp_[col_flag_imputed] = True
 
         # Different behaviour depending whether we have a list of countries or a single country to impute
         if isinstance(impute["country"], list):
@@ -447,7 +452,7 @@ def add_imputes(tb: Table, path: Path, cols_verify: List[str] | None = None) -> 
     tb_ = concat(tb_imputed + [tb_], ignore_index=True)
 
     # Set to False by default (for non-imputed countries)
-    tb_["values_imputed"] = tb_["values_imputed"].fillna(False).astype(bool)
+    tb_[col_flag_imputed] = tb_[col_flag_imputed].fillna(False).astype(bool)
 
     # Re-order columns
     # cols = [

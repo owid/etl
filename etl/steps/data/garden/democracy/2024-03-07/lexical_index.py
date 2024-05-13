@@ -123,13 +123,14 @@ def run(dest_dir: str) -> None:
     ) == {"Germany"}, "Other versions of Germany!"
 
     # Impute values
-    tb = add_imputes(
-        tb=tb,
-        path=PATH_IMPUTE,
-    )
+    tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed="values_imputed")
 
     # Get region data
-    tb_regions = get_region_aggregates(tb, ds_regions, ds_population)
+    tb_regions = tb.loc[~tb["values_imputed"]].drop(columns=["values_imputed"]).copy()
+    tb_regions = get_region_aggregates(tb_regions, ds_regions, ds_population)
+
+    # Drop is imputed flag
+    tb = tb.drop(columns=["values_imputed"])
 
     # Format
     tb = tb.format(["country", "year"])
@@ -268,7 +269,11 @@ def add_universal_suffrage(tb: Table) -> Table:
     return tb
 
 
-def get_region_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Table:
+def get_region_aggregates(
+    tb: Table,
+    ds_regions: Dataset,
+    ds_population: Dataset,
+) -> Table:
     """Create table with region aggregates.
 
     Includes counts of countries and counts of people living in countries"""
