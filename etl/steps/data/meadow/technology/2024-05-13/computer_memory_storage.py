@@ -9,7 +9,7 @@ paths = PathFinder(__file__)
 
 PARSING_INSTRUCTIONS = {
     "MEMORY": {"skiprows": 4, "usecols": [0, 1]},
-    "DDRIVES": {"skiprows": 4, "usecols": [1, 4]},
+    "DDRIVES": {"skiprows": 4, "usecols": [1, 2, 3, 4]},
     "SSD": {"skiprows": 4, "usecols": [1, 3]},
     "FLASH": {"skiprows": 4, "usecols": [1, 5]},
 }
@@ -18,14 +18,23 @@ PARSING_INSTRUCTIONS = {
 def read_sheet(snapshot, sheet_name):
     """Read a sheet from a snapshot."""
     tb = snapshot.read_excel(sheet_name=sheet_name, header=None, **PARSING_INSTRUCTIONS[sheet_name])
+
+    # If sheet_name = "DDRIVES", the price column is based on column 4, filled in with values
+    # from columns 2 and 3 when empty.
+    if sheet_name == "DDRIVES":
+        tb[4] = tb[4].fillna(tb[2])
+        tb[4] = tb[4].fillna(tb[3])
+        # Drop columns 2 and 3
+        tb = tb.drop(columns=[2, 3])
+
     tb.columns = ["year", "price"]
     tb["type"] = sheet_name.lower()
     return tb
 
 
 def clean_data(tb):
-    # Remove NA years
-    tb = tb.dropna(subset=["year"])
+    # Remove NA years and prices
+    tb = tb.dropna(subset=["year", "price"])
 
     # Convert year to integer
     tb["year"] = tb["year"].astype(int)
