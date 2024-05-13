@@ -13,6 +13,9 @@ dataset:
 
 tables:
   lexical_index:
+    common:
+      description_processing: |-
+        Data for former USSR member states has been obtained by imputing the values of the USSR. This includes: Russia, Ukraine, Belarus, Latvia, Lithuania, Estonia, Armenia, Azerbaijan, Georgia, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, Uzbekistan, and Moldova.
     variables:
       exelec_lied:
         title: Elections for chief executive
