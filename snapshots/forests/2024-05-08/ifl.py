@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+Data was sent by email from the source - Peter Potapov (potapov@umd.edu) - on 2024-05-07 is the country level aggregates of the Intact Forest Landscapes data produced by Potapov et al (https://intactforests.org/)
+"""
 
 from pathlib import Path
 

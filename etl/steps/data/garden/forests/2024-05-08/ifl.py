@@ -22,8 +22,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Convert to square kilometers.
+    # Convert to square kilometers - the original data is in 1000 square kilometers
     tb["ifl_area"] *= 1000
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
     tb = geo.add_regions_to_table(
         tb,
         regions=REGIONS,
@@ -31,7 +33,6 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
 
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
 
     #
