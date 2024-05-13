@@ -8,6 +8,7 @@ from owid.catalog.processing import concat
 from shared import (
     add_age_groups,
     add_count_years_in_regime,
+    add_imputes,
     add_population_in_dummies,
     add_regions_and_global_aggregates,
     expand_observations,
@@ -20,6 +21,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+PATH_IMPUTE = paths.directory / "lexical_index.countries_impute.yml"
 
 REGIME_LABELS = {
     0: "non-electoral autocracy",
@@ -119,6 +121,12 @@ def run(dest_dir: str) -> None:
     assert set(
         tb.loc[tb["country"].str.contains("Germany") & ((tb["year"] >= 1990) | (tb["year"] <= 1944)), "country"]
     ) == {"Germany"}, "Other versions of Germany!"
+
+    # Impute values
+    tb = add_imputes(
+        tb=tb,
+        path=PATH_IMPUTE,
+    )
 
     # Get region data
     tb_regions = get_region_aggregates(tb, ds_regions, ds_population)

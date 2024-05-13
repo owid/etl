@@ -1,7 +1,9 @@
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
 
@@ -387,3 +389,77 @@ def add_age_groups(
     # Copy metadata
     tb[column_new] = tb[column_new].copy_metadata(tb[column])
     return tb
+
+
+def add_imputes(tb: Table, path: Path, cols_verify: List[str] | None = None) -> Table:
+    """Add imputed values to the table.
+
+    Imputed values are inferred from historical equivalents.
+
+    Example: Was "Eritrea" a democracy in 1993?
+
+        - We can infer this from "Ethiopia (former)" (historical equivalent). You can see all these mappings in bmr.countries_impute.yml file.
+
+        - This is useful to (i) be able to colour these world regions in grapher map charts, and (ii) to be able to count the number of people living in democracy (in `make_tables_population_counters`).
+
+        - Note that these "imputed country values" are ignored when estimating the number of countries in democracies (function `make_tables_country_counters`), since these countries did not exist at the time!
+    """
+    tb_ = tb.copy()
+
+    if cols_verify is None:
+        cols_verify = ["country", "year"]
+
+    # Load impute data
+    countries_impute = yaml.safe_load(path.read_text())
+
+    # Drop known values that are not correct
+
+    tb_imputed = []
+    for impute in countries_impute:
+        # Get relevant rows
+        tb_imp_ = tb_.loc[
+            (tb_["country"] == impute["country_impute"])
+            & (tb_["year"] >= impute.get("year_min", 99999))
+            & (tb_["year"] <= impute.get("year_max", -99999))
+        ].copy()
+        # Sanity checks
+        assert tb_imp_.shape[0] > 0, f"No data found for {impute['country_impute']}"
+        assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
+        assert tb_imp_["year"].min() == impute["year_min"], f"Missing years (min check) for {impute['country_impute']}"
+
+        # Tweak them
+        # tb_ = tb_.rename(
+        #     columns={
+        #         "country": "regime_imputed_country",
+        #     }
+        # )
+        tb_imp_["values_imputed"] = True
+
+        # Different behaviour depending whether we have a list of countries or a single country to impute
+        if isinstance(impute["country"], list):
+            for country in impute["country"]:
+                tb_imp_["country"] = country
+                tb_imputed.append(tb_imp_.copy())
+        else:
+            tb_imp_["country"] = impute["country"]
+            tb_imputed.append(tb_imp_)
+
+    tb_ = concat(tb_imputed + [tb_], ignore_index=True)
+
+    # Set to False by default (for non-imputed countries)
+    tb_["values_imputed"] = tb_["values_imputed"].fillna(False).astype(bool)
+
+    # Re-order columns
+    # cols = [
+    #     "country",
+    #     "year",
+    #     "regime",
+    #     "regime_womsuffr",
+    #     "regime_imputed_country",
+    #     "regime_imputed",
+    # ]
+    # tb_ = cast(Table, tb_[cols])
+
+    # Verify that there are no duplicates
+    tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
+    return tb_
