@@ -32,9 +32,10 @@ def run(branch: str) -> str:
 
 <details open>
 <summary><b>SVG tester</b>: </summary>
-Number of differences (default views): {default_views} {default_views_commit}
 
+Number of differences (default views): {default_views} {default_views_commit}
 Number of differences (all views): {all_views} {all_views_commit}
+
 </details>
     """.strip()
 
