@@ -441,7 +441,9 @@ def add_imputes(
         # Sanity checks
         assert tb_imp_.shape[0] > 0, f"No data found for {impute['country_impute']}"
         assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
-        assert tb_imp_["year"].min() == impute["year_min"], f"Missing years (min check) for {impute['country_impute']}"
+        assert (a := tb_imp_["year"].min()) == (
+            b := impute["year_min"]
+        ), f"Missing years (min check) for {impute['country_impute']}: {a} != {b}"
 
         # Tweak them
         # tb_ = tb_.rename(

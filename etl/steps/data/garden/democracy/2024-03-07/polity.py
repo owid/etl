@@ -42,13 +42,15 @@ LABELS
 
 import pandas as pd
 from owid.catalog import Table
-from shared import add_age_groups, add_count_years_in_regime
+from shared import add_age_groups, add_count_years_in_regime, add_imputes
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+PATH_IMPUTE = paths.directory / f"{paths.short_name}.countries_impute.yml"
+
 
 # Regime labels
 REGIME_LABELS = {
@@ -96,6 +98,16 @@ def run(dest_dir: str) -> None:
 
     # Age and experience of democracy
     tb = add_age_and_experience(tb)
+
+    # Add imputes
+    col_flag_imputed = "values_imputed"
+    tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
+
+    # Get region data
+    # tb_regions = tb.loc[~tb[col_flag_imputed]].drop(columns=[col_flag_imputed]).copy()
+
+    # Drop is imputed flag
+    tb = tb.drop(columns=[col_flag_imputed])
 
     # Remove columns
     tb = tb.drop(columns=["ccode"])
