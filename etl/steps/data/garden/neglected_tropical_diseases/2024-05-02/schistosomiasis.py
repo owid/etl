@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = tb.drop(columns=["region", "age_group", "country_code"])
     tb = tb.format(["country", "year"])
 
     #

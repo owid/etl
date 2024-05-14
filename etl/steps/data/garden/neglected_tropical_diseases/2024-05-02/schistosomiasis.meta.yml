@@ -15,111 +15,45 @@ dataset:
 tables:
   schistosomiasis:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      region:
-        unit: ""
-        presentation:
-          topic_tags:
-            - Global Health
       population_requiring_pc_for_sch_annually:
-        title: Population requiring PC for SCH annually
-        unit: ""
+        title: Population requiring preventive chemotherapy annually
+        description_short: "Population requiring preventive chemotherapy for schistosomiasis."
+        unit: "people"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 0
       sac_population_requiring_pc_for_sch_annually:
-        title: SAC population requiring PC for SCH annually
-        unit: ""
+        title: School-age children population requiring preventive chemotherapy annually
+        description_short: "School-age children population requiring preventive chemotherapy for schistosomiasis."
+        unit: "school-age children"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 0
       number_of_people_targeted:
         title: Number of people targeted
-        unit: ""
+        description_short: "Number of people targeted for preventive chemotherapy for schistosomiasis."
+        unit: "people"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 0
       reported_number_of_people_treated:
         title: Reported number of people treated
-        unit: ""
+        description_short: "Reported number of people treated for schistosomiasis."
+        unit: "people"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      age_group:
-        title: Age group
-        unit: ""
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 0
       reported_number_of_sac_treated:
-        title: Reported number of SAC treated
-        unit: ""
+        title: Reported number of school-age children treated
+        description_short: "Reported number of school-age children treated for schistosomiasis."
+        unit: "school-age children"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 0
       programme_coverage__pct:
-        title: Programme coverage (%)
-        unit: ""
+        title: Programme coverage
+        description_short: "Programme coverage for preventive chemotherapy for schistosomiasis."
+        unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 1
       national_coverage__pct:
         title: National coverage (%)
-        unit: ""
+        description_short: "Drug coverage out of estimated population who require it."
+        unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      country_code:
-        unit: ""
-        presentation:
-          topic_tags:
-            - Global Health
-    title: Preventive Chemotherapy (PC) Data Portal
-    description: Progress towards achieving the Roadmap targets for control and elimination of the Neglected Tropical Diseases.
+          numDecimalPlaces: 1

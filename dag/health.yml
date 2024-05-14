@@ -582,3 +582,5 @@ steps:
     - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
   data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
+  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
