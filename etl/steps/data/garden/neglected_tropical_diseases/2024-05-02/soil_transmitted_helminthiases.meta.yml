@@ -42,7 +42,7 @@ tables:
           numDecimalPlaces: 1
   soil_transmitted_helminthiases_national_pre_sac:
     variables:
-      national_coverage__sac__pct:
+      national_coverage__pre_sac__pct:
         title: National coverage pre-school age children
         description_short: "Drug coverage out of estimated population of pre-school age children who require it."
         unit: "%"
@@ -78,7 +78,7 @@ tables:
           numDecimalPlaces: 1
   soil_transmitted_helminthiases_national_sac:
     variables:
-      national_coverage__pre_sac__pct:
+      national_coverage__sac__pct:
         title: National coverage school age children
         unit: "%"
         description_short: "Drug coverage out of estimated population of school age children who require it."
