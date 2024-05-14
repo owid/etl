@@ -27,10 +27,10 @@ tables:
         unit: deaths
       missing:
         title: Number of reported missing persons directly caused by a natural disaster
-        unit: missing
+        unit: missing people
       injuries:
         title: Number of reported injuries directly caused by a natural disaster
-        unit: injuries
+        unit: injured people
       damage:
         title: Economic damage directly caused by a natural disaster
         unit: current US$
@@ -46,10 +46,10 @@ tables:
         unit: deaths
       missing_total:
         title: Total number of missing persons caused by a disaster and secondary effects
-        unit: missing
+        unit: missing people
       injuries_total:
         title: Total number of injuries caused by a disaster and secondary effects
-        unit: injuries
+        unit: injured people
       damage_total:
         title: Total economic damage caused by a disaster and secondary effects
         unit: current US$

@@ -11,6 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
 # The common impact metrics among the three tables are as follows:
 # Note that the definitions are not easy to be found explicitly anywhere.
 # But in the resulting search table, by clicking on the header of each column, a pop up appears with a short definition.
@@ -301,6 +302,15 @@ def run(dest_dir: str) -> None:
             tables[table_name], countries_file=paths.country_mapping_path, warn_on_unused_countries=False
         )
 
+        # Column "deaths_total" is more often informed than "deaths", but there are also cases where there is "deaths"
+        # but not "deaths_total". Since "deaths_total" includes all deaths (including secondary ones), it would make
+        # sense to fill empty "deaths_total" with "deaths".
+        # Note that there are events where "deaths" > "deaths_total", which should not happen.
+        # We contacted Nicolas Arcos (NOAA Federal) who suggested indeed to fill missing "deaths_total" with "deaths".
+        # He also explained that events that have a value for "deaths" but not for "deaths_total" are under review, and
+        # are more uncertain.
+        tables[table_name]["deaths_total"] = tables[table_name]["deaths_total"].fillna(tables[table_name]["deaths"])
+
         # Calculate the number of events and the total impact (for each metric) per country-year.
         # Note that the data on the socio-economic impacts is very sparse.
         # For example, the percentage of events that lack data on "deaths" is
@@ -331,11 +341,10 @@ def run(dest_dir: str) -> None:
             .assign(**{"type": table_name})
         )
 
-    # NOTE: Usually "deathstotal" is more often informed than "deaths", but there are also cases where there is
-    #  "deaths" but not "deathstotal". Since "deathstotal" includes all deaths (including secondary ones), it would make
-    #  sense to fill empty "deathstotal" with "deaths".
-    #  However, note that there are events where "deaths" > "deathstotal", which should not happen.
-    #  These are probably data issues. I contacted the data provider to ask about it.
+        # Since the current year is never complete, remove it from the data.
+        tables[table_name] = tables[table_name][
+            tables[table_name]["year"] < int(paths.version.split("-")[0])
+        ].reset_index(drop=True)
 
     # Merge all tables.
     tb = pr.concat(list(tables.values()), ignore_index=True)
