@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -29,6 +31,8 @@ def run(dest_dir: str) -> None:
     tb_nat.metadata.short_name = "lymphatic_filariasis_national"
     # Drop `national_coverage_pct` from tb
     tb = tb.drop(columns=["national_coverage__pct", "region", "country_code", "mapping_status"])
+    # Replace "No data" with NaN
+    tb = tb.replace("No data", np.nan)
     # Format the tables
     tb = tb.format(["country", "year", "type_of_mda"])
     tb_nat = tb_nat.format(["country", "year"])
