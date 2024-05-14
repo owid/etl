@@ -13,11 +13,10 @@ meta:
       Schistosomiasis situational analyses, core implementation data and trend data are provided through direct access to the interactive reports.
 
     # Citation
-    producer: World Health Organization (2024)
+    producer: World Health Organization
     citation_full: |-
       PCT Databank - Schistosomiasis,  World Health Organization (2024)
     attribution_short: WHO
-
     # Files
     url_main: https://www.who.int/teams/control-of-neglected-tropical-diseases/data-platforms/pct-databank/schistosomiasis
     url_download: https://apps.who.int/neglected_diseases/ntddata/data/SCH_data.xlsx?ua=1
