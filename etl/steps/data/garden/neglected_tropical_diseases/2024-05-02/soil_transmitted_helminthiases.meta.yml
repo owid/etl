@@ -13,129 +13,71 @@ dataset:
 
   title: Preventive Chemotherapy (PC) Data Portal
 tables:
-  soil_transmitted_helminthiases:
+  soil_transmitted_helminthiases_pre_sac:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      region:
-        unit: ""
-        presentation:
-          topic_tags:
-            - Global Health
-      population_requiring_pc_for_sth__pre_sac:
-        title: Population requiring PC for STH, Pre-SAC
-        unit: ""
+      population_requiring_pc_for_sth:
+        title: Population of pre-school age children requiring preventive chemotherapy
+        description_short: "Population of pre-school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        unit: "pre-school age children"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      number_of_pre_sac_targeted:
-        title: Number of Pre-SAC targeted
-        unit: ""
+          numDecimalPlaces: 0
+      number_targeted:
+        title: Number of pre-school age children targeted
+        description_short: "Number of pre-school age children targeted for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "pre-school age children"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      reported_number_of_pre_sac_treated:
-        title: Reported number of Pre-SAC treated
-        unit: ""
+          numDecimalPlaces: 0
+      reported_number_treated:
+        title: Reported number of pre-school age children treated
+        description_short: "Reported number of pre-school age children treated for soil transmitted helminthiases."
+        unit: "pre-school age children"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      programme_coverage__pre_sac__pct:
-        title: Programme coverage, Pre-SAC (%)
-        unit: ""
+          numDecimalPlaces: 0
+      programme_coverage__pct:
+        title: Programme coverage of pre-school age children
+        description_short: "Programme coverage of pre-school age children for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "%"
+        short_unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      national_coverage__pre_sac__pct:
-        title: National coverage, Pre-SAC (%)
-        unit: ""
+          numDecimalPlaces: 1
+      national_coverage__pct:
+        title: National coverage pre-school age children
+        description_short: "Drug coverage out of estimated population of pre-school age children who require it."
+        unit: "%"
+        short_unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      population_requiring_pc_for_sth__sac:
-        title: Population requiring PC for STH, SAC
-        unit: ""
+          numDecimalPlaces: 1
+  soil_transmitted_helminthiases_sac:
+    variables:
+      population_requiring_pc_for_sth:
+        title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
+        unit: "school age children"
+        description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      number_of_sac_targeted:
-        title: Number of SAC targeted
-        unit: ""
+          numDecimalPlaces: 0
+      number_targeted:
+        title: Number of school age children targeted
+        unit: "school age children"
+        description_short: "Number of school age children targeted for preventive chemotherapy for soil transmitted helminthiases."
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      reported_number_of_sac_treated:
-        title: Reported number of SAC treated
-        unit: ""
+          numDecimalPlaces: 0
+      reported_number_treated:
+        title: Reported number of school age children treated
+        unit: "school age children"
+        description_short: "Reported number of school age children treated for soil transmitted helminthiases."
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      programme_coverage__sac__pct:
-        title: Programme coverage, SAC (%)
-        unit: ""
+          numDecimalPlaces: 0
+      programme_coverage__pct:
+        title: Programme coverage of school age children
+        description_short: "Programme coverage of school age children for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "%"
+        short_unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      national_coverage__sac__pct:
-        title: National coverage, SAC (%)
-        unit: ""
+          numDecimalPlaces: 1
+      national_coverage__pct:
+        title: National coverage school age children
+        unit: "%"
+        description_short: "Drug coverage out of estimated population of school age children who require it."
+        short_unit: "%"
         display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - Global Health
-      country_code:
-        unit: ""
-        presentation:
-          topic_tags:
-            - Global Health
+          numDecimalPlaces: 1
