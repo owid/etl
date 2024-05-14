@@ -40,9 +40,20 @@ LABELS
     5 "competitive"
 """
 
+from typing import Tuple, cast
+
+import numpy as np
 import pandas as pd
-from owid.catalog import Table
-from shared import add_age_groups, add_count_years_in_regime, add_imputes
+from owid.catalog import Dataset, Table
+from owid.catalog.tables import concat
+from shared import (
+    add_age_groups,
+    add_count_years_in_regime,
+    add_imputes,
+    add_regions_and_global_aggregates,
+    from_wide_to_long,
+    make_table_with_dummies,
+)
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -58,6 +69,28 @@ REGIME_LABELS = {
     1: "anocracy",
 }
 
+# Missing classifications of states
+REGIONS = {
+    "Africa": {},
+    "Asia": {},
+    "North America": {
+        "additional_members": [
+            "United Provinces of Central America",
+        ]
+    },
+    "South America": {},
+    "Europe": {
+        "additional_members": [
+            "Prussia",
+        ]
+    },
+    "Oceania": {},
+}
+
+# Year range for aggregates
+YEAR_AGG_MIN = 1800
+YEAR_AGG_MAX = 2018
+
 
 def run(dest_dir: str) -> None:
     #
@@ -65,6 +98,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("polity")
+    ds_regions = paths.load_dataset(short_name="regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["polity"].reset_index()
@@ -103,24 +137,44 @@ def run(dest_dir: str) -> None:
     col_flag_imputed = "values_imputed"
     tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
 
+    # Remove countries to avoid overlaps
+    # tb = tb.loc[~((tb["country"] == "USSR") & (tb["year"] == 1991))]
+
+    ##################################################
+    # AGGREGATES
+
+    # Get country-count-related data: country-averages, number of countries, ...
+    tb_num_countries, tb_avg_countries = get_country_data(tb, ds_regions)
+
+    # Get population-related data: population-weighed averages, people livin in ...
+    tb_population = get_population_data(tb)
+
     # Get region data
     # tb_regions = tb.loc[~tb[col_flag_imputed]].drop(columns=[col_flag_imputed]).copy()
 
-    # Drop is imputed flag
-    tb = tb.drop(columns=[col_flag_imputed])
+    ##################################################
+
+    # Add regions to main table
+    tb = concat([tb, tb_avg_countries], ignore_index=True)
 
     # Remove columns
-    tb = tb.drop(columns=["ccode"])
+    tb = tb.drop(columns=[col_flag_imputed, "ccode"])
 
     # Format table
     tb = tb.format(["country", "year"])
+    tb_num_countries = tb_num_countries.format(["country", "year", "category"], short_name="num_countries")
 
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_num_countries,
+    ]
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -139,6 +193,16 @@ def harmonize_country_names(tb: Table) -> Table:
     ## Fix Pakistan entity (ccode = 769 is actually 'Pakistan (former)')
     tb["country"] = tb["country"].astype("string")
     tb.loc[tb["ccode"] == 769, "country"] = "Pakistan (former)"
+
+    ## Fix Sudan: remove former country for 2011 (already have north/south sudan data that year)
+    tb = tb.loc[~((tb["ccode"] == 625) & (tb["year"] == 2011))]
+
+    ## Fix Serbia and Montenegro: remove data for Serbia@2006 (already have S&M data that year)
+    # tb = tb.loc[~((tb["ccode"] == 342) & (tb["year"] == 2006))]
+
+    ## Fix Ethiopia (former): remove that @1993 (already have ethiopia/eritrea)
+    tb = tb.loc[~((tb["ccode"] == 530) & (tb["year"] == 1993))]
+
     ## Classic harmization
     tb = geo.harmonize_countries(
         df=tb,
@@ -183,3 +247,118 @@ def add_age_and_experience(tb: Table) -> Table:
         tb[col_age] = tb[col_age].astype("string")
 
     return tb
+
+
+def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+    """Estimate number of countries in each regime, and country-average for some indicators.
+
+    Returns two tables:
+
+    1) tb_num_countres: Counts countries in different categories
+        regime_polity (counts)
+            - Number of autocracies
+            - Number of anocracies
+            - Number of democracies
+
+        group_age_dem_polity (counts)
+            - Number of democracies aged 1-18 years
+            - Number of democracies aged 19-30 years
+            - Number of democracies aged 31-60 years
+            - Number of democracies aged 61-90 years
+            - Number of democracies aged 91+ years
+
+    2) tb_avg_countries: Country-average for some indicators
+        - democracy_polity (country-average)
+        - democracy_recod_polity (country-average)
+    """
+    tb_ = tb.loc[~tb["values_imputed"]].copy()
+
+    # 1/ COUNT COUNTRIES
+    # Keep only non-imputed data
+    tb_num = tb_.copy()
+
+    # Set INTs
+    tb_num = tb_num.astype(
+        {
+            "regime_polity": "Int64",
+        }
+    )
+    tb_num = cast(Table, tb_num)
+
+    # Define columns on which we will estimate (i) "number of countries" and (ii) "number of people living in ..."
+    indicators = [
+        {
+            "name": "regime_polity",
+            "name_new": "num_regime_polity",
+            "values_expected": {"0": "autocracy", "1": "anocracy", "2": "democracy"},
+            "has_na": True,
+        },
+        {
+            "name": "group_age_dem_polity",
+            "name_new": "num_group_age_dem_polity",
+            "values_expected": {
+                "autocracy": "autocracy",
+                "anocracy": "anocracy",
+                "1-18 years": "1-18 years",
+                "19-30 years": "19-30 years",
+                "31-60 years": "31-60 years",
+                "61-90 years": "61-90 years",
+                "91+ years": "91+ years",
+            },
+            "has_na": True,
+        },
+    ]
+
+    # Column per indicator-dimension
+    tb_num = make_table_with_dummies(tb_num, indicators)
+
+    # Add regions and global aggregates
+    tb_num = add_regions_and_global_aggregates(tb_num, ds_regions, regions=REGIONS)
+    tb_num = from_wide_to_long(tb_num)
+
+    # Keep only certain year range
+    tb_num = tb_num.loc[tb_num["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
+
+    # 2/ COUNTRY-AVERAGE INDICATORS
+    tb_avg = tb_.copy()
+    indicators_avg = ["democracy_polity", "democracy_recod_polity"]
+
+    # Keep only relevant columns
+    tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
+
+    # Estimate region aggregates
+    tb_avg = add_regions_and_global_aggregates(
+        tb=tb_avg,
+        ds_regions=ds_regions,
+        aggregations={k: "mean" for k in indicators_avg},  # type: ignore
+        aggregations_world={k: np.mean for k in indicators_avg},  # type: ignore
+        regions=REGIONS,
+    )
+
+    # Keep only certain year range
+    tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
+
+    return tb_num, tb_avg
+
+
+def get_population_data(tb: Table) -> Table:
+    """Estimate people living in each regime, and population-weighted averages for some indicators.
+
+    regime_polity (people living)
+        - People living in autocracies
+        - People living in anocracies
+        - People living in democracies
+
+    group_age_dem_polity (people living)
+        - People living in democracies aged 1-18 years
+        - People living in democracies aged 19-30 years
+        - People living in democracies aged 31-60 years
+        - People living in democracies aged 61-90 years
+        - People living in democracies aged 91+ years
+
+    democracy_polity (population-weighed-average)
+
+    """
+    tb_ = tb.copy()
+
+    return tb_

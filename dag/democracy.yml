@@ -44,5 +44,7 @@ steps:
     - snapshot://democracy/2024-05-13/polity.xlsx
   data://garden/democracy/2024-03-07/polity:
     - data://meadow/democracy/2024-05-13/polity
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-13/polity:
     - data://garden/democracy/2024-03-07/polity

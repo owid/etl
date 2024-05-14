@@ -93,8 +93,8 @@
 # Serbia and Montenegro
 - country:
     - Serbia
-    - Montenegro
     - Kosovo
+    - Montenegro
   country_impute: Serbia and Montenegro
   year_min: 1991
   year_max: 2005

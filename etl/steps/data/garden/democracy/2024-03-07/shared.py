@@ -403,7 +403,11 @@ def add_age_groups(
 
 
 def add_imputes(
-    tb: Table, path: Path, cols_verify: List[str] | None = None, col_flag_imputed: str | None = None
+    tb: Table,
+    path: Path,
+    cols_verify: List[str] | None = None,
+    col_flag_imputed: str | None = None,
+    verify_integrity: bool = True,
 ) -> Table:
     """Add imputed values to the table.
 
@@ -443,7 +447,7 @@ def add_imputes(
         assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
         assert (a := tb_imp_["year"].min()) == (
             b := impute["year_min"]
-        ), f"Missing years (min check) for {impute['country_impute']}: {a} != {b}"
+        ), f"Missing years (min check) for {impute['country']} imputed from {impute['country_impute']}: {a} != {b}"
 
         # Tweak them
         # tb_ = tb_.rename(
@@ -479,5 +483,6 @@ def add_imputes(
     # tb_ = cast(Table, tb_[cols])
 
     # Verify that there are no duplicates
-    tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
+    if verify_integrity:
+        tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
     return tb_
