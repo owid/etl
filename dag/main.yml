@@ -1,7 +1,22 @@
 steps:
   #
-  #  OWID curated datasets
+  # Regions.
   #
+  data://garden/regions/2023-01-01/regions:
+  data://grapher/regions/2023-01-01/regions:
+    - data://garden/regions/2023-01-01/regions
+  # WARNING: The following step exists for backward compatibility and should eventually be removed.
+  # Consider using external/owid_grapher/latest/regions instead.
+  data://grapher/regions/latest/regions:
+    - data://garden/regions/2023-01-01/regions
+  # Create a step with regions data used by the owid-grapher repository.
+  data://external/owid_grapher/latest/regions:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+  # Create a step with a simplified countries-regions file used by the notebooks repository.
+  data://external/notebooks/latest/regions:
+    - data://grapher/regions/2023-01-01/regions
+
   # Gapminder
   data://meadow/gapminder/2019-12-10/population:
     - walden://gapminder/2019-12-10/population
@@ -188,16 +203,10 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    - data://garden/energy/2023-12-12/energy_mix
+    - data://garden/energy/2024-05-08/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Global GDP in the long run
-  data://garden/growth/2024-01-04/gdp_historical:
-    - data://grapher/worldbank_wdi/2023-05-29/wdi
-    - data://grapher/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/ggdc/2022-12-23/maddison_database
-  data://grapher/growth/2024-01-04/gdp_historical:
-    - data://garden/growth/2024-01-04/gdp_historical
+  # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
     - snapshot://ggdc/2022-12-23/maddison_database.xlsx
   data://garden/ggdc/2022-12-23/maddison_database:
@@ -222,13 +231,6 @@ steps:
     - data://meadow/technology/2023-03-06/mobile_money
   data://grapher/technology/2023-03-06/mobile_money:
     - data://garden/technology/2023-03-06/mobile_money
-
-  #
-  # Regions - Regions (2023).
-  #
-  data://garden/regions/2023-01-01/regions:
-  data://grapher/regions/latest/regions:
-    - data://garden/regions/2023-01-01/regions
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -390,12 +392,12 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-11-02/world_economic_outlook:
-    - snapshot://imf/2023-11-02/world_economic_outlook.xls
-  data://garden/imf/2023-11-02/world_economic_outlook:
-    - data://meadow/imf/2023-11-02/world_economic_outlook
-  data://grapher/imf/2023-11-02/world_economic_outlook:
-    - data://garden/imf/2023-11-02/world_economic_outlook
+  data://meadow/imf/2024-05-02/world_economic_outlook:
+    - snapshot://imf/2024-05-02/world_economic_outlook.xls
+  data://garden/imf/2024-05-02/world_economic_outlook:
+    - data://meadow/imf/2024-05-02/world_economic_outlook
+  data://grapher/imf/2024-05-02/world_economic_outlook:
+    - data://garden/imf/2024-05-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
@@ -603,6 +605,14 @@ steps:
   data://grapher/technology/2023-11-28/dna_sequencing:
     - data://garden/technology/2023-11-28/dna_sequencing
 
+  # John C. McCallum, Price and Performance Changes of Computer Technology with Time
+  data://meadow/technology/2024-05-13/computer_memory_storage:
+    - snapshot://technology/2024-05-13/computer_memory_storage.xlsx
+  data://garden/technology/2024-05-13/computer_memory_storage:
+    - data://meadow/technology/2024-05-13/computer_memory_storage
+  data://grapher/technology/2024-05-13/computer_memory_storage:
+    - data://garden/technology/2024-05-13/computer_memory_storage
+
   # European Social Survey - Trust questions
   data://meadow/ess/2023-08-02/ess_trust:
     - snapshot://ess/2023-08-02/ess_trust.csv
@@ -667,6 +677,20 @@ steps:
   data://grapher/missing_data/2024-03-26/who_md_suicides:
     - data://garden/missing_data/2024-03-26/who_md_suicides
 
+  # Maddison Project Database
+  data://meadow/ggdc/2024-04-26/maddison_project_database:
+    - snapshot://ggdc/2024-04-26/maddison_project_database.xlsx
+  data://garden/ggdc/2024-04-26/maddison_project_database:
+    - data://meadow/ggdc/2024-04-26/maddison_project_database
+  data://grapher/ggdc/2024-04-26/maddison_project_database:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+
+  # Global GDP in the long run
+  data://grapher/growth/2024-04-29/gdp_historical:
+    - data://garden/growth/2024-04-29/gdp_historical
+  data://garden/growth/2024-04-29/gdp_historical:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/ggdc/2022-12-23/maddison_database
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -697,32 +721,6 @@ steps:
     - data://meadow/wb/2024-03-11/income_groups
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
-
-  #
-  # EM-DAT Natural disasters.
-  #
-  data://meadow/emdat/2024-04-11/natural_disasters:
-    - snapshot://emdat/2024-04-11/natural_disasters.xlsx
-
-  # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2024-04-11/natural_disasters:
-    - data://meadow/emdat/2024-04-11/natural_disasters
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-03-11/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2023-05-29/wdi
-
-  # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2024-04-11/natural_disasters:
-    - data://garden/emdat/2024-04-11/natural_disasters
-
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2024-04-11/natural_disasters_global_by_type:
-    - data://garden/emdat/2024-04-11/natural_disasters
-
-  # Natural disasters explorer.
-  data://explorers/emdat/latest/natural_disasters:
-    - data://garden/emdat/2024-04-11/natural_disasters
 
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
@@ -760,3 +758,5 @@ include:
   - dag/democracy.yml
   - dag/temp.yml
   - dag/survey.yml
+  - dag/forests.yml
+  - dag/natural_disasters.yml

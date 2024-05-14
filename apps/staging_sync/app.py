@@ -6,6 +6,7 @@ from st_pages import add_indentation
 
 from apps.utils import run_command
 from apps.wizard import utils as wizard_utils
+from etl import config
 
 wizard_utils.enable_bugsnag_for_streamlit()
 
@@ -48,9 +49,6 @@ def main():
         help="Branch name of PR that created the staging server (with existing `staging-site-mybranch` server) or the name of staging server.",
     )
     target = st.text_input("Target", value="live", help="Using `live` uses DB from local `.env` file as target.")
-    publish = st.checkbox(
-        "Automatically publish new charts", value=False, help="Otherwise you'd have to publish new charts manually."
-    )
     approve_revisions = st.checkbox(
         "Automatically approve chart revisions for edited charts",
         value=False,
@@ -60,18 +58,23 @@ def main():
 
     # Live uses `.env` file which points to the live database in production
     if target == "live":
-        target = ".env"
+        target_env = ".env"
+    else:
+        target_env = target
 
     # Button to show text
     if st.button("Sync charts", help="This can take a while."):
-        if not _is_valid_config(source, target):
+        if target == "live":
+            assert (
+                config.DB_IS_PRODUCTION
+            ), "If target = live, then chart-sync must be run in production with .env pointing to live DB."
+
+        if not _is_valid_config(source, target_env):
             return
 
-        cmd = ["poetry", "run", "etl", "chart-sync", source, target]
+        cmd = ["poetry", "run", "etl", "chart-sync", source, target_env]
         if dry_run:
             cmd.append("--dry-run")
-        if publish:
-            cmd.append("--publish")
         if approve_revisions:
             cmd.append("--approve-revisions")
 

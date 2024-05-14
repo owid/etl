@@ -35,6 +35,12 @@ main:
       maintainer: "@lucas"
       entrypoint: pages/expert/app.py
       emoji: "🧙"
+  oracle:
+      title: "OWID Datasette Oracle"
+      description: "Get help writing SQL queries for datasette!"
+      maintainer: "@daniel"
+      entrypoint: pages/owid_datasette_oracle.py
+      emoji: "🔮"
 
 # ETL steps
 etl:
@@ -45,10 +51,16 @@ etl:
       title: "Snapshot"
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
-      image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
+      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
       disable:
         "production": True
-        "staging": True
+    express:
+      title: "Express"
+      entrypoint: etl_steps/express.py
+      emoji: "️🐆"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+      disable:
+        "production": True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py
@@ -56,7 +68,6 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
       disable:
         "production": True
-        "staging": True
     garden:
       title: "Garden"
       entrypoint: etl_steps/garden.py
@@ -64,7 +75,6 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
       disable:
         "production": True
-        "staging": True
     grapher:
       title: "Grapher"
       entrypoint: etl_steps/grapher.py
@@ -72,7 +82,6 @@ etl:
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
       disable:
         "production": True
-        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -92,13 +101,15 @@ sections:
         maintainer: "@lucas"
         emoji: "🌟"
         image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync (deprecated)"
+      - title: "Chart Sync"
         alias: staging_sync
         entrypoint: ../staging_sync/app.py
         description: Sync charts between servers
         maintainer: "@mojmir"
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+        disable:
+          "staging": True
 
   - title: "Data tools"
     description: |-
@@ -135,7 +146,7 @@ sections:
 
   - title: "Charts v2"
     description: |-
-      Create chart revisions, and synchronize aproved revisions between servers.
+      THIS SECTION IS IN DEVELOPMENT! Create chart revisions, and synchronize aproved revisions between servers.
     apps:
     - title: "Indicator Upgrader"
       alias: indicator-upgrade

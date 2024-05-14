@@ -7,7 +7,9 @@ paths = PathFinder(__file__)
 
 def create_wide_tables(table: Table, is_decade: bool) -> Table:
     # Create wide tables.
-    table_wide = table.reset_index().pivot(index=["country", "year"], columns="type", join_column_levels_with="-")
+    table_wide = table.reset_index()
+
+    table_wide = table_wide.pivot(index=["country", "year"], columns="type", join_column_levels_with="-")
 
     if is_decade:
         variable_name_suffix = "_decadal"

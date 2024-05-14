@@ -3,26 +3,24 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session
 from st_pages import add_indentation
+from structlog import get_logger
 
 from apps.staging_sync.cli import _get_engine_for_env, _modified_chart_ids_by_admin, _validate_env
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
 from apps.wizard.utils import chart_html, set_states
 from apps.wizard.utils.env import OWID_ENV
-from etl import grapher_model as gm
-from etl.config import DB_HOST
+from etl import config
+
+log = get_logger()
 
 # from apps.wizard import utils as wizard_utils
 
 # wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-# TODO: unhardcode this
-SOURCE_ENV = DB_HOST  # "staging-site-streamlit-chart-approval"
-# TODO: switch to production once we are ready
-TARGET_ENV = "staging-site-master"
 
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 
@@ -38,6 +36,25 @@ st.set_page_config(
 )
 add_indentation()
 st.session_state.hide_approved_charts = st.session_state.get("hide_approved_charts", False)
+
+
+########################################
+# LOAD ENVS
+########################################
+# TODO: simplify this
+SOURCE_ENV = config.DB_HOST  # "staging-site-streamlit-chart-approval"
+SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
+
+if config.DB_IS_PRODUCTION:
+    TARGET_ENV = config.ENV_FILE
+    TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
+else:
+    warning_msg = "ENV file doesn't connect to production DB, comparing against staging-site-master"
+    log.warning(warning_msg)
+    st.warning(warning_msg)
+    TARGET_ENV = "staging-site-master"
+    TARGET_API = f"https://api-staging.owid.io/{TARGET_ENV}/v1/indicators/"
+
 
 ########################################
 # FUNCTIONS
@@ -69,7 +86,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
     # Define action for Toggle on change
     def tgl_on_change(diff, session) -> None:
         with st.spinner():
-            diff.update_state(session=session)
+            diff.switch_state(session=session)
 
     # Define action for Refresh on click
     def refresh_on_click(source_session=source_session, target_session=None):
@@ -125,7 +142,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
                 compare_charts(**kwargs_diff)
             with tab2:
                 assert diff.target_chart is not None
-                st_show_diff(diff.source_chart.config, diff.target_chart.config)
+                st_show_diff(diff.target_chart.config, diff.source_chart.config)
         elif diff.is_new:
             compare_charts(**kwargs_diff)
 
@@ -150,7 +167,7 @@ def compare_charts(
     # Only one chart: new chart
     if target_chart is None:
         st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-        chart_html(source_chart.config, base_url=SOURCE_ENV)
+        chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
     # Two charts, actual diff
     else:
         # Create two columns for the iframes
@@ -160,10 +177,10 @@ def compare_charts(
         if not prod_is_newer:
             with col1:
                 st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
-                chart_html(target_chart.config, base_url=TARGET_ENV)
+                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
             with col2:
                 st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
-                chart_html(source_chart.config, base_url=SOURCE_ENV)
+                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
         # Conflict with live
         else:
             with col1:
@@ -171,10 +188,10 @@ def compare_charts(
                     f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
                     help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
                 )
-                chart_html(target_chart.config, base_url=TARGET_ENV)
+                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
             with col2:
                 st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-                chart_html(source_chart.config, base_url=SOURCE_ENV)
+                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
 
 
 @st.cache_resource
@@ -250,9 +267,6 @@ def main():
                 }
             ),
         )
-    # TODO: this should be created via migration in owid-grapher!!!!!
-    # Create chart_diff_approvals table if it doesn't exist
-    SQLModel.metadata.create_all(source_engine, [gm.ChartDiffApprovals.__table__])  # type: ignore
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:

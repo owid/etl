@@ -1,0 +1,13 @@
+dataset:
+  title: Cumulative lives saved from vaccinations since 1974 (Shattock et al. 2024)
+  description: The cumulative number of lives saved thanks to vaccinations, from 1974 onwards.
+  licenses:
+    - {}
+tables:
+  cumulative_lives_saved_vaccination_shattock:
+    variables:
+      cumulative_deaths_averted_vaccination:
+        title: Lives saved
+        unit: lives
+        description: The cumulative number of lives saved as a results of key vaccinations against fatal diseases, from 1974
+          to 2024.

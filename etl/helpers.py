@@ -499,7 +499,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
@@ -663,12 +663,15 @@ class PathFinder:
         return deps[0].replace("etag://", "https://")
 
 
-def print_tables_metadata_template(tables: List[Table]):
+def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.
     # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
     # AI-generated texts when possible.
+
+    if fields is None:
+        fields = ["title", "unit", "short_unit", "description_short"]
 
     # Initialize output dictionary.
     dict_tables = {}
@@ -676,7 +679,7 @@ def print_tables_metadata_template(tables: List[Table]):
         dict_variables = {}
         for column in tb.columns:
             dict_values = {}
-            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
+            for field in fields:
                 value = getattr(tb[column].metadata, field) or ""
 
                 # Add some simple rules to simplify some common cases.
