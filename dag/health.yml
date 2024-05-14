@@ -569,12 +569,16 @@ steps:
     - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
   data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
     - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
-    # Schistosomiasis
+  data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+
+  # Schistosomiasis
   data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
   data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
-
+  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
     # Soil-transmitted helminthiases
   data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
@@ -582,5 +586,3 @@ steps:
     - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
   data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
-  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
-    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis

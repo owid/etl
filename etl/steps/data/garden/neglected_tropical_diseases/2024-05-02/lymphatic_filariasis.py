@@ -22,9 +22,13 @@ def run(dest_dir: str) -> None:
     # Process data.
     # There are separate rows for each combination of drugs used, but this is duplicate for `national_coverage__pct`, so we will extract this column and create a separate table for it
 
+    # In many cases the are two identical values for 'national_coverage__pct', for each country year, this de-duplicates them
     tb_nat = tb[["country", "year", "national_coverage__pct"]].copy().drop_duplicates()
+    # There are a few cases with two values for some country-year combos, here we drop them because we are not sure which is the correct value
+    tb_nat = tb_nat.drop_duplicates(subset=["country", "year"])
+    tb_nat.metadata.short_name = "lymphatic_filariasis_national"
     # Drop `national_coverage_pct` from tb
-    tb = tb.drop(columns=["national_coverage__pct"])
+    tb = tb.drop(columns=["national_coverage__pct", "region", "country_code", "mapping_status"])
     # Format the tables
     tb = tb.format(["country", "year", "type_of_mda"])
     tb_nat = tb_nat.format(["country", "year"])
