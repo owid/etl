@@ -1,0 +1,41 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Technological Change
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  computer_memory_storage:
+    variables:
+      ddrives:
+        title: Historical price of disk drives
+        unit: "current US$ per terabyte"
+        short_unit: "$/TB"
+        description_from_producer: "In general, these are the lowest priced disk drives for which I found prices at the time. The floppy drives are not the lowest price per capacity. Floppies are included because they set a low unit price, making disk drives accessible to the masses."
+        display:
+          numDecimalPlaces: 0
+      flash:
+        title: Historical price of flash memory
+        unit: "current US$ per terabyte"
+        short_unit: "$/TB"
+        description_from_producer: "Flash memory provides a solid state alternative to disk drives, although at a greater cost per megabyte. In general, these are the lowest priced USB flash memory devices I could find. I have stopped recording separate flash prices, since SSDs are now the best source of flash memory prices."
+        display:
+          numDecimalPlaces: 0
+      memory:
+        title: Historical price of memory
+        unit: "current US$ per terabyte"
+        short_unit: "$/TB"
+        display:
+          numDecimalPlaces: 0
+      ssd:
+        title: Historical price of solid-state drives
+        unit: "current US$ per terabyte"
+        short_unit: "$/TB"
+        description_from_producer: "Flash memory provides a solid state alternative to disk drives, although at a greater cost per megabyte. In general, these are the lowest priced USB flash memory devices I could find. I have stopped recording separate flash prices, since SSDs are now the best source of flash memory prices."
+        display:
+          numDecimalPlaces: 0

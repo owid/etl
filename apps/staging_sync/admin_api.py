@@ -25,7 +25,7 @@ class AdminAPI(object):
             session.commit()
 
         if engine.url.database == "live_grapher" and "prod-db" in str(engine.url.host):
-            self.base_url = "https://owid.cloud"
+            self.base_url = "http://owid-admin-prod"
         else:
             self.base_url = f"http://{engine.url.host}"
 

@@ -118,7 +118,7 @@ def get_schema() -> Dict[str, Any]:
             return schema
 
 
-@st.cache_data
+@st.cache_data(max_entries=1, ttl=60 * 10)
 def get_indicators_from_datasets(
     dataset_id_1: int, dataset_id_2: int, show_new_not_in_old: int = False
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:

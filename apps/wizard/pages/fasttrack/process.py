@@ -2,14 +2,13 @@
 
 Relies on Streamlit.
 """
-import datetime as dt
 import json
 from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import streamlit as st
-from owid.catalog import Dataset, Source, Table, VariableMeta
+from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore, validate_underscore
 
 from apps.wizard.pages.fasttrack.fast_import import FasttrackImport
