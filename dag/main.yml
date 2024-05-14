@@ -758,4 +758,5 @@ include:
   - dag/democracy.yml
   - dag/temp.yml
   - dag/survey.yml
+  - dag/forests.yml
   - dag/natural_disasters.yml
