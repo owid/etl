@@ -48,6 +48,7 @@ def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_
         tb = tb.reset_index()
         # Add global and regional totals
         tb = geo.add_regions_to_table(tb =tb, regions = REGIONS,ds_regions= ds_regions, min_num_values_per_year=1)
+        tb = tb.set_index(['country', 'year'], verify_integrity = True)
         tables_dict[indicator_name] = tb
 
 
