@@ -33,7 +33,7 @@ class AdminAPI(object):
         resp.raise_for_status()
         try:
             js = resp.json()
-        except json.JSONDecodeError as e:
+        except (json.JSONDecodeError, requests.exceptions.JSONDecodeError) as e:
             raise AdminAPIError(resp.text) from e
         return js
 
