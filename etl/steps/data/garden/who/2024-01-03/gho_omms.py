@@ -24,7 +24,7 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
 
     add_both_sexes_for_pneumonia(tables_dict)
 
-    add_trachoma_and_onchocerciasis_aggregate(tables_dict)
+    add_trachoma_and_onchocerciasis_aggregate(tables_dict, ds_regions)
     # df_variables = add_youth_mortality_rates(
     #    df_variables=df_variables,
     #    younger_ind="Indicator:Under-five mortality rate (per 1000 live births) (SDG 3.2.1) - Sex:Both sexes",
