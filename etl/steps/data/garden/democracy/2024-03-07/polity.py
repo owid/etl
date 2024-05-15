@@ -40,6 +40,7 @@ LABELS
     5 "competitive"
 """
 
+import ast
 from typing import Tuple, cast
 
 import numpy as np
@@ -50,7 +51,9 @@ from shared import (
     add_age_groups,
     add_count_years_in_regime,
     add_imputes,
+    add_population_in_dummies,
     add_regions_and_global_aggregates,
+    expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
 )
@@ -99,6 +102,7 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("polity")
     ds_regions = paths.load_dataset(short_name="regions")
+    ds_population = paths.load_dataset(short_name="population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["polity"].reset_index()
@@ -147,7 +151,7 @@ def run(dest_dir: str) -> None:
     tb_num_countries, tb_avg_countries = get_country_data(tb, ds_regions)
 
     # Get population-related data: population-weighed averages, people livin in ...
-    tb_population = get_population_data(tb)
+    tb_num_people, tb_avg_w_countries = get_population_data(tb, ds_regions, ds_population)
 
     # Get region data
     # tb_regions = tb.loc[~tb[col_flag_imputed]].drop(columns=[col_flag_imputed]).copy()
@@ -163,6 +167,8 @@ def run(dest_dir: str) -> None:
     # Format table
     tb = tb.format(["country", "year"])
     tb_num_countries = tb_num_countries.format(["country", "year", "category"], short_name="num_countries")
+    tb_num_people = tb_num_people.format(["country", "year", "category"], short_name="num_people")
+    tb_avg_w_countries = tb_avg_w_countries.format(["country", "year"], short_name="avg_pop")
 
     #
     # Save outputs.
@@ -170,6 +176,8 @@ def run(dest_dir: str) -> None:
     tables = [
         tb,
         tb_num_countries,
+        tb_num_people,
+        tb_avg_w_countries,
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -290,7 +298,11 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
         {
             "name": "regime_polity",
             "name_new": "num_regime_polity",
-            "values_expected": {"0": "autocracy", "1": "anocracy", "2": "democracy"},
+            "values_expected": {
+                "0": "autocracy",
+                "1": "anocracy",
+                "2": "democracy",
+            },
             "has_na": True,
         },
         {
@@ -341,7 +353,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     return tb_num, tb_avg
 
 
-def get_population_data(tb: Table) -> Table:
+def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
     """Estimate people living in each regime, and population-weighted averages for some indicators.
 
     regime_polity (people living)
@@ -359,6 +371,171 @@ def get_population_data(tb: Table) -> Table:
     democracy_polity (population-weighed-average)
 
     """
-    tb_ = tb.copy()
+    tb_ = tb.loc[~tb["values_imputed"]].copy()
 
-    return tb_
+    # 1/ COUNT PEOPLE
+    # Keep only non-imputed data
+    tb_ppl = tb_.copy()
+
+    # Set INTs
+    tb_ppl = tb_ppl.astype(
+        {
+            "regime_polity": "Int64",
+        }
+    )
+    tb_ppl = cast(Table, tb_ppl)
+
+    indicators = [
+        {
+            "name": "regime_polity",
+            "name_new": "pop_regime_polity",
+            "values_expected": {
+                "0": "autocracy",
+                "1": "anocracy",
+                "2": "democracy",
+            },
+            "has_na": True,
+        },
+        {
+            "name": "group_age_dem_polity",
+            "name_new": "pop_group_age_dem_polity",
+            "values_expected": {
+                "autocracy": "autocracy",
+                "anocracy": "anocracy",
+                "1-18 years": "1-18 years",
+                "19-30 years": "19-30 years",
+                "31-60 years": "31-60 years",
+                "61-90 years": "61-90 years",
+                "91+ years": "91+ years",
+            },
+            "has_na": True,
+        },
+    ]
+
+    ## Get missing years (not to miss anyone!) -- Note that this can lead to country overlaps (e.g. USSR and Latvia)
+    tb_ppl = expand_observations_without_duplicates(tb_ppl)
+    print(f"{tb_.shape} -> {tb_ppl.shape}")
+
+    # Column per indicator-dimension
+    tb_ppl = make_table_with_dummies(tb_ppl, indicators)
+
+    # Replace USSR -> current states
+    tb_ppl = replace_ussr(tb_ppl, ds_regions)
+
+    ## Counts
+    tb_ppl = add_population_in_dummies(tb_ppl, ds_population)
+    tb_ppl = add_regions_and_global_aggregates(tb_ppl, ds_regions, regions=REGIONS)
+    tb_ppl = from_wide_to_long(tb_ppl)
+
+    # 2/ COUNTRY-AVERAGE INDICATORS
+    tb_avg = tb_.copy()
+    indicators_avg = ["democracy_polity"]
+
+    # Keep only relevant columns
+    tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
+
+    # Add population in dummies (population value replaces 1, 0 otherwise)
+    tb_avg = add_population_in_dummies(
+        tb_avg,
+        ds_population,
+        drop_population=False,
+    )
+
+    # Get region aggregates
+    tb_avg = add_regions_and_global_aggregates(
+        tb=tb_avg,
+        ds_regions=ds_regions,
+        aggregations={k: "sum" for k in indicators_avg} | {"population": "sum"},  # type: ignore
+        min_num_values_per_year=1,
+    )
+
+    # Normalize by region's population
+    columns_index = ["year", "country"]
+    columns_indicators = [col for col in tb_avg.columns if col not in columns_index + ["population"]]
+    tb_avg[columns_indicators] = tb_avg[columns_indicators].div(tb_avg["population"], axis=0)
+    tb_avg = tb_avg.drop(columns="population")
+
+    # Keep only certain year range
+    tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
+
+    return tb_ppl, tb_avg
+
+
+def expand_observations_without_duplicates(tb: Table) -> Table:
+    # Full expansion
+    tb_exp = expand_observations(tb)
+
+    # Limit years
+    tb_exp = tb_exp[tb_exp["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
+
+    # Limit entries to avoid duplicates
+    tb_exp = tb_exp.loc[
+        ~(
+            # YUGOSLAVIA
+            ((tb_exp["country"] == "Yugoslavia") & ((tb_exp["year"] > 1991) | (tb_exp["year"] < 1921)))
+            | ((tb_exp["country"] == "Slovenia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "North Macedonia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "Croatia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "Serbia and Montenegro") & ((tb_exp["year"] > 2005) | (tb_exp["year"] <= 1990)))
+            ## YUG 2
+            | ((tb_exp["country"] == "Bosnia and Herzegovina") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1991)))
+            | ((tb_exp["country"] == "Serbia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2005)))
+            | ((tb_exp["country"] == "Montenegro") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2005)))
+            | ((tb_exp["country"] == "Kosovo") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2007)))
+            # YEMEN
+            | ((tb_exp["country"] == "Yemen Arab Republic") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1940)))
+            | ((tb_exp["country"] == "Yemen People's Republic") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1940)))
+            | ((tb_exp["country"] == "Yemen") & ((tb_exp["year"] >= 1940) & (tb_exp["year"] <= 1989)))
+            # GERMANY
+            | ((tb_exp["country"] == "West Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1949)))
+            | ((tb_exp["country"] == "East Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1949)))
+            | ((tb_exp["country"] == "Germany") & (tb_exp["year"] >= 1949) & (tb_exp["year"] <= 1989))
+            # USSR
+            | ((tb_exp["country"] == "USSR") & ((tb_exp["year"] > 1991) | (tb_exp["year"] < 1941)))
+            | ((tb_exp["country"] == "Uzbekistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Kazakhstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Turkmenistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Kyrgyzstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Tajikistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Russia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Ukraine") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Belarus") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Moldova") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Latvia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Lithuania") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Estonia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Armenia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Georgia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            | ((tb_exp["country"] == "Azerbaijan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
+            # CZECHOSLOVAKIA
+            | ((tb_exp["country"] == "Czechoslovakia") & ((tb_exp["year"] > 1992) | (tb_exp["year"] < 1918)))
+            | ((tb_exp["country"] == "Czechia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
+            | ((tb_exp["country"] == "Slovakia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
+        ),
+    ]
+
+    return tb_exp
+
+
+def replace_ussr(tb: Table, ds_regions: Dataset) -> Table:
+    tb_regions = ds_regions["regions"]
+    codes = tb_regions.loc["OWID_USS", "successors"]
+    successors = set(tb_regions.loc[ast.literal_eval(codes), "name"])
+
+    # Create new rows
+    tb_succ = []
+    for successor in successors:
+        # Copy USSR data
+        tb_ = tb.loc[(tb["country"] == "USSR")].copy()
+        # Replace country name
+        tb_["country"] = successor
+        # Append
+        tb_succ.append(tb_)
+    tb_succ = concat(tb_succ, ignore_index=True)
+
+    # Concatenate tables
+    tb = concat([tb, tb_succ], ignore_index=True).sort_values(["country", "year"])
+
+    # Remove USSR
+    tb = tb.loc[~(tb["country"] == "USSR")]
+    return tb

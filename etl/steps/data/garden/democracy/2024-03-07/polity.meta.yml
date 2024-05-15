@@ -253,3 +253,48 @@ tables:
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups)
           <% endif %>
         unit: "countries"
+
+
+  num_people:
+    variables:
+      pop_regime_polity:
+        title: |-
+          <% if category == '-1' %>
+          Number of people living in countries with unknown regime
+          <% else %>
+          Number of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
+          <% endif %>
+        unit: "people"
+      pop_group_age_dem_polity:
+        title: |-
+          <% if 'years' in category %>
+          Number of of people living in electoral democracies aged << category >>
+          <% elif category == '-1' %>
+          Number of of people living in countries with unknown regime (age groups)
+          <% else %>
+          Number of of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups)
+          <% endif %>
+        unit: "people"
+
+  avg_pop:
+    variables:
+      democracy_polity:
+        title: Democracy
+        unit: ""
+        description_short: |-
+          It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive.
+
+          It ranges from -10 to 10 (fully democratic).
+        description_processing: |-
+          Values for continents have been obtained by averaging the values of the countries in the continent weighed by each country's population.
+        description_from_producer: |-
+          Indicator name: `polity2`
+
+          Revised Combined Polity Score: This variable is a modified version of the POLITY variable added in order to facilitate the use of the POLITY regime measure in time-series analyses. It modifies the combined annual POLITY score by applying a simple treatment, or ““fix,” to convert instances of “standardized authority scores” (i.e., -66, -77, and -88) to conventional polity scores (i.e., within the range, -10 to +10). The values have been converted according to the following rule set:
+
+          -66: Cases of foreign “interruption” are treated as “system missing.”
+          -77 Cases of “interregnum,” or anarchy, are converted to a “neutral” Polity score of “0.”
+          -88 Cases of “transition” are prorated across the span of the transition. For example, country X has a POLITY score of -7 in 1957, followed by three years of -88 and, finally, a score of +5 in 1961. The change (+12) would be prorated over the intervening three years at a rate of per year, so that the converted scores would be as follows: 1957 -7; 1958 -4; 1959 -1; 1960 +2; and 1961 +5.
+
+          Note: Ongoing (-88) transitions in the most recent year (2018) are converted to “system missing” values. Transitions (-88) following a year of independence, interruption (-66), or interregnum (-77) are prorated from the value “0.”
+
