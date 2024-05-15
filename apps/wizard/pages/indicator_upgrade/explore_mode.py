@@ -60,24 +60,28 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     score = get_similarity_score(df_indicators, indicator_old, indicator_new)
 
     # TODO: maybe structure the information in tabs?
-    # tab1, tab2, tab3 = st.tabs(["Summary", "Changes in datapoints", "Error distribution"])
+    tab1, tab2 = st.tabs(["Summary", "Error distribution"])
 
-    # 3/ Show score
-    st_show_score(score)
+    with tab1:
+        # 3/ Show score
+        st_show_score(score)
 
-    # 4/ other info (% of rows changed, number of rows changed)
-    st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
+        # 4/ other info (% of rows changed, number of rows changed)
+        st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
 
-    # Rename, remove equal datapoints
-    df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
-    df_indicators = df_indicators.rename(columns=var_id_to_display)
+        # Rename, remove equal datapoints
+        df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
+        df_indicators = df_indicators.rename(columns=var_id_to_display)
 
-    # 5/ Show dataframe with different rows
-    st.header("Changes in data points")
-    st_show_dataframe(df_indicators)
+        # 5/ Show dataframe with different rows
+        st.header("Changes in data points")
+        st_show_dataframe(
+            df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
+        )
 
-    # 6/ Show distribution of change
-    st_show_plot(df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new])
+    with tab2:
+        # 6/ Show distribution of change
+        st_show_plot(df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new])
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -276,14 +280,29 @@ def st_show_details(df, indicator_old, indicator_new, is_numeric):
     nrows_1 = (df[(indicator_old)] != df[indicator_new]).sum()
     nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
     text.append(f"**{nrows_change_relative} %** of the rows changed ({nrows_1} out of {nrows_0})")
+
+    # Changes in detail
+    text_changes = []
+
+    # Number of changes in datapoints
+    num_changes = len(df[df[(indicator_old)] != df[indicator_new]].dropna(subset=[indicator_old, indicator_new]))
+    text_changes.append(f"**{num_changes}** changes in datapoint values")
+    # Number of NAs is old indicator = new datapoints
+    num_nan_old = df[indicator_old].isna().sum()
+    if num_nan_old > 0:
+        text_changes.append(f"**{num_nan_old}** new datapoints")
     # Number of NAs is new indicator
     num_nan_new = df[indicator_new].isna().sum()
-    text.append(f"**{num_nan_new}** NAs in new indicator")
+    if num_nan_new > 0:
+        text_changes.append(f"**{num_nan_new}** NAs in new indicator")
 
-    st.info("## Sumary\n- " + "\n- ".join(text))
+    text_changes = "\n\t- " + "\n\t- ".join(text_changes)
+
+    text = "## Sumary\n- " + "\n- ".join(text) + text_changes
+    st.info(text)
 
 
-def st_show_dataframe(df: pd.DataFrame) -> None:
+def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
     """Show dataframe accounting for cell limit and good sorting."""
     df_show = df.copy()
 
@@ -299,59 +318,60 @@ def st_show_dataframe(df: pd.DataFrame) -> None:
     if COLUMN_ABS_RELATIVE_ERROR in df_show.columns:
         df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
 
-    # Show
-    st.dataframe(df_show)
+    # Change column names
+    df_show = df_show.rename(columns={col_old: "OLD", col_new: "NEW"})
+
+    # Get types of tables
+    df_changes = df_show.dropna(subset=["OLD", "NEW"])
+    # Get new datapoints
+    df_new = df_show.loc[df_show["OLD"].isna(), COLUMNS_INDEX + ["NEW"]]
+    # Get missing datapoints
+    df_missing = df_show.loc[df_show["NEW"].isna(), COLUMNS_INDEX + ["OLD"]]
+
+    tab_names = []
+    if len(df_changes) > 0:
+        tab_names.append(f"**{len(df_changes)}** Datapoint changes")
+    if len(df_new) > 0:
+        tab_names.append(f"**{len(df_new)}** New datapoints")
+    if len(df_missing) > 0:
+        tab_names.append(f"**{len(df_missing)}** Missing datapoints")
+
+    tabs = st.tabs(tab_names)
+
+    for tab, tab_name in zip(tabs, tab_names):
+        with tab:
+            if "Datapoint changes" in tab_name:
+                st.dataframe(df_changes)
+            elif "New datapoints" in tab_name:
+                st.dataframe(df_new)
+            elif "Missing datapoints" in tab_name:
+                st.dataframe(df_missing)
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str) -> None:
     if not ((COLUMN_RELATIVE_ERROR in df.columns) or (COLUMN_LOG_ERROR in df.columns)):
+        # TODO: Show as a sankey diagram where the flow from old to new categories is shown.
         # Reshape
-        st.write(df[col_old].unique())
         df_cat = df.melt(id_vars=COLUMNS_INDEX, value_vars=[col_old, col_new], var_name="indicator", value_name="value")
         counts = df_cat.groupby(["indicator", "value"]).size().reset_index(name="count")
         pivot_df = counts.pivot(index="value", columns="indicator", values="count").fillna(0).reset_index()
-        # st.dataframe(pivot_df)
+
+        # avg column to sort by
         pivot_df["avg"] = pivot_df[[col for col in pivot_df.columns if col != "value"]].mean(axis=1)
-        # pivot_df["avg"] = (df[col_old].astype(float).fillna(0) + df[col_new].astype(float).fillna(0)) / 2
         pivot_df = pivot_df.sort_values("avg", ascending=False).drop(columns="avg")
-        pivot_df.columns = ["value"] + [f"count_{col}" for col in pivot_df.columns if col != "value"]
-        # st.write(df_cat)
-        # x = df_cat.groupby(["indicator"])["value"].value_counts()
-        st.write(pivot_df)
-        # df_cat["value"] = df_cat["value"].astype("string").fillna("NaN")
-        # categories = list(set(df_cat["value"]))
-        # categories_map = {cat: i for i, cat in enumerate(categories)}
-        # df_cat["value"] = df_cat["value"].map(categories_map)
 
-        # st.dataframe(df_cat.value.unique())
-        # fig = px.histogram(
-        #     df_cat,
-        #     x="value",
-        #     color="indicator",
-        #     # barmode="overlay",
-        #     barmode="group",
-        #     # nbins=100,
-        #     title="Distribution of relative error",
-        #     text_auto=True,
-        #     color_discrete_map={
-        #         col_old: "blue",
-        #         col_new: "red",
-        #     },
-        #     category_orders={"value": categories},
-        #     opacity=0.7,
-        # )
+        # change column names
+        pivot_df = pivot_df.rename(
+            columns={
+                col_old: "OLD",
+                col_new: "NEW",
+            }
+        )
 
-        # # Update layout to modify the x-axis labels
-        # custom_labels = {k: v for k, v in categories_map.items()}
-        # st.write(custom_labels)
-        # st.plotly_chart(fig, use_container_width=True)
-        # # Apply custom tick labels to x-axis
-        # fig.update_layout(
-        #     xaxis=dict(tickmode="array", tickvals=list(custom_labels.keys()), ticktext=list(custom_labels.values()))
-        # )
-
-        # st.plotly_chart(fig, use_container_width=True)
+        # Show
+        st.dataframe(pivot_df)
     else:
+        st.header("Charts")
         if COLUMN_RELATIVE_ERROR in df.columns:
             fig = px.histogram(df, x=COLUMN_RELATIVE_ERROR, nbins=100, title="Distribution of relative error")
             st.plotly_chart(fig, use_container_width=True)

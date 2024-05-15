@@ -279,7 +279,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
                 "Map indicators from the old to the new dataset. The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
             )
             # Column proportions per row (out of 1)
-            cols = [10, 43, 43, 4.5, 4.5] if search_form.enable_explore_mode else [10, 45, 45, 5]
+            cols = [10, 43, 43, 7, 4.5] if search_form.enable_explore_mode else [10, 45, 45, 5]
 
             #################################
             # 2.2/ Header: Titles, links, general checkboxes
