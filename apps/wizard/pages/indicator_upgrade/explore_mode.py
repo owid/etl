@@ -2,7 +2,7 @@
 
 This is currently shown in the indicator upgrader, but might be moved to chart-diff in the future.
 """
-from typing import Dict, Tuple, cast
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -59,29 +59,34 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     # 2/ Get similarity score
     score = get_similarity_score(df_indicators, indicator_old, indicator_new)
 
-    # TODO: maybe structure the information in tabs?
-    tab1, tab2 = st.tabs(["Summary", "Error distribution"])
+    num_changes = (df_indicators[(indicator_old)] != df_indicators[indicator_new]).sum()
+    if num_changes == 0:
+        st.success("No changes in the data points!")
+    else:
+        tab1, tab2 = st.tabs(["Summary", "Error distribution"])
 
-    with tab1:
-        # 3/ Show score
-        st_show_score(score)
+        with tab1:
+            # 3/ Show score
+            st_show_score(score)
 
-        # 4/ other info (% of rows changed, number of rows changed)
-        st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
+            # 4/ other info (% of rows changed, number of rows changed)
+            st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
 
-        # Rename, remove equal datapoints
-        df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
-        df_indicators = df_indicators.rename(columns=var_id_to_display)
+            # Rename, remove equal datapoints
+            df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
+            df_indicators = df_indicators.rename(columns=var_id_to_display)
 
-        # 5/ Show dataframe with different rows
-        st.header("Changes in data points")
-        st_show_dataframe(
-            df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
-        )
+            # 5/ Show dataframe with different rows
+            st.header("Changes in data points")
+            st_show_dataframe(
+                df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
+            )
 
-    with tab2:
-        # 6/ Show distribution of change
-        st_show_plot(df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new])
+        with tab2:
+            # 6/ Show distribution of change
+            st_show_plot(
+                df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
+            )
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -336,16 +341,17 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
     if len(df_missing) > 0:
         tab_names.append(f"**{len(df_missing)}** Missing datapoints")
 
-    tabs = st.tabs(tab_names)
+    if tab_names:
+        tabs = st.tabs(tab_names)
 
-    for tab, tab_name in zip(tabs, tab_names):
-        with tab:
-            if "Datapoint changes" in tab_name:
-                st.dataframe(df_changes)
-            elif "New datapoints" in tab_name:
-                st.dataframe(df_new)
-            elif "Missing datapoints" in tab_name:
-                st.dataframe(df_missing)
+        for tab, tab_name in zip(tabs, tab_names):
+            with tab:
+                if "Datapoint changes" in tab_name:
+                    st.dataframe(df_changes)
+                elif "New datapoints" in tab_name:
+                    st.dataframe(df_new)
+                elif "Missing datapoints" in tab_name:
+                    st.dataframe(df_missing)
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str) -> None:
