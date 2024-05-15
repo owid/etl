@@ -43,7 +43,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-      population_requiring_pc_for_sth:
+      population_requiring_pc_for_sth__pre_sac:
         title: Population of pre-school age children requiring preventive chemotherapy
         description_short: "Population of pre-school age children requiring preventive chemotherapy for soil transmitted helminthiases."
         unit: "pre-school age children"
@@ -79,7 +79,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-      population_requiring_pc_for_sth:
+      population_requiring_pc_for_sth__sac:
         title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
         unit: "school age children"
         description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
