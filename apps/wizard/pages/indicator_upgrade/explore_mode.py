@@ -21,7 +21,6 @@ COLUMN_ABS_LOG_ERROR = "(abs) Log error [abs(log(x - y))]"  # (this one only if 
 COLUMNS_INDEX = ["entityName", "year"]
 
 
-@st.cache_data(show_spinner=False)
 @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
 def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_display) -> None:
     """Same as st_explore_indicator but framed in a dialog.
@@ -31,6 +30,7 @@ def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_disp
     st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display)
 
 
+@st.cache_data(show_spinner=False)
 def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) -> None:
     """Compare `indicator_old` and `indicator_new`.
 
