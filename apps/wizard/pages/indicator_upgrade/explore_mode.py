@@ -325,7 +325,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
         df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
 
     # Change column names
-    df_show = cast(pd.Dataframe, df_show)
+    df_show = cast(pd.DataFrame, df_show)
     df_show = df_show.rename(columns={col_old: "OLD", col_new: "NEW"})
 
     # Get types of tables
