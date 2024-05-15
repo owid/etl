@@ -129,7 +129,10 @@ def _validate_description_key(description_key: list[str], col: str) -> None:
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:
     if tab[col].m.sort:
-        extra_values = set(tab[col]) - set(tab[col].m.sort)
+        # Exclude NaN values, these will be dropped before inserting to the database.
+        vals = tab[col].dropna()
+
+        extra_values = set(vals) - set(vals.m.sort)
         assert (
             not extra_values
         ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
