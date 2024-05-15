@@ -1,12 +1,14 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def run(dest_dir: str) -> None:
@@ -15,6 +17,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("lymphatic_filariasis")
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["lymphatic_filariasis"].reset_index()
@@ -33,6 +37,15 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["national_coverage__pct", "region", "country_code", "mapping_status"])
     # Replace "No data" with NaN
     tb = tb.replace("No data", np.nan)
+    # Add regions to the table - for selected variables
+    tb_agg = geo.add_regions_to_table(
+        tb[["country", "year", "population_requiring_pc_for_lf", "reported_number_of_people_treated"]],
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        min_num_values_per_year=1,
+    )
+    tb_agg = tb_agg[tb_agg["country"].isin(REGIONS)]
+    tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True)
     # Format the tables
     tb = tb.format(["country", "year", "type_of_mda"])
     tb_nat = tb_nat.format(["country", "year"])
