@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -27,19 +30,31 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # Split out the national coverage variables into separate tables
     tb_nat_sac = (
-        tb[["country", "year", "national_coverage__sac__pct"]]
+        tb[["country", "year", "national_coverage__sac__pct", "population_requiring_pc_for_sth__sac"]]
         .copy()
         .drop_duplicates()
         .dropna(subset=["national_coverage__sac__pct"])
         .drop_duplicates(subset=["country", "year"])
     )
     tb_nat_pre_sac = (
-        tb[["country", "year", "national_coverage__pre_sac__pct"]]
+        tb[["country", "year", "national_coverage__pre_sac__pct", "population_requiring_pc_for_sth__pre_sac"]]
         .copy()
         .drop_duplicates()
         .dropna(subset=["national_coverage__pre_sac__pct"])
         .drop_duplicates(subset=["country", "year"])
     )
+    # Adding region aggregates to selected variables
+    tb_nat_sac = add_regions_to_selected_vars(
+        tb_nat_sac,
+        cols=["country", "year", "population_requiring_pc_for_sth__sac"],
+        ds_regions=ds_regions,
+    )
+    tb_nat_pre_sac = add_regions_to_selected_vars(
+        tb_nat_pre_sac,
+        cols=["country", "year", "population_requiring_pc_for_sth__pre_sac"],
+        ds_regions=ds_regions,
+    )
+    #  Splitting the table into two tables for pre-sac and sac
     age_groups = ["pre_sac", "sac"]
     tbs = {}
     for age_group in age_groups:
@@ -47,7 +62,6 @@ def run(dest_dir: str) -> None:
             "country",
             "year",
             f"drug_combination__{age_group}",
-            f"population_requiring_pc_for_sth__{age_group}",
             f"number_of_{age_group}_targeted",
             f"reported_number_of_{age_group}_treated",
             f"programme_coverage__{age_group}__pct",
@@ -57,7 +71,6 @@ def run(dest_dir: str) -> None:
             "country",
             "year",
             "drug_combination",
-            "population_requiring_pc_for_sth",
             "number_targeted",
             "reported_number_treated",
             "programme_coverage__pct",
@@ -65,7 +78,6 @@ def run(dest_dir: str) -> None:
         tbs[f"tb_{age_group}"] = tbs[f"tb_{age_group}"].dropna(
             subset=[
                 "drug_combination",
-                "population_requiring_pc_for_sth",
                 "number_targeted",
                 "reported_number_treated",
                 "programme_coverage__pct",
@@ -74,16 +86,11 @@ def run(dest_dir: str) -> None:
         # There are some rows which seem to be erroneous duplicates, we will drop these e.g. Burundi 2015 for sac
         tbs[f"tb_{age_group}"] = tbs[f"tb_{age_group}"].drop_duplicates(subset=["country", "year", "drug_combination"])
         # Adding region aggregates to selected variables
-        tb_agg = geo.add_regions_to_table(
-            tbs[f"tb_{age_group}"][
-                ["country", "year", "population_requiring_pc_for_sth", "number_targeted", "reported_number_treated"]
-            ],
-            regions=REGIONS,
+        tbs[f"tb_{age_group}"] = add_regions_to_selected_vars(
+            tbs[f"tb_{age_group}"],
+            cols=["country", "year", "number_targeted", "reported_number_treated"],
             ds_regions=ds_regions,
-            min_num_values_per_year=1,
         )
-        tb_agg = tb_agg[tb_agg["country"].isin(REGIONS)]
-        tbs[f"tb_{age_group}"] = pr.concat([tbs[f"tb_{age_group}"], tb_agg], axis=0, ignore_index=True)
 
     tb_pre_sac = tbs["tb_pre_sac"]
     tb_sac = tbs["tb_sac"]
@@ -109,3 +116,20 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_regions_to_selected_vars(tb: Table, cols: List[str], ds_regions: Dataset) -> Table:
+    """
+    Adding regions to selected variables in the table and then combining the table with the original table
+    """
+
+    tb_agg = geo.add_regions_to_table(
+        tb[cols],
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        min_num_values_per_year=1,
+    )
+    tb_agg = tb_agg[tb_agg["country"].isin(REGIONS)]
+    tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True)
+
+    return tb
