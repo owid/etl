@@ -15,11 +15,6 @@ dataset:
 tables:
   lymphatic_filariasis:
     variables:
-      population_requiring_pc_for_lf:
-        title: Population requiring PC for LF
-        unit: ""
-        display:
-          numDecimalPlaces: 3
       current_status_of_mda:
         title: Current status of MDA
         unit: ""
@@ -62,3 +57,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      population_requiring_pc_for_lf:
+        title: Population requiring PC for LF
+        unit: "people"
+        display:
+          numDecimalPlaces: 0

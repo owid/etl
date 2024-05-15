@@ -42,7 +42,9 @@ def run(dest_dir: str) -> None:
     tb_nat = tb_nat.drop_duplicates(subset=["country", "year"])
     tb_nat.metadata.short_name = "lymphatic_filariasis_national"
     # Drop `national_coverage_pct` from tb
-    tb = tb.drop(columns=["national_coverage__pct", "region", "country_code", "mapping_status"])
+    tb = tb.drop(
+        columns=["national_coverage__pct", "population_requiring_pc_for_lf", "region", "country_code", "mapping_status"]
+    )
     # Replace "No data" with NaN
     tb = tb.replace("No data", np.nan)
     # Add regions to the table - for selected variables
