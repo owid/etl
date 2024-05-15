@@ -148,6 +148,10 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
 ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
+# Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
+# because that would resolve to LXC container instead of the actual server
+TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
+
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
