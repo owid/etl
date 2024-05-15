@@ -279,7 +279,7 @@ tables:
   avg_pop:
     variables:
       democracy_polity:
-        title: Democracy
+        title: Democracy (population-weighted)
         unit: ""
         description_short: |-
           It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive.
