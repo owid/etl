@@ -17,6 +17,17 @@ COLUMN_RELATIVE_ERROR = "Relative error [(x - y) / x, %]"
 COLUMN_ABS_RELATIVE_ERROR = "(abs) Relative error [abs(x - y) / x, %]"
 COLUMN_LOG_ERROR = "Log error [log(x - y)]"  # (this one only if all values are positive)
 COLUMN_ABS_LOG_ERROR = "(abs) Log error [abs(log(x - y))]"  # (this one only if all values are positive)
+# INDEX COLUMNS
+COLUMNS_INDEX = ["entityName", "year"]
+
+
+@st.experimental_dialog("Explore changes in the new indicator", width="large")
+def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_display) -> None:
+    """Same as st_explore_indicator but framed in a dialog.
+
+    More on dialogs: https://docs.streamlit.io/develop/api-reference/execution-flow/st.dialog
+    """
+    st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display)
 
 
 def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) -> None:
@@ -36,6 +47,10 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
             - If indicator is numeric: distribution of relative error
             - If indicator is string/categorical: distribution of categories in old and new indicator
     """
+    if not all(col in df.columns for col in COLUMNS_INDEX):
+        st.warning(f"This indicator is missing index columns {COLUMNS_INDEX}. Can't run explore mode.")
+        return None
+
     log.info("table: comparison of two indicators")
 
     # 1/ Get comparison table
@@ -44,75 +59,25 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     # 2/ Get similarity score
     score = get_similarity_score(df_indicators, indicator_old, indicator_new)
 
-    # 3/ Show score
-    col1, col2, col3 = st.columns([1, 1, 4])
-    st_show_score(score, col1, col2)
+    # TODO: maybe structure the information in tabs?
+    # tab1, tab2, tab3 = st.tabs(["Summary", "Changes in datapoints", "Error distribution"])
 
-    # 4 other info (% of rows changed, number of rows changed)
-    st_show_details(df_indicators, indicator_old, indicator_new, col3, is_numeric)
+    # 3/ Show score
+    st_show_score(score)
+
+    # 4/ other info (% of rows changed, number of rows changed)
+    st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
 
     # Rename, remove equal datapoints
     df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
     df_indicators = df_indicators.rename(columns=var_id_to_display)
-    st.write(df_indicators)
 
-    # 3/ Show number of rows changed
+    # 5/ Show dataframe with different rows
+    st.header("Changes in data points")
+    st_show_dataframe(df_indicators)
 
-    # 4/ Show table with rows changed
-
-    # 5/ Show distribution of change
-
-    # score = round(100 - df_indicators["Relative difference (abs, %)"].mean(), 1)
-    # if score == 100:
-    #     score = round(100 - df_indicators["Relative difference (abs, %)"].mean(), 2)
-    #     if score == 100:
-    #         score = round(100 - df_indicators["Relative difference (abs, %)"].mean(), 3)
-    #         if score == 100:
-    #             score = round(100 - df_indicators["Relative difference (abs, %)"].mean(), 4)
-    # num_nan_score = df_indicators["Relative difference (abs, %)"].isna().sum()
-
-    # nrows_0 = df_indicators.shape[0]
-    # ## Keep only rows with relative difference != 0
-    # df_indicators = df_indicators[df_indicators["Relative difference (abs, %)"] != 0]
-    # ## Keep only rows with different values (old != new)
-    # df_indicators = df_indicators[
-    #     df_indicators[var_id_to_display[indicator_old]] != df_indicators[var_id_to_display[indicator_new]]
-    # ]
-    # nrows_1 = df_indicators.shape[0]
-
-    # # Row sanity check
-    # ## (Streamlit has a limit on the number of rows it can show)
-    # cell_limit = 262144
-    # num_cells = df_indicators.shape[0] * df_indicators.shape[1]
-    # if num_cells > cell_limit:
-    #     num_rows_new = cell_limit // df_indicators.shape[1]
-    #     df_indicators = df_indicators.head(num_rows_new)
-    #     st.warning(f"Cell limit reached. Only showing first {num_rows_new} rows.")
-
-    # # Show preliminary information
-    # nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
-    # col1, col2 = st.columns([1, 5])
-    # with col1:
-    #     st.metric(
-    #         "Data matching score (%)",
-    #         score,
-    #         help="The data matching score is based on the average of the relative difference between the two indicators. A high score indicates a good match. It is estimated as `100 - average(relative scores)`.",
-    #     )
-    # with col2:
-    #     st.info(
-    #         f"""
-    #         - {num_nan_score} rows with unknown score
-    #         - {nrows_change_relative} % of the rows changed ({nrows_1} out of {nrows_0})
-    #     """
-    #     )
-    # # Show table
-    # st.dataframe(df_indicators)
-
-    # # Show distribution of relative change
-    # fig = px.histogram(
-    #     df_indicators, x="Relative difference (abs, %)", nbins=100, title="Distribution of relative change"
-    # )
-    # st.plotly_chart(fig, use_container_width=True)
+    # 6/ Show distribution of change
+    st_show_plot(df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new])
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -195,6 +160,31 @@ def _add_error_columns(df: pd.DataFrame, indicator_old: str, indicator_new: str)
 
         # Add absolute
         df[COLUMN_ABS_LOG_ERROR] = df[COLUMN_LOG_ERROR].abs()
+
+        # Re-order
+        df = df[
+            COLUMNS_INDEX
+            + [
+                indicator_old,
+                indicator_new,
+                COLUMN_RELATIVE_ERROR,
+                COLUMN_LOG_ERROR,
+                COLUMN_ABS_RELATIVE_ERROR,
+                COLUMN_ABS_LOG_ERROR,
+            ]
+        ]
+    else:
+        # Re-order
+        df = df[
+            COLUMNS_INDEX
+            + [
+                indicator_old,
+                indicator_new,
+                COLUMN_RELATIVE_ERROR,
+                COLUMN_ABS_RELATIVE_ERROR,
+            ]
+        ]
+
     return df
 
 
@@ -231,7 +221,7 @@ def get_similarity_score(
     return score
 
 
-def st_show_score(score, col1, col2):
+def st_show_score(score):
     """Show similarity scores.
 
     col1: streamlit column for main score
@@ -241,52 +231,130 @@ def st_show_score(score, col1, col2):
     def st_show_error_relative(score):
         st.metric(
             "Average relative error",
-            f"{score['rel_error']} %",
+            f"{round(score['rel_error'], 2)}%",
             help="The average relative error is the average of the relative difference between the two indicators. A high score indicates a bad match.",
         )
 
     def st_show_error_log(score):
         st.metric(
             "Average log error",
-            f"{score['log_error']} dB",
+            f"{round(score['log_error'], 2)}dB",
             help="The average log error is the average of the log error. The log error is defined as the difference between the logs of the old and new indicators: `log(old) - log(new)`. A value close to zero means very few errors. A value of 2, means that on average, there is a 2-order magnitude of error (e.g. 10 times more or less than expected).",
         )
 
     def st_show_error_diff(score):
         st.metric(
             "Share of different datapoints",
-            f"{score['rel_diff_error']} %",
+            f"{round(score['rel_diff_error'], 2)}%",
             help="This indicates the percentage of all datapoints (both and new) that are distinct between old and new indicators.",
         )
 
     # Find out the case: (numeric positive => 1 column, numeric w negatives => 2 columns, categorical => 1 column)
     if ("log_error" in score) and ("rel_error" in score):
+        col1, col2 = st.columns(2)
         with col1:
             st_show_error_relative(score)
         with col2:
             st_show_error_log(score)
     elif "rel_error" in score:
-        with col1:
-            st_show_error_relative(score)
+        # with col1:
+        st_show_error_relative(score)
     elif "rel_diff_error" in score:
-        with col1:
-            st_show_error_diff(score)
+        # with col1:
+        st_show_error_diff(score)
 
 
-def st_show_details(df, indicator_old, indicator_new, col, is_numeric):
-    with col:
-        text = []
-        # Number of unknown scores
-        if is_numeric:
-            num_nan_score = df[COLUMN_RELATIVE_ERROR].isna().sum()
-            text.append(f"**{num_nan_score}** rows with unknown score")
-        # Number of rows changed
-        nrows_0 = df.shape[0]
-        nrows_1 = (df[(indicator_old)] != df[indicator_new]).sum()
-        nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
-        text.append(f"**{nrows_change_relative} %** of the rows changed ({nrows_1} out of {nrows_0})")
-        # Number of NAs is new indicator
-        num_nan_new = df[indicator_new].isna().sum()
-        text.append(f"**{num_nan_new}** NAs in new indicator")
+def st_show_details(df, indicator_old, indicator_new, is_numeric):
+    # with col:
+    text = []
+    # Number of unknown scores
+    if is_numeric:
+        num_nan_score = df[COLUMN_RELATIVE_ERROR].isna().sum()
+        text.append(f"**{num_nan_score}** rows with unknown score")
+    # Number of rows changed
+    nrows_0 = df.shape[0]
+    nrows_1 = (df[(indicator_old)] != df[indicator_new]).sum()
+    nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
+    text.append(f"**{nrows_change_relative} %** of the rows changed ({nrows_1} out of {nrows_0})")
+    # Number of NAs is new indicator
+    num_nan_new = df[indicator_new].isna().sum()
+    text.append(f"**{num_nan_new}** NAs in new indicator")
 
-        st.info("- " + "\n- ".join(text))
+    st.info("## Sumary\n- " + "\n- ".join(text))
+
+
+def st_show_dataframe(df: pd.DataFrame) -> None:
+    """Show dataframe accounting for cell limit and good sorting."""
+    df_show = df.copy()
+
+    # Limit number of rows
+    cell_limit = 262144
+    num_cells = df_show.shape[0] * df.shape[1]
+    if num_cells > cell_limit:
+        num_rows_new = cell_limit // df.shape[1]
+        df_show = df_show.head(num_rows_new)
+        st.warning(f"Cell limit reached. Only showing first {num_rows_new} rows.")
+
+    # Sort by error
+    if COLUMN_ABS_RELATIVE_ERROR in df_show.columns:
+        df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
+
+    # Show
+    st.dataframe(df_show)
+
+
+def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str) -> None:
+    if not ((COLUMN_RELATIVE_ERROR in df.columns) or (COLUMN_LOG_ERROR in df.columns)):
+        # Reshape
+        st.write(df[col_old].unique())
+        df_cat = df.melt(id_vars=COLUMNS_INDEX, value_vars=[col_old, col_new], var_name="indicator", value_name="value")
+        counts = df_cat.groupby(["indicator", "value"]).size().reset_index(name="count")
+        pivot_df = counts.pivot(index="value", columns="indicator", values="count").fillna(0).reset_index()
+        # st.dataframe(pivot_df)
+        pivot_df["avg"] = pivot_df[[col for col in pivot_df.columns if col != "value"]].mean(axis=1)
+        # pivot_df["avg"] = (df[col_old].astype(float).fillna(0) + df[col_new].astype(float).fillna(0)) / 2
+        pivot_df = pivot_df.sort_values("avg", ascending=False).drop(columns="avg")
+        pivot_df.columns = ["value"] + [f"count_{col}" for col in pivot_df.columns if col != "value"]
+        # st.write(df_cat)
+        # x = df_cat.groupby(["indicator"])["value"].value_counts()
+        st.write(pivot_df)
+        # df_cat["value"] = df_cat["value"].astype("string").fillna("NaN")
+        # categories = list(set(df_cat["value"]))
+        # categories_map = {cat: i for i, cat in enumerate(categories)}
+        # df_cat["value"] = df_cat["value"].map(categories_map)
+
+        # st.dataframe(df_cat.value.unique())
+        # fig = px.histogram(
+        #     df_cat,
+        #     x="value",
+        #     color="indicator",
+        #     # barmode="overlay",
+        #     barmode="group",
+        #     # nbins=100,
+        #     title="Distribution of relative error",
+        #     text_auto=True,
+        #     color_discrete_map={
+        #         col_old: "blue",
+        #         col_new: "red",
+        #     },
+        #     category_orders={"value": categories},
+        #     opacity=0.7,
+        # )
+
+        # # Update layout to modify the x-axis labels
+        # custom_labels = {k: v for k, v in categories_map.items()}
+        # st.write(custom_labels)
+        # st.plotly_chart(fig, use_container_width=True)
+        # # Apply custom tick labels to x-axis
+        # fig.update_layout(
+        #     xaxis=dict(tickmode="array", tickvals=list(custom_labels.keys()), ticktext=list(custom_labels.values()))
+        # )
+
+        # st.plotly_chart(fig, use_container_width=True)
+    else:
+        if COLUMN_RELATIVE_ERROR in df.columns:
+            fig = px.histogram(df, x=COLUMN_RELATIVE_ERROR, nbins=100, title="Distribution of relative error")
+            st.plotly_chart(fig, use_container_width=True)
+        if COLUMN_LOG_ERROR in df.columns:
+            fig = px.histogram(df, x=COLUMN_LOG_ERROR, nbins=100, title="Distribution of relative log error")
+            st.plotly_chart(fig, use_container_width=True)

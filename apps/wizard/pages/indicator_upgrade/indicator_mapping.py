@@ -11,7 +11,7 @@ from streamlit_extras.grid import grid
 from structlog import get_logger
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
-from apps.wizard.pages.indicator_upgrade.explore_mode import st_explore_indicator
+from apps.wizard.pages.indicator_upgrade.explore_mode import st_explore_indicator_dialog
 from apps.wizard.pages.indicator_upgrade.utils import get_indicators_from_datasets
 from apps.wizard.utils import set_states
 from apps.wizard.utils.env import OWID_ENV
@@ -87,10 +87,7 @@ def st_mappings_auto(indicator_mapping_auto, enable_explore_mode, cols, indicato
         indicator_mapping_auto = dict(islice(indicator_mapping_auto.items(), LIMIT_VARS_TO_MAP))
 
     # Automatically mapped indicators (non-editable)
-    if enable_explore_mode:
-        grid_indicators_auto = grid(cols, 1)
-    else:
-        grid_indicators_auto = grid(cols)
+    grid_indicators_auto = grid(cols)
 
     # Loop over automatically mapped indicators
     for i, (indicator_old, indicator_new) in enumerate(indicator_mapping_auto.items()):
@@ -131,17 +128,16 @@ def st_mappings_auto(indicator_mapping_auto, enable_explore_mode, cols, indicato
         # (Optional) Explore mode
         if enable_explore_mode:
             ## Explore mode checkbox
-            element_check = grid_indicators_auto.toggle(
-                "Explore", key=f"auto-explore-{i}", label_visibility="collapsed"
+            show_explore = grid_indicators_auto.button(
+                label="🔎",
+                key=f"auto-explore-{i}",
             )
-            ## Explore mode plot
-            with grid_indicators_auto.container():
-                show_explore_mode(
-                    df_data,  # type: ignore
-                    indicator_old,  # type: ignore
-                    indicator_new,  # type: ignore
+            if show_explore:
+                st_explore_indicator_dialog(
+                    df_data,
+                    indicator_old,
+                    indicator_new,
                     indicator_id_to_display,
-                    element_check,
                 )  # type: ignore
 
     return old_var_selectbox, ignore_selectbox, new_var_selectbox
@@ -157,10 +153,7 @@ def st_mapping_manual(
     new_var_selectbox,
     df_data,
 ):
-    if enable_explore_mode:
-        grid_indicators_manual = grid(cols, 1)
-    else:
-        grid_indicators_manual = grid(cols)
+    grid_indicators_manual = grid(cols)
 
     # Show only first 100 indicators to map (otherwise app crashes)
     if len(suggestions) > LIMIT_VARS_TO_MAP:
@@ -193,9 +186,7 @@ def st_mapping_manual(
             label_visibility="collapsed",
             format_func=indicator_id_to_display.get,
         )
-        # grid_indicators_manual.markdown(
-        #     f"**{indicator_id_to_display.get(indicator_old)}**",
-        # )
+
         old_var_selectbox.append(indicator_old)
         # New indicator selectbox
         indicator_new_manual = grid_indicators_manual.selectbox(
@@ -213,17 +204,16 @@ def st_mapping_manual(
         # (Optional) Explore mode
         if enable_explore_mode:
             ## Explore mode checkbox
-            element_check = grid_indicators_manual.toggle(
-                "Explore", key=f"manual-explore-{i}", label_visibility="collapsed"
+            show_explore = grid_indicators_manual.button(
+                label="🔎",
+                key=f"manual-explore-{i}",
             )
-            ## Explore mode plot
-            with grid_indicators_manual.container():
-                show_explore_mode(
-                    df_data,  # type: ignore
+            if show_explore:
+                st_explore_indicator_dialog(
+                    df_data,
                     indicator_old,
                     indicator_new_manual,
                     indicator_id_to_display,
-                    element_check,
                 )  # type: ignore
 
     return old_var_selectbox, ignore_selectbox, new_var_selectbox
@@ -289,7 +279,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
                 "Map indicators from the old to the new dataset. The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
             )
             # Column proportions per row (out of 1)
-            cols = [7, 43, 43, 4.5, 4.5] if search_form.enable_explore_mode else [7, 45, 45, 5]
+            cols = [10, 43, 43, 4.5, 4.5] if search_form.enable_explore_mode else [10, 45, 45, 5]
 
             #################################
             # 2.2/ Header: Titles, links, general checkboxes
@@ -376,20 +366,6 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
                 )
                 indicator_config = IndicatorConfig(indicator_mapping=indicator_mapping)
     return indicator_config
-
-
-def show_explore_mode(df_data, indicator_old, indicator_new, indicator_id_to_display, element_check) -> None:
-    if element_check:  # type: ignore
-        with st.container(border=True):
-            st_explore_indicator(df_data, indicator_old, indicator_new, indicator_id_to_display)  # type: ignore
-            # try:
-            #     st_explore_indicator(df_data, indicator_old, indicator_new, indicator_id_to_display)  # type: ignore
-            # except Exception:
-            #     st.error(
-            #         "Something went wrong! This can be due to several reasons: One (or both) of the indicators are not numeric, `values` for one of the indicators does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
-            #     )
-    else:
-        st.empty()
 
 
 class IndicatorConfig(BaseModel):
