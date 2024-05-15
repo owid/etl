@@ -91,7 +91,7 @@ def cli(
 
     - **Note 1:** The dataset (with the new chart's underlying indicators) from `SOURCE` must exist in `TARGET`. This means that you have to merge your work to master and wait for the ETL to finish running all steps.
 
-    - **Note 2:** Staging servers are destroyed after 1 day of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
+    - **Note 2:** Staging servers are destroyed after 7 days of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
 
     **Considerations on charts:**
 
