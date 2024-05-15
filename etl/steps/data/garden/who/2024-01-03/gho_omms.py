@@ -7,6 +7,8 @@ from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+
 
 def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_regions: Dataset) -> None:
     # Adding a global total for Yaws - adding to existing variable
@@ -22,6 +24,7 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
 
     add_both_sexes_for_pneumonia(tables_dict)
 
+    add_trachoma_aggregate(tables_dict)
     # df_variables = add_youth_mortality_rates(
     #    df_variables=df_variables,
     #    younger_ind="Indicator:Under-five mortality rate (per 1000 live births) (SDG 3.2.1) - Sex:Both sexes",
@@ -30,6 +33,22 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
     #    new_ind_name_long="Indicator:Under-ten mortality rate (per 1000 live births)",
     #    new_ind_desc="Definition: Under ten mortality rate is the share of newborns who die before reaching the age of 10. It is calculated by OWID based on WHO Global Health Observatory data.",
     # )
+
+
+def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_regions: Dataset) -> None:
+    indicator_names = [
+        "Population in areas that warrant treatment with antibiotics, facial cleanliness and environmental improvement for elimination of trachoma as a public health problem",
+        "Number of people who received treatment with antibiotics for trachoma",
+        "Number of people operated for trachomatous trichiasis",
+        "Estimated number of individuals in the country requiring preventive chemotherapy for onchocerciasis",
+        "Reported number of individuals treated for onchocerciasis"
+    ]
+    for indicator_name in indicator_names:
+        tb = tables_dict[indicator_name]
+        tb = tb.reset_index()
+        # Add global and regional totals
+        tb = geo.add_regions_to_table(tb =tb, regions = REGIONS,ds_regions= ds_regions, min_num_values_per_year=1)
+        tables_dict[indicator_name] = tb
 
 
 def add_both_sexes_for_pneumonia(tables_dict: dict[str, Table]) -> None:
