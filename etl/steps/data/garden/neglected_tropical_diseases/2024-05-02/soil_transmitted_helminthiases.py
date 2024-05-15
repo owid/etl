@@ -1,10 +1,13 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def run(dest_dir: str) -> None:
@@ -13,7 +16,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("soil_transmitted_helminthiases")
-
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["soil_transmitted_helminthiases"].reset_index()
 
@@ -69,6 +73,17 @@ def run(dest_dir: str) -> None:
         )
         # There are some rows which seem to be erroneous duplicates, we will drop these e.g. Burundi 2015 for sac
         tbs[f"tb_{age_group}"] = tbs[f"tb_{age_group}"].drop_duplicates(subset=["country", "year", "drug_combination"])
+        # Adding region aggregates to selected variables
+        tb_agg = geo.add_regions_to_table(
+            tbs[f"tb_{age_group}"][
+                ["country", "year", "population_requiring_pc_for_sth", "number_targeted", "reported_number_treated"]
+            ],
+            regions=REGIONS,
+            ds_regions=ds_regions,
+            min_num_values_per_year=1,
+        )
+        tb_agg = tb_agg[tb_agg["country"].isin(REGIONS)]
+        tbs[f"tb_{age_group}"] = pr.concat([tbs[f"tb_{age_group}"], tb_agg], axis=0, ignore_index=True)
 
     tb_pre_sac = tbs["tb_pre_sac"]
     tb_sac = tbs["tb_sac"]
