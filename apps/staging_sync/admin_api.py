@@ -9,7 +9,7 @@ import requests
 from sqlmodel import Session
 
 from etl import grapher_model as gm
-from etl.config import GRAPHER_USER_ID
+from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
 from etl.db import Engine
 
 
@@ -25,7 +25,7 @@ class AdminAPI(object):
             session.commit()
 
         if engine.url.database == "live_grapher" and "prod-db" in str(engine.url.host):
-            self.base_url = "http://owid-admin-prod"
+            self.base_url = TAILSCALE_ADMIN_HOST
         else:
             self.base_url = f"http://{engine.url.host}"
 
@@ -42,8 +42,8 @@ class AdminAPI(object):
             f"{self.base_url}/admin/api/charts/{chart_id}.config.json",
             cookies={"sessionid": self.session_id},
         )
-        resp.raise_for_status()
-        return resp.json()
+        js = self._json_from_response(resp)
+        return js
 
     def create_chart(self, chart_config: dict) -> dict:
         resp = requests.post(

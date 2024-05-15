@@ -68,7 +68,7 @@ class OWIDEnv:
     def base_site(self) -> str | None:
         """Get site."""
         if self.env_type_id == "live":
-            return "https://owid.cloud"
+            return "https://admin.owid.io"
         elif self.env_type_id == "staging":
             return "https://staging.owid.cloud"
         elif self.env_type_id in ["local", "remote-staging"]:
