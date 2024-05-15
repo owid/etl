@@ -2,7 +2,7 @@
 
 This is currently shown in the indicator upgrader, but might be moved to chart-diff in the future.
 """
-from typing import Dict, Tuple
+from typing import Dict, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -21,7 +21,8 @@ COLUMN_ABS_LOG_ERROR = "(abs) Log error [abs(log(x - y))]"  # (this one only if 
 COLUMNS_INDEX = ["entityName", "year"]
 
 
-@st.experimental_dialog("Explore changes in the new indicator", width="large")
+@st.cache_data(show_spinner=False)
+@st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
 def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_display) -> None:
     """Same as st_explore_indicator but framed in a dialog.
 
@@ -324,6 +325,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
         df_show = df_show.sort_values(COLUMN_ABS_RELATIVE_ERROR, ascending=False)  # type: ignore
 
     # Change column names
+    df_show = cast(pd.Dataframe, df_show)
     df_show = df_show.rename(columns={col_old: "OLD", col_new: "NEW"})
 
     # Get types of tables
