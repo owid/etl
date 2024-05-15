@@ -11,7 +11,7 @@ REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceani
 
 
 def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_regions: Dataset) -> None:
-    # Adding a global total for Yaws - adding to existing variable
+    #  Adding a global total for Yaws - adding to existing variable
     add_global_yaws(tables_dict, ds_regions)
     # Adding a variables for neonatal cases per million
     add_neonatal_tetanus_cases_per_mil(tables_dict, ds_population)
@@ -47,7 +47,7 @@ def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], ds_
         tb = tables_dict[indicator_name]
         tb = tb.reset_index()
         # Add global and regional totals
-        tb = geo.add_regions_to_table(tb =tb, regions = REGIONS,ds_regions= ds_regions, min_num_values_per_year=1)
+        tb = geo.add_regions_to_table(tb =tb, regions = REGIONS, ds_regions= ds_regions, min_num_values_per_year=1)
         tb = tb.set_index(['country', 'year'], verify_integrity = True)
         tables_dict[indicator_name] = tb
 
