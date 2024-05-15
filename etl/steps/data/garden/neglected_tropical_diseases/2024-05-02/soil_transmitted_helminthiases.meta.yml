@@ -15,12 +15,6 @@ dataset:
 tables:
   soil_transmitted_helminthiases_pre_sac:
     variables:
-      population_requiring_pc_for_sth:
-        title: Population of pre-school age children requiring preventive chemotherapy
-        description_short: "Population of pre-school age children requiring preventive chemotherapy for soil transmitted helminthiases."
-        unit: "pre-school age children"
-        display:
-          numDecimalPlaces: 0
       number_targeted:
         title: Number of pre-school age children targeted
         description_short: "Number of pre-school age children targeted for preventive chemotherapy for soil transmitted helminthiases."
@@ -49,14 +43,14 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-  soil_transmitted_helminthiases_sac:
-    variables:
       population_requiring_pc_for_sth:
-        title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
-        unit: "school age children"
-        description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        title: Population of pre-school age children requiring preventive chemotherapy
+        description_short: "Population of pre-school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        unit: "pre-school age children"
         display:
           numDecimalPlaces: 0
+  soil_transmitted_helminthiases_sac:
+    variables:
       number_targeted:
         title: Number of school age children targeted
         unit: "school age children"
@@ -85,3 +79,9 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      population_requiring_pc_for_sth:
+        title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
+        unit: "school age children"
+        description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        display:
+          numDecimalPlaces: 0
