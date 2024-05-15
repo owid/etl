@@ -60,6 +60,14 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     # 2/ Get similarity score
     score = get_similarity_score(df_indicators, indicator_old, indicator_new)
 
+    # 3/ Get names
+    name_old = var_id_to_display[indicator_old]
+    name_new = var_id_to_display[indicator_new]
+
+    st.markdown(f"Old: `{name_old}`")
+    st.markdown(f"New: `{name_new}`")
+
+    # Check if there is any change
     num_changes = (df_indicators[(indicator_old)] != df_indicators[indicator_new]).sum()
     if num_changes == 0:
         st.success("No changes in the data points!")
@@ -67,27 +75,23 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
         tab1, tab2 = st.tabs(["Summary", "Error distribution"])
 
         with tab1:
-            # 3/ Show score
+            # 4/ Show score
             st_show_score(score)
 
-            # 4/ other info (% of rows changed, number of rows changed)
+            # 5/ other info (% of rows changed, number of rows changed)
             st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
 
             # Rename, remove equal datapoints
             df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
             df_indicators = df_indicators.rename(columns=var_id_to_display)
 
-            # 5/ Show dataframe with different rows
+            # 6/ Show dataframe with different rows
             st.header("Changes in data points")
-            st_show_dataframe(
-                df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
-            )
+            st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
 
         with tab2:
-            # 6/ Show distribution of change
-            st_show_plot(
-                df_indicators, col_old=var_id_to_display[indicator_old], col_new=var_id_to_display[indicator_new]
-            )
+            # 7/ Show distribution of change
+            st_show_plot(df_indicators, col_old=name_old, col_new=name_new)
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -148,7 +152,7 @@ def _add_error_columns(df: pd.DataFrame, indicator_old: str, indicator_new: str)
     ## Estimate error only when indicator_old is not 0. If indicator_old is 0, the relative error is infinite.
     mask = df[indicator_old] == 0
     df.loc[~mask, COLUMN_RELATIVE_ERROR] = (
-        (100 * (df.loc[~mask, indicator_old] - df.loc[~mask, indicator_new]) / df.loc[~mask, indicator_old]).round(2)
+        (100 * (df.loc[~mask, indicator_new] - df.loc[~mask, indicator_old]) / df.loc[~mask, indicator_old]).round(2)
     ).round(2)
     df.loc[mask, COLUMN_RELATIVE_ERROR] = float("inf")
 
