@@ -6,13 +6,46 @@ from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _mod
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from etl import config
 
+from . import github_utils as gh_utils
+
 log = get_logger()
 
 
-def run(branch: str) -> str:
+def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame) -> None:
+    access_token = gh_utils.github_app_access_token()
+    repo = gh_utils.get_repo(repo_name, access_token=access_token)
+    pr = gh_utils.get_pr(repo, branch)
+
+    # Get the latest commit of the pull request
+    latest_commit = pr.get_commits().reversed[0]
+
+    if charts_df.empty:
+        conclusion = "neutral"
+        title = "No new or modified charts"
+    elif charts_df.approved.all():
+        conclusion = "success"
+        title = "All charts are approved"
+    else:
+        conclusion = "failure"
+        title = "Some charts are not approved"
+
+    # Create the check run and complete it in a single command
+    repo.create_check_run(
+        name="owidbot/chart-diff",
+        head_sha=latest_commit.sha,
+        status="completed",
+        conclusion=conclusion,
+        output={
+            "title": title,
+            "summary": format_chart_diff(charts_df),
+        },
+    )
+
+
+def run(branch: str, charts_df: pd.DataFrame) -> str:
     container_name = _get_container_name(branch) if branch else "dry-run"
 
-    chart_diff = format_chart_diff(call_chart_diff(branch))
+    chart_diff = format_chart_diff(charts_df)
 
     body = f"""
 <details open>

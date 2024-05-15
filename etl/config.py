@@ -158,6 +158,13 @@ OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
+# OWIDBOT app
+OWIDBOT_APP_PRIVATE_KEY_PATH = env.get("OWIDBOT_APP_PRIVATE_KEY_PATH", None)
+# get it from https://github.com/settings/apps/owidbot-app
+OWIDBOT_APP_CLIENT_ID = env.get("OWIDBOT_APP_CLIENT_ID", None)
+# get it from https://github.com/settings/installations
+OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
+
 
 def enable_bugsnag() -> None:
     if BUGSNAG_API_KEY:
