@@ -439,21 +439,31 @@ def combine_strategy_tables(tb_national_strategy: Table, tb_housing_first_strate
     # Create a new column with the type of strategy
     tb["type_of_strategy"] = tb["housing_first_strategy"]
 
-    # Assign housing first strategy if national or regional
+    # Assign housing first strategy if national
     tb.loc[
-        tb["housing_first_strategy"].isin(["Have a national strategy", "Have regional or local strategies"]),
+        tb["housing_first_strategy"] == "Have a national strategy",
         "type_of_strategy",
     ] = "Housing First/housing-led strategy"
 
-    # If housing first strategy is No strategy, but national strategy is different, assign "Other strategy"
+    # If housing first strategy is No strategy or regional, but national strategy is different, assign "Other strategy"
     tb.loc[
-        (tb["housing_first_strategy"] == "No strategy")
-        & (tb["national_strategy"].isin(["Have an active national strategy", "Have regional or local strategies"])),
+        (tb["housing_first_strategy"].isin(["No strategy", "Have regional or local strategies"]))
+        & (tb["national_strategy"] == "Have an active national strategy"),
         "type_of_strategy",
     ] = "Other strategy"
 
+    # If housing first strategy is No strategy or regional and national strategy is No strategy or Have regional or local strategies, assign "No strategy"
+    tb.loc[
+        (tb["housing_first_strategy"].isin(["No strategy", "Have regional or local strategies"]))
+        & (tb["national_strategy"].isin(["No strategy", "Have regional or local strategies"])),
+        "type_of_strategy",
+    ] = "No national strategy"
+
     # Assign "No strategy" if type_of_strategy is still missing
-    tb["type_of_strategy"] = tb["type_of_strategy"].fillna("No strategy")
+    tb["type_of_strategy"] = tb["type_of_strategy"].fillna("No national strategy")
+
+    # Replace "No strategy" with "No national strategy"
+    tb["type_of_strategy"] = tb["type_of_strategy"].replace("No strategy", "No national strategy")
 
     # Remove housing_first_strategy and national_strategy columns
     tb = tb.drop(columns=["housing_first_strategy", "national_strategy"])
