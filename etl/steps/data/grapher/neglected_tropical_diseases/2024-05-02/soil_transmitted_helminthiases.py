@@ -16,12 +16,14 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb_pre_sac = ds_garden["soil_transmitted_helminthiases_pre_sac"]
     tb_sac = ds_garden["soil_transmitted_helminthiases_sac"]
+    tb_nat_pre_sac = ds_garden["soil_transmitted_helminthiases_national_sac"]
+    tb_nat_sac = ds_garden["soil_transmitted_helminthiases_national_pre_sac"]
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_pre_sac, tb_sac], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb_pre_sac, tb_sac, tb_nat_pre_], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.
