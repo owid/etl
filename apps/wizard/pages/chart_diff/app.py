@@ -196,14 +196,11 @@ def compare_charts(
 
 @st.cache_resource
 def get_engines() -> tuple[Engine, Engine]:
-    s = Path(SOURCE_ENV)
-    t = Path(TARGET_ENV)
+    _validate_env(SOURCE_ENV)
+    _validate_env(TARGET_ENV)
 
-    _validate_env(s)
-    _validate_env(t)
-
-    source_engine = _get_engine_for_env(s)
-    target_engine = _get_engine_for_env(t)
+    source_engine = _get_engine_for_env(SOURCE_ENV)
+    target_engine = _get_engine_for_env(TARGET_ENV)
 
     return source_engine, target_engine
 

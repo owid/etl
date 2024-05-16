@@ -13,7 +13,7 @@ Dedicated staging servers are automatically created from every ETL pull request.
 
     For more details, refer to the [python code](https://github.com/owid/etl/blob/master/apps/staging_sync/cli.py#L284) generating `<branch>` from the branch name.
 
-Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 24 hours after the PR is merged, then the staging server will be destroyed.
+Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 7 days after the PR is merged, then the staging server will be destroyed.
 
 ```mermaid
 sequenceDiagram
