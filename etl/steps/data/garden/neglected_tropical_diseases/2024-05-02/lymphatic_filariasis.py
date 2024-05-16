@@ -47,10 +47,6 @@ def run(dest_dir: str) -> None:
     )
     # Replace "No data" with NaN
     tb = tb.replace("No data", np.nan)
-    # Add regions to the table - for selected variables
-    tb = add_regions_to_selected_vars(
-        tb, cols=["country", "year", "reported_number_of_people_treated"], ds_regions=ds_regions
-    )
     # Format the tables
     tb = tb.format(["country", "year", "type_of_mda"])
     tb_nat = tb_nat.format(["country", "year"])

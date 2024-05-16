@@ -85,12 +85,6 @@ def run(dest_dir: str) -> None:
         )
         # There are some rows which seem to be erroneous duplicates, we will drop these e.g. Burundi 2015 for sac
         tbs[f"tb_{age_group}"] = tbs[f"tb_{age_group}"].drop_duplicates(subset=["country", "year", "drug_combination"])
-        # Adding region aggregates to selected variables
-        tbs[f"tb_{age_group}"] = add_regions_to_selected_vars(
-            tbs[f"tb_{age_group}"],
-            cols=["country", "year", "number_targeted", "reported_number_treated"],
-            ds_regions=ds_regions,
-        )
 
     tb_pre_sac = tbs["tb_pre_sac"]
     tb_sac = tbs["tb_sac"]
