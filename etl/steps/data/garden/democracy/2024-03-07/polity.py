@@ -477,7 +477,7 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
     tb_exp = tb_exp.loc[
         ~(
             # YUGOSLAVIA
-            ((tb_exp["country"] == "Yugoslavia") & ((tb_exp["year"] > 1991) | (tb_exp["year"] < 1921)))
+            ((tb_exp["country"] == "Yugoslavia") & ((tb_exp["year"] > 1990) | (tb_exp["year"] < 1921)))
             | ((tb_exp["country"] == "Slovenia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
             | ((tb_exp["country"] == "North Macedonia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
             | ((tb_exp["country"] == "Croatia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
@@ -544,3 +544,4 @@ def replace_ussr(tb: Table, ds_regions: Dataset) -> Table:
     # Remove USSR
     tb = tb.loc[~(tb["country"] == "USSR")]
     return tb
+
