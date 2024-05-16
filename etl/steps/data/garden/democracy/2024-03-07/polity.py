@@ -478,9 +478,9 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
         ~(
             # YUGOSLAVIA
             ((tb_exp["country"] == "Yugoslavia") & ((tb_exp["year"] > 1990) | (tb_exp["year"] < 1921)))
-            | ((tb_exp["country"] == "Slovenia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
-            | ((tb_exp["country"] == "North Macedonia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
-            | ((tb_exp["country"] == "Croatia") & ((tb_exp["year"] >= 1918) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "Slovenia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "North Macedonia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
+            | ((tb_exp["country"] == "Croatia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
             | ((tb_exp["country"] == "Serbia and Montenegro") & ((tb_exp["year"] > 2005) | (tb_exp["year"] <= 1990)))
             ## YUG 2
             | ((tb_exp["country"] == "Bosnia and Herzegovina") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1991)))
