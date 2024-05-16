@@ -685,20 +685,21 @@ steps:
   data://grapher/ggdc/2024-04-26/maddison_project_database:
     - data://garden/ggdc/2024-04-26/maddison_project_database
 
-  # Global GDP in the long run
+  # Global GDP in the long run (MD + MPD)
   data://grapher/growth/2024-04-29/gdp_historical:
     - data://garden/growth/2024-04-29/gdp_historical
   data://garden/growth/2024-04-29/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
 
-  # Global GDP in the long run (previous version)
-  data://garden/growth/2024-01-04/gdp_historical:
-    - data://grapher/worldbank_wdi/2023-05-29/wdi
-    - data://grapher/ggdc/2020-10-01/ggdc_maddison
+  # Global GDP in the long run (with WDI)
+  data://garden/growth/2024-05-16/gdp_historical:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-  data://grapher/growth/2024-01-04/gdp_historical:
-    - data://garden/growth/2024-01-04/gdp_historical
+    - data://grapher/worldbank_wdi/2023-05-29/wdi
+
+  data://grapher/growth/2024-05-16/gdp_historical:
+    - data://garden/growth/2024-05-16/gdp_historical
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
