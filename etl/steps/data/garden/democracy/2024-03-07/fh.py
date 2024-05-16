@@ -13,8 +13,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("fh")
-    ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
+    # ds_regions = paths.load_dataset("regions")
+    # ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_ratings = ds_meadow["fh_ratings"].reset_index()
