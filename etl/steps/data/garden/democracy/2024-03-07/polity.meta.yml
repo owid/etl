@@ -278,7 +278,7 @@ tables:
 
   avg_pop:
     variables:
-      democracy_polity:
+      democracy_polity_weighted:
         title: Democracy (population-weighted)
         unit: ""
         description_short: |-

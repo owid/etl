@@ -458,6 +458,11 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     # Keep only certain year range
     tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
 
+    tb_avg = tb_avg.rename(
+        columns={
+            "democracy_polity": "democracy_polity_weighted",
+        }
+    )
     return tb_ppl, tb_avg
 
 
