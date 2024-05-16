@@ -544,4 +544,3 @@ def replace_ussr(tb: Table, ds_regions: Dataset) -> Table:
     # Remove USSR
     tb = tb.loc[~(tb["country"] == "USSR")]
     return tb
-
