@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_ratings = reshape_ratings(tb_ratings_countries, tb_ratings_territories)
+    tb_ratings = reshape_ratings(tb_c=tb_ratings_countries, tb_t=tb_ratings_territories)
     tb_scores = reshape_scores(tb_scores)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.

@@ -13,7 +13,7 @@ dataset:
 
 
 tables:
-  fh:
+  fh_ratings:
     variables:
       # testing_variable:
       #   title: Testing variable title
@@ -50,4 +50,7 @@ tables:
       #     yearIsDay: false
       #     zeroDay:
       {}
+
+  fh_scores:
+    variables: {}
 

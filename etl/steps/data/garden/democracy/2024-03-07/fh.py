@@ -17,23 +17,37 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["fh"].reset_index()
+    tb_ratings = ds_meadow["fh_ratings"].reset_index()
+    tb_scores = ds_meadow["fh_scores"].reset_index()
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb,
+    tb_ratings = geo.harmonize_countries(
+        df=tb_ratings,
         countries_file=paths.country_mapping_path,
     )
-    tb = tb.format(["country", "year"])
+    tb_scores = geo.harmonize_countries(
+        df=tb_scores,
+        countries_file=paths.country_mapping_path,
+    )
+
+    tables = [
+        tb_ratings.format(["country", "year"]),
+        tb_scores.format(
+            ["country", "year"],
+        ),
+    ]
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
