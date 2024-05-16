@@ -1,15 +1,15 @@
 """Script to create a snapshot of dataset."""
 
-from pathlib import Path
 import datetime
 import io
-import requests
+from pathlib import Path
 
 import click
 import pandas as pd
+import requests
+from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
-from owid.datautils.io import df_to_file
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
