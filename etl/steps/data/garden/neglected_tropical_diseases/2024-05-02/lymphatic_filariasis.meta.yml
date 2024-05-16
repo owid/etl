@@ -19,13 +19,13 @@ tables:
         title: Current status of MDA
         unit: ""
       number_of_ius_covered:
-        title: Number of IUs covered
+        title: Number of implementation units covered
         unit: ""
         display:
           numDecimalPlaces: 0
       geographical_coverage__pct:
         title: Geographical coverage (%)
-        description_short: "Geographical coverage of preventive chemotherapy for lymphatic filariasis."
+        description_short: "Geographical coverage of preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis)."
         unit: "%"
         display:
           numDecimalPlaces: 1
@@ -37,13 +37,13 @@ tables:
           numDecimalPlaces: 0
       reported_number_of_people_treated:
         title: Reported number of people treated
-        description_short: "Reported number of people treated for lymphatic filariasis."
+        description_short: "Reported number of people treated for [lymphatic filariasis](#dod:lymphatic-filariasis)."
         unit: "people"
         display:
           numDecimalPlaces: 0
       programme__drug__coverage__pct:
         title: Programme coverage
-        description_short: "Programme coverage for preventive chemotherapy for lymphatic filariasis. The share of people who require preventive chemotherapy for lymphatic filariasis who actually receive it."
+        description_short: "Programme coverage for preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis). The share of people who require preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis) who actually receive it."
         unit: "%"
         short_unit: "%"
         display:
@@ -58,7 +58,8 @@ tables:
         display:
           numDecimalPlaces: 1
       population_requiring_pc_for_lf:
-        title: Population requiring PC for LF
+        title: Population requiring preventive chemotherapy for lymphatic filariasis
+        description_short: "Population requiring preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis)."
         unit: "people"
         display:
           numDecimalPlaces: 0
