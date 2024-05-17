@@ -75,6 +75,10 @@ def reshape_ratings(tb_c: Table, tb_t: Table) -> Table:
     tb_c = tb_c.loc[~((tb_c["country"] == "Kosovo") & (tb_c["year"] < 2009))]
     tb_t = tb_t.loc[~((tb_t["country"] == "Kosovo") & (tb_t["year"] >= 2009))]
 
+    # Add flag
+    tb_c["country_fh"] = 1
+    tb_t["country_fh"] = 0
+
     # Concatenate
     tb = concat([tb_c, tb_t], ignore_index=True)
 
@@ -82,6 +86,10 @@ def reshape_ratings(tb_c: Table, tb_t: Table) -> Table:
 
 
 def reshape_scores(tb: Table) -> Table:
+    """Format scores table.
+
+    Rename columns, select relevant columns, set dtypes, fix year,
+    """
     tb = cast(Table, tb.dropna(axis=1, how="all"))
 
     # Rename columns, keep relevant
@@ -97,6 +105,9 @@ def reshape_scores(tb: Table) -> Table:
     # Set dtype to INT where applicable
     column_ints = ["year", "electprocess_fh", "polrights_score_fh", "civlibs_score_fh"]
     tb[column_ints] = tb[column_ints].astype("Int64")
+
+    # Recode edition year such that it becomes observation year (instead of edition year)
+    tb["year"] = tb["year"] - 1
 
     return tb
 
@@ -121,8 +132,8 @@ def _reshape_rating(tb: Table) -> Table:
 
     # Fix years
     year_mapping = {
-        "Jan.1981-Aug. 1982": 1982,
-        "Aug.1982-Nov.1983": 1983,
+        "Jan.1981-Aug. 1982": 1982,  # Consider January 1981 to August 1982 as 1982. Set tolerance in charts to 1.
+        "Aug.1982-Nov.1983": 1983,  # Consider August 1982 to November 1983 as 1983.
         "Nov.1983-Nov.1984": 1984,
         "Nov.1984-Nov.1985": 1985,
         "Nov.1985-Nov.1986": 1986,
