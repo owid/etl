@@ -28,13 +28,17 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    # Split out the national coverage variables into separate tables
+    # Split out the national coverage variables into separate tables, SAC = school age children, pre-SAC = pre-school age children
     tb_nat_sac = (
         tb[["country", "year", "national_coverage__sac__pct", "population_requiring_pc_for_sth__sac"]]
         .copy()
         .drop_duplicates()
         .dropna(subset=["national_coverage__sac__pct"])
         .drop_duplicates(subset=["country", "year"])
+    )
+    # Calculating the number of SAC treated
+    tb_nat_sac["estimated_number_of_sac_treated"] = (
+        tb["national_coverage__sac__pct"] * tb["population_requiring_pc_for_sth__sac"] / 100
     )
     tb_nat_pre_sac = (
         tb[["country", "year", "national_coverage__pre_sac__pct", "population_requiring_pc_for_sth__pre_sac"]]
@@ -43,15 +47,19 @@ def run(dest_dir: str) -> None:
         .dropna(subset=["national_coverage__pre_sac__pct"])
         .drop_duplicates(subset=["country", "year"])
     )
+    # Calculating the number of pre-SAC treated
+    tb_nat_pre_sac["estimated_number_of_pre_sac_treated"] = (
+        tb["national_coverage__pre_sac__pct"] * tb["population_requiring_pc_for_sth__pre_sac"] / 100
+    )
     # Adding region aggregates to selected variables
     tb_nat_sac = add_regions_to_selected_vars(
         tb_nat_sac,
-        cols=["country", "year", "population_requiring_pc_for_sth__sac"],
+        cols=["country", "year", "population_requiring_pc_for_sth__sac", "estimated_number_of_sac_treated"],
         ds_regions=ds_regions,
     )
     tb_nat_pre_sac = add_regions_to_selected_vars(
         tb_nat_pre_sac,
-        cols=["country", "year", "population_requiring_pc_for_sth__pre_sac"],
+        cols=["country", "year", "population_requiring_pc_for_sth__pre_sac", "estimated_number_of_pre_sac_treated"],
         ds_regions=ds_regions,
     )
     #  Splitting the table into two tables for pre-sac and sac

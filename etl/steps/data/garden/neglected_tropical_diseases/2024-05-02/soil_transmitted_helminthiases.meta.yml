@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Global Health
         # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
-
+    processing_level: minor
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -49,6 +49,13 @@ tables:
         unit: "pre-school age children"
         display:
           numDecimalPlaces: 0
+      estimated_number_of_pre_sac_treated:
+        title: Estimated number of pre-school age children treated
+        description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        unit: "pre-school age children"
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
   soil_transmitted_helminthiases_sac:
     variables:
       number_targeted:
@@ -83,5 +90,12 @@ tables:
         title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
         unit: "school age children"
         description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        display:
+          numDecimalPlaces: 0
+      estimated_number_of_pre_sac_treated:
+        title: Estimated number of pre-school age children treated
+        description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        unit: "pre-school age children"
+        processing_level: minor
         display:
           numDecimalPlaces: 0
