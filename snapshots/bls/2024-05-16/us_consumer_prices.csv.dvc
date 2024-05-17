@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: US consumer prices
+    description: |-
+      The Bureau of Labor Statistics reports the monthly Consumer Price Index (CPI) of individual goods and services for urban consumers at the national, city, and state levels. CPI is presented on an annual basis, which we have derived as the average of the monthly CPIs in a given year.
+    date_published: "2024"
+
+    # Citation
+    producer: U.S. Bureau of Labor Statistics
+    citation_full: |-
+      U.S. Bureau of Labor Statistics
+
+    # Files
+    url_main: https://www.bls.gov/data/tools.htm
+    date_accessed: 2024-05-16
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.bls.gov/opub/copyright-information.htm
+
+outs:
+  - md5: c339b124e1a1cf1240b866344d6fef39
+    size: 356986
+    path: us_consumer_prices.csv
