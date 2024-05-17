@@ -96,6 +96,18 @@ WORRIES_QUESTIONS = ["losing_job", "not_being_able_to_provide_good_education", "
 
 HAPPINESS_QUESTIONS = ["happy"]
 
+# Define questions to aggregate
+QUESTIONS_TO_AGGREGATE = IMPORTANT_IN_LIFE_QUESTIONS + [
+    "very_important_in_life_family",
+    "very_important_in_life_friends",
+    "very_important_in_life_leisure_time",
+    "very_important_in_life_politics",
+    "very_important_in_life_work",
+    "very_important_in_life_religion",
+    "like_me_agg_secure",
+    "like_me_agg_respect_environment",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -123,7 +135,7 @@ def run(dest_dir: str) -> None:
     # Add aggregations
     tb = add_population_weighted_aggregations(
         tb=tb,
-        columns=IMPORTANT_IN_LIFE_QUESTIONS,
+        columns=QUESTIONS_TO_AGGREGATE,
         ds_regions=ds_regions,
         ds_population=ds_population,
         regions=REGIONS,
