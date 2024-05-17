@@ -377,7 +377,7 @@ def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool)
                 col_old: "OLD",
                 col_new: "NEW",
             }
-        )
+        ).set_index("value")
 
         # Show
         st.dataframe(pivot_df)
