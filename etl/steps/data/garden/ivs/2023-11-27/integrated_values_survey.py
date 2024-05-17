@@ -25,7 +25,7 @@ MARGIN = 0.5
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
 # Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = None
+FRAC_ALLOWED_NANS_PER_YEAR = 0.3
 
 # Define question suffixes
 
