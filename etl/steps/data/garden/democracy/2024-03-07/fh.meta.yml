@@ -15,36 +15,73 @@ dataset:
 tables:
   fh:
     variables:
+
       civlibs_fh:
         title: Civil liberties rating
         unit: ""
+        description_short: |-
+          Identifies the extent of freedom of expression and association, the rule of law, and personal autonomy. Lower ratings indicate more liberties.
         description_key:
           - It is measured on a one-to-seven scale, with one representing the highest degree of Freedom and seven the lowest.
+
       polrights_fh:
         title: Political rights rating
         unit: ""
+        description_short: |-
+          Identifies the extent of free and fair elections, political pluralism and participation, and a functioning government. Lower ratings indicate more rights.
         description_key:
           - It is measured on a one-to-seven scale, with one representing the highest degree of Freedom and seven the lowest.
+
       regime_fh:
         title: Political regime
         unit: ""
+        description_short: |-
+          The variable identifies the political regime of a country. It distinguishes between free countries (score 2), partly free countries (score 1), and not free countries (score 0).
+
+        description_key:
+          - Free countries are understood as countries in which citizens have many political rights (free and fair elections, political pluralism and participation, functioning government) and civil liberties (freedoms of expression and association, rule of law, personal autonomy).
+          - Partly free country are countries in which citizens have some political rights and civil liberties.
+          - Not free country are countries in which citizens have few political rights and civil liberties.
         description_processing: |-
           score 0: Not free
           Score 1: Partly free
           Score 2: Free
+
+
       country_fh:
         title: Entity considered a country by Freedom House
         unit: ""
+        description_short: |-
+          Identifies whether Freedom House consider the entity a country or territory.
+
       electprocess_fh:
-        title: Electoral process
+        title: Democratic electoral institutions
         unit: ""
-        description_short: ""
+        description_short: |-
+          The variable identifies the extent to which the chief executive and legislature are chosen in free and fair elections under universal suffrage. Higher scores indicate a freer electoral process.
+
       polrights_score_fh:
         title: Political rights score
         unit: ""
-        description_short: ""
-      civlibs_score_fh:
-        title: Civil liberties score (Freedom House)
-        unit: ""
-        description_short: ""
+        description_short: |-
+          Identifies the fine-grained extent of free and fair elections, political pluralism and participation, and a functioning government. Higher scores indicate more rights.
 
+      civlibs_score_fh:
+        title: Civil liberties score
+        unit: ""
+        description_short: |-
+          The variable identifies the fine-grained extent of freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more liberties.
+
+      electdem_fh:
+        title: Electoral democracy
+        unit: ""
+        description_short: |-
+          Identifies if the political regime of a country is an electoral democracy. It identifies whether a country is an electoral democracy (score 1) or not (score 0).
+        description_key:
+          - Electoral democracies are understood as political systems in which citizens have the right to choose chief executive and legislature in broadly free and fair elections and have substantial other political rights and civil liberties.
+        description_processing: |-
+          This is a binary indicator which we define as follows:
+
+          * score 1: If `electprocess_fh >= 7`, `polrights_score_fh >= 20` and `civlibs_score_fh >= 30`.
+          * score NA: If `electprocess_fh`, `polrights_score_fh` and `civlibs_score_fh` values are all missing.
+          * score 0: Otherwise.

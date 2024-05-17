@@ -69,4 +69,5 @@ def add_electdem(tb: Table) -> Table:
         "electdem_fh",
     ] = 0
 
+    tb["electdem_fh"] = tb["electdem_fh"].copy_metadata(tb["electprocess_fh"])
     return tb

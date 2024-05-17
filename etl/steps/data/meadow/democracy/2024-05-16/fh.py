@@ -81,6 +81,7 @@ def reshape_ratings(tb_c: Table, tb_t: Table) -> Table:
 
     # Concatenate
     tb = concat([tb_c, tb_t], ignore_index=True)
+    tb["country_fh"] = tb["country_fh"].copy_metadata(tb_c["civlibs_fh"])
 
     return tb
 
