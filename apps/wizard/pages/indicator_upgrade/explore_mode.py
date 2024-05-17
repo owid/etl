@@ -30,7 +30,7 @@ def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_disp
     st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display)
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) -> None:
     """Compare `indicator_old` and `indicator_new`.
 
@@ -88,10 +88,9 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
             # 6/ Show dataframe with different rows
             st.header("Changes in data points")
             st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
-
         with tab2:
             # 7/ Show distribution of change
-            st_show_plot(df_indicators, col_old=name_old, col_new=name_new)
+            st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -360,8 +359,8 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
                     st.dataframe(df_missing)
 
 
-def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str) -> None:
-    if not ((COLUMN_RELATIVE_ERROR in df.columns) or (COLUMN_LOG_ERROR in df.columns)):
+def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
+    if is_numeric:
         # TODO: Show as a sankey diagram where the flow from old to new categories is shown.
         # Reshape
         df_cat = df.melt(id_vars=COLUMNS_INDEX, value_vars=[col_old, col_new], var_name="indicator", value_name="value")
@@ -383,6 +382,8 @@ def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str) -> None:
         # Show
         st.dataframe(pivot_df)
     else:
+        if (COLUMN_RELATIVE_ERROR not in df.columns) and (COLUMN_LOG_ERROR not in df.columns):
+            st.warning("No error columns found. Can't show distribution. Please report this error.")
         st.header("Charts")
         if COLUMN_RELATIVE_ERROR in df.columns:
             fig = px.histogram(df, x=COLUMN_RELATIVE_ERROR, nbins=100, title="Distribution of relative error")
