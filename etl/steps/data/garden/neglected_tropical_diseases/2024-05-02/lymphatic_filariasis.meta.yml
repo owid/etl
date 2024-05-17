@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Global Health
         # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
-
+    processing_level: minor
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -63,3 +63,11 @@ tables:
         unit: "people"
         display:
           numDecimalPlaces: 0
+      estimated_number_of_people_treated:
+        title: Estimated number of people treated
+        description_short: "Estimated number of people treated for [lymphatic filariasis](#dod:lymphatic-filariasis)."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+        processing_level: major

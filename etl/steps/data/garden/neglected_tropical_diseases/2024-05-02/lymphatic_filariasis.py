@@ -35,8 +35,13 @@ def run(dest_dir: str) -> None:
     tb_nat = (
         tb[["country", "year", "national_coverage__pct", "population_requiring_pc_for_lf"]].copy().drop_duplicates()
     )
+    tb_nat["estimated_number_of_people_treated"] = (
+        tb_nat["national_coverage__pct"] * tb_nat["population_requiring_pc_for_lf"] / 100
+    )
     tb_nat = add_regions_to_selected_vars(
-        tb_nat, cols=["country", "year", "population_requiring_pc_for_lf"], ds_regions=ds_regions
+        tb_nat,
+        cols=["country", "year", "population_requiring_pc_for_lf", "estimated_number_of_people_treated"],
+        ds_regions=ds_regions,
     )
     # There are a few cases with two values for some country-year combos, here we drop them because we are not sure which is the correct value
     tb_nat = tb_nat.drop_duplicates(subset=["country", "year"])

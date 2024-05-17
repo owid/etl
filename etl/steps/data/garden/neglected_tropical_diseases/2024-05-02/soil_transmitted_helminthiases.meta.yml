@@ -52,6 +52,7 @@ tables:
       estimated_number_of_pre_sac_treated:
         title: Estimated number of pre-school age children treated
         description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
         unit: "pre-school age children"
         processing_level: minor
         display:
@@ -92,9 +93,10 @@ tables:
         description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
         display:
           numDecimalPlaces: 0
-      estimated_number_of_pre_sac_treated:
+      estimated_number_of_sac_treated:
         title: Estimated number of pre-school age children treated
         description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
         unit: "pre-school age children"
         processing_level: minor
         display:

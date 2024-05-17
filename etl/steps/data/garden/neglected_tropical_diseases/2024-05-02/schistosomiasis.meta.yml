@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Global Health
         # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
-
+    processing_level: minor
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
