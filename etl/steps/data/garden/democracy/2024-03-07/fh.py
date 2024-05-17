@@ -58,6 +58,9 @@ def run(dest_dir: str) -> None:
     ), f"Minimum year is not as expected (should be {YEAR_MIN}! Imputing might behave unexpectedly."
     tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
 
+    # Remove imputed flag
+    tb = tb.drop(columns=[col_flag_imputed])
+
     # Table list
     tables = [
         tb.format(["country", "year"], short_name=paths.short_name),
