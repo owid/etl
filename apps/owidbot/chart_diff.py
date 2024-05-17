@@ -2,9 +2,9 @@ import pandas as pd
 from sqlmodel import Session
 from structlog import get_logger
 
-from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _modified_chart_ids_by_admin
+from apps.staging_sync.cli import _get_container_name, _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from etl import config
+from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 
 from . import github_utils as gh_utils
 
@@ -64,13 +64,13 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
-    source_engine = _get_engine_for_env(branch)
+    source_engine = OWIDEnv.from_staging(branch).get_engine()
 
-    if config.DB_IS_PRODUCTION:
-        target_engine = _get_engine_for_env(config.ENV_FILE)
+    if OWID_ENV.env_type_id == "live":
+        target_engine = OWID_ENV.get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        target_engine = _get_engine_for_env("staging-site-master")
+        target_engine = OWIDEnv.from_staging("master").get_engine()
 
     df = []
     with Session(source_engine) as source_session:

@@ -2,14 +2,13 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Set
 
 import click
 import pandas as pd
 import pytz
 import requests
 import structlog
-from dotenv import dotenv_values
 from rich import print
 from rich_click.rich_command import RichCommand
 from slack_sdk import WebClient
@@ -18,10 +17,11 @@ from sqlmodel import Session
 
 from apps.staging_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.utils.env import OWIDEnv, _get_container_name
 from etl import config
 from etl import grapher_model as gm
 from etl.datadiff import _dict_diff
-from etl.db import Engine, get_engine, read_sql
+from etl.db import read_sql
 
 log = structlog.get_logger()
 
@@ -138,11 +138,8 @@ def cli(
         source = _get_git_branch_from_commit_sha(source)
         log.info("staging_sync.use_branch", branch=source)
 
-    _validate_env(source)
-    _validate_env(target)
-
-    source_engine = _get_engine_for_env(source)
-    target_engine = _get_engine_for_env(target)
+    source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
+    target_engine = OWIDEnv.from_staging_or_env_file(target).get_engine()
 
     staging_created_at = _get_staging_created_at(source, staging_created_at)  # type: ignore
 
@@ -457,7 +454,7 @@ def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optiona
 
 def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> dt.datetime:
     if staging_created_at is None:
-        if not _is_env(source):
+        if not source.exists():
             return _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
         else:
             log.warning(
@@ -467,56 +464,6 @@ def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> 
             # raise click.BadParameter("staging-created-at is required when source is not a staging server name")
     else:
         return pd.to_datetime(staging_created_at)
-
-
-def _is_env(env: Union[str, Path]) -> bool:
-    return Path(env).exists()
-
-
-def _normalise_branch(branch_name):
-    return re.sub(r"[\/\._]", "-", branch_name)
-
-
-def _get_container_name(branch_name):
-    normalized_branch = _normalise_branch(branch_name)
-
-    # Strip staging-site- prefix to add it back later
-    normalized_branch = normalized_branch.replace("staging-site-", "")
-
-    # Ensure the container name is less than 63 characters
-    container_name = f"staging-site-{normalized_branch[:50]}"
-    # Remove trailing hyphens
-    return container_name.rstrip("-")
-
-
-def _validate_env(env: Union[str, Path]) -> None:
-    # if `env` is a path, it must exist (otherwise we'd confuse it with a staging server name)s
-    if str(env).startswith(".") and "env" in str(env) and not Path(env).exists():
-        raise click.BadParameter(f"File {env} does not exist")
-
-
-def _get_engine_for_env(env: Union[Path, str]) -> Engine:
-    # env exists as a path
-    if _is_env(Path(env)):
-        config = dotenv_values(str(env))
-    # env could be server name
-    else:
-        staging_name = str(env)
-
-        # add staging-site- prefix
-        if not staging_name.startswith("staging-site-"):
-            staging_name = "staging-site-" + staging_name
-
-        # generate config for staging server
-        config = {
-            "DB_USER": "owid",
-            "DB_NAME": "owid",
-            "DB_PASS": "",
-            "DB_PORT": "3306",
-            "DB_HOST": _get_container_name(staging_name),
-        }
-
-    return get_engine(config)
 
 
 def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
