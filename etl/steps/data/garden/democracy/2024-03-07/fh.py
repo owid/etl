@@ -1,12 +1,18 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import cast
+
 from owid.catalog import Table
+from shared import add_imputes
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+PATH_IMPUTE = paths.directory / "fh.countries_impute.yml"
+# Minimum dataset year expected
+YEAR_MIN = 1972
 
 
 def run(dest_dir: str) -> None:
@@ -39,6 +45,18 @@ def run(dest_dir: str) -> None:
 
     # Merge
     tb = tb_ratings.merge(tb_scores, on=["country", "year"], how="outer")
+
+    # Drop rows without values
+    columns_excluded = ["country", "year", "country_fh"]
+    tb = tb.dropna(subset=[col for col in tb.columns if col not in columns_excluded], how="all")
+    tb = cast(Table, tb)
+
+    # Impute values
+    col_flag_imputed = "values_imputed"
+    assert (
+        tb["year"].min() == YEAR_MIN
+    ), f"Minimum year is not as expected (should be {YEAR_MIN}! Imputing might behave unexpectedly."
+    tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
 
     # Table list
     tables = [
