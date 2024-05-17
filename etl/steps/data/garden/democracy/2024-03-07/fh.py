@@ -106,7 +106,8 @@ def run(dest_dir: str) -> None:
     # tb_regions.loc[tb_regions["year"] < 2005, "num_regime_fh"] = pd.NA
     tb_regions.loc[tb_regions["year"] < 2005, "num_electdem_fh"] = pd.NA
     tb_regions.loc[tb_regions["year"] < 2005, "pop_electdem_fh"] = pd.NA
-    tb_regions.loc[(tb_regions["year"] < 1981) & (tb_regions["year"] < 1972), "num_regime_fh"] = pd.NA
+    tb_regions.loc[(tb_regions["year"] == 1981) | (tb_regions["year"] < 1972), "pop_regime_fh"] = pd.NA
+    # tb_regions.loc[(tb_regions["year"] == 1981) & (tb_regions["year"] < 1972), "pop_electdem_fh"] = pd.NA
 
     # Remove imputed flag
     tb = tb.drop(columns=[col_flag_imputed])
