@@ -98,9 +98,9 @@ make watch
 
 ## Changelog
 
-- `dev`
+- `v0.3.10`
   - Add experimental chart data API in `owid.catalog.charts`
-- `v0.3.8`
+- `v0.3.9`
   - Switch from isort & black & fake8 to ruff
 - `v0.3.8`
   - Pin dataclasses-json==0.5.8 to fix error with python3.9
