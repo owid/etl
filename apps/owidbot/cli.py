@@ -77,7 +77,7 @@ def cli(
             services_body["chart_diff"] = chart_diff.run(branch, charts_df)
 
             # update github check run
-            chart_diff.create_check_run(repo_name, branch, charts_df)
+            chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
 
         elif service == "grapher":
             services_body["grapher"] = grapher.run(branch)

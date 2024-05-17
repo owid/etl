@@ -11,7 +11,7 @@ from . import github_utils as gh_utils
 log = get_logger()
 
 
-def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame) -> None:
+def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_run: bool = False) -> None:
     access_token = gh_utils.github_app_access_token()
     repo = gh_utils.get_repo(repo_name, access_token=access_token)
     pr = gh_utils.get_pr(repo, branch)
@@ -29,17 +29,18 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame) -> No
         conclusion = "failure"
         title = "Some charts are not approved"
 
-    # Create the check run and complete it in a single command
-    repo.create_check_run(
-        name="owidbot/chart-diff",
-        head_sha=latest_commit.sha,
-        status="completed",
-        conclusion=conclusion,
-        output={
-            "title": title,
-            "summary": format_chart_diff(charts_df),
-        },
-    )
+    if not dry_run:
+        # Create the check run and complete it in a single command
+        repo.create_check_run(
+            name="owidbot/chart-diff",
+            head_sha=latest_commit.sha,
+            status="completed",
+            conclusion=conclusion,
+            output={
+                "title": title,
+                "summary": format_chart_diff(charts_df),
+            },
+        )
 
 
 def run(branch: str, charts_df: pd.DataFrame) -> str:
@@ -47,11 +48,15 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
+    if charts_df.approved.all():
+        status = "✅"
+    else:
+        status = "❌"
+
     body = f"""
 <details open>
-<summary><b>Chart diff</b>: </summary>
+<summary>{status} <a href="http://{container_name}/etl/wizard/Chart%20Diff"><b>chart-diff</b></a>: </summary>
 {chart_diff}
-<a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a>
 </details>
     """.strip()
 
