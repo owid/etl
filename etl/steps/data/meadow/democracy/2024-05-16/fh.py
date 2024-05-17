@@ -167,8 +167,8 @@ def _set_dtypes_indicators_ratings(tb: Table) -> Table:
         .astype("string")
         .replace(
             {
-                "PF": "0",
-                "NF": "1",
+                "NF": "0",
+                "PF": "1",
                 "F": "2",
             }
         )
