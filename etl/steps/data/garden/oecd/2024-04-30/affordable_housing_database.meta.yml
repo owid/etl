@@ -193,6 +193,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
@@ -215,6 +216,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
@@ -237,6 +239,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
@@ -441,6 +444,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - Data for the United Kingdom only considers England.
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
