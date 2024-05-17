@@ -55,13 +55,25 @@ class Chart:
 
 def list_charts() -> List[str]:
     """
-    List all available charts published on Our World in Data.
+    List all available charts published on Our World in Data, representing each via
+    a short slug that you can use with `get_data()`.
     """
     return sorted(_list_charts())
 
 
-def get_data(slug: str) -> pd.DataFrame:
+def get_data(slug_or_url: str) -> pd.DataFrame:
     """
-    Fetch the data for a chart by its slug.
+    Fetch the data for a chart by its slug or by the URL of the chart.
+
+    Additional metadata about the chart is available in the DataFrame's `attrs` attribute.
     """
+    if slug_or_url.startswith("https://ourworldindata.org/grapher/"):
+        slug = slug_or_url.split("/")[-1]
+
+    elif slug_or_url.startswith("https://"):
+        raise ValueError("URL must be a Grapher URL, e.g. https://ourworldindata.org/grapher/life-expectancy")
+
+    else:
+        slug = slug_or_url
+
     return Chart(slug).get_data()

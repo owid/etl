@@ -139,7 +139,7 @@ class _GrapherBundle:
 def _fetch_grapher_config(slug):
     resp = requests.get(f"https://ourworldindata.org/grapher/{slug}")
     if resp.status_code == 404:
-        raise ChartNotFoundError(slug)
+        raise ChartNotFoundError(f"No such chart found at https://ourworldindata.org/grapher/{slug}")
 
     resp.raise_for_status()
     return json.loads(resp.content.decode("utf-8").split("//EMBEDDED_JSON")[1])

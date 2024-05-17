@@ -35,18 +35,33 @@ This API attempts to give you exactly the data you in a chart on our site.
 ```python
 from owid.catalog import charts
 
-# list all available charts
-slugs = charts.list_charts()
+# get the data for one chart by URL
+df = charts.get_data('https://ourworldindata.org/grapher/life-expectancy')
+```
 
-# get the data for one chart by its slug
+Notice that the last part of the URL is the chart's slug, its identifier, in this case `life-expectancy`. Using the slug alone also works.
+
+```python
 df = charts.get_data('life-expectancy')
+```
+
+To see what charts are available, you can list them all.
+
+```python
+>>> slugs = charts.list_charts()
+>>> slugs[:5]
+['above-ground-biomass-in-forest-per-hectare',
+ 'above-or-below-extreme-poverty-line-world-bank',
+ 'abs-change-energy-consumption',
+ 'absolute-change-co2',
+ 'absolute-gains-in-mean-female-height']
 ```
 
 ### Data science API
 
 We also curate much more data than is available on our site. To access that in efficient binary (Feather) format, use our data science API.
 
-This API works very well in a Jupyter notebook.
+This API is designed for use in Jupyter notebooks.
 
 ```python
 from owid import catalog
@@ -56,10 +71,17 @@ catalog.find('covid')
 
 # load Covid-19 data from the Our World in Data namespace as a data frame
 df = catalog.find('covid', namespace='owid').load()
+```
 
-# load data from other than the default `garden` channel
-lung_cancer_tables = catalog.find('lung_cancer_deaths_per_100000_men', channels=['open_numbers'])
-df = lung_cancer_tables.iloc[0].load()
+There many be multiple versions of the same dataset in a catalog, each will have a unique path. To easily load the same dataset again, you should record its path and load it this way:
+
+```python
+from owid import catalog
+
+path = 'garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate/gbd_mental_health_prevalence_rate'
+
+rc = catalog.RemoteCatalog()
+df = rc[path]
 ```
 
 ## Development

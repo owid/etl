@@ -52,6 +52,23 @@ def test_fetch_missing_chart():
 
 
 def test_fetch_chart_with_dates():
-    df = charts.Chart("sea-level").get_data()
+    df = charts.get_data("sea-level")
     assert "dates" in df.columns
     assert "years" not in df.columns
+    assert len(df) > 0
+
+
+def test_fetch_chart_by_url():
+    df = charts.get_data("https://ourworldindata.org/grapher/life-expectancy")
+    assert set(df.columns) == set(["entities", "years", "life_expectancy"])
+    assert len(df) > 0
+
+
+def test_fetch_chart_by_non_grapher_url():
+    with pytest.raises(ValueError):
+        charts.get_data("https://ourworldindata.org/this-is-not-a-grapher-url")
+
+
+def test_fetch_chart_by_missing_grapher_url():
+    with pytest.raises(charts.ChartNotFoundError):
+        charts.get_data("https://ourworldindata.org/grapher/this-chart-does-not-exist")
