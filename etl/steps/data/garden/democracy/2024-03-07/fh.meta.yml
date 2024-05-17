@@ -85,3 +85,28 @@ tables:
           * score 1: If `electprocess_fh >= 7`, `polrights_score_fh >= 20` and `civlibs_score_fh >= 30`.
           * score NA: If `electprocess_fh`, `polrights_score_fh` and `civlibs_score_fh` values are all missing.
           * score 0: Otherwise.
+
+  fh_regions:
+    variables:
+      num_regime_fh:
+        title: |-
+          <% if category == '-1' %>
+          Number of countries with unknown regime
+          <% elif category == 'Not free' %>
+          Number of not-free countries
+          <% elif category == 'Partly free' %>
+          Number of partly-free countries
+          <% elif category == 'Free' %>
+          Number of free countries
+          <% endif %>
+        unit: "countries"
+      num_electdem_fh:
+        title: |-
+          <% if category == '-1' %>
+          Number of countries with unknown regime (electoral democracies)
+          <% elif category == 'Non-electoral democracy' %>
+          Number of not-electoral democracies
+          <% elif category == 'Electoral democracy' %>
+          Number of electoral democracies
+          <% endif %>
+        unit: "countries"
