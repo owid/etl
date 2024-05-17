@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -32,11 +34,15 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
+    # Create indicator for electoral democracy
+    tb_scores = add_electdem(tb_scores)
+
+    # Merge
+    tb = tb_ratings.merge(tb_scores, on=["country", "year"], how="outer")
+
+    # Table list
     tables = [
-        tb_ratings.format(["country", "year"]),
-        tb_scores.format(
-            ["country", "year"],
-        ),
+        tb.format(["country", "year"], short_name=paths.short_name),
     ]
 
     #
@@ -52,3 +58,15 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_electdem(tb: Table) -> Table:
+    """Add electoral democracy indicator."""
+    mask = (tb["electprocess_fh"] >= 7) & (tb["polrights_score_fh"] >= 20) & (tb["civlibs_score_fh"] >= 30)
+    tb.loc[mask, "electdem_fh"] = 1
+    tb.loc[
+        ~mask & (tb[["electprocess_fh", "polrights_score_fh", "civlibs_score_fh"]].notna().all(axis=1)),
+        "electdem_fh",
+    ] = 0
+
+    return tb

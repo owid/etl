@@ -220,13 +220,11 @@
   "Tibet": "Tibet",
   "Vietnam, N.": "Democratic Republic of Vietnam",
   "Vietnam, S.": "Republic of Vietnam",
-
-  "Israeli-Occupied Territories": "Israeli-Occupied Territories",
-  "Palestinian Authority-Administered Territories": "Palestinian Authority-Administered Territories",
+  "Israeli-Occupied Territories": "Israeli Occupied Territories",
+  "Palestinian Authority-Administered Territories": "Palestinian Authority Administered Territories",
   "West Bank": "West Bank",
   "West Bank and Gaza Strip": "West Bank and Gaza Strip",
   "Gaza Strip": "Gaza Strip",
-
   "West Papua": "West Papua",
   "Yemen, N.": "Yemen Arab Republic",
   "Yemen, S.": "Yemen People's Republic"
