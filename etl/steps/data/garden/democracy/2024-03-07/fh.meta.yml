@@ -110,3 +110,27 @@ tables:
           Number of electoral democracies
           <% endif %>
         unit: "countries"
+
+
+      pop_regime_fh:
+        title: |-
+          <% if category == '-1' %>
+          People living in countries without regime data
+          <% elif category == 'Not free' %>
+          People living in not-free countries
+          <% elif category == 'Partly free' %>
+          People living in partly-free countries
+          <% elif category == 'Free' %>
+          People living in free countries
+          <% endif %>
+        unit: "countries"
+      pop_electdem_fh:
+        title: |-
+          <% if category == '-1' %>
+          People living in countries without democracy data
+          <% elif category == 'Non-electoral democracy' %>
+          People living in not-electoral democracies
+          <% elif category == 'Electoral democracy' %>
+          People living in electoral democracies
+          <% endif %>
+        unit: "countries"
