@@ -218,6 +218,10 @@ def prepare_input_data(tb: Table) -> Table:
     # Make "entry_date" a datetime column.
     tb["entry_date"] = pd.to_datetime(tb["entry_date"], errors="coerce")
 
+    # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
+    for variable in COST_VARIABLES:
+        tb[variable] *= 1000
+
     return tb
 
 
@@ -728,8 +732,6 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
     # Prepare cost variables.
     for variable in COST_VARIABLES:
-        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-        tb[variable] *= 1000
         # Create variables of costs (in current US$) as a share of GDP (in current US$).
         tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
 
@@ -931,7 +933,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Prepare input data (and fix some known issues).
+    # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
     tb = prepare_input_data(tb=tb_meadow)
 
     # Sanity checks.
