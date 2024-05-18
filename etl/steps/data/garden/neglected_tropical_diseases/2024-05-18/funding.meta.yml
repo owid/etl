@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  funding_disease:
+    amount__usd:
+      title: Funding for each neglected disease
+      unit: “constant 2022 US$
+      short_unit: "$"
+      description_short: "This data is expressed in US dollars, adjusted for inflation."
+  funding_product:
+    amount__usd:
+      title: Funding for each product
+      unit: “constant 2022 US$
+      short_unit: "$"
+      description_short: "This data is expressed in US dollars, adjusted for inflation."
+  funding_disease_product:
+    amount__usd:
+      title: Funding for each neglected disease, by product
+      unit: “constant 2022 US$
+      short_unit: "$"
+      description_short: "This data is expressed in US dollars, adjusted for inflation."

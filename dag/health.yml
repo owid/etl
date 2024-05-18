@@ -568,3 +568,5 @@ steps:
     - snapshot://neglected_tropical_diseases/2024-05-18/funding.xlsx
   data://garden/neglected_tropical_diseases/2024-05-18/funding:
     - data://meadow/neglected_tropical_diseases/2024-05-18/funding
+  data://grapher/neglected_tropical_diseases/2024-05-18/funding:
+    - data://garden/neglected_tropical_diseases/2024-05-18/funding

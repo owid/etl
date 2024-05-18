@@ -2,10 +2,10 @@
 Load a meadow dataset and create a garden dataset.
 """
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -25,9 +25,27 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["funding"].reset_index()
     # Aggregate the funding amounts so that we have three tables, one summed by disease, one summed by product and one summed by disease*product
-    tb_disease = tb.groupby(["disease", "year"], observed=True)["amount__usd"].sum()
-    tb_product = tb.groupby(["product", "year"], observed=True)["amount__usd"].sum()
-    tb_disease_product = tb.groupby(["disease", "product", "year"], observed=True)["amount__usd"].sum()
+    tb_disease = (
+        tb.groupby(["disease", "year"], observed=True)["amount__usd"]
+        .sum()
+        .reset_index()
+        .set_index(["disease", "year"], verify_integrity=True)
+    )
+    tb_disease.metadata.short_name = "funding_disease"
+    tb_product = (
+        tb.groupby(["product", "year"], observed=True)["amount__usd"]
+        .sum()
+        .reset_index()
+        .set_index(["product", "year"], verify_integrity=True)
+    )
+    tb_product.metadata.short_name = "funding_product"
+    tb_disease_product = (
+        tb.groupby(["disease", "product", "year"], observed=True)["amount__usd"]
+        .sum()
+        .reset_index()
+        .set_index(["disease", "product", "year"], verify_integrity=True)
+    )
+    tb_disease_product.metadata.short_name = "funding_disease_product"
     #
     # Save outputs.
     #
