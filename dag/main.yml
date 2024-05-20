@@ -400,11 +400,11 @@ steps:
     - data://garden/imf/2024-05-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
-  data://garden/research_development/2023-05-05/patents_articles:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://garden/research_development/2024-05-20/patents_articles:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
     - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2023-05-05/patents_articles:
-    - data://garden/research_development/2023-05-05/patents_articles
+  data://grapher/research_development/2024-05-20/patents_articles:
+    - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data
   data://meadow/wb/2023-05-12/women_business_law_additional:
