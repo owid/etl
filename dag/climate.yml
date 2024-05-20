@@ -57,7 +57,7 @@ steps:
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
-    - data://garden/climate/2024-04-17/climate_change_impacts
+    - data://garden/climate/2024-05-20/climate_change_impacts
   #
   # Global Wildfire Information System - Monthly burned area.
   #
