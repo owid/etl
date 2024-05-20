@@ -5,6 +5,9 @@ from owid.catalog import Dataset, Table, Variable
 
 CURRENT_DIR = Path(__file__).parent
 METADATA_PATH = CURRENT_DIR / "patents_articles.meta.yml"
+SHORT_NAME = "patents_wdi_unwpp"
+NAMESPACE = "research_development"
+VERSION = "2024-05-20"
 
 
 def run(dest_dir: str) -> None:
@@ -21,9 +24,9 @@ def run(dest_dir: str) -> None:
 
     # Add metadata to dataset.
     ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    ds.metadata.short_name = "patents_wdi_unwpp"
-    ds.metadata.namespace = "research_development"
-    ds.metadata.version = "latest"
+    ds.metadata.short_name = SHORT_NAME
+    ds.metadata.namespace = NAMESPACE
+    ds.metadata.version = VERSION
 
     # Save
     ds.save()
