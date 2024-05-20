@@ -1,20 +1,37 @@
-from structlog import get_logger
+"""Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder
+from etl.data_helpers import geo
+from etl.helpers import PathFinder, create_dataset
 
-from .shared import run_wrapper
-
+# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-log = get_logger()
 
 
 def run(dest_dir: str) -> None:
-    dims = ["neglected_tropical_disease", "impairment", "sex", "age"]
-    # Get dataset level variables
-    dataset = paths.short_name
-    log.info(f"{dataset}.start")
-    country_mapping_path = paths.directory / "gbd.countries.json"
-    excluded_countries_path = paths.directory / "gbd.excluded_countries.json"
-    # Run the function to produce garden dataset
-    run_wrapper(dataset, country_mapping_path, excluded_countries_path, dest_dir, dims)
-    log.info(f"{dataset}.end")
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("impairments")
+
+    # Read table from meadow dataset.
+    tb = ds_meadow["impairments"].reset_index()
+
+    #
+    # Process data.
+    #
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+    tb = tb.format(["country", "year"])
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
