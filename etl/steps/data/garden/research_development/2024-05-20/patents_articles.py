@@ -9,7 +9,6 @@ METADATA_PATH = CURRENT_DIR / "patents_articles.meta.yml"
 
 def run(dest_dir: str) -> None:
     ds = Dataset.create_empty(dest_dir)
-    ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
 
     # Create and add patents table
     table = make_table()
@@ -19,6 +18,8 @@ def run(dest_dir: str) -> None:
 
     # Add table to dataset
     ds.add(table)
+    # Add metadata to dataset.
+    ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
 
     # Save
     ds.save()
