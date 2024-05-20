@@ -2,7 +2,9 @@
 Load a meadow dataset and create a garden dataset.
 """
 
-from owid.catalog import Dataset
+from typing import List
+
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -24,28 +26,18 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["funding"].reset_index()
-    # Aggregate the funding amounts so that we have three tables, one summed by disease, one summed by product and one summed by disease*product
-    tb_disease = (
-        tb.groupby(["disease", "year"], observed=True)["amount__usd"]
-        .sum()
-        .reset_index()
-        .set_index(["disease", "year"], verify_integrity=True)
+
+    # The funding for each disease
+    tb_disease = format_table(tb=tb, group=["disease", "year"], index_col=["disease"], short_name="funding_disease")
+    # The funding for each product
+    tb_product = format_table(tb=tb, group=["product", "year"], index_col=["product"], short_name="funding_product")
+    # The funding for each disease*product
+    tb_disease_product = format_table(
+        tb=tb,
+        group=["disease", "product", "year"],
+        index_col=["disease", "product"],
+        short_name="funding_disease_product",
     )
-    tb_disease.metadata.short_name = "funding_disease"
-    tb_product = (
-        tb.groupby(["product", "year"], observed=True)["amount__usd"]
-        .sum()
-        .reset_index()
-        .set_index(["product", "year"], verify_integrity=True)
-    )
-    tb_product.metadata.short_name = "funding_product"
-    tb_disease_product = (
-        tb.groupby(["disease", "product", "year"], observed=True)["amount__usd"]
-        .sum()
-        .reset_index()
-        .set_index(["disease", "product", "year"], verify_integrity=True)
-    )
-    tb_disease_product.metadata.short_name = "funding_disease_product"
     #
     # Save outputs.
     #
@@ -59,3 +51,16 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def format_table(tb: Table, group: List[str], index_col: List[str], short_name: str) -> Table:
+    """
+    Formatting original table so that we can have total funding by disease, product and disease*product
+    """
+    tb = tb.groupby(group, observed=True)["amount__usd"].sum().reset_index()
+    tb["country"] = "World"
+    tb = tb.set_index(["country", "year"] + index_col, verify_integrity=False)
+    # tb = tb.pivot(index="year", columns=pivot_col, values="amount__usd")
+    tb.metadata.short_name = short_name
+
+    return tb
