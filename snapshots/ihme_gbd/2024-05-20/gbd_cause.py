@@ -42,6 +42,26 @@ BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/63d75c7559682458eb
 NUMBER_OF_FILES = 103
 
 
+@click.command()
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+def main(upload: bool) -> None:
+    # Create a new snapshot.
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
+    # Download data from source.
+    all_dfs = []
+    for file_number in range(1, NUMBER_OF_FILES + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
+        df = download_data(file_number)
+        all_dfs.append(df)
+
+    combined_df = pd.concat(all_dfs, ignore_index=True)
+    # Download data from source.
+    df_to_file(combined_df, file_path=snap.path)
+
+    # Add file to DVC and upload to S3.
+    snap.dvc_add(upload=upload)
+
+
 def download_data(file_number: int) -> pd.DataFrame:
     # Unique URL for each file
     url_to_download = f"{BASE_URL}{file_number}.zip"
@@ -78,26 +98,6 @@ def download_data(file_number: int) -> pd.DataFrame:
         # Read the CSV file
         df = pd.read_csv(csv_file_path)
         return df
-
-
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
-    # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
-    # Download data from source.
-    all_dfs = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number)
-        all_dfs.append(df)
-
-    combined_df = pd.concat(all_dfs, ignore_index=True)
-    # Download data from source.
-    df_to_file(combined_df, file_path=snap.path)
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
 
 
 if __name__ == "__main__":

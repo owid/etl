@@ -572,5 +572,5 @@ steps:
     - data://garden/neglected_tropical_diseases/2024-05-18/funding
 
   # GBD 2021 - GBD Deaths and DALYs
-  data://meadow/ihme_gbd/2024-05-20/gbd_cause:
-    - snapshot://ihme_gbd/2024-05-20/gbd_cause.csv
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.csv
