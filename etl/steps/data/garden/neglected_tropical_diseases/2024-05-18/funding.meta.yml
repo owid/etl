@@ -9,6 +9,8 @@ definitions:
       grapher_config:
         note: "This data is expressed in constant constant 2022 US$."
         selectedEntityNames: ["World"]
+    display:
+      numDecimalPlaces: 0
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
