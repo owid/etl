@@ -1,0 +1,166 @@
+definitions:
+  common:
+    unit: animals
+    short_unit: ""
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
+tables:
+  animals_used_for_food:
+    title: Animals used for food
+    variables:
+      cattle_killed:
+        title: Number of cattle slaughtered to produce meat
+        display:
+          name: Cattle
+        presentation:
+          title_public: Number of cattle slaughtered to produce meat
+      sheep_killed:
+        title: Number of sheep slaughtered to produce meat
+        display:
+          name: Sheep
+        presentation:
+          title_public: Number of sheep slaughtered to produce meat
+      goats_killed:
+        title: Number of goats slaughtered to produce meat
+        display:
+          name: Goats
+        presentation:
+          title_public: Number of goats slaughtered to produce meat
+      pigs_killed:
+        title: Number of pigs slaughtered to produce meat
+        display:
+          name: Pigs
+        presentation:
+          title_public: Number of pigs slaughtered to produce meat
+      chickens_killed:
+        title: Number of chickens slaughtered to produce meat
+        display:
+          name: Chickens
+        presentation:
+          title_public: Number of chickens slaughtered to produce meat
+      rabbits_killed:
+        title: Number of rabbits slaughtered to produce meat
+        display:
+          name: Rabbits
+        presentation:
+          title_public: Number of rabbits slaughtered to produce meat
+      ducks_killed:
+        title: Number of ducks slaughtered to produce meat
+        display:
+          name: Ducks
+        presentation:
+          title_public: Number of ducks slaughtered to produce meat
+      turkeys_killed:
+        title: Number of turkeys slaughtered to produce meat
+        display:
+          name: Turkeys
+        presentation:
+          title_public: Number of turkeys slaughtered to produce meat
+      horses_killed:
+        title: Number of horses slaughtered to produce meat
+        display:
+          name: Horses
+        presentation:
+          title_public: Number of horses slaughtered to produce meat
+      buffaloes_killed:
+        title: Number of buffaloes slaughtered to produce meat
+        display:
+          name: Buffaloes
+        presentation:
+          title_public: Number of buffaloes slaughtered to produce meat
+      geese_killed:
+        title: Number of geese slaughtered to produce meat
+        display:
+          name: Geese
+        presentation:
+          title_public: Number of geese slaughtered to produce meat
+      camels_killed:
+        title: Number of camels slaughtered to produce meat
+        display:
+          name: Camels
+        presentation:
+          title_public: Number of camels slaughtered to produce meat
+      pigeons_killed:
+        title: Number of pigeons slaughtered to produce meat
+        display:
+          name: Pigeons
+        presentation:
+          title_public: Number of pigeons slaughtered to produce meat
+      snails_killed:
+        title: Number of snails slaughtered to produce meat
+        display:
+          name: Snails
+        presentation:
+          title_public: Number of snails slaughtered to produce meat
+      donkeys_killed:
+        title: Number of donkeys slaughtered to produce meat
+        display:
+          name: Donkeys
+        presentation:
+          title_public: Number of donkeys slaughtered to produce meat
+      game_killed:
+        title: Number of game animals slaughtered to produce meat
+        display:
+          name: Game animals
+        presentation:
+          title_public: Number of game animals slaughtered to produce meat
+      other_non_mammals_killed:
+        title: Number of other non-mammals slaughtered to produce meat
+        display:
+          name: Other non-mammals
+        presentation:
+          title_public: Number of other non-mammals slaughtered to produce meat
+      other_rodents_killed:
+        title: Number of other rodents slaughtered to produce meat
+        display:
+          name: Other rodents
+        presentation:
+          title_public: Number of other rodents slaughtered to produce meat
+      other_camelids_killed:
+        title: Number of other camelids slaughtered to produce meat
+        display:
+          name: Other camelids
+        presentation:
+          title_public: Number of other camelids slaughtered to produce meat
+      mule_killed:
+        title: Number of mules slaughtered to produce meat
+        display:
+          name: Mules
+        presentation:
+          title_public: Number of mules slaughtered to produce meat
+      cattle_alive:
+        title: Number of live cattle used to produce meat
+      buffalo_alive:
+        title: Number of live buffaloes used to produce meat
+      sheep_alive:
+        title: Number of live sheep used to produce meat
+      goats_alive:
+        title: Number of live goats used to produce meat
+      pigs_alive:
+        title: Number of live pigs used to produce meat
+      chickens_alive:
+        title: Number of live chickens used to produce meat
+      turkeys_alive:
+        title: Number of live turkeys used to produce meat
+      horses_alive:
+        title: Number of live horses used to produce meat
+      donkeys_alive:
+        title: Number of live donkeys used to produce meat
+      mules_alive:
+        title: Number of live mules used to produce meat
+      rabbits_alive:
+        title: Number of live rabbits used to produce meat
+      bees_alive:
+        title: Number of live bees used to produce honey
+      ducks_alive:
+        title: Number of live ducks used to produce meat
+      camels_alive:
+        title: Number of live camels used to produce meat
+      geese_alive:
+        title: Number of live geese used to produce meat
+      other_rodents_alive:
+        title: Number of other live rodents used to produce meat
+      other_camelids_alive:
+        title: Number of other live camelids used to produce meat
