@@ -29,8 +29,11 @@ import click
 import pandas as pd
 import requests
 from owid.datautils.io import df_to_file
+from structlog import get_logger
 
 from etl.snapshot import Snapshot
+
+log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -85,6 +88,7 @@ def main(upload: bool) -> None:
     # Download data from source.
     all_dfs = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
         df = download_data(file_number)
         all_dfs.append(df)
 
