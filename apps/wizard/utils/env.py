@@ -1,30 +1,51 @@
 """Tools to handle OWID environment."""
 import re
+from dataclasses import dataclass, fields
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Literal, Optional, cast
 
 from dotenv import dotenv_values
 from typing_extensions import Self
 
 from etl import config
-from etl.db import Engine, dict_to_object, get_engine
+from etl.db import Engine, get_engine
 
-OWIDEnvType = Literal["live", "staging", "local", "remote-staging", "unknown"]
+OWIDEnvType = Literal["live", "local", "remote-staging", "unknown"]
+
+
+@dataclass
+class Config:
+    """Configuration for OWID environment which is a subset of etl.config."""
+
+    DB_USER: str
+    DB_NAME: str
+    DB_PASS: str
+    DB_PORT: str
+    DB_HOST: str
+
+    @classmethod
+    def from_env_file(cls, env_file: str) -> Self:
+        env_dict = dotenv_values(env_file)
+        config_dict = {field.name: env_dict[field.name] for field in fields(cls)}
+        return cls(**config_dict)  # type: ignore
+
+
+class UnknownOWIDEnv(Exception):
+    pass
 
 
 class OWIDEnv:
     """OWID environment."""
 
     env_type_id: OWIDEnvType
-    # TODO: use proper type
-    conf: Any
+    conf: Config
 
     def __init__(
         self: Self,
         env_type_id: Optional[OWIDEnvType] = None,
-        conf: Any = None,
+        conf: Config | None = None,
     ) -> None:
-        self.conf = conf or config
+        self.conf = conf or cast(Config, config)
 
         if env_type_id is None:
             self.env_type_id = self.detect_env_type()
@@ -36,9 +57,6 @@ class OWIDEnv:
         # live
         if self.conf.DB_NAME == "live_grapher":
             return "live"
-        # staging
-        elif self.conf.DB_NAME == "staging_grapher" and self.conf.DB_USER == "staging_grapher":
-            return "staging"
         # local
         elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
             return "local"
@@ -50,14 +68,12 @@ class OWIDEnv:
     @classmethod
     def from_staging(cls, branch: str) -> Self:
         """Create OWIDEnv for staging."""
-        conf = dict_to_object(
-            {
-                "DB_USER": "owid",
-                "DB_NAME": "owid",
-                "DB_PASS": "",
-                "DB_PORT": "3306",
-                "DB_HOST": _get_container_name(branch),
-            }
+        conf = Config(
+            DB_USER="owid",
+            DB_NAME="owid",
+            DB_PASS="",
+            DB_PORT="3306",
+            DB_HOST=_get_container_name(branch),
         )
         return cls("remote-staging", conf)
 
@@ -65,8 +81,7 @@ class OWIDEnv:
     def from_env_file(cls, env_file: str) -> Self:
         """Create OWIDEnv from env file."""
         assert Path(env_file).exists(), f"ENV file {env_file} doesn't exist"
-        conf = dict_to_object(dotenv_values(env_file))
-        return cls(conf=conf)
+        return cls(conf=Config.from_env_file(env_file))
 
     @classmethod
     def from_staging_or_env_file(cls, staging_or_env_file: str) -> Self:
@@ -84,8 +99,6 @@ class OWIDEnv:
         """Get site."""
         if self.env_type_id == "live":
             return "https://ourworldindata.org"
-        elif self.env_type_id == "staging":
-            return "https://staging.ourworldindata.org"
         elif self.env_type_id == "local":
             return "http://localhost:3030"
         elif self.env_type_id == "remote-staging":
@@ -97,8 +110,6 @@ class OWIDEnv:
         """Get site."""
         if self.env_type_id == "live":
             return "production"
-        elif self.env_type_id == "staging":
-            return "staging"
         elif self.env_type_id == "local":
             return "local"
         elif self.env_type_id == "remote-staging":
@@ -110,10 +121,10 @@ class OWIDEnv:
         """Get site."""
         if self.env_type_id == "live":
             return "https://admin.owid.io"
-        elif self.env_type_id == "staging":
-            return "https://staging.owid.cloud"
-        elif self.env_type_id in ["local", "remote-staging"]:
-            return self.site
+        elif self.env_type_id == "local":
+            return "http://localhost:3030"
+        elif self.env_type_id == "remote-staging":
+            return f"http://{self.conf.DB_HOST}"
         return None
 
     @property
@@ -134,7 +145,7 @@ class OWIDEnv:
         elif self.env_type_id == "local":
             return "http://localhost:3030"
         else:
-            raise NotImplementedError()
+            raise UnknownOWIDEnv()
 
     @property
     def chart_approval_tool_url(self: Self) -> str:

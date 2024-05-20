@@ -176,7 +176,7 @@ def compare_charts(
     # Only one chart: new chart
     if target_chart is None:
         st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-        chart_html(source_chart.config, base_url=SOURCE.conf.DB_HOST, base_api_url=SOURCE.indicators_url)
+        chart_html(source_chart.config, owid_env=SOURCE)
     # Two charts, actual diff
     else:
         # Create two columns for the iframes
@@ -186,11 +186,10 @@ def compare_charts(
         if not prod_is_newer:
             with col1:
                 st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
-                # TODO: fix TARGET.conf.DB_HOST
-                chart_html(target_chart.config, base_url=TARGET.conf.DB_HOST, base_api_url=TARGET.indicators_url)
+                chart_html(target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
-                chart_html(source_chart.config, base_url=SOURCE.conf.DB_HOST, base_api_url=SOURCE.indicators_url)
+                chart_html(source_chart.config, owid_env=SOURCE)
         # Conflict with live
         else:
             with col1:
@@ -198,10 +197,10 @@ def compare_charts(
                     f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
                     help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
                 )
-                chart_html(target_chart.config, base_url=TARGET.conf.DB_HOST, base_api_url=TARGET.indicators_url)
+                chart_html(target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-                chart_html(source_chart.config, base_url=SOURCE.conf.DB_HOST, base_api_url=SOURCE.indicators_url)
+                chart_html(source_chart.config, owid_env=SOURCE)
 
 
 @st.cache_resource
