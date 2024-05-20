@@ -18,8 +18,11 @@ def run(dest_dir: str) -> None:
 
     # Add table to dataset
     ds.add(table)
+
     # Add metadata to dataset.
     ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
+    ds.metadata.short_name = "patents_wdi_unwpp"
+    ds.metadata.namespace = "research_development"
 
     # Save
     ds.save()

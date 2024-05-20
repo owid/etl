@@ -1,8 +1,5 @@
 dataset:
-  namespace: research_development
-  version: 2024-05-20
   title: Patent applications and journal articles per million (World Bank, UN)
-  short_name: patents_wdi_unwpp
   update_period_days: 365
 
 definitions:
