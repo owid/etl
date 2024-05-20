@@ -3,17 +3,32 @@ dataset:
   version: 2024-05-20
   title: Patent applications and journal articles per million (World Bank, UN)
   short_name: patents_wdi_unwpp
+  update_period_days: 365
 
-origin:
-  attribution_short: World Bank
-  citation_full: "World Development Indicators, The World Bank; United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition"
-  date_accessed: "2023-05-11"
-  date_published: "2023-05-11"
-  description: The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
-  license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
-  license_name: Creative Commons Attribution 4.0
-  producer: World Bank
-  title: World Development Indicators
+definitions:
+  common:
+    processing_level: minor
+    origins:
+      - producer: World Bank
+        title: World Development Indicators
+        description: The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+        citation_full: World Development Indicators, The World Bank
+        url_main: https://hdr.undp.org/
+        date_accessed: "2023-05-11"
+        date_published: "2023-05-11"
+        license:
+          name: Creative Commons Attribution 4.0
+          url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+      - producer: United Nations
+        title: World Population Prospects
+        description: World Population Prospects are the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
+        citation_full: United Nations, Department of Economic and Social Affairs, Population Division, Online Edition.
+        url_main: https://population.un.org/wpp/Download/
+        date_accessed: "2022-09-09"
+        date_published: "2022-07-11"
+        license:
+          name: CC BY 3.0 IGO
+          url: https://population.un.org/wpp/Download/Standard/MostUsed/
 
 tables:
   patents_articles:
@@ -35,6 +50,7 @@ tables:
         description_short: Scientific and technical journal articles per million people. Disciplines include physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
         description_key:
           - Scientific and technical journal articles per million people are calculated by Our World in Data based on article data from the World Bank's World Development Indicators, and population estimates from the United Nations World Population Prospects.
+          - Patents are assigned based on the residence country of the first-named applicant.
         description_from_producer: "Scientific and technical journal articles refer to the number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences.
         
         The number of scientific and engineering articles published in the following fields: physics, biology, chemistry, mathematics, clinical medicine, biomedical research, engineering and technology, and earth and space sciences. The NSF considers article counts from a set of journals covered by Science Citation Index (SCI) and Social Sciences Citation Index (SSCI)."
