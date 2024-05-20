@@ -17,7 +17,7 @@ from sqlmodel import Session
 
 from apps.staging_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from apps.wizard.utils.env import OWIDEnv, _get_container_name
+from apps.wizard.utils.env import OWIDEnv, get_container_name
 from etl import config
 from etl import grapher_model as gm
 from etl.datadiff import _dict_diff
@@ -402,7 +402,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
 
     message = f"""
 :warning: *ETL chart-sync: Unapproved Chart Update* from `{source}`
-<http://{_get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
+<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
 ```
@@ -421,7 +421,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
 def _notify_slack_chart_create(source_chart_id: int, target_chart_id: int, source: str, dry_run: bool) -> None:
     message = f"""
 :warning: *ETL chart-sync: Unapproved New Chart* from `{source}`
-<http://{_get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
+<http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
     """.strip()
 
     print(message)

@@ -42,15 +42,10 @@ class OWIDEnv:
 
     def __init__(
         self: Self,
-        env_type_id: Optional[OWIDEnvType] = None,
         conf: Config | None = None,
     ) -> None:
         self.conf = conf or cast(Config, config)
-
-        if env_type_id is None:
-            self.env_type_id = self.detect_env_type()
-        else:
-            self.env_type_id = env_type_id
+        self.env_type_id = self.detect_env_type()
 
     def detect_env_type(self: Self) -> OWIDEnvType:
         """Detect environment type."""
@@ -73,9 +68,9 @@ class OWIDEnv:
             DB_NAME="owid",
             DB_PASS="",
             DB_PORT="3306",
-            DB_HOST=_get_container_name(branch),
+            DB_HOST=get_container_name(branch),
         )
-        return cls("remote-staging", conf)
+        return cls(conf)
 
     @classmethod
     def from_env_file(cls, env_file: str) -> Self:
@@ -121,10 +116,8 @@ class OWIDEnv:
         """Get site."""
         if self.env_type_id == "live":
             return "https://admin.owid.io"
-        elif self.env_type_id == "local":
-            return "http://localhost:3030"
-        elif self.env_type_id == "remote-staging":
-            return f"http://{self.conf.DB_HOST}"
+        elif self.env_type_id in ["local", "remote-staging"]:
+            return self.site
         return None
 
     @property
@@ -143,7 +136,7 @@ class OWIDEnv:
         elif self.env_type_id == "remote-staging":
             return f"https://api-staging.owid.io/{self.conf.DB_HOST}"
         elif self.env_type_id == "local":
-            return "http://localhost:3030"
+            return "http://localhost:8000"
         else:
             raise UnknownOWIDEnv()
 
@@ -185,7 +178,7 @@ def _normalise_branch(branch_name):
     return re.sub(r"[\/\._]", "-", branch_name)
 
 
-def _get_container_name(branch_name):
+def get_container_name(branch_name):
     normalized_branch = _normalise_branch(branch_name)
 
     # Strip staging-site- prefix to add it back later
