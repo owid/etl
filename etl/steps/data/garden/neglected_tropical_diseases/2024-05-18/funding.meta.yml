@@ -5,7 +5,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-        - Neglected Tropical Diseases
+        #- Neglected Tropical Diseases
       grapher_config:
         note: "This data is expressed in constant constant 2022 US$."
         selectedEntityNames: ["World"]
@@ -18,14 +18,14 @@ tables:
   funding_disease:
     variables:
       amount__usd:
-        title: Funding for << disease.lower() >>
+        title: Funding for << disease.lower() >>, all technologies.
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << disease.lower() >>. This data is expressed in US dollars, adjusted for inflation."
   funding_product:
     variables:
       amount__usd:
-        title: Funding for << product.lower() >>
+        title: Funding for technology - << product.lower() >>
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << product.lower() >>. This data is expressed in US dollars, adjusted for inflation."
