@@ -551,7 +551,7 @@ steps:
     - snapshot://health/2024-04-22/gpei_funding.xlsx
   data://garden/health/2024-04-22/gpei_funding:
     - data://meadow/health/2024-04-22/gpei_funding
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding
 

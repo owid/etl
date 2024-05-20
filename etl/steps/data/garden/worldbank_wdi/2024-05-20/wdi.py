@@ -1,13 +1,12 @@
 import json
 import re
 import zipfile
-from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pandas as pd
 import structlog
-from owid.catalog import Source, Table, VariableMeta
+from owid.catalog import Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
@@ -31,23 +30,22 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_meadow = ds_meadow["wdi"]
-    df = pd.DataFrame(ds_meadow["wdi"]).reset_index()
+    tb_meadow = ds_meadow["wdi"].reset_index()
 
-    df = geo.harmonize_countries(
-        df=df,
+    tb = geo.harmonize_countries(
+        df=tb_meadow,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
     ).set_index(["country", "year"], verify_integrity=True)  # type: ignore
 
-    df_cust = mk_custom_entities(df)
-    assert all([col in df.columns for col in df_cust.columns])
-    df = pd.concat([df, df_cust], axis=0)
+    tb_cust = mk_custom_entities(tb)
+    assert all([col in tb.columns for col in tb_cust.columns])
+    tb = pd.concat([tb, tb_cust], axis=0).copy_metadata(tb)  # type: ignore
 
-    tb_garden = Table(df, metadata=tb_meadow.metadata)
+    tb_garden = tb
 
     log.info("wdi.add_variable_metadata")
-    tb_garden = add_variable_metadata(tb_garden, ds_meadow.metadata.sources[0])
+    tb_garden = add_variable_metadata(tb_garden)
 
     tb_omm = mk_omms(tb_garden)
     tb_garden = tb_garden.join(tb_omm, how="outer")
@@ -84,18 +82,12 @@ def mk_omms(table: Table) -> Table:
 
     # for convenience, uses the same generic "Our World in Data based on..."
     # source for all OMMs created here
-    source = deepcopy(table["sp_pop_totl"].metadata.sources[0])
-    omm_source = Source(
-        name="Our World in Data based on World Bank",
-        description=None,
-        url=source.url,
-        source_data_url=source.source_data_url,
-        owid_data_url=source.owid_data_url,
-        date_accessed=source.date_accessed,
-        publication_date=source.publication_date,
-        publication_year=source.publication_year,
-        published_by=f"Our World in Data based on {source.published_by}",
-    )
+    omm_origin = table["sp_pop_totl"].metadata.origins[0].copy()
+
+    # rewrite "World Development Indicators" to "Our World in Data based on World Bank"
+    omm_origin.citation_full = f"{omm_origin.producer} - {omm_origin.citation_full}"
+
+    published_by = omm_origin.producer
 
     # omm: urban population living in slums
     urb_pop_code = "sp_urb_totl"  # Urban population
@@ -110,18 +102,18 @@ def mk_omms(table: Table) -> Table:
         title="Urban population living in slums",
         description=(
             "Total urban population living in slums. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[urb_pop_code].metadata.title}"'
             " and"
             f' "{table[slums_pct_code].metadata.title}"'
             "\n\n----\n"
             f"{table[urb_pop_code].metadata.title}:"
-            f" {table[urb_pop_code].metadata.description}"
+            f" {table[urb_pop_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[slums_pct_code].metadata.title}:"
-            f" {table[slums_pct_code].metadata.description}"
+            f" {table[slums_pct_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit="",
         short_unit="",
         display={},
@@ -132,18 +124,18 @@ def mk_omms(table: Table) -> Table:
         title="Urban population not living in slums",
         description=(
             "Total urban population not living in slums. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[urb_pop_code].metadata.title}"'
             " and"
             f' "{table[slums_pct_code].metadata.title}"'
             "\n\n----\n"
             f"{table[urb_pop_code].metadata.title}:"
-            f" {table[urb_pop_code].metadata.description}"
+            f" {table[urb_pop_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[slums_pct_code].metadata.title}:"
-            f" {table[slums_pct_code].metadata.description}"
+            f" {table[slums_pct_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit="",
         short_unit="",
         display={},
@@ -162,18 +154,18 @@ def mk_omms(table: Table) -> Table:
         title="Share of services in total goods and services exports",
         description=(
             "Service exports as a share of total exports of goods and services. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[service_exp_code].metadata.title}"'
             " and"
             f' "{table[goods_exp_code].metadata.title}"'
             "\n\n----\n"
             f"{table[service_exp_code].metadata.title}:"
-            f" {table[service_exp_code].metadata.description}"
+            f" {table[service_exp_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[goods_exp_code].metadata.title}:"
-            f" {table[goods_exp_code].metadata.description}"
+            f" {table[goods_exp_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit="% of goods and services exports",
         short_unit="%",
         display={},
@@ -194,18 +186,18 @@ def mk_omms(table: Table) -> Table:
         title="Merchandise exports as a share of GDP",
         description=(
             "Merchandise exports as a share of GDP. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[merch_code].metadata.title}"'
             " and"
             f' "{table[gdp_code].metadata.title}"'
             "\n\n----\n"
             f"{table[merch_code].metadata.title}:"
-            f" {table[merch_code].metadata.description}"
+            f" {table[merch_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[gdp_code].metadata.title}:"
-            f" {table[gdp_code].metadata.description}"
+            f" {table[gdp_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit="% of GDP",
         short_unit="%",
         display={},
@@ -216,18 +208,18 @@ def mk_omms(table: Table) -> Table:
         title="Goods exports as a share of GDP",
         description=(
             "Goods exports as a share of GDP. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[goods_code].metadata.title}"'
             " and"
             f' "{table[gdp_code].metadata.title}"'
             "\n\n----\n"
             f"{table[goods_code].metadata.title}:"
-            f" {table[goods_code].metadata.description}"
+            f" {table[goods_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[gdp_code].metadata.title}:"
-            f" {table[gdp_code].metadata.description}"
+            f" {table[gdp_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit="% of GDP",
         short_unit="%",
         display={},
@@ -251,18 +243,18 @@ def mk_omms(table: Table) -> Table:
         title="Tax revenues per capita (current international $)",
         description=(
             "Tax revenues per capita, expressed in current international $. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[tax_rev_share_gdp_code].metadata.title}"'
             " and"
             f' "{table[gdp_percap_code].metadata.title}"'
             "\n\n----\n"
             f"{table[tax_rev_share_gdp_code].metadata.title}:"
-            f" {table[tax_rev_share_gdp_code].metadata.description}"
+            f" {table[tax_rev_share_gdp_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[gdp_percap_code].metadata.title}:"
-            f" {table[gdp_percap_code].metadata.description}"
+            f" {table[gdp_percap_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit=table[gdp_percap_code].metadata.unit,
         short_unit=table[gdp_percap_code].metadata.short_unit,
         display={},
@@ -283,18 +275,18 @@ def mk_omms(table: Table) -> Table:
         description=(
             "Adjusted net savings per capita (excluding particulate emission"
             " damage), expressed in current US$. This variable is calculated"
-            f" by Our World in Data based on the following variables from {source.published_by}:"
+            f" by Our World in Data based on the following variables from {published_by}:"
             f' "{table[net_savings_code].metadata.title}"'
             " and"
             f' "{table[pop_code].metadata.title}"'
             "\n\n----\n"
             f"{table[net_savings_code].metadata.title}:"
-            f" {table[net_savings_code].metadata.description}"
+            f" {table[net_savings_code].metadata.description or ''}"
             "\n\n----\n"
             f"{table[pop_code].metadata.title}:"
-            f" {table[pop_code].metadata.description}"
+            f" {table[pop_code].metadata.description or ''}"
         ),
-        sources=[omm_source],
+        origins=[omm_origin],
         unit=table[net_savings_code].metadata.unit,
         short_unit=table[net_savings_code].metadata.short_unit,
         display={},
@@ -305,7 +297,7 @@ def mk_omms(table: Table) -> Table:
     return tb_omm[omms]
 
 
-def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
+def mk_custom_entities(df: Table) -> pd.DataFrame:
     """constructs observations for custom entities, to be appended to existing df
 
     e.g. poverty headcount for "World (excluding China)"
@@ -356,7 +348,7 @@ def load_variable_metadata() -> pd.DataFrame:
     return df_vars.set_index("indicator_code")
 
 
-def add_variable_metadata(table: Table, ds_source: Source) -> Table:
+def add_variable_metadata(table: Table) -> Table:
     var_codes = table.columns.tolist()
 
     df_vars = load_variable_metadata()
@@ -369,28 +361,22 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
     for var_code in var_codes:
         var = df_vars.loc[var_code].to_dict()
 
-        # retrieve clean source name, then construct source.
+        # raw source name, can be very long and can be sometimes full citation
         source_raw_name = var["source"]
+
+        # load metadata created from raw source name
         clean_source = clean_source_mapping.get(source_raw_name)
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
-        source = Source(
-            name=clean_source["name"],
-            description=None,
-            url=ds_source.url,
-            source_data_url=ds_source.source_data_url,
-            date_accessed=str(ds_source.date_accessed),
-            publication_date=str(ds_source.publication_date),
-            publication_year=ds_source.publication_year,
-            published_by=ds_source.name,
-        )
 
-        table[var_code].metadata.description = create_description(var)
-        table[var_code].metadata.sources = [source]
+        # create an origin with WDI source name as producer
+        table[var_code].m.origins[0].producer = clean_source["name"]
 
-    if not all([len(table[var_code].sources) == 1 for var_code in var_codes]):
-        missing = [var_code for var_code in var_codes if len(table[var_code].sources) != 1]
+        table[var_code].m.description_from_producer = create_description(var)
+
+    if not all([len(table[var_code].origins) == 1 for var_code in var_codes]):
+        missing = [var_code for var_code in var_codes if len(table[var_code].origins) != 1]
         raise RuntimeError(
-            "Expected each variable code to have one source, but the following variables "
+            "Expected each variable code to have one origin, but the following variables "
             f"do not: {missing}. Are the source names for these variables "
             "missing from `wdi.sources.json`?"
         )
@@ -399,7 +385,7 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
 
 
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
-    # TODO: say something about how it was created
+    # The mapping was generated by update_metadata.ipynb notebook
     with open(Path(__file__).parent / "wdi.sources.json", "r") as f:
         sources = json.load(f)
         source_mapping = {source["rawName"]: source for source in sources}

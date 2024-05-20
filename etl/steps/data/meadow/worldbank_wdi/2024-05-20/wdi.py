@@ -44,10 +44,10 @@ def run(dest_dir: str) -> None:
 
     # variable code <-> variable name should be a 1:1 mapping
     assert (
-        df.groupby("indicator_code")["indicator_name"].apply(lambda gp: gp.nunique()) == 1
+        df.groupby("indicator_code", observed=True)["indicator_name"].apply(lambda gp: gp.nunique()) == 1
     ).all(), "A variable code in `WDIData.csv` has multiple variable names."
     assert (
-        df.groupby("indicator_name")["indicator_code"].apply(lambda gp: gp.nunique()) == 1
+        df.groupby("indicator_name", observed=True)["indicator_code"].apply(lambda gp: gp.nunique()) == 1
     ).all(), "A variable name in `WDIData.csv` has multiple variable codes."
 
     # reshapes data from `country indicator 1960 1961 ...` format to long format `country indicator_code year value`
@@ -73,6 +73,10 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df_wide, short_name=paths.short_name, underscore=True)
+
+    # Add origin to all indicators
+    for col in tb.columns:
+        tb[col].m.origins = [snap.m.origin]
 
     #
     # Save outputs.
