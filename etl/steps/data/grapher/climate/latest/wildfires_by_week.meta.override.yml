@@ -1,0 +1,5 @@
+tables:
+  weekly_wildfires:
+    variables:
+      _2016_share_area_ha_cumulative:
+        title: Cumulative share of total area burnt by wildfires in  2016
