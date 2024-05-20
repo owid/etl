@@ -45,7 +45,7 @@ def main(upload: bool) -> None:
         # https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/download.html
         # does not seem to be the date of the latest update of the data (since currently there are data points posterior
         # to that date). Hence, assume that the publication date is the access date.
-        snap.metadata.origin.date_published = snap.metadata.origin.date_accessed
+        snap.metadata.origin.date_published = snap.metadata.origin.date_accessed  # type: ignore
 
         # Rewrite metadata to dvc file.
         snap.metadata_path.write_text(snap.metadata.to_yaml())
