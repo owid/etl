@@ -11,21 +11,21 @@ tables:
   funding_disease:
     variables:
       amount__usd:
-        title: Funding for each neglected disease
+        title: Funding for << disease >>
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << disease >>. This data is expressed in US dollars, adjusted for inflation."
   funding_product:
     variables:
       amount__usd:
-        title: Funding for each product
+        title: Funding for << product >>
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << product >>. This data is expressed in US dollars, adjusted for inflation."
   funding_disease_product:
     variables:
       amount__usd:
-        title: Funding for each neglected disease, by product
+        title: Funding for << disease >> for treating << product >>
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << product >> for treating << disease >>.This data is expressed in US dollars, adjusted for inflation."
