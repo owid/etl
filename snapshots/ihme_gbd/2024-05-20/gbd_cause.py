@@ -47,6 +47,7 @@ NUMBER_OF_FILES = 103
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
+    snap.metadata.is_public = False
     # Download data from source.
     all_dfs = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
