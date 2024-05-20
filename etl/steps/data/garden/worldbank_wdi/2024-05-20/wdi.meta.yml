@@ -1,7 +1,6 @@
 #
 dataset:
   update_period_days: 365
-
 tables:
   wdi:
     variables:
@@ -1469,31 +1468,31 @@ tables:
         title: Primary government expenditures as a proportion of original approved budget (%)
       hd_hci_ovrl:
         title: Human capital index (HCI) (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_fe:
         title: Human capital index (HCI), female (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_lb:
         title: Human capital index (HCI), lower bound (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_lb_fe:
         title: Human capital index (HCI), female, lower bound (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_lb_ma:
         title: Human capital index (HCI), male, lower bound (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_ma:
         title: Human capital index (HCI), male (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_ub:
         title: Human capital index (HCI), upper bound (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_ub_fe:
         title: Human capital index (HCI), female, upper bound (scale 0-1)
-        unit: ""
+        unit: ''
       hd_hci_ovrl_ub_ma:
         title: Human capital index (HCI), male, upper bound (scale 0-1)
-        unit: ""
+        unit: ''
       ic_bus_dfrn_xq:
         title: Ease of doing business score (0 = lowest performance to 100 = best performance)
         unit: 0=lowest performance to 100=frontier
@@ -3847,51 +3846,21 @@ tables:
       sh_tbs_incd:
         title: Incidence of tuberculosis (per 100,000 people)
         unit: per 100,000 people
-      sh_uhc_nop1_cg:
-        title: Increase in poverty gap at $1.90 ($ 2011 PPP) poverty line due to out-of-pocket health care expenditure (USD)
-        short_unit: USD
-        unit: USD
-      sh_uhc_nop1_to:
-        title: Number of people pushed below the $1.90 ($ 2011 PPP) poverty line by out-of-pocket health care expenditure
-        short_unit: $
-        unit: $ 2011 PPP
-      sh_uhc_nop1_zg:
-        title: Increase in poverty gap at $1.90 ($ 2011 PPP) poverty line due to out-of-pocket health care expenditure (%
-          of poverty line)
-        short_unit: '%'
-        unit: '% of poverty line'
       sh_uhc_nop1_zs:
-        title: Proportion of population pushed below the $1.90 ($ 2011 PPP) poverty line by out-of-pocket health care expenditure
+        title: Proportion of population pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure
           (%)
         short_unit: '%'
         unit: '%'
-      sh_uhc_nop2_cg:
-        title: Increase in poverty gap at $3.20 ($ 2011 PPP) poverty line due to out-of-pocket health care expenditure (USD)
-        short_unit: USD
-        unit: USD
-      sh_uhc_nop2_to:
-        title: Number of people pushed below the $3.20 ($ 2011 PPP) poverty line by out-of-pocket health care expenditure
-        short_unit: $
-        unit: $ 2011 PPP
-      sh_uhc_nop2_zg:
-        title: Increase in poverty gap at $3.20 ($ 2011 PPP) poverty line due to out-of-pocket health care expenditure (%
-          of poverty line)
-        short_unit: '%'
-        unit: '% of poverty line'
       sh_uhc_nop2_zs:
-        title: Proportion of population pushed below the $3.20 ($ 2011 PPP) poverty line by out-of-pocket health care expenditure
+        title: Proportion of population pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure
           (%)
         short_unit: '%'
         unit: '%'
-      sh_uhc_oopc_10_to:
-        title: Number of people spending more than 10% of household consumption or income on out-of-pocket health care expenditure
       sh_uhc_oopc_10_zs:
         title: Proportion of population spending more than 10% of household consumption or income on out-of-pocket health
           care expenditure (%)
         short_unit: '%'
         unit: '%'
-      sh_uhc_oopc_25_to:
-        title: Number of people spending more than 25% of household consumption or income on out-of-pocket health care expenditure
       sh_uhc_oopc_25_zs:
         title: Proportion of population spending more than 25% of household consumption or income on out-of-pocket health
           care expenditure (%)
@@ -4947,8 +4916,8 @@ tables:
         short_unit: '%'
         unit: '% of GDP'
       tm_qty_mrch_xd_wd:
-        title: Import volume index (2000 = 100)
-        unit: 2000 = 100
+        title: Import volume index (2015 = 100)
+        unit: 2015 = 100
       tm_tax_manf_bc_zs:
         title: Binding coverage, manufactured products (%)
         short_unit: '%'
@@ -5132,8 +5101,8 @@ tables:
         short_unit: '%'
         unit: '% of total merchandise imports'
       tm_val_mrch_xd_wd:
-        title: Import value index (2000 = 100)
-        unit: 2000 = 100
+        title: Import value index (2015 = 100)
+        unit: 2015 = 100
       tm_val_othr_zs_wt:
         title: Computer, communications and other services (% of commercial service imports)
         short_unit: '%'
@@ -5151,15 +5120,15 @@ tables:
         short_unit: '%'
         unit: '% of commercial service imports'
       tt_pri_mrch_xd_wd:
-        title: Net barter terms of trade index (2000 = 100)
-        unit: 2000 = 100
+        title: Net barter terms of trade index (2015 = 100)
+        unit: 2015 = 100
       tx_mnf_tech_zs_un:
         title: Medium and high-tech exports (% manufactured exports)
         short_unit: '%'
         unit: '% manufactured exports'
       tx_qty_mrch_xd_wd:
-        title: Export volume index (2000 = 100)
-        unit: 2000 = 100
+        title: Export volume index (2015 = 100)
+        unit: 2015 = 100
       tx_uvi_mrch_xd_wd:
         title: Export unit value index (2015 = 100)
         unit: 2015 = 100
@@ -5246,8 +5215,8 @@ tables:
         short_unit: '%'
         unit: '% of total merchandise exports'
       tx_val_mrch_xd_wd:
-        title: Export value index (2000 = 100)
-        unit: 2000 = 100
+        title: Export value index (2015 = 100)
+        unit: 2015 = 100
       tx_val_othr_zs_wt:
         title: Computer, communications and other services (% of commercial service exports)
         short_unit: '%'
@@ -5302,3 +5271,117 @@ tables:
       omm_goods_exp_share_gdp: {}
       omm_tax_rev_percap: {}
       omm_net_savings_percap: {}
+      cc_est:
+        title: 'Control of Corruption: Estimate'
+      cc_no_src:
+        title: 'Control of Corruption: Number of Sources'
+      cc_per_rnk:
+        title: 'Control of Corruption: Percentile Rank'
+      cc_per_rnk_lower:
+        title: 'Control of Corruption: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      cc_per_rnk_upper:
+        title: 'Control of Corruption: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      cc_std_err:
+        title: 'Control of Corruption: Standard Error'
+      ge_est:
+        title: 'Government Effectiveness: Estimate'
+      ge_no_src:
+        title: 'Government Effectiveness: Number of Sources'
+      ge_per_rnk:
+        title: 'Government Effectiveness: Percentile Rank'
+      ge_per_rnk_lower:
+        title: 'Government Effectiveness: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      ge_per_rnk_upper:
+        title: 'Government Effectiveness: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      ge_std_err:
+        title: 'Government Effectiveness: Standard Error'
+      pv_est:
+        title: 'Political Stability and Absence of Violence/Terrorism: Estimate'
+      pv_no_src:
+        title: 'Political Stability and Absence of Violence/Terrorism: Number of Sources'
+      pv_per_rnk:
+        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank'
+      pv_per_rnk_lower:
+        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      pv_per_rnk_upper:
+        title: 'Political Stability and Absence of Violence/Terrorism: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      pv_std_err:
+        title: 'Political Stability and Absence of Violence/Terrorism: Standard Error'
+      rl_est:
+        title: 'Rule of Law: Estimate'
+      rl_no_src:
+        title: 'Rule of Law: Number of Sources'
+      rl_per_rnk:
+        title: 'Rule of Law: Percentile Rank'
+      rl_per_rnk_lower:
+        title: 'Rule of Law: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      rl_per_rnk_upper:
+        title: 'Rule of Law: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      rl_std_err:
+        title: 'Rule of Law: Standard Error'
+      rq_est:
+        title: 'Regulatory Quality: Estimate'
+      rq_no_src:
+        title: 'Regulatory Quality: Number of Sources'
+      rq_per_rnk:
+        title: 'Regulatory Quality: Percentile Rank'
+      rq_per_rnk_lower:
+        title: 'Regulatory Quality: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      rq_per_rnk_upper:
+        title: 'Regulatory Quality: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      rq_std_err:
+        title: 'Regulatory Quality: Standard Error'
+      se_lpv_prim:
+        title: 'Learning poverty: Share of Children at the End-of-Primary age below minimum reading proficiency adjusted by
+          Out-of-School Children (%)'
+      se_lpv_prim_fe:
+        title: 'Learning poverty: Share of Female Children at the End-of-Primary age below minimum reading proficiency adjusted
+          by Out-of-School Children (%)'
+      se_lpv_prim_ld:
+        title: Pupils below minimum reading proficiency at end of primary (%). Low GAML threshold
+      se_lpv_prim_ld_fe:
+        title: Female pupils below minimum reading proficiency at end of primary (%). Low GAML threshold
+      se_lpv_prim_ld_ma:
+        title: Male pupils below minimum reading proficiency at end of primary (%). Low GAML threshold
+      se_lpv_prim_ma:
+        title: 'Learning poverty: Share of Male Children at the End-of-Primary age below minimum reading proficiency adjusted
+          by Out-of-School Children (%)'
+      se_lpv_prim_sd:
+        title: Primary school age children out-of-school (%)
+      se_lpv_prim_sd_fe:
+        title: Female primary school age children out-of-school (%)
+      se_lpv_prim_sd_ma:
+        title: Male primary school age children out-of-school (%)
+      sh_uhc_fbp1_zs:
+        title: Proportion of population pushed further below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care
+          expenditure (%)
+      sh_uhc_fbp2_zs:
+        title: Proportion of population pushed further below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care
+          expenditure (%)
+      sh_uhc_fbpr_zs:
+        title: Proportion of population pushed further below the 60% median consumption poverty line by out-of-pocket health
+          care expenditure (%)
+      sh_uhc_nopr_zs:
+        title: Proportion of population pushed below the 60% median consumption poverty line by out-of-pocket health expenditure
+          (%)
+      sh_uhc_tot1_zs:
+        title: Proportion of population pushed or further pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket
+          health care expenditure (%)
+      sh_uhc_tot2_zs:
+        title: Proportion of population pushed or further pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket
+          health care expenditure (%)
+      sh_uhc_totr_zs:
+        title: Proportion of population pushed or further pushed below the 60% median consumption poverty line by out-of-pocket
+          health expenditure (%)
+      va_est:
+        title: 'Voice and Accountability: Estimate'
+      va_no_src:
+        title: 'Voice and Accountability: Number of Sources'
+      va_per_rnk:
+        title: 'Voice and Accountability: Percentile Rank'
+      va_per_rnk_lower:
+        title: 'Voice and Accountability: Percentile Rank, Lower Bound of 90% Confidence Interval'
+      va_per_rnk_upper:
+        title: 'Voice and Accountability: Percentile Rank, Upper Bound of 90% Confidence Interval'
+      va_std_err:
+        title: 'Voice and Accountability: Standard Error'

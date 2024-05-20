@@ -30,32 +30,32 @@
     "dataPublisherSource": "Brauer et al. (2017)"
   },
   {
-    "rawName": "CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions.",
+    "rawName": "CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions.",
     "name": "World Resources Institute (via World Bank)",
     "dataPublisherSource": "Climate Watch - World Resources Institute"
   },
   {
-    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions.",
+    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions.",
     "name": "World Resources Institute (via World Bank)",
     "dataPublisherSource": "Climate Watch - World Resources Institute"
   },
   {
-    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See SP.POP.TOTL for the denominator's source.",
+    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See SP.POP.TOTL for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Climate Watch - World Resources Institute, World Population Prospects - UN Population Division (2019), National statistical offices, Eurostat, Population and Vital Statistics Report - UN Statistical Division, International Database - US Census Bureau, Secretariat of the Pacific Community Statistics and Demography Programme"
   },
   {
-    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.CD for the denominator's source.",
+    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.CD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Climate Watch - World Resources Institute, International Comparison Program - World Bank, Eurostat-OECD PPP Programme"
   },
   {
-    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.KD for the denominator's source.",
+    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.KD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Climate Watch - World Resources Institute, International Comparison Program - World Bank, Eurostat-OECD PPP Programme"
   },
   {
-    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.KD for the denominator's source.",
+    "rawName": "Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.KD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Climate Watch - World Resources Institute, National accounts data - World Bank / OECD"
   },
@@ -436,7 +436,7 @@
     "dataPublisherSource": "Netcraft, Population estimates - World Bank"
   },
   {
-    "rawName": "Public Expenditure and Financial Accountability\u00a0(PEFA). Ministry of Finance (MoF).",
+    "rawName": "Public Expenditure and Financial Accountability (PEFA). Ministry of Finance (MoF).",
     "name": "Public Expenditure and Financial Accountability program (via World Bank)",
     "dataPublisherSource": "Public Expenditure and Financial Accountability program"
   },
@@ -951,7 +951,7 @@
     "dataPublisherSource": "Global Health Observatory Data Repository - World Health Organization"
   },
   {
-    "rawName": "WHO Global Health Observatory\u00a0 (https://www.who.int/data/gho/data/themes/air-pollution/household-air-pollution)",
+    "rawName": "WHO Global Health Observatory  (https://www.who.int/data/gho/data/themes/air-pollution/household-air-pollution)",
     "name": "World Health Organization (via World Bank)",
     "dataPublisherSource": "Global Health Observatory Data Repository - World Health Organization"
   },
@@ -1011,27 +1011,27 @@
     "dataPublisherSource": "World Trade Organization"
   },
   {
-    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions.",
+    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions.",
     "name": "Carbon Dioxide Information Analysis Center and World Resources Institute (via World Bank)",
     "dataPublisherSource": "Carbon Dioxide Information Analysis Center, Climate Watch - World Resources Institute"
   },
   {
-    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See SP.POP.TOTL for the denominator's source.",
+    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See SP.POP.TOTL for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Carbon Dioxide Information Analysis Center, Climate Watch - World Resources Institute, World Population Prospects - UN Population Division (2019), National statistical offices, Eurostat, Population and Vital Statistics Report - UN Statistical Division, International Database - US Census Bureau, Secretariat of the Pacific Community Statistics and Demography Programme"
   },
   {
-    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.KD for the denominator's source.",
+    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.KD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Carbon Dioxide Information Analysis Center, Climate Watch - World Resources Institute, National accounts data - World Bank / OECD"
   },
   {
-    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.CD for the denominator's source.",
+    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.CD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Carbon Dioxide Information Analysis Center, Climate Watch - World Resources Institute, International Comparison Program - World Bank, Eurostat-OECD PPP Programme"
   },
   {
-    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at:\u00a0https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.KD for the denominator's source.",
+    "rawName": "Data for up to 1990 are sourced from Carbon Dioxide Information Analysis Center, Environmental Sciences Division, Oak Ridge National Laboratory, Tennessee, United States. Data from 1990 are CAIT data: Climate Watch. 2020. GHG Emissions. Washington, DC: World Resources Institute. Available at: https://www.climatewatchdata.org/ghg-emissions. See NY.GDP.MKTP.PP.KD for the denominator's source.",
     "name": "Data compiled from multiple sources by World Bank",
     "dataPublisherSource": "Carbon Dioxide Information Analysis Center, Climate Watch - World Resources Institute, International Comparison Program - World Bank, Eurostat-OECD PPP Programme"
   },
@@ -1211,7 +1211,7 @@
     "dataPublisherSource": "ILO Modelled Estimates and Projections Database - ILOSTAT"
   },
   {
-    "rawName": "Center for International Earth Science Information Network - CIESIN - Columbia University, and CUNY Institute for Demographic Research - CIDR - City University of New York. 2021. Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/d1x1-d702.",
+    "rawName": "Center for International Earth Science Information Network - CIESIN - Columbia University, and CUNY Institute for Demographic Research - CIDR - City University of New York. 2021. Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/d1x1-d702.",
     "name": "CIESIN and CIDR (via World Bank)",
     "dataPublisherSource": "Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates - CIESIN / CIDR"
   },
@@ -1239,5 +1239,160 @@
     "rawName": "World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2022 Revision.",
     "name": "World Bank",
     "dataPublisherSource": "World Population Prospects - United Nations Population Division"
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed November 27, 2023. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UNESCO Institute for Statistics",
+    "dataPublisherSource": "UIS.Stat Bulk Data Download Service - UNESCO Institute for Statistics"
+  },
+  {
+    "rawName": "World Bank and UIS",
+    "name": "World Bank and UNESCO Institute for Statistics",
+    "dataPublisherSource": "World Bank and UNESCO Institute for Statistics"
+  },
+  {
+    "rawName": "UNICEF, WHO, World Bank: Joint child Malnutrition Estimates (JME). Aggregation is based on UNICEF, WHO, and the World Bank harmonized dataset (adjusted, comparable data) and methodology.",
+    "name": "UNICEF, WHO, World Bank",
+    "dataPublisherSource": "Joint child Malnutrition Estimates - UNICEF, WHO, World Bank"
+  },
+  {
+    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "Wages and Working Time Statistics database (COND) - International Labour Organization"
+  },
+  {
+    "rawName": "IEA Statistics © OECD/IEA 2014 (https://www.iea.org/data-and-statistics), subject to https://www.iea.org/terms/",
+    "name": "International Energy Agency",
+    "dataPublisherSource": "IEA Statistics - International Energy Agency"
+  },
+  {
+    "rawName": "UNICEF, WHO, World Bank: Joint child Malnutrition Estimates (JME).",
+    "name": "UNICEF, WHO, World Bank",
+    "dataPublisherSource": "Joint child Malnutrition Estimates - UNICEF, WHO, World Bank"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.",
+    "name": "Data compiled from multiple sources by World Bank",
+    "dataPublisherSource": "World Population Prospects - UN Population Division (2022), Human Mortality Database - Max Planck Institute for Demographic Research, University of California, Berkeley, French Institute for Demographic Studies"
+  },
+  {
+    "rawName": "WHO, UNICEF, UNFPA, World Bank Group, and UNDESA/Population Division. Trends in Maternal Mortality 2000 to 2020. Geneva, World Health Organization, 2023",
+    "name": "World Health Organization",
+    "dataPublisherSource": "Trends in Maternal Mortality - WHO, UNICEF, UNFPA, World Bank Group, UNDESA/Population Division"
+  },
+  {
+    "rawName": "Global Health Observatory. Geneva: World Health Organization; 2023. (https://www.who.int/data/gho/data/themes/topics/financial-protection)",
+    "name": "World Health Organization",
+    "dataPublisherSource": "Global Health Observatory - World Health Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed February 07, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "ILO modelled estimates database - International Labour Organization"
+  },
+  {
+    "rawName": "IEA Statistics © OECD/IEA 2018 (https://www.iea.org/data-and-statistics), subject to https://www.iea.org/terms/",
+    "name": "International Energy Agency",
+    "dataPublisherSource": "IEA Statistics - International Energy Agency"
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed September 19, 2023. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UNESCO Institute for Statistics",
+    "dataPublisherSource": "UIS.Stat Bulk Data Download Service - UNESCO Institute for Statistics"
+  },
+  {
+    "rawName": "Climate Watch Historical GHG Emissions (1990-2020). 2023. Washington, DC: World Resources Institute. Available online at: https://www.climatewatchdata.org/ghg-emissions",
+    "name": "World Resources Institute",
+    "dataPublisherSource": "Climate Watch Historical GHG Emissions - World Resources Institute"
+  },
+  {
+    "rawName": "Household surveys such as Demographic and Health Surveys and Multiple Indicator Cluster Surveys.  Largely compiled by UNICEF.",
+    "name": "UNICEF",
+    "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys - UNICEF"
+  },
+  {
+    "rawName": "Emissions data are sourced from Climate Watch Historical GHG Emissions (1990-2020). 2023. Washington, DC: World Resources Institute. Available online at: https://www.climatewatchdata.org/ghg-emissions",
+    "name": "World Resources Institute",
+    "dataPublisherSource": "Climate Watch Historical GHG Emissions - World Resources Institute"
+  },
+  {
+    "rawName": "Internation Union of Railways (UIC Railisa Database), OECD Statistics",
+    "name": "International Union of Railways",
+    "dataPublisherSource": "UIC Railisa Database - International Union of Railways, OECD Statistics"
+  },
+  {
+    "rawName": "Global Health Observatory. Geneva: World Health Organization; 2023. (https://www.who.int/data/gho/data/themes/topics/service-coverage)",
+    "name": "World Health Organization",
+    "dataPublisherSource": "Global Health Observatory - World Health Organization"
+  },
+  {
+    "rawName": "Data are available online at: https://lpi.worldbank.org/. Summary results are published in World Bank (2023): Connecting to Compete: Trade Logistics in the Global Economy, The Logistics Performance Index and Its Indicators.",
+    "name": "World Bank",
+    "dataPublisherSource": "Logistics Performance Index - World Bank"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "Labour Force Statistics database (LFS) - International Labour Organization"
+  },
+  {
+    "rawName": "Global Burden of Disease Collaborative Network. 2021. Global Burden of Disease Study 2019 (GBD 2019) Air Pollution Exposure Estimates 1990-2019. Seattle, United States of America: Institute for Health Metrics and Evaluation (IHME). https://doi.org/10.6069/70JS-NC54",
+    "name": "Institute for Health Metrics and Evaluation",
+    "dataPublisherSource": "Global Burden of Disease Study 2019 - Institute for Health Metrics and Evaluation"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "ILO modelled estimates database - International Labour Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "Labour Market-related SDG Indicators database (ILOSDG) - International Labour Organization"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division. The data were downloaded on February 14, 2023, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
+    "name": "United Nations Statistics Division",
+    "dataPublisherSource": "National statistical offices, Global SDG API - United Nations Statistics Division"
+  },
+  {
+    "rawName": "World Health Organization Global Health Expenditure database (http://apps.who.int/nha/database). The data was retrieved on April 7, 2023.",
+    "name": "World Health Organization",
+    "dataPublisherSource": "Global Health Expenditure database - World Health Organization"
+  },
+  {
+    "rawName": "United Nations Conference on Trade and Development",
+    "name": "United Nations Conference on Trade and Development",
+    "dataPublisherSource": "United Nations Conference on Trade and Development"
+  },
+  {
+    "rawName": "Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org. The WGI are produced by Daniel Kaufmann (Natural Resource Governance Institute and Brookings Institution) and Aart Kraay (World Bank Development Research Group).  Please cite Kaufmann, Daniel, Aart Kraay and Massimo Mastruzzi (2010).  \"The Worldwide Governance Indicators:  Methodology and Analytical Issues\".  World Bank Policy Research Working Paper No. 5430 (http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1682130).  The WGI do not reflect the official views of the Natural Resource Governance Institute, the Brookings Institution, the World Bank, its Executive Directors, or the countries they represent.",
+    "name": "World Bank",
+    "dataPublisherSource": "Worldwide Governance Indicators - World Bank"
+  },
+  {
+    "rawName": "IEA, IRENA, UNSD, World Bank, WHO. 2023. Tracking SDG 7: The Energy Progress Report. World Bank, Washington DC. © World Bank. License: Creative Commons Attribution—NonCommercial 3.0 IGO (CC BY-NC 3.0 IGO).",
+    "name": "World Bank and International Energy Agency",
+    "dataPublisherSource": "Tracking SDG 7: The Energy Progress Report - World Bank, International Energy Agency, IRENA, UNSD, WHO"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division.  The data were downloaded on February 14, 2023, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
+    "name": "United Nations Statistics Division",
+    "dataPublisherSource": "National statistical offices, Global SDG API - United Nations Statistics Division"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "ILO Modelled Estimates and Projections database (ILOEST) - International Labour Organization"
+  },
+  {
+    "rawName": "Demographic and Health Surveys compiled by United Nations Population Fund. Retrieved on February 14, 2023, from the SDG Global database API (https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html).",
+    "name": "United Nations Population Fund",
+    "dataPublisherSource": "Demographic and Health Surveys - United Nations Population Fund"
+  },
+  {
+    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization",
+    "dataPublisherSource": "Education and Mismatch Indicators database (EMI) - International Labour Organization"
   }
 ]

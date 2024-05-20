@@ -62,29 +62,6 @@ def run(dest_dir: str) -> None:
         assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
 
     ####################################################################################################################
-    # Fix issue with Papua New Guinea's electricity access.
-    # The current version of the data reports around 60% electricity access, but the newer version reports around 20%.
-    # The new version can be found here:
-    # https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS?locations=PG
-    # A similar issue happens with the electricity access as a percentage of rural or urban population.
-    # The issue is known, so, for now, and before we update the data, simply remove that data for Papua New Guinea.
-    # Therefore, rows for Papua New Guinea for the following columns will be made nan:
-    # * 'eg_elc_accs_ru_zs' - 'Access to electricity, rural (% of rural population)'.
-    # * 'eg_elc_accs_ur_zs' - 'Access to electricity, urban (% of urban population)'.
-    # * 'eg_elc_accs_zs' - 'Access to electricity (% of population)'.
-
-    # First check that the data is as expected (so that we remember to remove this code when we update the data).
-    error = (
-        "Papua New Guinea electricity access was mistakenly high and was removed from the data. But it seems that"
-        "data has changed (hopefully fixing the issue), so this piece of code can now safely be removed."
-    )
-    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_ru_zs"] > 50, error
-    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_zs"] > 50, error
-    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_ur_zs"] > 80, error
-    # Make nan all those rows.
-    for column in ["eg_elc_accs_zs", "eg_elc_accs_ur_zs", "eg_elc_accs_ru_zs"]:
-        tb_garden.loc["Papua New Guinea", column] = None
-    ####################################################################################################################
 
     #
     # Save outputs.
@@ -373,6 +350,9 @@ def load_variable_metadata() -> pd.DataFrame:
 
     df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
 
+    # remove non-breaking spaces
+    df_vars.source = df_vars.source.str.replace("\xa0", " ").replace("\u00a0", " ")
+
     return df_vars.set_index("indicator_code")
 
 
@@ -392,7 +372,7 @@ def add_variable_metadata(table: Table, ds_source: Source) -> Table:
         # retrieve clean source name, then construct source.
         source_raw_name = var["source"]
         clean_source = clean_source_mapping.get(source_raw_name)
-        assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json'
+        assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
         source = Source(
             name=clean_source["name"],
             description=None,
