@@ -5,7 +5,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-        - Neglected Tropical Diseases
+        #- Neglected Tropical Diseases
       grapher_config:
         note: "This data is expressed in constant constant 2022 US$."
         selectedEntityNames: ["World"]
