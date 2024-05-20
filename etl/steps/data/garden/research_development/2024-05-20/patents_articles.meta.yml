@@ -5,6 +5,7 @@ dataset:
 definitions:
   common:
     processing_level: minor
+    version: "2024-05-20"
     origins:
       - producer: World Bank
         title: World Development Indicators
