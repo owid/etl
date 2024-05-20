@@ -87,6 +87,8 @@ def call_etl_diff(include: str) -> list[str]:
         "3",
     ]
 
+    print(" ".join(cmd))
+
     result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = result.communicate()
 

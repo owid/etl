@@ -70,11 +70,11 @@ def cli(
     # recalculate services
     for service in services:
         if service == "data-diff":
-            services_body["data_diff"] = data_diff.run(include)
+            services_body["data-diff"] = data_diff.run(include)
 
         elif service == "chart-diff":
             charts_df = chart_diff.call_chart_diff(branch)
-            services_body["chart_diff"] = chart_diff.run(branch, charts_df)
+            services_body["chart-diff"] = chart_diff.run(branch, charts_df)
 
             # update github check run
             chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
@@ -135,10 +135,10 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 {services.get('grapher', '')}
 <!--grapher-end-->
 <!--chart-diff-start-->
-{services.get('chart_diff', '')}
+{services.get('chart-diff', '')}
 <!--chart-diff-end-->
 <!--data-diff-start-->
-{services.get('data_diff', '')}
+{services.get('data-diff', '')}
 <!--data-diff-end-->
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_

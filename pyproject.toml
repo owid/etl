@@ -146,4 +146,7 @@ exclude = [
     ".git",
     "**/.venv",
     "**/.ipynb_checkpoints",
+    "playground/",
+    ".cachedir/",
+    ".cache/",
 ]
