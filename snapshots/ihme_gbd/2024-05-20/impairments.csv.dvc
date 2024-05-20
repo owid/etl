@@ -4,6 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Global Burden of Disease - Impairments
+    description: "The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset provides estimates of the prevalence of the number of people living with impairments due to neglected tropical diseases."
     date_published: "2024-05-17"
     title_snapshot: Global Burden of Disease - Impairments from Neglected Tropical Diseases
 
