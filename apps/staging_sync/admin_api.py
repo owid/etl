@@ -27,7 +27,7 @@ class AdminAPI(object):
         if engine.url.database == "live_grapher" and "prod-db" in str(engine.url.host):
             self.base_url = TAILSCALE_ADMIN_HOST
         else:
-            self.base_url = f"http://{engine.url.host}"
+            self.base_url = f"http://{engine.url.host}.tail6e23.ts.net"
 
     def _json_from_response(self, resp: requests.Response) -> dict:
         resp.raise_for_status()

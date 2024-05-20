@@ -119,7 +119,10 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
             percent_complete = int(100 * (i + 1) / len(charts))
             bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
     except Exception as e:
-        st.error(f"Something went wrong! {e}")
+        st.error(
+            "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
+        )
+        st.exception(e)
     else:
         st.success("The charts were successfully updated! Review the changes with `chart diff`")
         st_page_link("chart_diff")
