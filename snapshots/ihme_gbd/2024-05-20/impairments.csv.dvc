@@ -12,7 +12,7 @@ meta:
     producer: "Institute of Health Metrics and Evaluation, Global Burden of Disease Study"
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021) Results. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2022. Available from https://vizhub.healthdata.org/gbd-results/."
-    attribution_short: "IHME, GBD"
+    attribution_short: "IHME - GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
     date_accessed: 2024-05-20
