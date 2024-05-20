@@ -251,3 +251,20 @@ steps:
   #
   data://grapher/climate/2024-05-20/climate_change_impacts_annual:
     - data://garden/climate/2024-05-20/climate_change_impacts
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2024-05-20/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2024-05-20/near_surface_temperature_southern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2024-05-20/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2024-05-20/near_surface_temperature_global.csv
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://garden/met_office_hadley_centre/2024-05-20/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2024-05-20/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://grapher/met_office_hadley_centre/2024-05-20/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2024-05-20/near_surface_temperature
