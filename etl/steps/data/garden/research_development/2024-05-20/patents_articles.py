@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
     ds.metadata.short_name = "patents_wdi_unwpp"
     ds.metadata.namespace = "research_development"
+    ds.metadata.version = "latest"
 
     # Save
     ds.save()
