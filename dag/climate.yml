@@ -101,23 +101,6 @@ steps:
   data://grapher/climate/latest/wildfires_by_week:
     - data://garden/climate/latest/weekly_wildfires
   #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://meadow/met_office_hadley_centre/2024-03-04/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2024-03-04/near_surface_temperature_southern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2024-03-04/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2024-03-04/near_surface_temperature_northern_hemisphere.csv
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://garden/met_office_hadley_centre/2024-03-04/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2024-03-04/near_surface_temperature
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://grapher/met_office_hadley_centre/2024-03-04/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2024-03-04/near_surface_temperature
-  #
   # EPA - Climate change indicators (possibly not updateable).
   #
   data://meadow/epa/2024-04-17/ocean_heat_content:
