@@ -26,7 +26,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["funding"].reset_index()
-
+    # Group some of the research technologies (products) into broader groups
+    tb = aggregate_products(tb)
     # The funding for each disease
     tb_disease = format_table(tb=tb, group=["disease", "year"], index_col=["disease"], short_name="funding_disease")
     # The funding for each product
@@ -51,6 +52,25 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def aggregate_products(tb: Table) -> Table:
+    """
+    Aggregate some of the research technologies (products) into broader groups
+    """
+    replacement_dict = {
+        "Diagnostics": "Diagnostics and diagnostic platforms",
+        "General diagnostic platforms & multi-disease diagnostics": "Diagnostics and diagnostic platforms",
+        "Biological vector control products": "Vector control products and research",
+        "Chemical vector control products": "Vector control products and research",
+        "Fundamental vector control research": "Vector control products and research",
+    }
+    missing_keys = set(replacement_dict.keys()) - set(tb["product"].unique())
+
+    assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
+    tb["product"] = tb["product"].replace(replacement_dict)
+
+    return tb
 
 
 def format_table(tb: Table, group: List[str], index_col: List[str], short_name: str) -> Table:
