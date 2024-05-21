@@ -83,10 +83,12 @@ def load_data(snap: Snapshot) -> Table:
     tb[columns] = tb[columns].replace("-", float("nan"))
 
     # Map
-    tb["pol_sys"] = tb["pol_sys"].replace({
-        "Aut.": 0,
-        "Dem.": 1,
-    })
+    tb["pol_sys"] = tb["pol_sys"].replace(
+        {
+            "Aut.": 0,
+            "Dem.": 1,
+        }
+    )
 
     # Set dtypes
     tb[columns] = tb[columns].astype(float)
