@@ -9,7 +9,7 @@ definitions:
       - The number of slaughtered animals is based on the country of production, not consumption.
       - Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.
       - Male baby chickens slaughtered in the egg industry are not included.
-      - Other land animals for which no data is available, like quails and frogs, are not included.
+      - Land animals for which FAOSTAT provides no data are not included.
 
 tables:
   animals_used_for_food:
