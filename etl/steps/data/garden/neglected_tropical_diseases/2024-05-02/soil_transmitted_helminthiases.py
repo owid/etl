@@ -96,16 +96,15 @@ def run(dest_dir: str) -> None:
 
     tb_pre_sac = tbs["tb_pre_sac"]
     tb_sac = tbs["tb_sac"]
-    # Give the tables relevant short names
-    tb_pre_sac.metadata.short_name = "soil_transmitted_helminthiases_pre_sac"
-    tb_sac.metadata.short_name = "soil_transmitted_helminthiases_sac"
-    tb_nat_sac.metadata.short_name = "soil_transmitted_helminthiases_national_sac"
-    tb_nat_pre_sac.metadata.short_name = "soil_transmitted_helminthiases_national_pre_sac"
 
-    tb_sac = tb_sac.format(["country", "year", "drug_combination"])
-    tb_pre_sac = tb_pre_sac.format(["country", "year", "drug_combination"])
-    tb_nat_sac = tb_nat_sac.format(["country", "year"])
-    tb_nat_pre_sac = tb_nat_pre_sac.format(["country", "year"])
+    tb_sac = tb_sac.format(["country", "year", "drug_combination"], short_name="soil_transmitted_helminthiases_sac")
+    tb_pre_sac = tb_pre_sac.format(
+        ["country", "year", "drug_combination"], short_name="soil_transmitted_helminthiases_pre_sac"
+    )
+    tb_nat_sac = tb_nat_sac.format(["country", "year"], short_name="soil_transmitted_helminthiases_national_sac")
+    tb_nat_pre_sac = tb_nat_pre_sac.format(
+        ["country", "year"], short_name="soil_transmitted_helminthiases_national_pre_sac"
+    )
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
