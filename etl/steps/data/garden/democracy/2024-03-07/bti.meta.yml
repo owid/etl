@@ -168,7 +168,7 @@ tables:
 
   num_people:
     variables:
-      num_regime_bti:
+      pop_regime_bti:
         title: |-
           <% if category == '-1' %>
           Number of people living in countries with unknown regime

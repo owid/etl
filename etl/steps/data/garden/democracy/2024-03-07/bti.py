@@ -258,12 +258,12 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     indicators = [
         {
             "name": "regime_bti",
-            "name_new": "num_regime_bti",
+            "name_new": "pop_regime_bti",
             "values_expected": {
                 "1": "hard-line autocracy",
                 "2": "moderate autocracy",
-                "3": "highly defective democracy",
                 "4": "defective democracy",
+                "3": "highly defective democracy",
                 "5": "consolidating democracy",
             },
             "has_na": True,
