@@ -25,7 +25,23 @@ definitions:
       <% elif metric == "Rate" and age == 'All ages'%>
       Rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
       <%- endif -%>
+    description_short: |-
+      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      <% elif metric == "Number" and age == 'All ages'%>
+      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      <%- endif -%>
     decimal_places: <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+    footnote: |-
+      <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -40,6 +56,12 @@ tables:
           {definitions.metric.title}
         unit: |-
           {definitions.metric.unit}
+        description_short: |-
+          {definitions.metric.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.metric.footnote}
         display:
           numDecimalPlaces: |-
             {definitions.metric.decimal_places}
