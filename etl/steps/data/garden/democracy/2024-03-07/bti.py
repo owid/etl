@@ -27,6 +27,9 @@ REGIONS = {
     "Europe": {},
     "Oceania": {},
 }
+# Year range
+YEAR_MIN = 2005
+YEAR_MAX = 2023
 
 
 def run(dest_dir: str) -> None:
@@ -329,6 +332,7 @@ def expand_observations_without_duplicates(tb: Table) -> Table:
     tb_exp = expand_observations(tb)
 
     # Limit years
+    tb_exp = tb_exp.loc[tb_exp["year"].isin(range(YEAR_MIN, YEAR_MAX + 1, 2))]
     # tb_exp = tb_exp[tb_exp["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
 
     # # Limit entries to avoid duplicates
