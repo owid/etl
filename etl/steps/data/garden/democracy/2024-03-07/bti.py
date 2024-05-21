@@ -49,6 +49,9 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
+    # Invert the scores of regime_bti
+    tb["regime_bti"] = 5 - (tb["regime_bti"] - 1)
+
     # Sanity checks
     tb = check_pol_sys(tb)
     tb = check_regime(tb)
@@ -138,11 +141,11 @@ def check_pol_sys(tb: Table) -> Table:
 
 def check_regime(tb: Table) -> Table:
     col_tmp = "regime_bti_check"
-    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 1) & (tb["democracy_bti"] < 4), col_tmp] = 5
-    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 4) & (tb["democracy_bti"] <= 10), col_tmp] = 4
+    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 1) & (tb["democracy_bti"] < 4), col_tmp] = 1
+    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 4) & (tb["democracy_bti"] <= 10), col_tmp] = 2
     tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 1) & (tb["democracy_bti"] < 6), col_tmp] = 3
-    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 6) & (tb["democracy_bti"] < 8), col_tmp] = 2
-    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 8) & (tb["democracy_bti"] <= 10), col_tmp] = 1
+    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 6) & (tb["democracy_bti"] < 8), col_tmp] = 4
+    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 8) & (tb["democracy_bti"] <= 10), col_tmp] = 5
 
     tb[col_tmp] = tb[col_tmp].astype("UInt8")
 
@@ -187,11 +190,11 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
             "name": "regime_bti",
             "name_new": "num_regime_bti",
             "values_expected": {
-                "1": "consolidating democracy",
-                "2": "defective democracy",
+                "1": "hard-line autocracy",
+                "2": "moderate autocracy",
                 "3": "highly defective democracy",
-                "4": "moderate autocracy",
-                "5": "hard-line autocracy",
+                "4": "defective democracy",
+                "5": "consolidating democracy",
             },
             "has_na": True,
         },
@@ -257,11 +260,11 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
             "name": "regime_bti",
             "name_new": "num_regime_bti",
             "values_expected": {
-                "1": "consolidating democracy",
-                "2": "defective democracy",
+                "1": "hard-line autocracy",
+                "2": "moderate autocracy",
                 "3": "highly defective democracy",
-                "4": "moderate autocracy",
-                "5": "hard-line autocracy",
+                "4": "defective democracy",
+                "5": "consolidating democracy",
             },
             "has_na": True,
         },
