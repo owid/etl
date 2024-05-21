@@ -20,7 +20,7 @@ COLUMNS = {
     "  Q3 | Rule of Law": "rule_of_law_bti",
     "  Q4 | Stability of Democratic Institutions": "stability_dem_inst_bti",
     "  Q5 | Political and Social Integration": "pol_soc_integr_bti",
-    # "": "regime_bti",
+    "  Category.1": "regime_bti",
     "  Q2_1 | Free and fair elections": "electfreefair_bti",
     "  Q2_2 | Effective power to govern": "effective_power_bti",
     "  Q2_3 | Association / assembly rights": "freeassoc_bti",
@@ -28,7 +28,7 @@ COLUMNS = {
     "  Q3_1 | Separation of powers": "sep_power_bti",
     "  Q3_4 | Civil rights": "civ_rights_bti",
     "  Failed State": "state_basic_bti",
-    "  Total": "pol_sys",
+    "  Democracy/Autocracy": "pol_sys",
 }
 COLUMNS_INDEX = ["country", "year"]
 
@@ -81,6 +81,12 @@ def load_data(snap: Snapshot) -> Table:
     # Replace '-' -> NA
     columns = [col for col in COLUMNS.values() if col not in COLUMNS_INDEX]
     tb[columns] = tb[columns].replace("-", float("nan"))
+
+    # Map
+    tb["pol_sys"] = tb["pol_sys"].replace({
+        "Aut.": 0,
+        "Dem.": 1,
+    })
 
     # Set dtypes
     tb[columns] = tb[columns].astype(float)
