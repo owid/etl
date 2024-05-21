@@ -18,23 +18,17 @@ The data will then be requested and a download link will be sent to you with a n
 
 We will download and combine the files in the following script.
 """
-
 import os
 import tempfile
-import time
-import zipfile
 from pathlib import Path
 
 import click
-import pandas as pd
-import requests
-from owid.datautils.io import df_to_file
+from shared import compress_files, download_data
 from structlog import get_logger
 
 from etl.snapshot import Snapshot
 
 log = get_logger()
-
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
@@ -48,56 +42,16 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_prevalence.csv")
     # Download data from source.
-    all_dfs = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number)
-        all_dfs.append(df)
-
-    combined_df = pd.concat(all_dfs, ignore_index=True)
-    # Download data from source.
-    df_to_file(combined_df, file_path=snap.path)
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
-
-
-def download_data(file_number: int) -> pd.DataFrame:
-    # Unique URL for each file
-    url_to_download = f"{BASE_URL}{file_number}.zip"
-    # Retry logic
-    max_retries = 5
-    backoff_factor = 1  # Factor for exponential backoff
-
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(url_to_download)
-            response.raise_for_status()
-            break  # If request is successful, exit the loop
-        except requests.RequestException as e:
-            if attempt < max_retries - 1:
-                wait_time = backoff_factor * (2**attempt)  # Exponential backoff
-                log.info(f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time} seconds...")
-                time.sleep(wait_time)
-            else:
-                log.info(f"Failed to download the file after {max_retries} attempts. Error: {e}")
-                raise
-    # Download data from source, open the csv within and return that.
-    response = requests.get(url_to_download)
+    all_file_paths = []
     with tempfile.TemporaryDirectory() as tmpdirname:
-        zip_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.zip"
-        zip_file_path = os.path.join(tmpdirname, zip_file_name)
-        with open(zip_file_path, "wb") as f:
-            f.write(response.content)
-        # Extract the zip file
-        with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
-            zip_ref.extractall(tmpdirname)
-        # Construct the CSV file name and path
-        csv_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.csv"
-        csv_file_path = os.path.join(tmpdirname, csv_file_name)
-        # Read the CSV file
-        df = pd.read_csv(csv_file_path)
-        return df
+        for file_number in range(1, NUMBER_OF_FILES + 1):
+            log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
+            file_path = download_data(file_number, tmpdirname, base_url=BASE_URL)
+            all_file_paths.append(file_path)
+
+        zip_file_path = os.path.join(tmpdirname, "all_csv_files.zip")
+        compress_files(all_file_paths, zip_file_path)
+        snap.create_snapshot(upload=upload, filename=zip_file_path)
 
 
 if __name__ == "__main__":
