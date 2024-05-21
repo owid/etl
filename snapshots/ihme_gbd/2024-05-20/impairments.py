@@ -81,7 +81,6 @@ def download_data(file_number: int) -> pd.DataFrame:
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/impairments.csv")
-    snap.metadata.is_public = False
     # Download data from source.
     all_dfs = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
