@@ -5,6 +5,11 @@ definitions:
     presentation:
       topic_tags:
       - Animal Welfare
+    description_key:
+      - The number of slaughtered animals is based on the country of production, not consumption.
+      - Deaths prior to the slaughter, for example due to disease or accidents during production, are not included.
+      - Male baby chickens slaughtered in the egg industry, commonly via chick culling, are not included.
+      - Other land animals for which no data is available, like quails, frogs and bees, are not included.
 
 tables:
   animals_used_for_food:
