@@ -40,4 +40,4 @@ tables:
         unit: |-
           {definitions.metric.unit}
         display:
-          numDecimalPlaces: <% if metric == 0 %>0<% else %>1<%- endif -%>
+          numDecimalPlaces: <% if metric == 0 %>0<% else %>2<%- endif -%>
