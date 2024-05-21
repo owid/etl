@@ -1,0 +1,103 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
+    processing_level: minor
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+  title: Preventive Chemotherapy (PC) Data Portal
+tables:
+  soil_transmitted_helminthiases_pre_sac:
+    variables:
+      number_targeted:
+        title: Number of pre-school age children targeted
+        description_short: "Number of pre-school age children targeted for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "pre-school age children"
+        display:
+          numDecimalPlaces: 0
+      reported_number_treated:
+        title: Reported number of pre-school age children treated
+        description_short: "Reported number of pre-school age children treated for soil transmitted helminthiases."
+        unit: "pre-school age children"
+        display:
+          numDecimalPlaces: 0
+      programme_coverage__pct:
+        title: Programme coverage of pre-school age children
+        description_short: "Programme coverage of pre-school age children for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  soil_transmitted_helminthiases_national_pre_sac:
+    variables:
+      national_coverage__pre_sac__pct:
+        title: National coverage pre-school age children
+        description_short: "Drug coverage out of estimated population of pre-school age children who require it."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      population_requiring_pc_for_sth__pre_sac:
+        title: Population of pre-school age children requiring preventive chemotherapy
+        description_short: "Population of pre-school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        unit: "pre-school age children"
+        display:
+          numDecimalPlaces: 0
+      estimated_number_of_pre_sac_treated:
+        title: Estimated number of pre-school age children treated
+        description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
+        unit: "pre-school age children"
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+  soil_transmitted_helminthiases_sac:
+    variables:
+      number_targeted:
+        title: Number of school age children targeted
+        unit: "school age children"
+        description_short: "Number of school age children targeted for preventive chemotherapy for soil transmitted helminthiases."
+        display:
+          numDecimalPlaces: 0
+      reported_number_treated:
+        title: Reported number of school age children treated
+        unit: "school age children"
+        description_short: "Reported number of school age children treated for soil transmitted helminthiases."
+        display:
+          numDecimalPlaces: 0
+      programme_coverage__pct:
+        title: Programme coverage of school age children
+        description_short: "Programme coverage of school age children for preventive chemotherapy for soil transmitted helminthiases."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+  soil_transmitted_helminthiases_national_sac:
+    variables:
+      national_coverage__sac__pct:
+        title: National coverage school age children
+        unit: "%"
+        description_short: "Drug coverage out of estimated population of school age children who require it."
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      population_requiring_pc_for_sth__sac:
+        title: Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases
+        unit: "school age children"
+        description_short: "Population of school age children requiring preventive chemotherapy for soil transmitted helminthiases."
+        display:
+          numDecimalPlaces: 0
+      estimated_number_of_sac_treated:
+        title: Estimated number of pre-school age children treated
+        description_short: "Estimated number of pre-school age children treated for soil transmitted helminthiases."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
+        unit: "pre-school age children"
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
