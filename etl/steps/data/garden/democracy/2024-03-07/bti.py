@@ -274,7 +274,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     ]
 
     ## Get missing years (not to miss anyone!) -- Note that this can lead to country overlaps (e.g. USSR and Latvia)
-    tb_ppl = expand_observations_without_duplicates(tb_ppl)
+    tb_ppl = expand_observations_without_duplicates(tb_ppl, ds_regions)
     print(f"{tb.shape} -> {tb_ppl.shape}")
 
     # Column per indicator-dimension
@@ -327,9 +327,14 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     return tb_ppl, tb_avg
 
 
-def expand_observations_without_duplicates(tb: Table) -> Table:
+def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Table:
+    # Get list of regions
+    tb_regions = ds_regions["regions"]
+    countries = set(tb_regions.loc[(tb_regions["region_type"] == "country") & ~(tb_regions["is_historical"]), "name"])
+    countries |= set(tb["country"])
+
     # Full expansion
-    tb_exp = expand_observations(tb)
+    tb_exp = expand_observations(tb, countries)
 
     # Limit years
     tb_exp = tb_exp.loc[tb_exp["year"].isin(range(YEAR_MIN, YEAR_MAX + 1, 2))]
