@@ -28,6 +28,7 @@ from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
+from apps.wizard.utils.env import OWIDEnv
 from apps.wizard.utils.step_form import StepForm
 from etl import config
 from etl.db import get_connection
@@ -613,10 +614,10 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], base_url, base_api_url, height=500, **kwargs):
-    chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
-    chart_config["adminBaseUrl"] = f"http://{base_url}"
-    chart_config["dataApiUrl"] = base_api_url
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+    chart_config["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    chart_config["adminBaseUrl"] = owid_env.base_site
+    chart_config["dataApiUrl"] = owid_env.indicators_url
 
     HTML = f"""
     <!DOCTYPE html>
