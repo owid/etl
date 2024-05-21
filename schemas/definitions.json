@@ -745,9 +745,18 @@
         "description": "Unit to use in charts instead of the indicator's `unit`."
       },
       "numDecimalPlaces": {
-        "type": "integer",
-        "description": "Number of decimal places to show in charts (and in the table tab).",
-        "minimum": 0
+        "anyOf": [
+          {
+            "type": "integer",
+            "description": "Number of decimal places to show in charts (and in the table tab).",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "description": "Number of decimal places to show in charts (and in the table tab), allowing templating syntax.",
+            "pattern": "<%"
+          }
+        ]
       },
       "zeroDay": {
         "type": "string",
