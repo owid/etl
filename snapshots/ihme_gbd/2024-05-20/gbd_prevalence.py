@@ -38,8 +38,8 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/63d75c7559682458eb38f52711fd082b_files/IHME-GBD_2021_DATA-63d75c75-"
-NUMBER_OF_FILES = 150
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/7fe48f68f1956453091ac5de855166b7_files/IHME-GBD_2021_DATA-7fe48f68-"
+NUMBER_OF_FILES = 101
 
 
 @click.command()
@@ -78,10 +78,10 @@ def download_data(file_number: int) -> pd.DataFrame:
         except requests.RequestException as e:
             if attempt < max_retries - 1:
                 wait_time = backoff_factor * (2**attempt)  # Exponential backoff
-                print(f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time} seconds...")
+                log.info(f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
-                print(f"Failed to download the file after {max_retries} attempts. Error: {e}")
+                log.info(f"Failed to download the file after {max_retries} attempts. Error: {e}")
                 raise
     # Download data from source, open the csv within and return that.
     response = requests.get(url_to_download)
