@@ -569,3 +569,5 @@ steps:
     - snapshot-private://ihme_gbd/2024-05-20/impairments.csv
   data-private://garden/ihme_gbd/2024-05-20/impairments:
     - data-private://meadow/ihme_gbd/2024-05-20/impairments
+  data-private://grapher/ihme_gbd/2024-05-20/impairments:
+    - data-private://garden/ihme_gbd/2024-05-20/impairments

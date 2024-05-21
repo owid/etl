@@ -7,23 +7,23 @@ definitions:
   metric:
     unit: |-
       <% if metric == "Number" %>
-      impaired individuals
+      impairments
       <% elif metric == "Rate" %>
-      impaired individuals per 100,000 population
+      impairments per 100,000 people
       <%- endif -%>
     title: |-
-      <% if metric == "Number" & (age != 'Age-standardized' or age != 'All ages')%>
+      <% if metric == "Number" and (age != 'Age-standardized' or age != 'All ages')%>
       Number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
-      <% elif metric == "Number" & age == 'Age-standardized')%>
+      <% elif metric == "Number" and age == 'Age-standardized'%>
       Age-standardized number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
-      <% elif metric == "Number" & age == 'All ages')%>
+      <% elif metric == "Number" and age == 'All ages'%>
       Total number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
-      <% elif metric == "Rate" & (age != 'Age-standardized' or age != 'All ages')%>
-      Number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
-      <% elif metric == "Rate" & age == 'Age-standardized')%>
-      Age-standardized number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
-      <% elif metric == "Rate" & age == 'All ages')%>
-      Total number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      <% elif metric == "Rate" and (age != 'Age-standardized' or age != 'All ages')%>
+      Rate of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      Rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
       <%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
