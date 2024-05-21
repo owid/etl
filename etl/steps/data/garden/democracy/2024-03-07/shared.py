@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -117,12 +117,13 @@ def from_wide_to_long(
     return tb_
 
 
-def expand_observations(tb: Table) -> Table:
+def expand_observations(tb: Table, regions: Set | None = None) -> Table:
     """Expand to have a row per (year, country)."""
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
 
     # List of countries
-    regions = set(tb["country"])
+    if regions is None:
+        regions = set(tb["country"])
 
     # List of possible years
     years = np.arange(tb["year"].min(), tb["year"].max() + 1)
