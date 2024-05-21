@@ -193,6 +193,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
@@ -215,6 +216,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
@@ -237,6 +239,7 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
+          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
@@ -441,6 +444,8 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - Data for the United Kingdom only considers England.
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
@@ -471,7 +476,7 @@ tables:
         title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at any administrative level, other strategy, or no strategy at all.
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
         description_key:
           - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
@@ -490,7 +495,7 @@ tables:
         sort:
           - Housing First/housing-led strategy
           - Other strategy
-          - No strategy
+          - No national strategy
           - Not applicable
 
 

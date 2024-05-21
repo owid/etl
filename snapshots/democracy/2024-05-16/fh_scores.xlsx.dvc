@@ -1,0 +1,42 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Freedom in the World
+    description: |-
+      The Freedom in the World report is composed of numerical ratings and supporting descriptive texts for 195 countries and 15 territories. External analysts assess 210 countries and territories, using a combination of on-the-ground research, consultations with local contacts, and information from news articles, nongovernmental organizations, governments, and a variety of other sources. Expert advisers and regional specialists then vet the analysts’ conclusions. The final product represents the consensus of the analysts, advisers, and Freedom House staff.
+
+      For each country and territory, Freedom in the World analyzes the electoral process, political pluralism and participation, the functioning of the government, freedom of expression and of belief, associational and organizational rights, the rule of law, and personal autonomy and individual rights.
+
+    date_published: "2024-02-01"
+    title_snapshot: Freedom in the World - Aggregate Category and Subcategory Scores, 2003-2024
+    description_snapshot: |-
+      This workbook lists all publicly available data by survey year (e.g. survey FIW2003 analyzes calendar year 2002).
+
+      The same indicators were present from FIW2003 through FIW2017.
+
+      In FIW2018, Add A (Additional Discretionary Question A) was eliminated, and Add B (Additional Discretionary Question B) was renamed Add Q.
+
+      For data-analysis purposes, Freedom in the World divides countries and territories into six world regions: Africa, the Americas, Asia-Pacific, Eurasia, Europe, and the Middle East. Prior to the 2022 edition, the countries of North Africa were grouped with the Middle East rather than the rest of Africa.
+
+
+    # Citation
+    producer: Freedom House
+    citation_full: |-
+      House, Freedom. "Freedom in the world. Freedom House." (2021).
+
+    # Files
+    url_main: https://freedomhouse.org/report/freedom-world
+    url_download: https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx
+    date_accessed: 2024-05-16
+
+    # License
+    license:
+      name: Freedom House 2024
+      url: https://freedomhouse.org/about-us/content-permissions
+
+outs:
+  - md5: d9dd921212178c1b53b4c8b122829dda
+    size: 363560
+    path: fh_scores.xlsx

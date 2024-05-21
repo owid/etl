@@ -473,6 +473,15 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
     return cast(PROCESSING_LEVELS, combined_processing_level)
 
 
+def combine_variables_sort(variables: List[Variable]) -> List[str]:
+    # Return sort if all variables have the same sort, otherwise return empty list.
+    sorts = [variable.metadata.sort for variable in variables if variable.metadata.sort]
+    if not sorts:
+        return []
+    else:
+        return sorts[0] if all(sort == sorts[0] for sort in sorts) else []
+
+
 def combine_variables_metadata(
     variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
@@ -510,6 +519,14 @@ def combine_variables_metadata(
     metadata.display = combine_variables_display(variables=variables_only, operation=operation)
     metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
+
+    metadata.type = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="type", operation=operation, warn_if_different=True
+    )
+    metadata.sort = combine_variables_sort(variables=variables_only)
+    metadata.license = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="license", operation=operation, warn_if_different=True
+    )
 
     if pl.enabled():
         metadata.processing_log = combine_variables_processing_logs(variables=variables_only)

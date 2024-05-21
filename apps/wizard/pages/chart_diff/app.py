@@ -100,7 +100,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
     # Get the right arguments for the toggle, button and diff show
     if diff.is_modified:
         # Arguments for the toggle
-        label_tgl = "Approved new chart version"
+        # label_tgl = "Approved new chart version"
 
         # Arguments for diff
         kwargs_diff = {
@@ -109,7 +109,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         }
     elif diff.is_new:
         # Arguments for the toggle
-        label_tgl = "Approved new chart"
+        # label_tgl = "Approved new chart"
 
         # Arguments for diff
         kwargs_diff = {
@@ -120,19 +120,30 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
     # Actually show stuff
     with st.expander(label, not diff.approved):
-        # Toggle
-        st.toggle(
-            label=label_tgl,
-            key=f"toggle-{diff.chart_id}",
-            value=diff.approved,
-            on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
-        )
         # Refresh
         st.button(
             "🔄 Refresh",
             key=f"refresh-btn-{diff.chart_id}",
             on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
             help="Get the latest version of the chart from the staging server.",
+        )
+
+        options = ["Pending", "Approve"]
+        options = {
+            "Approve": "green",
+            "Pending": "orange",
+            # "Reject": "red",
+        }
+        option_names = list(options.keys())
+        st.radio(
+            label="Approve or reject chart",
+            key=f"radio-{diff.chart_id}",
+            options=option_names,
+            horizontal=True,
+            format_func=lambda x: f":{options.get(x)}-background[{x}]",
+            index=option_names.index("Approve") if diff.approved else option_names.index("Pending"),
+            on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
+            # label_visibility="collapsed",
         )
 
         if diff.is_modified:
@@ -196,14 +207,11 @@ def compare_charts(
 
 @st.cache_resource
 def get_engines() -> tuple[Engine, Engine]:
-    s = Path(SOURCE_ENV)
-    t = Path(TARGET_ENV)
+    _validate_env(SOURCE_ENV)
+    _validate_env(TARGET_ENV)
 
-    _validate_env(s)
-    _validate_env(t)
-
-    source_engine = _get_engine_for_env(s)
-    target_engine = _get_engine_for_env(t)
+    source_engine = _get_engine_for_env(SOURCE_ENV)
+    target_engine = _get_engine_for_env(TARGET_ENV)
 
     return source_engine, target_engine
 

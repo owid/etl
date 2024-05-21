@@ -321,18 +321,29 @@ def add_regions_and_global_aggregates(
 def add_count_years_in_regime(
     tb: Table,
     columns: List[Tuple[str, str, int]],
+    na_is_zero: bool = False,
 ) -> Table:
     """Add years in a certain regime.
 
     Two types of counters are generated:
         - Age: Number of years consecutively with a certain regime type.
         - Experience: Number of years with a certain regime type.
+
+    columns: List of tuples with 3 elements: (colname, col_newname, threshold).
+    na_is_zero: NaN values (i.e. can't be classified based on the threshold) are classified into the negative class (i.e. 0).
     """
 
-    def _count_years_in_regime(tb, col, col_new, th):
+    def _count_years_in_regime(tb, col, col_new, th, na_is_zero=False):
+        """Groups are created as (-inf, th] and (th, inf).
+
+        If NaN is found, we assume that the country is not in the regime.
+        """
         col_th = "thresholded"
 
-        tb[col_th] = pd.cut(tb[col], bins=[-float("inf"), th, float("inf")], labels=[0, 1]).astype(int)
+        tb[col_th] = pd.cut(tb[col], bins=[-float("inf"), th, float("inf")], labels=[0, 1]).astype("Int64")
+        if na_is_zero:
+            tb[col_th] = tb[col_th].fillna(0)
+
         # Add age of democracy
         tb[f"age_{col_new}"] = tb.groupby(["country", tb[col_th].fillna(0).eq(0).cumsum()])[col_th].cumsum().astype(int)
         tb[f"age_{col_new}"] = tb[f"age_{col_new}"].copy_metadata(tb[col])
@@ -349,7 +360,7 @@ def add_count_years_in_regime(
     if columns:
         for col in columns:
             assert len(col) == 3, "Columns should be a list of tuples with 3 elements: (colname, col_newname, col_th)"
-            tb = _count_years_in_regime(tb, *col)
+            tb = _count_years_in_regime(tb, *col, na_is_zero=na_is_zero)
     return tb
 
 
@@ -392,7 +403,11 @@ def add_age_groups(
 
 
 def add_imputes(
-    tb: Table, path: Path, cols_verify: List[str] | None = None, col_flag_imputed: str | None = None
+    tb: Table,
+    path: Path,
+    cols_verify: List[str] | None = None,
+    col_flag_imputed: str | None = None,
+    verify_integrity: bool = True,
 ) -> Table:
     """Add imputed values to the table.
 
@@ -430,7 +445,9 @@ def add_imputes(
         # Sanity checks
         assert tb_imp_.shape[0] > 0, f"No data found for {impute['country_impute']}"
         assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
-        assert tb_imp_["year"].min() == impute["year_min"], f"Missing years (min check) for {impute['country_impute']}"
+        assert (a := tb_imp_["year"].min()) == (
+            b := impute["year_min"]
+        ), f"Missing years (min check) for {impute['country']} imputed from {impute['country_impute']}: {a} != {b}"
 
         # Tweak them
         # tb_ = tb_.rename(
@@ -466,5 +483,6 @@ def add_imputes(
     # tb_ = cast(Table, tb_[cols])
 
     # Verify that there are no duplicates
-    tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
+    if verify_integrity:
+        tb_ = tb_.set_index(cols_verify, verify_integrity=True).sort_index().reset_index()
     return tb_
