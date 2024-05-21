@@ -25,6 +25,7 @@ definitions:
       <% elif metric == "Rate" and age == 'All ages'%>
       Rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
       <%- endif -%>
+    decimal_places: <% if metric == 'Number' %>0<% else %>2<%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -40,4 +41,5 @@ tables:
         unit: |-
           {definitions.metric.unit}
         display:
-          numDecimalPlaces: <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+          numDecimalPlaces: |-
+            {definitions.metric.decimal_places}
