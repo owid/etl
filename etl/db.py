@@ -10,7 +10,7 @@ import structlog
 import validators
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import config
 
@@ -440,12 +440,17 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
     return df
 
 
-def read_sql(sql: str, engine: Optional[Engine] = None, *args, **kwargs) -> pd.DataFrame:
+def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
     """
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        with engine.connect() as con:
-            return pd.read_sql(sql, con.connection, *args, **kwargs)
+        if isinstance(engine, Engine):
+            with engine.connect() as con:
+                return pd.read_sql(sql, con, *args, **kwargs)
+        elif isinstance(engine, Session):
+            return pd.read_sql(sql, engine.bind, *args, **kwargs)
+        else:
+            raise ValueError(f"Unsupported engine type {type(engine)}")

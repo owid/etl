@@ -3,7 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
@@ -59,7 +59,7 @@ else:
 ########################################
 
 
-def get_chart_diffs(source_engine, target_engine):
+def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified]:
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # Get IDs from modified charts

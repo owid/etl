@@ -6,14 +6,16 @@ from urllib.error import HTTPError, URLError
 
 import numpy as np
 import pandas as pd
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from etl import config
+from etl.db import read_sql
 
 
 def _fetch_data_df_from_s3(variable_id: int):
@@ -67,14 +69,9 @@ def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
         name AS entityName,
         code AS entityCode
     FROM entities
-    WHERE id in :entity_ids
+    WHERE id in %(entity_ids)s
     """
-
-    # Execute the SQL using session
-    result_proxy = session.execute(q, {"entity_ids": entity_ids})  # type: ignore
-
-    # Convert the result into a DataFrame
-    return pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
+    return read_sql(q, session, params={"entity_ids": entity_ids})
 
 
 def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
@@ -124,11 +121,11 @@ def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
     """
 
     # Using the session to execute raw SQL and fetching one row as a result
-    result = session.execute(sql, {"variable_id": variable_id}).fetchone()  # type: ignore
+    result = session.execute(text(sql), {"variable_id": variable_id}).fetchone()
 
     # Ensure result exists and convert to dictionary
     assert result, f"variableId `{variable_id}` not found"
-    return dict(result)
+    return dict(result._mapping)
 
 
 def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
@@ -142,7 +139,7 @@ def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     """
 
     # Using the session to execute raw SQL
-    result = session.execute(sql, {"variable_id": variable_id}).fetchall()  # type: ignore
+    result = session.execute(text(sql), {"variable_id": variable_id}).fetchall()
 
     # Extract tag names from the result and return as a list
     return [row[0] for row in result]
@@ -159,10 +156,10 @@ def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
     """
 
     # Using the session to execute raw SQL
-    result = session.execute(sql, {"variable_id": variable_id}).fetchall()  # type: ignore
+    result = session.execute(text(sql), {"variable_id": variable_id}).fetchall()
 
     # Convert the result rows to a list of dictionaries
-    return [dict(row) for row in result]
+    return [dict(row._mapping) for row in result]
 
 
 def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
@@ -176,7 +173,7 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     """
 
     # Use the session to execute the raw SQL
-    result_proxy = session.execute(sql, {"variable_id": variable_id})  # type: ignore
+    result_proxy = session.execute(text(sql), {"variable_id": variable_id})
 
     # Fetch the results into a DataFrame
     df = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
@@ -291,7 +288,7 @@ def _variable_metadata(
     # convert timestamp to string
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
     for col in ("createdAt", "updatedAt"):
-        variableMetadata[col] = variableMetadata[col].strftime(time_format)  # type: ignore
+        variableMetadata[col] = variableMetadata[col].strftime(time_format)
 
     # add origins
     variableMetadata["origins"] = _move_population_origin_to_end(

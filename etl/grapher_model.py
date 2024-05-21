@@ -1,13 +1,13 @@
 """This schema was generated using https://github.com/agronholm/sqlacodegen library with the following command:
 ```
-sqlacodegen --generator sqlmodels mysql://root@localhost:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
 ```
 It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import humps
 import pandas as pd
@@ -15,36 +15,34 @@ import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import (
+    JSON,
     BigInteger,
+    Column,
     Computed,
+    Date,
     DateTime,
+    ForeignKey,
     ForeignKeyConstraint,
     Index,
     Integer,
+    SmallInteger,
     String,
     Table,
+    or_,
+    select,
     text,
 )
 from sqlalchemy.dialects.mysql import (
     ENUM,
-    LONGBLOB,
     LONGTEXT,
-    MEDIUMTEXT,
+    TEXT,
     TINYINT,
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import JSON as _JSON
-from sqlmodel import (
-    Column,
-    Field,
-    Relationship,
-    Session,
-    SQLModel,
-    or_,
-    select,
-)
-from sqlmodel.sql.expression import Select, SelectOfScalar
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy.sql import Select
+from typing_extensions import TypedDict
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
@@ -52,26 +50,28 @@ from etl.db import read_sql
 
 log = structlog.get_logger()
 
-# get rid of warning from https://github.com/tiangolo/sqlmodel/issues/189
-SelectOfScalar.inherit_cache = True  # type: ignore
-Select.inherit_cache = True  # type: ignore
-
 S3_PATH_TYP = Literal["s3", "http"]
-
-metadata = SQLModel.metadata
 
 
 # persist the value None as a SQL NULL value, not the JSON encoding of null
-JSON = _JSON(none_as_null=True)
+# JSON = _JSON(none_as_null=True)
+
+
+# class Base(MappedAsDataclass, DeclarativeBase):
+class Base(DeclarativeBase):
+    __table_args__ = {"extend_existing": True}
+
+    def dict(self) -> Dict[str, Any]:
+        return {field.name: getattr(self, field.name) for field in self.__table__.c}
 
 
 t_active_datasets = Table(
     "active_datasets",
-    metadata,
+    Base.metadata,
     Column("id", Integer, server_default=text("'0'")),
     Column("name", String(512)),
     Column("description", LONGTEXT),
-    Column("createdAt", DateTime),
+    Column("createdAt", DateTime, server_default=text("'CURRENT_TIMESTAMP'")),
     Column("updatedAt", DateTime),
     Column("namespace", String(255)),
     Column("isPrivate", TINYINT(1), server_default=text("'0'")),
@@ -83,43 +83,44 @@ t_active_datasets = Table(
     Column("nonRedistributable", TINYINT(1), server_default=text("'0'")),
     Column("isArchived", TINYINT(1), server_default=text("'0'")),
     Column("sourceChecksum", String(64)),
+    Column("shortName", String(255)),
+    Column("version", String(255)),
+    Column("updatePeriodDays", Integer),
     extend_existing=True,
 )
 
 
-class Entity(SQLModel, table=True):
-    __tablename__: str = "entities"  # type: ignore
-    __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True), {"extend_existing": True})
+class Entity(Base):
+    __tablename__ = "entities"
+    __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    name: str = Field(sa_column=Column("name", VARCHAR(255), nullable=False))
-    validated: int = Field(sa_column=Column("validated", TINYINT(1), nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    displayName: str = Field(sa_column=Column("displayName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(255))
+    validated: Mapped[int] = mapped_column(TINYINT(1))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    displayName: Mapped[str] = mapped_column(VARCHAR(255))
+    code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
-class Namespace(SQLModel, table=True):
-    __tablename__: str = "namespaces"  # type: ignore
-    __table_args__ = (
-        Index("namespaces_name_uq", "name", unique=True),
-        {"extend_existing": True},
-    )
+class Namespace(Base):
+    __tablename__ = "namespaces"
+    __table_args__ = (Index("namespaces_name_uq", "name", unique=True),)
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    isArchived: int = Field(
-        default=0, sa_column=Column("isArchived", TINYINT(1), nullable=False, server_default=text("'0'"))
-    )
-    description: Optional[str] = Field(default=None, sa_column=Column("description", String(255, "utf8mb4_0900_as_cs")))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(255))
+    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    description: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     def upsert(self, session: Session) -> "Namespace":
         cls = self.__class__
         q = select(cls).where(
             cls.name == self.name,
         )
-        ns = session.exec(q).one_or_none()
+        ns = session.scalar(q)
+
         if ns is None:
             ns = self
         else:
@@ -131,67 +132,34 @@ class Namespace(SQLModel, table=True):
         q = select(cls).where(
             cls.name == self.name,
         )
-        return session.exec(q).one()
+        return session.scalars(q).one()
 
 
-class Posts(SQLModel, table=True):
-    __table_args__ = {"extend_existing": True}
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    title: str = Field(sa_column=Column("title", MEDIUMTEXT, nullable=False))
-    slug: str = Field(sa_column=Column("slug", MEDIUMTEXT, nullable=False))
-    type: str = Field(sa_column=Column("type", MEDIUMTEXT, nullable=False))
-    status: str = Field(sa_column=Column("status", MEDIUMTEXT, nullable=False))
-    content: str = Field(sa_column=Column("content", LONGTEXT, nullable=False))
-    updated_at: datetime = Field(sa_column=Column("updated_at", DateTime, nullable=False))
-    published_at: Optional[datetime] = Field(default=None, sa_column=Column("published_at", DateTime))
-
-    tag: List["Tag"] = Relationship(back_populates="post")
-
-
-t_post_tags = Table(
-    "post_tags",
-    metadata,
-    Column("post_id", Integer, primary_key=True, nullable=False),
-    Column("tag_id", Integer, primary_key=True, nullable=False),
-    ForeignKeyConstraint(["post_id"], ["posts.id"], ondelete="CASCADE", name="FK_post_tags_post_id"),
-    ForeignKeyConstraint(["tag_id"], ["tags.id"], ondelete="CASCADE", name="FK_post_tags_tag_id"),
-    Index("FK_post_tags_tag_id", "tag_id"),
-    extend_existing=True,
-)
-
-
-class Tag(SQLModel, table=True):
-    __tablename__: str = "tags"  # type: ignore
+class Tag(Base):
+    __tablename__ = "tags"
     __table_args__ = (
-        ForeignKeyConstraint(["parentId"], ["tags.id"], name="tags_ibfk_1"),
+        ForeignKeyConstraint(["parentId"], ["tags.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="tags_ibfk_1"),
         Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
         Index("parentId", "parentId"),
-        {"extend_existing": True},
+        Index("slug", "slug", unique=True),
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
-    specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
-
-    post: List["Posts"] = Relationship(back_populates="tag")
-    tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
-    tags_reverse: List["Tag"] = Relationship(back_populates="tags")
-    datasets: List["Dataset"] = Relationship(back_populates="tags")
-    chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(255))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    parentId: Mapped[Optional[int]] = mapped_column(Integer)
+    specialType: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    slug: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
 
     @classmethod
     def load_tags(cls, session: Session) -> List["Tag"]:  # type: ignore
-        return session.exec(select(cls).where(cls.slug.isnot(None))).all()  # type: ignore
+        return session.scalars(select(cls).where(cls.slug.isnot(None))).all()  # type: ignore
 
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()  # type: ignore
+        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()  # type: ignore
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -203,79 +171,80 @@ class Tag(SQLModel, table=True):
         return tags
 
 
-class User(SQLModel, table=True):
-    __tablename__: str = "users"  # type: ignore
+class User(Base):
+    __tablename__ = "users"
+    __table_args__ = (Index("email", "email", unique=True),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    isSuperuser: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    email: Mapped[str] = mapped_column(VARCHAR(255))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
+    fullName: Mapped[str] = mapped_column(VARCHAR(255))
+    password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
+    lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+
+class ChartRevisions(Base):
+    __tablename__ = "chart_revisions"
     __table_args__ = (
-        Index("email", "email", unique=True),
-        {"extend_existing": True},
-    )
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    password: str = Field(sa_column=Column("password", String(128, "utf8mb4_0900_as_cs"), nullable=False))
-    isSuperuser: int = Field(sa_column=Column("isSuperuser", TINYINT(1), nullable=False, server_default=text("'0'")))
-    email: str = Field(sa_column=Column("email", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    isActive: int = Field(sa_column=Column("isActive", TINYINT(1), nullable=False, server_default=text("'1'")))
-    fullName: str = Field(sa_column=Column("fullName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    lastLogin: Optional[datetime] = Field(default=None, sa_column=Column("lastLogin", DateTime))
-    lastSeen: Optional[datetime] = Field(default=None, sa_column=Column("lastSeen", DateTime))
-
-    chart_revisions: List["ChartRevisions"] = Relationship(back_populates="users")
-    charts: List["Chart"] = Relationship(back_populates="users")
-    charts_: List["Chart"] = Relationship(back_populates="users_")
-    datasets: List["Dataset"] = Relationship(back_populates="users")
-    datasets_: List["Dataset"] = Relationship(back_populates="users_")
-    datasets1: List["Dataset"] = Relationship(back_populates="users1")
-    suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="users")
-    suggested_chart_revisions_: List["SuggestedChartRevisions"] = Relationship(back_populates="users_")
-
-
-class ChartRevisions(SQLModel, table=True):
-    __table_args__ = (
-        ForeignKeyConstraint(["userId"], ["users.id"], name="chart_revisions_userId"),
+        ForeignKeyConstraint(
+            ["userId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="chart_revisions_userId"
+        ),
         Index("chartId", "chartId"),
         Index("chart_revisions_userId", "userId"),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", BigInteger, primary_key=True))
-    chartId: Optional[int] = Field(default=None, sa_column=Column("chartId", Integer))
-    userId: Optional[int] = Field(default=None, sa_column=Column("userId", Integer))
-    config: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("config", JSON))
-    createdAt: Optional[datetime] = Field(default=None, sa_column=Column("createdAt", DateTime))
-    updatedAt: Optional[datetime] = Field(default=None, sa_column=Column("updatedAt", DateTime))
-
-    users: Optional["User"] = Relationship(back_populates="chart_revisions")
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    chartId: Mapped[Optional[int]] = mapped_column(Integer)
+    userId: Mapped[Optional[int]] = mapped_column(Integer)
+    config: Mapped[Optional[dict]] = mapped_column(JSON)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
-class Chart(SQLModel, table=True):
-    __tablename__: str = "charts"  # type: ignore
+class Chart(Base):
+    __tablename__ = "charts"
     __table_args__ = (
-        ForeignKeyConstraint(["lastEditedByUserId"], ["users.id"], name="charts_lastEditedByUserId"),
-        ForeignKeyConstraint(["publishedByUserId"], ["users.id"], name="charts_publishedByUserId"),
+        ForeignKeyConstraint(
+            ["lastEditedByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="charts_lastEditedByUserId",
+        ),
+        ForeignKeyConstraint(
+            ["publishedByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="charts_publishedByUserId",
+        ),
         Index("charts_lastEditedByUserId", "lastEditedByUserId"),
         Index("charts_publishedByUserId", "publishedByUserId"),
-        {"extend_existing": True},
+        Index("charts_slug", "slug"),
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    config: Dict[Any, Any] = Field(sa_column=Column("config", JSON, nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    lastEditedAt: datetime = Field(sa_column=Column("lastEditedAt", DateTime, nullable=False))
-    lastEditedByUserId: int = Field(sa_column=Column("lastEditedByUserId", Integer, nullable=False))
-    is_indexable: int = Field(sa_column=Column("is_indexable", TINYINT(1), nullable=False, server_default=text("'0'")))
-    publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
-    publishedByUserId: Optional[int] = Field(default=None, sa_column=Column("publishedByUserId", Integer))
-
-    users: Optional["User"] = Relationship(back_populates="charts")
-    users_: Optional["User"] = Relationship(back_populates="charts_")
-    chart_slug_redirects: List["ChartSlugRedirects"] = Relationship(back_populates="chart")
-    chart_tags: List["ChartTags"] = Relationship(back_populates="charts")
-    suggested_chart_revisions: List["SuggestedChartRevisions"] = Relationship(back_populates="charts")
-    chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
+    lastEditedByUserId: Mapped[int] = mapped_column(Integer)
+    is_indexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    slug: Mapped[Optional[str]] = mapped_column(
+        VARCHAR(255), Computed("(json_unquote(json_extract(`config`,_utf8mb4'$.slug')))", persisted=False)
+    )
+    type: Mapped[Optional[str]] = mapped_column(
+        VARCHAR(255),
+        Computed(
+            "(coalesce(json_unquote(json_extract(`config`,_utf8mb4'$.type')),_utf8mb4'LineChart'))", persisted=False
+        ),
+    )
+    updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
     @classmethod
     def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
@@ -286,7 +255,7 @@ class Chart(SQLModel, table=True):
             cond = cls.slug == slug
         else:
             raise ValueError("Either chart_id or slug must be provided")
-        charts = session.exec(select(cls).where(cond)).all()
+        charts = session.scalars(select(cls).where(cond)).all()
 
         # there can be multiple charts with the same slug, pick the published one
         if len(charts) > 1:
@@ -301,12 +270,12 @@ class Chart(SQLModel, table=True):
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
         chart_ids = (
-            session.exec(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
+            session.scalars(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
             .unique()
             .all()
         )
         # Find charts
-        return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+        return session.scalars(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
 
     def load_chart_variables(self, session: Session) -> Dict[int, "Variable"]:
         q = """
@@ -316,7 +285,7 @@ class Chart(SQLModel, table=True):
         join variables as v on v.id = cd.variableId
         where cd.chartId = :chart_id
         """
-        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()  # type: ignore
         variables = {r["id"]: Variable(**r) for r in rows}
 
         # add columnSlug if present
@@ -350,7 +319,7 @@ class Chart(SQLModel, table=True):
             # old style variable, match it on name and dataset id
             else:
                 try:
-                    target_var = target_session.exec(
+                    target_var = target_session.scalars(
                         select(Variable).where(
                             Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
                         )
@@ -386,7 +355,7 @@ class Chart(SQLModel, table=True):
         join tags as t on ct.tagId = t.id
         where ct.chartId = :chart_id
         """
-        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()  # type: ignore
         return rows
 
     def remove_nonexisting_map_column_slug(self, session: Session) -> None:
@@ -408,7 +377,7 @@ class Chart(SQLModel, table=True):
                 self.config["map"].pop("columnSlug")
 
 
-class Dataset(SQLModel, table=True):
+class Dataset(Base):
     """Example
         {
         'id': 5357,
@@ -427,61 +396,49 @@ class Dataset(SQLModel, table=True):
     }
     """
 
-    __tablename__: str = "datasets"  # type: ignore
+    __tablename__ = "datasets"
     __table_args__ = (
-        ForeignKeyConstraint(["createdByUserId"], ["users.id"], name="datasets_createdByUserId"),
-        ForeignKeyConstraint(["dataEditedByUserId"], ["users.id"], name="datasets_dataEditedByUserId"),
-        ForeignKeyConstraint(["metadataEditedByUserId"], ["users.id"], name="datasets_metadataEditedByUserId"),
+        ForeignKeyConstraint(
+            ["createdByUserId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="datasets_createdByUserId"
+        ),
+        ForeignKeyConstraint(
+            ["dataEditedByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="datasets_dataEditedByUserId",
+        ),
+        ForeignKeyConstraint(
+            ["metadataEditedByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="datasets_metadataEditedByUserId",
+        ),
         Index("datasets_createdByUserId", "createdByUserId"),
         Index("datasets_dataEditedByUserId", "dataEditedByUserId"),
         Index("datasets_metadataEditedByUserId", "metadataEditedByUserId"),
-        Index("datasets_name_namespace_d3d60d22_uniq", "name", "namespace", unique=True),
         Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    # NOTE: name allows nulls in MySQL, but there are none in reality
-    name: str = Field(sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
-    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
-    version: Optional[str] = Field(default=None, sa_column=Column("version", String(255, "utf8mb4_0900_as_cs")))
-    namespace: str = Field(sa_column=Column("namespace", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    description: str = Field(sa_column=Column("description", LONGTEXT, nullable=False))
-    createdAt: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
-    )
-    updatedAt: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
-    )
-    isPrivate: Optional[int] = Field(
-        default=0, sa_column=Column("isPrivate", TINYINT(1), nullable=False, server_default=text("'0'"))
-    )
-    createdByUserId: int = Field(sa_column=Column("createdByUserId", Integer, nullable=False))
-    metadataEditedAt: datetime = Field(
-        default_factory=datetime.utcnow, sa_column=Column("metadataEditedAt", DateTime, nullable=False)
-    )
-    metadataEditedByUserId: int = Field(sa_column=Column("metadataEditedByUserId", Integer, nullable=False))
-    dataEditedAt: datetime = Field(
-        default_factory=datetime.utcnow, sa_column=Column("dataEditedAt", DateTime, nullable=False)
-    )
-    dataEditedByUserId: int = Field(sa_column=Column("dataEditedByUserId", Integer, nullable=False))
-    nonRedistributable: int = Field(
-        default=0, sa_column=Column("nonRedistributable", TINYINT(1), nullable=False, server_default=text("'0'"))
-    )
-    isArchived: Optional[int] = Field(
-        default=0, sa_column=Column("isArchived", TINYINT(1), nullable=False, server_default=text("'0'"))
-    )
-    sourceChecksum: Optional[str] = Field(
-        default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
-    )
-    updatePeriodDays: Optional[int] = Field(sa_column=Column("updatePeriodDays", Integer, nullable=True))
-
-    users: Optional["User"] = Relationship(back_populates="datasets")
-    users_: Optional["User"] = Relationship(back_populates="datasets_")
-    users1: Optional["User"] = Relationship(back_populates="datasets1")
-    tags: List["Tag"] = Relationship(back_populates="datasets")
-    sources: List["Source"] = Relationship(back_populates="datasets")
-    variables: List["Variable"] = Relationship(back_populates="datasets")
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    description: Mapped[str] = mapped_column(LONGTEXT)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    namespace: Mapped[str] = mapped_column(VARCHAR(255))
+    isPrivate: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    createdByUserId: Mapped[int] = mapped_column(Integer)
+    metadataEditedAt: Mapped[datetime] = mapped_column(DateTime)
+    metadataEditedByUserId: Mapped[int] = mapped_column(Integer)
+    dataEditedAt: Mapped[datetime] = mapped_column(DateTime)
+    dataEditedByUserId: Mapped[int] = mapped_column(Integer)
+    nonRedistributable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64))
+    shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    version: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    updatePeriodDays: Mapped[Optional[int]] = mapped_column(Integer)
 
     def upsert(self, session: Session) -> "Dataset":
         cls = self.__class__
@@ -490,7 +447,7 @@ class Dataset(SQLModel, table=True):
             cls.version == self.version,
             cls.namespace == self.namespace,
         )
-        ds = session.exec(q).one_or_none()
+        ds = session.scalar(q)
         if not ds:
             ds = self
         else:
@@ -517,7 +474,7 @@ class Dataset(SQLModel, table=True):
             cls.version == self.version,
             cls.namespace == self.namespace,
         )
-        return session.exec(q).one()
+        return session.scalars(q).one()
 
     @classmethod
     def from_dataset_metadata(cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int) -> "Dataset":
@@ -538,74 +495,19 @@ class Dataset(SQLModel, table=True):
 
     @classmethod
     def load_dataset(cls, session: Session, dataset_id: int) -> "Dataset":
-        return session.exec(select(cls).where(cls.id == dataset_id)).one()
+        return session.scalars(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
     def load_with_path(cls, session: Session, namespace: str, short_name: str, version: str) -> "Dataset":
-        return session.exec(
+        return session.scalars(
             select(cls).where(cls.namespace == namespace, cls.shortName == short_name, cls.version == version)
         ).one()
 
     @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
-        vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
+        vars = session.scalars(select(Variable).where(Variable.datasetId == dataset_id)).all()
         assert vars, f"Dataset {dataset_id} has no variables"
-        return vars
-
-
-class ChartSlugRedirects(SQLModel, table=True):
-    __table_args__ = (
-        ForeignKeyConstraint(["chart_id"], ["charts.id"], name="chart_slug_redirects_chart_id"),
-        Index("chart_slug_redirects_chart_id", "chart_id"),
-        Index("slug", "slug", unique=True),
-        {"extend_existing": True},
-    )
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    chart_id: int = Field(sa_column=Column("chart_id", Integer, nullable=False))
-
-    chart: Optional["Chart"] = Relationship(back_populates="chart_slug_redirects")
-
-
-class ChartTags(SQLModel, table=True):
-    __table_args__ = (
-        ForeignKeyConstraint(["chartId"], ["charts.id"], ondelete="CASCADE", name="FK_chart_tags_chartId"),
-        ForeignKeyConstraint(["tagId"], ["tags.id"], name="FK_chart_tags_tagId"),
-        Index("FK_chart_tags_tagId", "tagId"),
-        {"extend_existing": True},
-    )
-
-    chartId: int = Field(sa_column=Column("chartId", Integer, primary_key=True, nullable=False))
-    tagId: int = Field(sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
-    isKey: Optional[int] = Field(default=None, sa_column=Column("isKey", TINYINT))
-
-    charts: Optional["Chart"] = Relationship(back_populates="chart_tags")
-    tags: Optional["Tag"] = Relationship(back_populates="chart_tags")
-
-
-t_dataset_files = Table(
-    "dataset_files",
-    metadata,
-    Column("datasetId", Integer, nullable=False),
-    Column("filename", String(255, "utf8mb4_0900_as_cs"), nullable=False),
-    Column("file", LONGBLOB, nullable=False),
-    ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="dataset_files_datasetId"),
-    Index("dataset_files_datasetId", "datasetId"),
-    extend_existing=True,
-)
-
-
-t_dataset_tags = Table(
-    "dataset_tags",
-    metadata,
-    Column("datasetId", Integer, primary_key=True, nullable=False),
-    Column("tagId", Integer, primary_key=True, nullable=False),
-    ForeignKeyConstraint(["datasetId"], ["datasets.id"], ondelete="CASCADE", name="FK_fa434de5c36953f4efce6b073b3"),
-    ForeignKeyConstraint(["tagId"], ["tags.id"], ondelete="CASCADE", name="FK_2e330c9e1074b457d1d238b2dac"),
-    Index("FK_2e330c9e1074b457d1d238b2dac", "tagId"),
-    extend_existing=True,
-)
+        return list(vars)
 
 
 class SourceDescription(TypedDict, total=False):
@@ -616,7 +518,7 @@ class SourceDescription(TypedDict, total=False):
     dataPublisherSource: Optional[str]
 
 
-class Source(SQLModel, table=True):
+class Source(Base):
     """Example:
     {
         "id": 21261,
@@ -634,31 +536,23 @@ class Source(SQLModel, table=True):
     }
     """
 
-    __tablename__: str = "sources"  # type: ignore
+    __tablename__ = "sources"
     __table_args__ = (
-        ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="sources_datasetId"),
+        ForeignKeyConstraint(
+            ["datasetId"], ["datasets.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="sources_datasetId"
+        ),
         Index("sources_datasetId", "datasetId"),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    # NOTE: nested models are not supported yet in SQLModel so we use TypedDict instead
-    # https://github.com/tiangolo/sqlmodel/issues/63
-    description: SourceDescription = Field(sa_column=Column(JSON), nullable=False)
-    createdAt: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
-    )
-    updatedAt: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
-    )
-    name: Optional[str] = Field(default=None, sa_column=Column("name", String(512, "utf8mb4_0900_as_cs")))
-    datasetId: Optional[int] = Field(default=None, sa_column=Column("datasetId", Integer))
-
-    datasets: Optional["Dataset"] = Relationship(back_populates="sources")
-    variables: List["Variable"] = Relationship(back_populates="sources")
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    description: Mapped[SourceDescription] = mapped_column(JSON)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    name: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    datasetId: Mapped[Optional[int]] = mapped_column(Integer)
 
     @property
-    def _upsert_select(self) -> SelectOfScalar["Source"]:
+    def _upsert_select(self) -> Select:
         cls = self.__class__
         # NOTE: we match on both name and additionalInfo (source's description) so that we can
         # have sources with the same name, but different descriptions
@@ -671,7 +565,7 @@ class Source(SQLModel, table=True):
         return select(cls).where(*conds)  # type: ignore
 
     def upsert(self, session: Session) -> "Source":
-        ds = session.exec(self._upsert_select).one_or_none()
+        ds = session.scalars(self._upsert_select).one_or_none()
 
         if not ds:
             ds = self
@@ -682,7 +576,7 @@ class Source(SQLModel, table=True):
         session.add(ds)
 
         # select added object to get its id
-        return session.exec(self._upsert_select).one()
+        return session.scalars(self._upsert_select).one()
 
     @classmethod
     def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
@@ -705,7 +599,7 @@ class Source(SQLModel, table=True):
 
     @classmethod
     def load_source(cls, session: Session, source_id: int) -> "Source":
-        return session.exec(select(cls).where(cls.id == source_id)).one()
+        return session.scalars(select(cls).where(cls.id == source_id)).one()
 
     @classmethod
     def load_sources(
@@ -749,82 +643,80 @@ class Source(SQLModel, table=True):
         return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]  # type: ignore
 
 
-class SuggestedChartRevisions(SQLModel, table=True):
-    __tablename__: str = "suggested_chart_revisions"
+class SuggestedChartRevisions(Base):
+    __tablename__ = "suggested_chart_revisions"
     __table_args__ = (
-        ForeignKeyConstraint(["chartId"], ["charts.id"], name="suggested_chart_revisions_ibfk_1"),
-        ForeignKeyConstraint(["createdBy"], ["users.id"], name="suggested_chart_revisions_ibfk_2"),
-        ForeignKeyConstraint(["updatedBy"], ["users.id"], name="suggested_chart_revisions_ibfk_3"),
+        ForeignKeyConstraint(
+            ["chartId"],
+            ["charts.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="suggested_chart_revisions_ibfk_1",
+        ),
+        ForeignKeyConstraint(
+            ["createdBy"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="suggested_chart_revisions_ibfk_2",
+        ),
+        ForeignKeyConstraint(
+            ["updatedBy"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="suggested_chart_revisions_ibfk_3",
+        ),
         Index("chartId", "chartId", "originalVersion", "suggestedVersion", "isPendingOrFlagged", unique=True),
         Index("createdBy", "createdBy"),
         Index("updatedBy", "updatedBy"),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", BigInteger, primary_key=True))
-    chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
-    createdBy: int = Field(sa_column=Column("createdBy", Integer, nullable=False))
-    originalConfig: Dict[Any, Any] = Field(sa_column=Column("originalConfig", JSON, nullable=False))
-    suggestedConfig: Dict[Any, Any] = Field(sa_column=Column("suggestedConfig", JSON, nullable=False))
-    status: str = Field(sa_column=Column("status", String(8, "utf8mb4_0900_as_cs"), nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
-    updatedBy: Optional[int] = Field(default=None, sa_column=Column("updatedBy", Integer))
-    suggestedReason: Optional[str] = Field(
-        default=None, sa_column=Column("suggestedReason", String(512, "utf8mb4_0900_as_cs"))
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    chartId: Mapped[int] = mapped_column(Integer)
+    createdBy: Mapped[int] = mapped_column(Integer)
+    originalConfig: Mapped[dict] = mapped_column(JSON)
+    suggestedConfig: Mapped[dict] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(VARCHAR(8))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    originalVersion: Mapped[int] = mapped_column(
+        Integer, Computed("(json_unquote(json_extract(`originalConfig`,_utf8mb4'$.version')))", persisted=False)
     )
-    decisionReason: Optional[str] = Field(
-        default=None, sa_column=Column("decisionReason", String(512, "utf8mb4_0900_as_cs"))
+    suggestedVersion: Mapped[int] = mapped_column(
+        Integer, Computed("(json_unquote(json_extract(`suggestedConfig`,_utf8mb4'$.version')))", persisted=False)
     )
-    originalVersion: Optional[int] = Field(
-        default=None,
-        sa_column=Column(
-            "originalVersion",
-            Integer,
-            Computed("(json_unquote(json_extract(`originalConfig`,_utf8mb4'$.version')))", persisted=False),
-        ),
+    updatedBy: Mapped[Optional[int]] = mapped_column(Integer)
+    suggestedReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    decisionReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    isPendingOrFlagged: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False)
     )
-    suggestedVersion: Optional[int] = Field(
-        default=None,
-        sa_column=Column(
-            "suggestedVersion",
-            Integer,
-            Computed("(json_unquote(json_extract(`suggestedConfig`,_utf8mb4'$.version')))", persisted=False),
-        ),
-    )
-    isPendingOrFlagged: Optional[int] = Field(
-        default=None,
-        sa_column=Column(
-            "isPendingOrFlagged",
-            TINYINT(1),
-            Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
-        ),
-    )
-    changesInDataSummary: Optional[str] = Field(
-        default=None, sa_column=Column("changesInDataSummary", String(512, "utf8mb4_0900_as_cs"))
-    )
-    experimental: Optional[Dict[Any, Any]] = Field(sa_column=Column("experimental", JSON, nullable=False))
-
-    charts: Optional["Chart"] = Relationship(back_populates="suggested_chart_revisions")
-    users: Optional["User"] = Relationship(back_populates="suggested_chart_revisions")
-    users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
+    changesInDataSummary: Mapped[Optional[str]] = mapped_column(TEXT)
+    experimental: Mapped[Optional[dict]] = mapped_column(JSON)
 
     @classmethod
     def load_pending(cls, session: Session, user_id: Optional[int] = None) -> List["SuggestedChartRevisions"]:
         if user_id is None:
-            return session.exec(
-                select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
-            ).all()
+            return list(
+                session.scalars(
+                    select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
+                ).all()
+            )
         else:
-            return session.exec(
-                select(SuggestedChartRevisions)
-                .where(SuggestedChartRevisions.status == "pending")
-                .where(SuggestedChartRevisions.createdBy == user_id)
-            ).all()
+            return list(
+                session.scalars(
+                    select(SuggestedChartRevisions)
+                    .where(SuggestedChartRevisions.status == "pending")
+                    .where(SuggestedChartRevisions.createdBy == user_id)
+                ).all()
+            )
 
     @classmethod
     def load_revisions(cls, session: Session, chart_id: int) -> List["SuggestedChartRevisions"]:
-        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.chartId == chart_id)).all()
+        return list(
+            session.scalars(select(SuggestedChartRevisions).where(SuggestedChartRevisions.chartId == chart_id)).all()
+        )
 
 
 class DimensionFilter(TypedDict):
@@ -838,32 +730,40 @@ class Dimensions(TypedDict):
     filters: List[DimensionFilter]
 
 
-class PostsGdocs(SQLModel, table=True):
-    __tablename__ = "posts_gdocs"  # type: ignore
-    __table_args__ = {"extend_existing": True}
+class PostsGdocs(Base):
+    __tablename__ = "posts_gdocs"
+    __table_args__ = (Index("idx_posts_gdocs_type", "type"), Index("idx_updatedAt", "updatedAt"))
 
-    id: Optional[str] = Field(default=None, sa_column=Column("id", VARCHAR(255), primary_key=True))
-    slug: str = Field(sa_column=Column("slug", VARCHAR(255), nullable=False))
-    content: dict = Field(sa_column=Column("content", JSON, nullable=False))
-    published: int = Field(sa_column=Column("published", TINYINT, nullable=False))
-    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
-    publicationContext: str = Field(
-        sa_column=Column(
-            "publicationContext", ENUM("unlisted", "listed"), nullable=False, server_default=text("'unlisted'")
-        )
+    id: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
+    slug: Mapped[str] = mapped_column(VARCHAR(255))
+    content: Mapped[dict] = mapped_column(JSON)
+    published: Mapped[int] = mapped_column(TINYINT)
+    createdAt: Mapped[datetime] = mapped_column(DateTime)
+    publicationContext: Mapped[str] = mapped_column(ENUM("unlisted", "listed"), server_default=text("'unlisted'"))
+    type: Mapped[Optional[str]] = mapped_column(
+        VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
     )
-    publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
-    updatedAt: Optional[datetime] = Field(default=None, sa_column=Column("updatedAt", DateTime))
-    revisionId: Optional[str] = Field(default=None, sa_column=Column("revisionId", VARCHAR(255)))
+    publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    revisionId: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    breadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
+    markdown: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 
-class OriginsVariablesLink(SQLModel, table=True):
-    __tablename__: str = "origins_variables"  # type: ignore
-    __table_args__ = {"extend_existing": True}
+class OriginsVariablesLink(Base):
+    __tablename__ = "origins_variables"
+    __table_args__ = (
+        ForeignKeyConstraint(["originId"], ["origins.id"], name="origins_variables_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="origins_variables_ibfk_2"),
+        Index("variableId", "variableId"),
+    )
 
-    originId: int = Field(default=None, foreign_key="origins.id", primary_key=True)
-    variableId: int = Field(default=None, foreign_key="variables.id", primary_key=True)
-    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+    originId: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
+    variableId: Mapped[int] = mapped_column(Integer, ForeignKey("variables.id"), primary_key=True)
+    displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
+
+    # origin: Mapped["Origin"] = relationship("Origin", back_populates="origins_variabless")
+    # variable: Mapped["Variable"] = relationship("Variable", back_populates="origins_variabless")
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
@@ -896,23 +796,18 @@ class OriginsVariablesLink(SQLModel, table=True):
             )
 
 
-class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
-    __tablename__ = "posts_gdocs_variables_faqs"  # type: ignore
+class PostsGdocsVariablesFaqsLink(Base):
+    __tablename__ = "posts_gdocs_variables_faqs"
     __table_args__ = (
         ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"),
         ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"),
         Index("variableId", "variableId"),
-        {"extend_existing": True},
     )
 
-    gdocId: Optional[str] = Field(
-        default=None, sa_column=Column("gdocId", VARCHAR(255), primary_key=True, nullable=False)
-    )
-    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
-    fragmentId: Optional[str] = Field(
-        default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
-    )
-    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+    gdocId: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
+    variableId: Mapped[int] = mapped_column(Integer, primary_key=True)
+    fragmentId: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
+    displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
@@ -946,18 +841,20 @@ class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
             )
 
 
-class TagsVariablesTopicTagsLink(SQLModel, table=True):
-    __tablename__ = "tags_variables_topic_tags"  # type: ignore
+class TagsVariablesTopicTagsLink(Base):
+    __tablename__ = "tags_variables_topic_tags"
     __table_args__ = (
         ForeignKeyConstraint(["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"),
         ForeignKeyConstraint(["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"),
         Index("variableId", "variableId"),
-        {"extend_existing": True},
     )
 
-    tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
-    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
-    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+    tagId: Mapped[int] = mapped_column(Integer, primary_key=True)
+    variableId: Mapped[int] = mapped_column(Integer, primary_key=True)
+    displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
+
+    # tag: Mapped["Tag"] = relationship("Tag", back_populates="tags_variables_topic_tagss")
+    # variable: Mapped["Variable"] = relationship("Variable", back_populates="tags_variables_topic_tagss")
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[str]) -> None:
@@ -992,7 +889,7 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
             )
 
 
-class Variable(SQLModel, table=True):
+class Variable(Base):
     """Example:
     {
         'id': 157342,
@@ -1014,77 +911,88 @@ class Variable(SQLModel, table=True):
     }
     """
 
-    __tablename__: str = "variables"  # type: ignore
+    __tablename__ = "variables"
     __table_args__ = (
-        ForeignKeyConstraint(["datasetId"], ["datasets.id"], name="variables_datasetId_50a98bfd_fk_datasets_id"),
-        ForeignKeyConstraint(["sourceId"], ["sources.id"], name="variables_sourceId_31fce80a_fk_sources_id"),
+        ForeignKeyConstraint(
+            ["datasetId"],
+            ["datasets.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="variables_datasetId_50a98bfd_fk_datasets_id",
+        ),
+        ForeignKeyConstraint(
+            ["sourceId"],
+            ["sources.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="variables_sourceId_31fce80a_fk_sources_id",
+        ),
+        Index("idx_catalogPath", "catalogPath", unique=True),
         Index("unique_short_name_per_dataset", "shortName", "datasetId", unique=True),
         Index("variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True),
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
         Index("variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True),
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    datasetId: int = Field(sa_column=Column("datasetId", Integer, nullable=False))
-    name: Optional[str] = Field(default=None, sa_column=Column("name", String(750, "utf8mb4_0900_as_cs")))
-    shortName: Optional[str] = Field(default=None, sa_column=Column("shortName", String(255, "utf8mb4_0900_as_cs")))
-    description: Optional[str] = Field(default=None, sa_column=Column("description", LONGTEXT))
-    unit: str = Field(sa_column=Column("unit", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    createdAt: datetime = Field(
-        default_factory=datetime.utcnow, sa_column=Column("createdAt", DateTime, nullable=False)
-    )
-    updatedAt: datetime = Field(
-        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
-    )
-    coverage: str = Field(sa_column=Column("coverage", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    timespan: str = Field(sa_column=Column("timespan", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    sourceId: Optional[int] = Field(sa_column=Column("sourceId", Integer, nullable=True))
-    display: Dict[str, Any] = Field(sa_column=Column("display", JSON, nullable=False))
-    columnOrder: int = Field(
-        default=0, sa_column=Column("columnOrder", Integer, nullable=False, server_default=text("'0'"))
-    )
-    code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
-    shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
-    originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
-    grapherConfigAdmin: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigAdmin", JSON))
-    grapherConfigETL: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigETL", JSON))
-    catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
-    dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
-
-    schemaVersion: Optional[int] = Field(default=None, sa_column=Column("schemaVersion", Integer))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    unit: Mapped[str] = mapped_column(VARCHAR(255))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    coverage: Mapped[str] = mapped_column(VARCHAR(255))
+    timespan: Mapped[str] = mapped_column(VARCHAR(255))
+    datasetId: Mapped[int] = mapped_column(Integer)
+    display: Mapped[dict] = mapped_column(JSON)
+    columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"))
+    schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"))
+    name: Mapped[Optional[str]] = mapped_column(VARCHAR(750))
+    description: Mapped[Optional[str]] = mapped_column(LONGTEXT)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    sourceId: Mapped[Optional[int]] = mapped_column(Integer)
+    shortUnit: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    originalMetadata: Mapped[Optional[dict]] = mapped_column(JSON)
+    grapherConfigAdmin: Mapped[Optional[dict]] = mapped_column(JSON)
+    shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
+    dimensions: Mapped[Optional[dict]] = mapped_column(JSON)
+    # TODO: use this
     # processingLevel: Optional[str] = Field(
     #     default=None, sa_column=Column("processingLevel", ENUM("minor", "medium", "major"))
     # )
-    processingLevel: Optional[Optional[Annotated[str, catalog.meta.PROCESSING_LEVELS]]] = Field(default=None)
-    processingLog: Optional[dict] = Field(default=None, sa_column=Column("processingLog", JSON))
-    titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
-    titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))
-    attributionShort: Optional[str] = Field(default=None, sa_column=Column("attributionShort", LONGTEXT))
-    attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
-    descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
-    descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
-    descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
-    descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
+    # processingLevel: Optional[catalog.meta.PROCESSING_LEVELS] = Field(
+    #     default=None, sa_column=Column("processingLevel", ENUM(*get_args(catalog.meta.PROCESSING_LEVELS)))
+    # )
+    processingLevel: Mapped[Optional[str]] = mapped_column(VARCHAR(30))
+    processingLog: Mapped[Optional[dict]] = mapped_column(JSON)
+    titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    attributionShort: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    attribution: Mapped[Optional[str]] = mapped_column(TEXT)
+    descriptionShort: Mapped[Optional[str]] = mapped_column(TEXT)
+    descriptionFromProducer: Mapped[Optional[str]] = mapped_column(TEXT)
+    descriptionKey: Mapped[Optional[dict]] = mapped_column(JSON)
+    descriptionProcessing: Mapped[Optional[str]] = mapped_column(TEXT)
     # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
-    licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
+    licenses: Mapped[Optional[dict]] = mapped_column(JSON)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
-    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
-    type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", ENUM(*get_args(VARIABLE_TYPE))))
-    sort: Optional[List[str]] = Field(
-        default=None,
-        sa_column=Column(
-            "sort",
-            JSON,
-        ),
-    )
+    license: Mapped[Optional[dict]] = mapped_column(JSON)
+    grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON)
+    # TODO: use this
+    # type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", ENUM(*get_args(VARIABLE_TYPE))))
+    type: Mapped[Optional[str]] = mapped_column(ENUM("float", "int", "mixed", "string", "ordinal"))
+    sort: Mapped[Optional[dict]] = mapped_column(JSON)
 
-    datasets: Optional["Dataset"] = Relationship(back_populates="variables")
-    sources: Optional["Source"] = Relationship(back_populates="variables")
-    chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
-    origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
-    posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesFaqsLink)
+    # dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="variabless")
+    # source: Mapped["Source"] = relationship("Source", back_populates="variabless")
+    # chart_dimensionss: Mapped[List["ChartDimension"]] = relationship("ChartDimension", back_populates="variable")
+    # explorer_variabless: Mapped[List["ExplorerVariable"]] = relationship("ExplorerVariable", back_populates="variable")
+    # origins_variabless: Mapped[List["OriginsVariable"]] = relationship("OriginsVariable", back_populates="variable")
+    # posts_gdocs_variables_faqss: Mapped[List["PostsGdocsVariablesFaq"]] = relationship(
+    #     "PostsGdocsVariablesFaq", back_populates="variable"
+    # )
+    # tags_variables_topic_tagss: Mapped[List["TagsVariablesTopicTag"]] = relationship(
+    #     "TagsVariablesTopicTag", back_populates="variable"
+    # )
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -1102,7 +1010,7 @@ class Variable(SQLModel, table=True):
             ),
             cls.datasetId == self.datasetId,
         )
-        ds = session.exec(q).one_or_none()
+        ds = session.scalars(q).one_or_none()
 
         # try matching on name if there was no match on shortName
         if not ds:
@@ -1110,7 +1018,7 @@ class Variable(SQLModel, table=True):
                 cls.name == self.name,
                 cls.datasetId == self.datasetId,
             )
-            ds = session.exec(q).one_or_none()
+            ds = session.scalars(q).one_or_none()
 
         # there's a unique index on `name` which can cause conflict if we swap names of two variables
         # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
@@ -1123,7 +1031,7 @@ class Variable(SQLModel, table=True):
                 cls.shortName != self.shortName,
                 cls.datasetId == self.datasetId,
             )
-            conflict = session.exec(q).one_or_none()
+            conflict = session.scalars(q).one_or_none()
             if conflict:
                 conflict.name = f"{conflict.name} (conflict)"
                 session.add(conflict)
@@ -1178,7 +1086,7 @@ class Variable(SQLModel, table=True):
             cls.shortName == self.shortName,
             cls.datasetId == self.datasetId,
         )
-        return session.exec(q).one()
+        return session.scalars(q).one()
 
     @classmethod
     def from_variable_metadata(
@@ -1203,8 +1111,7 @@ class Variable(SQLModel, table=True):
         else:
             presentation_dict = {}
 
-        # TODO: implement `topicTagsLinks`
-        presentation_dict.pop("topicTagsLinks", None)
+        presentation_dict.pop("topicTags", None)
 
         if metadata.description_key:
             assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
@@ -1241,16 +1148,16 @@ class Variable(SQLModel, table=True):
 
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
-        return session.exec(select(cls).where(cls.id == variable_id)).one()
+        return session.scalars(select(cls).where(cls.id == variable_id)).one()
 
     @classmethod
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
-        return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
+        return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     @classmethod
     def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
-        return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+        return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
 
     def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
@@ -1270,7 +1177,7 @@ class Variable(SQLModel, table=True):
         # establish relationships between variables and posts
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
         query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
-        gdoc_posts = session.exec(query).all()
+        gdoc_posts = session.scalars(query).all()
         existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
         missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
         if missing_gdoc_ids:
@@ -1324,43 +1231,64 @@ class Variable(SQLModel, table=True):
         return self.step_path.with_suffix(".meta.override.yml")
 
 
-class ChartDimensions(SQLModel, table=True):
-    __tablename__: str = "chart_dimensions"
+class ChartDimensions(Base):
+    __tablename__ = "chart_dimensions"
     __table_args__ = (
-        ForeignKeyConstraint(["chartId"], ["charts.id"], name="chart_dimensions_chartId_78d6a092_fk_charts_id"),
         ForeignKeyConstraint(
-            ["variableId"], ["variables.id"], name="chart_dimensions_variableId_9ba778e6_fk_variables_id"
+            ["chartId"],
+            ["charts.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="chart_dimensions_chartId_78d6a092_fk_charts_id",
+        ),
+        ForeignKeyConstraint(
+            ["variableId"],
+            ["variables.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="chart_dimensions_variableId_9ba778e6_fk_variables_id",
         ),
         Index("chart_dimensions_chartId_78d6a092_fk_charts_id", "chartId"),
         Index("chart_dimensions_variableId_9ba778e6_fk_variables_id", "variableId"),
-        {"extend_existing": True},
     )
 
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    order: int = Field(sa_column=Column("order", Integer, nullable=False))
-    property: str = Field(sa_column=Column("property", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
-    variableId: int = Field(sa_column=Column("variableId", Integer, nullable=False))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    order: Mapped[int] = mapped_column(Integer)
+    property: Mapped[str] = mapped_column(VARCHAR(255))
+    chartId: Mapped[int] = mapped_column(Integer)
+    variableId: Mapped[int] = mapped_column(Integer)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    charts: Optional["Chart"] = Relationship(back_populates="chart_dimensions")
-    variables: Optional["Variable"] = Relationship(back_populates="chart_dimensions")
+    # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_dimensionss")
+    # variable: Mapped["Variable"] = relationship("Variable", back_populates="chart_dimensionss")
+
+    # TODO: enable this in SQLALchemy
+    # charts: Optional["Chart"] = Relationship(back_populates="chart_dimensions")
+    # variables: Optional["Variable"] = Relationship(back_populates="chart_dimensions")
 
 
 t_country_latest_data = Table(
     "country_latest_data",
-    metadata,
-    Column("country_code", String(255, "utf8mb4_0900_as_cs")),
+    Base.metadata,
+    Column("country_code", VARCHAR(255)),
     Column("variable_id", Integer),
     Column("year", Integer),
-    Column("value", String(255, "utf8mb4_0900_as_cs")),
-    ForeignKeyConstraint(["variable_id"], ["variables.id"], name="country_latest_data_variable_id_foreign"),
+    Column("value", VARCHAR(255)),
+    ForeignKeyConstraint(
+        ["variable_id"],
+        ["variables.id"],
+        ondelete="RESTRICT",
+        onupdate="RESTRICT",
+        name="country_latest_data_variable_id_foreign",
+    ),
     Index("country_latest_data_country_code_variable_id_unique", "country_code", "variable_id", unique=True),
     Index("country_latest_data_variable_id_foreign", "variable_id"),
     extend_existing=True,
 )
 
 
-class Origin(SQLModel, table=True):
+class Origin(Base):
     """Get CREATE TABLE statement for origins table with
     ```
     from sqlalchemy.schema import CreateTable
@@ -1369,26 +1297,29 @@ class Origin(SQLModel, table=True):
     ```
     """
 
-    __tablename__: str = "origins"  # type: ignore
-    __table_args__ = {"extend_existing": True}
+    __tablename__ = "origins"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    producer: Optional[str] = None
-    title: Optional[str] = None
-    description: Optional[str] = None
-    titleSnapshot: Optional[str] = None
-    descriptionSnapshot: Optional[str] = None
-    citationFull: Optional[str] = None
-    attribution: Optional[str] = None
-    attributionShort: Optional[str] = None
-    versionProducer: Optional[str] = None
-    urlMain: Optional[str] = None
-    urlDownload: Optional[str] = None
-    dateAccessed: Optional[date] = None
-    datePublished: Optional[str] = None
-    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    titleSnapshot: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    title: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    descriptionSnapshot: Mapped[Optional[str]] = mapped_column(TEXT)
+    description: Mapped[Optional[str]] = mapped_column(TEXT)
+    producer: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    citationFull: Mapped[Optional[str]] = mapped_column(TEXT)
+    attribution: Mapped[Optional[str]] = mapped_column(TEXT)
+    attributionShort: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
+    versionProducer: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+    urlMain: Mapped[Optional[str]] = mapped_column(TEXT)
+    urlDownload: Mapped[Optional[str]] = mapped_column(TEXT)
+    dateAccessed: Mapped[Optional[date]] = mapped_column(Date)
+    datePublished: Mapped[Optional[str]] = mapped_column(VARCHAR(10))
+    license: Mapped[Optional[dict]] = mapped_column(JSON)
 
-    variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+    # TODO: enable this
+    # variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+    # origins_variables: Mapped[List["OriginsVariablesLink"]] = relationship(
+    #     "OriginsVariablesLink", back_populates="origin"
+    # )
 
     @classmethod
     def from_origin(
@@ -1413,7 +1344,7 @@ class Origin(SQLModel, table=True):
         )
 
     @property
-    def _upsert_select(self) -> SelectOfScalar["Origin"]:
+    def _upsert_select(self) -> Select:
         # match on all fields for now, otherwise we could get an origin from a different dataset
         # and modify it, which would make it out of sync with origin from its recipe
         # NOTE: we don't match on license because it's JSON and hard to compare
@@ -1441,7 +1372,7 @@ class Origin(SQLModel, table=True):
         # index on all columns because it would be too long.
         # Storing duplicate origins is not a big deal though
 
-        origin = session.exec(self._upsert_select).one_or_none()
+        origin = session.scalars(self._upsert_select).one_or_none()
         if origin is None:
             # create new origin
             origin = self
@@ -1452,10 +1383,10 @@ class Origin(SQLModel, table=True):
         session.add(origin)
 
         # select added object to get its id
-        return session.exec(self._upsert_select).one()
+        return session.scalars(self._upsert_select).one()
         """
 
-        origins = session.exec(self._upsert_select).all()
+        origins = session.scalars(self._upsert_select).all()
         if not origins:
             # create new origin
             origin = self
@@ -1472,25 +1403,31 @@ class Origin(SQLModel, table=True):
 CHART_DIFF_STATUS = Literal["approved", "unapproved"]
 
 
-class ChartDiffApprovals(SQLModel, table=True):
-    __tablename__: str = "chart_diff_approvals"
-    __table_args__ = (Index("chart_id_ix", "chartId"), {"extend_existing": True})
-
-    id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
-    chartId: int = Field(sa_column=Column("chartId", Integer, nullable=False))
-    sourceUpdatedAt: datetime = Field(sa_column=Column("sourceUpdatedAt", DateTime, nullable=False))
-    targetUpdatedAt: Optional[datetime] = Field(sa_column=Column("targetUpdatedAt", DateTime, nullable=True))
-    updatedAt: datetime = Field(
-        default_factory=datetime.utcnow, sa_column=Column("updatedAt", DateTime, nullable=False)
+class ChartDiffApprovals(Base):
+    __tablename__ = "chart_diff_approvals"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_approvals_ibfk_1"
+        ),
+        Index("chartId", "chartId"),
     )
-    status: CHART_DIFF_STATUS = Field(sa_column=Column("status", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chartId: Mapped[int] = mapped_column(Integer)
+    sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    # TODO: use CHART_DIFF_STATUS
+    status: Mapped[str] = mapped_column(VARCHAR(255))
+    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_diff_approvalss")
 
     @classmethod
     def latest_chart_status(
         cls, session: Session, chart_id: int, source_updated_at, target_updated_at
     ) -> CHART_DIFF_STATUS:
         """Load the latest approval of the chart. If there's none, return 'unapproved'."""
-        result = session.exec(
+        result = session.scalars(
             select(cls)
             .where(
                 cls.chartId == chart_id,

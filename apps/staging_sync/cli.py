@@ -13,7 +13,7 @@ from rich import print
 from rich_click.rich_command import RichCommand
 from slack_sdk import WebClient
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.staging_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
@@ -279,7 +279,7 @@ def cli(
                                         status="pending",
                                         createdBy=int(config.GRAPHER_USER_ID),  # type: ignore
                                     )  # type: ignore
-                                    .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)
+                                    .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)  # type: ignore
                                     .delete()
                                 )
 

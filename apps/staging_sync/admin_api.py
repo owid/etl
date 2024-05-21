@@ -6,7 +6,7 @@ import string
 from typing import Any, Dict, List, Optional
 
 import requests
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST

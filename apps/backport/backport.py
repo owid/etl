@@ -9,7 +9,7 @@ from git.exc import GitCommandError
 from git.repo import Repo
 from owid.catalog import Source
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     _variable_metadata,
