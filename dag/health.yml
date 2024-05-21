@@ -574,3 +574,7 @@ steps:
   # GBD 2021 - GBD Deaths and DALYs
   #data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
   #  - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.csv
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.csv
+  data-private://garden/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
