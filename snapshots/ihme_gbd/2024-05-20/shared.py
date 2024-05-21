@@ -39,6 +39,11 @@ def download_data(file_number: int, base_url: str) -> pd.DataFrame:
     with zipfile.ZipFile(zip_file, "r") as z:
         with z.open(csv_file_name) as f:
             df = pd.read_csv(f)
+            # Remove columns that end with 'id' except for 'cause_id' and 'rei_id' - these might be useful for hierachical data in the future
+            columns_to_keep = [
+                col for col in df.columns if not (col.endswith("id") and col not in ["cause_id", "rei_id"])
+            ]
+            df = df[columns_to_keep]
 
     # Use smaller types
     df = repack_frame(df)
