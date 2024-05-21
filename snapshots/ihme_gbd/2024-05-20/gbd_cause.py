@@ -54,6 +54,7 @@ def main(upload: bool) -> None:
         log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
         df = download_data(file_number)
         all_dfs.append(df)
+        log.info(f"Downloaded file {file_number} of {NUMBER_OF_FILES}")
 
     combined_df = pd.concat(all_dfs, ignore_index=True)
     # Download data from source.
