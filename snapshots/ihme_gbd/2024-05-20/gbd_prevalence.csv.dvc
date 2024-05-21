@@ -1,6 +1,7 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
+  is_public: false
   origin:
     # Data product / Snapshot
     title: Global Burden of Disease - Prevalence and Incidence
