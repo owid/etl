@@ -66,7 +66,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 def call_chart_diff(branch: str) -> pd.DataFrame:
     source_engine = OWIDEnv.from_staging(branch).get_engine()
 
-    if OWID_ENV.env_type_id == "live":
+    if OWID_ENV.env_type_id == "production":
         target_engine = OWID_ENV.get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")

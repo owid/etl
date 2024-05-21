@@ -42,7 +42,7 @@ st.session_state.hide_approved_charts = st.session_state.get("hide_approved_char
 # LOAD ENVS
 ########################################
 SOURCE = OWID_ENV
-assert OWID_ENV.env_type_id != "live", "Your .env points to production DB, please use a staging environment."
+assert OWID_ENV.env_type_id != "production", "Your .env points to production DB, please use a staging environment."
 
 # Try to compare against production DB if possible, otherwise compare against staging-site-master
 if config.ENV_FILE_PROD:

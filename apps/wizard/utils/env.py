@@ -2,7 +2,7 @@
 import re
 from dataclasses import dataclass, fields
 from pathlib import Path
-from typing import Literal, Optional, cast
+from typing import Literal, cast
 
 from dotenv import dotenv_values
 from typing_extensions import Self
@@ -10,7 +10,7 @@ from typing_extensions import Self
 from etl import config
 from etl.db import Engine, get_engine
 
-OWIDEnvType = Literal["live", "local", "remote-staging", "unknown"]
+OWIDEnvType = Literal["production", "local", "staging", "unknown"]
 
 
 @dataclass
@@ -49,15 +49,15 @@ class OWIDEnv:
 
     def detect_env_type(self: Self) -> OWIDEnvType:
         """Detect environment type."""
-        # live
+        # production
         if self.conf.DB_NAME == "live_grapher":
-            return "live"
+            return "production"
         # local
         elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
             return "local"
         # other
         elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
-            return "remote-staging"
+            return "staging"
         return "unknown"
 
     @classmethod
@@ -92,31 +92,31 @@ class OWIDEnv:
     @property
     def site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "https://ourworldindata.org"
         elif self.env_type_id == "local":
             return "http://localhost:3030"
-        elif self.env_type_id == "remote-staging":
+        elif self.env_type_id == "staging":
             return f"http://{self.conf.DB_HOST}"
         return None
 
     @property
     def name(self) -> str:
         """Get site."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "production"
         elif self.env_type_id == "local":
             return "local"
-        elif self.env_type_id == "remote-staging":
+        elif self.env_type_id == "staging":
             return f"{self.conf.DB_HOST}"
         raise ValueError("Unknown env_type_id")
 
     @property
     def base_site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "https://admin.owid.io"
-        elif self.env_type_id in ["local", "remote-staging"]:
+        elif self.env_type_id in ["local", "staging"]:
             return self.site
         return None
 
@@ -131,9 +131,9 @@ class OWIDEnv:
     @property
     def api_site(self: Self) -> str:
         """Get api url."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "https://api.ourworldindata.org"
-        elif self.env_type_id == "remote-staging":
+        elif self.env_type_id == "staging":
             return f"https://api-staging.owid.io/{self.conf.DB_HOST}"
         elif self.env_type_id == "local":
             return "http://localhost:8000"

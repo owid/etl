@@ -9,7 +9,7 @@ def test_get_container_name():
 
 def test_OWIDEnv_staging():
     env = OWIDEnv.from_staging("branch")
-    assert env.env_type_id == "remote-staging"
+    assert env.env_type_id == "staging"
     assert env.site == "http://staging-site-branch"
     assert env.name == "staging-site-branch"
     assert env.base_site == "http://staging-site-branch"
@@ -28,7 +28,7 @@ def test_OWIDEnv_production():
             DB_HOST="prod-db.owid.io",
         )
     )
-    assert env.env_type_id == "live"
+    assert env.env_type_id == "production"
     assert env.site == "https://ourworldindata.org"
     assert env.name == "production"
     assert env.base_site == "https://admin.owid.io"
