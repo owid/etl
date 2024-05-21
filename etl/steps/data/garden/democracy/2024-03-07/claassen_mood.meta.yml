@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Democracy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  claassen_mood:
+    variables:
+      democracy_support_claassen:
+        title: "Citizen support for democracy"
+        unit: ""
+        description_short: |-
+          Central estimate of the average extent to which citizens support a democratic political system and reject autocratic alternatives. It combines responses across more than one thousand nationally-representative surveys on how desirable citizens find democracy, how they evaluate undemocratic alternatives (such as a strong unelected leader, the army, or religious authorities), and how they assess democratic and autocratic political systems relative to another.
+        description_processing: |-
+          The variable matches Claassen's variable `supdem`.
+        description_key: &descruption_key
+          - "Examples of survey questions include: 'Democracy may have its problems, but it is better than any other form of government. To what extent do you agree or disagree?', 'There are many ways to govern a country. Would you approve or disapprove of the following alternatives? Elections and Parliament are abolished so that the president can decide everything.', 'I will describe different political systems to you, and I want to ask you about your opinion of each one of them with regard to the country's governance. For each one would you say it is very good, good, bad, or very bad? — A democratic political systems (public freedoms, guarantees equality in political and civil rights, alternation of power, and accountability and transparency of the executive authority)'"
+          - Responses above the median were considered as support of democracy. Non-supportive respondents may have opposed democracy, may have given an indifferent answer, may have answered "I don't know", or may not have responded at all.
+          - Higher scores indicate more support. Positive scores mean that citizen support for democracy is higher than the average across all countries and years. A score of 1 means that citizen support lies one standard deviation above the average support.
+
+      democracy_support_high_claassen:
+        title: "Citizen support for democracy, upper bound"
+        unit: ""
+        description_short: |-
+          Upper-bound estimate of the average extent to which citizens support a democratic political system and reject autocratic alternatives. It combines responses across more than one thousand nationally-representative surveys on how desirable citizens find democracy, how they evaluate undemocratic alternatives (such as a strong unelected leader, the army, or religious authorities), and how they assess democratic and autocratic political systems relative to another.
+        description_key: *descruption_key
+        description_processing: |-
+          The variable matches Claassen's variable `supdem_u95`.
+
+      democracy_support_low_claassen:
+        title: "Citizen support for democracy, lower bound"
+        unit: ""
+        description_short: |-
+          Lower-bound estimate of the average extent to which citizens support a democratic political system and reject autocratic alternatives. It combines responses across more than one thousand nationally-representative surveys on how desirable citizens find democracy, how they evaluate undemocratic alternatives (such as a strong unelected leader, the army, or religious authorities), and how they assess democratic and autocratic political systems relative to another.
+        description_from_producer: |-
+          The variable matches Claassen's variable `supdem_l95`.
+        description_key: *descruption_key
+
