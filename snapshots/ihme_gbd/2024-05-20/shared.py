@@ -1,20 +1,17 @@
-import os
 import time
 import zipfile
-from typing import Any, List
+from io import BytesIO
 
+import pandas as pd
 import requests
+from owid.repack import repack_frame
 
 
-def compress_files(file_paths: List[str], zip_file_path: str) -> None:
-    with zipfile.ZipFile(zip_file_path, "w") as zipf:
-        for file_path in file_paths:
-            zipf.write(file_path, os.path.basename(file_path))
-
-
-def download_data(file_number: int, tmpdirname: Any, base_url: str) -> str:
+def download_data(file_number: int, base_url: str) -> pd.DataFrame:
     # Unique URL for each file
     url_to_download = f"{base_url}{file_number}.zip"
+    csv_file_name = f"{base_url.split('/')[-1]}{file_number}.csv"
+
     # Retry logic
     max_retries = 5
     backoff_factor = 1  # Factor for exponential backoff
@@ -35,14 +32,15 @@ def download_data(file_number: int, tmpdirname: Any, base_url: str) -> str:
     # Download data from source, open the csv within and return that.
     response = requests.get(url_to_download)
 
-    zip_file_name = f"{base_url.split('/')[-1]}{file_number}.zip"
-    zip_file_path = os.path.join(tmpdirname, zip_file_name)
-    with open(zip_file_path, "wb") as f:
-        f.write(response.content)
-    # Extract the zip file
-    with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
-        zip_ref.extractall(tmpdirname)
-    # Construct the CSV file name and path
-    csv_file_name = f"{base_url.split('/')[-1]}{file_number}.csv"
-    csv_file_path = os.path.join(tmpdirname, csv_file_name)
-    return csv_file_path
+    # Load the ZIP file into a BytesIO object
+    zip_file = BytesIO(response.content)
+
+    # Read the CSV file from the ZIP file
+    with zipfile.ZipFile(zip_file, "r") as z:
+        with z.open(csv_file_name) as f:
+            df = pd.read_csv(f)
+
+    # Use smaller types
+    df = repack_frame(df)
+
+    return df
