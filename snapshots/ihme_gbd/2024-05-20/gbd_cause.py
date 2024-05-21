@@ -24,11 +24,10 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path
+from typing import Any, List
 
 import click
-import pandas as pd
 import requests
-from owid.datautils.io import df_to_file
 from structlog import get_logger
 
 from etl.snapshot import Snapshot
@@ -48,21 +47,31 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
     # Download data from source.
-    all_dfs = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number)
-        all_dfs.append(df)
+    all_fp = []
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        for file_number in range(1, NUMBER_OF_FILES + 1):
+            log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
+            file_path = download_data(file_number, tmpdirname)
+            all_fp.append(file_path)
 
-    combined_df = pd.concat(all_dfs, ignore_index=True)
+        zip_file_path = os.path.join(tmpdirname, "all_csv_files.zip")
+        compress_files(all_fp, zip_file_path)
+        snap.dvc_add(upload=upload, filename=zip_file_path)
+
+    # combined_df = pd.concat(all_dfs, ignore_index=True)
     # Download data from source.
-    df_to_file(combined_df, file_path=snap.path)
+    # df_to_file(combined_df, file_path=snap.path)
 
     # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
 
 
-def download_data(file_number: int) -> pd.DataFrame:
+def compress_files(file_paths: List[str], zip_file_path: str) -> None:
+    with zipfile.ZipFile(zip_file_path, "w") as zipf:
+        for file_path in file_paths:
+            zipf.write(file_path, os.path.basename(file_path))
+
+
+def download_data(file_number: int, tmpdirname: Any) -> str:
     # Unique URL for each file
     url_to_download = f"{BASE_URL}{file_number}.zip"
     # Retry logic
@@ -84,20 +93,20 @@ def download_data(file_number: int) -> pd.DataFrame:
                 raise
     # Download data from source, open the csv within and return that.
     response = requests.get(url_to_download)
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        zip_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.zip"
-        zip_file_path = os.path.join(tmpdirname, zip_file_name)
-        with open(zip_file_path, "wb") as f:
-            f.write(response.content)
-        # Extract the zip file
-        with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
-            zip_ref.extractall(tmpdirname)
-        # Construct the CSV file name and path
-        csv_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.csv"
-        csv_file_path = os.path.join(tmpdirname, csv_file_name)
-        # Read the CSV file
-        df = pd.read_csv(csv_file_path)
-        return df
+
+    zip_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.zip"
+    zip_file_path = os.path.join(tmpdirname, zip_file_name)
+    with open(zip_file_path, "wb") as f:
+        f.write(response.content)
+    # Extract the zip file
+    with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
+        zip_ref.extractall(tmpdirname)
+    # Construct the CSV file name and path
+    csv_file_name = f"{BASE_URL.split('/')[-1]}{file_number}.csv"
+    csv_file_path = os.path.join(tmpdirname, csv_file_name)
+    # Read the CSV file
+    # df = pd.read_csv(csv_file_path)
+    return csv_file_path
 
 
 if __name__ == "__main__":
