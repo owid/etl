@@ -19,6 +19,8 @@ tables:
         title: "Democracy score"
         description_short: |-
           Captures the extent of democratic features — political participation, rule of law, stable democratic institutions, political and social integration, and a capable state. It ranges from 1 to 10 (most democratic).
+        description_processing: |-
+          Values for continents have been obtained by averaging the values of the countries in the continent.
         unit: ""
 
       regime_bti:
@@ -150,4 +152,36 @@ tables:
           Indicates the extent to which the party system is stable and rooted in society, interest groups are numerous and diverse, regular citizens approve of democratic norms and procedures, and societal trust is high.
         description_key:
           - It ranges from countries with poor integration (scores of 1 to 2.49), over flawed integration (scores of 2.5 to 4.49), fair integration (scores of 4.5 to 6.49), and sound integration (scores of 6.5 to 8.49), to countries with excellent political and social integration (scores of 8.5 to 10).
+        unit: ""
+
+  num_countries:
+    variables:
+      num_regime_bti:
+        title: |-
+          <% if category == '-1' %>
+          Number of countries with unknown regime
+          <% else %>
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
+          <% endif %>
+        unit: "countries"
+
+
+  num_people:
+    variables:
+      num_regime_bti:
+        title: |-
+          <% if category == '-1' %>
+          Number of people living in countries with unknown regime
+          <% else %>
+          Number of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
+          <% endif %>
+        description_short: "Number of countries with available data."
+        unit: "people"
+
+
+  avg_pop:
+    variables:
+      democracy_bti_weighted:
+        title: "Democracy score (population-weighted)"
+        description_short: Average democratic status, weighted by population.
         unit: ""
