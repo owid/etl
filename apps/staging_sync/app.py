@@ -48,7 +48,9 @@ def main():
         placeholder="my-branch",
         help="Branch name of PR that created the staging server (with existing `staging-site-mybranch` server) or the name of staging server.",
     )
-    target = st.text_input("Target", value="live", help="Using `live` uses DB from local `.env` file as target.")
+    target = st.text_input(
+        "Target", value="production", help="Using `production` uses DB from local `.env` file as target."
+    )
     approve_revisions = st.checkbox(
         "Automatically approve chart revisions for edited charts",
         value=False,
@@ -57,17 +59,17 @@ def main():
     dry_run = st.checkbox("Dry run", value=True)
 
     # Live uses `.env` file which points to the live database in production
-    if target == "live":
+    if target == "production":
         target_env = ".env"
     else:
         target_env = target
 
     # Button to show text
     if st.button("Sync charts", help="This can take a while."):
-        if target == "live":
+        if target == "production":
             assert (
                 config.DB_IS_PRODUCTION
-            ), "If target = live, then chart-sync must be run in production with .env pointing to live DB."
+            ), "If target = production, then chart-sync must be run in production with .env pointing to live DB."
 
         if not _is_valid_config(source, target_env):
             return
