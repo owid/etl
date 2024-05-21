@@ -24,6 +24,8 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
+
+    # Format
     tb = tb.format(["country", "year"])
 
     #
