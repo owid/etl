@@ -46,7 +46,7 @@ NUMBER_OF_FILES = 150
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_prevalence.csv")
     snap.metadata.is_public = False
     # Download data from source.
     all_dfs = []
