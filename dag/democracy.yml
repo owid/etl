@@ -59,3 +59,13 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-16/fh:
     - data://garden/democracy/2024-03-07/fh
+
+  # Bertelsmann Transformation Index (2024)
+  data://meadow/democracy/2024-05-21/bti:
+    - snapshot://democracy/2024-05-21/bti.xlsx
+  data://garden/democracy/2024-03-07/bti:
+    - data://meadow/democracy/2024-05-21/bti
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/democracy/2024-05-21/bti:
+    - data://garden/democracy/2024-03-07/bti
