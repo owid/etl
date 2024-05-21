@@ -23,7 +23,10 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.format(["country", "year"])
+    # Dropping sex column as we only have values for both sexes
+    if len(tb["sex"].unique() == 1):
+        tb = tb.drop(columns="sex")
+    tb = tb.format(["country", "year", "metric", "neglected_tropical_disease", "impairment", "age"])
 
     #
     # Save outputs.

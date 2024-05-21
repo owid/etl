@@ -209,16 +209,16 @@
   "Eastern Mediterranean Region": "Eastern Mediterranean (WHO)",
   "Europe & Central Asia - WB": "Europe & Central Asia (WB)",
   "European Region": "European Region (WHO)",
-  "Latin America & Caribbean - WB": "Latin America & Caribbean (WB)",
+  "Latin America & Caribbean - WB": "Latin American & Caribbean (WB)",
   "Middle East & North Africa - WB": "Middle East & North Africa (WB)",
   "Region of the Americas": "Americas (WHO)",
-  "South Asia - WB": "Asia",
-  "South-East Asia Region": "South-East Asia (WB)",
+  "South Asia - WB": "South Asia (WB)",
+  "South-East Asia Region": "South-East Asia Region (WHO)",
   "Sub-Saharan Africa - WB": "Sub-Saharan Africa (WB)",
   "T\u00fcrkiye": "Turkey",
   "Western Pacific Region": "Western Pacific (WHO)",
-  "World Bank High Income": "High Income Countries (WB)",
-  "World Bank Low Income": "Low Income Countries (WB)",
-  "World Bank Lower Middle Income": "Lower-Middle income countries (WB)",
-  "World Bank Upper Middle Income": "Upper-middle income countries"
+  "World Bank High Income": "High-income countries",
+  "World Bank Low Income": "Low-income countries",
+  "World Bank Lower Middle Income": "Lower-middle-income countries",
+  "World Bank Upper Middle Income": "Upper-middle-income countries"
 }
