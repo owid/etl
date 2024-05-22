@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import cast
+
 import pandas as pd
 from owid.catalog import Table
 
@@ -33,6 +35,9 @@ def run(dest_dir: str) -> None:
 
     # Drop rank column
     tb = tb.drop(columns=["rank_eiu"])
+    tb = cast(Table, tb)
+
+    tb = add_regime_identifier(tb)
 
     # Format
     tb = tb.format(["country", "year"])
@@ -50,6 +55,8 @@ def run(dest_dir: str) -> None:
 
 
 def add_regime_identifier(tb: Table) -> Table:
+    """Create regime identifier."""
+    # `regime_eiu`: Categorise democracy_eiu into 4 groups
     bins = [
         -0.01,
         4,
@@ -63,7 +70,8 @@ def add_regime_identifier(tb: Table) -> Table:
         2,
         3,
     ]
-    # 1. Create variable for age group of electoral demcoracies:
     tb["regime_eiu"] = pd.cut(tb["democracy_eiu"], bins=bins, labels=labels)
 
+    # Add metadata
+    tb["regime_eiu"] = tb["regime_eiu"].copy_metadata(tb["democracy_eiu"])
     return tb

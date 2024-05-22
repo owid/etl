@@ -1,6 +1,4 @@
 """Load a snapshot and create a meadow dataset."""
-
-import pandas as pd
 from owid.catalog.tables import Table, concat
 
 from etl.helpers import PathFinder, create_dataset
