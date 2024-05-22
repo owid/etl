@@ -28,8 +28,12 @@ def run(dest_dir: str) -> None:
     tb_dalys["metric"] = "DALYs"
 
     # Format the tables
-    tb_deaths = tb_deaths.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_deaths")
-    tb_dalys = tb_dalys.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_dalys")
+    tb_deaths = tb_deaths.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_deaths").drop(
+        columns="metric"
+    )
+    tb_dalys = tb_dalys.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_dalys").drop(
+        columns="metric"
+    )
 
     #
     # Save outputs.
