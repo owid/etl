@@ -22,18 +22,18 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # Split into two tables: one for deaths, one for DALYs
-    tb_deaths = tb[tb["metric"] == "Deaths"].copy()
-    tb_dalys = tb[tb["metric"] == "DALYs (Disability-Adjusted Life Years)"].copy()
+    tb_deaths = tb[tb["measure"] == "Deaths"].copy()
+    tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
     # Shorten the metric name for DALYs
-    tb_dalys["metric"] = "DALYs"
+    tb_dalys["measure"] = "DALYs"
+
+    # Drop the measure column
+    tb_deaths = tb_deaths.drop(columns="measure")
+    tb_dalys = tb_dalys.drop(columns="measure")
 
     # Format the tables
-    tb_deaths = tb_deaths.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_deaths").drop(
-        columns="metric"
-    )
-    tb_dalys = tb_dalys.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_dalys").drop(
-        columns="metric"
-    )
+    tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
+    tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
 
     #
     # Save outputs.
