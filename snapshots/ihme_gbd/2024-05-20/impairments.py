@@ -35,8 +35,8 @@ from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/033e3c4587cb33090160399cb28b369e_files/IHME-GBD_2021_DATA-033e3c45-"
-NUMBER_OF_FILES = 9
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/a086e74384319dfcf408e10b4fdcdcd8_files/IHME-GBD_2021_DATA-a086e743-"
+NUMBER_OF_FILES = 21
 
 
 def download_data(file_number: int) -> pd.DataFrame:
