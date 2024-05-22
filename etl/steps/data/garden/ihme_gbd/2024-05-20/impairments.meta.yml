@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
+    processing_level: minor
   metric:
     unit: |-
       <% if metric == "Number" %>
