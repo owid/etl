@@ -34,7 +34,7 @@ tables:
   funding_product_ntd:
     variables:
       amount__usd:
-        title: Funding for technology - << product.lower() >> towards neglected tropical diseases
+        title: Funding for technology - << product.lower() >> - towards neglected tropical diseases
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << product.lower() >> towards neglected tropical diseases. This data is expressed in US dollars, adjusted for inflation."
@@ -42,7 +42,7 @@ tables:
   funding_disease_product:
     variables:
       amount__usd:
-        title: Funding for << product.lower() >>for treating << disease.lower() >>
+        title: Funding for << product.lower() >> for treating << disease.lower() >>
         unit: constant 2022 US$
         short_unit: $
         description_short: "The amount of funding for << product.lower() >> for treating << disease >>.This data is expressed in US dollars, adjusted for inflation."
