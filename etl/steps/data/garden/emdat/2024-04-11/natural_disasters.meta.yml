@@ -193,6 +193,8 @@ tables:
       total_dead_per_100k_people:
         title: Deaths per 100,000 people
         unit: 'deaths per 100,000 people'
+        description_short: |-
+          Death rate per 100,000 people as a result of a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-dead
@@ -200,6 +202,8 @@ tables:
       injured_per_100k_people:
         title: Injured per 100,000 people
         unit: 'injured per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
@@ -207,6 +211,8 @@ tables:
       affected_per_100k_people:
         title: Affected per 100,000 people
         unit: 'affected per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
         description_processing: *description-processing-100k
         description_key:
           - *definition-affected
@@ -214,6 +220,8 @@ tables:
       homeless_per_100k_people:
         title: Homeless per 100,000 people
         unit: 'homeless per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 whose houses are destroyed or heavily damaged and therefore need shelter after an event.
         description_processing: *description-processing-100k
         description_key:
           - *definition-homeless
@@ -221,6 +229,8 @@ tables:
       total_affected_per_100k_people:
         title: Total affected per 100,000 people
         unit: 'affected per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 affected by a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
@@ -231,6 +241,8 @@ tables:
       n_events_per_100k_people:
         title: Natural disasters per 100,000 people
         unit: 'events per 100,000 people'
+        description_short: |-
+          Rate of reported natural disasters per 100,000 people.
         description_processing: *description-processing-100k
         description_key:
           - *description-key-common
