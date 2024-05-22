@@ -3,6 +3,7 @@
 from typing import Tuple, cast
 
 import numpy as np
+import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
 from shared import (
@@ -28,7 +29,7 @@ REGIONS = {
     "Oceania": {},
 }
 # Year range
-YEAR_MIN = 2005
+YEAR_MIN = 2006
 YEAR_MAX = 2023
 
 
@@ -37,12 +38,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("bti")
+    ds_meadow = paths.load_dataset("eiu")
     ds_regions = paths.load_dataset("regions")
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["bti"].reset_index()
+    tb = ds_meadow["eiu"].reset_index()
 
     #
     # Process data.
@@ -52,21 +53,17 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
-    # Invert the scores of regime_bti
-    tb["regime_bti"] = 5 - (tb["regime_bti"] - 1)
+    # Remove years with interpolated data (2007 and 2009 are interpolated by Gapminder)
+    tb = tb[~tb["year"].isin([2007, 2009])]
 
-    # Sanity checks
-    tb = check_pol_sys(tb)
-    tb = check_regime(tb)
-    tb = tb.drop(
-        columns=[
-            "pol_sys",
-        ]
-    )
+    # Drop rank column
+    tb = tb.drop(columns=["rank_eiu"])
+    tb = cast(Table, tb)
+
+    tb = add_regime_identifier(tb)
 
     ##################################################
     # AGGREGATES
-
     # Get country-count-related data: country-averages, number of countries, ...
     tb_num_countries, tb_avg_countries = get_country_data(tb, ds_regions)
 
@@ -96,65 +93,26 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def check_pol_sys(tb: Table) -> Table:
-    """Sanity-check the indicator.
+def add_regime_identifier(tb: Table) -> Table:
+    """Create regime identifier."""
+    # `regime_eiu`: Categorise democracy_eiu into 4 groups
+    bins = [
+        -0.01,
+        4,
+        6,
+        8,
+        10,
+    ]
+    labels = [
+        0,
+        1,
+        2,
+        3,
+    ]
+    tb["regime_eiu"] = pd.cut(tb["democracy_eiu"], bins=bins, labels=labels)
 
-    Some years looked off in the previous edition, this is a sanity check.
-    """
-    col_tmp = "pol_sys_check"
-
-    tb.loc[
-        (tb["electfreefair_bti"] >= 6)
-        & (tb["electfreefair_bti"].notna())
-        & (tb["effective_power_bti"] >= 4)
-        & (tb["effective_power_bti"].notna())
-        & (tb["freeassoc_bti"] >= 4)
-        & (tb["freeassoc_bti"].notna())
-        & (tb["freeexpr_bti"] >= 4)
-        & (tb["freeexpr_bti"].notna())
-        & (tb["sep_power_bti"] >= 4)
-        & (tb["sep_power_bti"].notna())
-        & (tb["civ_rights_bti"] >= 4)
-        & (tb["civ_rights_bti"].notna())
-        & (tb["state_basic_bti"] >= 3)
-        & (tb["state_basic_bti"].notna()),
-        col_tmp,
-    ] = 1
-
-    # Replace pol_sys_check = 0 if any condition is not met
-    tb.loc[
-        (tb["electfreefair_bti"] < 6)
-        | (tb["effective_power_bti"] < 4)
-        | (tb["freeassoc_bti"] < 4)
-        | (tb["freeexpr_bti"] < 4)
-        | (tb["sep_power_bti"] < 4)
-        | (tb["civ_rights_bti"] < 4)
-        | (tb["state_basic_bti"] < 3),
-        col_tmp,
-    ] = 0
-
-    # print(tb[["pol_sys", "pol_sys_check"]].dropna().value_counts())
-
-    assert (tb["pol_sys"] == tb[col_tmp]).all(), "Miss-labelled `pol_sys`."
-
-    tb = tb.drop(columns=[col_tmp])
-
-    return tb
-
-
-def check_regime(tb: Table) -> Table:
-    col_tmp = "regime_bti_check"
-    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 1) & (tb["democracy_bti"] < 4), col_tmp] = 1
-    tb.loc[(tb["pol_sys"] == 0) & (tb["democracy_bti"] >= 4) & (tb["democracy_bti"] <= 10), col_tmp] = 2
-    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 1) & (tb["democracy_bti"] < 6), col_tmp] = 3
-    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 6) & (tb["democracy_bti"] < 8), col_tmp] = 4
-    tb.loc[(tb["pol_sys"] == 1) & (tb["democracy_bti"] >= 8) & (tb["democracy_bti"] <= 10), col_tmp] = 5
-
-    tb[col_tmp] = tb[col_tmp].astype("UInt8")
-
-    assert (tb["regime_bti"] == tb[col_tmp]).all(), "Miss-labelled `regime_bti`."
-
-    tb = tb.drop(columns=[col_tmp])
+    # Add metadata
+    tb["regime_eiu"] = tb["regime_eiu"].copy_metadata(tb["democracy_eiu"])
     return tb
 
 
@@ -164,15 +122,14 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     Returns two tables:
 
     1) tb_num_countres: Counts countries in different regimes
-        regime_bti (counts)
-            - Number of hard-line autocracies
-            - Number of moderate autocracies
-            - Number of highly defective democracies
-            - Number of defective democracies
-            - Number of consolidating democracies
+        regime_eiu (counts)
+            - Number of authoritarian regimes
+            - Number of hybrid regimes
+            - Number of flawed democracies
+            - Number of full democracies
 
     2) tb_avg_countries: Country-average for some indicators
-        - democracy_bti (country-average)
+        - democracy_eiu (country-average)
 
     """
     # 1/ COUNT COUNTRIES
@@ -182,7 +139,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     # Set INTs
     tb_num = tb_num.astype(
         {
-            "regime_bti": "Int64",
+            "regime_eiu": "Int64",
         }
     )
     tb_num = cast(Table, tb_num)
@@ -190,16 +147,15 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     # Define columns on which we will estimate (i) "number of countries" and (ii) "number of people living in ..."
     indicators = [
         {
-            "name": "regime_bti",
-            "name_new": "num_regime_bti",
+            "name": "regime_eiu",
+            "name_new": "num_regime_eiu",
             "values_expected": {
-                "1": "hard-line autocracy",
-                "2": "moderate autocracy",
-                "3": "highly defective democracy",
-                "4": "defective democracy",
-                "5": "consolidating democracy",
+                "0": "authoritarian regime",
+                "1": "hybrid regime",
+                "2": "flawed democracy",
+                "3": "full democracy",
             },
-            "has_na": True,
+            "has_na": False,
         },
     ]
 
@@ -212,7 +168,7 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
 
     # 2/ COUNTRY-AVERAGE INDICATORS
     tb_avg = tb.copy()
-    indicators_avg = ["democracy_bti"]
+    indicators_avg = ["democracy_eiu"]
 
     # Keep only relevant columns
     tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
@@ -253,21 +209,20 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     # Set INTs
     tb_ppl = tb_ppl.astype(
         {
-            "regime_bti": "Int64",
+            "regime_eiu": "Int64",
         }
     )
     tb_ppl = cast(Table, tb_ppl)
 
     indicators = [
         {
-            "name": "regime_bti",
-            "name_new": "pop_regime_bti",
+            "name": "regime_eiu",
+            "name_new": "pop_regime_eiu",
             "values_expected": {
-                "1": "hard-line autocracy",
-                "2": "moderate autocracy",
-                "4": "defective democracy",
-                "3": "highly defective democracy",
-                "5": "consolidating democracy",
+                "0": "authoritarian regime",
+                "1": "hybrid regime",
+                "2": "flawed democracy",
+                "3": "full democracy",
             },
             "has_na": True,
         },
@@ -290,7 +245,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
 
     # 2/ COUNTRY-AVERAGE INDICATORS
     tb_avg = tb.copy()
-    indicators_avg = ["democracy_bti"]
+    indicators_avg = ["democracy_eiu"]
 
     # Keep only relevant columns
     tb_avg = tb_avg.loc[:, ["year", "country"] + indicators_avg]
@@ -321,7 +276,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
 
     tb_avg = tb_avg.rename(
         columns={
-            "democracy_bti": "democracy_bti_weighted",
+            "democracy_eiu": "democracy_eiu_weighted",
         }
     )
     return tb_ppl, tb_avg
