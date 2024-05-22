@@ -4,6 +4,7 @@ Load a meadow dataset and create a garden dataset.
 
 from typing import List
 
+import numpy as np
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -97,8 +98,10 @@ def aggregate_products(tb: Table) -> Table:
     missing_keys = set(replacement_dict.keys()) - set(tb["product"].unique())
 
     assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
-    tb["product"] = tb["product"].astype(str)
-    tb["product"] = tb["product"].replace(replacement_dict)
+    # Going round the houses to replace the values in the product column to aggregate them
+    tb["product"] = tb["product"].astype(str).replace(replacement_dict)
+    tb["product"] = tb["product"].replace("nan", np.nan)
+    tb["product"] = tb["product"].astype("category")
 
     return tb
 
@@ -108,6 +111,7 @@ def format_table(tb: Table, group: List[str], index_col: List[str], short_name: 
     Formatting original table so that we can have total funding by disease, product and disease*product
     """
     tb = tb.groupby(group, observed=True)["amount__usd"].sum().reset_index()
+    tb = tb.dropna(subset=index_col, how="any")
     tb["country"] = "World"
     tb = tb.set_index(["country", "year"] + index_col, verify_integrity=False)
     # tb = tb.pivot(index="year", columns=pivot_col, values="amount__usd")
