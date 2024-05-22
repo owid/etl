@@ -62,6 +62,8 @@ def other_vision_loss_minus_trachoma(tb: Table) -> Table:
     tb_combine["value"] = tb_combine["value"] - tb_combine["value_trachoma"]
     tb_combine["cause"] = "Other vision loss minus trachoma"
 
+    tb_combine = tb_combine.drop(columns=["value_trachoma", "cause_trachoma"])
+
     tb = pr.concat([tb, tb_combine], ignore_index=True)
 
     return tb
