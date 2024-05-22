@@ -20,6 +20,8 @@ tables:
         title: Democracy score
         description_short: |-
           Extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf. It ranges from 0 to 10 (most democratic).
+        description_processing: |-
+          Values for continents have been obtained by averaging the values of the countries in the continent.
         unit: ""
 
       elect_freefair_eiu:
@@ -62,3 +64,34 @@ tables:
           - Flawed democracies have some weaknesses in democratic institutions and culture.
           - Hybrid regimes have serious weaknesses in democratic institutions and culture.
           - Authoritarian regimes have few democratic institutions and little democratic culture.
+
+  num_countries:
+    variables:
+      num_regime_eiu:
+        title: |-
+          <% if category == '-1' %>
+          Number of countries with unknown regime
+          <% else %>
+          Number of << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
+          <% endif %>
+        unit: "countries"
+
+  num_people:
+    variables:
+      pop_regime_eiu:
+        title: |-
+          <% if category == '-1' %>
+          Number of people living in countries with unknown regime
+          <% else %>
+          Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
+          <% endif %>
+        description_short: "Number of countries with available data."
+        unit: "people"
+
+
+  avg_pop:
+    variables:
+      democracy_eiu_weighted:
+        title: "Democracy score (population-weighted)"
+        description_short: Average democratic status, weighted by population.
+        unit: ""
