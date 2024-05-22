@@ -10,6 +10,11 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: EIU Democratic Index (2006-2023)
+  description: |-
+    The Economist Intelligence Unit's (EIU) Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime".
+
+    This dataset was constructed using data collected from various EIU yearly reports and a multi-year compilation by Gapminder.
 
 
 tables:
