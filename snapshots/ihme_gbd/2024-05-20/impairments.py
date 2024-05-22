@@ -36,14 +36,14 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/a086e74384319dfcf408e10b4fdcdcd8_files/IHME-GBD_2021_DATA-a086e743-"
-NUMBER_OF_FILES = 21
+NUMBER_OF_FILES = 24
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/impairments.csv")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
