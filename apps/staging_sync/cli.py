@@ -260,10 +260,14 @@ def cli(
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
                         else:
+                            assert config.GRAPHER_USER_ID
+                            GRAPHER_USER_ID = int(config.GRAPHER_USER_ID)
+
                             # there's already a chart with the same slug, create a new revision
                             chart_revision = gm.SuggestedChartRevisions(
                                 chartId=chart_id,
-                                createdBy=int(config.GRAPHER_USER_ID),  # type: ignore
+                                createdBy=GRAPHER_USER_ID,
+                                updatedBy=GRAPHER_USER_ID,
                                 originalConfig=diff.target_chart.config,
                                 suggestedConfig=diff.source_chart.config,
                                 status="pending",
@@ -277,9 +281,9 @@ def cli(
                                     .filter_by(
                                         chartId=chart_id,
                                         status="pending",
-                                        createdBy=int(config.GRAPHER_USER_ID),  # type: ignore
-                                    )  # type: ignore
-                                    .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)  # type: ignore
+                                        createdBy=GRAPHER_USER_ID,
+                                    )
+                                    .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)
                                     .delete()
                                 )
 

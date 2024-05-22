@@ -5,6 +5,8 @@ sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@loca
 If you want to add a new table to ORM, add --tables mytable to the command above.
 
 Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
+
+It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
 import json
 from datetime import date, datetime
@@ -19,7 +21,6 @@ from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import JSON as _JSON
 from sqlalchemy import (
     BigInteger,
-    Column,
     Computed,
     Date,
     DateTime,
@@ -28,8 +29,7 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
-    String,
-    Table,
+    func,
     or_,
     select,
     text,
@@ -42,7 +42,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
 from sqlalchemy.sql import Select
 from typing_extensions import TypedDict
 
@@ -59,62 +59,36 @@ S3_PATH_TYP = Literal["s3", "http"]
 JSON = _JSON(none_as_null=True)
 
 
-# class Base(MappedAsDataclass, DeclarativeBase):
-class Base(DeclarativeBase):
+class Base(MappedAsDataclass, DeclarativeBase):
     __table_args__ = {"extend_existing": True}
 
     def dict(self) -> Dict[str, Any]:
         return {field.name: getattr(self, field.name) for field in self.__table__.c}
 
 
-t_active_datasets = Table(
-    "active_datasets",
-    Base.metadata,
-    Column("id", Integer, server_default=text("'0'")),
-    Column("name", String(512)),
-    Column("description", LONGTEXT),
-    Column("createdAt", DateTime, server_default=text("'CURRENT_TIMESTAMP'")),
-    Column("updatedAt", DateTime),
-    Column("namespace", String(255)),
-    Column("isPrivate", TINYINT(1), server_default=text("'0'")),
-    Column("createdByUserId", Integer),
-    Column("metadataEditedAt", DateTime),
-    Column("metadataEditedByUserId", Integer),
-    Column("dataEditedAt", DateTime),
-    Column("dataEditedByUserId", Integer),
-    Column("nonRedistributable", TINYINT(1), server_default=text("'0'")),
-    Column("isArchived", TINYINT(1), server_default=text("'0'")),
-    Column("sourceChecksum", String(64)),
-    Column("shortName", String(255)),
-    Column("version", String(255)),
-    Column("updatePeriodDays", Integer),
-    extend_existing=True,
-)
-
-
 class Entity(Base):
     __tablename__ = "entities"
     __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     validated: Mapped[int] = mapped_column(TINYINT(1))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     displayName: Mapped[str] = mapped_column(VARCHAR(255))
     code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
 class Namespace(Base):
     __tablename__ = "namespaces"
     __table_args__ = (Index("namespaces_name_uq", "name", unique=True),)
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
-    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    description: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    description: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     def upsert(self, session: Session) -> "Namespace":
         cls = self.__class__
@@ -146,22 +120,22 @@ class Tag(Base):
         Index("slug", "slug", unique=True),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     parentId: Mapped[Optional[int]] = mapped_column(Integer)
     specialType: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     slug: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
 
     @classmethod
-    def load_tags(cls, session: Session) -> List["Tag"]:  # type: ignore
-        return session.scalars(select(cls).where(cls.slug.isnot(None))).all()  # type: ignore
+    def load_tags(cls, session: Session) -> List["Tag"]:
+        return list(session.scalars(select(cls).where(cls.slug.isnot(None))).all())
 
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()  # type: ignore
+        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -177,15 +151,15 @@ class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     isSuperuser: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     email: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
@@ -200,11 +174,11 @@ class ChartRevisions(Base):
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     chartId: Mapped[Optional[int]] = mapped_column(Integer)
     userId: Mapped[Optional[int]] = mapped_column(Integer)
     config: Mapped[Optional[dict]] = mapped_column(JSON)
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
 class Chart(Base):
@@ -229,9 +203,9 @@ class Chart(Base):
         Index("charts_slug", "slug"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     config: Mapped[dict] = mapped_column(JSON)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     is_indexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
@@ -244,7 +218,7 @@ class Chart(Base):
             "(coalesce(json_unquote(json_extract(`config`,_utf8mb4'$.type')),_utf8mb4'LineChart'))", persisted=False
         ),
     )
-    updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
@@ -272,22 +246,24 @@ class Chart(Base):
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
         chart_ids = (
-            session.scalars(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
+            session.scalars(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))
             .unique()
             .all()
         )
         # Find charts
-        return session.scalars(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+        return list(session.scalars(select(Chart).where(Chart.id.in_(chart_ids))).all())
 
     def load_chart_variables(self, session: Session) -> Dict[int, "Variable"]:
-        q = """
+        q = text(
+            """
         select
             v.*
         from chart_dimensions as cd
         join variables as v on v.id = cd.variableId
         where cd.chartId = :chart_id
         """
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        )
+        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
         variables = {r["id"]: Variable(**r) for r in rows}
 
         # add columnSlug if present
@@ -347,7 +323,8 @@ class Chart(Base):
 
     def tags(self, session: Session) -> List[Dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
-        q = """
+        q = text(
+            """
         select
             tagId as id,
             t.name,
@@ -357,8 +334,9 @@ class Chart(Base):
         join tags as t on ct.tagId = t.id
         where ct.chartId = :chart_id
         """
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()  # type: ignore
-        return rows
+        )
+        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
+        return list(rows)
 
     def remove_nonexisting_map_column_slug(self, session: Session) -> None:
         """Remove map.columnSlug if the variable doesn't exist. It'd be better
@@ -423,24 +401,24 @@ class Dataset(Base):
         Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(512))
     description: Mapped[str] = mapped_column(LONGTEXT)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     namespace: Mapped[str] = mapped_column(VARCHAR(255))
     isPrivate: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdByUserId: Mapped[int] = mapped_column(Integer)
-    metadataEditedAt: Mapped[datetime] = mapped_column(DateTime)
     metadataEditedByUserId: Mapped[int] = mapped_column(Integer)
-    dataEditedAt: Mapped[datetime] = mapped_column(DateTime)
     dataEditedByUserId: Mapped[int] = mapped_column(Integer)
     nonRedistributable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     version: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     updatePeriodDays: Mapped[Optional[int]] = mapped_column(Integer)
+    dataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
+    metadataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
+    isArchived: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
+    sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Dataset":
         cls = self.__class__
@@ -546,12 +524,12 @@ class Source(Base):
         Index("sources_datasetId", "datasetId"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     description: Mapped[SourceDescription] = mapped_column(JSON)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    name: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    datasetId: Mapped[Optional[int]] = mapped_column(Integer)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    name: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+    datasetId: Mapped[Optional[int]] = mapped_column(Integer, default=None)
 
     @property
     def _upsert_select(self) -> Select:
@@ -564,7 +542,7 @@ class Source(Base):
             _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
             _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
         ]
-        return select(cls).where(*conds)  # type: ignore
+        return select(cls).where(*conds)
 
     def upsert(self, session: Session) -> "Source":
         ds = session.scalars(self._upsert_select).one_or_none()
@@ -624,7 +602,7 @@ class Source(Base):
         """
         sources = read_sql(
             q,
-            session.bind,  # type: ignore
+            session,
             params={
                 "datasetId": dataset_id,
                 # NOTE: query doesn't work with empty list so we use a dummy value
@@ -642,7 +620,7 @@ class Source(Base):
             )
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
-        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]  # type: ignore
+        return [cls(**d) for d in sources.to_dict(orient="records")]  # type: ignore
 
 
 class SuggestedChartRevisions(Base):
@@ -674,7 +652,7 @@ class SuggestedChartRevisions(Base):
         Index("updatedBy", "updatedBy"),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
     createdBy: Mapped[int] = mapped_column(Integer)
     originalConfig: Mapped[dict] = mapped_column(JSON)
@@ -682,20 +660,26 @@ class SuggestedChartRevisions(Base):
     status: Mapped[str] = mapped_column(VARCHAR(8))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
     originalVersion: Mapped[int] = mapped_column(
-        Integer, Computed("(json_unquote(json_extract(`originalConfig`,_utf8mb4'$.version')))", persisted=False)
+        Integer,
+        Computed("(json_unquote(json_extract(`originalConfig`,_utf8mb4'$.version')))", persisted=False),
+        init=False,
     )
     suggestedVersion: Mapped[int] = mapped_column(
-        Integer, Computed("(json_unquote(json_extract(`suggestedConfig`,_utf8mb4'$.version')))", persisted=False)
+        Integer,
+        Computed("(json_unquote(json_extract(`suggestedConfig`,_utf8mb4'$.version')))", persisted=False),
+        init=False,
     )
     updatedBy: Mapped[Optional[int]] = mapped_column(Integer)
-    suggestedReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
-    decisionReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
     updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    suggestedReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
+    decisionReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
     isPendingOrFlagged: Mapped[Optional[int]] = mapped_column(
-        TINYINT(1), Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False)
+        TINYINT(1),
+        Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
+        init=False,
     )
-    changesInDataSummary: Mapped[Optional[str]] = mapped_column(TEXT)
-    experimental: Mapped[Optional[dict]] = mapped_column(JSON)
+    changesInDataSummary: Mapped[Optional[str]] = mapped_column(TEXT, default="")
+    experimental: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
 
     @classmethod
     def load_pending(cls, session: Session, user_id: Optional[int] = None) -> List["SuggestedChartRevisions"]:
@@ -740,13 +724,13 @@ class PostsGdocs(Base):
     slug: Mapped[str] = mapped_column(VARCHAR(255))
     content: Mapped[dict] = mapped_column(JSON)
     published: Mapped[int] = mapped_column(TINYINT)
-    createdAt: Mapped[datetime] = mapped_column(DateTime)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publicationContext: Mapped[str] = mapped_column(ENUM("unlisted", "listed"), server_default=text("'unlisted'"))
     type: Mapped[Optional[str]] = mapped_column(
         VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
     )
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     revisionId: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     breadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
     markdown: Mapped[Optional[str]] = mapped_column(LONGTEXT)
@@ -763,9 +747,6 @@ class OriginsVariablesLink(Base):
     originId: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
     variableId: Mapped[int] = mapped_column(Integer, ForeignKey("variables.id"), primary_key=True)
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
-
-    # origin: Mapped["Origin"] = relationship("Origin", back_populates="origins_variabless")
-    # variable: Mapped["Variable"] = relationship("Variable", back_populates="origins_variabless")
 
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
@@ -855,11 +836,8 @@ class TagsVariablesTopicTagsLink(Base):
     variableId: Mapped[int] = mapped_column(Integer, primary_key=True)
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
-    # tag: Mapped["Tag"] = relationship("Tag", back_populates="tags_variables_topic_tagss")
-    # variable: Mapped["Variable"] = relationship("Variable", back_populates="tags_variables_topic_tagss")
-
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[str]) -> None:
+    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[int]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         assert len(new_tag_ids) == len(set(new_tag_ids)), "Tag IDs must be unique"
 
@@ -937,55 +915,43 @@ class Variable(Base):
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    description: Mapped[Optional[str]] = mapped_column(LONGTEXT)
     unit: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     coverage: Mapped[str] = mapped_column(VARCHAR(255))
     timespan: Mapped[str] = mapped_column(VARCHAR(255))
     datasetId: Mapped[int] = mapped_column(Integer)
     display: Mapped[dict] = mapped_column(JSON)
-    columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"))
-    schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"))
-    name: Mapped[Optional[str]] = mapped_column(VARCHAR(750))
-    description: Mapped[Optional[str]] = mapped_column(LONGTEXT)
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    sourceId: Mapped[Optional[int]] = mapped_column(Integer)
-    shortUnit: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    originalMetadata: Mapped[Optional[dict]] = mapped_column(JSON)
-    grapherConfigAdmin: Mapped[Optional[dict]] = mapped_column(JSON)
-    shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
-    dimensions: Mapped[Optional[dict]] = mapped_column(JSON)
-    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30))
-    processingLog: Mapped[Optional[dict]] = mapped_column(JSON)
-    titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
-    titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    attributionShort: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
-    attribution: Mapped[Optional[str]] = mapped_column(TEXT)
-    descriptionShort: Mapped[Optional[str]] = mapped_column(TEXT)
-    descriptionFromProducer: Mapped[Optional[str]] = mapped_column(TEXT)
-    descriptionKey: Mapped[Optional[dict]] = mapped_column(JSON)
-    descriptionProcessing: Mapped[Optional[str]] = mapped_column(TEXT)
+    columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"), default=0)
+    schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"), default=1)
+    name: Mapped[Optional[str]] = mapped_column(VARCHAR(750), default=None)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+    code: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    sourceId: Mapped[Optional[int]] = mapped_column(Integer, default=None)
+    shortUnit: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    originalMetadata: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    grapherConfigAdmin: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
+    dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
+    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
+    processingLog: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
+    titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    attributionShort: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
+    attribution: Mapped[Optional[str]] = mapped_column(TEXT, default=None)
+    descriptionShort: Mapped[Optional[str]] = mapped_column(TEXT, default=None)
+    descriptionFromProducer: Mapped[Optional[str]] = mapped_column(TEXT, default=None)
+    descriptionKey: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    descriptionProcessing: Mapped[Optional[str]] = mapped_column(TEXT, default=None)
     # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
-    licenses: Mapped[Optional[dict]] = mapped_column(JSON)
+    licenses: Mapped[Optional[list[dict]]] = mapped_column(JSON, default=None)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
-    license: Mapped[Optional[dict]] = mapped_column(JSON)
-    grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON)
-    type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)))
-    sort: Mapped[Optional[dict]] = mapped_column(JSON)
-
-    # dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="variabless")
-    # source: Mapped["Source"] = relationship("Source", back_populates="variabless")
-    # chart_dimensionss: Mapped[List["ChartDimension"]] = relationship("ChartDimension", back_populates="variable")
-    # explorer_variabless: Mapped[List["ExplorerVariable"]] = relationship("ExplorerVariable", back_populates="variable")
-    # origins_variabless: Mapped[List["OriginsVariable"]] = relationship("OriginsVariable", back_populates="variable")
-    # posts_gdocs_variables_faqss: Mapped[List["PostsGdocsVariablesFaq"]] = relationship(
-    #     "PostsGdocsVariablesFaq", back_populates="variable"
-    # )
-    # tags_variables_topic_tagss: Mapped[List["TagsVariablesTopicTag"]] = relationship(
-    #     "TagsVariablesTopicTag", back_populates="variable"
-    # )
+    license: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
+    type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
+    sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -995,11 +961,11 @@ class Variable(Base):
         # try matching on shortName first
         q = select(cls).where(
             or_(
-                cls.shortName == self.shortName,  # type: ignore
+                cls.shortName == self.shortName,
                 # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
                 # this was a bug, we should have kept the double underscore
                 # match even those variables and correct their shortName
-                cls.shortName == self.shortName.replace("__", "_"),  # type: ignore
+                cls.shortName == self.shortName.replace("__", "_"),
             ),
             cls.datasetId == self.datasetId,
         )
@@ -1098,7 +1064,7 @@ class Variable(Base):
             assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
 
         if metadata.presentation:
-            presentation_dict = metadata.presentation.to_dict()  # type: ignore
+            presentation_dict = metadata.presentation.to_dict()
             # convert all fields from snake_case to camelCase
             presentation_dict = humps.camelize(presentation_dict)
         else:
@@ -1165,11 +1131,11 @@ class Variable(Base):
         assert self.id
 
         # establish relationships between variables and origins
-        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])  # type: ignore
+        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
 
         # establish relationships between variables and posts
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
         gdoc_posts = session.scalars(query).all()
         existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
         missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
@@ -1182,7 +1148,7 @@ class Variable(Base):
         # establish relationships between variables and tags
         tags = Tag.load_tags_by_names(session, tag_names)
 
-        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])  # type: ignore
+        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
@@ -1245,16 +1211,13 @@ class ChartDimensions(Base):
         Index("chart_dimensions_variableId_9ba778e6_fk_variables_id", "variableId"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     order: Mapped[int] = mapped_column(Integer)
     property: Mapped[str] = mapped_column(VARCHAR(255))
     chartId: Mapped[int] = mapped_column(Integer)
     variableId: Mapped[int] = mapped_column(Integer)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-
-    # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_dimensionss")
-    # variable: Mapped["Variable"] = relationship("Variable", back_populates="chart_dimensionss")
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
 class Origin(Base):
@@ -1268,7 +1231,7 @@ class Origin(Base):
 
     __tablename__ = "origins"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     titleSnapshot: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
     title: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
     descriptionSnapshot: Mapped[Optional[str]] = mapped_column(TEXT)
@@ -1283,11 +1246,6 @@ class Origin(Base):
     dateAccessed: Mapped[Optional[date]] = mapped_column(Date)
     datePublished: Mapped[Optional[str]] = mapped_column(VARCHAR(10))
     license: Mapped[Optional[dict]] = mapped_column(JSON)
-
-    # variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
-    # origins_variables: Mapped[List["OriginsVariablesLink"]] = relationship(
-    #     "OriginsVariablesLink", back_populates="origin"
-    # )
 
     @classmethod
     def from_origin(
@@ -1331,7 +1289,7 @@ class Origin(Base):
             cls.description == self.description,
             cls.datePublished == self.datePublished,
             cls.dateAccessed == self.dateAccessed,
-        )  # type: ignore
+        )
 
     def upsert(self, session: Session) -> "Origin":
         """
@@ -1380,14 +1338,12 @@ class ChartDiffApprovals(Base):
         Index("chartId", "chartId"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime] = mapped_column(DateTime)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
-    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
-
-    # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_diff_approvalss")
+    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
     def latest_chart_status(
@@ -1401,11 +1357,11 @@ class ChartDiffApprovals(Base):
                 cls.sourceUpdatedAt == source_updated_at,
                 cls.targetUpdatedAt == target_updated_at,
             )
-            .order_by(cls.updatedAt.desc())  # type: ignore
+            .order_by(cls.updatedAt.desc())
             .limit(1)
         ).first()
         if result:
-            return result.status  # type: ignore
+            return result.status
         else:
             return "unapproved"
 
