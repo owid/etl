@@ -116,7 +116,7 @@ tables:
         title: Deaths
         unit: 'people'
         description_short: |-
-          Total number of deaths as a result of a natural disaster.
+          Total number of dead and missing people.
         description_key:
           - *definition-dead
           - *description-key-common
