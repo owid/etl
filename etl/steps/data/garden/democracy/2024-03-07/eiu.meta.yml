@@ -19,6 +19,10 @@ dataset:
 
 tables:
   eiu:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023)
+
     variables:
 
       democracy_eiu:
@@ -71,6 +75,10 @@ tables:
           - Authoritarian regimes have few democratic institutions and little democratic culture.
 
   num_countries:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023)
+
     variables:
       num_regime_eiu:
         title: |-
@@ -82,6 +90,9 @@ tables:
         unit: "countries"
 
   num_people:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023); Population based on various sources (2023)
     variables:
       pop_regime_eiu:
         title: |-
@@ -95,6 +106,9 @@ tables:
 
 
   avg_pop:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023); Population based on various sources (2023)
     variables:
       democracy_eiu_weighted:
         title: "Democracy score (population-weighted)"
