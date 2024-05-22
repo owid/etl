@@ -59,3 +59,19 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-16/fh:
     - data://garden/democracy/2024-03-07/fh
+
+  # Claassen Mood (2022)
+  data://meadow/democracy/2024-05-22/claassen_mood:
+    - snapshot://democracy/2024-05-22/claassen_mood.csv
+  data://garden/democracy/2024-03-07/claassen_mood:
+    - data://meadow/democracy/2024-05-22/claassen_mood
+  data://grapher/democracy/2024-05-22/claassen_mood:
+    - data://garden/democracy/2024-03-07/claassen_mood
+
+  # Claassen Satisfaction (2022)
+  data://meadow/democracy/2024-05-22/claassen_satisfaction:
+    - snapshot://democracy/2024-05-22/claassen_satisfaction.csv
+  data://garden/democracy/2024-03-07/claassen_satisfaction:
+    - data://meadow/democracy/2024-05-22/claassen_satisfaction
+  data://grapher/democracy/2024-05-22/claassen_satisfaction:
+    - data://garden/democracy/2024-03-07/claassen_satisfaction
