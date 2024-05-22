@@ -452,9 +452,9 @@ def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optiona
     return True
 
 
-def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> dt.datetime:
+def _get_staging_created_at(source: str, staging_created_at: Optional[str]) -> dt.datetime:
     if staging_created_at is None:
-        if not source.exists():
+        if not Path(source).exists():
             return _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
         else:
             log.warning(
