@@ -7,13 +7,35 @@ from typing import List
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+NTDS = [
+    "Buruli ulcer",
+    "Dengue",
+    "Helminth infections (worms & flukes) - Hookworm (ancylostomiasis & necatoriasis)",
+    "Helminth infections (worms & flukes) - Lymphatic filariasis (elephantiasis)",
+    "Helminth infections (worms & flukes) - Multiple helminth infections",
+    "Helminth infections (worms & flukes) - Onchocerciasis (river blindness)",
+    "Helminth infections (worms & flukes) - Roundworm (ascariasis)",
+    "Helminth infections (worms & flukes) - Schistosomiasis (bilharziasis)",
+    "Helminth infections (worms & flukes) - Strongyloidiasis & other intestinal roundworms",
+    "Helminth infections (worms & flukes) - Tapeworm (taeniasis / cysticercosis)",
+    "Helminth infections (worms & flukes) - Whipworm (trichuriasis)",
+    "Kinetoplastid diseases - Chagas' disease",
+    "Kinetoplastid diseases - Leishmaniasis",
+    "Kinetoplastid diseases - Multiple kinetoplastid diseases",
+    "Kinetoplastid diseases - Sleeping sickness (HAT)",
+    "Leprosy",
+    "Mycetoma",
+    "Scabies",
+    "Snakebite envenoming",
+    "Trachoma",
+    "Yaws",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -30,8 +52,15 @@ def run(dest_dir: str) -> None:
     tb = aggregate_products(tb)
     # The funding for each disease
     tb_disease = format_table(tb=tb, group=["disease", "year"], index_col=["disease"], short_name="funding_disease")
-    # The funding for each product
+    # The funding for each product - across all diseases
     tb_product = format_table(tb=tb, group=["product", "year"], index_col=["product"], short_name="funding_product")
+    # Funding for each product - across only the NTDs in the dataset
+    missing_items = [item for item in NTDS if item not in tb["disease"].values]
+    log.info(f"Missing items in the NTD list: {missing_items}, check if they are in the dataset.")
+    tb_product_ntd = tb[tb["disease"].isin(NTDS)].copy()
+    tb_product_ntd = format_table(
+        tb=tb_product_ntd, group=["product", "year"], index_col=["product"], short_name="funding_product_ntd"
+    )
     # The funding for each disease*product
     tb_disease_product = format_table(
         tb=tb,
@@ -68,6 +97,7 @@ def aggregate_products(tb: Table) -> Table:
     missing_keys = set(replacement_dict.keys()) - set(tb["product"].unique())
 
     assert len(missing_keys) == 0, f"Missing keys in replacement_dict: {missing_keys}"
+    tb["product"] = tb["product"].astype(str)
     tb["product"] = tb["product"].replace(replacement_dict)
 
     return tb
