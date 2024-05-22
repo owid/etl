@@ -75,3 +75,14 @@ steps:
     - data://meadow/democracy/2024-05-22/claassen_satisfaction
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
     - data://garden/democracy/2024-03-07/claassen_satisfaction
+
+  # EIU (2024)
+  data://meadow/democracy/2024-05-22/eiu:
+    - snapshot://democracy/2024-05-22/eiu_gapminder.csv
+    - snapshot://democracy/2024-05-22/eiu_2021.csv
+    - snapshot://democracy/2024-05-22/eiu_2022.csv
+    - snapshot://democracy/2024-05-22/eiu_2023.csv
+  data://garden/democracy/2024-03-07/eiu:
+    - data://meadow/democracy/2024-05-22/eiu
+  data://grapher/democracy/2024-05-22/eiu:
+    - data://garden/democracy/2024-03-07/eiu
