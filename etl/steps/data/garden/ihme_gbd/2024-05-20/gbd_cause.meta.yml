@@ -25,38 +25,104 @@ definitions:
       Total number of deaths from << cause.lower() >>
 
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from << cause >>, among individuals aged << age >> per 100,000 people
+      Deaths from << cause.lower() >>, among individuals aged << age >> per 100,000 people
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause >> per 100,000 people
+      Age-standardized deaths from << cause.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
-      Deaths from << cause >> per 100,000 people
+      Deaths from << cause.lower() >> per 100,000 people
 
        <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      Share of total deaths of individuals aged << age >> from << cause >>
+      Share of total deaths of individuals aged << age >> from << cause.lower() >>
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized deaths that are from << cause >>
+      Share of total age-standardized deaths that are from << cause.lower() >>
       <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total deaths that are from << cause >>
+      Share of total deaths that are from << cause.lower() >>
 
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      The estimated number of deaths from << cause.lower() >> in those aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      The estimated number of age-standardized deaths from << cause.lower() >>.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of deaths from << cause.lower() >>.
+
+      <% if metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of deaths from << cause.lower() >> in those aged << age >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of age-standardized deaths from << cause.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of deaths from << cause.lower() >>, per 100,000 people.
+
+      <% if metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated share of deaths from << cause.lower() >> in those aged << age >>.
+      <% elif metric == "Percent" and age == 'Age-standardized'%>
+      The estimated share of age-standardized deaths from << cause.lower() >>.
+      <% elif metric == "Percent" and age == 'All ages'%>
+      The estimated share of deaths from << cause.lower() >>.
+
       <%- endif -%>
-    footnote: |-
-      <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
-  value_dalys:
-    dataset:
+    value_dalys:
+      unit: |-
+        <% if metric == "Number" %>
+        DALYs
+        <% elif metric == "Rate" %>
+        DALYs per 100,000 people
+        <% elif metric == "Percent" %>
+        share of total DALYs
+        <%- endif -%>
+      short_unit: |-
+        <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      title: |-
+        <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+        DALYs from << cause.lower() >>, among individuals aged << age >>
+        <% elif metric == "Number" and age == 'Age-standardized'%>
+        Age-standardized DALYs from << cause.lower() >>
+        <% elif metric == "Number" and age == 'All ages'%>
+        Total number of DALYs from << cause.lower() >>
+
+        <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+        DALYs from << cause.lower() >>, among individuals aged << age >> per 100,000 people
+        <% elif metric == "Rate" and age == 'Age-standardized'%>
+        Age-standardized DALYs from << cause.lower() >> per 100,000 people
+        <% elif metric == "Rate" and age == 'All ages'%>
+        DALYs from << cause.lower() >> per 100,000 people
+
+        <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
+        Share of total DALYs of individuals aged << age >> from << cause.lower() >>
+        <% elif metric == "Percent" and age == 'Age-standardized'%>
+        Share of total age-standardized DALYs that are from << cause.lower() >>
+        <% elif metric == "Percent" and age == 'All ages'%>
+        Share of total DALYs that are from << cause.lower() >>
+
+        <%- endif -%>
+      description_short: |-
+        <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+        The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>.
+        <% elif metric == "Number" and age == 'Age-standardized'%>
+        The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+        <% elif metric == "Number" and age == 'All ages'%>
+        The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+
+        <% if metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+        The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>, per 100,000 people.
+        <% elif metric == "Rate" and age == 'Age-standardized'%>
+        The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+        <% elif metric == "Rate" and age == 'All ages'%>
+        The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+
+        <% if metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
+        The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>.
+        <% elif metric == "Percent" and age == 'Age-standardized'%>
+        The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+        <% elif metric == "Percent" and age == 'All ages'%>
+        The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+
+        <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+
+dataset:
   update_period_days: 1460
 
 tables:
@@ -72,11 +138,23 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              {definitions.value_deaths.footnote}
+              {definitions.footnote}
         display:
           numDecimalPlaces: |-
             <% if metric == 'Number' %>0<% else %>2<%- endif -%>
   gbd_cause_dalys:
     variables:
       value:
-        title: Disability-Adjusted Life Years (DALYs)
+        title: |-
+          {definitions.value_dalys.title}
+        unit: |-
+          {definitions.value_dalys.unit}
+        description_short: |-
+          {definitions.value_dalys.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>2<%- endif -%>
