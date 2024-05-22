@@ -113,7 +113,7 @@ tables:
     # NOTE: This table contains AVERAGE decadal values, not total sums.
     variables: &variables-default
       total_dead:
-        title: Total deaths
+        title: Deaths
         unit: 'people'
         description_short: |-
           Total number of deaths as a result of a natural disaster.
@@ -159,8 +159,6 @@ tables:
         title: Reconstruction costs
         short_unit: '$'
         unit: 'current US$'
-        description_short: |-
-          Reconstruction costs.
         description_key:
           - *definition-reconstruction-costs
           - *description-key-common
@@ -174,7 +172,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages:
-        title: Total economic damage from natural disasters
+        title: Total economic damages
         short_unit: '$'
         unit: 'current US$'
         description_short: |-
@@ -183,7 +181,7 @@ tables:
           - *definition-total-damage
           - *description-key-common
       n_events:
-        title: Number of reported natural disasters
+        title: Natural disasters
         unit: 'events'
         description_short: |-
           Number of reported natural disasters.
@@ -193,35 +191,35 @@ tables:
         title: Population
         unit: 'people'
       total_dead_per_100k_people:
-        title: Total number of deaths per 100,000 people
+        title: Deaths per 100,000 people
         unit: 'deaths per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-dead
           - *description-key-common
       injured_per_100k_people:
-        title: Number of injured persons per 100,000 people
+        title: Injured per 100,000 people
         unit: 'injured per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
           - *description-key-common
       affected_per_100k_people:
-        title: Number of affected persons per 100,000 people
+        title: Affected per 100,000 people
         unit: 'affected per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-affected
           - *description-key-common
       homeless_per_100k_people:
-        title: Number of homeless persons per 100,000 people
+        title: Homeless per 100,000 people
         unit: 'homeless per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
           - *definition-homeless
           - *description-key-common
       total_affected_per_100k_people:
-        title: Total number of affected persons per 100,000 people
+        title: Total affected per 100,000 people
         unit: 'affected per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
@@ -231,7 +229,7 @@ tables:
           - *definition-total-affected
           - *description-key-common
       n_events_per_100k_people:
-        title: Number of events per 100,000 people
+        title: Natural disasters per 100,000 people
         unit: 'events per 100,000 people'
         description_processing: *description-processing-100k
         description_key:
@@ -241,7 +239,7 @@ tables:
         unit: "current US$"
         short_unit: "$"
       reconstruction_costs_per_gdp:
-        title: "Reconstruction costs from natural disasters as a share of GDP"
+        title: "Reconstruction costs as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -251,7 +249,7 @@ tables:
           - *definition-reconstruction-costs
           - *description-key-common
       insured_damages_per_gdp:
-        title: "Insured damages from natural disasters as a share of GDP"
+        title: "Insured damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -261,7 +259,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages_per_gdp:
-        title: "Total economic damages from natural disasters as a share of GDP"
+        title: "Total economic damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
