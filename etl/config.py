@@ -10,12 +10,17 @@ only important for OWID staff.
 import os
 import pwd
 from os import environ as env
+from typing import Optional
 
 import bugsnag
+import git
 import pandas as pd
+import structlog
 from dotenv import load_dotenv
 
 from etl.paths import BASE_DIR
+
+log = structlog.get_logger()
 
 ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
 
@@ -76,17 +81,36 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-# if STAGING is used, override ENV values
-if env.get("STAGING"):
+def load_STAGING() -> Optional[str]:
+    # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
+
+    # ENV_FILE takes precedence over STAGING
+    if STAGING and ENV_FILE != BASE_DIR / ".env":
+        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        return None
+    # if STAGING=1, use branch name
+    elif STAGING == "1":
+        branch_name = git.Repo(BASE_DIR).active_branch.name
+        if branch_name == "master":
+            log.warning("You're on master branch, using local env instead of STAGING=master")
+            return None
+        else:
+            return branch_name
+    else:
+        return STAGING
+
+
+STAGING = load_STAGING()
+
+# if STAGING is used, override ENV values
+if STAGING is not None:
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
     DB_PORT = 3306
     DB_HOST = f"staging-site-{STAGING}"
     DATA_API_ENV = f"staging-site-{STAGING}"
-else:
-    STAGING = None
 
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
