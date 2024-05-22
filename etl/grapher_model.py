@@ -2,20 +2,22 @@
 ```
 sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
 ```
-It has been slightly modified since then.
+If you want to add a new table to ORM, add --tables mytable to the command above.
+
+Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
 """
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
 import humps
 import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
+from sqlalchemy import JSON as _JSON
 from sqlalchemy import (
-    JSON,
     BigInteger,
     Column,
     Computed,
@@ -54,7 +56,7 @@ S3_PATH_TYP = Literal["s3", "http"]
 
 
 # persist the value None as a SQL NULL value, not the JSON encoding of null
-# JSON = _JSON(none_as_null=True)
+JSON = _JSON(none_as_null=True)
 
 
 # class Base(MappedAsDataclass, DeclarativeBase):
@@ -233,7 +235,7 @@ class Chart(Base):
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     is_indexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    slug: Mapped[Optional[str]] = mapped_column(
+    slug: Mapped[str] = mapped_column(
         VARCHAR(255), Computed("(json_unquote(json_extract(`config`,_utf8mb4'$.slug')))", persisted=False)
     )
     type: Mapped[Optional[str]] = mapped_column(
@@ -955,14 +957,7 @@ class Variable(Base):
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
     dimensions: Mapped[Optional[dict]] = mapped_column(JSON)
-    # TODO: use this
-    # processingLevel: Optional[str] = Field(
-    #     default=None, sa_column=Column("processingLevel", ENUM("minor", "medium", "major"))
-    # )
-    # processingLevel: Optional[catalog.meta.PROCESSING_LEVELS] = Field(
-    #     default=None, sa_column=Column("processingLevel", ENUM(*get_args(catalog.meta.PROCESSING_LEVELS)))
-    # )
-    processingLevel: Mapped[Optional[str]] = mapped_column(VARCHAR(30))
+    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30))
     processingLog: Mapped[Optional[dict]] = mapped_column(JSON)
     titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512))
     titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
@@ -977,9 +972,7 @@ class Variable(Base):
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Mapped[Optional[dict]] = mapped_column(JSON)
     grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON)
-    # TODO: use this
-    # type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", ENUM(*get_args(VARIABLE_TYPE))))
-    type: Mapped[Optional[str]] = mapped_column(ENUM("float", "int", "mixed", "string", "ordinal"))
+    type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)))
     sort: Mapped[Optional[dict]] = mapped_column(JSON)
 
     # dataset: Mapped["Dataset"] = relationship("Dataset", back_populates="variabless")
@@ -1263,30 +1256,6 @@ class ChartDimensions(Base):
     # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_dimensionss")
     # variable: Mapped["Variable"] = relationship("Variable", back_populates="chart_dimensionss")
 
-    # TODO: enable this in SQLALchemy
-    # charts: Optional["Chart"] = Relationship(back_populates="chart_dimensions")
-    # variables: Optional["Variable"] = Relationship(back_populates="chart_dimensions")
-
-
-t_country_latest_data = Table(
-    "country_latest_data",
-    Base.metadata,
-    Column("country_code", VARCHAR(255)),
-    Column("variable_id", Integer),
-    Column("year", Integer),
-    Column("value", VARCHAR(255)),
-    ForeignKeyConstraint(
-        ["variable_id"],
-        ["variables.id"],
-        ondelete="RESTRICT",
-        onupdate="RESTRICT",
-        name="country_latest_data_variable_id_foreign",
-    ),
-    Index("country_latest_data_country_code_variable_id_unique", "country_code", "variable_id", unique=True),
-    Index("country_latest_data_variable_id_foreign", "variable_id"),
-    extend_existing=True,
-)
-
 
 class Origin(Base):
     """Get CREATE TABLE statement for origins table with
@@ -1315,7 +1284,6 @@ class Origin(Base):
     datePublished: Mapped[Optional[str]] = mapped_column(VARCHAR(10))
     license: Mapped[Optional[dict]] = mapped_column(JSON)
 
-    # TODO: enable this
     # variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
     # origins_variables: Mapped[List["OriginsVariablesLink"]] = relationship(
     #     "OriginsVariablesLink", back_populates="origin"
@@ -1416,8 +1384,7 @@ class ChartDiffApprovals(Base):
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
     updatedAt: Mapped[datetime] = mapped_column(DateTime)
-    # TODO: use CHART_DIFF_STATUS
-    status: Mapped[str] = mapped_column(VARCHAR(255))
+    status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
     targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     # chart: Mapped["Chart"] = relationship("Chart", back_populates="chart_diff_approvalss")
