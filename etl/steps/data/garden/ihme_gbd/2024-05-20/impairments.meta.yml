@@ -14,31 +14,31 @@ definitions:
       <%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
+      Number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
+      Age-standardized number of individuals with <<impairment.lower()>> due to << cause.lower()>>
       <% elif metric == "Number" and age == 'All ages'%>
-      Total number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>
+      Total number of individuals with <<impairment.lower()>> due to << cause.lower()>>
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Rate of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      Rate of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      Age-standardized rate of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
-      Rate of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people
+      Rate of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>.
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>.
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
       <%- endif -%>
     footnote: |-
       <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
