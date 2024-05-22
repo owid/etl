@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -20,11 +23,17 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     # Dropping sex column as we only have values for both sexes
     if len(tb["sex"].unique() == 1):
         tb = tb.drop(columns="sex")
-    tb = tb.format(["country", "year", "metric", "neglected_tropical_disease", "impairment", "age"])
+    # Split up the causes of blindness
+    tb = other_vision_loss_minus_trachoma(tb)
+
+    cols = tb.columns.drop(["value"]).to_list()
+    tb = tb.format(cols)
 
     #
     # Save outputs.
@@ -36,3 +45,23 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def other_vision_loss_minus_trachoma(tb: Table) -> Table:
+    """
+    To split up the causes of blindness we need to subtract trachoma from other vision loss
+    """
+
+    tb_other_vision_loss = tb[tb["cause"] == "Other vision loss"].copy()
+    tb_trachoma = tb[tb["cause"] == "Trachoma"].copy()
+
+    tb_combine = tb_other_vision_loss.merge(
+        tb_trachoma, on=["country", "year", "metric", "impairment", "age"], suffixes=("", "_trachoma")
+    )
+    # Can I subtract rates if they have the same denominator? I think so
+    tb_combine["value"] = tb_combine["value"] - tb_combine["value_trachoma"]
+    tb_combine["cause"] = "Other vision loss minus trachoma"
+
+    tb = pr.concat([tb, tb_combine], ignore_index=True)
+
+    return tb

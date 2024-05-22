@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     tb = clean_data(tb)
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "metric", "neglected_tropical_disease", "impairment", "age", "sex"])
+    tb = tb.format(["country", "year", "metric", "cause", "impairment", "age", "sex"])
 
     #
     # Save outputs.
@@ -44,7 +44,7 @@ def clean_data(tb: Table) -> Table:
             "measure_name": "measure",
             "sex_name": "sex",
             "age_name": "age",
-            "cause_name": "neglected_tropical_disease",
+            "cause_name": "cause",
             "metric_name": "metric",
         },
         errors="ignore",
@@ -71,7 +71,7 @@ def clean_data(tb: Table) -> Table:
             "impairment": "category",
             "sex": "category",
             "age": "category",
-            "neglected_tropical_disease": "category",
+            "cause": "category",
             "metric": "category",
             "year": "int",
         }
