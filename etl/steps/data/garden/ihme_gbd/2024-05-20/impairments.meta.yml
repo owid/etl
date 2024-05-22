@@ -39,7 +39,6 @@ definitions:
       <% elif metric == "Rate" and age == 'All ages'%>
       The estimated number of individuals with <<impairment.lower()>> due to <<neglected_tropical_disease.lower()>>, per 100,000 people.
       <%- endif -%>
-    decimal_places: <% if metric == 'Number' %>0<% else %>2<%- endif -%>
     footnote: |-
       <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 # Learn more about the available fields:
@@ -64,4 +63,4 @@ tables:
               {definitions.metric.footnote}
         display:
           numDecimalPlaces: |-
-            {definitions.metric.decimal_places}
+            <% if metric == 'Number' %>0<% else %>2<%- endif -%>
