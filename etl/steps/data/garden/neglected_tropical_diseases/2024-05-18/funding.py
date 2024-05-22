@@ -59,8 +59,9 @@ def run(dest_dir: str) -> None:
     missing_items = [item for item in NTDS if item not in tb["disease"].values]
     log.info(f"Missing items in the NTD list: {missing_items}, check if they are in the dataset.")
     tb_product_ntd = tb[tb["disease"].isin(NTDS)].copy()
+    tb_product_ntd = tb_product_ntd.rename(columns={"product": "product_ntd"})
     tb_product_ntd = format_table(
-        tb=tb_product_ntd, group=["product", "year"], index_col=["product"], short_name="funding_product_ntd"
+        tb=tb_product_ntd, group=["product_ntd", "year"], index_col=["product_ntd"], short_name="funding_product_ntd"
     )
     # The funding for each disease*product
     tb_disease_product = format_table(
