@@ -21,7 +21,15 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.format(["country", "year"])
+    # Split into two tables: one for deaths, one for DALYs
+    tb_deaths = tb[tb["metric"] == "Deaths"].copy()
+    tb_dalys = tb[tb["metric"] == "DALYs (Disability-Adjusted Life Years)"].copy()
+    # Shorten the metric name for DALYs
+    tb_dalys["metric"] = "DALYs"
+
+    # Format the tables
+    tb_deaths = tb_deaths.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_deaths")
+    tb_dalys = tb_dalys.format(["country", "year", "measure", "age", "cause"], short_name="gbd_cause_dalys")
 
     #
     # Save outputs.
