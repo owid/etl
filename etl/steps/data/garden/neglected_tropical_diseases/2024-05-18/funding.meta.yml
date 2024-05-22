@@ -37,7 +37,7 @@ tables:
         title: Funding for technology - << product.lower() >> towards neglected tropical diseases
         unit: constant 2022 US$
         short_unit: $
-        description_short: "The amount of funding for << product.lower() >>. This data is expressed in US dollars, adjusted for inflation."
+        description_short: "The amount of funding for << product.lower() >> towards neglected tropical diseases. This data is expressed in US dollars, adjusted for inflation."
         description_processing: "We separated out this funding data for << product.lower() >>, for just neglected tropical diseases. This includes: Buruli ulcer, Chagas' disease, Dengue, Hookworm (ancylostomiasis & necatoriasis), Leishmaniasis, Leprosy, Lymphatic filariasis, multiple helminth infections, multiple kinetoplastid diseases, Mycetoma,  Onchocerciasis, Roundworm , Scabies, Schistosomiasis, Sleeping sicknes (HAT), Snakebite envenoming, Strongyloidiasis & other intestical roundworms, Tapeworm (Taeniasis/Cysticercosis), Trachoma, Whipworm (trichuriasis),Yaws."
   funding_disease_product:
     variables:
