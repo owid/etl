@@ -605,3 +605,5 @@ steps:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.csv
   data-private://garden/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
