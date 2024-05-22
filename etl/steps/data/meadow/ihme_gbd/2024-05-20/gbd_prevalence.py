@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-from shared import clean_data, fix_percent
+from shared import clean_data
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -13,22 +13,21 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("gbd_cause.csv")
+    snap = paths.load_snapshot("gbd_prevalence.csv")
 
     # Load data from snapshot.
     tb = snap.read()
     # standardize column names
     tb = clean_data(tb)
-    # fix percent values - they aren't consistently presented as either 0-1, or 0-100.
-    tb = fix_percent(tb)
     #
     # Process data.
     #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    # Drop the sex column if it is not needed
     if all(tb["sex"] == "Both"):
         tb = tb.drop(columns="sex")
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     cols = tb.columns.drop("value").to_list()
-    tb = tb.format(cols)
+    tb = tb.format([cols])
 
     #
     # Save outputs.
