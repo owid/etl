@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Bertelsmann Transformation Index, Scores
+    description: |-
+      Throughout the world, democracy and a market economy have become powerful frameworks in which social sustainability can prosper. Successful processes of reform can be observed in every region of the globe. There are, however, no guarantees of success; many countries undergoing transformation face stagnation and power struggles or violence and even state failure. Good governance is pivotal to reform policies that work. What are the key decisions? What are the lessons to be learned from past experiences? What strategies are likely to succeed? Under which conditions? The BTI 2024 puts development and transformation policies to the test.
+
+      Advocating reforms aimed at supporting the development of a constitutional democracy and a socially responsible market economy, the BTI provides the framework for an exchange of good practices among agents of reform. The BTI publishes two rankings, the Status Index and the Governance Index, both of which are based on in-depth assessments of 137 countries. The Status Index ranks the countries according to the state of their democracy and market economy, while the Governance Index ranks them according to their respective leadership’s performance. Distributed among the dimensions of democracy, market economy and governance, a total of 17 criteria are subdivided into 49 questions.
+
+      BTI countries are selected according to the following criteria: They have yet to achieve a fully consolidated democracy and market economy, have populations of more than one million, and are recognized as sovereign states.
+
+      The Transformation Index project is managed by the Bertelsmann Stiftung.
+    date_published: "2024"
+
+    # Citation
+    producer: Bertelsmann Transformation Index
+    citation_full: |-
+      Bertelsmann Stiftung. 2024. Bertelsmann Transformation Index 2024.
+
+    # Files
+    url_main: https://bti-project.org/
+    url_download: https://bti-project.org/fileadmin/api/content/en/downloads/data/BTI_2006-2024_Scores.xlsx
+    date_accessed: 2024-05-21
+
+    # License
+    license:
+      name: Bertelsmann Stiftung 2024
+      url: https://bti-project.org/en/imprint
+
+outs:
+  - md5: 0bf4d3fa2b940a3312abf8f69f4411de
+    size: 1117266
+    path: bti.xlsx

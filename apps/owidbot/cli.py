@@ -9,7 +9,7 @@ from rich import print
 from rich_click.rich_command import RichCommand
 
 from apps.owidbot import chart_diff, data_diff, grapher
-from apps.staging_sync.cli import _get_container_name
+from apps.wizard.utils.env import get_container_name
 
 from . import github_utils as gh_utils
 
@@ -122,7 +122,7 @@ def services_from_comment(comment: Any) -> Dict[str, str]:
 
 
 def create_comment_body(branch: str, services: Dict[str, str], start_time: float):
-    container_name = _get_container_name(branch) if branch else "dry-run"
+    container_name = get_container_name(branch) if branch else "dry-run"
 
     body = f"""
 <b>Quick links (staging server)</b>:
