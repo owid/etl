@@ -27,6 +27,6 @@ meta:
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
 
 outs:
-  - md5: 49684ae7e90f51d12e77df274b4537ad
-    size: 117535
+  - md5: a0a83113f66599ad285496253c279039
+    size: 108880
     path: eiu_gapminder.csv
