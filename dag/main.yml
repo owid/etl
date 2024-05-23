@@ -740,6 +740,15 @@ steps:
   data://grapher/news/2024-05-08/guardian_mentions:
     - data://garden/news/2024-05-08/guardian_mentions
 
+  # News coverage by GDELT 2
+  data://meadow/news/2024-05-23/gdelt_v2:
+    - snapshot://news/2024-05-23/gdelt_v2.csv
+  data://garden/news/2024-05-23/gdelt_v2:
+    - data://meadow/news/2024-05-23/gdelt_v2
+  data://grapher/news/2024-05-23/gdelt_v2:
+    - data://garden/news/2024-05-23/gdelt_v2
+
+
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
 
