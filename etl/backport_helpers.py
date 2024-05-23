@@ -1,5 +1,5 @@
 import json
-from typing import Optional, cast
+from typing import Any, Dict, Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -99,16 +99,16 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     # add variables metadata
     # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
     #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
-    variable_dict = {v["name"]: v for v in config["variables"]}
+    variable_dict: Dict[str, Dict[str, Any]] = {v["name"]: v for v in config["variables"]}
     variable_source_dict = {s["id"]: s for s in config["sources"]}
 
     for col, variable in variable_dict.items():
         if col not in t.columns:
-            log.warning("create_wide_table.no_values", variable_id=variable.id, variable_name=variable.name)
+            log.warning("create_wide_table.no_values", variable_id=variable["id"], variable_name=variable["name"])
             t[col] = np.nan
 
-        assert variable.sourceId
-        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable.sourceId])
+        assert variable["sourceId"]
+        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable["sourceId"]])
 
     # NOTE: collision happens for dataset 5629 with column names
     # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits

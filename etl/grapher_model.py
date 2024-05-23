@@ -1064,7 +1064,7 @@ class Variable(Base):
             assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
 
         if metadata.presentation:
-            presentation_dict = metadata.presentation.to_dict()
+            presentation_dict = metadata.presentation.to_dict()  # type: ignore
             # convert all fields from snake_case to camelCase
             presentation_dict = humps.camelize(presentation_dict)
         else:
