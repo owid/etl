@@ -55,6 +55,6 @@ meta:
       url: https://www.gdeltproject.org/about.html#termsofuse
 
 outs:
-  - md5: 682584241765508ab2c5d365b05ecf96
-    size: 7516
+  - md5: 8b478c7acc95960e98c565fcb665adb6
+    size: 56609
     path: gdelt_v2.csv
