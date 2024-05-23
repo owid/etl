@@ -6,6 +6,7 @@ from typing import List
 
 import numpy as np
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -14,6 +15,7 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Picking out just the NTDs from the dataset
 NTDS = [
     "Buruli ulcer",
     "Dengue",
@@ -53,6 +55,8 @@ def run(dest_dir: str) -> None:
     tb = aggregate_products(tb)
     # The funding for each disease
     tb_disease = format_table(tb=tb, group=["disease", "year"], index_col=["disease"], short_name="funding_disease")
+    # Combining the types of malaria
+    tb_disease = aggregate_malaria(tb_disease, groupby_cols=[], index_cols=["disease"])
     # The funding for each product - across all diseases
     tb_product = format_table(tb=tb, group=["product", "year"], index_col=["product"], short_name="funding_product")
     # Funding for each product - across only the NTDs in the dataset
@@ -70,6 +74,9 @@ def run(dest_dir: str) -> None:
         index_col=["disease", "product"],
         short_name="funding_disease_product",
     )
+    tb_disease_product = aggregate_malaria(
+        tb_disease_product, groupby_cols=["product"], index_cols=["disease", "product"]
+    )
     #
     # Save outputs.
     #
@@ -83,6 +90,26 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def aggregate_malaria(tb: Table, groupby_cols: List[str], index_cols: List[str]) -> Table:
+    """
+    Aggregating the three types of malaria into a new overall category
+    """
+    tb = tb.reset_index()
+    malaria_types = ["Malaria - P. vivax", "Malaria - P. falciparum", "Malaria - Multiple / other malaria strains"]
+    tb_malaria = tb[tb["disease"].isin(malaria_types)].copy()
+    assert len(tb_malaria["disease"].unique()) == 3, f"Missing malaria types: {malaria_types}"
+    # Combining the malaria types
+    tb_malaria = (
+        tb_malaria.groupby(["country", "year"] + groupby_cols, observed=True)["amount__usd"].sum().reset_index()
+    )
+    tb_malaria["disease"] = "Malaria - all types"
+    # Adding the combined malaria types back to the original table
+    tb = pr.concat([tb, tb_malaria], ignore_index=True)
+    tb = tb.set_index(["country", "year"] + index_cols, verify_integrity=True)
+
+    return tb
 
 
 def aggregate_products(tb: Table) -> Table:
