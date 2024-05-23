@@ -24,12 +24,12 @@ tables:
 
 
           1. Obtain all tags that concern a country:
-            - Obtain all the tag pages that have a title starting with a country name: a query like "https://content.guardianapis.com/tags?web-title=spain", for Spain. As a result we obtain a mapping that tells us for each country the list of tags (e.g. "Spain: [world/spain, travel/spain, etc.]") in use.
-            - We work with a list of ~240 countries.
-            - Getting the right country names has been an iterative process, trying to align our standard country names with the Guardian's.
+              - Obtain all the tag pages that have a title starting with a country name: a query like "https://content.guardianapis.com/tags?web-title=spain", for Spain. As a result we obtain a mapping that tells us for each country the list of tags (e.g. "Spain: [world/spain, travel/spain, etc.]") in use.
+              - We work with a list of ~240 countries.
+              - Getting the right country names has been an iterative process, trying to align our standard country names with the Guardian's.
 
           2. For each country, obtain the number of pages using each set of tags. Steps:
-            - For each country and year we get all content metadata: a query like "https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31" for year 2020. The count of pages is in the property `response.total`.
+              - For each country and year we get all content metadata: a query like "https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31" for year 2020. The count of pages is in the property `response.total`.
 
           For mor details, please refer to the snapshot script.
 
@@ -49,13 +49,14 @@ tables:
 
 
           1. Get all country name variations:
-            - Obtain all the country name variations using our standard name list.
-            - Our list may not cover all cases, and may contain some names that are not valid on The Guardian API (e.g. names with symbols like ';' are not supported). Therefore, we clean this list.
+              - Obtain all the country name variations using our standard name list.
+              - Our list may not cover all cases, and may contain some names that are not valid on The Guardian API (e.g. names with symbols like ';' are not supported). Therefore, we clean this list.
 
           2. For each country, obtain the number of pages using each set of name variations. Steps:
-            - For each country and year we get all content metadata: a query like "https://content.guardianapis.com/search?q=...&from-date=2020-01-01&to-date=2020-12-31" for year 2020. The count of pages is in the property `response.total`.
+              - For each country and year we get all content metadata: a query like "https://content.guardianapis.com/search?q=...&from-date=2020-01-01&to-date=2020-12-31" for year 2020. The count of pages is in the property `response.total`.
 
           For mor details, please refer to the snapshot script.
+
       num_pages_mentions_relative:
         title: Share of pages in The Guardian that mention a country
         unit: "pages per 100,000 pages"
