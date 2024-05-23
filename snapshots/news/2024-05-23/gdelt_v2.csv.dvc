@@ -34,7 +34,7 @@ meta:
         -- convert 20160517 to 2016
         CAST(SUBSTR(CAST(event_date AS STRING), 1, 4) AS INT64) year,
         country,
-        count(*) news_mentions
+        count(*) num_events
       from events_unrolled
       group by year, country
     date_published: "2024"
@@ -55,6 +55,6 @@ meta:
       url: https://www.gdeltproject.org/about.html#termsofuse
 
 outs:
-  - md5: f98ff0adb06799f8a4f38fe024045f65
-    size: 7517
+  - md5: 682584241765508ab2c5d365b05ecf96
+    size: 7516
     path: gdelt_v2.csv
