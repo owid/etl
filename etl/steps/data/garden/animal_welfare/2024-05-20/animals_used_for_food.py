@@ -76,7 +76,8 @@ def run(dest_dir: str) -> None:
     #
     # Create a table for the number of killed animals of each kind.
     tb_killed = tb_qcl[
-        tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES)
+        tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)
+        & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
     ].reset_index(drop=True)
 
     # Sanity check.

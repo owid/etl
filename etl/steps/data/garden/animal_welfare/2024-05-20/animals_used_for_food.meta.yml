@@ -1,4 +1,6 @@
 definitions:
+  title_killed: |-
+      Number of << animal >> slaughtered to produce meat
   common:
     unit: animals
     short_unit: ""
@@ -16,125 +18,125 @@ tables:
     title: Animals used for food
     variables:
       cattle_killed:
-        title: Number of cattle slaughtered to produce meat
+        title: <% set animal = "cattle" %>{definitions.title_killed}
         display:
           name: Cattle
         presentation:
-          title_public: Number of cattle slaughtered to produce meat
+          title_public: <% set animal = "cattle" %>{definitions.title_killed}
       sheep_killed:
-        title: Number of sheep slaughtered to produce meat
+        title: <% set animal = "sheep" %>{definitions.title_killed}
         display:
           name: Sheep
         presentation:
-          title_public: Number of sheep slaughtered to produce meat
+          title_public: <% set animal = "sheep" %>{definitions.title_killed}
       goats_killed:
-        title: Number of goats slaughtered to produce meat
+        title: <% set animal = "goats" %>{definitions.title_killed}
         display:
           name: Goats
         presentation:
-          title_public: Number of goats slaughtered to produce meat
+          title_public: <% set animal = "goats" %>{definitions.title_killed}
       pigs_killed:
-        title: Number of pigs slaughtered to produce meat
+        title: <% set animal = "pigs" %>{definitions.title_killed}
         display:
           name: Pigs
         presentation:
-          title_public: Number of pigs slaughtered to produce meat
+          title_public: <% set animal = "pigs" %>{definitions.title_killed}
       chickens_killed:
-        title: Number of chickens slaughtered to produce meat
+        title: <% set animal = "chickens" %>{definitions.title_killed}
         display:
           name: Chickens
         presentation:
-          title_public: Number of chickens slaughtered to produce meat
+          title_public: <% set animal = "chickens" %>{definitions.title_killed}
       rabbits_killed:
-        title: Number of rabbits slaughtered to produce meat
+        title: <% set animal = "rabbits" %>{definitions.title_killed}
         display:
           name: Rabbits
         presentation:
-          title_public: Number of rabbits slaughtered to produce meat
+          title_public: <% set animal = "rabbits" %>{definitions.title_killed}
       ducks_killed:
-        title: Number of ducks slaughtered to produce meat
+        title: <% set animal = "ducks" %>{definitions.title_killed}
         display:
           name: Ducks
         presentation:
-          title_public: Number of ducks slaughtered to produce meat
+          title_public: <% set animal = "ducks" %>{definitions.title_killed}
       turkeys_killed:
-        title: Number of turkeys slaughtered to produce meat
+        title: <% set animal = "turkeys" %>{definitions.title_killed}
         display:
           name: Turkeys
         presentation:
-          title_public: Number of turkeys slaughtered to produce meat
+          title_public: <% set animal = "turkeys" %>{definitions.title_killed}
       horses_killed:
-        title: Number of horses slaughtered to produce meat
+        title: <% set animal = "horses" %>{definitions.title_killed}
         display:
           name: Horses
         presentation:
-          title_public: Number of horses slaughtered to produce meat
+          title_public: <% set animal = "horses" %>{definitions.title_killed}
       buffaloes_killed:
-        title: Number of buffaloes slaughtered to produce meat
+        title: <% set animal = "buffaloes" %>{definitions.title_killed}
         display:
           name: Buffaloes
         presentation:
-          title_public: Number of buffaloes slaughtered to produce meat
+          title_public: <% set animal = "buffaloes" %>{definitions.title_killed}
       geese_killed:
-        title: Number of geese slaughtered to produce meat
+        title: <% set animal = "geese" %>{definitions.title_killed}
         display:
           name: Geese
         presentation:
-          title_public: Number of geese slaughtered to produce meat
+          title_public: <% set animal = "geese" %>{definitions.title_killed}
       camels_killed:
-        title: Number of camels slaughtered to produce meat
+        title: <% set animal = "camels" %>{definitions.title_killed}
         display:
           name: Camels
         presentation:
-          title_public: Number of camels slaughtered to produce meat
+          title_public: <% set animal = "camels" %>{definitions.title_killed}
       pigeons_killed:
-        title: Number of pigeons slaughtered to produce meat
+        title: <% set animal = "pigeons" %>{definitions.title_killed}
         display:
           name: Pigeons
         presentation:
-          title_public: Number of pigeons slaughtered to produce meat
+          title_public: <% set animal = "pigeons" %>{definitions.title_killed}
       snails_killed:
-        title: Number of snails slaughtered to produce meat
+        title: <% set animal = "snails" %>{definitions.title_killed}
         display:
           name: Snails
         presentation:
-          title_public: Number of snails slaughtered to produce meat
+          title_public: <% set animal = "snails" %>{definitions.title_killed}
       donkeys_killed:
-        title: Number of donkeys slaughtered to produce meat
+        title: <% set animal = "donkeys" %>{definitions.title_killed}
         display:
           name: Donkeys
         presentation:
-          title_public: Number of donkeys slaughtered to produce meat
+          title_public: <% set animal = "donkeys" %>{definitions.title_killed}
       game_killed:
-        title: Number of game animals slaughtered to produce meat
+        title: <% set animal = "game animals" %>{definitions.title_killed}
         display:
           name: Game animals
         presentation:
-          title_public: Number of game animals slaughtered to produce meat
+          title_public: <% set animal = "game animals" %>{definitions.title_killed}
       other_non_mammals_killed:
-        title: Number of other non-mammals slaughtered to produce meat
+        title: <% set animal = "other non-mammals" %>{definitions.title_killed}
         display:
           name: Other non-mammals
         presentation:
-          title_public: Number of other non-mammals slaughtered to produce meat
+          title_public: <% set animal = "other non-mammals" %>{definitions.title_killed}
       other_rodents_killed:
-        title: Number of other rodents slaughtered to produce meat
+        title: <% set animal = "other rodents" %>{definitions.title_killed}
         display:
           name: Other rodents
         presentation:
-          title_public: Number of other rodents slaughtered to produce meat
+          title_public: <% set animal = "other rodents" %>{definitions.title_killed}
       other_camelids_killed:
-        title: Number of other camelids slaughtered to produce meat
+        title: <% set animal = "other camelids" %>{definitions.title_killed}
         display:
           name: Other camelids
         presentation:
-          title_public: Number of other camelids slaughtered to produce meat
+          title_public: <% set animal = "other camelids" %>{definitions.title_killed}
       mule_killed:
-        title: Number of mules slaughtered to produce meat
+        title: <% set animal = "mules" %>{definitions.title_killed}
         display:
           name: Mules
         presentation:
-          title_public: Number of mules slaughtered to produce meat
+          title_public: <% set animal = "mules" %>{definitions.title_killed}
       cattle_alive:
         title: Number of live cattle used to produce meat
       buffalo_alive:
