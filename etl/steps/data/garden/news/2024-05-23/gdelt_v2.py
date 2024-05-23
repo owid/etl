@@ -27,6 +27,9 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
+    # Remove year 1920
+    tb = tb.loc[tb["year"] != 1920]
+
     # Add relative indicator
     tb = add_relative_indicator(tb, "num_events")
 
