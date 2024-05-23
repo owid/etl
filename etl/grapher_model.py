@@ -1070,7 +1070,9 @@ class Variable(Base):
         else:
             presentation_dict = {}
 
+        # field that are processed elsewhere and are not part of the class
         presentation_dict.pop("topicTags", None)
+        presentation_dict.pop("faqs", None)
 
         if metadata.description_key:
             assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
