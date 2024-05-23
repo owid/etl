@@ -207,7 +207,7 @@ YEAR_END = 2024
 
 # Guardian API
 API_KEY = os.environ.get("GUARDIAN_API_KEY")
-API_KEY = "82296f6b-56e5-4580-bb79-801b01a09e2a"
+API_KEY = ""
 API_CONTENT_URL = "https://content.guardianapis.com/search"
 API_TAGS_URL = "https://content.guardianapis.com/tags"
 
