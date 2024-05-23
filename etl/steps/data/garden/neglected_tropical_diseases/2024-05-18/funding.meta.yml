@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Global Health
+        #- Neglected Tropical Diseases
+      grapher_config:
+        note: "This data is expressed in constant constant 2022 US$."
+        selectedEntityNames: ["World"]
+    display:
+      numDecimalPlaces: 0
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  funding_disease:
+    variables:
+      amount__usd:
+        title: Funding for << disease.lower() >>, all technologies
+        unit: constant 2022 US$
+        short_unit: $
+        description_short: "The amount of funding for << disease.lower() >>. This data is expressed in US dollars, adjusted for inflation."
+  funding_product:
+    variables:
+      amount__usd:
+        title: Funding for technology - << product.lower() >>
+        unit: constant 2022 US$
+        short_unit: $
+        description_short: "The amount of funding for << product.lower() >>. This data is expressed in US dollars, adjusted for inflation."
+  funding_disease_product:
+    variables:
+      amount__usd:
+        title: Funding for << product.lower() >>for treating << disease.lower() >>
+        unit: constant 2022 US$
+        short_unit: $
+        description_short: "The amount of funding for << product.lower() >> for treating << disease >>.This data is expressed in US dollars, adjusted for inflation."
