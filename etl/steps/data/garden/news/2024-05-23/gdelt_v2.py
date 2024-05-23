@@ -54,23 +54,35 @@ def add_relative_indicator(tb: Table, colname: str):
     E.g. Global share of ? for a given year. Note that we use 'per 100,000' factor.
     """
     EXCLUDE_ENTITIES = [
+        # Africa
+        "North Africa (GDELT)",
         "Africa (GDELT)",
+        "Eastern Africa (GDELT)",
+        "Southern Africa (GDELT)",
+        "West Africa (GDELT)",
+        "Eastern Africa (GDELT)",
+        # Middle East
+        "Middle East (GDELT)",
+        "Persian Gulf (GDELT)",
+        # Asia
         "Asia (GDELT)",
         "Central Asia (GDELT)",
-        "Eastern Africa (GDELT)",
-        "Europe (GDELT)",
-        "Latin America (GDELT)",
-        "Middle East (GDELT)",
-        "North Africa (GDELT)",
-        "North America (GDELT)",
-        "Persian Gulf (GDELT)",
-        "Southern Africa (GDELT)",
-        "South America (GDELT)",
         "South Asia (GDELT)",
-        "Scandinavia",
         "Southeast Asia (GDELT)",
-        "West Africa (GDELT)",
+        # Europe
+        "Europe (GDELT)",
+        # America
+        "Latin America (GDELT)",
+        "North America (GDELT)",
+        "South America (GDELT)",
+        "The West (GDELT)",
+        # Others
+        "Scandinavia",
+        "Balkans",
+        "Caucasus",
+        "Caribbean",
         "Undetermined",
+
     ]
 
     # Split data into regions and countries
