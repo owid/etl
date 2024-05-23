@@ -12,7 +12,7 @@ from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.step_update.cli import NON_UPDATEABLE_IDENTIFIERS, StepUpdater, UpdateState
-from etl.config import ADMIN_HOST, ENV_IS_REMOTE
+from etl.config import ADMIN_HOST, ENV
 from etl.db import can_connect
 
 ########################################
@@ -657,10 +657,8 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_submit:
-            if ENV_IS_REMOTE:
-                st.error(
-                    "The update command is not available in the remote version of the wizard. Update steps locally."
-                )
+            if ENV == "production":
+                st.error("The update command is not available in production. Update steps locally or in staging.")
                 st.stop()
             else:
                 with st.spinner("Executing step updater..."):
@@ -768,8 +766,8 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_etl_run:
-            if ENV_IS_REMOTE:
-                st.error("Running the ETL is not available in the remote version of the wizard. Run them locally.")
+            if ENV == "production":
+                st.error("Running the ETL is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
                 with st.spinner("Executing ETL..."):
@@ -816,8 +814,8 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_archive:
-            if ENV_IS_REMOTE:
-                st.error("Archiving is not available in the remote version of the wizard. Run them locally.")
+            if ENV == "production":
+                st.error("Archiving is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
                 with st.spinner("Archiving steps..."):

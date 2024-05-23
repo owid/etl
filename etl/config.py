@@ -60,6 +60,9 @@ DB_PASS = env.get("DB_PASS", "")
 
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
+# Special ENV file with access to production DB (read-only), used by chart-diff
+ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
 else:
@@ -148,11 +151,22 @@ FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
 ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
+# Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
+# because that would resolve to LXC container instead of the actual server
+TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
+
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
+
+# OWIDBOT app
+OWIDBOT_APP_PRIVATE_KEY_PATH = env.get("OWIDBOT_APP_PRIVATE_KEY_PATH", None)
+# get it from https://github.com/settings/apps/owidbot-app
+OWIDBOT_APP_CLIENT_ID = env.get("OWIDBOT_APP_CLIENT_ID", None)
+# get it from https://github.com/settings/installations
+OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 
 
 def enable_bugsnag() -> None:

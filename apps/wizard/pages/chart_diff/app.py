@@ -7,11 +7,11 @@ from sqlmodel import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
-from apps.staging_sync.cli import _get_engine_for_env, _modified_chart_ids_by_admin, _validate_env
+from apps.staging_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
 from apps.wizard.utils import chart_html, set_states
-from apps.wizard.utils.env import OWID_ENV
+from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl import config
 
 log = get_logger()
@@ -41,19 +41,17 @@ st.session_state.hide_approved_charts = st.session_state.get("hide_approved_char
 ########################################
 # LOAD ENVS
 ########################################
-# TODO: simplify this
-SOURCE_ENV = config.DB_HOST  # "staging-site-streamlit-chart-approval"
-SOURCE_API = f"https://api-staging.owid.io/{SOURCE_ENV}/v1/indicators/"
+SOURCE = OWID_ENV
+assert OWID_ENV.env_type_id != "production", "Your .env points to production DB, please use a staging environment."
 
-if config.DB_IS_PRODUCTION:
-    TARGET_ENV = config.ENV_FILE
-    TARGET_API = "https://api.ourworldindata.org/v1/indicators/"
+# Try to compare against production DB if possible, otherwise compare against staging-site-master
+if config.ENV_FILE_PROD:
+    TARGET = OWIDEnv.from_env_file(config.ENV_FILE_PROD)
 else:
     warning_msg = "ENV file doesn't connect to production DB, comparing against staging-site-master"
     log.warning(warning_msg)
     st.warning(warning_msg)
-    TARGET_ENV = "staging-site-master"
-    TARGET_API = f"https://api-staging.owid.io/{TARGET_ENV}/v1/indicators/"
+    TARGET = OWIDEnv.from_staging("master")
 
 
 ########################################
@@ -100,7 +98,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
     # Get the right arguments for the toggle, button and diff show
     if diff.is_modified:
         # Arguments for the toggle
-        label_tgl = "Approved new chart version"
+        # label_tgl = "Approved new chart version"
 
         # Arguments for diff
         kwargs_diff = {
@@ -109,7 +107,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         }
     elif diff.is_new:
         # Arguments for the toggle
-        label_tgl = "Approved new chart"
+        # label_tgl = "Approved new chart"
 
         # Arguments for diff
         kwargs_diff = {
@@ -120,19 +118,30 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
     # Actually show stuff
     with st.expander(label, not diff.approved):
-        # Toggle
-        st.toggle(
-            label=label_tgl,
-            key=f"toggle-{diff.chart_id}",
-            value=diff.approved,
-            on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
-        )
         # Refresh
         st.button(
             "🔄 Refresh",
             key=f"refresh-btn-{diff.chart_id}",
             on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
             help="Get the latest version of the chart from the staging server.",
+        )
+
+        options = ["Pending", "Approve"]
+        options = {
+            "Approve": "green",
+            "Pending": "orange",
+            # "Reject": "red",
+        }
+        option_names = list(options.keys())
+        st.radio(
+            label="Approve or reject chart",
+            key=f"radio-{diff.chart_id}",
+            options=option_names,
+            horizontal=True,
+            format_func=lambda x: f":{options.get(x)}-background[{x}]",
+            index=option_names.index("Approve") if diff.approved else option_names.index("Pending"),
+            on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
+            # label_visibility="collapsed",
         )
 
         if diff.is_modified:
@@ -167,7 +176,7 @@ def compare_charts(
     # Only one chart: new chart
     if target_chart is None:
         st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-        chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
+        chart_html(source_chart.config, owid_env=SOURCE)
     # Two charts, actual diff
     else:
         # Create two columns for the iframes
@@ -177,10 +186,10 @@ def compare_charts(
         if not prod_is_newer:
             with col1:
                 st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
-                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
+                chart_html(target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
-                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
+                chart_html(source_chart.config, owid_env=SOURCE)
         # Conflict with live
         else:
             with col1:
@@ -188,24 +197,15 @@ def compare_charts(
                     f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
                     help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
                 )
-                chart_html(target_chart.config, base_url=TARGET_ENV, base_api_url=TARGET_API)
+                chart_html(target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-                chart_html(source_chart.config, base_url=SOURCE_ENV, base_api_url=SOURCE_API)
+                chart_html(source_chart.config, owid_env=SOURCE)
 
 
 @st.cache_resource
 def get_engines() -> tuple[Engine, Engine]:
-    s = Path(SOURCE_ENV)
-    t = Path(TARGET_ENV)
-
-    _validate_env(s)
-    _validate_env(t)
-
-    source_engine = _get_engine_for_env(s)
-    target_engine = _get_engine_for_env(t)
-
-    return source_engine, target_engine
+    return SOURCE.get_engine(), TARGET.get_engine()
 
 
 def show_help_text():

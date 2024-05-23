@@ -218,6 +218,10 @@ def prepare_input_data(tb: Table) -> Table:
     # Make "entry_date" a datetime column.
     tb["entry_date"] = pd.to_datetime(tb["entry_date"], errors="coerce")
 
+    # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
+    for variable in COST_VARIABLES:
+        tb[variable] *= 1000
+
     return tb
 
 
@@ -524,7 +528,7 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
-    # Create a table with the decadal count of events.
+    # Create a table with the total decadal count of events.
     tb_decadal = tb_yearly.copy()
     tb_decadal["decade"] = (tb_decadal["year"] // 10) * 10
     tb_decadal = (
@@ -548,11 +552,7 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
         abs(tb_decadal[[column for column in tb_decadal.columns if "share" in column]].sum(axis=1) - 100) < 1
     ).all(), error
 
-    # Format new tables conveniently.
-    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_impact")
-    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_impact")
-
-    # Plot the share of large events as a bar chart.
+    # # Plot the share of large events as a bar chart.
     # import plotly.express as px
     # columns_sorted = ["year", "share_unknown_events", "share_large_events", "share_medium_events", "share_small_events"]
     # tb_plot = tb_decadal[tb_decadal["country"]=="World"][columns_sorted].melt(
@@ -568,6 +568,10 @@ def create_tables_of_event_sizes(tb: Table, ds_regions: Dataset, ds_income_group
     #     labels={"year": "Year", "share": "Share of events (%)", "event_size": "Event size"},
     # )
     # fig.show()
+
+    # Format new tables conveniently.
+    tb_yearly = tb_yearly.format(short_name="natural_disasters_yearly_impact")
+    tb_decadal = tb_decadal.format(short_name="natural_disasters_decadal_impact")
 
     return tb_yearly, tb_decadal
 
@@ -728,8 +732,6 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
     # Prepare cost variables.
     for variable in COST_VARIABLES:
-        # Convert costs (given in '000 US$, aka thousand current US$) into current US$.
-        tb[variable] *= 1000
         # Create variables of costs (in current US$) as a share of GDP (in current US$).
         tb[f"{variable}_per_gdp"] = tb[variable] / tb["gdp"] * 100
 
@@ -743,7 +745,7 @@ def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table
     return tb
 
 
-def create_decade_data(tb: Table) -> Table:
+def create_decadal_average_data(tb: Table) -> Table:
     """Create data of average impacts over periods of 10 years.
 
     For example (as explained in the footer of the natural disasters explorer), the value for 1900 of any column should
@@ -931,7 +933,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Prepare input data (and fix some known issues).
+    # Prepare input data (prepare time columns, convert cost variables to dollars, and fix some known issues).
     tb = prepare_input_data(tb=tb_meadow)
 
     # Sanity checks.
@@ -988,7 +990,7 @@ def run(dest_dir: str) -> None:
     tb["type"] = tb["type"].replace({value: utils.underscore(value) for value in tb["type"].unique()})
 
     # Create data aggregated (using a simple mean) in intervals of 10 years.
-    tb_decadal = create_decade_data(tb=tb)
+    tb_decadal = create_decadal_average_data(tb=tb)
 
     # Run sanity checks on output yearly data.
     sanity_checks_on_outputs(tb=tb, is_decade=False, ds_regions=ds_regions)

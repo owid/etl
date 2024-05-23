@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# Data was sent by email from the source - Peter Potapov (potapov@umd.edu) - on 2024-05-07
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Intact Forest Landscapes
+    description: |
+      Most of the world's original forests have either been lost to conversion or altered by logging and forest management. Forests that still combine large size with insignificant human influence are becoming increasingly important as their global extent continues to shrink.
+      There are several reasons to focus on large undeveloped forest areas:
+      - Ecosystems are generally better able to support their natural biological diversity and ecological processes the lower their exposure to humans and the greater their area. They are also better able to absorb and recover from disturbance (resistance and resilience).
+      - Large natural forest areas are important for the preservation of all strata of biological diversity. Fragmentation and loss of natural habitats are the main factors threatening plant and animal species with extinction. Large, roaming animals (such as forest elephants, great apes, bears, wolfs, tigers, jaguars, eagles, deer etc.) especially require that intact forest landscapes be preserved.
+      - Large natural forest areas are also important for maintaining ecological processes and supplying ecosystem services like water and air purification, nutrient cycling, carbon sequestration, erosion, and flood control.
+      - The conservation value of forest landscapes that are free from human disturbance is therefore high, although it varies among regions. At the same time the cost of conserving large unpopulated areas is often low. The same factors that have kept them from being developed, such as remoteness and low economic value, also help to reduce the cost of protecting them.
+
+      The concept of an Intact Forest Landscape (IFL) and its technical definition were developed to help create, implement, and monitor policies concerning the human impact on forest landscapes at the regional or country levels.
+    date_published: "2021-11-29"
+    # Citation
+    producer: Potapov et al.
+    citation_full: |-
+      Potapov, P., Hansen, M. C., Laestadius L., Turubanova S., Yaroshenko A., Thies C., Smith W., Zhuravleva I., Komarova A., Minnemeyer S., Esipova E. The last frontiers of wilderness: Tracking loss of intact forest landscapes from 2000 to 2013. [Science Advances, 2017; 3:e1600821](https://www.science.org/doi/10.1126/sciadv.1600821)
+
+    # Files
+    url_main: https://intactforests.org/
+    date_accessed: 2024-05-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://intactforests.org/data.ifl.html
+
+outs:
+  - md5: a73b89c94f8b256832c9415fa35ba6bf
+    size: 16483
+    path: ifl.xlsx

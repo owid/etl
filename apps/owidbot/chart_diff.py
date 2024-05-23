@@ -2,23 +2,61 @@ import pandas as pd
 from sqlmodel import Session
 from structlog import get_logger
 
-from apps.staging_sync.cli import _get_container_name, _get_engine_for_env, _modified_chart_ids_by_admin
+from apps.staging_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from etl import config
+from apps.wizard.utils.env import OWID_ENV, OWIDEnv, get_container_name
+
+from . import github_utils as gh_utils
 
 log = get_logger()
 
 
-def run(branch: str) -> str:
-    container_name = _get_container_name(branch) if branch else "dry-run"
+def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_run: bool = False) -> None:
+    access_token = gh_utils.github_app_access_token()
+    repo = gh_utils.get_repo(repo_name, access_token=access_token)
+    pr = gh_utils.get_pr(repo, branch)
 
-    chart_diff = format_chart_diff(call_chart_diff(branch))
+    # Get the latest commit of the pull request
+    latest_commit = pr.get_commits().reversed[0]
+
+    if charts_df.empty:
+        conclusion = "neutral"
+        title = "No new or modified charts"
+    elif charts_df.approved.all():
+        conclusion = "success"
+        title = "All charts are approved"
+    else:
+        conclusion = "failure"
+        title = "Some charts are not approved"
+
+    if not dry_run:
+        # Create the check run and complete it in a single command
+        repo.create_check_run(
+            name="owidbot/chart-diff",
+            head_sha=latest_commit.sha,
+            status="completed",
+            conclusion=conclusion,
+            output={
+                "title": title,
+                "summary": format_chart_diff(charts_df),
+            },
+        )
+
+
+def run(branch: str, charts_df: pd.DataFrame) -> str:
+    container_name = get_container_name(branch) if branch else "dry-run"
+
+    chart_diff = format_chart_diff(charts_df)
+
+    if charts_df.empty or charts_df.approved.all():
+        status = "✅"
+    else:
+        status = "❌"
 
     body = f"""
 <details open>
-<summary><b>Chart diff</b>: </summary>
+<summary><a href="http://{container_name}/etl/wizard/Chart%20Diff"><b>chart-diff</b></a>: {status}</summary>
 {chart_diff}
-<a href="http://{container_name}/etl/wizard/Chart%20Diff">Details</a>
 </details>
     """.strip()
 
@@ -26,13 +64,13 @@ def run(branch: str) -> str:
 
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
-    source_engine = _get_engine_for_env(branch)
+    source_engine = OWIDEnv.from_staging(branch).get_engine()
 
-    if config.DB_IS_PRODUCTION:
-        target_engine = _get_engine_for_env(config.ENV_FILE)
+    if OWID_ENV.env_type_id == "production":
+        target_engine = OWID_ENV.get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        target_engine = _get_engine_for_env("staging-site-master")
+        target_engine = OWIDEnv.from_staging("master").get_engine()
 
     df = []
     with Session(source_engine) as source_session:

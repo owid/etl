@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Price and Performance Changes of Computer Technology with Time
+    date_published: "2023-11-16"
+
+    # Citation
+    producer: John C. McCallum
+    citation_full: |-
+      John C. McCallum, Price and Performance Changes of Computer Technology with Time
+
+    # Files
+    url_main: https://jcmit.net/memoryprice.htm
+    url_download: https://jcmit.net/MemDiskPrice-XL2010.xlsx
+    date_accessed: 2024-05-13
+
+    # License
+    license:
+      name: copyright 2001, 2022, 2023 John C. McCallum
+      url: https://jcmit.net/memoryprice.htm
+
+outs:
+  - md5: 54b3fcc2931bb60e428dc1dcc8fea034
+    size: 171246
+    path: computer_memory_storage.xlsx

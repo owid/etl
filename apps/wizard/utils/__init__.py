@@ -28,6 +28,7 @@ from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
+from apps.wizard.utils.env import OWIDEnv
 from apps.wizard.utils.step_form import StepForm
 from etl import config
 from etl.db import get_connection
@@ -84,6 +85,7 @@ MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
+MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
 
 # Dummy data
 DUMMY_DATA = {
@@ -115,6 +117,12 @@ def get_namespaces(step_type: str) -> List[str]:
             folders = sorted(item for item in STEPS_GARDEN_DIR.iterdir() if item.is_dir())
         case "grapher":
             folders = sorted(item for item in STEPS_GRAPHER_DIR.iterdir() if item.is_dir())
+        case "all":
+            folders = sorted(
+                item
+                for item in [*STEPS_MEADOW_DIR.iterdir(), *STEPS_GARDEN_DIR.iterdir(), *STEPS_GRAPHER_DIR.iterdir()]
+                if item.is_dir()
+            )
         case _:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
     namespaces = [folder.name for folder in folders]
@@ -142,13 +150,15 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
         "garden": None,
         "grapher": None,
+        "express": None,
     }
+    _previous_step: str | None = None
 
     def __init__(self: "AppState") -> None:
         """Construct variable."""
@@ -170,6 +180,9 @@ class AppState:
         # Add defaults (these are used when not value is found in current or previous step)
         self.default_steps["snapshot"]["snapshot_version"] = DATE_TODAY
         self.default_steps["snapshot"]["origin.date_accessed"] = DATE_TODAY
+
+        self.default_steps["express"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["express"]["version"] = DATE_TODAY
 
         self.default_steps["meadow"]["version"] = DATE_TODAY
         self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
@@ -244,23 +257,27 @@ class AppState:
         value_step = self.state_step.get(key)
         # st.write(f"value_step: {value_step}")
         if value_step is not None:
+            # st.code(1)
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
-        key = key.replace(f"{self.step}.", f"{self.previous_step}.")
-        value_previous_step = st.session_state["steps"][self.previous_step].get(key)
+        key = key.replace(f"{self.step}.", f"{previous_step}.")
+        value_previous_step = st.session_state["steps"][previous_step].get(key)
         # st.write(f"value_previous_step: {value_previous_step}")
         if value_previous_step is not None:
+            # st.code(2)
             return value_previous_step
         # (3) If none, use self.default_steps
         value_defaults = self.default_steps[self.step].get(key)
         # st.write(f"value_defaults: {value_defaults}")
         if value_defaults is not None:
+            # st.code(3)
             return value_defaults
         # (4) Use default_last as last resource
         if default_last is None:
             raise ValueError(
                 f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
             )
+        # st.code(4)
         return cast(str | bool | int, default_last)
 
     def display_error(self: "AppState", key: str) -> None:
@@ -272,14 +289,19 @@ class AppState:
                 st.error(msg)
 
     @property
-    def previous_step(self: "AppState") -> str:
+    def previous_step(self: "AppState") -> str | None:
         """Get the name of the previous step.
 
         E.g. 'snapshot' is the step prior to 'meadow', etc.
         """
-        self._check_step()
-        idx = max(self.steps.index(self.step) - 1, 0)
-        return self.steps[idx]
+        if self._previous_step is None:
+            self._check_step()
+            if self.step not in {"explorer", "express"}:
+                idx = max(self.steps.index(self.step) - 1, 0)
+                self._previous_step = self.steps[idx]
+            elif self.step == "express":
+                self._previous_step = "snapshot"
+        return self._previous_step
 
     def st_widget(
         self: "AppState",
@@ -364,10 +386,10 @@ def preview_file(file_path: str | Path, language: str = "python") -> None:
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content: str, dag_path: str | Path) -> None:
+def preview_dag_additions(dag_content: str, dag_path: str | Path, expanded: bool = False) -> None:
     """Preview DAG additions."""
     if dag_content:
-        with st.expander(f"File: `{dag_path}`", expanded=False):
+        with st.expander(f"File: `{dag_path}`", expanded=expanded):
             st.code(dag_content, "yaml")
 
 
@@ -592,10 +614,10 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], base_url, base_api_url, height=500, **kwargs):
-    chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
-    chart_config["adminBaseUrl"] = f"http://{base_url}"
-    chart_config["dataApiUrl"] = base_api_url
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+    chart_config["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    chart_config["adminBaseUrl"] = owid_env.base_site
+    chart_config["dataApiUrl"] = owid_env.indicators_url
 
     HTML = f"""
     <!DOCTYPE html>

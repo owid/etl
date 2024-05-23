@@ -109,13 +109,14 @@ dataset:
 
 tables:
   natural_disasters_decadal:
-    title: Natural disasters, decadal data
+    title: Natural disasters, decadal average
+    # NOTE: This table contains AVERAGE decadal values, not total sums.
     variables: &variables-default
       total_dead:
-        title: Total deaths
+        title: Deaths
         unit: 'people'
         description_short: |-
-          Total number of deaths as a result of a natural disaster.
+          Total number of dead and missing people.
         description_key:
           - *definition-dead
           - *description-key-common
@@ -158,8 +159,6 @@ tables:
         title: Reconstruction costs
         short_unit: '$'
         unit: 'current US$'
-        description_short: |-
-          Reconstruction costs.
         description_key:
           - *definition-reconstruction-costs
           - *description-key-common
@@ -173,7 +172,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages:
-        title: Total economic damage from natural disasters
+        title: Total economic damages
         short_unit: '$'
         unit: 'current US$'
         description_short: |-
@@ -182,7 +181,7 @@ tables:
           - *definition-total-damage
           - *description-key-common
       n_events:
-        title: Number of reported natural disasters
+        title: Natural disasters
         unit: 'events'
         description_short: |-
           Number of reported natural disasters.
@@ -192,36 +191,46 @@ tables:
         title: Population
         unit: 'people'
       total_dead_per_100k_people:
-        title: Total number of deaths per 100,000 people
+        title: Deaths per 100,000 people
         unit: 'deaths per 100,000 people'
+        description_short: |-
+          Death rate per 100,000 people as a result of a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-dead
           - *description-key-common
       injured_per_100k_people:
-        title: Number of injured persons per 100,000 people
+        title: Injured per 100,000 people
         unit: 'injured per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
           - *description-key-common
       affected_per_100k_people:
-        title: Number of affected persons per 100,000 people
+        title: Affected per 100,000 people
         unit: 'affected per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
         description_processing: *description-processing-100k
         description_key:
           - *definition-affected
           - *description-key-common
       homeless_per_100k_people:
-        title: Number of homeless persons per 100,000 people
+        title: Homeless per 100,000 people
         unit: 'homeless per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 whose houses are destroyed or heavily damaged and therefore need shelter after an event.
         description_processing: *description-processing-100k
         description_key:
           - *definition-homeless
           - *description-key-common
       total_affected_per_100k_people:
-        title: Total number of affected persons per 100,000 people
+        title: Total affected per 100,000 people
         unit: 'affected per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 affected by a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
@@ -230,8 +239,10 @@ tables:
           - *definition-total-affected
           - *description-key-common
       n_events_per_100k_people:
-        title: Number of events per 100,000 people
+        title: Natural disasters per 100,000 people
         unit: 'events per 100,000 people'
+        description_short: |-
+          Rate of reported natural disasters per 100,000 people.
         description_processing: *description-processing-100k
         description_key:
           - *description-key-common
@@ -240,7 +251,7 @@ tables:
         unit: "current US$"
         short_unit: "$"
       reconstruction_costs_per_gdp:
-        title: "Reconstruction costs from natural disasters as a share of GDP"
+        title: "Reconstruction costs as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -250,7 +261,7 @@ tables:
           - *definition-reconstruction-costs
           - *description-key-common
       insured_damages_per_gdp:
-        title: "Insured damages from natural disasters as a share of GDP"
+        title: "Insured damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -260,7 +271,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages_per_gdp:
-        title: "Total economic damages from natural disasters as a share of GDP"
+        title: "Total economic damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -384,7 +395,8 @@ tables:
         presentation:
           title_public: Share of reported natural disasters with a large impact
   natural_disasters_decadal_impact:
-    title: Natural disasters by decadal impact
+    title: Natural disasters by total decadal impact
+    # NOTE: This table contains TOTAL decadal sums, not averages.
     variables: *variables-impact
   natural_disasters_yearly_deaths:
     title: Natural disasters by yearly deaths
@@ -462,5 +474,6 @@ tables:
         presentation:
           title_public: Number of reported natural disasters with unknown deaths
   natural_disasters_decadal_deaths:
-    title: Natural disasters by decadal deaths
+    title: Natural disasters by total decadal deaths
+    # NOTE: This table contains TOTAL decadal sums, not averages.
     variables: *variables-deaths

@@ -1,4 +1,4 @@
-"""Handle submission of chart revisions."""
+"""Handle submission of chart updates."""
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List
 from urllib.error import URLError
@@ -87,13 +87,13 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 
 
 def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any]) -> None:
-    """Push submissions to the database."""
+    """Updating charts in the database."""
     # API to interact with the admin tool
     engine = get_engine()
     # HACK: Forcing grapher user to be Admin so that it is detected by staging sync.
     api = AdminAPI(engine, grapher_user_id=1)
     # Update charts
-    progress_text = "Submitting chart revisions..."
+    progress_text = "Updating charts..."
     bar = st.progress(0, progress_text)
     try:
         for i, chart in enumerate(charts):
@@ -119,7 +119,10 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
             percent_complete = int(100 * (i + 1) / len(charts))
             bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")
     except Exception as e:
-        st.error(f"Something went wrong! {e}")
+        st.error(
+            "Something went wrong! Maybe the server was not properly launched? Check the job on the GitHub pull request."
+        )
+        st.exception(e)
     else:
         st.success("The charts were successfully updated! Review the changes with `chart diff`")
         st_page_link("chart_diff")

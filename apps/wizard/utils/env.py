@@ -1,77 +1,122 @@
 """Tools to handle OWID environment."""
-from typing import Literal, Optional
+import re
+from dataclasses import dataclass, fields
+from pathlib import Path
+from typing import Literal, cast
 
+from dotenv import dotenv_values
 from typing_extensions import Self
 
 from etl import config
+from etl.db import Engine, get_engine
 
-OWIDEnvType = Literal["live", "staging", "local", "remote-staging", "unknown"]
+OWIDEnvType = Literal["production", "local", "staging", "unknown"]
+
+
+@dataclass
+class Config:
+    """Configuration for OWID environment which is a subset of etl.config."""
+
+    DB_USER: str
+    DB_NAME: str
+    DB_PASS: str
+    DB_PORT: str
+    DB_HOST: str
+
+    @classmethod
+    def from_env_file(cls, env_file: str) -> Self:
+        env_dict = dotenv_values(env_file)
+        config_dict = {field.name: env_dict[field.name] for field in fields(cls)}
+        return cls(**config_dict)  # type: ignore
+
+
+class UnknownOWIDEnv(Exception):
+    pass
 
 
 class OWIDEnv:
     """OWID environment."""
 
     env_type_id: OWIDEnvType
+    conf: Config
 
     def __init__(
         self: Self,
-        env_type_id: Optional[OWIDEnvType] = None,
+        conf: Config | None = None,
     ) -> None:
-        if env_type_id is None:
-            self.env_type_id = self.detect_env_type()
-        else:
-            self.env_type_id = env_type_id
+        self.conf = conf or cast(Config, config)
+        self.env_type_id = self.detect_env_type()
 
     def detect_env_type(self: Self) -> OWIDEnvType:
         """Detect environment type."""
-        # live
-        if config.DB_NAME == "live_grapher":
-            return "live"
-        # staging
-        elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":
-            return "staging"
+        # production
+        if self.conf.DB_NAME == "live_grapher":
+            return "production"
         # local
-        elif config.DB_NAME == "grapher" and config.DB_USER == "grapher":
+        elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
             return "local"
         # other
-        elif config.DB_NAME == "owid" and config.DB_USER == "owid":
-            return "remote-staging"
+        elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
+            return "staging"
         return "unknown"
+
+    @classmethod
+    def from_staging(cls, branch: str) -> Self:
+        """Create OWIDEnv for staging."""
+        conf = Config(
+            DB_USER="owid",
+            DB_NAME="owid",
+            DB_PASS="",
+            DB_PORT="3306",
+            DB_HOST=get_container_name(branch),
+        )
+        return cls(conf)
+
+    @classmethod
+    def from_env_file(cls, env_file: str) -> Self:
+        """Create OWIDEnv from env file."""
+        assert Path(env_file).exists(), f"ENV file {env_file} doesn't exist"
+        return cls(conf=Config.from_env_file(env_file))
+
+    @classmethod
+    def from_staging_or_env_file(cls, staging_or_env_file: str) -> Self:
+        """Create OWIDEnv from staging or env file."""
+        if Path(staging_or_env_file).exists():
+            return cls.from_env_file(staging_or_env_file)
+        return cls.from_staging(staging_or_env_file)
+
+    def get_engine(self) -> Engine:
+        """Get engine for env."""
+        return get_engine(self.conf.__dict__)
 
     @property
     def site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "https://ourworldindata.org"
-        elif self.env_type_id == "staging":
-            return "https://staging.ourworldindata.org"
         elif self.env_type_id == "local":
             return "http://localhost:3030"
-        elif self.env_type_id == "remote-staging":
-            return f"http://{config.DB_HOST}"
+        elif self.env_type_id == "staging":
+            return f"http://{self.conf.DB_HOST}"
         return None
 
     @property
     def name(self) -> str:
         """Get site."""
-        if self.env_type_id == "live":
+        if self.env_type_id == "production":
             return "production"
-        elif self.env_type_id == "staging":
-            return "staging"
         elif self.env_type_id == "local":
             return "local"
-        elif self.env_type_id == "remote-staging":
-            return f"{config.DB_HOST}"
+        elif self.env_type_id == "staging":
+            return f"{self.conf.DB_HOST}"
         raise ValueError("Unknown env_type_id")
 
     @property
     def base_site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "live":
-            return "https://owid.cloud"
-        elif self.env_type_id == "staging":
-            return "https://staging.owid.cloud"
-        elif self.env_type_id in ["local", "remote-staging"]:
+        if self.env_type_id == "production":
+            return "https://admin.owid.io"
+        elif self.env_type_id in ["local", "staging"]:
             return self.site
         return None
 
@@ -84,9 +129,26 @@ class OWIDEnv:
             return f"{self.base_site}/admin"
 
     @property
+    def api_site(self: Self) -> str:
+        """Get api url."""
+        if self.env_type_id == "production":
+            return "https://api.ourworldindata.org"
+        elif self.env_type_id == "staging":
+            return f"https://api-staging.owid.io/{self.conf.DB_HOST}"
+        elif self.env_type_id == "local":
+            return "http://localhost:8000"
+        else:
+            raise UnknownOWIDEnv()
+
+    @property
     def chart_approval_tool_url(self: Self) -> str:
         """Get chart approval tool url."""
         return f"{self.admin_site}/suggested-chart-revisions/review"
+
+    @property
+    def indicators_url(self: Self) -> str:
+        """Get indicators url."""
+        return self.api_site + "/v1/indicators/"
 
     def dataset_admin_site(self: Self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
@@ -110,6 +172,22 @@ class OWIDEnv:
         Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
         """
         return f"{self.site}/grapher/thumbnail/{slug}.png"
+
+
+def _normalise_branch(branch_name):
+    return re.sub(r"[\/\._]", "-", branch_name)
+
+
+def get_container_name(branch_name):
+    normalized_branch = _normalise_branch(branch_name)
+
+    # Strip staging-site- prefix to add it back later
+    normalized_branch = normalized_branch.replace("staging-site-", "")
+
+    # Ensure the container name is less than 63 characters
+    container_name = f"staging-site-{normalized_branch[:50]}"
+    # Remove trailing hyphens
+    return container_name.rstrip("-")
 
 
 OWID_ENV = OWIDEnv()
