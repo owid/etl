@@ -82,7 +82,6 @@ def add_relative_indicator(tb: Table, colname: str):
         "Caucasus",
         "Caribbean",
         "Undetermined",
-
     ]
 
     # Split data into regions and countries
