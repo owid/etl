@@ -731,6 +731,15 @@ steps:
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
 
+  # Attention in Media: The Guardian
+  data://meadow/news/2024-05-08/guardian_mentions:
+    - snapshot://news/2024-05-07/guardian_mentions.csv
+    - snapshot://news/2024-05-07/guardian_mentions_raw.csv
+  data://garden/news/2024-05-08/guardian_mentions:
+    - data://meadow/news/2024-05-08/guardian_mentions
+  data://grapher/news/2024-05-08/guardian_mentions:
+    - data://garden/news/2024-05-08/guardian_mentions
+
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
 
