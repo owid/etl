@@ -73,6 +73,14 @@ steps:
   data://grapher/wb/2024-03-26/food_prices_for_nutrition:
     - data://garden/wb/2024-03-26/food_prices_for_nutrition
 
+  #
+  # Harris et al. (2015) - Daily calories in England and Wales, according to various studies.
+  #
+  data://meadow/agriculture/2024-05-23/harris_et_al_2015:
+    - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
+  data://garden/agriculture/2024-05-23/daily_calories_per_person:
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
   ######################################################################################################################
