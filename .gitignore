@@ -51,3 +51,5 @@ site/
 .ipynb_lock
 .execution_time.json
 
+
+notebooks/
