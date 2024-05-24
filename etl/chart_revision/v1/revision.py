@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Literal, Optional, cast
 
 import pandas as pd
 import simplejson as json
-from MySQLdb import IntegrityError
+from pymysql import IntegrityError
 from sqlalchemy import text
 from structlog import get_logger
 

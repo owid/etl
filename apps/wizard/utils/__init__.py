@@ -21,8 +21,8 @@ from typing import Any, Callable, Dict, List, Optional, cast
 import bugsnag
 import streamlit as st
 import streamlit.components.v1 as components
-from MySQLdb import OperationalError
 from owid.catalog import Dataset
+from pymysql import OperationalError
 from structlog import get_logger
 from typing_extensions import Self
 
