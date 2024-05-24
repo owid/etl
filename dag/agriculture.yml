@@ -80,6 +80,8 @@ steps:
     - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
     - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+  data://grapher/agriculture/2024-05-23/daily_calories_per_person:
+    - data://garden/agriculture/2024-05-23/daily_calories_per_person
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
