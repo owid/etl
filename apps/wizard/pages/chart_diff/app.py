@@ -277,15 +277,22 @@ def main():
             on_click=lambda e=source_engine: reject_chart_diffs(e),
         )
 
-        st.toggle(
-            "Hide appoved charts",
-            key="hide-approved-charts",
-            on_change=lambda: set_states(
+        def hide_approved():
+            set_states(
                 {
                     "hide_approved_charts": not st.session_state.hide_approved_charts,
                 }
-            ),
-        )
+            )
+
+            # Hide approved (if option selected)
+            if st.session_state.hide_approved_charts:
+                st.session_state.chart_diffs_filtered = {
+                    k: v for k, v in st.session_state.chart_diffs.items() if not v.approved
+                }
+            else:
+                st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
+
+        st.toggle("Hide appoved charts", key="hide-approved-charts", on_change=hide_approved)
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:
@@ -297,12 +304,8 @@ def main():
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
     )
 
-    # Hide approved (if option selected)
-    if st.session_state.hide_approved_charts:
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs.items() if not v.approved
-        }
-    else:
+    # Init, can be changed by the toggle
+    if not hasattr(st.session_state, "chart_diffs_filtered"):
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
     # Modified / New charts
