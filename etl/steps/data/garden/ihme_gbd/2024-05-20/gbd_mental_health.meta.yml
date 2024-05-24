@@ -3,19 +3,14 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Global Health
-        - Causes of Death
-  value_deaths:
+        - Mental Health
+  value:
     unit: |-
       <% if metric == "Number" %>
-      deaths
+      cases
       <% elif metric == "Rate" %>
-      deaths per 100,000 people
-      <% elif metric == "Percent" %>
-      share of total deaths
+      cases per 100,000 people
       <%- endif -%>
-    short_unit: |-
-      <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from << cause.lower() >>, among individuals aged << age >>
