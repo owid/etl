@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = paths.meadow_dataset
-    df = pd.DataFrame(ds_meadow["ghe"])
+    df = pd.DataFrame(ds_meadow["ghe"]).reset_index()
     df = df.drop(columns="flag_level")
     # Load countries regions
     regions_dataset: Dataset = paths.load_dataset("regions")
