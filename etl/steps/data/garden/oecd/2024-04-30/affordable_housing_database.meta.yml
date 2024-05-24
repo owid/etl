@@ -198,7 +198,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_2_3:
@@ -220,7 +220,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_1_2_3:
@@ -242,7 +242,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_total:
@@ -264,7 +264,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1:
@@ -283,7 +283,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_2_3:
@@ -302,7 +302,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1_2_3:
@@ -321,7 +321,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_total:
@@ -340,7 +340,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1_2_3:
