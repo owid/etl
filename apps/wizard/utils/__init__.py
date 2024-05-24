@@ -647,3 +647,51 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kw
     """
 
     components.html(HTML, height=height, **kwargs)
+
+
+class Pagination:
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+        self.items = items
+        self.items_per_page = items_per_page
+        self.pagination_key = pagination_key
+
+        # Initialize session state for the current page
+        if self.pagination_key not in st.session_state:
+            self.page = 1
+
+    @property
+    def page(self):
+        return st.session_state[self.pagination_key]
+
+    @page.setter
+    def page(self, value):
+        st.session_state[self.pagination_key] = value
+
+    @property
+    def total_pages(self) -> int:
+        return (len(self.items) - 1) // self.items_per_page + 1
+
+    def get_page_items(self) -> list[Any]:
+        page = self.page
+        start_idx = (page - 1) * self.items_per_page
+        end_idx = start_idx + self.items_per_page
+        return self.items[start_idx:end_idx]
+
+    def show_controls(self) -> None:
+        # Pagination controls
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if self.page > 1:
+                if st.button("Previous"):
+                    self.page -= 1
+                    st.rerun()
+
+        with col3:
+            if self.page < self.total_pages:
+                if st.button("Next"):
+                    self.page += 1
+                    st.rerun()
+
+        with col2:
+            st.write(f"Page {self.page} of {self.total_pages}")

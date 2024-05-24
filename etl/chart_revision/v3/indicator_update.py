@@ -108,8 +108,8 @@ def update_chart_config_map(
 ) -> Dict[str, Any]:
     """Update map config."""
     log.info("variable_update: updating map config")
-    # Proceed only if chart uses map
-    if config["hasMapTab"]:
+    # Proceed only if chart uses map and has `map` field
+    if config["hasMapTab"] and "map" in config:
         log.info("variable_update: chart uses map")
         # Get map.columnSlug
         map_var_id = config["map"].get(
