@@ -358,8 +358,8 @@ class Chart(Base):
         where ct.chartId = :chart_id
         """
         )
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
-        return list(rows)
+        rows = session.execute(q, params={"chart_id": self.id}).mappings().all()
+        return list(map(dict, rows))
 
     def remove_nonexisting_map_column_slug(self, session: Session) -> None:
         """Remove map.columnSlug if the variable doesn't exist. It'd be better
@@ -643,7 +643,7 @@ class Source(Base):
             )
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
-        return [cls(**d) for d in sources.to_dict(orient="records")]  # type: ignore
+        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # type: ignore
 
 
 class SuggestedChartRevisions(Base):
@@ -1291,7 +1291,7 @@ class Origin(Base):
             descriptionSnapshot=origin.description_snapshot,
             description=origin.description,
             datePublished=origin.date_published,
-            dateAccessed=origin.date_accessed,
+            dateAccessed=origin.date_accessed,  # type: ignore
         )
 
     @property
