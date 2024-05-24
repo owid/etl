@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - Mental Health
     processing_level: minor
+  sex: |-
+    <% if sex == "Both sexes" %> individuals <% elif sex == "Male" %> male <% elif sex == "Female" %> female <%- endif -%>
   value:
     unit: |-
       <% if metric == "Number" %>
@@ -12,35 +14,33 @@ definitions:
       <% elif metric == "Rate" %>
       cases per 100,000 people
       <%- endif -%>
-    sex: |-
-      <% if sex == "Both" %>individuals<% sex == "Female"%>female<% sex == "Male"%>male<% endif %>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.value.sex} aged << age >>
+      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized current number of {definitions.value.sex} with << cause.lower() >>
+      Age-standardized current number of {definitions.sex} with << cause.lower() >>
       <% elif metric == "Number" and age == 'All ages'%>
-      Total current number of {definitions.value.sex} with << cause.lower() >>
+      Total current number of {definitions.sex} with << cause.lower() >>
       <% elif metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.value.sex} aged << age >>, per 100,000 people
+      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>, per 100,000 people
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized current cases of {definitions.value.sex} with << cause.lower() >>, per 100,000 people
+      Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100,000 people
       <% elif metric == "Number" and age == 'All ages'%>
-      Total current number of {definitions.value.sex} with << cause.lower() >>, per 100,000 people
+      Total current number of {definitions.sex} with << cause.lower() >>, per 100,000 people
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.value.sex} aged << age >>.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized {definitions.value.sex} aged << age >> with << cause.lower() >>.
+      The estimated number of age-standardized {definitions.sex} aged << age >> with << cause.lower() >>.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.value.sex} aged << age >>.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>.
       <% elif metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.value.sex} aged << age >>, per 100,000 people.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized {definitions.value.sex} aged << age >> with << cause.lower() >>, per 100,000 people.
+      The estimated number of age-standardized {definitions.sex} aged << age >> with << cause.lower() >>, per 100,000 people.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.value.sex} aged << age >>, per 100,000 people.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
