@@ -666,7 +666,11 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     counts["n_events"] = counts["n_events"].copy_metadata(tb["total_dead"])
     # Ensure columns have the right type.
     tb = tb.astype(
-        {column: int for column in tb.columns if column not in ["country", "year", "type", "start_date", "end_date"]}
+        {
+            column: "Int64"
+            for column in tb.columns
+            if column not in ["country", "year", "type", "start_date", "end_date"]
+        }
     )
     # Get the sum of impacts per country, year and type of disaster.
     tb = tb.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
@@ -823,14 +827,14 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool, ds_regions: Dataset) ->
         "country",
         "year",
         "type",
-        "total_dead",
-        "injured",
-        "affected",
-        "homeless",
-        "total_affected",
-        "reconstruction_costs",
-        "insured_damages",
-        "total_damages",
+        # "total_dead",
+        # "injured",
+        # "affected",
+        # "homeless",
+        # "total_affected",
+        # "reconstruction_costs",
+        # "insured_damages",
+        # "total_damages",
         "n_events",
     ]
     error = "There are unexpected nans in data."
@@ -965,7 +969,10 @@ def run(dest_dir: str) -> None:
     )
 
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
-    tb = calculate_yearly_impacts(tb=tb)
+    ####################################################################################################################
+    # TODO: Fix the following function to be able to handle missing values.
+    # tb = calculate_yearly_impacts(tb=tb)
+    ####################################################################################################################
 
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
