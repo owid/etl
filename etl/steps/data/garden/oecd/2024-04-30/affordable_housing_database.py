@@ -22,7 +22,6 @@ DEFAULT_YEAR = 2023
 NEW_YEARS_PIT_FLOW = {
     2022: [
         "Austria",
-        "Belgium",
         "Canada",
         "Czechia",
         "Denmark",

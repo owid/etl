@@ -8,6 +8,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
+
 import json
 from datetime import date, datetime
 from pathlib import Path
@@ -44,7 +45,7 @@ from sqlalchemy.dialects.mysql import (
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
 from sqlalchemy.sql import Select
-from typing_extensions import TypedDict
+from typing_extensions import Self, TypedDict
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
@@ -64,6 +65,27 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
     def dict(self) -> Dict[str, Any]:
         return {field.name: getattr(self, field.name) for field in self.__table__.c}
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Create an object from dictionary. This method is a workaround for cls(**d)
+        when you want to initialize it with `id`. Typically `id` field has init=False which
+        raises an error. This method creates an object and sets the id later.
+
+        There might be a more native way to do this, but I haven't found it yet.
+        """
+
+        set_after_init = {}
+        for k, field in cls.__dataclass_fields__.items():
+            if not field.init and k in d:
+                set_after_init[k] = d.pop(k)
+
+        x = cls(**d)
+
+        for k, v in set_after_init.items():
+            setattr(x, k, v)
+
+        return x
 
 
 class Entity(Base):
@@ -263,8 +285,9 @@ class Chart(Base):
         where cd.chartId = :chart_id
         """
         )
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
-        variables = {r["id"]: Variable(**r) for r in rows}
+        stm = select(Variable).from_statement(q).params(chart_id=self.id)
+        rows = session.execute(stm).scalars().all()
+        variables = {r.id: r for r in rows}
 
         # add columnSlug if present
         column_slug = self.config.get("map", {}).get("columnSlug")
@@ -311,7 +334,8 @@ class Chart(Base):
             # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
             remap_ids[source_var_id] = target_var.id
 
-        target_chart = Chart(**self.dict())
+        # copy chart as a new object
+        target_chart = Chart.from_dict(self.dict())
         del target_chart.id
         target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
 
@@ -335,8 +359,8 @@ class Chart(Base):
         where ct.chartId = :chart_id
         """
         )
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
-        return list(rows)
+        rows = session.execute(q, params={"chart_id": self.id}).mappings().all()
+        return list(map(dict, rows))
 
     def remove_nonexisting_map_column_slug(self, session: Session) -> None:
         """Remove map.columnSlug if the variable doesn't exist. It'd be better
@@ -620,7 +644,7 @@ class Source(Base):
             )
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
-        return [cls(**d) for d in sources.to_dict(orient="records")]  # type: ignore
+        return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # type: ignore
 
 
 class SuggestedChartRevisions(Base):
@@ -1268,7 +1292,7 @@ class Origin(Base):
             descriptionSnapshot=origin.description_snapshot,
             description=origin.description,
             datePublished=origin.date_published,
-            dateAccessed=origin.date_accessed,
+            dateAccessed=origin.date_accessed,  # type: ignore
         )
 
     @property
@@ -1343,9 +1367,9 @@ class ChartDiffApprovals(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
-    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
     def latest_chart_status(
