@@ -10,7 +10,7 @@ from git.repo import Repo
 from owid.catalog import Dataset, DatasetMeta, Origin, Source, Table
 from owid.datautils import io
 from rich.console import Console
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.utils.files import add_to_dag

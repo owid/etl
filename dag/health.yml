@@ -554,6 +554,7 @@ steps:
     - data://garden/worldbank_wdi/2023-05-29/wdi
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding
+
     # WHO Avian Influenza H5N1
   data://meadow/who/2024-04-26/avian_influenza_ah5n1:
     - snapshot://who/2024-04-26/avian_influenza_ah5n1.csv
@@ -562,6 +563,16 @@ steps:
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
+
+  # IHME GBD - Burden of Disease (2021) - Impairments from NTDs
+  data-private://meadow/ihme_gbd/2024-05-20/impairments:
+    - snapshot-private://ihme_gbd/2024-05-20/impairments.csv
+  data-private://garden/ihme_gbd/2024-05-20/impairments:
+    - data-private://meadow/ihme_gbd/2024-05-20/impairments
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data-private://grapher/ihme_gbd/2024-05-20/impairments:
+    - data-private://garden/ihme_gbd/2024-05-20/impairments
 
   # WHO Preventive Chemotherapy - Neglected Tropical Diseases
   # Lymphatic filariasis

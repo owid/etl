@@ -3,7 +3,7 @@ from unittest import mock
 
 import pandas as pd
 import pytest
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,

@@ -721,7 +721,11 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     d = meta.to_dict()
+    # remove noise
     d.pop("processing_log", None)
+    for source in d.get("sources", []):
+        source.pop("date_accessed", None)
+        source.pop("publication_date", None)
     return d
 
 

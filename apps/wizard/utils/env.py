@@ -1,4 +1,5 @@
 """Tools to handle OWID environment."""
+
 import re
 from dataclasses import dataclass, fields
 from pathlib import Path

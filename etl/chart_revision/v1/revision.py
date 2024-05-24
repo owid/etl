@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Literal, Optional, cast
 import pandas as pd
 import simplejson as json
 from MySQLdb import IntegrityError
+from sqlalchemy import text
 from structlog import get_logger
 
 from etl.chart_revision.v1.chart import Chart
@@ -342,10 +343,11 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
     n_before = 0
     try:
         with get_engine().connect() as con:
-            n_before = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
+            n_before = con.execute(text("SELECT COUNT(id) FROM suggested_chart_revisions")).one()
 
             res = con.execute(
-                """
+                text(
+                    """
                 SELECT *
                 FROM (
                     SELECT chartId, COUNT(chartId) as c
@@ -356,6 +358,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                     ) as grouped
                 WHERE grouped.c > 1
             """
+                )
             ).fetchmany()
             if len(res):
                 raise RuntimeError(
@@ -387,14 +390,15 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                 VALUES
                     (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             """
-            con.execute(query, tuples)
+            con.execute(text(query), tuples)
 
             # checks if any of the affected chartIds now has multiple
             # pending suggested revisions. If so, then rejects the whole
             # insert and tell the user which suggested chart revisions need
             # to be approved/rejected.
             res = con.execute(
-                f"""
+                text(
+                    f"""
                 SELECT id, scr.chartId, c, createdAt
                 FROM (
                     SELECT chartId, COUNT(chartId) as c
@@ -411,6 +415,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                 WHERE grouped.c > 1
                 ORDER BY createdAt ASC
             """
+                )
             ).fetchmany()
             if len(res):
                 df = pd.DataFrame(res, columns=["id", "chart_id", "count", "created_at"])
@@ -442,7 +447,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
         raise e
     finally:
         with get_engine().connect() as con:
-            n_after = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
+            n_after = con.execute(text("SELECT COUNT(id) FROM suggested_chart_revisions")).one()[0]
 
         log.info(f"{n_after - n_before} of {len(revisions)} suggested chart revisions inserted.")
 
@@ -455,19 +460,23 @@ def _get_chart_update_reason(variable_ids: List[int]) -> str:
         with get_engine().connect() as con:
             if len(variable_ids) == 1:
                 results = con.execute(
-                    f"""
+                    text(
+                        f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN ({variable_ids[0]})
                         """
+                    )
                 ).fetchmany()
             else:
                 results = con.execute(
-                    f"""
+                    text(
+                        f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN {*variable_ids,}
                         """
+                    )
                 ).fetchmany()
     except Exception:
         log.error(

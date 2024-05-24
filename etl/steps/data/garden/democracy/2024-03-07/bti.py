@@ -338,52 +338,5 @@ def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Ta
 
     # Limit years
     tb_exp = tb_exp.loc[tb_exp["year"].isin(range(YEAR_MIN, YEAR_MAX + 1, 2))]
-    # tb_exp = tb_exp[tb_exp["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
-
-    # # Limit entries to avoid duplicates
-    # tb_exp = tb_exp.loc[
-    #     ~(
-    #         # YUGOSLAVIA
-    #         ((tb_exp["country"] == "Yugoslavia") & ((tb_exp["year"] > 1990) | (tb_exp["year"] < 1921)))
-    #         | ((tb_exp["country"] == "Slovenia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
-    #         | ((tb_exp["country"] == "North Macedonia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
-    #         | ((tb_exp["country"] == "Croatia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1990)))
-    #         | ((tb_exp["country"] == "Serbia and Montenegro") & ((tb_exp["year"] > 2005) | (tb_exp["year"] <= 1990)))
-    #         ## YUG 2
-    #         | ((tb_exp["country"] == "Bosnia and Herzegovina") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 1991)))
-    #         | ((tb_exp["country"] == "Serbia") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2005)))
-    #         | ((tb_exp["country"] == "Montenegro") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2005)))
-    #         | ((tb_exp["country"] == "Kosovo") & ((tb_exp["year"] >= 1921) & (tb_exp["year"] <= 2007)))
-    #         # YEMEN
-    #         | ((tb_exp["country"] == "Yemen Arab Republic") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1940)))
-    #         | ((tb_exp["country"] == "Yemen People's Republic") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1940)))
-    #         | ((tb_exp["country"] == "Yemen") & ((tb_exp["year"] >= 1940) & (tb_exp["year"] <= 1989)))
-    #         # GERMANY
-    #         | ((tb_exp["country"] == "West Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1949)))
-    #         | ((tb_exp["country"] == "East Germany") & ((tb_exp["year"] > 1989) | (tb_exp["year"] < 1949)))
-    #         | ((tb_exp["country"] == "Germany") & (tb_exp["year"] >= 1949) & (tb_exp["year"] <= 1989))
-    #         # USSR
-    #         | ((tb_exp["country"] == "USSR") & ((tb_exp["year"] > 1991) | (tb_exp["year"] < 1941)))
-    #         | ((tb_exp["country"] == "Uzbekistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Kazakhstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Turkmenistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Kyrgyzstan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Tajikistan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Russia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Ukraine") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Belarus") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Moldova") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Latvia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Lithuania") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Estonia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Armenia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Georgia") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         | ((tb_exp["country"] == "Azerbaijan") & (tb_exp["year"] >= 1941) & (tb_exp["year"] <= 1991))
-    #         # CZECHOSLOVAKIA
-    #         | ((tb_exp["country"] == "Czechoslovakia") & ((tb_exp["year"] > 1992) | (tb_exp["year"] < 1918)))
-    #         | ((tb_exp["country"] == "Czechia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
-    #         | ((tb_exp["country"] == "Slovakia") & ((tb_exp["year"] <= 1992) & (tb_exp["year"] >= 1918)))
-    #     ),
-    # ]
 
     return tb_exp
