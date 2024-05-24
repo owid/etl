@@ -5,7 +5,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Map of variable titles to their corresponding public titles.
-TITLE_MAPPING = {
+TITLE_IMPACT = {
     "Natural disasters": "Annual number of natural disasters",
     "Natural disasters per 100,000 people": "Annual rate of natural disasters",
     "Affected": "Annual number of people requiring immediate assistance",
@@ -24,6 +24,40 @@ TITLE_MAPPING = {
     "Reconstruction costs as a share of GDP": "Annual reconstruction costs as a share of GDP",
     "Total economic damages": "Annual economic damages",
     "Total economic damages as a share of GDP": "Annual economic damages as a share of GDP",
+}
+# Map disaster type to their name in the title (singular).
+TITLE_DISASTER = {
+    "earthquake": "Earthquake",
+    "extreme_weather": "Extreme weather",
+    "volcanic_activity": "Volcanic activity",
+    "flood": "Flood",
+    "all_disasters": "All disasters",
+    "glacial_lake_outburst_flood": "Glacial lake outburst flood",
+    "all_disasters_excluding_earthquakes": "All disasters excluding earthquakes",
+    "wildfire": "Wildfire",
+    "wet_mass_movement": "Wet mass movement",
+    "dry_mass_movement": "Dry mass movement",
+    "fog": "Fog",
+    "drought": "Drought",
+    "extreme_temperature": "Extreme temperature",
+    "all_disasters_excluding_extreme_temperature": "All disasters excluding extreme temperature",
+}
+# Map disaster type to their name in the title (plural).
+TITLE_DISASTER_PLURAL = {
+    "earthquake": "earthquakes",
+    "extreme_weather": "extreme weather events",
+    "volcanic_activity": "volcanic activity",
+    "flood": "floods",
+    "all_disasters": "all disasters",
+    "glacial_lake_outburst_flood": "glacial lake outburst floods",
+    "all_disasters_excluding_earthquakes": "all disasters excluding earthquakes",
+    "wildfire": "wildfires",
+    "wet_mass_movement": "wet mass movements",
+    "dry_mass_movement": "dry mass movements",
+    "fog": "fogs",
+    "drought": "droughts",
+    "extreme_temperature": "extreme temperatures",
+    "all_disasters_excluding_extreme_temperature": "all disasters excluding extreme temperatures",
 }
 
 
@@ -45,12 +79,13 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
     # Improve variable names and titles.
     for column in table_wide.drop(columns=["country", "year"], errors="raise").columns:
         old_title = table_wide[column].metadata.title
-        impact, disaster = column.split("-")
-        disaster = disaster.replace("_", " ")
-        new_title = old_title + " - " + disaster.capitalize() + variable_title_suffix
-        new_title_public = f"{variable_title_public_prefix}{TITLE_MAPPING[old_title]} from {disaster + 's' if disaster[-1] != 's' else disaster}"
+        _, disaster = column.split("-")
+        new_title = old_title + " - " + TITLE_DISASTER[disaster] + variable_title_suffix
+        new_title_public = (
+            f"{variable_title_public_prefix}{TITLE_IMPACT[old_title]} from {TITLE_DISASTER_PLURAL[disaster]}"
+        )
         table_wide[column].metadata.title = new_title
-        table_wide[column].metadata.display = {"name": disaster.capitalize()}
+        table_wide[column].metadata.display = {"name": TITLE_DISASTER[disaster]}
         table_wide[column].metadata.presentation.title_public = new_title_public
         table_wide = table_wide.rename(
             columns={column: column.replace("-", "_") + variable_name_suffix}, errors="raise"
