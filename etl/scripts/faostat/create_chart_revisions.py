@@ -16,9 +16,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from MySQLdb import IntegrityError
 from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
+from pymysql import IntegrityError
 from structlog import get_logger
 
 from etl import db

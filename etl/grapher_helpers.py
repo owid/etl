@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 import structlog
 from jinja2 import Environment
-from MySQLdb import IntegrityError
 from owid import catalog
 from owid.catalog.utils import underscore
+from pymysql import IntegrityError
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 

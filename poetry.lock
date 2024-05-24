@@ -3454,24 +3454,6 @@ files = [
 ]
 
 [[package]]
-name = "mysqlclient"
-version = "2.2.3"
-description = "Python interface to MySQL"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "mysqlclient-2.2.3-cp310-cp310-win_amd64.whl", hash = "sha256:5a5451b3eea2a2a3316b2b432c89f25b1a28b986aa924a04aca659ad454e9a5f"},
-    {file = "mysqlclient-2.2.3-cp311-cp311-win_amd64.whl", hash = "sha256:2fa388cf076d3fee010d7094ca979fc8236988159c762becfea4d42cd56e6580"},
-    {file = "mysqlclient-2.2.3-cp312-cp312-win_amd64.whl", hash = "sha256:c37a7f641fa2e0582bf6808851dc4b82736b61ccb39e1607e59dce797db3f6c5"},
-    {file = "mysqlclient-2.2.3-cp38-cp38-win_amd64.whl", hash = "sha256:c79740385d9df70606e87dade197c5fce5c0d22c0e5c40cd048cfa693daa0e7b"},
-    {file = "mysqlclient-2.2.3-cp39-cp39-win_amd64.whl", hash = "sha256:7d74de2fa08dc7483b5ec82e130fde6d965f53c9ac6bf678f6d6c362c952b8b6"},
-    {file = "mysqlclient-2.2.3-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:90164463c0bda46ebe9f8ca2b7ec502ff915ab1c23af54bdf60997fc4c59e47c"},
-    {file = "mysqlclient-2.2.3-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:8b34574bceb548ac94a31c8cc1f67d454f414e5dee240dd29ad0e09405756638"},
-    {file = "mysqlclient-2.2.3-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:a47d266820fb8da26582cddc98ded1546edc7a0def556b0ca8de4a1a7dd8505c"},
-    {file = "mysqlclient-2.2.3.tar.gz", hash = "sha256:ee51656e36fc5a92920b807ee8b9e373e3b0e267c89cdc95d73b1dbe46863631"},
-]
-
-[[package]]
 name = "nbclient"
 version = "0.8.0"
 description = "A client library for executing notebooks. Formerly nbconvert's ExecutePreprocessor."
@@ -3794,10 +3776,10 @@ files = [
 
 [[package]]
 name = "owid-catalog"
-version = "0.3.9"
+version = "0.3.11"
 description = "Core data types used by OWID for managing data."
 optional = false
-python-versions = ">=3.9, <3.12"
+python-versions = ">=3.9,<4"
 files = []
 develop = true
 
@@ -4671,6 +4653,21 @@ pyyaml = "*"
 
 [package.extras]
 extra = ["pygments (>=2.12)"]
+
+[[package]]
+name = "pymysql"
+version = "1.1.1"
+description = "Pure Python MySQL Driver"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "PyMySQL-1.1.1-py3-none-any.whl", hash = "sha256:4de15da4c61dc132f4fb9ab763063e693d521a80fd0e87943b9a453dd4c19d6c"},
+    {file = "pymysql-1.1.1.tar.gz", hash = "sha256:e127611aaf2b417403c60bf4dc570124aeb4a57f5f37b8e95ae399a42f904cd0"},
+]
+
+[package.extras]
+ed25519 = ["PyNaCl (>=1.4.0)"]
+rsa = ["cryptography"]
 
 [[package]]
 name = "pynacl"
@@ -7762,4 +7759,4 @@ test = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "1d68ff59ce8d75fda96192fa02d30ba98623ea95350eb00840e579c7918cf3d2"
+content-hash = "5878b91ab05beb9e1ec60dd3aa17fb94d7794f0b5eda6dd46224374e7e18e9f3"

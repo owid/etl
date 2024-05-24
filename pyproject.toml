@@ -22,7 +22,6 @@ PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
 # we had to pin this because of this bug https://github.com/owid/etl/issues/2320, versions newer than 2.2.4 might be working again
-mysqlclient = "2.2.3"
 SPARQLWrapper = ">=1.8.5"
 openpyxl = ">=3.0.9"
 sh = "1.14.3"
@@ -70,6 +69,7 @@ html2text = "^2020.1.16"
 pygithub = "^2.3.0"
 pandas = "2.2.1"
 sqlalchemy = "^2.0.30"
+pymysql = "^1.1.1"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
