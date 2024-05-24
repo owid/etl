@@ -622,3 +622,5 @@ steps:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.csv
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health.csv
