@@ -617,10 +617,17 @@ steps:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
   data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+
   # GBD 2021 - GBD Prevalence
   data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.csv
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+
+  # GBD 2021 - GBD Mental Health
   data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health.csv
+  data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health
