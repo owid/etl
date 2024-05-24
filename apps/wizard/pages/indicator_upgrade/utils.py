@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 import streamlit as st
-from MySQLdb import OperationalError
+from pymysql import OperationalError
 from rapidfuzz import fuzz
 from structlog import get_logger
 

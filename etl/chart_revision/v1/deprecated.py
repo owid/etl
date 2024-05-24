@@ -17,7 +17,7 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Union, c
 import pandas as pd
 import simplejson as json
 import structlog
-from MySQLdb import IntegrityError
+from pymysql import IntegrityError
 from sqlalchemy import text
 from tqdm import tqdm
 
