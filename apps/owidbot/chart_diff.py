@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.staging_sync.cli import _modified_chart_ids_by_admin

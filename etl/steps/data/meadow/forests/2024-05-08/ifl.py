@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = pr.melt(tb, ["Name"], var_name="year_unit", value_name="ifl_area")
-    tb["year"] = tb["year_unit"].str.extract("(\d{4})")[0]
+    tb["year"] = tb["year_unit"].str.extract("(\d{4})")[0]  # type: ignore
     tb = tb.drop(columns=["year_unit"])
     tb = tb.rename(columns={"Name": "country"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.

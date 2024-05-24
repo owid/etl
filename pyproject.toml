@@ -35,7 +35,6 @@ wikipedia = ">=1.4.0"
 numpy = ">=1.22.1"
 pydantic = ">=1.9.0"
 structlog = ">=21.5.0"
-sqlmodel = "^0.0.6"
 rich = ">=12.1.0"
 owid-datautils = {path = "lib/datautils", develop = true}
 rich-click = ">=1.7.3"
@@ -70,6 +69,7 @@ tiktoken = "^0.6.0"
 html2text = "^2020.1.16"
 pygithub = "^2.3.0"
 pandas = "2.2.1"
+sqlalchemy = "^2.0.30"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
@@ -115,6 +115,7 @@ mkdocs-git-authors-plugin = "^0.7.2"
 mkdocs-git-revision-date-localized-plugin = "^1.2.4"
 mkdocs-click = "^0.8.1"
 mkdocs-glightbox = "^0.3.7"
+sqlacodegen = {git = "https://github.com/agronholm/sqlacodegen.git"}
 
 [tool.ruff]
 extend-select = [

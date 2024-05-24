@@ -8,7 +8,8 @@ from typing import Any, Dict, List, Tuple, cast
 import rich_click as click
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -154,7 +155,7 @@ def cli(
 
         # Get revision for a specific ID
         if revision_id:
-            revisions = session.exec(
+            revisions = session.scalars(
                 select(gm.SuggestedChartRevisions)
                 .where(gm.SuggestedChartRevisions.status == "pending")
                 .where(gm.SuggestedChartRevisions.id == revision_id)
@@ -162,14 +163,14 @@ def cli(
 
         # Get revisions for a specific user
         elif user_id:
-            revisions = session.exec(
+            revisions = session.scalars(
                 select(gm.SuggestedChartRevisions)
                 .where(gm.SuggestedChartRevisions.status == "pending")
                 .where(gm.SuggestedChartRevisions.createdBy == user_id)
             ).all()
         # Get all revisions
         else:
-            revisions = session.exec(
+            revisions = session.scalars(
                 select(gm.SuggestedChartRevisions).where(gm.SuggestedChartRevisions.status == "pending")
             ).all()
 

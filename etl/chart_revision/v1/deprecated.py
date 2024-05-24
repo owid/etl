@@ -18,6 +18,7 @@ import pandas as pd
 import simplejson as json
 import structlog
 from MySQLdb import IntegrityError
+from sqlalchemy import text
 from tqdm import tqdm
 
 from etl.config import DEBUG, GRAPHER_USER_ID
@@ -182,19 +183,23 @@ class ChartRevisionSuggester:
             with get_engine().connect() as con:
                 if len(variable_ids) == 1:
                     results = con.execute(
-                        f"""
+                        text(
+                            f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN ({variable_ids[0]})
                         """
+                        )
                     ).fetchmany()
                 else:
                     results = con.execute(
-                        f"""
+                        text(
+                            f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN {*variable_ids,}
                         """
+                        )
                     ).fetchmany()
         except Exception:
             self.report_error(
@@ -221,10 +226,11 @@ class ChartRevisionSuggester:
         n_before = 0
         try:
             with get_engine().connect() as con:
-                n_before = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
+                n_before = con.execute(text("SELECT COUNT(id) FROM suggested_chart_revisions")).fetchone()[0]  # type: ignore
 
                 res = con.execute(
-                    """
+                    text(
+                        """
                     SELECT *
                     FROM (
                         SELECT chartId, COUNT(chartId) as c
@@ -235,6 +241,7 @@ class ChartRevisionSuggester:
                         ) as grouped
                     WHERE grouped.c > 1
                 """
+                    )
                 ).fetchmany()
                 if len(res):
                     raise RuntimeError(
@@ -267,14 +274,15 @@ class ChartRevisionSuggester:
                     VALUES
                         (%s, %s, %s, %s, %s, %s, NOW(), NOW())
                 """
-                con.execute(query, tuples)
+                con.execute(text(query), tuples)
 
                 # checks if any of the affected chartIds now has multiple
                 # pending suggested revisions. If so, then rejects the whole
                 # insert and tell the user which suggested chart revisions need
                 # to be approved/rejected.
                 res = con.execute(
-                    f"""
+                    text(
+                        f"""
                     SELECT id, scr.chartId, c, createdAt
                     FROM (
                         SELECT chartId, COUNT(chartId) as c
@@ -291,6 +299,7 @@ class ChartRevisionSuggester:
                     WHERE grouped.c > 1
                     ORDER BY createdAt ASC
                 """
+                    )
                 ).fetchmany()
                 if len(res):
                     df = pd.DataFrame(res, columns=["id", "chart_id", "count", "created_at"])
@@ -322,7 +331,7 @@ class ChartRevisionSuggester:
             raise e
         finally:
             with get_engine().connect() as con:
-                n_after = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
+                n_after = con.execute(text("SELECT COUNT(id) FROM suggested_chart_revisions")).fetchone()[0]  # type: ignore
 
             self.report_info(
                 f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested chart revisions inserted."
@@ -349,11 +358,13 @@ class ChartRevisionSuggester:
             variable_ids_str = ",".join([str(_id) for _id in variable_ids])
             columns = ["id", "chartId", "variableId", "property", "order"]
             rows = con.execute(
-                f"""
+                text(
+                    f"""
                 SELECT {','.join([f'`{col}`' for col in columns])}
                 FROM chart_dimensions
                 WHERE variableId IN ({variable_ids_str})
             """
+                )
             ).fetchmany()
             df_chart_dimensions = pd.DataFrame(rows, columns=columns)
 
@@ -370,22 +381,26 @@ class ChartRevisionSuggester:
                 "publishedAt",
             ]
             rows = con.execute(
-                f"""
+                text(
+                    f"""
                 SELECT {','.join(columns)}
                 FROM charts
                 WHERE id IN ({chart_ids_str})
             """
+                )
             ).fetchmany()
             df_charts = pd.DataFrame(rows, columns=columns)
 
             # retrieves chart_revisions
             columns = ["id", "chartId", "userId", "config", "createdAt", "updatedAt"]
             rows = con.execute(
-                f"""
+                text(
+                    f"""
                 SELECT {','.join(columns)}
                 FROM chart_revisions
                 WHERE chartId IN ({chart_ids_str})
             """
+                )
             ).fetchmany()
             df_chart_revisions = pd.DataFrame(rows, columns=columns)
         return df_charts, df_chart_dimensions, df_chart_revisions

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from st_pages import add_indentation
 from structlog import get_logger
 

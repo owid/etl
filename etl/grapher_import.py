@@ -20,8 +20,9 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import utils
+from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session, select, update
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     add_entity_code_and_name,
@@ -340,7 +341,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
             gm.Dataset.version == dataset.metadata.version,
             gm.Dataset.namespace == dataset.metadata.namespace,
         )
-        ds = session.exec(q).one_or_none()
+        ds = session.scalars(q).one_or_none()
         return ds.sourceChecksum if ds is not None else None
 
 
@@ -348,7 +349,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
     with Session(get_engine()) as session:
         q = (
             update(gm.Dataset)
-            .where(gm.Dataset.id == dataset_id)
+            .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
                 dataEditedAt=datetime.datetime.utcnow(),
@@ -371,9 +372,11 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
     with engine.connect() as con:
         # get all those variables first
         rows = con.execute(
-            """
-            SELECT id FROM variables WHERE datasetId=%(dataset_id)s AND id NOT IN %(variable_ids)s
-        """,
+            text(
+                """
+            SELECT id FROM variables WHERE datasetId = :dataset_id AND id NOT IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids or [-1]},
         ).fetchall()
 
@@ -387,9 +390,11 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
 
         # raise an exception if they're used in any charts
         rows = con.execute(
-            """
-            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN %(variable_ids)s
-        """,
+            text(
+                """
+            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         ).fetchall()
         if rows:
@@ -398,45 +403,57 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
 
         # then variables themselves with related data in other tables
         con.execute(
-            """
-            DELETE FROM country_latest_data WHERE variable_id IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM country_latest_data WHERE variable_id IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # delete relationships
         con.execute(
-            """
-            DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM origins_variables WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
         con.execute(
-            """
-            DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM tags_variables_topic_tags WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
         con.execute(
-            """
-            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # delete them from explorers
         con.execute(
-            """
-            DELETE FROM explorer_variables WHERE variableId IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM explorer_variables WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # finally delete variables
         result = con.execute(
-            """
-            DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
-        """,
+            text(
+                """
+            DELETE FROM variables WHERE datasetId = :dataset_id AND id IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
@@ -456,16 +473,12 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: 
     with engine.connect() as con:
         if upserted_source_ids:
             result = con.execute(
-                """
-                DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
-            """,
+                text("""DELETE FROM sources WHERE datasetId = :dataset_id AND id NOT IN :source_ids"""),
                 {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
             )
         else:
             result = con.execute(
-                """
-                DELETE FROM sources WHERE datasetId=%(dataset_id)s
-            """,
+                text("""DELETE FROM sources WHERE datasetId = :dataset_id"""),
                 {"dataset_id": dataset_id},
             )
         if result.rowcount > 0:
@@ -474,5 +487,5 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: 
 
 def _get_entity_name(session: Session, entity_id: int) -> str:
     q = select(gm.Entity).where(gm.Entity.id == entity_id)
-    entity = session.exec(q).one_or_none()
+    entity = session.scalars(q).one_or_none()
     return entity.name if entity else ""

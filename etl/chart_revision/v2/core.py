@@ -2,7 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
