@@ -4,50 +4,114 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-
+  value_prevalence:
+    unit: |-
+      <% if metric == "Number" %>
+      cases
+      <% elif metric == "Rate" %>
+      cases per 100,000 people
+      <%- endif -%>
+    title: |-
+      <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
+      Current cases of << cause.lower() >>, among individuals aged << age >>
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      Age-standardized current cases of << cause.lower() >>
+      <% elif metric == "Number" and age == 'All ages'%>
+      Total current number of cases of << cause.lower() >>
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      Current cases of << cause.lower() >>, among individuals aged << age >> per 100,000 people
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized current cases of << cause.lower() >> per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      Total current cases of << cause.lower() >> per 100,000 people
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of current cases of << cause.lower() >> in those aged << age >>.
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      The estimated number of age-standardized current cases of << cause.lower() >>.
+      <% elif metric == "Number" and age == 'All ages'%>
+      The estimated number of current cases of << cause.lower() >>.
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of current cases of << cause.lower() >> in those aged << age >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      The estimated number of age-standardized current cases of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated number of current cases of << cause.lower() >>, per 100,000 people.
+      <%- endif -%>
+  value_incidence:
+    unit: |-
+      <% if metric == "Number" %>
+      new cases
+      <% elif metric == "Rate" %>
+      new cases per 100,000 people
+      <%- endif -%>
+    title: |-
+      <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
+      New cases of << cause.lower() >>, among individuals aged << age >>
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      Age-standardized new cases of << cause.lower() >>
+      <% elif metric == "Number" and age == 'All ages'%>
+      Total number of new cases of << cause.lower() >>
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      New cases of << cause.lower() >>, among individuals aged << age >> per 100,000 people
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized new cases of << cause.lower() >> per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      New cases of << cause.lower() >> per 100,000 people
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of new cases of << cause.lower() >> in those aged << age >>.
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      The estimated number of age-standardized new cases of << cause.lower() >>.
+      <% elif metric == "Number" and age == 'All ages'%>
+      The estimated number of new cases of << cause.lower() >>.
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of new cases of << cause.lower() >> in those aged << age >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      The estimated number of age-standardized new cases of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated number of new cases of << cause.lower() >>, per 100,000 people.
+      <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 1460
 
-
 tables:
   gbd_prevalence:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
-
+      value:
+        title: |-
+          {definition.value_prevalence.title}
+        unit: |-
+          {definition.value_prevalence.unit}
+        description_short: |-
+          {definition.value_prevalence.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+  gbd_incidence:
+    variables:
+      value:
+        title: |-
+          {definition.value_incidence.title}
+        unit: |-
+          {definition.value_incidence.unit}
+        description_short: |-
+          {definition.value_incidence.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>2<%- endif -%>

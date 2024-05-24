@@ -33,7 +33,6 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["impairments"].reset_index()
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
     #
     # Process data.
     #
@@ -46,9 +45,7 @@ def run(dest_dir: str) -> None:
     # Split up the causes of blindness
     tb = other_vision_loss_minus_trachoma(tb)
     # Add region aggregates.
-    tb = add_regional_aggregates(
-        tb, ds_regions, ds_population, index_cols=["country", "year", "metric", "cause", "impairment", "age"]
-    )
+    tb = add_regional_aggregates(tb, ds_regions, index_cols=["country", "year", "metric", "cause", "impairment", "age"])
 
     cols = tb.columns.drop(["value"]).to_list()
     tb = tb.format(cols)
@@ -65,7 +62,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_population: Dataset, index_cols: List[str]) -> Table:
+def add_regional_aggregates(tb: Table, ds_regions: Dataset, index_cols: List[str]) -> Table:
     """
     Adding the regional aggregated data for the OWID continent regions
     """
