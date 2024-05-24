@@ -8,6 +8,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
+
 import json
 from datetime import date, datetime
 from pathlib import Path
@@ -1366,9 +1367,9 @@ class ChartDiffApprovals(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     chartId: Mapped[int] = mapped_column(Integer)
     sourceUpdatedAt: Mapped[datetime] = mapped_column(DateTime)
-    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
-    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
     def latest_chart_status(
