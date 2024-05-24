@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
         tb = tb.drop(columns="sex")
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     cols = tb.columns.drop("value").to_list()
-    tb = tb.format([cols])
+    tb = tb.format(cols)
 
     #
     # Save outputs.

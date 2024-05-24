@@ -563,7 +563,6 @@ steps:
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
 
-
   # WHO Preventive Chemotherapy - Neglected Tropical Diseases
   # Lymphatic filariasis
   data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
@@ -607,5 +606,8 @@ steps:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
   data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+  # GBD 2021 - GBD Prevalence
   data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
     - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.csv
+  data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
