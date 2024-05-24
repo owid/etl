@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - Global Health
         - Causes of Death
+    processing_level: minor
+
   value_deaths:
     unit: |-
       <% if metric == "Number" %>

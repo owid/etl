@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Mental Health
+    processing_level: minor
   value:
     unit: |-
       <% if metric == "Number" %>
@@ -51,11 +52,11 @@ tables:
     variables:
       value:
         title: |-
-          {definitions.value_deaths.title}
+          {definitions.value.title}
         unit: |-
-          {definitions.value_deaths.unit}
+          {definitions.value.unit}
         description_short: |-
-          {definitions.value_deaths.description_short}
+          {definitions.value.description_short}
         presentation:
           grapher_config:
             note: |-
