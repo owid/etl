@@ -443,8 +443,8 @@ tables:
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - Data for the United Kingdom only considers England.
-          - Data for Ireland refer to October of each year.
-          - Data for the United Kingdom refer households to Q2 (April-June) of each year.
+          - Data for Ireland refers to October of each year.
+          - Data for the United Kingdom refers to households to Q2 (April-June) of each year.
           - Data refer to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refer to flow data (collected at a given period of time).
         processing_level: minor
         presentation:
