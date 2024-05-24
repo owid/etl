@@ -6,10 +6,10 @@ paths = PathFinder(__file__)
 
 # Map of variable titles to their corresponding public titles.
 TITLE_PUBLIC_START = {
-    "Natural disasters": "Annual number of ",
-    "Natural disasters per 100,000 people": "Annual rate of ",
-    "Affected": "Annual number of people requiring immediate assistance from ",
-    "Affected per 100,000 people": "Annual rate of people requiring immediate assistance from ",
+    "Disasters": "Annual number of ",
+    "Disasters per 100,000 people": "Annual rate of ",
+    "Requiring assistance": "Annual number of people requiring immediate assistance from ",
+    "Requiring assistance per 100,000 people": "Annual rate of people requiring immediate assistance from ",
     "Deaths": "Annual number of deaths from ",
     "Deaths per 100,000 people": "Annual rate of deaths from ",
     "Homeless": "Annual number of people left homeless from ",
