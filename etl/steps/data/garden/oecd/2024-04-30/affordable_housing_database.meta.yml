@@ -445,7 +445,7 @@ tables:
           - Data for the United Kingdom only considers England.
           - Data for Ireland refers to October of each year.
           - Data for the United Kingdom refers to households to Q2 (April-June) of each year.
-          - Data refer to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refer to flow data (collected at a given period of time).
+          - Data refers to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refers to flow data (collected at a given period of time).
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
