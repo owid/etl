@@ -193,13 +193,12 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
-          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_2_3:
@@ -216,13 +215,12 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
-          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_1_2_3:
@@ -239,13 +237,12 @@ tables:
           - "{definitions.point_in_time_count}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
-          - Data for Belgium only considers Brussels.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_total:
@@ -267,7 +264,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1:
@@ -286,7 +283,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_2_3:
@@ -305,7 +302,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1_2_3:
@@ -324,7 +321,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_total:
@@ -343,7 +340,7 @@ tables:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1_2_3:
@@ -362,7 +359,7 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_2_3:
@@ -381,7 +378,7 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1:
@@ -400,7 +397,7 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_flow_1_2_3:
@@ -418,7 +415,7 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_flow_2_3:
@@ -436,7 +433,7 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share:
@@ -446,6 +443,9 @@ tables:
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
           - Data for the United Kingdom only considers England.
+          - Data for Ireland refer to October of each year.
+          - Data for the United Kingdom refer households to Q2 (April-June) of each year.
+          - Data refer to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refer to flow data (collected at a given period of time).
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
