@@ -44,7 +44,7 @@ from sqlalchemy.dialects.mysql import (
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
 from sqlalchemy.sql import Select
-from typing_extensions import TypedDict
+from typing_extensions import Self, TypedDict
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
@@ -64,6 +64,27 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
     def dict(self) -> Dict[str, Any]:
         return {field.name: getattr(self, field.name) for field in self.__table__.c}
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Create an object from dictionary. This method is a workaround for cls(**d)
+        when you want to initialize it with `id`. Typically `id` field has init=False which
+        raises an error. This method creates an object and sets the id later.
+
+        There might be a more native way to do this, but I haven't found it yet.
+        """
+
+        set_after_init = {}
+        for k, field in cls.__dataclass_fields__.items():
+            if not field.init and k in d:
+                set_after_init[k] = d.pop(k)
+
+        x = cls(**d)
+
+        for k, v in set_after_init.items():
+            setattr(x, k, v)
+
+        return x
 
 
 class Entity(Base):
@@ -263,8 +284,9 @@ class Chart(Base):
         where cd.chartId = :chart_id
         """
         )
-        rows = session.scalars(q, params={"chart_id": self.id}).fetchall()
-        variables = {r["id"]: Variable(**r) for r in rows}
+        stm = select(Variable).from_statement(q).params(chart_id=self.id)
+        rows = session.execute(stm).scalars().all()
+        variables = {r.id: r for r in rows}
 
         # add columnSlug if present
         column_slug = self.config.get("map", {}).get("columnSlug")
@@ -311,7 +333,8 @@ class Chart(Base):
             # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
             remap_ids[source_var_id] = target_var.id
 
-        target_chart = Chart(**self.dict())
+        # copy chart as a new object
+        target_chart = Chart.from_dict(self.dict())
         del target_chart.id
         target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
 
