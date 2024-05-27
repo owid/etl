@@ -107,3 +107,19 @@ def test_Origin_date_published():
     assert meta.Origin(producer="p", title="a", date_published="latest").date_published == "latest"  # type: ignore
     with pytest.raises(ValueError):
         assert meta.Origin(producer="p", title="a", date_published="nope")  # type: ignore
+
+
+def test_hash():
+    origin_a = meta.Origin("a", "b")
+    origin_b = meta.Origin("a", "b")
+    origin_c = meta.Origin("a", "c")
+    assert origin_a == origin_b
+    assert origin_a != origin_c
+    assert set([origin_a, origin_b, origin_c]) == {origin_a, origin_c}
+
+    # test hashing of nested dictionary
+    var_a = meta.VariableMeta(display={"d": {"a": 1, "b": 2}})
+    var_b = meta.VariableMeta(display={"d": {"a": 1, "b": 2}})
+    var_c = meta.VariableMeta(display={"d": {"a": 1, "b": 2, "c": 3}})
+    assert var_a == var_b
+    assert var_a != var_c
