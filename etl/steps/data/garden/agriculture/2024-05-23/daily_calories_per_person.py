@@ -40,6 +40,10 @@ def run(dest_dir: str) -> None:
     ds_fao1949 = paths.load_dataset("fao_1949")
     tb_fao1949 = ds_fao1949["fao_1949"].reset_index()
 
+    # Load USDA/ERS data on food availability.
+    ds_usda = paths.load_dataset("food_availability")
+    tb_usda = ds_usda["food_availability"].reset_index()
+
     #
     # Process data.
     #
