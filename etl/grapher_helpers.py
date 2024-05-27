@@ -323,7 +323,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     INSERT INTO entities
                         (name, displayName, validated, createdAt, updatedAt)
                     VALUES
-                        (%(name)s, '', FALSE, NOW(), NOW())
+                        (:name, '', FALSE, NOW(), NOW())
                 """
                     ),
                     {"name": name},
@@ -337,7 +337,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                 text(
                     """
                 SELECT id FROM entities
-                WHERE name = %(name)s
+                WHERE name = :name
             """
                 ),
                 {"name": name},
