@@ -20,6 +20,10 @@ def run(dest_dir: str) -> None:
     ds_floud = paths.load_dataset("floud_et_al_2011")
     tb_floud = ds_floud["floud_et_al_2011"].reset_index()
 
+    # Load Jonsson (1998) dataset and read its main table.
+    ds_jonsson = paths.load_dataset("jonsson_1998")
+    tb_jonsson = ds_jonsson["jonsson_1998"].reset_index()
+
     #
     # Process data.
     #

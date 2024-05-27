@@ -3,7 +3,8 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Daily calories in England and Wales according to various authors
+    title: How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries
+    title_snapshot: How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries - Daily calories in England and Wales
     description: |-
       This dataset contains the table in the appendix of Harris et al. (2015) paper: "How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries".
       That table contains a compilation of daily calorie (supply or consumption) in England and Wales, according to various different studies.

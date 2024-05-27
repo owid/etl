@@ -85,11 +85,17 @@ steps:
   - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
   - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
   #
+  # Jonsson (1998) - Daily calories in Iceland.
+  #
+  data://meadow/agriculture/2024-05-23/jonsson_1998:
+    - snapshot://agriculture/2024-05-23/jonsson_1998.csv
+  #
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
     - data://meadow/agriculture/2024-05-23/harris_et_al_2015
     - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
   ######################################################################################################################
