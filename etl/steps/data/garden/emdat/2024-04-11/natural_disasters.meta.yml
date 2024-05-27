@@ -188,7 +188,7 @@ tables:
         title: Disasters
         unit: 'events'
         description_short: |-
-          Number of reported natural disasters.
+          Number of reported natural disaster events in any given year. Note that the historical increase largely reflects improvements in data reporting, and should not be used to assess the total number of events.
         description_key:
           - *description-key-common
       population:
@@ -246,7 +246,7 @@ tables:
         title: Disasters per 100,000 people
         unit: 'events per 100,000 people'
         description_short: |-
-          Rate of reported natural disasters per 100,000 people.
+          Rate of reported natural disasters per 100,000 people in any given year. Note that the historical increase largely reflects improvements in data reporting, and should not be used to assess the true rate of events.
         description_processing: *description-processing-100k
         description_key:
           - *description-key-common
