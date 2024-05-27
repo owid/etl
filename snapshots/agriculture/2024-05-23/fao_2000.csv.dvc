@@ -7,7 +7,7 @@ meta:
     title_snapshot: The State of Food and Agriculture 2000 - Daily calories in various countries
     description: |-
       This dataset contains daily calories in various countries, from Table 11 of FAO's "The State of Food and Agriculture 2000".
-    date_published: "2000-03-01"
+    date_published: "2000-10-01"
 
     # Citation
     producer: Food and Agriculture Organization of the United Nations

@@ -100,10 +100,15 @@ steps:
   data://meadow/agriculture/2024-05-23/fogel_2004:
     - snapshot://agriculture/2024-05-23/fogel_2004.csv
   #
-  # FAO (2000) - The State of Food and Agriculture.
+  # FAO (2000) - The State of Food and Agriculture 2000.
   #
   data://meadow/agriculture/2024-05-23/fao_2000:
     - snapshot://agriculture/2024-05-23/fao_2000.csv
+  #
+  # FAO (1949) - The State of Food and Agriculture 1949.
+  #
+  data://meadow/agriculture/2024-05-23/fao_1949:
+    - snapshot://agriculture/2024-05-23/fao_1949.csv
   #
   # Agriculture - Long-run daily calorie supply per person.
   #
@@ -114,6 +119,7 @@ steps:
     - data://meadow/agriculture/2024-05-23/grigg_1995
     - data://meadow/agriculture/2024-05-23/fogel_2004
     - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/fao_1949
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
   ######################################################################################################################

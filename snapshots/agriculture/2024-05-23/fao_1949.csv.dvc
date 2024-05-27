@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The State of Food and Agriculture 1949
+    title_snapshot: The State of Food and Agriculture 1949 - Daily calories in various countries
+    description: |-
+      This dataset contains daily calories in various countries, from Table 15 of FAO's "The State of Food and Agriculture 1949".
+    date_published: "1949-10-01"
+
+    # Citation
+    producer: Food and Agriculture Organization of the United Nations
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations (1949), "The State of Food and Agriculture 1949".
+      Data extracted from Table 15.
+    attribution_short: FAO (1949)
+
+    # Files
+    url_main: https://www.un-ilibrary.org/content/books/9789210472654
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: © FAO 1949
+      url: https://www.un-ilibrary.org/content/books/9789210472654
+outs:
+  - md5: 4fdce005d413a34348174c4371f41025
+    size: 1103
+    path: fao_1949.csv

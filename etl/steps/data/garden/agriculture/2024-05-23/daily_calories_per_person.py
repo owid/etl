@@ -33,8 +33,12 @@ def run(dest_dir: str) -> None:
     tb_fogel = ds_fogel["fogel_2004"].reset_index()
 
     # Load FAO (2000) dataset and read its main table.
-    ds_fao = paths.load_dataset("fao_2000")
-    tb_fao = ds_fao["fao_2000"].reset_index()
+    ds_fao2000 = paths.load_dataset("fao_2000")
+    tb_fao2000 = ds_fao2000["fao_2000"].reset_index()
+
+    # Load FAO (1949) dataset and read its main table.
+    ds_fao1949 = paths.load_dataset("fao_1949")
+    tb_fao1949 = ds_fao1949["fao_1949"].reset_index()
 
     #
     # Process data.
