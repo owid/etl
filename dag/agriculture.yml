@@ -95,6 +95,11 @@ steps:
   data://meadow/agriculture/2024-05-23/grigg_1995:
     - snapshot://agriculture/2024-05-23/grigg_1995.csv
   #
+  # Fogel (2004) - Daily calories in France and Great Britain.
+  #
+  data://meadow/agriculture/2024-05-23/fogel_2004:
+    - snapshot://agriculture/2024-05-23/fogel_2004.csv
+  #
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
@@ -102,6 +107,7 @@ steps:
     - data://meadow/agriculture/2024-05-23/floud_et_al_2011
     - data://meadow/agriculture/2024-05-23/jonsson_1998
     - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/agriculture/2024-05-23/fogel_2004
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
   ######################################################################################################################

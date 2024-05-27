@@ -28,6 +28,10 @@ def run(dest_dir: str) -> None:
     ds_grigg = paths.load_dataset("grigg_1995")
     tb_grigg = ds_grigg["grigg_1995"].reset_index()
 
+    # Load Fogel (2004) dataset and read its main table.
+    ds_fogel = paths.load_dataset("fogel_2004")
+    tb_fogel = ds_fogel["fogel_2004"].reset_index()
+
     #
     # Process data.
     #
