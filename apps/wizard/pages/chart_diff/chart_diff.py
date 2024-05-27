@@ -1,8 +1,9 @@
+import datetime as dt
 from typing import Optional, get_args
 
 import streamlit as st
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
 
@@ -33,7 +34,7 @@ class ChartDiffModified:
         return not self.is_modified
 
     @property
-    def latest_update(self):
+    def latest_update(self) -> dt.datetime:
         """Get latest time of change (either be staging or live)."""
         if self.target_chart is None:
             return self.source_chart.updatedAt

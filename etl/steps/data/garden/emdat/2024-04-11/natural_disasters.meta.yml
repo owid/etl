@@ -8,7 +8,7 @@ definitions:
 
   # General definitions.
   definition_disaster: &definition-disaster |-
-    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering.
+    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, extreme temperatures, floods, glacial lake outburst floods, mass movements, extreme weather events, volcanic activity, and wildfires.
   # Definitions of impact variables.
   definition_dead: &definition-dead |-
     EM-DAT counts deaths as deceased and missing people combined, as a result of a natural disaster.
@@ -36,7 +36,7 @@ definitions:
     Drought is defined as an extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect.
   # Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector.
   definition_earthquake: &definition-earthquake |-
-    An earthquake is defined as a sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking.
+    An earthquake is defined as a sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking. The data includes the impacts of earthquake events, aftershocks and tsunamis.
   definition_extreme_temperature: &definition-extreme-temperature |-
     Extreme temperature is used as a general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions.
   definition_flood: &definition-flood |-
@@ -57,14 +57,18 @@ definitions:
     Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
   definition_fog: &definition-fog |-
     Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground. Currently, the only fog disaster recorded in EM-DAT is the Great Smog of London in 1952.
-  # definition_extreme_weather: &definition-extreme-weather |-
   # I couldn't find any precise definition of extreme weather in the EM-DAT documentation: https://doc.emdat.be/docs/
+  # But I can see the subtype of events that are included for the type "Storm" (which we call "Extreme weather").
+  # Do not mention all (there are many and detailed) but a summary of the most important.
+  definition_extreme_weather: &definition-extreme-weather |-
+    Extreme weather events include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events.
   # Common description key of all disasters.
   description_key_common: &description-key-common
     - *definition-disaster
     - *definition-drought
     - *definition-earthquake
     - *definition-extreme-temperature
+    - *definition-extreme-weather
     - *definition-flood
     - *definition-volcanic-eruption
     - *definition-wildfire
@@ -129,7 +133,7 @@ tables:
           - *definition-injured
           - *description-key-common
       affected:
-        title: Affected
+        title: Requiring assistance
         unit: 'people'
         description_short: |-
           People requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
@@ -181,7 +185,7 @@ tables:
           - *definition-total-damage
           - *description-key-common
       n_events:
-        title: Natural disasters
+        title: Disasters
         unit: 'events'
         description_short: |-
           Number of reported natural disasters.
@@ -209,8 +213,8 @@ tables:
           - *definition-injured
           - *description-key-common
       affected_per_100k_people:
-        title: Affected per 100,000 people
-        unit: 'affected per 100,000 people'
+        title: Requiring assistance per 100,000 people
+        unit: 'requiring assistance per 100,000 people'
         description_short: |-
           Rate of people per 100,000 requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
         description_processing: *description-processing-100k
@@ -239,7 +243,7 @@ tables:
           - *definition-total-affected
           - *description-key-common
       n_events_per_100k_people:
-        title: Natural disasters per 100,000 people
+        title: Disasters per 100,000 people
         unit: 'events per 100,000 people'
         description_short: |-
           Rate of reported natural disasters per 100,000 people.

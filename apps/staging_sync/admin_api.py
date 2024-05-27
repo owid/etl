@@ -6,7 +6,8 @@ import string
 from typing import Any, Dict, List, Optional
 
 import requests
-from sqlmodel import Session
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
@@ -92,12 +93,14 @@ def _create_user_session(session: Session, user_email: str, expiration_seconds=3
     # Base64 encode
     session_data = base64.b64encode(("prefix:" + json_str).encode("utf-8")).decode("utf-8")
 
-    query = """
+    query = text(
+        """
         INSERT INTO sessions (session_key, session_data, expire_date)
         VALUES (:session_key, :session_data, :expire_date);
     """
+    )
     session.execute(
-        query,  # type: ignore
+        query,
         params={
             "session_key": session_key,
             "session_data": session_data,

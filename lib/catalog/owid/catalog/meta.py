@@ -332,7 +332,7 @@ class DatasetMeta:
     additional_info: Optional[Dict[str, Any]] = None
     version: Optional[str] = None
     # update period in days
-    update_period_days: Optional[str] = None
+    update_period_days: Optional[int] = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
 

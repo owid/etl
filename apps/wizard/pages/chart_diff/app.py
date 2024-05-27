@@ -3,14 +3,14 @@ from pathlib import Path
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.staging_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
-from apps.wizard.utils import chart_html, set_states
+from apps.wizard.utils import Pagination, chart_html, set_states
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl import config
 
@@ -53,13 +53,15 @@ else:
     st.warning(warning_msg)
     TARGET = OWIDEnv.from_staging("master")
 
+CHART_PER_PAGE = 10
+
 
 ########################################
 # FUNCTIONS
 ########################################
 
 
-def get_chart_diffs(source_engine, target_engine):
+def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified]:
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # Get IDs from modified charts
@@ -72,6 +74,19 @@ def get_chart_diffs(source_engine, target_engine):
                 )
                 for chart_id in chart_ids
             }
+
+            # TODO: parallelize it, doesn't work with current version of SQLALchemy
+            # from concurrent.futures import ThreadPoolExecutor, as_completed
+            # with ThreadPoolExecutor(max_workers=5) as executor:
+            #     chart_diffs_futures = {
+            #         chart_id: executor.submit(ChartDiffModified.from_chart_id, chart_id, source_session, target_session)
+            #         for chart_id in chart_ids
+            #     }
+            #     chart_diffs = {}
+            #     for chart_id, future in chart_diffs_futures.items():
+
+            #         chart_diffs[chart_id] = future.result()
+
     return chart_diffs
 
 
@@ -118,13 +133,16 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
     # Actually show stuff
     with st.expander(label, not diff.approved):
+        col1, col2 = st.columns([1, 3])
+
         # Refresh
-        st.button(
-            "🔄 Refresh",
-            key=f"refresh-btn-{diff.chart_id}",
-            on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
-            help="Get the latest version of the chart from the staging server.",
-        )
+        with col2:
+            st.button(
+                "🔄 Refresh",
+                key=f"refresh-btn-{diff.chart_id}",
+                on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
+                help="Get the latest version of the chart from the staging server.",
+            )
 
         options = ["Pending", "Approve"]
         options = {
@@ -133,16 +151,17 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
             # "Reject": "red",
         }
         option_names = list(options.keys())
-        st.radio(
-            label="Approve or reject chart",
-            key=f"radio-{diff.chart_id}",
-            options=option_names,
-            horizontal=True,
-            format_func=lambda x: f":{options.get(x)}-background[{x}]",
-            index=option_names.index("Approve") if diff.approved else option_names.index("Pending"),
-            on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
-            # label_visibility="collapsed",
-        )
+        with col1:
+            st.radio(
+                label="Approve or reject chart",
+                key=f"radio-{diff.chart_id}",
+                options=option_names,
+                horizontal=True,
+                format_func=lambda x: f":{options.get(x)}-background[{x}]",
+                index=option_names.index("Approve") if diff.approved else option_names.index("Pending"),
+                on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
+                # label_visibility="collapsed",
+            )
 
         if diff.is_modified:
             tab1, tab2 = st.tabs(["Charts", "Config diff"])
@@ -304,16 +323,29 @@ def main():
                 if chart_diffs_modified:
                     st.header("Modified charts")
                     st.markdown(f"{len(chart_diffs_modified)} charts modified in [{OWID_ENV.name}]({OWID_ENV.site})")
-                    for chart_diff in chart_diffs_modified:
+
+                    modified_charts_pagination = Pagination(
+                        chart_diffs_modified, items_per_page=CHART_PER_PAGE, pagination_key="pagination_modified"
+                    )
+                    modified_charts_pagination.show_controls()
+
+                    for chart_diff in modified_charts_pagination.get_page_items():
                         st_show(chart_diff, source_session, target_session)
                 else:
                     st.warning(
                         "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
                     )
+
                 if chart_diffs_new:
                     st.header("New charts")
                     st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
-                    for chart_diff in chart_diffs_new:
+
+                    new_charts_pagination = Pagination(
+                        chart_diffs_new, items_per_page=CHART_PER_PAGE, pagination_key="pagination_new"
+                    )
+                    new_charts_pagination.show_controls()
+
+                    for chart_diff in new_charts_pagination.get_page_items():
                         st_show(chart_diff, source_session, target_session)
                 else:
                     st.warning(

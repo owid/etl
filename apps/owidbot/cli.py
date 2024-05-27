@@ -59,15 +59,8 @@ def cli(
     repo = gh_utils.get_repo(repo_name)
     pr = gh_utils.get_pr(repo, branch)
 
-    comment = gh_utils.get_comment_from_pr(pr)
-
-    # prefill services from existing PR comment
-    if comment:
-        services_body = services_from_comment(comment)
-    else:
-        services_body = {}
-
     # recalculate services
+    services_body = {}
     for service in services:
         if service == "data-diff":
             services_body["data-diff"] = data_diff.run(include)
@@ -83,6 +76,14 @@ def cli(
             services_body["grapher"] = grapher.run(branch)
         else:
             raise AssertionError("Invalid service")
+
+    # get existing comment (do this as late as possible to avoid race conditions)
+    comment = gh_utils.get_comment_from_pr(pr)
+
+    # fill in services from existing comment if not run via --services to avoid deleting them
+    if comment:
+        for service, content in services_from_comment(comment).items():
+            services_body.setdefault(service, content)
 
     body = create_comment_body(branch, services_body, start_time)
 

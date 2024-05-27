@@ -86,7 +86,7 @@ df = rc[path]
 
 ## Development
 
-You need Python 3.8+, `poetry` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.9+, `poetry` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks
@@ -98,6 +98,8 @@ make watch
 
 ## Changelog
 
+- `v0.3.11`
+  - Add support for Python 3.12 in `pypackage.toml`
 - `v0.3.10`
   - Add experimental chart data API in `owid.catalog.charts`
 - `v0.3.9`

@@ -9,9 +9,10 @@ import numpy as np
 import pandas as pd
 import structlog
 from jinja2 import Environment
-from MySQLdb import IntegrityError
 from owid import catalog
 from owid.catalog.utils import underscore
+from pymysql import IntegrityError
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from etl.db import get_engine, read_sql
@@ -317,12 +318,14 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
         for name in countries:
             try:
                 con.execute(
-                    """
+                    text(
+                        """
                     INSERT INTO entities
                         (name, displayName, validated, createdAt, updatedAt)
                     VALUES
-                        (%(name)s, '', FALSE, NOW(), NOW())
-                """,
+                        (:name, '', FALSE, NOW(), NOW())
+                """
+                    ),
                     {"name": name},
                 )
             except IntegrityError:
@@ -331,10 +334,12 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                 pass
 
             row = con.execute(
-                """
+                text(
+                    """
                 SELECT id FROM entities
-                WHERE name = %(name)s
-            """,
+                WHERE name = :name
+            """
+                ),
                 {"name": name},
             ).fetchone()
             assert row

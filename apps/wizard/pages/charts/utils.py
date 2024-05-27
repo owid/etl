@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple
 
 import pandas as pd
 import streamlit as st
-from MySQLdb import OperationalError
+from pymysql import OperationalError
 from structlog import get_logger
 
 from etl.chart_revision.v2.schema import get_schema_chart_config

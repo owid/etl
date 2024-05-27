@@ -7,7 +7,8 @@ These functions are used when there are updates on variables. They are used in t
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Set
 
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -29,12 +30,12 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
     with Session(get_engine()) as session:
         # Find IDs of charts that use the given variable IDs
         chart_ids = (
-            session.exec(select(gm.ChartDimensions.chartId).where(gm.ChartDimensions.variableId.in_(variable_ids)))  # type: ignore
+            session.scalars(select(gm.ChartDimensions.chartId).where(gm.ChartDimensions.variableId.in_(variable_ids)))
             .unique()
             .all()
         )
         # Retrieve charts from a given list of chart IDs
-        charts = session.exec(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()  # type: ignore
+        charts = session.scalars(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()
 
     # some charts don't have ID in config, fix that here (should be ideally fixed in the database)
     for chart in charts:
@@ -45,7 +46,7 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
             log.warning(f"Chart {chart.id} does not have a version in config.")
             chart.config["version"] = 1
 
-    return charts
+    return list(charts)
 
 
 def update_chart_config(
@@ -108,8 +109,8 @@ def update_chart_config_map(
 ) -> Dict[str, Any]:
     """Update map config."""
     log.info("variable_update: updating map config")
-    # Proceed only if chart uses map
-    if config["hasMapTab"]:
+    # Proceed only if chart uses map and has `map` field
+    if config["hasMapTab"] and "map" in config:
         log.info("variable_update: chart uses map")
         # Get map.columnSlug
         map_var_id = config["map"].get(
