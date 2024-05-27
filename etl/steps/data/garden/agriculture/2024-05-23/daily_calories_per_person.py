@@ -16,6 +16,10 @@ def run(dest_dir: str) -> None:
     ds_harris = paths.load_dataset("harris_et_al_2015")
     tb_harris = ds_harris["harris_et_al_2015"].reset_index()
 
+    # Load Floud et al. (2011) dataset and read its main table.
+    ds_floud = paths.load_dataset("floud_et_al_2011")
+    tb_floud = ds_floud["floud_et_al_2011"].reset_index()
+
     #
     # Process data.
     #

@@ -78,11 +78,20 @@ steps:
   #
   data://meadow/agriculture/2024-05-23/harris_et_al_2015:
     - snapshot://agriculture/2024-05-23/harris_et_al_2015.csv
+  #
+  # Floud et al. (2011) - Daily calories in United States and Western Europe.
+  #
+  data://meadow/agriculture/2024-05-23/floud_et_al_2011:
+  - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_europe.csv
+  - snapshot://agriculture/2024-05-23/floud_et_al_2011_daily_calories_us.csv
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
     - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
-
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
   ######################################################################################################################

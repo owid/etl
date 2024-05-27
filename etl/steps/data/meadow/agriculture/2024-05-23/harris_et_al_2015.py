@@ -10,23 +10,19 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot.
+    # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("harris_et_al_2015.csv")
-
-    # Load data from snapshot.
     tb = snap.read()
 
     #
     # Process data.
     #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year"])
+    # Format table conveniently.
+    tb = tb.format(["years", "source"])
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
-
-    # Save changes in the new meadow dataset.
+    # Create a new meadow dataset.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()
