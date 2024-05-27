@@ -24,11 +24,15 @@ def run(dest_dir: str) -> None:
     ds_jonsson = paths.load_dataset("jonsson_1998")
     tb_jonsson = ds_jonsson["jonsson_1998"].reset_index()
 
+    # Load Grigg (1995) dataset and read its main table.
+    ds_grigg = paths.load_dataset("grigg_1995")
+    tb_grigg = ds_grigg["grigg_1995"].reset_index()
+
     #
     # Process data.
     #
     # TODO: Continue processing.
-    tb = tb_harris.copy()
+    tb = tb_grigg.copy()
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(short_name=paths.short_name)

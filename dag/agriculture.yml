@@ -90,12 +90,18 @@ steps:
   data://meadow/agriculture/2024-05-23/jonsson_1998:
     - snapshot://agriculture/2024-05-23/jonsson_1998.csv
   #
+  # Grigg (1995) - Daily calories in Western Europe.
+  #
+  data://meadow/agriculture/2024-05-23/grigg_1995:
+    - snapshot://agriculture/2024-05-23/grigg_1995.csv
+  #
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
     - data://meadow/agriculture/2024-05-23/harris_et_al_2015
     - data://meadow/agriculture/2024-05-23/floud_et_al_2011
     - data://meadow/agriculture/2024-05-23/jonsson_1998
+    - data://meadow/agriculture/2024-05-23/grigg_1995
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
   ######################################################################################################################

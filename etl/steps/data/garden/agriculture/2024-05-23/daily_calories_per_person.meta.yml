@@ -12,4 +12,7 @@ tables:
   daily_calories_per_person:
     title: Daily calory supply per person
     variables:
-      {}
+      daily_calories:
+        title: Daily calory supply per person
+        unit: kilocalories
+        short_unit: kcal
