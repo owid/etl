@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -61,31 +62,31 @@ CHART_PER_PAGE = 10
 ########################################
 
 
-def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified]:
+def _get_chart_diff(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiffModified:
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
-            # Get IDs from modified charts
-            chart_ids = _modified_chart_ids_by_admin(source_session)
-            chart_diffs = {
-                chart_id: ChartDiffModified.from_chart_id(
-                    chart_id=chart_id,
-                    source_session=source_session,
-                    target_session=target_session,
-                )
-                for chart_id in chart_ids
-            }
+            return ChartDiffModified.from_chart_id(
+                chart_id=chart_id,
+                source_session=source_session,
+                target_session=target_session,
+            )
 
-            # TODO: parallelize it, doesn't work with current version of SQLALchemy
-            # from concurrent.futures import ThreadPoolExecutor, as_completed
-            # with ThreadPoolExecutor(max_workers=5) as executor:
-            #     chart_diffs_futures = {
-            #         chart_id: executor.submit(ChartDiffModified.from_chart_id, chart_id, source_session, target_session)
-            #         for chart_id in chart_ids
-            #     }
-            #     chart_diffs = {}
-            #     for chart_id, future in chart_diffs_futures.items():
 
-            #         chart_diffs[chart_id] = future.result()
+def get_chart_diffs(
+    source_engine: Engine, target_engine: Engine, max_workers: int = 10
+) -> dict[int, ChartDiffModified]:
+    with Session(source_engine) as source_session:
+        # Get IDs from modified charts
+        chart_ids = _modified_chart_ids_by_admin(source_session)
+
+    # Get all chart diffs in parallel
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        chart_diffs_futures = {
+            chart_id: executor.submit(_get_chart_diff, chart_id, source_engine, target_engine) for chart_id in chart_ids
+        }
+        chart_diffs = {}
+        for chart_id, future in chart_diffs_futures.items():
+            chart_diffs[chart_id] = future.result()
 
     return chart_diffs
 
