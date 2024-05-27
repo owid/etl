@@ -36,7 +36,10 @@ log = get_logger()
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
 BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/dc4483f633cb2f00f658aeb536fe7777_files/IHME-GBD_2021_DATA-dc4483f6-"
+# The download had to be broken down into two parts due to the number of files, the request was failing when trying to request the full dataset
+BASE_URL_TWO = "https://dl.healthdata.org:443/gbd-api-2021-public/1b99f0270f533ae234d4679ccd78df26_files/IHME-GBD_2021_DATA-1b99f027-"
 NUMBER_OF_FILES = 150
+NUMBER_OF_FILES_TWO = 23
 
 
 @click.command()
@@ -46,9 +49,14 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_cause.csv")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
-    for file_number in range(1, NUMBER_OF_FILES + 1):
-        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES}")
-        df = download_data(file_number, base_url=BASE_URL)
+    for file_number in range(1, NUMBER_OF_FILES + NUMBER_OF_FILES_TWO + 1):
+        log.info(f"Downloading file {file_number} of {NUMBER_OF_FILES + NUMBER_OF_FILES_TWO}")
+        if file_number <= NUMBER_OF_FILES:
+            df = download_data(file_number, base_url=BASE_URL)
+        else:
+            # Downloading the second batch of files
+            file_number_two = file_number - NUMBER_OF_FILES
+            df = download_data(file_number_two, base_url=BASE_URL_TWO)
         log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
         dfs.append(df)
 
