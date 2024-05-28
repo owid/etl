@@ -11,9 +11,8 @@ definitions:
           The International Completeness of Death Registration 2015–2019 database (ICDR), produced by Ariel Karlinsky, represents the most comprehensive and up-to-date database on the completeness of death reporting globally.
 
           The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
-
-          You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
-        citation_full: A. Karlinsky (2021). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+        citation_full: |-
+          Karlinsky, A. (2024). International completeness of death registration. Demographic Research, 50, 1151–1170. https://doi.org/10.4054/DemRes.2024.50.38
         url_main: https://github.com/akarlinsky/death_registration
         url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
         date_accessed: "2023-08-16"
