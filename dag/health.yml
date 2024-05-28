@@ -609,3 +609,12 @@ steps:
     - data://meadow/neglected_tropical_diseases/2024-05-18/funding
   data://grapher/neglected_tropical_diseases/2024-05-18/funding:
     - data://garden/neglected_tropical_diseases/2024-05-18/funding
+
+  # WHO Avian Influenza H5N1
+  data://meadow/who/latest/avian_influenza_ah5n1:
+    - snapshot://who/latest/avian_influenza_ah5n1.csv
+  data://garden/who/latest/avian_influenza_ah5n1:
+    - data://meadow/who/latest/avian_influenza_ah5n1
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/who/latest/avian_influenza_ah5n1:
+    - data://garden/who/latest/avian_influenza_ah5n1
