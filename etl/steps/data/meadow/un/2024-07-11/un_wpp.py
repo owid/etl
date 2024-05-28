@@ -7,17 +7,80 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Origin, Table, TableMeta
 from pandas.api.types import CategoricalDtype
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
-log = get_logger()
+paths = PathFinder(__file__=__file__)
 
 
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    paths.log.info("reading snapshots...")
+    # Retrieve population snapshot
+    snap = paths.load_snapshot("un_wpp_population.csv")
+    # Load data from snapshot
+    tb_population = snap.read()
+
+    #
+    # Process data.
+    #
+    # Get population data ready for ETL.
+    tb_population = process_population(tb_population)
+
+    #
+    # Save outputs.
+    #
+    tables = [
+        tb_population,
+    ]
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, default_metadata=snap.metadata)
+
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
+
+
+def process_population(tb: Table) -> Table:
+    """Process population data.
+
+    From snapshot table to ETL-ready-cleaned table.
+    """
+    paths.log.info("processing population data...")
+
+    COLUMNS = {
+        "LocationName": "country",
+        "Year": "year",
+        "LocTypeName": "location_type",
+        "VariantName": "variant",
+        "Sex": "sex",
+        "Age": "age",
+        "Value": "population",
+    }
+
+    # Column rename
+    tb = tb.rename(columns=COLUMNS)
+    # Keep relevant columns
+    tb = tb.loc[:, COLUMNS.values()]
+
+    # Keep relevant location types
+    location_types = ["Country/Area", "Region", "Income Group", "Development Group", "World"]
+    tb = tb.loc[tb["location_type"].isin(location_types)]
+
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.format(["country", "year", "location_type", "variant", "sex", "age"])
+
+    return tb
+
+
+#################################################################################
+#################################################################################
+# Old code below. Left in case it's needed for reference.
+#################################################################################
+#################################################################################
 def extract_data(snap: Snapshot, output_dir: str) -> None:
     z = zipfile.ZipFile(snap.path)
     z.extractall(output_dir)
@@ -35,7 +98,7 @@ def load_data(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Tuple[Table,
 
 def _load_population(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load population dataset (CSV)"""
-    log.info("un_wpp._load_population")
+    paths.log.info("un_wpp._load_population")
     filenames = list(filter(lambda x: "PopulationBySingleAgeSex" in x, sorted(os.listdir(tmp_dir))))
     dtype = {
         "SortOrder": "category",
@@ -69,7 +132,7 @@ def _load_population(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table
 
 
 def _load_fertility(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
-    log.info("un_wpp._load_fertility")
+    paths.log.info("un_wpp._load_fertility")
     """Load fertility dataset (CSV)"""
     (filename,) = [f for f in filter(lambda x: "Fertility" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
@@ -99,7 +162,7 @@ def _load_fertility(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
 
 def _load_demographics(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load demographics dataset (CSV)"""
-    log.info("un_wpp._load_demographics")
+    paths.log.info("un_wpp._load_demographics")
     filenames = [f for f in filter(lambda x: "Demographic" in x, sorted(os.listdir(tmp_dir))) if "notes" not in f]
     dtype = {
         "SortOrder": "category",
@@ -145,7 +208,7 @@ def _load_demographics(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Tab
 
 def _load_deaths(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load deaths dataset (XLSX)"""
-    log.info("un_wpp._load_deaths")
+    paths.log.info("un_wpp._load_deaths")
     filenames = list(filter(lambda x: "DEATHS" in x, sorted(os.listdir(tmp_dir))))
     # Load
     dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata, origin=origin) for filename in filenames]
@@ -154,7 +217,7 @@ def _load_deaths(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
 
 def _load_dependency_ratio(tmp_dir: str, metadata: TableMeta, origin: Origin) -> Table:
     """Load dependency ratio dataset (XLSX)"""
-    log.info("un_wpp._load_dependency_ratio")
+    paths.log.info("un_wpp._load_dependency_ratio")
     filenames = list(filter(lambda x: "DEPENDENCY_RATIOS" in x, sorted(os.listdir(tmp_dir))))
     # Load
     dfs = [_read_xlsx_file(tmp_dir, filename, metadata=metadata, origin=origin) for filename in filenames]
@@ -380,14 +443,14 @@ def _sanity_checks(
     return df
 
 
-def run(dest_dir: str) -> None:
+def run_old(dest_dir: str) -> None:
     # Load
     snap = paths.load_snapshot("un_wpp.zip")
     with tempfile.TemporaryDirectory() as tmp_dir:
-        log.info("un_wpp.extract_data")
+        paths.log.info("un_wpp.extract_data")
         extract_data(snap, tmp_dir)
         assert snap.metadata.origin
-        log.info("un_wpp.load_data")
+        paths.log.info("un_wpp.load_data")
         (
             df_population,
             df_fertility,
@@ -396,7 +459,7 @@ def run(dest_dir: str) -> None:
             df_deaths,
         ) = load_data(tmp_dir, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)
     # Process
-    log.info("un_wpp.process")
+    paths.log.info("un_wpp.process")
     df_population, df_fertility, df_demographics, df_depratio, df_deaths = process(
         df_population, df_fertility, df_demographics, df_depratio, df_deaths
     )
