@@ -84,7 +84,7 @@ def add_all_forms_of_violence(tb: Table) -> Table:
     ), "Not all elements of 'violence' are present in tb_violence['cause']"
 
     tb_violence = tb_violence.groupby(["country", "age", "metric", "year"])["value"].sum().reset_index()
-    tb_violence["cause"] == "All forms of violence"
+    tb_violence["cause"] = "All forms of violence"
 
     tb = pr.concat([tb, tb_violence], ignore_index=True)
 
