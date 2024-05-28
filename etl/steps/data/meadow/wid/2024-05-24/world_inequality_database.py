@@ -9,8 +9,29 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define missing values (because of the country NA, Namibia)
+NA_VALUES = [
+    "-1.#IND",
+    "1.#QNAN",
+    "1.#IND",
+    "-1.#QNAN",
+    "#N/A N/A",
+    "#N/A",
+    "N/A",
+    "n/a",
+    "",
+    "#NA",
+    "NULL",
+    "null",
+    "NaN",
+    "-NaN",
+    "nan",
+    "-nan",
+    "",
+]
+
 # List of countries/regions not included in the ISO2 standard, but added by WID
-iso2_missing = {
+ISO2_MISSING = {
     "CN-RU": "China (rural)",
     "CN-UR": "China (urban)",
     "DD": "East Germany",
@@ -54,7 +75,7 @@ iso2_missing = {
 }
 
 # Market exchange rates regions (we are not using them)
-iso2_missing_mer = {
+ISO2_MISSING_MER = {
     "OA-MER": "Other Russia and Central Asia (at market exchange rate) (WID)",
     "OB-MER": "Other East Asia (at market exchange rate) (WID)",
     "OC-MER": "Other Western Europe (at market exchange rate) (WID)",
@@ -93,7 +114,7 @@ iso2_missing_mer = {
 }
 
 # Create a dictionary with the names of the snapshots and their id variables
-snapshots_dict = {
+SNAPSHOTS_DICT = {
     "world_inequality_database": ["country", "year"],
     "world_inequality_database_distribution": ["country", "year", "welfare", "p", "percentile"],
 }
@@ -112,37 +133,18 @@ def run(dest_dir: str) -> None:
 
     # Initialize tables list
     tables = []
-    for tb_name, tb_ids in snapshots_dict.items():
+    for tb_name, tb_ids in SNAPSHOTS_DICT.items():
         # Load data from snapshot.
         # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
-        na_values = [
-            "-1.#IND",
-            "1.#QNAN",
-            "1.#IND",
-            "-1.#QNAN",
-            "#N/A N/A",
-            "#N/A",
-            "N/A",
-            "n/a",
-            "",
-            "#NA",
-            "NULL",
-            "null",
-            "NaN",
-            "-NaN",
-            "nan",
-            "-nan",
-            "",
-        ]
 
         # Retrieve snapshot.
         snap = paths.load_snapshot(f"{tb_name}.csv")
-        tb = snap.read(keep_default_na=False, na_values=na_values)
+        tb = snap.read(keep_default_na=False, na_values=NA_VALUES)
 
         # Retrieve snapshot with extrapolations
         snap = paths.load_snapshot(f"{tb_name}_with_extrapolations.csv")
         # Load data from snapshot.
-        tb_extrapolations = snap.read(keep_default_na=False, na_values=na_values)
+        tb_extrapolations = snap.read(keep_default_na=False, na_values=NA_VALUES)
 
         # Combine both datasets
         tb = pr.merge(tb, tb_extrapolations, on=tb_ids, how="outer", suffixes=("", "_extrapolated"), short_name=tb_name)
@@ -151,7 +153,7 @@ def run(dest_dir: str) -> None:
         # Process data.
         #
         # Harmonize countries
-        tb = harmonize_countries(tb, tb_regions, iso2_missing, iso2_missing_mer)
+        tb = harmonize_countries(tb, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
 
         # Set index and sort
         tb = tb.format(tb_ids)
@@ -161,10 +163,10 @@ def run(dest_dir: str) -> None:
 
     # Add fiscal income data
     snap_fiscal = paths.load_snapshot("world_inequality_database_fiscal.csv")
-    tb_fiscal = snap_fiscal.read(keep_default_na=False, na_values=na_values)
+    tb_fiscal = snap_fiscal.read(keep_default_na=False, na_values=NA_VALUES)
 
     # Harmonize countries
-    tb_fiscal = harmonize_countries(tb_fiscal, tb_regions, iso2_missing, iso2_missing_mer)
+    tb_fiscal = harmonize_countries(tb_fiscal, tb_regions, ISO2_MISSING, ISO2_MISSING_MER)
     tb_fiscal.metadata.short_name = "world_inequality_database_fiscal"
     tb_fiscal = tb_fiscal.format()
 
