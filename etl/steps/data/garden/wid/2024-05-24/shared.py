@@ -17,7 +17,10 @@ TOLERANCE = 5
 ADDITIONAL_DESCRIPTION = [
     "The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.",
     "These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).",
-    "In the case of national post-tax income, when the data sources are not available, distributions are constructed by using the more widely available pre-tax distributions, combined with tax revenue and government expenditure aggregates. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/).",
+]
+
+POST_TAX_NATIONAL_DESCRIPTION = [
+    "In the case of national post-tax income, when the data sources are not available, distributions are constructed by using the more widely available pre-tax distributions, combined with tax revenue and government expenditure aggregates. This method is described in more detail in this [technical note](https://wid.world/document/preliminary-estimates-of-global-posttax-income-distributions-world-inequality-lab-technical-note-2023-02/)."
 ]
 
 RELATIVE_POVERTY_DESCRIPTION = "This data has been estimated by calculating the {povline}, and then checking that value against the closest threshold in the percentile distribution. The headcount ratio is then the percentile, the share of the population below that threshold."
@@ -345,12 +348,20 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
     """
     This function assigns each of the metadata fields for the variables not depending on deciles
     """
+    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
+    if wel == "posttax_nat":
+        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
+    else:
+        post_tax_national_description = []
+
     # For monetary variables I include the PPP description
     if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
             title=f"{VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
+            + ADDITIONAL_DESCRIPTION
+            + post_tax_national_description,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -363,7 +374,7 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
         meta = VariableMeta(
             title=f"{VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -387,11 +398,19 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
     """
     This function assigns each of the metadata fields for the variables depending on deciles
     """
+    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
+    if wel == "posttax_nat":
+        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
+    else:
+        post_tax_national_description = []
+
     if var == "thr":
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile9']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
+            + ADDITIONAL_DESCRIPTION
+            + post_tax_national_description,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -404,7 +423,9 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile10']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
+            + ADDITIONAL_DESCRIPTION
+            + post_tax_national_description,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -418,7 +439,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile10']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -439,10 +460,19 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
 
 
 def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
+    """
+    This function assigns each of the metadata fields for the variables depending on relative poverty lines
+    """
+    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
+    if wel == "posttax_nat":
+        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
+    else:
+        post_tax_national_description = []
+
     meta = VariableMeta(
         title=f"{REL_DICT[rel]} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
         description_short=VAR_DICT[var]["description"],
-        description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION,
+        description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
         description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {RELATIVE_POVERTY_DESCRIPTION}
