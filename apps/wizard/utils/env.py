@@ -110,7 +110,7 @@ class OWIDEnv:
             return "local"
         elif self.env_type_id == "staging":
             return f"{self.conf.DB_HOST}"
-        raise ValueError("Unknown env_type_id")
+        raise ValueError(f"Unknown env_type_id (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})")
 
     @property
     def base_site(self) -> str | None:
