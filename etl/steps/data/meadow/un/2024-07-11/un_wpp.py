@@ -71,7 +71,7 @@ def process_population(tb: Table) -> Table:
     tb = tb.loc[tb["location_type"].isin(location_types)]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "location_type", "variant", "sex", "age"])
+    tb = tb.format(["country", "year", "location_type", "variant", "sex", "age"], short_name="population")
 
     return tb
 

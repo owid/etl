@@ -1,0 +1,484 @@
+"""Population table."""
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+from dtypes import optimize_dtypes
+from owid.catalog import Table
+from owid.catalog.tables import concat
+from shared import harmonize_dimension
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
+
+
+def process(tb: Table) -> Table:
+    """Process the population table."""
+    paths.log.info("Processing population variables...")
+
+    # Sanity check
+    assert tb.notna().all(axis=None), "Some NaNs detected"
+
+    # Scale
+    tb["population"] *= 1000
+
+    # Remove location_type
+    tb = tb.drop(columns="location_type")
+
+    # Estimate age groups
+    tb = estimate_age_groups(tb)
+
+    # Add population change
+    tb = add_population_change(tb)
+
+    # Harmonize country names
+    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+
+    # Harmonize dimensions
+    tb = harmonize_dimension(
+        tb,
+        "variant",
+        mapping={"Medium variant": "medium"},
+    )
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        {
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    # Format
+    tb = tb.format(["country", "year", "sex", "age", "variant"])
+
+    return tb
+
+
+def estimate_age_groups(tb: Table) -> Table:
+    """Estimate population values for all age groups."""
+    tb_ = tb.copy()
+
+    # List with all agge groups
+    tbs = []
+
+    # 1/ Basic age groups
+    age_map = {
+        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{"100+": "100+"},
+    }
+    tb_basic = tb_.assign(age=tb_.age.map(age_map))
+    tb_basic = tb_basic.groupby(
+        ["country", "year", "sex", "age", "variant"],
+        as_index=False,
+        observed=True,
+    )["population"].sum()
+    tbs.append(tb_basic)
+
+    # 2/ Additional age groups (NOTE: they are not disjoint!)
+    age_groups = [
+        0,
+        1,
+        (1, 4),  # 1-4
+        (0, 14),  # 0-14
+        (0, 24),  # 0-24
+        (5, 14),  # 5-14
+        (15, 24),  # 15-24
+        (15, 64),  # 15-64
+        (20, 29),  # 20-29
+        (25, 64),  # 25-64
+        (30, 39),  # 30-39
+        (40, 49),  # 40-49
+        (50, 59),  # 50-59
+        (60, 69),  # 60-69
+        (70, 79),  # 70-79
+        (80, 89),  # 80-89
+        (90, 99),  # 90-99
+        (15, 200, "15+"),  # 15+
+        (18, 200, "18+"),  # 18+
+        (65, 200, "65+"),  # 65+
+    ]
+    for age_group in age_groups:
+        if isinstance(age_group, int):
+            tb_age = tb_[tb_.age == str(age_group)].copy()
+        else:
+            tb_age = _add_age_group(tb_, *age_group)
+
+        tbs.append(tb_age)
+
+    # 3/ All-age group
+    tb_all = (
+        tb_.groupby(
+            ["country", "year", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )["population"]
+        .sum()
+        .assign(age="all")
+    )
+    tbs.append(tb_all)
+
+    # 4/ Merge all age groups
+    tb_population = concat(
+        tbs,
+        ignore_index=True,
+    )
+
+    return tb_population
+
+
+def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+    """Estimate a new age group."""
+    # Get subset of entries, apply groupby-sum if needed
+    if age_min == age_max:
+        tb_age = tb.loc[tb["age"] == str(age_min)].copy()
+    else:
+        ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
+        tb_age = tb.loc[tb["age"].isin(ages_accepted)].drop(columns="age").copy()
+
+        tb_age = tb_age.groupby(
+            ["country", "year", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )["population"].sum()
+
+    # Assign age group name
+    if age_group:
+        tb_age["age"] = age_group
+    else:
+        tb_age["age"] = f"{age_min}-{age_max}"
+
+    return tb_age
+
+
+def add_population_change(tb: Table) -> Table:
+    """Estimate anual population change."""
+    column_pop_change = "population_change"
+
+    # Sort by year
+    tb.sort_values("year")
+
+    # Estimate population change
+    pop_change = tb.groupby(["country", "sex", "age", "variant"])["population"].diff()
+    tb[column_pop_change] = pop_change
+
+    # Sanity check
+    assert (years := set(tb[tb[column_pop_change].isna()]["year"])) == {1950}, f"Other than year 1950 detected: {years}"
+
+    return tb
+
+
+#################################################################################
+#################################################################################
+# Old code below. Left in case it's needed for reference.
+#################################################################################
+#################################################################################
+# rename columns
+COLUMNS_ID: Dict[str, str] = {
+    "location": "location",
+    "time": "year",
+    "variant": "variant",
+    "agegrp": "age",
+}
+COLUMNS_METRICS: Dict[str, Dict[str, Any]] = {
+    "sex_ratio": {
+        "name": "sex_ratio",
+        "sex": "none",
+    },
+    "popmale": {
+        "name": "population",
+        "sex": "male",
+        "operation": lambda x: (x * 1000),
+    },
+    "popfemale": {
+        "name": "population",
+        "sex": "female",
+        "operation": lambda x: (x * 1000),
+    },
+    "poptotal": {
+        "name": "population",
+        "sex": "all",
+        "operation": lambda x: (x * 1000),
+    },
+}
+COLUMNS_ORDER: List[str] = [
+    "location",
+    "year",
+    "metric",
+    "sex",
+    "age",
+    "variant",
+    "value",
+]
+
+
+def process_base(df: Table, country_std: str) -> Table:
+    df = df.reset_index()
+    df = df.assign(location=df.location.map(country_std).astype("category"))
+    # Discard unmapped regions
+    df = df.dropna(subset=["location"])
+    # Estimate sex_ratio
+    df = df.assign(sex_ratio=(100 * df.popmale / df.popfemale).round(2))
+    # Unpivot
+    df = df.melt(COLUMNS_ID.keys(), COLUMNS_METRICS.keys(), "metric", "value")
+    # Rename columns
+    df = df.rename(columns=COLUMNS_ID)
+    # dtypes
+    df = df.astype({"metric": "category", "year": "uint16"})
+    # Scale units
+    ops = {k: v.get("operation", lambda x: x) for k, v in COLUMNS_METRICS.items()}
+    for m in df.metric.unique():
+        df.loc[df.metric == m, "value"] = ops[m](df.loc[df.metric == m, "value"])
+    # Column value mappings
+    df = df.assign(
+        metric=df.metric.map({k: v["name"] for k, v in COLUMNS_METRICS.items()}).astype("category"),
+        sex=df.metric.map({k: v["sex"] for k, v in COLUMNS_METRICS.items()}).astype("category"),
+        variant=df.variant.apply(lambda x: x.lower()).astype("category"),
+    )
+    # Column order
+    df = df[COLUMNS_ORDER]
+    return df
+
+
+# def process_old(df: Table, country_std: str) -> Tuple[Table, Table]:
+#     """Re-organizes age groups and complements some metrics."""
+#     df_base = process_base(df, country_std)
+#     # Add metrics
+#     df = add_metrics(df_base.copy())
+#     # Remove potential outliers
+#     df = remove_outliers(df)
+#     return df_base, df
+
+
+# def add_metrics(df: Table) -> Table:
+#     # Build metrics (e.g. age groups)
+#     df_sr = _add_metric_sexratio(df)
+#     df_p_granular, df_p_broad = _add_metric_population_old(df)
+#     df_p_diff = _add_metric_population_change_old(df_p_granular)
+#     df_sr_all = _add_metric_sexratio_all(df_p_granular)
+#     # Optimize field types
+#     df_sr = optimize_dtypes(df_sr)
+#     df_sr_all = optimize_dtypes(df_sr_all)
+#     df_p_granular = optimize_dtypes(df_p_granular)
+#     df_p_broad = optimize_dtypes(df_p_broad)
+#     df_p_diff = optimize_dtypes(df_p_diff)
+#     # Concatenate
+#     df = pr.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
+#     # Remove infs
+#     msk = np.isinf(df["value"])
+#     df.loc[msk, "value"] = np.nan
+#     return df
+
+
+def remove_outliers(df: Table) -> Table:
+    """Remove outliers from the population table.
+
+    So far, detected ones are:
+        - Sex ratio for Sint Maarten
+    """
+    df = df.loc[
+        ~(
+            (df["location"] == "Sint Maarten (Dutch part)")
+            & (df["metric"] == "sex_ratio")
+            & (df["age"].isin(["5", "10", "30", "40"]))
+        )
+    ]
+    return df
+
+
+def _add_metric_sexratio(df: Table) -> Table:
+    df_sr = df.loc[df.metric == "sex_ratio"]
+    df_sr = df_sr.loc[
+        df_sr.age.isin(
+            [
+                "0",
+                "5",
+                "10",
+                "15",
+                "20",
+                "30",
+                "40",
+                "50",
+                "60",
+                "70",
+                "80",
+                "90",
+                "100+",
+                "at birth",
+            ]
+        )
+    ]
+    return df_sr
+
+
+# def _add_metric_population_old(df: Table) -> Tuple[Table, Table]:
+#     df_p = df.loc[df.metric == "population"]
+#     # Basic age groups
+#     age_map = {
+#         **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+#         **{"100+": "100+"},
+#     }
+#     df_p_granular = df_p.assign(age=df_p.age.map(age_map).astype("category"))
+#     df_p_granular = df_p_granular.groupby(
+#         ["location", "year", "metric", "sex", "age", "variant"],
+#         as_index=False,
+#         observed=True,
+#     ).sum()
+#     df_p_granular = optimize_dtypes(df_p_granular, simple=True)
+#     # Additional age groups
+#     # <1
+#     df_p_0 = df_p[df_p.age == "0"].copy()
+#     df_p_0 = optimize_dtypes(df_p_0, simple=True)
+#     # 1
+#     df_p_1 = df_p[df_p.age == "1"].copy()
+#     df_p_1 = optimize_dtypes(df_p_1, simple=True)
+#     # 1-4
+#     df_p_1_4 = _add_age_group(df_p, 1, 4)
+#     # 0 - 14
+#     df_p_0_14 = _add_age_group(df_p, 0, 14)
+#     # 0 - 24
+#     df_p_0_24 = _add_age_group(df_p, 0, 24)
+#     # 15 - 64
+#     df_p_15_64 = _add_age_group(df_p, 15, 64)
+#     # 15+
+#     df_p_15_plus = _add_age_group(df_p, 15, 200, "15+")
+#     # 18+
+#     df_p_18_plus = _add_age_group(df_p, 18, 200, "18+")
+#     # 20 - 29
+#     df_p_20_29 = _add_age_group(df_p, 20, 29)
+#     # 30 - 39
+#     df_p_30_39 = _add_age_group(df_p, 30, 39)
+#     # 40 - 49
+#     df_p_40_49 = _add_age_group(df_p, 40, 49)
+#     # 50 - 59
+#     df_p_50_59 = _add_age_group(df_p, 50, 59)
+#     # 60 - 69
+#     df_p_60_69 = _add_age_group(df_p, 60, 69)
+#     # 70 - 79
+#     df_p_70_79 = _add_age_group(df_p, 70, 79)
+#     # 80 - 89
+#     df_p_80_89 = _add_age_group(df_p, 80, 89)
+#     # 90 - 99
+#     df_p_90_99 = _add_age_group(df_p, 90, 99)
+#     # all
+#     df_p_all = (
+#         df_p.groupby(
+#             ["location", "year", "metric", "sex", "variant"],
+#             as_index=False,
+#             observed=True,
+#         )
+#         .value.sum()
+#         .assign(age="all")
+#     )
+#     df_p_all = optimize_dtypes(df_p_all, simple=True)
+#     # Merge all age groups
+#     df_p_granular = pd.concat(
+#         [
+#             df_p_granular,
+#             df_p_0,
+#             df_p_0_14,
+#             df_p_0_24,
+#             df_p_1,
+#             df_p_1_4,
+#             df_p_15_64,
+#             df_p_15_plus,
+#             df_p_18_plus,
+#             df_p_20_29,
+#             df_p_30_39,
+#             df_p_40_49,
+#             df_p_50_59,
+#             df_p_60_69,
+#             df_p_70_79,
+#             df_p_80_89,
+#             df_p_90_99,
+#             df_p_all,
+#         ],
+#         ignore_index=True,
+#     ).astype({"age": "category"})
+#     # Broad age groups
+#     df_p_broad = df_p.assign(age=df_p.age.map(map_broad_age).astype("category"))
+#     df_p_broad = df_p_broad.groupby(
+#         ["location", "year", "metric", "sex", "age", "variant"],
+#         as_index=False,
+#         observed=True,
+#     ).sum()
+#     df_p_broad = df_p_broad.assign(metric="population_broad").astype({"metric": "category"})
+#     return df_p_granular, df_p_broad
+
+
+def _add_age_group_old(df: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+    ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
+    dfx: Table = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
+    dfx = dfx.groupby(
+        ["location", "year", "metric", "sex", "variant"],
+        as_index=False,
+        observed=True,
+    ).sum()
+    if age_group:
+        dfx = dfx.assign(age=age_group)
+    else:
+        dfx = dfx.assign(age=f"{age_min}-{age_max}")
+    dfx = optimize_dtypes(dfx, simple=True)
+    return dfx
+
+
+def map_broad_age_old(age: str) -> str:
+    """Broader age groups mapping."""
+    if age == "100+":
+        return "65+"
+    elif int(age) < 5:
+        return "0-4"
+    elif int(age) < 15:
+        return "5-14"
+    elif int(age) < 25:
+        return "15-24"
+    elif int(age) < 65:
+        return "25-64"
+    else:
+        return "65+"
+
+
+def _add_metric_population_change_old(df_p_granular: Table) -> Table:
+    pop_diff = (
+        df_p_granular.sort_values("year")
+        .groupby(["location", "sex", "age", "variant"])[["value"]]
+        .diff()
+        .assign(metric="population_change")
+        .astype({"metric": "category"})
+    )
+    df_p_diff = pd.concat(
+        [
+            df_p_granular[[col for col in df_p_granular.columns if col not in ["value", "metric"]]],
+            pop_diff,
+        ],
+        axis=1,
+    ).dropna(subset="value")
+    return df_p_diff
+
+
+def _add_metric_sexratio_all(df_p_granular: Table) -> Any:
+    # print(df_p_granular.head())
+    # Check
+    (df_p_granular.metric.unique() == ["population"]).all()
+    # Get M/F values
+    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
+        columns={"value": "value_male"}
+    )  # type: ignore
+    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
+        columns={"value": "value_female"}
+    )  # type: ignore
+    # Check
+    assert len(df_male) == len(df_female)
+    # Build df
+    cols_merge = ["location", "year", "variant"]
+    df_ = df_male.merge(df_female[cols_merge + ["value_female"]], on=cols_merge)
+    df_ = df_.assign(
+        value=(100 * df_.value_male / df_.value_female).round(2),
+        metric="sex_ratio",
+        age="all",
+        sex="none",
+    ).drop(columns=["value_male", "value_female"])
+    # print(df_.head())
+    return df_

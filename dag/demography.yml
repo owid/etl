@@ -23,12 +23,12 @@ steps:
     - data://garden/demography/2023-03-31/population
 
   # WPP (2024)
-  data://meadow/un/2024-07-11/un_wpp:
-    - snapshot://un/2024-07-11/un_wpp.zip
-  data://garden/un/2024-07-11/un_wpp:
-    - data://meadow/un/2024-07-11/un_wpp
-  data://grapher/un/2024-07-11/un_wpp:
-    - data://garden/un/2024-07-11/un_wpp
+  data-private://meadow/un/2024-07-11/un_wpp:
+    - snapshot-private://un/2024-07-11/un_wpp_population.csv
+  data-private://garden/un/2024-07-11/un_wpp:
+    - data-private://meadow/un/2024-07-11/un_wpp
+  data-private://grapher/un/2024-07-11/un_wpp:
+    - data-private://garden/un/2024-07-11/un_wpp
 
   # Population (Fariss et al.)
   data://meadow/demography/2023-12-20/population_fariss:
