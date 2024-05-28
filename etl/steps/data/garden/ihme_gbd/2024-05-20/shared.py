@@ -19,13 +19,12 @@ def add_regional_aggregates(
     For Rate we need to calculate it for each region by dividing the sum of the 'Number' values by the sum of the population.
     """
     # Split the table into Number, Percent and Rate
-    tb_number = tb[tb["metric"].isin(["Number", "Percent"])].copy()
+    tb_number_percent = tb[tb["metric"].isin(["Number", "Percent"])].copy()
     tb_rate = tb[tb["metric"] == "Rate"].copy()
-    tb_percent = tb[tb["metric"] == "Percent"].copy()
     # Add population data - some datasets will have data disaggregated by sex
     if "sex" in tb.columns:
-        tb_number = add_population(
-            df=tb_number,
+        tb_number_percent = add_population(
+            df=tb_number_percent,
             country_col="country",
             year_col="year",
             age_col="age",
@@ -36,12 +35,14 @@ def add_regional_aggregates(
             sex_group_male="Male",
         )
     else:
-        tb_number = add_population(
-            df=tb_number, country_col="country", year_col="year", age_col="age", age_group_mapping=age_group_mapping
+        tb_number_percent = add_population(
+            df=tb_number_percent,
+            country_col="country",
+            year_col="year",
+            age_col="age",
+            age_group_mapping=age_group_mapping,
         )
-    assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
-    # Combine Number and Percent tables
-    tb_number_percent = pr.concat([tb_number, tb_percent], ignore_index=True)
+    assert tb_number_percent["value"].notna().all(), "Values are missing in the Number table, check configuration"
     # Add region aggregates - for Number and Percent (if present)
     tb_number_percent = geo.add_regions_to_table(
         tb_number_percent,
