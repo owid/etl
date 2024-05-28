@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["gbd_mental_health"].reset_index()
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = add_regional_aggregates(
         tb,
@@ -50,9 +51,6 @@ def run(dest_dir: str) -> None:
     # Add a share of the population column
     tb = add_share_population(tb)
     #
-    # Process data.
-    #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Format the tables
     tb = tb.format(["country", "year", "cause", "metric", "sex", "age"])
