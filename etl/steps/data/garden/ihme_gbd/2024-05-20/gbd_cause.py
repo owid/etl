@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+from owid.catalog import processing as pr
 from shared import add_regional_aggregates
 
 from etl.data_helpers import geo
@@ -51,6 +53,8 @@ def run(dest_dir: str) -> None:
     tb_deaths = tb_deaths.drop(columns="measure")
     tb_dalys = tb_dalys.drop(columns="measure")
 
+    # Add all forms of violence together - for Deaths only
+    tb_deaths = add_all_forms_of_violence(tb_deaths)
     # Format the tables
     tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
     tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
@@ -65,3 +69,23 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_all_forms_of_violence(tb: Table) -> Table:
+    """
+    Add all forms of violence together
+    """
+    violence = ["Interpersonal violence", "Conflict and terrorism", "Police conflict and executions"]
+
+    tb_violence = tb[(tb["cause"].isin(violence)) & (tb["age"] == "Age-standardized")]
+    assert all(tb_violence["metric"] == "Rate")
+    assert all(
+        v in tb_violence["cause"].values for v in violence
+    ), "Not all elements of 'violence' are present in tb_violence['cause']"
+
+    tb_violence = tb_violence.groupby(["country", "age", "metric", "year"])["value"].sum().reset_index()
+    tb_violence["cause"] == "All forms of violence"
+
+    tb = pr.concat([tb, tb_violence], ignore_index=True)
+
+    return tb
