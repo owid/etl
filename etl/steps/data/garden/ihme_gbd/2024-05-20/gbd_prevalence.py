@@ -1,8 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
-from owid.catalog import processing as pr
-from shared import add_regional_aggregates
+from shared import add_regional_aggregates, add_share_population
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -72,16 +70,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def add_share_population(tb: Table) -> Table:
-    """
-    Add a share of the population column to the table.
-    The 'Rate' column is the number of cases per 100,000 people, we want the equivalent per 100 people.
-    """
-    tb_share = tb[tb["metric"] == "Rate"].copy()
-    tb_share["metric"] = "Share"
-    tb_share["value"] = tb_share["value"] / 1000
-
-    tb = pr.concat([tb, tb_share], ignore_index=True)
-    return tb

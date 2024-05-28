@@ -22,10 +22,24 @@ def add_regional_aggregates(
     tb_number = tb[tb["metric"].isin(["Number", "Percent"])].copy()
     tb_rate = tb[tb["metric"] == "Rate"].copy()
     tb_percent = tb[tb["metric"] == "Percent"].copy()
-    # Add population data
-    tb_number = add_population(
-        df=tb_number, country_col="country", year_col="year", age_col="age", age_group_mapping=age_group_mapping
-    )
+    # Add population data - some datasets will have data disaggregated by sex
+    if "sex" in tb.columns:
+        tb_number = add_population(
+            df=tb_number,
+            country_col="country",
+            year_col="year",
+            age_col="age",
+            age_group_mapping=age_group_mapping,
+            sex_col="sex",
+            sex_group_all="Both",
+            sex_group_female="Female",
+            sex_group_male="Male",
+        )
+    else:
+        tb_number = add_population(
+            df=tb_number, country_col="country", year_col="year", age_col="age", age_group_mapping=age_group_mapping
+        )
+    assert tb_number["value"].notna().all(), "Values are missing in the Number table, check configuration"
     # Combine Number and Percent tables
     tb_number_percent = pr.concat([tb_number, tb_percent], ignore_index=True)
     # Add region aggregates - for Number and Percent (if present)
@@ -51,3 +65,16 @@ def add_regional_aggregates(
     )
     tb_out = tb_out.drop(columns="population")
     return tb_out
+
+
+def add_share_population(tb: Table) -> Table:
+    """
+    Add a share of the population column to the table.
+    The 'Rate' column is the number of cases per 100,000 people, we want the equivalent per 100 people.
+    """
+    tb_share = tb[tb["metric"] == "Rate"].copy()
+    tb_share["metric"] = "Share"
+    tb_share["value"] = tb_share["value"] / 1000
+
+    tb = pr.concat([tb, tb_share], ignore_index=True)
+    return tb
