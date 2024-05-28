@@ -110,7 +110,7 @@ def cli(
 
     - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
 
-    **Example 1:** Run staging-sync in dry-run mode to see what charts will be updated
+    **Example 1:** Run chart-sync in dry-run mode to see what charts will be updated
 
     ```
     $ etl chart-sync staging-site-my-branch .env.prod.write --dry-run

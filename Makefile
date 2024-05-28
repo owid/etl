@@ -28,7 +28,7 @@ help:
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make api   		Start the ETL API on port 8081'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
-	@echo '  make staging-sync 	Start Staging-sync on port 8083'
+	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
