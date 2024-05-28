@@ -33,13 +33,13 @@ log = get_logger()
 ########################################################################################################################
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def main(upload: bool, path_to_file: str) -> None:
+@click.option("--path-to-file-population", prompt=True, type=str, help="Path to local population file.")
+def main(upload: bool, path_to_file_population: str) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"un/{SNAPSHOT_VERSION}/un_wpp.csv")
+    snap = Snapshot(f"un/{SNAPSHOT_VERSION}/un_wpp_population.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(filename=path_to_file, upload=upload)
+    snap.create_snapshot(filename=path_to_file_population, upload=upload)
 
 
 ########################################################################################################################

@@ -1,5 +1,5 @@
 meta:
-  is_public: False
+  is_public: false
 
   origin:
     # Data product / Snapshot
@@ -7,6 +7,9 @@ meta:
     description: |-
       World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
     date_published: '2024-07-11'
+    title_snapshot: World Population Prospects, Population
+    description_snapshot: |-
+      Indicators concerning population estimates by the WPP.
 
     # Citation
     producer: United Nations
@@ -23,3 +26,7 @@ meta:
     license:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
+outs:
+  - md5: 64cd28fe0cc76bc75bafc4bf3e4bb27e
+    size: 1179610364
+    path: un_wpp_population.csv
