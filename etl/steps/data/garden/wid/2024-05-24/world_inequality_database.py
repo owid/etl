@@ -10,7 +10,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
-from structlog import get_logger
 from tabulate import tabulate
 
 from etl.helpers import PathFinder, create_dataset
@@ -18,8 +17,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Initialize logger.
-log = get_logger()
 
 # Define combinations of variables to calculate relative poverty
 EXTRAPOLATED_DICT = {"no": "", "yes": "_extrapolated"}
@@ -106,8 +103,8 @@ def drop_columns_and_transform(tb: Table) -> Table:
     # Delete some share ratios we are not using, and also the p0p40 (share) variable only available for pretax
     drop_list = ["s90_s10_ratio", "s90_s50_ratio", "p0p40"]
 
-    for var in drop_list:
-        tb = tb[tb.columns.drop(list(tb.filter(like=var)))]
+    columns_drop = tb.filter(regex=r"|".join(drop_list)).columns
+    tb = tb.drop(columns=columns_drop)
 
     return tb
 
@@ -123,26 +120,24 @@ def add_relative_poverty(tb: Table, tb_percentiles: Table, extrapolated_dict: di
 
     # Make tb_percentiles wide, by creating a column for each welfare
     tb_percentiles = tb_percentiles.pivot(
-        index=["country", "year", "p", "percentile"], columns="welfare", values=["thr", "thr_extrapolated"]
+        index=["country", "year", "p", "percentile"],
+        columns="welfare",
+        values=["thr", "thr_extrapolated"],
+        join_column_levels_with="_",
     )
 
-    # Flatten column names
-    tb_percentiles.columns = ["_".join(col).strip() for col in tb_percentiles.columns.values]
-    tb_percentiles = tb_percentiles.reset_index()
+    # Merge the two tables
+    tb_percentiles = pr.merge(tb_percentiles, tb, on=["country", "year"], how="left")
 
     # Calculate 40, 50, and 60 percent of the median for each country and year
     for var in welfare_vars:
         for yn, extrapolated in extrapolated_dict.items():
             for pct in [40, 50, 60]:
-                tb[f"median{pct}pct_{var}{extrapolated}"] = tb[f"median_{var}{extrapolated}"] * pct / 100
+                tb_percentiles[f"median{pct}pct_{var}{extrapolated}"] = (
+                    tb_percentiles[f"median_{var}{extrapolated}"] * pct / 100
+                )
 
-    # Merge the two tables
-    tb_percentiles = pr.merge(tb_percentiles, tb, on=["country", "year"], how="left")
-
-    # Calculate absolute difference between thresholds and percentage of median
-    for var in welfare_vars:
-        for yn, extrapolated in extrapolated_dict.items():
-            for pct in [40, 50, 60]:
+                # Calculate absolute difference between thresholds and percentage of median
                 tb_percentiles[f"abs_diff{pct}pct_{var}{extrapolated}"] = abs(
                     tb_percentiles[f"thr{extrapolated}_{var}"] - tb_percentiles[f"median{pct}pct_{var}{extrapolated}"]
                 )
@@ -205,19 +200,22 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
     for e in EXTRAPOLATED_DICT:
         for v in variables:
             for w in welfare:
-                # Filter only values lower than 0 or higher than 1
                 col = f"{v}_{w}{EXTRAPOLATED_DICT[e]}"
                 mask = (tb[col] > 1) | (tb[col] < 0)
-                tb_error = tb[mask].copy().reset_index()
+                any_error = mask.any()
 
-                if not tb_error.empty and w != "wealth":
-                    log.fatal(
+                if any_error and w != "wealth":
+                    # Filter only values lower than 0 or higher than 1
+                    tb_error = tb[mask].copy().reset_index()
+                    paths.log.fatal(
                         f"""Values for {col} are not between 0 and 1:
                         {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
                     )
 
-                elif not tb_error.empty and w == "wealth":
-                    log.warning(
+                elif any_error and w == "wealth":
+                    # Filter only values lower than 0 or higher than 1
+                    tb_error = tb[mask].copy().reset_index()
+                    paths.log.warning(
                         f"""Values for {col} are not between 0 and 1:
                         {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
                     )
@@ -243,10 +241,11 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
             tb["null_check"] = tb[cols].isnull().sum(1)
 
             mask = (tb["sum_check"] >= 100 + margin) | (tb["sum_check"] <= 100 - margin) & (tb["null_check"] == 0)
-            tb_error = tb[mask].reset_index(drop=True).copy()
+            any_error = mask.any()
 
-            if not tb_error.empty:
-                log.fatal(
+            if any_error:
+                tb_error = tb[mask].reset_index(drop=True).copy()
+                paths.log.fatal(
                     f"""{len(tb_error)} share observations ({w}{EXTRAPOLATED_DICT[e]}) are not adding up to 100%:
                     {tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
                 )
@@ -269,10 +268,11 @@ def check_negative_values(tb: Table):
     for v in variables:
         # Create a mask to check if any value is negative
         mask = tb[v] < 0
-        tb_error = tb[mask].reset_index(drop=True).copy()
+        any_error = mask.any()
 
-        if not tb_error.empty:
-            log.warning(
+        if any_error:
+            tb_error = tb[mask].reset_index(drop=True).copy()
+            paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
                 {tabulate(tb_error[['country', 'year', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
             )
@@ -310,10 +310,11 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
 
                 # Create a mask to check if all the previous columns are True
                 mask = (~tb["monotonicity_check"]) & (tb["null_check"] == 0)
-                tb_error = tb[mask].reset_index(drop=True).copy()
+                any_error = mask.any()
 
-                if not tb_error.empty:
-                    log.fatal(
+                if any_error:
+                    tb_error = tb[mask].reset_index(drop=True).copy()
+                    paths.log.fatal(
                         f"""{len(tb_error)} observations for {m}_{w}{EXTRAPOLATED_DICT[e]} are not monotonically increasing:
                         {tabulate(tb_error[['country', 'year'] + cols], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".2f")}"""
                     )
@@ -359,11 +360,11 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
             tb["null_check"] = tb[check_nulls].sum(1)
 
             mask = (~tb["check"]) & (tb["null_check"] == 0)
+            any_error = mask.any()
 
-            tb_error = tb[mask].reset_index(drop=True).copy()
-
-            if not tb_error.empty:
-                log.fatal(
+            if any_error:
+                tb_error = tb[mask].reset_index(drop=True).copy()
+                paths.log.fatal(
                     f"""{len(tb_error)} observations for avg {w}{EXTRAPOLATED_DICT[e]} are not between the corresponding thresholds:
                     {tabulate(tb_error[['country', 'year'] + check_cols], headers = 'keys', tablefmt = TABLEFMT)}"""
                 )

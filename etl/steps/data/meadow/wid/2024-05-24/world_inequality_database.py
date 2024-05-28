@@ -3,12 +3,8 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -205,7 +201,7 @@ def harmonize_countries(tb: Table, tb_regions: Table, iso2_missing: dict, iso_2_
 
     # Warns if there are still entities missing
     if missing_count > 0:
-        log.warning(
+        paths.log.warning(
             f"There are still {missing_count} unnamed WID countries/regions in {tb.m.short_name}! Take a look at this list:\n {missing_list}"
         )
 
