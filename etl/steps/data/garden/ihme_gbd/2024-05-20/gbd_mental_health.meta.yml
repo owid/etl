@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Mental Health
-    processing_level: minor
+    processing_level: major
   sex: |-
     <% if sex == "Both sexes" %> individuals <% elif sex == "Male" %> male <% elif sex == "Female" %> female <%- endif -%>
   value:

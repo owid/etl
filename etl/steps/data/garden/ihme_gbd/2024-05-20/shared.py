@@ -42,14 +42,12 @@ def add_regional_aggregates(
     ].copy()
 
     # Calculate rates per 100,000 for regions
-    tb_rate_regions["value"] = tb_number["value"] / tb_number["population"] * 100_000
+    tb_rate_regions["value"] = (tb_rate_regions["value"] / tb_rate_regions["population"]) * 100000
     tb_rate_regions["metric"] = "Rate"
-
     tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)
-    tb_rate = tb_rate.drop(columns="population")
-
     tb_out = pr.concat(
         [tb_number_percent, tb_rate],
         ignore_index=True,
     )
+    tb_out = tb_out.drop(columns="population")
     return tb_out

@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-    processing_level: minor
+    processing_level: major
 
   value_prevalence:
     unit: |-
@@ -12,6 +12,8 @@ definitions:
       cases
       <% elif metric == "Rate" %>
       cases per 100,000 people
+      <% elif metric == "Share" %>
+      cases per 100 people
       <%- endif -%>
     title: |-
       <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
@@ -26,6 +28,10 @@ definitions:
       Age-standardized current cases of << cause.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
       Total current cases of << cause.lower() >> per 100,000 people
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      Age-standardized current cases of << cause.lower() >> per 100 people
+      <% elif metric == "Share" and age == 'All ages'%>
+      Total current cases of << cause.lower() >> per 100 people
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
@@ -40,6 +46,12 @@ definitions:
       The estimated number of age-standardized current cases of << cause.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
       The estimated number of current cases of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of current cases of << cause.lower() >> in those aged << age >>, per 100 people.
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      The estimated number of age-standardized current cases of << cause.lower() >>, per 100 people.
+      <% elif metric == "Share" and age == 'All ages'%>
+      The estimated number of current cases of << cause.lower() >>, per 100 people.
       <%- endif -%>
   value_incidence:
     unit: |-
@@ -47,6 +59,8 @@ definitions:
       new cases
       <% elif metric == "Rate" %>
       new cases per 100,000 people
+      <% elif metric == "Share" %>
+      new cases per 100 people
       <%- endif -%>
     title: |-
       <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
@@ -61,6 +75,12 @@ definitions:
       Age-standardized new cases of << cause.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
       New cases of << cause.lower() >> per 100,000 people
+      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
+      New cases of << cause.lower() >>, among individuals aged << age >> per 100 people
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      Age-standardized new cases of << cause.lower() >> per 100 people
+      <% elif metric == "Share" and age == 'All ages'%>
+      New cases of << cause.lower() >> per 100 people
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
@@ -75,6 +95,12 @@ definitions:
       The estimated number of age-standardized new cases of << cause.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
       The estimated number of new cases of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of new cases of << cause.lower() >> in those aged << age >>, per 100 people.
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      The estimated number of age-standardized new cases of << cause.lower() >>, per 100 people.
+      <% elif metric == "Share" and age == 'All ages'%>
+      The estimated number of new cases of << cause.lower() >>, per 100 people.
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
