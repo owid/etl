@@ -29,6 +29,8 @@ definitions:
       <% elif metric == "Rate" and age == 'Age-standardized'%>
       Age-standardized current cases of << cause.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      Current cases of << cause.lower() >>, among individuals aged << age >> per 100 people
       Total current cases of << cause.lower() >> per 100,000 people
       <% elif metric == "Share" and age == 'Age-standardized'%>
       Age-standardized current cases of << cause.lower() >> per 100 people
