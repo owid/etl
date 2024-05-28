@@ -6,7 +6,13 @@ definitions:
         - Mental Health
     processing_level: major
   sex: |-
-    <% if sex == "Both" %> individuals <% elif sex == "Male" %> males <% elif sex == "Female" %> females <%- endif -%>
+    <% if sex == "Both" %>
+    individuals
+    <% elif sex == "Male" %>
+    males
+    <% elif sex == "Female" %>
+    females
+    <%- endif -%>
   value:
     unit: |-
       <% if metric == "Number" %>
