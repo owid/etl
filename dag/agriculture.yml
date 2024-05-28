@@ -118,6 +118,7 @@ steps:
   # Agriculture - Long-run daily calorie supply per person.
   #
   data://garden/agriculture/2024-05-23/daily_calories_per_person:
+    - data://garden/faostat/2024-03-14/faostat_fbsc
     - data://meadow/agriculture/2024-05-23/harris_et_al_2015
     - data://meadow/agriculture/2024-05-23/floud_et_al_2011
     - data://meadow/agriculture/2024-05-23/jonsson_1998

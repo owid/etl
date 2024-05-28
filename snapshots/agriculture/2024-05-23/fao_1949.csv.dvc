@@ -25,6 +25,6 @@ meta:
       name: © FAO 1949
       url: https://www.un-ilibrary.org/content/books/9789210472654
 outs:
-  - md5: 4fdce005d413a34348174c4371f41025
-    size: 1103
+  - md5: de13ba1616d768c467cb228cc495ad87
+    size: 1074
     path: fao_1949.csv

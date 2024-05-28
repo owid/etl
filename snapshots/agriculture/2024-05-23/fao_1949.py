@@ -23,7 +23,6 @@ def main(upload: bool) -> None:
 country,1947/48,1948/49
 Burma,1986,1877
 Ceylon,1977,1918
-China (22 provinces),2115,
 India,,1570
 Japan,1670,1795
 Philippines,1770,
@@ -73,6 +72,7 @@ Tunisia,1498,1545
 Union of South Africa,2422,2517
     """
     # NOTE:
+    # * The table includes China, but only for 22 provinces, so we ignore it.
     # * The table includes India and Pakistan, but the footnote says that the value for 1948/49 is only India.
     # * Footnote says about Japan: "1t is believed by the Supreme Command Allied Powers that for staple foods there is an appreciable understatement of production, particularly from home gardens, both in staple foods and vegetables. A nutrition survey conducted by the Ministry of Welfare estimated calorie supplies per person per day at 1,965.".
     # * Footnote says about France: "Unreported production has most likely provided enough calories to raise the level to about 2,500-2,600 calories.".

@@ -17,8 +17,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Rename columns.
+    tb = tb.rename(columns={"Years": "year", "Source": "source", "Total": "daily_calories"}, errors="raise")
+
+    # Add a country column.
+    tb["country"] = "England and Wales"
+
     # Format table conveniently.
-    tb = tb.format(["years", "source"])
+    tb = tb.format(["country", "year", "source"])
 
     #
     # Save outputs.
