@@ -360,7 +360,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
-    if is_numeric:
+    if not is_numeric:
         # TODO: Show as a sankey diagram where the flow from old to new categories is shown.
         # Reshape
         df_cat = df.melt(id_vars=COLUMNS_INDEX, value_vars=[col_old, col_new], var_name="indicator", value_name="value")
