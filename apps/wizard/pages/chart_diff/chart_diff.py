@@ -30,15 +30,15 @@ class ChartDiffModified:
 
     @property
     def is_approved(self) -> bool:
-        return self.approval_status == gm.ChartStatus.APPROVED
+        return self.approval_status == gm.ChartStatus.APPROVED.value
 
     @property
     def is_rejected(self) -> bool:
-        return self.approval_status == gm.ChartStatus.REJECTED
+        return self.approval_status == gm.ChartStatus.REJECTED.value
 
     @property
     def is_pending(self) -> bool:
-        return self.approval_status == gm.ChartStatus.PENDING
+        return self.approval_status == gm.ChartStatus.PENDING.value
 
     @property
     def is_new(self):
@@ -89,6 +89,7 @@ class ChartDiffModified:
             source_chart.updatedAt,
             target_chart.updatedAt if target_chart else None,
         )
+        print("called DB for state, got:", approval_status)
 
         # Build object
         chart_diff = cls(source_chart, target_chart, approval_status)

@@ -102,6 +102,7 @@ def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified
 def st_show(diff: ChartDiffModified, source_session, target_session=None) -> None:
     """Show the chart diff in Streamlit."""
     # Define label
+    print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = "✅" if diff.is_approved else ("❌" if diff.is_rejected else "⏳")
     label = f"{emoji} {diff.source_chart.config['slug']}"
 
@@ -143,7 +144,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
 
     # Actually show stuff
-    with st.expander(label, not diff.is_approved):
+    with st.expander(label, not diff.is_reviewed):
         col1, col2 = st.columns([1, 3])
 
         # Refresh
@@ -171,8 +172,6 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
             },
         }
         option_names = list(options.keys())
-        print(option_names)
-        print(diff.approval_status)
         with col1:
             st.radio(
                 label="Approve or reject chart",
@@ -180,7 +179,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
                 options=option_names,
                 horizontal=True,
                 format_func=lambda x: f":{options[x]['color']}-background[{options[x]['label']}]",
-                index=option_names.index(diff.approval_status),
+                index=option_names.index(diff.approval_status),  # type: ignore
                 on_change=lambda diff=diff, session=source_session: chart_state_change(diff, session),
                 # label_visibility="collapsed",
             )
@@ -322,7 +321,7 @@ def main():
     # Hide reviewed (if option selected)
     if st.session_state.hide_reviewed_charts:
         st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs.items() if not v.reviewed
+            k: v for k, v in st.session_state.chart_diffs.items() if not v.is_reviewed
         }
     else:
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs

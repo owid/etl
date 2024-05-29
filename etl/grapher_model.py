@@ -1383,9 +1383,7 @@ class ChartDiffApprovals(Base):
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
-    def latest_chart_status(
-        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
-    ) -> CHART_DIFF_STATUS:
+    def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
         """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
         result = session.scalars(
             select(cls)
@@ -1400,7 +1398,7 @@ class ChartDiffApprovals(Base):
         if result:
             return result.status
         else:
-            return ChartStatus.PENDING
+            return ChartStatus.PENDING.value
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
