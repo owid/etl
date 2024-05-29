@@ -98,13 +98,19 @@ def other_vision_loss_minus_some_causes(tb: Table) -> Table:
     """
     causes_to_subtract = ["Trachoma", "Onchocerciasis", "Malaria"]
 
-    tb_other_vision_loss = tb[tb["cause"] == "Other vision loss"].copy()
-    tb_trachoma = tb[tb["cause"].isin(causes_to_subtract)].copy()
+    tb_other_vision_loss = tb[
+        (tb["cause"] == "Other vision loss") & (tb["metric"] == "Number") & (tb["impairment"] == "Blindness")
+    ].copy()
+    # Get the trachoma, malaria and onchocerciasis data
+    tb[["cause", "metric", "impairment"]] = tb[["cause", "metric", "impairment"]].astype(str)
+    msk = (tb["cause"].isin(causes_to_subtract)) & (tb["metric"] == "Number") & (tb["impairment"] == "Blindness")
+    tb_trachoma = tb[msk].copy()
+    tb_trachoma = tb_trachoma.groupby(["country", "year", "metric", "impairment", "age"])["value"].sum().reset_index()
+    tb_trachoma["cause"] = "Trachoma, malaria and onchocerciasis"
 
     tb_combine = tb_other_vision_loss.merge(
         tb_trachoma, on=["country", "year", "metric", "impairment", "age"], suffixes=("", "_trachoma")
     )
-    # Can I subtract rates if they have the same denominator? I think so
     tb_combine["value"] = tb_combine["value"] - tb_combine["value_trachoma"]
     tb_combine["cause"] = "Other vision loss minus trachoma, malaria and onchocerciasis"
 
