@@ -157,15 +157,15 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
         # Actions on chart diff: approve, pending, reject
         options = {
-            gm.ChartStatus.APPROVED: {
+            gm.ChartStatus.APPROVED.value: {
                 "label": "Approve",
                 "color": "green",
             },
-            gm.ChartStatus.REJECTED: {
+            gm.ChartStatus.REJECTED.value: {
                 "label": "Reject",
                 "color": "red",
             },
-            gm.ChartStatus.PENDING: {
+            gm.ChartStatus.PENDING.value: {
                 "label": "Pending",
                 "color": "gray",
             },
