@@ -131,10 +131,10 @@ st.selectbox(
     options=[
         Options.FULL,
         Options.METADATA,
+        Options.DATASETTE,
         Options.START,
         Options.GUIDES,
         Options.PRINCIPLES,
-        Options.DATASETTE,
     ],
     index=1,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
