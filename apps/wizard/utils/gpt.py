@@ -2,7 +2,6 @@
 Auxiliary classes, functions and variables.
 """
 from dataclasses import asdict, dataclass
-from datetime import date
 from typing import Any, Dict, List, Optional, Tuple
 
 import structlog
