@@ -32,15 +32,11 @@ main:
   expert:
       title: "Expert"
       description: "Ask the expert ETL questions!"
-      maintainer: "@lucas"
+      maintainer:
+        - "@lucas"
+        - "@daniel"
       entrypoint: pages/expert/app.py
       emoji: "🧙"
-  oracle:
-      title: "Datasette Oracle"
-      description: "Get help writing SQL queries for datasette!"
-      maintainer: "@daniel"
-      entrypoint: pages/owid_datasette_oracle.py
-      emoji: "🔮"
 
 # ETL steps
 etl:
