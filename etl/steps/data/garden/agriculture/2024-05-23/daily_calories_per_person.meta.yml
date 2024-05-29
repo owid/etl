@@ -33,6 +33,8 @@ tables:
           - For Uganda, Cambodia, China, India, Brazil, Mexico, and Peru for 1936 and 1947: We use Table 11 of [FAO (2000)](https://www.fao.org/4/x4400e/x4400e.pdf) (The State of Food and Agriculture).
           - For many countries (including some of the above) for 1947 and 1948: We use values from Table 15 from [FAO (1949)](https://www.fao.org/4/ap637e/ap637e.pdf).
           - Note that prior to 1961, data for the UK may correspond to England, or England and Wales; and Tanzania refers to Tanganyika.
+        display:
+          numDecimalPlaces: 0
       source:
         title: Source of the data point
         unit: ""

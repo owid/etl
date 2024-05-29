@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: The Escape from hunger and Premature Death
+    title: The Escape from Hunger and Premature Death
     title_snapshot: The Escape from hunger and Premature Death - Daily calories in France and Great Britain
     description: |-
       This dataset contains daily calorie supply from Table 1.2 of Fogel (2004) book: "The Escape from hunger and Premature Death".
