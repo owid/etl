@@ -79,38 +79,60 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     if num_changes == 0:
         st.success("No changes in the data points!")
     else:
-        # Display if there are changes (similarity score, error distribution)
-        if summary.num_datapoints_changed > 0:
-            tab1, tab2 = st.tabs(["Summary", "Error distribution"])
-
-            with tab1:
-                # 5/ Show score
-                st_show_score(score)
-
-                # 6/ other info (% of rows changed, number of rows changed)
-                st_show_details(summary)
-
-                # Rename, remove equal datapoints
-                df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
-                df_indicators = df_indicators.rename(columns=var_id_to_display)
-
-                # 7/ Show dataframe with different rows
-                st.header("Changes in data points")
-                st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
-            with tab2:
-                # 8/ Show distribution of change
-                st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
+        # No change in datapoints. I.e. only show main tab.
+        if summary.num_datapoints_changed == 0:
+            st_show_tab_main(
+                score, summary, df_indicators, indicator_old, indicator_new, var_id_to_display, name_old, name_new
+            )
+        # Changes in datapoints. Show more tabs
         else:
-            # 6/ other info (% of rows changed, number of rows changed)
-            st_show_details(summary)
+            tab_names = ["Summary"]
+            if is_numeric:
+                tab_names.append("Error distribution")
+            if (summary.num_categories_old < 10) & (summary.num_categories_new < 10):
+                tab_names.append("Confusion Matrix")
 
-            # Rename, remove equal datapoints
-            df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
-            df_indicators = df_indicators.rename(columns=var_id_to_display)
+            tabs = st.tabs(tab_names)
+            for tab, tab_name in zip(tabs, tab_names):
+                with tab:
+                    if tab_name == "Summary":
+                        st_show_tab_main(
+                            score,
+                            summary,
+                            df_indicators,
+                            indicator_old,
+                            indicator_new,
+                            var_id_to_display,
+                            name_old,
+                            name_new,
+                        )
+                    elif tab_name == "Error distribution":
+                        st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
+                    elif tab_name == "Confusion Matrix":
+                        df_ = df_indicators.copy()
+                        df_[indicator_old] = df_[indicator_old].fillna("None")
+                        df_[indicator_new] = df_[indicator_new].fillna("None")
+                        confusion_matrix = pd.crosstab(df_[indicator_old], df_[indicator_new], dropna=False)
+                        st.dataframe(confusion_matrix)
 
-            # 7/ Show dataframe with different rows
-            st.header("Changes in data points")
-            st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
+
+def st_show_tab_main(
+    score, summary, df_indicators, indicator_old, indicator_new, var_id_to_display, name_old, name_new
+):
+    # 5/ Show score
+    if summary.num_datapoints_changed > 0:
+        st_show_score(score)
+
+    # 6/ other info (% of rows changed, number of rows changed)
+    st_show_details(summary)
+
+    # Rename, remove equal datapoints
+    df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
+    df_indicators = df_indicators.rename(columns=var_id_to_display)
+
+    # 7/ Show dataframe with different rows
+    st.header("Changes in data points")
+    st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -263,6 +285,8 @@ class SummaryDiff:
     num_datapoints_changed: int = field(default=0)
     num_datapoints_new: int = field(default=0)
     num_datapoints_lost: int = field(default=0)
+    num_categories_old: int = field(default=0)
+    num_categories_new: int = field(default=0)
 
 
 def get_summary_diff(df: pd.DataFrame, indicator_old: str, indicator_new: str, is_numeric: bool) -> SummaryDiff:
@@ -293,6 +317,10 @@ def get_summary_diff(df: pd.DataFrame, indicator_old: str, indicator_new: str, i
     # Number of NAs is new indicator
     num_nan_new = df[indicator_new].isna().sum()
     summary["num_datapoints_lost"] = num_nan_new
+
+    # Get number of categories in old and new
+    summary["num_categories_old"] = df[indicator_old].nunique()
+    summary["num_categories_new"] = df[indicator_new].nunique()
 
     return SummaryDiff(**summary)
 
