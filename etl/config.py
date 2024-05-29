@@ -33,7 +33,7 @@ def load_env():
     if env.get("ENV", "").startswith("."):
         raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
 
-    load_dotenv(ENV_FILE, override=True)
+    load_dotenv(ENV_FILE)
 
 
 load_env()
