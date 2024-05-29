@@ -1,0 +1,67 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    processing_level: minor
+  metric:
+    unit: |-
+      <% if metric == "Number" %>
+      impairments
+      <% elif metric == "Rate" %>
+      impairments per 100,000 people
+      <%- endif -%>
+    title: |-
+      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+      Number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      Age-standardized number of individuals with <<impairment.lower()>> due to << cause.lower()>>
+      <% elif metric == "Number" and age == 'All ages'%>
+      Total number of individuals with <<impairment.lower()>> due to << cause.lower()>>
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      Rate of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized rate of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      Rate of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>.
+      <% elif metric == "Number" and age == 'Age-standardized'%>
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>.
+      <% elif metric == "Number" and age == 'All ages'%>
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>.
+      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
+      The estimated number of individuals aged << age >> with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'Age-standardized'%>
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated number of individuals with <<impairment.lower()>> due to << cause.lower()>>, per 100,000 people.
+      <%- endif -%>
+    footnote: |-
+      <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+  
+tables:
+  impairments:
+    variables:
+      value:
+        title: |-
+          {definitions.metric.title}
+        unit: |-
+          {definitions.metric.unit}
+        description_short: |-
+          {definitions.metric.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.metric.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>2<%- endif -%>

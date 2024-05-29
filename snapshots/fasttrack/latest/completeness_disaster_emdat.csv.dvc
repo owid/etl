@@ -5,7 +5,6 @@ meta:
     title: completeness_disaster_emdat
     citation_full: |-
       Jones, R.L., Guha-Sapir, D. & Tubeuf, S (2022). Human and economic impacts of natural disasters: can we trust the global data?. Scientific Data.
-    version_producer: Google Sheet
     url_main: https://www.nature.com/articles/s41597-022-01667-x
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSv2S-A56FpO3ZAt8QjiQiaUOz86dK1dZ3jWpyvLulm-jX-lSCQrI5pjiIK58h1MMCnXJab_nbdF0pC/pub?output=csv

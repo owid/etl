@@ -159,11 +159,11 @@ steps:
     - data://garden/who/2023-04-03/flu_elderly
 
   # Registered vehicles per 1000 people
-  data://garden/who/2023-03-13/vehicles:
-    - data://garden/owid/latest/key_indicators
-    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
-  data://grapher/who/2023-03-13/vehicles:
-    - data://garden/who/2023-03-13/vehicles
+  data://garden/who/2024-05-20/vehicles:
+    - data://garden/who/2024-01-03/gho
+    - data://garden/demography/2023-03-31/population
+  data://grapher/who/2024-05-20/vehicles:
+    - data://garden/who/2024-05-20/vehicles
 
   # WGM 2020
   data://meadow/health/2023-04-18/wgm_mental_health:
@@ -546,11 +546,66 @@ steps:
   data://grapher/who/2024-04-22/polio_vaccine_schedule:
     - data://garden/who/2024-04-22/polio_vaccine_schedule
 
-    # WHO Avian Influenza H5N1
-  data://meadow/who/2024-04-26/avian_influenza_ah5n1:
-    - snapshot://who/2024-04-26/avian_influenza_ah5n1.csv
-  data://garden/who/2024-04-26/avian_influenza_ah5n1:
+  # Polio GPEI funding
+  data://meadow/health/2024-04-22/gpei_funding:
+    - snapshot://health/2024-04-22/gpei_funding.xlsx
+  data://garden/health/2024-04-22/gpei_funding:
+    - data://meadow/health/2024-04-22/gpei_funding
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+  data://grapher/health/2024-04-22/gpei_funding:
+    - data://garden/health/2024-04-22/gpei_funding
+
+  # IHME GBD - Burden of Disease (2021) - Impairments from NTDs
+  data-private://meadow/ihme_gbd/2024-05-20/impairments:
+    - snapshot-private://ihme_gbd/2024-05-20/impairments.csv
+  data-private://garden/ihme_gbd/2024-05-20/impairments:
+    - data-private://meadow/ihme_gbd/2024-05-20/impairments
     - data://garden/regions/2023-01-01/regions
-    - data://meadow/who/2024-04-26/avian_influenza_ah5n1
-  data://grapher/who/2024-04-26/avian_influenza_ah5n1:
-    - data://garden/who/2024-04-26/avian_influenza_ah5n1
+    - data://garden/demography/2023-03-31/population
+  data-private://grapher/ihme_gbd/2024-05-20/impairments:
+    - data-private://garden/ihme_gbd/2024-05-20/impairments
+
+  # WHO Preventive Chemotherapy - Neglected Tropical Diseases
+  # Lymphatic filariasis
+  data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/lymphatic_filariasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/lymphatic_filariasis
+
+  # Schistosomiasis
+  data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - snapshot://neglected_tropical_diseases/2024-05-02/schistosomiasis.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/schistosomiasis
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
+    - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
+
+    # Soil-transmitted helminthiases
+  data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+    - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+    - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+    - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
+
+  # Neglected Tropical Diseases Funding
+  data://meadow/neglected_tropical_diseases/2024-05-18/funding:
+    - snapshot://neglected_tropical_diseases/2024-05-18/funding.xlsx
+  data://garden/neglected_tropical_diseases/2024-05-18/funding:
+    - data://meadow/neglected_tropical_diseases/2024-05-18/funding
+  data://grapher/neglected_tropical_diseases/2024-05-18/funding:
+    - data://garden/neglected_tropical_diseases/2024-05-18/funding
+
+  # WHO Avian Influenza H5N1
+  data://meadow/who/latest/avian_influenza_ah5n1:
+    - snapshot://who/latest/avian_influenza_ah5n1.csv
+  data://garden/who/latest/avian_influenza_ah5n1:
+    - data://meadow/who/latest/avian_influenza_ah5n1
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/who/latest/avian_influenza_ah5n1:
+    - data://garden/who/latest/avian_influenza_ah5n1

@@ -2,6 +2,7 @@
 
 If you want to add a new service, make sure to add it to the `GROUPS` list. If it is part of a subgroup, add it to the corresponding subgroup in the  `SUBGROUPS` list.
 """
+
 import importlib
 
 import rich_click as click
@@ -70,6 +71,8 @@ SUBGROUPS = {
             "publish": "etl.publish.publish_cli",
             "reindex": "etl.reindex.reindex_cli",
             "run-python-step": "etl.run_python_step.main",
+            "map-datasets": "apps.utils.map_datasets.cli",
+            "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
         },
     },
     "b": {
@@ -177,9 +180,15 @@ GROUPS = (
         {
             "name": "Charts",
             "commands": {
-                "chart-sync": "apps.staging_sync.cli.cli",
+                "chart-sync": "apps.chart_sync.cli.cli",
                 "chart-gpt": "etl.chart_revision.v2.chartgpt.cli",
                 "chart-upgrade": "etl.chart_revision.cli.main_cli",
+            },
+        },
+        {
+            "name": "Owidbot",
+            "commands": {
+                "owidbot": "apps.owidbot.cli.cli",
             },
         },
     ]

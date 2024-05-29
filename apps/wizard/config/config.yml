@@ -16,9 +16,10 @@
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
 # - emoji (str): Emoji to show in the sidebar menu.
-# - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all. Default is True.
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
-# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`. If it's not `staging` or `production`, the app will be disabled and overwrites the value of `enabled`.
+# - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
+#     bool: Whether the app is disabled in all settings.
+#     dict: Whether the app is disabled in certain settings. The key is the setting and the value is a boolean. Available settings (keys) are 'production', 'staging', 'dev'. 'dev' stands for local environments.
 
 # Main pages
 main:
@@ -34,6 +35,12 @@ main:
       maintainer: "@lucas"
       entrypoint: pages/expert/app.py
       emoji: "🧙"
+  oracle:
+      title: "OWID Datasette Oracle"
+      description: "Get help writing SQL queries for datasette!"
+      maintainer: "@daniel"
+      entrypoint: pages/owid_datasette_oracle.py
+      emoji: "🔮"
 
 # ETL steps
 etl:
@@ -44,26 +51,37 @@ etl:
       title: "Snapshot"
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
-      image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
-      disable_on_remote: True
+      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
+      disable:
+        "production": True
+    express:
+      title: "Express"
+      entrypoint: etl_steps/express.py
+      emoji: "️🐆"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+      disable:
+        "production": True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py
       emoji: "2️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-      disable_on_remote: True
+      disable:
+        "production": True
     garden:
       title: "Garden"
       entrypoint: etl_steps/garden.py
       emoji: "3️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-      disable_on_remote: True
+      disable:
+        "production": True
     grapher:
       title: "Grapher"
       entrypoint: etl_steps/grapher.py
       emoji: "4️⃣"
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-      disable_on_remote: True
+      disable:
+        "production": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -84,12 +102,14 @@ sections:
         emoji: "🌟"
         image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
       - title: "Chart Sync"
-        alias: staging_sync
-        entrypoint: ../staging_sync/app.py
+        alias: chart-sync
+        entrypoint: ../chart_sync/app.py
         description: Sync charts between servers
         maintainer: "@mojmir"
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+        disable:
+          "staging": True
 
   - title: "Data tools"
     description: |-
@@ -124,6 +144,30 @@ sections:
         emoji: "💡"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
 
+  - title: "Charts v2"
+    description: |-
+      THIS SECTION IS IN DEVELOPMENT! Create chart revisions, and synchronize aproved revisions between servers.
+    apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: pages/indicator_upgrade/app.py
+      description: Update indicator references in charts
+      maintainer: "@lucas"
+      emoji: "🧬"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+      disable:
+        production: True
+    - title: "Chart Diff"
+      alias: chart-diff
+      entrypoint: pages/chart_diff/app.py
+      description: Chart differences
+      maintainer: "@mojmir"
+      emoji: "⚡"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+      disable:
+        production: True
+
+
   - title: "Metadata"
     description: |-
       Tools to improve our metadata or learn how to use it.
@@ -135,7 +179,9 @@ sections:
         emoji: "🌟"
         alias: metagpt
         image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-        disable_on_remote: True
+        disable:
+          "production": True
+          "staging": True
       - title: "Meta Playground"
         alias: metaplay
         description: "How is metadata presented in data pages?"
@@ -143,7 +189,9 @@ sections:
         entrypoint: pages/metaplay.py
         emoji: "🏐"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-        disable_on_remote: True
+        disable:
+          "production": True
+          "staging": True
 
   - title: "Others"
     description: |-

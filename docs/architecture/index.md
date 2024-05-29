@@ -21,7 +21,7 @@ Learn more about our architecture in the following sections: -->
 
     Learn the different steps in ETL.
 
--   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference.md)__
+-   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/)__
 
     ---
 

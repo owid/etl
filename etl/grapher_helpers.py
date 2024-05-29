@@ -9,10 +9,12 @@ import numpy as np
 import pandas as pd
 import structlog
 from jinja2 import Environment
-from MySQLdb import IntegrityError
 from owid import catalog
 from owid.catalog.utils import underscore
+from pymysql import IntegrityError
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
 from etl.files import checksum_str
@@ -311,30 +313,35 @@ def _get_entities_from_db(
 
 def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
     engine = engine or get_engine()
-    with engine.connect() as con:
+    with Session(engine) as session:
         log.info("Creating entities in DB", countries=countries)
         out = {}
         for name in countries:
             try:
-                con.execute(
-                    """
+                session.execute(
+                    text(
+                        """
                     INSERT INTO entities
                         (name, displayName, validated, createdAt, updatedAt)
                     VALUES
-                        (%(name)s, '', FALSE, NOW(), NOW())
-                """,
+                        (:name, '', FALSE, NOW(), NOW())
+                """
+                    ),
                     {"name": name},
                 )
+                session.commit()
             except IntegrityError:
                 # If another process inserted the same entity before us, we can
                 # safely ignore the error and fetch the ID
                 pass
 
-            row = con.execute(
-                """
+            row = session.execute(
+                text(
+                    """
                 SELECT id FROM entities
-                WHERE name = %(name)s
-            """,
+                WHERE name = :name
+            """
+                ),
                 {"name": name},
             ).fetchone()
             assert row

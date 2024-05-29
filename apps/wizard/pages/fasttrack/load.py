@@ -197,21 +197,17 @@ def parse_metadata_from_csv(
         if col.lower() not in ("country", "year", "entity")
     }
 
-    dataset_dict["sources"] = [
-        dict(
-            name="Unknown",
-            url="",
-            publication_year=None,
-        )
-    ]
-    dataset_dict["licenses"] = [
-        {
-            "url": None,
-            "name": None,
-        }
-    ]
+    origin = Origin(
+        title="Unknown",
+        citation_full="Unknown",
+        producer="Unknown",
+        version_producer="Local CSV",
+        url_main="https://unknown.com",
+        date_accessed=str(dt.date.today()),
+        date_published=str(dt.date.today()),  # type: ignore
+    )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, None
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin
 
 
 ###################################

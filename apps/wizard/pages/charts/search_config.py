@@ -106,8 +106,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     dataset_new_id = display_name_to_id_mapping[dataset_new]
 
     return SearchConfigForm(
-        dataset_old_id=dataset_old_id,
-        dataset_new_id=dataset_new_id,
+        dataset_old_id=str(dataset_old_id),
+        dataset_new_id=str(dataset_new_id),
         map_identical_variables=map_identical,
         similarity_function_name=similarity_name,
         enable_explore_mode=enable_explore,

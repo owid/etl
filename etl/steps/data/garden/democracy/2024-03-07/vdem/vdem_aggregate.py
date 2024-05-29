@@ -5,7 +5,7 @@ from typing import Dict, Optional, Tuple, cast
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.processing import concat
+from owid.catalog.tables import concat
 from shared import add_population_in_dummies, expand_observations, from_wide_to_long
 
 from etl.data_helpers import geo
@@ -708,7 +708,7 @@ def make_table_with_dummies(tb: Table) -> Table:
     indicator_names = [indicator["name_new"] for indicator in indicators]
 
     ## Get dummy indicator table
-    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names))
+    tb_ = cast(Table, pd.get_dummies(tb_, dummy_na=True, columns=indicator_names, dtype=int))
 
     ## Add missing metadata to dummy indicators
     dummy_cols = []

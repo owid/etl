@@ -92,9 +92,9 @@ class Snapshot:
             return
 
         assert len(self.metadata.outs) == 1
-        md5 = self.metadata.outs[0]["md5"]
+        expected_md5 = self.metadata.outs[0]["md5"]
 
-        self._download_dvc_file(md5)
+        self._download_dvc_file(expected_md5)
 
         expected_size = self.metadata.outs[0]["size"]
         downloaded_size = self.path.stat().st_size
@@ -102,6 +102,12 @@ class Snapshot:
             # remove the downloaded file
             self.path.unlink()
             raise ValueError(f"Size mismatch for {self.path}: expected {expected_size}, got {downloaded_size}")
+
+        downloaded_md5 = checksum_file(self.path)
+        if downloaded_md5 != expected_md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Checksum mismatch for {self.path}: expected {expected_md5}, got {downloaded_md5}")
 
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""

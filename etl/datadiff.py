@@ -493,7 +493,7 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
-def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **kwargs) -> str:
+def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
@@ -503,7 +503,8 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **
     lines = [line for line in lines if not line.startswith("  ")]
 
     # add color
-    lines = ["[violet]" + line for line in lines]
+    if color:
+        lines = ["[violet]" + line for line in lines]
 
     if not lines:
         return ""
@@ -720,7 +721,11 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     d = meta.to_dict()
+    # remove noise
     d.pop("processing_log", None)
+    for source in d.get("sources", []):
+        source.pop("date_accessed", None)
+        source.pop("publication_date", None)
     return d
 
 
@@ -744,8 +749,9 @@ def _local_catalog_datasets(
     catalog_dir = catalog_path
 
     # it is possible to use subset of a data catalog
-    while not (catalog_dir / "catalog.meta.json").exists() and catalog_dir != catalog_dir.parent:
-        catalog_dir = catalog_dir.parent
+    if catalog_dir.name != "data":
+        while catalog_dir != catalog_dir.parent:
+            catalog_dir = catalog_dir.parent
 
     if catalog_dir != catalog_path:
         assert include is None, "Include pattern is not supported for subset of a catalog"

@@ -4,13 +4,13 @@ import warnings
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
-import MySQLdb
 import pandas as pd
+import pymysql
 import structlog
 import validators
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import config
 
@@ -21,14 +21,14 @@ def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
     try:
         get_connection(conf=conf)
         return True
-    except MySQLdb.OperationalError:
+    except pymysql.OperationalError:
         return False
 
 
-def get_connection(conf: Optional[Dict[str, Any]] = None) -> MySQLdb.Connection:
+def get_connection(conf: Optional[Dict[str, Any]] = None) -> pymysql.Connection:
     "Connect to the Grapher database."
     cf: Any = dict_to_object(conf) if conf else config
-    return MySQLdb.connect(
+    return pymysql.connect(
         db=cf.DB_NAME,
         host=cf.DB_HOST,
         port=cf.DB_PORT,
@@ -47,7 +47,7 @@ def get_session(**kwargs) -> Session:
 @functools.cache
 def _get_engine_cached(cf: Any, pid: int) -> Engine:
     return create_engine(
-        f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        f"mysql+pymysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
         max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
@@ -61,7 +61,7 @@ def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
 
 
 def get_dataset_id(
-    dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None, version: Optional[str] = None
+    dataset_name: str, db_conn: Optional[pymysql.Connection] = None, version: Optional[str] = None
 ) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
@@ -71,7 +71,7 @@ def get_dataset_id(
     ----------
     dataset_name : str
         Dataset name.
-    db_conn : MySQLdb.Connection
+    db_conn : pymysql.Connection
         Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
     version : str
         ETL version of the dataset. This is necessary when multiple datasets have the same title. In such a case, if
@@ -105,7 +105,7 @@ def get_dataset_id(
 
 
 def get_variables_in_dataset(
-    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[MySQLdb.Connection] = None
+    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[pymysql.Connection] = None
 ) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
@@ -115,7 +115,7 @@ def get_variables_in_dataset(
         Dataset ID.
     only_used_in_charts : bool
         True to select variables only if they have been used in at least one chart. False to select all variables.
-    db_conn : MySQLdb.Connection
+    db_conn : pymysql.Connection
         Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
@@ -148,7 +148,7 @@ def get_variables_in_dataset(
 def _get_variables_data_with_filter(
     field_name: Optional[str] = None,
     field_values: Optional[List[Any]] = None,
-    db_conn: Optional[MySQLdb.Connection] = None,
+    db_conn: Optional[pymysql.Connection] = None,
 ) -> Any:
     if db_conn is None:
         db_conn = get_connection()
@@ -180,7 +180,7 @@ def _get_variables_data_with_filter(
 def get_variables_data(
     filter: Optional[Dict[str, Any]] = None,
     condition: Optional[str] = "OR",
-    db_conn: Optional[MySQLdb.Connection] = None,
+    db_conn: Optional[pymysql.Connection] = None,
 ) -> pd.DataFrame:
     """Get data from variables table, given a certain condition.
 
@@ -193,7 +193,7 @@ def get_variables_data(
     condition : Optional[str], optional
         In case multiple filters are given, this parameter specifies whether the output filters should be the union
         ("OR") or the intersection ("AND").
-    db_conn : MySQLdb.Connection
+    db_conn : pymysql.Connection
         Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
 
     Returns
@@ -223,7 +223,7 @@ def get_variables_data(
     return df
 
 
-def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
     """Get all datasets in database.
 
     Parameters
@@ -250,7 +250,7 @@ def dict_to_object(d):
     return type("DynamicObject", (object,), d)()
 
 
-def get_charts_slugs(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+def get_charts_slugs(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -281,7 +281,7 @@ def get_charts_slugs(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFra
     return df
 
 
-def get_charts_views(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+def get_charts_views(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -324,7 +324,7 @@ def get_charts_views(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFra
     return df
 
 
-def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
 
@@ -440,12 +440,17 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
     return df
 
 
-def read_sql(sql: str, engine: Optional[Engine] = None, *args, **kwargs) -> pd.DataFrame:
+def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
     """
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        with engine.connect() as con:
-            return pd.read_sql(sql, con.connection, *args, **kwargs)
+        if isinstance(engine, Engine):
+            with engine.connect() as con:
+                return pd.read_sql(sql, con, *args, **kwargs)
+        elif isinstance(engine, Session):
+            return pd.read_sql(sql, engine.bind, *args, **kwargs)
+        else:
+            raise ValueError(f"Unsupported engine type {type(engine)}")

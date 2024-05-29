@@ -3,7 +3,6 @@ meta:
     producer: Community Emissions Data System (CEDS) 2024.
     title: air_pollution_ceds
     citation_full: Community Emissions Data System (CEDS) based on Hoesly et al. (2018)
-    version_producer: Google Sheet
     url_main: https://github.com/JGCRI/CEDS/tree/master
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_JxvLykZk1u5cL9yorygGDm8_oqsyO9uyxHM1HUbMJS35n3gIeMrXUTPnSBgHM5FbkaL2x_ajQ5ta/pub?output=csv

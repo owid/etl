@@ -287,7 +287,8 @@ class StepUpdater:
             metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
             # Update version and date accessed.
             metadata.version = step_version_new  # type: ignore
-            metadata.origin.date_accessed = step_version_new  # type: ignore
+            if metadata.origin:
+                metadata.origin.date_accessed = step_version_new  # type: ignore
             # Write metadata to new file.
             step_dvc_file_new.write_text(metadata.to_yaml())
 
