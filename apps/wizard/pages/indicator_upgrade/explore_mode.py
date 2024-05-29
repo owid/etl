@@ -89,7 +89,7 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
             tab_names = ["Summary"]
             if is_numeric:
                 tab_names.append("Error distribution")
-            if (summary.num_categories_old < 10) & (summary.num_categories_new < 10):
+            if ((summary.num_categories_old < 10) & (summary.num_categories_new < 10)) | (not is_numeric):
                 tab_names.append("Confusion Matrix")
 
             tabs = st.tabs(tab_names)
