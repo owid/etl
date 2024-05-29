@@ -251,7 +251,6 @@ def get_engines() -> tuple[Engine, Engine]:
 
 def show_help_text():
     with st.popover("How does this work?"):
-        staging_name = OWID_ENV.name
         st.markdown(
             f"""
         **Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
