@@ -10,12 +10,27 @@ dataset:
 
 tables:
   daily_calories_per_person:
-    title: Daily calory supply per person
+    title: Daily calorie supply per person
     variables:
       daily_calories:
-        title: Daily calory supply per person
+        title: Daily calorie supply per person
         unit: kilocalories per day
         short_unit: kcal
+        description_key:
+          - This data shows daily calorie supply per person, which is the amount of calories available to an average person, and does necessarily correspond to the calories actually consumed by that person.
+          - Calorie supply is always larger than actual calorie consumption, since there may be waste at the household level.
+          - For historical data, daily calorie supply and daily calorie consumption are sometimes used interchangeably, due to poor data availability.
+        description_processing: |-
+          - For all countries, the data after 1960 is taken from FAOSTAT Food Balances datasets ([old](https://www.fao.org/faostat/en/#data/FBSH) and [new](https://www.fao.org/faostat/en/#data/FBS) methodologies combined).
+          - For the UK: We load Appendix Table from [Harris et al. (2015)](https://www.emerald.com/insight/content/doi/10.1108/S0363-326820150000031003/full/html). From that table, we select values from [Broadberry et al. (2015)](https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56) and the corrected values from [Floud et al (2011)](https://www.cambridge.org/core/books/changing-body/DE3BB0E3577205AC26823CF2120D8B7E) (taking the average value of Estimates (A) and (B)).
+          - For the US: For years 1800-1900, we use Table 6.6 of [Floud et al. (2011)](https://www.cambridge.org/core/books/changing-body/DE3BB0E3577205AC26823CF2120D8B7E). For years 1900-1960, we use [the archived table of food supply from USDA](https://www.ers.usda.gov/webdocs/DataFiles/50472/nutrients.xls?v=6096.1).
+          - For Iceland: We use Table 5 of [Jonsson (1994)](https://www.tandfonline.com/doi/abs/10.1080/03585522.1998.10414677).
+          - For Finland, Germany, Italy, Norway: We use Table 1 from [Grigg (1995)](https://www.sciencedirect.com/science/article/abs/pii/S0305748885700187), which is a compilation of many sources.
+          - For France: We use Table 1 from Grigg (1995).
+            - We include the two additional data points (1705 and 1785) from [Fogel (2004)](https://www.cambridge.org/core/books/escape-from-hunger-and-premature-death-17002100/384C6032DE4E73C90EF6C9D1E55009CA).
+          - For Belgium and Netherlands: We use Table 5.5 of Floud et al. (2011).
+          - For Uganda, Cambodia, China, India, Brazil, Mexico, and Peru: We use Table 11 of [FAO (2000)](https://www.fao.org/4/x4400e/x4400e.pdf) (The State of Food and Agriculture), data for "1934-38" (use 1936) and/or "1946-49" (use 1947).
+          - For Myanmar, Sri Lanka, China, and many other countries for 1947 and 1948: We use values from Table 15 from [FAO (1949)](https://www.fao.org/4/ap637e/ap637e.pdf).
       source:
         title: Source of the data point
         unit: ""

@@ -1,4 +1,6 @@
-"""TODO: Explain this step.
+"""Historical daily calorie supply per person, based on a combination of sources.
+
+See description_processing (in the adjacent metadata file) for more details on the choices below.
 
 """
 
@@ -6,6 +8,7 @@ from typing import Union
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -21,6 +24,7 @@ ITEM_CODE_TOTAL = "00002901"
 
 
 def correct_year(year: Union[str, int], verbose: bool = False) -> int:
+    # Correct the value of a year, to ensure it is an integer, and, when given a range, take the average value.
     year_str = str(year)
     if len(year_str) == 4:
         # Normal format, e.g. "1990".
@@ -41,6 +45,19 @@ def correct_year(year: Union[str, int], verbose: bool = False) -> int:
         print(f'Corrected "{year}" -> "{year_corrected}"')
 
     return year_corrected
+
+
+def correct_data_values(tb: Table) -> Table:
+    # Some data values are given as ranges, e.g. "1234-1345".
+    # Ensure all values are real numbers, and take the average value when a range is given.
+    select_ranges = pd.to_numeric(tb["daily_calories"], errors="coerce").isnull()
+    tb.loc[select_ranges, "daily_calories"] = [
+        (float(value.split("-")[0]) + float(value.split("-")[1])) / 2
+        for value in tb[select_ranges]["daily_calories"].values
+    ]
+    tb = tb.astype({"daily_calories": float})
+
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -122,7 +139,7 @@ def run(dest_dir: str) -> None:
     # Ensure years are integers. When given a range of years, take the middle year.
     tb["year"] = tb["year"].apply(correct_year)
 
-    # Sanity check.
+    # Sanity checks.
     assert tb[tb["country"].isnull()].empty, "Some countries are missing."
     assert tb[tb["year"].isnull()].empty, "Some years are missing."
 
@@ -130,24 +147,17 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["daily_calories"]).reset_index(drop=True)
 
     # Some numbers are given as ranges, e.g. "2914-2949". Take the average value.
-    select_ranges = pd.to_numeric(tb["daily_calories"], errors="coerce").isnull()
-    tb.loc[select_ranges, "daily_calories"] = [
-        (float(value.split("-")[0]) + float(value.split("-")[1])) / 2
-        for value in tb[select_ranges]["daily_calories"].values
-    ]
-    tb = tb.astype({"daily_calories": float})
+    tb = correct_data_values(tb=tb)
 
     # Start a new table with the selection of all countries from different sources.
     # * Most countries have data only from FAOSTAT, or from FAOSTAT + FAO (1949), or from FAOSTAT + FAO (2000).
-    #   There is no conflicting overlap among them.
-    #   Although there are some jumps between FAO (1949) and FAOSTAT (which we will accept).
+    #   There is no overlap among them (i.e. there is only one value for each year).
+    #   Although there are some abrupt jumps between FAO (1949) and FAOSTAT (which we will accept).
     #   We take all these countries.
     countries_selected = [
         country for country in tb["country"].unique() if len(set(tb[tb["country"] == country]["source"])) < 3
     ]
     tb_selected = tb[tb["country"].isin(countries_selected)].reset_index(drop=True)
-
-    # For the remaining countries, we will combine sources in different ways one by one.
 
     # * Belgium:
     tb_belgium = tb[
@@ -194,8 +204,8 @@ def run(dest_dir: str) -> None:
     tb_norway = tb[(tb["country"] == "Norway") & (tb["source"].isin(["FAOSTAT", "Grigg (1995)", "FAO (1949)"]))]
 
     # * Mexico:
-    # There is an overlap on year 1947 between FAO (1949) and FAO (2000) (with similar values).
-    # Remove the overlapping point from FAO (1949).
+    #   There is an overlap on year 1947 between FAO (1949) and FAO (2000) (with similar values).
+    #   Remove the overlapping point from FAO (1949).
     tb_mexico = tb[
         (tb["country"] == "Mexico")
         & (tb["source"].isin(["FAOSTAT", "FAO (2000)", "FAO (1949)"]))
@@ -203,7 +213,8 @@ def run(dest_dir: str) -> None:
     ]
 
     # * Peru:
-    # (Same issue as Mexico).
+    #   There is an overlap on year 1947 between FAO (1949) and FAO (2000) (with similar values).
+    #   Remove the overlapping point from FAO (1949).
     tb_peru = tb[
         (tb["country"] == "Peru")
         & (tb["source"].isin(["FAOSTAT", "FAO (2000)", "FAO (1949)"]))
