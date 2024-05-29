@@ -175,9 +175,12 @@ def run(dest_dir: str) -> None:
         [
             # Prior to 1800, the only data (two points) comes from Fogel (2004).
             tb[(tb["country"] == "France") & (tb["year"] < 1800) & (tb["source"] == "Fogel (2004)")],
-            # After 1800, take data from Grigg (1995) and FAOSTAT.
-            # TODO: Shall we include "FAO (1949)"?
-            tb[(tb["country"] == "France") & (tb["year"] >= 1800) & (tb["source"].isin(["FAOSTAT", "Grigg (1995)"]))],
+            # After 1800, take data from Grigg (1995), FAOSTAT, and FAO (1949).
+            tb[
+                (tb["country"] == "France")
+                & (tb["year"] >= 1800)
+                & (tb["source"].isin(["FAOSTAT", "FAO (1949)", "Grigg (1995)"]))
+            ],
         ],
         ignore_index=True,
     )
@@ -186,7 +189,6 @@ def run(dest_dir: str) -> None:
     tb_germany = tb[(tb["country"] == "Germany") & (tb["source"].isin(["FAOSTAT", "Grigg (1995)"]))]
 
     # * Iceland:
-    #   TODO: Check why Floud et al. (2011) disregards the later increase from Jonsson (which is quite abrupt).
     tb_iceland = tb[(tb["country"] == "Iceland") & (tb["source"].isin(["FAOSTAT", "Jonsson (1998)", "FAO (1949)"]))]
 
     # * India:
