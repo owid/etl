@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.staging_sync.cli import _modified_chart_ids_by_admin
+from apps.chart_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv, get_container_name
 
