@@ -82,7 +82,7 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
                 df.append(
                     {
                         "chart_id": diff.chart_id,
-                        "approved": diff.approved,
+                        "approved": diff.is_approved,
                         "is_new": diff.is_new,
                     }
                 )

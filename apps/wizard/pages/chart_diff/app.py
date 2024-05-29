@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
+import etl.grapher_model as gm
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
@@ -35,12 +36,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 add_indentation()
-st.session_state.hide_approved_charts = st.session_state.get("hide_approved_charts", False)
+st.session_state.hide_reviewed_charts = st.session_state.get("hide_reviewed_charts", False)
 
 
 ########################################
 # LOAD ENVS
 ########################################
+warn_msg = []
+
 SOURCE = OWID_ENV
 assert OWID_ENV.env_type_id != "production", "Your .env points to production DB, please use a staging environment."
 
@@ -48,13 +51,19 @@ assert OWID_ENV.env_type_id != "production", "Your .env points to production DB,
 if config.ENV_FILE_PROD:
     TARGET = OWIDEnv.from_env_file(config.ENV_FILE_PROD)
 else:
-    warning_msg = "ENV file doesn't connect to production DB, comparing against staging-site-master"
+    warning_msg = "ENV file doesn't connect to production DB, comparing against `staging-site-master`."
     log.warning(warning_msg)
-    st.warning(warning_msg)
+    warn_msg.append(warning_msg)
     TARGET = OWIDEnv.from_staging("master")
 
 CHART_PER_PAGE = 10
 
+
+########################################
+# WARNING MSG
+########################################
+warn_msg += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
+st.warning("- " + "\n\n- ".join(warn_msg))
 
 ########################################
 # FUNCTIONS
@@ -93,13 +102,15 @@ def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified
 def st_show(diff: ChartDiffModified, source_session, target_session=None) -> None:
     """Show the chart diff in Streamlit."""
     # Define label
-    emoji = "✅" if diff.approved else "⏳"
+    emoji = "✅" if diff.is_approved else ("❌" if diff.is_rejected else "⏳")
     label = f"{emoji} {diff.source_chart.config['slug']}"
 
     # Define action for Toggle on change
-    def tgl_on_change(diff, session) -> None:
+    def chart_state_change(diff, session) -> None:
+        # print(st.session_state.chart_diffs[diff.chart_id].approval_status)
         with st.spinner():
-            diff.switch_state(session=session)
+            status = st.session_state[f"radio-{diff.chart_id}"]
+            diff.set_status(session=session, status=status)
 
     # Define action for Refresh on click
     def refresh_on_click(source_session=source_session, target_session=None):
@@ -132,7 +143,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
 
     # Actually show stuff
-    with st.expander(label, not diff.approved):
+    with st.expander(label, not diff.is_approved):
         col1, col2 = st.columns([1, 3])
 
         # Refresh
@@ -144,25 +155,37 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
                 help="Get the latest version of the chart from the staging server.",
             )
 
-        options = ["Pending", "Approve"]
+        # Actions on chart diff: approve, pending, reject
         options = {
-            "Approve": "green",
-            "Pending": "orange",
-            # "Reject": "red",
+            gm.ChartStatus.APPROVED: {
+                "label": "Approve",
+                "color": "green",
+            },
+            gm.ChartStatus.REJECTED: {
+                "label": "Reject",
+                "color": "red",
+            },
+            gm.ChartStatus.PENDING: {
+                "label": "Pending",
+                "color": "gray",
+            },
         }
         option_names = list(options.keys())
+        print(option_names)
+        print(diff.approval_status)
         with col1:
             st.radio(
                 label="Approve or reject chart",
                 key=f"radio-{diff.chart_id}",
                 options=option_names,
                 horizontal=True,
-                format_func=lambda x: f":{options.get(x)}-background[{x}]",
-                index=option_names.index("Approve") if diff.approved else option_names.index("Pending"),
-                on_change=lambda diff=diff, session=source_session: tgl_on_change(diff, session),
+                format_func=lambda x: f":{options[x]['color']}-background[{options[x]['label']}]",
+                index=option_names.index(diff.approval_status),
+                on_change=lambda diff=diff, session=source_session: chart_state_change(diff, session),
                 # label_visibility="collapsed",
             )
 
+        # Show diff
         if diff.is_modified:
             tab1, tab2 = st.tabs(["Charts", "Config diff"])
             with tab1:
@@ -229,14 +252,14 @@ def get_engines() -> tuple[Engine, Engine]:
 
 def show_help_text():
     with st.popover("How does this work?"):
-        staging_name = OWID_ENV.name.upper()
+        staging_name = OWID_ENV.name
         st.markdown(
             f"""
-        **Chart diff** is a living page that compares all ongoing charts between `PRODUCTION` and your `{staging_name}` environment.
+        **Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 
-        It lists all those charts that have been modified in the `{staging_name}` environment.
+        It lists all those charts that have been modified in the `{OWID_ENV.name}` environment.
 
-        If you want any of the modified charts in `{staging_name}` to be migrated to `PRODUCTION`, you can approve them by clicking on the toggle button.
+        If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
         """
         )
 
@@ -253,7 +276,6 @@ def reject_chart_diffs(engine):
 ########################################
 def main():
     st.title("Chart ⚡ **:gray[Diff]**")
-    st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
     show_help_text()
 
     # Get stuff from DB
@@ -278,11 +300,11 @@ def main():
         )
 
         st.toggle(
-            "Hide appoved charts",
-            key="hide-approved-charts",
+            "Hide reviewed charts",
+            key="hide-reviewed-charts",
             on_change=lambda: set_states(
                 {
-                    "hide_approved_charts": not st.session_state.hide_approved_charts,
+                    "hide_reviewed_charts": not st.session_state.hide_reviewed_charts,
                 }
             ),
         )
@@ -297,10 +319,10 @@ def main():
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
     )
 
-    # Hide approved (if option selected)
-    if st.session_state.hide_approved_charts:
+    # Hide reviewed (if option selected)
+    if st.session_state.hide_reviewed_charts:
         st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs.items() if not v.approved
+            k: v for k, v in st.session_state.chart_diffs.items() if not v.reviewed
         }
     else:
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs

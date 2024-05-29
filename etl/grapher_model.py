@@ -11,6 +11,7 @@ It is often necessary to add `default=None` or `init=False` to make pyright happ
 
 import json
 from datetime import date, datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
@@ -1352,7 +1353,17 @@ class Origin(Base):
 
 
 # TODO: should we also add "rejected" status and exclude such charts from chart-sync?
-CHART_DIFF_STATUS = Literal["approved", "unapproved"]
+class ChartStatus(Enum):
+    APPROVED = "approved"
+    PENDING = "pending"
+    REJECTED = "rejected"
+
+
+CHART_DIFF_STATUS = Literal[
+    ChartStatus.APPROVED,
+    ChartStatus.PENDING,
+    ChartStatus.REJECTED,
+]
 
 
 class ChartDiffApprovals(Base):
@@ -1375,7 +1386,7 @@ class ChartDiffApprovals(Base):
     def latest_chart_status(
         cls, session: Session, chart_id: int, source_updated_at, target_updated_at
     ) -> CHART_DIFF_STATUS:
-        """Load the latest approval of the chart. If there's none, return 'unapproved'."""
+        """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
         result = session.scalars(
             select(cls)
             .where(
@@ -1389,7 +1400,7 @@ class ChartDiffApprovals(Base):
         if result:
             return result.status
         else:
-            return "unapproved"
+            return ChartStatus.PENDING
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

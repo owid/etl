@@ -99,7 +99,7 @@ def cli(
     - Both published charts and drafts from staging are synced.
     - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with `--approve-revisions` flag)
     - You get a warning if the chart **_has been modified on live_** after staging server was created.
-    - If the chart is unapproved in chart-diff, you'll get a warning and Slack notification
+    - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
 
     **Considerations on chart revisions:**
@@ -193,16 +193,16 @@ def cli(
                     ### New chart-diff workflow ###
                     if chartdiff:
                         # Change has been approved, update the chart
-                        if diff.approved:
+                        if diff.is_approved:
                             log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
 
                         # TODO: should we add rejected state?
                         # Rejected chart diff
-                        # elif diff.rejected:
+                        # elif diff.is_rejected:
                         #     log.info(
-                        #         "chart_sync.rejected",
+                        #         "chart_sync.is_rejected",
                         #         slug=chart_slug,
                         #         chart_id=chart_id,
                         #     )
@@ -211,7 +211,7 @@ def cli(
                         # Not approved, update the chart, but notify us about it
                         # TODO: should we distinguish between not approving because of laziness and not
                         # approving because of change in prod?
-                        elif diff.unapproved:
+                        elif diff.is_pending:
                             log.warning(
                                 "chart_sync.unapproved_chart_update",
                                 slug=chart_slug,
@@ -309,7 +309,7 @@ def cli(
 
                     if chartdiff:
                         # New chart has been approved
-                        if diff.approved:
+                        if diff.is_approved:
                             if not dry_run:
                                 resp = target_api.create_chart(diff.source_chart.config)
                                 target_api.set_tags(resp["chartId"], chart_tags)
@@ -317,16 +317,16 @@ def cli(
                                 resp = {"chartId": None}
                         # TODO: should we add rejected state?
                         # Rejected chart diff
-                        # elif diff.rejected:
+                        # elif diff.is_rejected:
                         #     log.info(
-                        #         "chart_sync.rejected",
+                        #         "chart_sync.is_rejected",
                         #         slug=chart_slug,
                         #         chart_id=chart_id,
                         #     )
                         #     continue
 
                         # Not approved, create the chart, but notify us about it
-                        elif diff.unapproved:
+                        elif diff.is_pending:
                             log.warning(
                                 "chart_sync.create_unapproved_chart",
                                 slug=chart_slug,
