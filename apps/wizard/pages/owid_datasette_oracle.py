@@ -17,11 +17,11 @@ from etl.config import load_env
 log = get_logger()
 
 # CONFIG
-st.set_page_config(page_title="OWID Datasette Oracle", page_icon="🔮")
+st.set_page_config(page_title="Datasette Oracle", page_icon="🔮")
 add_indentation()
 ## Title/subtitle
-st.title("**OWID Datasette oracle** 🔮")
-st.markdown("Get help writing SQL queries for Datasette!")
+st.title("**Datasette oracle** 🔮")
+st.markdown("Get help writing SQL queries for OWID's Datasette!")
 
 ## Load variables
 load_env()

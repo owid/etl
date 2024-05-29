@@ -36,7 +36,7 @@ main:
       entrypoint: pages/expert/app.py
       emoji: "🧙"
   oracle:
-      title: "OWID Datasette Oracle"
+      title: "Datasette Oracle"
       description: "Get help writing SQL queries for datasette!"
       maintainer: "@daniel"
       entrypoint: pages/owid_datasette_oracle.py
