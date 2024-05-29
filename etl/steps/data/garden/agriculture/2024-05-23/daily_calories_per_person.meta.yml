@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     presentation:
       topic_tags:
-        - Food supply
+        - Food Supply
 
 dataset:
   update_period_days: 365
@@ -14,5 +14,9 @@ tables:
     variables:
       daily_calories:
         title: Daily calory supply per person
-        unit: kilocalories
+        unit: kilocalories per day
         short_unit: kcal
+      source:
+        title: Source of the data point
+        unit: ""
+        short_unit: ""
