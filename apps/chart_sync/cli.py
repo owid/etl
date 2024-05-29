@@ -17,9 +17,10 @@ from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from apps.wizard.utils.env import OWIDEnv, get_container_name
+from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl import grapher_model as gm
+from etl.config import get_container_name
 from etl.datadiff import _dict_diff
 from etl.db import read_sql
 

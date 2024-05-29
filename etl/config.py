@@ -9,6 +9,7 @@ only important for OWID staff.
 
 import os
 import pwd
+import re
 from os import environ as env
 from typing import Optional
 
@@ -34,6 +35,22 @@ def load_env():
         raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
 
     load_dotenv(ENV_FILE, override=True)
+
+
+def _normalise_branch(branch_name):
+    return re.sub(r"[\/\._]", "-", branch_name)
+
+
+def get_container_name(branch_name):
+    normalized_branch = _normalise_branch(branch_name)
+
+    # Strip staging-site- prefix to add it back later
+    normalized_branch = normalized_branch.replace("staging-site-", "")
+
+    # Ensure the container name is less than 63 characters
+    container_name = f"staging-site-{normalized_branch[:50]}"
+    # Remove trailing hyphens
+    return container_name.rstrip("-")
 
 
 load_env()
@@ -109,8 +126,8 @@ if STAGING is not None:
     DB_NAME = "owid"
     DB_PASS = ""
     DB_PORT = 3306
-    DB_HOST = f"staging-site-{STAGING}"
-    DATA_API_ENV = f"staging-site-{STAGING}"
+    DB_HOST = get_container_name(STAGING)
+    DATA_API_ENV = get_container_name(STAGING)
 
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
