@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     if len(tb["sex"].unique() == 1):
         tb = tb.drop(columns="sex")
     # Split up the causes of blindness
-    tb = other_vision_loss_minus_trachoma(tb)
+    tb = other_vision_loss_minus_some_causes(tb)
     # Add region aggregates.
     tb = add_regional_aggregates(
         tb, ds_regions, ds_population, index_cols=["country", "year", "metric", "cause", "impairment", "age"]
@@ -92,20 +92,21 @@ def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_population: Datas
     return tb_out
 
 
-def other_vision_loss_minus_trachoma(tb: Table) -> Table:
+def other_vision_loss_minus_some_causes(tb: Table) -> Table:
     """
-    To split up the causes of blindness we need to subtract trachoma from other vision loss
+    To split up the causes of blindness we need to subtract trachoma, onchocerciasis and malaria from other vision loss
     """
+    causes_to_subtract = ["Trachoma", "Onchocerciasis", "Malaria"]
 
     tb_other_vision_loss = tb[tb["cause"] == "Other vision loss"].copy()
-    tb_trachoma = tb[tb["cause"] == "Trachoma"].copy()
+    tb_trachoma = tb[tb["cause"].isin(causes_to_subtract)].copy()
 
     tb_combine = tb_other_vision_loss.merge(
         tb_trachoma, on=["country", "year", "metric", "impairment", "age"], suffixes=("", "_trachoma")
     )
     # Can I subtract rates if they have the same denominator? I think so
     tb_combine["value"] = tb_combine["value"] - tb_combine["value_trachoma"]
-    tb_combine["cause"] = "Other vision loss minus trachoma"
+    tb_combine["cause"] = "Other vision loss minus trachoma, malaria and onchocerciasis"
 
     tb_combine = tb_combine.drop(columns=["value_trachoma", "cause_trachoma"])
 
