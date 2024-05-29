@@ -374,7 +374,7 @@ class Chart(Base):
                 # When there are multiple indicators in a chart and it also has a map then this field tells the map which indicator to use.
                 # If the chart doesn't have the map tab active then it can be invalid quite often
                 log.warning(
-                    "staging_sync.remove_missing_map_column_slug",
+                    "chart_sync.remove_missing_map_column_slug",
                     chart_id=self.id,
                     column_slug=column_slug,
                 )
