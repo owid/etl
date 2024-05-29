@@ -10,6 +10,9 @@ from streamlit_extras.switch_page_button import switch_page
 from apps.wizard import utils
 from apps.wizard.config import WIZARD_CONFIG
 
+# Logo
+# st.logo("docs/assets/logo.png")
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # Page config
