@@ -22,20 +22,29 @@ def run(dest_dir: str) -> None:
     #
     paths.log.info("reading snapshots...")
 
-    # Retrieve population snapshot
+    # Population
+    paths.log.info("reading population...")
     tb_population = paths.read_snap_table("un_wpp_population.csv")
-    # Retrieve growth rate
+    # Growth rate
     tb_growth_rate = read_estimates_and_projections_from_snap("un_wpp_growth_rate.xlsx")
-    # Retrieve natural change rate
+    # Natural change rate
     tb_nat_change = read_estimates_and_projections_from_snap("un_wpp_nat_change_rate.xlsx")
-    # Retrieve fertility rate
+    # Fertility rate
     tb_tot = read_estimates_and_projections_from_snap("un_wpp_fert_rate_tot.xlsx")
     tb_age = read_estimates_and_projections_from_snap("un_wpp_fert_rate_age.xlsx")
     tb_fertility = combine_fertility_tables(tb_tot, tb_age)
-    # Retrieve migration
+    # Migration
     tb_migration = read_estimates_and_projections_from_snap("un_wpp_migration.xlsx")
     tb_migration = to_long_format_migration(tb_migration)
     tb_migration_rate = read_estimates_and_projections_from_snap("un_wpp_migration_rate.xlsx")
+    # Deaths
+    tb_deaths_tot = read_estimates_and_projections_from_snap("un_wpp_deaths.xlsx")
+    tb_deaths_age = read_estimates_and_projections_from_snap("un_wpp_deaths_age.xlsx")
+    tb_deaths_age_fem = read_estimates_and_projections_from_snap("un_wpp_deaths_age_fem.xlsx")
+    tb_deaths_age_male = read_estimates_and_projections_from_snap("un_wpp_deaths_age_male.xlsx")
+    tb_deaths = combine_death(tb_deaths_tot, tb_deaths_age, tb_deaths_age_fem, tb_deaths_age_male)
+    # Death rate
+    tb_death_rate = read_estimates_and_projections_from_snap("un_wpp_death_rate.xlsx")
 
     #
     # Process data.
@@ -47,6 +56,8 @@ def run(dest_dir: str) -> None:
     tb_fertility = clean_table(tb_fertility, "fertility_rate")
     tb_migration = clean_table(tb_migration, "net_migration")
     tb_migration_rate = clean_table(tb_migration_rate, "net_migration_rate")
+    tb_deaths = clean_table(tb_deaths, "deaths")
+    tb_death_rate = clean_table(tb_death_rate, "death_rate")
 
     #
     # Save outputs.
@@ -58,6 +69,8 @@ def run(dest_dir: str) -> None:
         tb_fertility,
         tb_migration,
         tb_migration_rate,
+        tb_deaths,
+        tb_death_rate,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
@@ -67,6 +80,7 @@ def run(dest_dir: str) -> None:
 
 
 def read_estimates_and_projections_from_snap(short_name: str) -> Table:
+    paths.log.info(f"reading {short_name}...")
     # Read snap
     snap = paths.load_snapshot(short_name)
     # Read tables
@@ -86,6 +100,37 @@ def combine_fertility_tables(tb_tot: Table, tb_age: Table) -> Table:
     return tb_fertility
 
 
+def combine_death(tb_tot: Table, tb_age: Table, tb_age_fem: Table, tb_age_male: Table) -> Table:
+    # Drop column 'Sex'
+    tb_age = tb_age.drop(columns=["Sex"])
+    tb_age_fem = tb_age_fem.drop(columns=["Sex"])
+    tb_age_male = tb_age_male.drop(columns=["Sex"])
+
+    # Get common columns
+    columns = set(tb_tot.columns).intersection(set(tb_age.columns))
+
+    # Add missing dimension to general population
+    tb_tot = tb_tot.melt(list(columns), var_name="Sex", value_name="Value")
+    tb_tot["Age"] = "all"
+
+    # Unpivot age table (all sex)
+    tb_age = tb_age.melt(list(columns), var_name="Age", value_name="Value")
+    tb_age["Sex"] = "Total"
+
+    # Unpivot age table (all sex)
+    tb_age_fem = tb_age_fem.melt(list(columns), var_name="Age", value_name="Value")
+    tb_age_fem["Sex"] = "Female"
+
+    # Unpivot age table (all sex)
+    tb_age_male = tb_age_male.melt(list(columns), var_name="Age", value_name="Value")
+    tb_age_male["Sex"] = "Male"
+
+    # Combine
+    tb_deaths = concat([tb_tot, tb_age, tb_age_fem, tb_age_male], ignore_index=True)
+
+    return tb_deaths
+
+
 def to_long_format_migration(tb: Table) -> Table:
     """Convert migration table to long format."""
     # Melt
@@ -102,7 +147,7 @@ def clean_table(tb: Table, indicator_name: str) -> Table:
 
     From snapshot table to ETL-ready-cleaned table.
     """
-    paths.log.info("processing growth rate data...")
+    paths.log.info(f"processing {indicator_name} data...")
 
     COLUMNS = {
         "LocationName": "country",

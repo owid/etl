@@ -37,6 +37,8 @@ def run(dest_dir: str) -> None:
     tb_fertility = ds_meadow["fertility_rate"].reset_index()
     tb_migration = ds_meadow["net_migration"].reset_index()
     tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
+    tb_deaths = ds_meadow["deaths"].reset_index()
+    tb_death_rate = ds_meadow["death_rate"].reset_index()
 
     #
     # Process data.
@@ -45,6 +47,7 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    tb_deaths = process_deaths(tb_deaths, tb_death_rate)
 
     # Drop 55-59 age group in fertility (is all zero!)
     tb_fertility = process_standard(tb_fertility)
@@ -59,6 +62,7 @@ def run(dest_dir: str) -> None:
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
     tb_fertility = set_variant_to_estimates(tb_fertility)
     tb_migration = set_variant_to_estimates(tb_migration)
+    tb_deaths = set_variant_to_estimates(tb_deaths)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -69,6 +73,7 @@ def run(dest_dir: str) -> None:
     tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
     tb_fertility = tb_fertility.format(COLUMNS_INDEX)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
+    tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
 
     # Build tables list for dataset
     tables = [
@@ -77,6 +82,7 @@ def run(dest_dir: str) -> None:
         tb_nat_change,
         tb_fertility,
         tb_migration,
+        tb_deaths,
     ]
 
     #
@@ -116,6 +122,32 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
 
     # Merge
     tb = tb_mig.merge(tb_mig_rate, on=COLUMNS_INDEX, how="left")
+
+    return tb
+
+
+def process_deaths(tb: Table, tb_rate: Table) -> Table:
+    """Process the migration tables.
+
+    Clean the individual tables and combine them into one with two indicators.
+    """
+    # Basic processing
+    tb = process_standard(tb)
+    tb_rate = process_standard(tb_rate)
+
+    # Standardise sex dimension values
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    # Merge
+    tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
 
     return tb
 
