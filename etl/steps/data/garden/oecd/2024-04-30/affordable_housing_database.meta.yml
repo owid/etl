@@ -158,6 +158,8 @@ definitions:
 
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical defintion of each country.
 
+  harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
+
   description_short_ethos_1: Includes people living in the streets or public spaces without a shelter that can be defined as living quarters.
   description_short_ethos_2_3: Includes people living in emergency accomodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
   description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accomodation, and in accommodation for the homeless.
@@ -191,6 +193,7 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
@@ -213,6 +216,7 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
@@ -235,6 +239,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
@@ -257,6 +262,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
@@ -279,6 +285,7 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
@@ -298,6 +305,7 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
@@ -317,6 +325,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
@@ -336,6 +345,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
@@ -353,6 +363,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
         presentation:
@@ -372,6 +383,7 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
         presentation:
@@ -391,6 +403,7 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
         presentation:
@@ -410,6 +423,7 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
@@ -428,6 +442,7 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
@@ -442,6 +457,7 @@ tables:
         short_unit: "%"
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
         description_key:
+          - "{definitions.harmonization}"
           - Data for the United Kingdom only considers England.
           - Data for Ireland refers to October of each year.
           - Data for the United Kingdom refers to households to Q2 (April-June) of each year.
@@ -459,6 +475,8 @@ tables:
         unit: people
         short_unit: ""
         description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - "{definitions.harmonization}"
         description_processing: |-
           {definitions.description_processing_years}
 
