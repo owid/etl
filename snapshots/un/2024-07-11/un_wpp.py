@@ -44,6 +44,7 @@ log = get_logger()
 @click.option("--deaths-age", type=str, help="Path to total deaths by age group local file.")
 @click.option("--deaths-age-fem", type=str, help="Path to female deaths by age group local file.")
 @click.option("--deaths-age-male", type=str, help="Path to male deaths by age group local file.")
+@click.option("--death-rate", type=str, help="Path to crude death rate local file.")
 def main(
     upload: bool,
     population: str | None = None,
@@ -57,6 +58,7 @@ def main(
     deaths_age: str | None = None,
     deaths_age_fem: str | None = None,
     deaths_age_male: str | None = None,
+    death_rate: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
@@ -70,6 +72,7 @@ def main(
         (deaths_age, "un_wpp_deaths_age.xlsx"),
         (deaths_age_fem, "un_wpp_deaths_age_fem.xlsx"),
         (deaths_age_male, "un_wpp_deaths_age_male.xlsx"),
+        (death_rate, "un_wpp_death_rate.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
