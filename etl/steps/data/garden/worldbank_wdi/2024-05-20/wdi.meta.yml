@@ -772,6 +772,8 @@ tables:
         unit: '% of population'
         display:
           name: Access to clean fuels and technologies for cooking
+        presentation:
+          title_public: Access to clean fuels and technologies for cooking (% of population)
       eg_egy_prim_pp_kd:
         title: Energy intensity level of primary energy (MJ/$2017 PPP GDP)
       eg_elc_accs_ru_zs:
@@ -792,6 +794,8 @@ tables:
         unit: '% of total'
         display:
           name: Coal
+        presentation:
+          title_public: Electricity production from coal sources (% of total)
       eg_elc_fosl_zs:
         title: Electricity production from oil, gas and coal sources (% of total)
         short_unit: '%'
@@ -2543,6 +2547,7 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
         presentation:
+          title_public: GDP per capita, PPP (current international $)
           topic_tags:
           - Economic Growth
       ny_gdp_pcap_pp_kd:
@@ -2555,6 +2560,7 @@ tables:
           isProjection: false
           numDecimalPlaces: 0
         presentation:
+          title_public: GDP per capita, PPP (constant 2017 international $)
           topic_tags:
           - Economic Growth
       ny_gdp_petr_rt_zs:
@@ -2640,6 +2646,8 @@ tables:
         display:
           name: GNI per capita
           numDecimalPlaces: 0
+        presentation:
+          title_public: GNI per capita, PPP (constant 2017 international $)
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $
@@ -3412,6 +3420,8 @@ tables:
         unit: liters of pure alcohol, projected estimates, 15+ years of age
         display:
           name: Alcohol consumption
+        presentation:
+          title_public: Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)
       sh_alc_pcap_ma_li:
         title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of
           age)
@@ -3485,6 +3495,8 @@ tables:
           tolerance: 5
           isProjection: false
           conversionFactor: 0.1
+        presentation:
+          title_public: Mortality rate, under-5 (per 1,000 live births)
       sh_dyn_mort_fe:
         title: Mortality rate, under-5, female (per 1,000 live births)
         unit: per 1,000 live births
@@ -3495,6 +3507,8 @@ tables:
           name: Child mortality rate of boys
           tolerance: 5
           conversionFactor: 0.1
+        presentation:
+          title_public: Mortality rate, under-5, male (per 1,000 live births)
       sh_dyn_ncom_fe_zs:
         title: Mortality from CVD, cancer, diabetes or CRD between exact ages 30 and 70, female (%)
       sh_dyn_ncom_ma_zs:
@@ -3631,6 +3645,8 @@ tables:
         unit: '% of adults'
         display:
           name: Adults who smoke
+        presentation:
+          title_public: Prevalence of current tobacco use (% of adults)
       sh_prv_smok_fe:
         title: Prevalence of current tobacco use, females (% of female adults)
         short_unit: '%'
@@ -3978,6 +3994,8 @@ tables:
           name: Share of the population living in extreme poverty
           tolerance: 5
           isProjection: false
+        presentation:
+          title_public: Poverty headcount ratio at $2.15 a day (2017 PPP) (% of population)
       si_pov_gaps:
         title: Poverty gap at $2.15 a day (2017 PPP) (%)
         short_unit: '%'
@@ -4801,6 +4819,8 @@ tables:
         unit: '% of working-age population'
         display:
           name: Age dependency ratio, young
+        presentation:
+          title_public: Age dependency ratio, young (% of working-age population)
       sp_pop_grow:
         title: Population growth (annual %)
         short_unit: '%'
