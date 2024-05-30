@@ -284,12 +284,3 @@ This will list all the folders and directories in the project. Find a brief expl
 | `lib/`    | Other OWID sub-packages. |
 | `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
 | `Makefile`, `default.mk`    | `make`-related files. |
-
-## Grapher
-
-!!! tip
-
-    It is recommended to use Grapher Admin on the staging server rather than running it locally.
-
-
-To test import datasets to the Grapher locally, you need to set your Grapher working environment first. For this, follow this [guide](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
