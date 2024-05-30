@@ -18,7 +18,20 @@ def run(dest_dir: str) -> None:
 
     # Select data of interest.
     tb = tb[tb.Measure == "Active, 90-day Accounts"]
-    tb = tb[tb.Geo_view == "Region"]
+
+    # Select regions.
+    tb = tb[
+        tb.Geo_name.isin(
+            [
+                "East Asia and Pacific",
+                "Europe and Central Asia",
+                "Latin America and the Caribbean",
+                "Middle East and North Africa",
+                "South Asia",
+                "Sub-Saharan Africa",
+            ]
+        )
+    ]
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=["Measure", "Geo_view", "Attribute", "Unit", "Metric"])
@@ -26,6 +39,9 @@ def run(dest_dir: str) -> None:
     # Data frame now starts with column Geo_name, then a series of quarterly columns.
     # Melt the data frame to a long format.
     tb = tb.melt(id_vars="Geo_name", var_name="date", value_name="active_accounts_90d")
+
+    # Drop rows with active_accounts_90d == 0.
+    tb = tb[tb.active_accounts_90d != 0]
 
     # Only keep dates for Q4, with regex "\d{2}/12/\d{4}"
     tb = tb[tb.date.str.match(r"\d{2}/12/\d{4}")]
@@ -37,9 +53,6 @@ def run(dest_dir: str) -> None:
     # Rename columns.
     tb = tb.rename(columns={"Geo_name": "country"})
 
-    #
-    # Process data.
-    #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 
