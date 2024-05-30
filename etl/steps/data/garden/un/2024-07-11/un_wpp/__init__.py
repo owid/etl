@@ -34,7 +34,8 @@ def run(dest_dir: str) -> None:
     tb_population = process_population(tb_population)
 
     # Split estimates vs. projections
-    tb_population.loc[tb_population.year < YEAR_SPLIT, "variant"] = "estimates"
+    tb_population["variant"] = tb_population["variant"].astype("string")
+    tb_population.loc[tb_population["year"] < YEAR_SPLIT, "variant"] = "estimates"
 
     # Format
     tb_population = tb_population.format(["country", "year", "sex", "age", "variant"])

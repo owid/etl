@@ -6,15 +6,11 @@ tables:
         title: Population
         unit: persons
         description_short: De facto population in a country, area or region as of 1 July of the year indicated.
-        display:
-          conversionFactor: 1
       population_change:
         title: Population change
         unit: persons
         description_short: |-
-          Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
-        display:
-          conversionFactor: 1
+          Population yearly increment. This is the difference between the population on 1st of July of the year indicated and the population on 1st of July of the previous year.
 
   # un_wpp:
   #   variables:

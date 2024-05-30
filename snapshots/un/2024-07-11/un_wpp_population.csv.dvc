@@ -9,7 +9,7 @@ meta:
     date_published: '2024-07-11'
     title_snapshot: World Population Prospects, Population
     description_snapshot: |-
-      Indicators concerning population estimates by the WPP.
+      Population estimates at mid-year (1 July).
 
     # Citation
     producer: United Nations
@@ -27,6 +27,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: 64cd28fe0cc76bc75bafc4bf3e4bb27e
-    size: 1179610364
+  - md5: be14d07d002bc70df31747151d5d6702
+    size: 1186556325
     path: un_wpp_population.csv
