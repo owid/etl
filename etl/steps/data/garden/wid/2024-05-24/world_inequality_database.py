@@ -8,6 +8,7 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
 from tabulate import tabulate
@@ -209,7 +210,7 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.fatal(
                         f"""Values for {col} are not between 0 and 1:
-                        {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                        {_tabulate(tb_error[['country', 'year', col]])}"""
                     )
 
                 elif any_error and w == "wealth":
@@ -217,7 +218,7 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.warning(
                         f"""Values for {col} are not between 0 and 1:
-                        {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                        {_tabulate(tb_error[['country', 'year', col]])}"""
                     )
 
     return tb
@@ -247,7 +248,7 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} share observations ({w}{EXTRAPOLATED_DICT[e]}) are not adding up to 100%:
-                    {tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
                 )
 
     return tb
@@ -274,7 +275,7 @@ def check_negative_values(tb: Table):
             tb_error = tb[mask].reset_index(drop=True).copy()
             paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {tabulate(tb_error[['country', 'year', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {_tabulate(tb_error[['country', 'year', v]])}"""
             )
 
     return tb
@@ -316,7 +317,7 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
                     tb_error = tb[mask].reset_index(drop=True).copy()
                     paths.log.fatal(
                         f"""{len(tb_error)} observations for {m}_{w}{EXTRAPOLATED_DICT[e]} are not monotonically increasing:
-                        {tabulate(tb_error[['country', 'year'] + cols], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".2f")}"""
+                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f")}"""
                     )
 
     return tb
@@ -366,7 +367,11 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} observations for avg {w}{EXTRAPOLATED_DICT[e]} are not between the corresponding thresholds:
-                    {tabulate(tb_error[['country', 'year'] + check_cols], headers = 'keys', tablefmt = TABLEFMT)}"""
+                    {_tabulate(tb_error[['country', 'year'] + check_cols])}"""
                 )
 
     return tb
+
+
+def _tabulate(df: pd.DataFrame, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    return tabulate(df.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
