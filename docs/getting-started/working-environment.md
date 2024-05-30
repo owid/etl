@@ -74,17 +74,32 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
 ??? "Extra config for staff"
 
-    OWID staff who want to add steps to the ETL will also need an `~/.aws/config` file configured, so that you can use snapshots.
+    OWID staff who want to upsert data from ETL to grapher database will also need access to Cloudflare R2.
 
-    The file itself will look like this:
+    First start with installing `rclone`
 
-    ```
-    [default]
-    aws_access_key_id = <access_key>
-    aws_secret_access_key = <secret_key>
+    ```bash
+    brew rclone
     ```
 
-    Please ask someone in the `#data-architecture` Slack channel to help you get set up.
+    Then configure its config with `code ~/.config/rclone/rclone.conf`. You should get your personal R2 keys
+    `r2_access_key_id` and `r2_secret_access_key` and replace them in the config file.
+
+    ```bash
+    [owid-r2]
+    type = s3
+    provider = Cloudflare
+    env_auth = true
+    access_key_id = r2_access_key_id
+    secret_access_key = r2_secret_access_key
+    region = auto
+    endpoint = https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com
+
+    [r2]
+    type = alias
+    remote = owid-r2:
+    ```
+
 
 ## Install pyenv
 
@@ -203,6 +218,46 @@ And adding this to your User `settings.json` (View -> Command Palette -> Prefere
   },
 ```
 
+## Improve your terminal experience
+
+We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugins and themes that can make your life easier.
+
+
+???  "Automatic virtualenv activation"
+
+    We use python virtual environments ("venv") everywhere. It's very convenient to have a script that automatically activates the virtualenv when you enter a project folder. Add the following to your `~/.zshrc` or `~/.bashrc`:
+
+    ```bash
+    # enters the virtualenv when I enter the folder, provide it's called either .venv or env
+    autoload -U add-zsh-hook
+    load-py-venv() {
+        if [ -f .venv/bin/activate ]; then
+            # enter a virtual environment that's here
+            source .venv/bin/activate
+        elif [ -f env/bin/activate ]; then
+            source env/bin/activate
+        elif [ ! -z "$VIRTUAL_ENV" ] && [ -f poetry.toml -o -f requirements.txt ]; then
+            # exit a virtual environment when you enter a new project folder
+            deactivate
+        fi
+    }
+    add-zsh-hook chpwd load-py-venv
+    load-py-venv
+    ```
+
+
+???  "Speed up navigation in terminal with autojump"
+
+    Instead of `cd ...` to a correct folder, you can add the following to your `~/.zshrc` or `~/.bashrc`:
+
+    ```bash
+    # autojump
+    [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
+    ```
+
+    and then type `j etl` or `j grapher` to jump to the right folder.
+
+
 ## Project folder
 The project has multiple folders and directories. Let's try to make sense of them.
 
@@ -228,11 +283,13 @@ This will list all the folders and directories in the project. Find a brief expl
 | `tests/`    | ETL library tests. |
 | `lib/`    | Other OWID sub-packages. |
 | `docs/`, `.readthedocs.yaml`, `mkdocs.yml`    | Project documentation config files and directory. |
-| `.dvc/`, `.dvcignore`       | DVC config folder and file.  |
 | `Makefile`, `default.mk`    | `make`-related files. |
 
-*[DVC]: Data Version Control
-
 ## Grapher
+
+!!! tip
+
+    It is recommended to use Grapher Admin on the staging server rather than running it locally.
+
 
 To test import datasets to the Grapher locally, you need to set your Grapher working environment first. For this, follow this [guide](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
