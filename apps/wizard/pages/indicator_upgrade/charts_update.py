@@ -8,7 +8,7 @@ import streamlit as st
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from apps.staging_sync.admin_api import AdminAPI
+from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states, st_page_link
 from apps.wizard.utils.env import OWID_ENV
 from etl.chart_revision.v3.indicator_update import find_charts_from_variable_ids, update_chart_config
@@ -90,7 +90,7 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
     """Updating charts in the database."""
     # API to interact with the admin tool
     engine = get_engine()
-    # HACK: Forcing grapher user to be Admin so that it is detected by staging sync.
+    # HACK: Forcing grapher user to be Admin so that it is detected by chart sync.
     api = AdminAPI(engine, grapher_user_id=1)
     # Update charts
     progress_text = "Updating charts..."
