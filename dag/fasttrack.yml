@@ -186,3 +186,5 @@ steps:
     - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
   data://grapher/fasttrack/latest/air_conditioning_rate_iea:
     - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
+  data://grapher/fasttrack/latest/projections_air_conditioners_iea:
+    - snapshot://fasttrack/latest/projections_air_conditioners_iea.csv
