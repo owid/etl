@@ -40,6 +40,10 @@ log = get_logger()
 @click.option("--fertility-age", type=str, help="Path to age-specific fetility rate local file.")
 @click.option("--migration", type=str, help="Path to net-migration local file.")
 @click.option("--migration-rate", type=str, help="Path to net-migration rate local file.")
+@click.option("--deaths", type=str, help="Path to total deaths local file.")
+@click.option("--deaths-age", type=str, help="Path to total deaths by age group local file.")
+@click.option("--deaths-age-fem", type=str, help="Path to female deaths by age group local file.")
+@click.option("--deaths-age-male", type=str, help="Path to male deaths by age group local file.")
 def main(
     upload: bool,
     population: str | None = None,
@@ -49,6 +53,10 @@ def main(
     fertility_age: str | None = None,
     migration: str | None = None,
     migration_rate: str | None = None,
+    deaths: str | None = None,
+    deaths_age: str | None = None,
+    deaths_age_fem: str | None = None,
+    deaths_age_male: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
@@ -58,6 +66,10 @@ def main(
         (fertility_age, "un_wpp_fert_rate_age.xlsx"),
         (migration, "un_wpp_migration.xlsx"),
         (migration_rate, "un_wpp_migration_rate.xlsx"),
+        (deaths, "un_wpp_deaths.xlsx"),
+        (deaths_age, "un_wpp_deaths_age.xlsx"),
+        (deaths_age_fem, "un_wpp_deaths_age_fem.xlsx"),
+        (deaths_age_male, "un_wpp_deaths_age_male.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
