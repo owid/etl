@@ -47,6 +47,7 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    # TODO: we currently report ages 0, 1-4, 5-year age groups and 100+. Maybe we want to add others (as in population), or 10-year age grogups (as in 2022 version)
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
 
     # Drop 55-59 age group in fertility (is all zero!)
