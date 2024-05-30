@@ -20,6 +20,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 YEAR_SPLIT = 2024
+COLUMNS_INDEX = ["country", "year", "sex", "age", "variant"]
 
 
 def run(dest_dir: str) -> None:
@@ -34,6 +35,8 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = ds_meadow["growth_rate"].reset_index()
     tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
     tb_fertility = ds_meadow["fertility_rate"].reset_index()
+    tb_migration = ds_meadow["net_migration"].reset_index()
+    tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
 
     #
     # Process data.
@@ -42,21 +45,24 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_fertility = process_standard(tb_fertility)
+    tb_migration = process_migration(tb_migration, tb_migration_rate)
 
     # Split estimates vs. pro`ections
     tb_population = set_variant_to_estimates(tb_population)
     tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
     tb_fertility = set_variant_to_estimates(tb_fertility)
+    tb_migration = set_variant_to_estimates(tb_migration)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
 
     # Format
-    tb_population = tb_population.format(["country", "year", "sex", "age", "variant"])
-    tb_growth_rate = tb_growth_rate.format(["country", "year", "sex", "age", "variant"])
-    tb_nat_change = tb_nat_change.format(["country", "year", "sex", "age", "variant"])
-    tb_fertility = tb_fertility.format(["country", "year", "sex", "age", "variant"])
+    tb_population = tb_population.format(COLUMNS_INDEX)
+    tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX)
+    tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
+    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
+    tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
 
     # Build tables list for dataset
     tables = [
@@ -64,6 +70,7 @@ def run(dest_dir: str) -> None:
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
+        tb_migration,
     ]
 
     #
@@ -79,6 +86,32 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
+    """Process the migration tables.
+
+    Clean the individual tables and combine them into one with two indicators.
+    """
+    # Basic processing
+    tb_mig = process_standard(tb_mig)
+    tb_mig_rate = process_standard(tb_mig_rate)
+
+    # Standardise sex dimension values
+    tb_mig = harmonize_dimension(
+        tb_mig,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    # Merge
+    tb = tb_mig.merge(tb_mig_rate, on=COLUMNS_INDEX, how="left")
+
+    return tb
 
 
 def process_standard(tb: Table) -> Table:

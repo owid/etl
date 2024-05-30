@@ -32,6 +32,10 @@ def run(dest_dir: str) -> None:
     tb_tot = read_estimates_and_projections_from_snap("un_wpp_fert_rate_tot.xlsx")
     tb_age = read_estimates_and_projections_from_snap("un_wpp_fert_rate_age.xlsx")
     tb_fertility = combine_fertility_tables(tb_tot, tb_age)
+    # Retrieve migration
+    tb_migration = read_estimates_and_projections_from_snap("un_wpp_migration.xlsx")
+    tb_migration = to_long_format_migration(tb_migration)
+    tb_migration_rate = read_estimates_and_projections_from_snap("un_wpp_migration_rate.xlsx")
 
     #
     # Process data.
@@ -41,6 +45,8 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = clean_table(tb_growth_rate, "growth_rate")
     tb_nat_change = clean_table(tb_nat_change, "natural_change_rate")
     tb_fertility = clean_table(tb_fertility, "fertility_rate")
+    tb_migration = clean_table(tb_migration, "net_migration")
+    tb_migration_rate = clean_table(tb_migration_rate, "net_migration_rate")
 
     #
     # Save outputs.
@@ -50,6 +56,8 @@ def run(dest_dir: str) -> None:
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
+        tb_migration,
+        tb_migration_rate,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
@@ -76,6 +84,17 @@ def combine_fertility_tables(tb_tot: Table, tb_age: Table) -> Table:
     tb_fertility = concat([tb_age, tb_tot], ignore_index=True)
 
     return tb_fertility
+
+
+def to_long_format_migration(tb: Table) -> Table:
+    """Convert migration table to long format."""
+    # Melt
+    tb = tb.melt(
+        id_vars=[col for col in tb.columns if col not in {"Male", "Female", "Total"}],
+        var_name="Sex",
+        value_name="Value",
+    )
+    return tb
 
 
 def clean_table(tb: Table, indicator_name: str) -> Table:

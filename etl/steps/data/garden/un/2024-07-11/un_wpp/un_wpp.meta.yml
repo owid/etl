@@ -39,6 +39,16 @@ tables:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
 
+  migration:
+    variables:
+      net_migration:
+        title: Net migration
+        unit: migrants
+        description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
+      net_migration_rate:
+        title: Net migration rate
+        unit: migrants per 1,000 population
+        description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
 
   # un_wpp:
   #   variables:
