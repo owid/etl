@@ -27,6 +27,8 @@ steps:
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
     - snapshot-private://un/2024-07-11/un_wpp_growth_rate.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_nat_change_rate.xlsx
+    - snapshot-private://un/2024-07-11/un_wpp_fert_rate_tot.xlsx
+    - snapshot-private://un/2024-07-11/un_wpp_fert_rate_age.xlsx
   data-private://garden/un/2024-07-11/un_wpp:
     - data-private://meadow/un/2024-07-11/un_wpp
   data-private://grapher/un/2024-07-11/un_wpp:

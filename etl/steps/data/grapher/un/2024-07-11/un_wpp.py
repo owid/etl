@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
         ds_garden["population"],
         ds_garden["growth_rate"],
         ds_garden["natural_change_rate"],
+        ds_garden["fertility_rate"],
     ]
     #
     # Save outputs.

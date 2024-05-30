@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     tb_population = ds_meadow["population"].reset_index()
     tb_growth_rate = ds_meadow["growth_rate"].reset_index()
     tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
+    tb_fertility = ds_meadow["fertility_rate"].reset_index()
 
     #
     # Process data.
@@ -40,11 +41,13 @@ def run(dest_dir: str) -> None:
     tb_population = process_population(tb_population)
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
+    tb_fertility = process_standard(tb_fertility)
 
     # Split estimates vs. pro`ections
     tb_population = set_variant_to_estimates(tb_population)
     tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
+    tb_fertility = set_variant_to_estimates(tb_fertility)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -53,12 +56,14 @@ def run(dest_dir: str) -> None:
     tb_population = tb_population.format(["country", "year", "sex", "age", "variant"])
     tb_growth_rate = tb_growth_rate.format(["country", "year", "sex", "age", "variant"])
     tb_nat_change = tb_nat_change.format(["country", "year", "sex", "age", "variant"])
+    tb_fertility = tb_fertility.format(["country", "year", "sex", "age", "variant"])
 
     # Build tables list for dataset
     tables = [
         tb_population,
         tb_growth_rate,
         tb_nat_change,
+        tb_fertility,
     ]
 
     #
@@ -97,8 +102,10 @@ def process_standard(tb: Table) -> Table:
     )
 
     # Add missing dimensions
-    tb["sex"] = "all"
-    tb["age"] = "all"
+    if "sex" not in tb.columns:
+        tb["sex"] = "all"
+    if "age" not in tb.columns:
+        tb["age"] = "all"
 
     return tb
 

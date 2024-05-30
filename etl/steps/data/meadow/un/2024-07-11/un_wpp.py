@@ -21,23 +21,26 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     paths.log.info("reading snapshots...")
-    # Retrieve population snapshot
-    tb_population = paths.read_snap_table("un_wpp_population.csv")
-    # Retrieve population snapshot
-    snap = paths.load_snapshot("un_wpp_growth_rate.xlsx")
-    tb_growth_rate = read_estimates_and_projections(snap)
 
     # Retrieve population snapshot
-    snap = paths.load_snapshot("un_wpp_nat_change_rate.xlsx")
-    tb_nat_change = read_estimates_and_projections(snap)
+    tb_population = paths.read_snap_table("un_wpp_population.csv")
+    # Retrieve growth rate
+    tb_growth_rate = read_estimates_and_projections_from_snap("un_wpp_growth_rate.xlsx")
+    # Retrieve natural change rate
+    tb_nat_change = read_estimates_and_projections_from_snap("un_wpp_nat_change_rate.xlsx")
+    # Retrieve fertility rate
+    tb_tot = read_estimates_and_projections_from_snap("un_wpp_fert_rate_tot.xlsx")
+    tb_age = read_estimates_and_projections_from_snap("un_wpp_fert_rate_age.xlsx")
+    tb_fertility = combine_fertility_tables(tb_tot, tb_age)
 
     #
     # Process data.
     #
     # Process tables
-    tb_population = process_table(tb_population, "population")
-    tb_growth_rate = process_table(tb_growth_rate, "growth_rate")
-    tb_nat_change = process_table(tb_nat_change, "natural_change_rate")
+    tb_population = clean_table(tb_population, "population")
+    tb_growth_rate = clean_table(tb_growth_rate, "growth_rate")
+    tb_nat_change = clean_table(tb_nat_change, "natural_change_rate")
+    tb_fertility = clean_table(tb_fertility, "fertility_rate")
 
     #
     # Save outputs.
@@ -46,6 +49,7 @@ def run(dest_dir: str) -> None:
         tb_population,
         tb_growth_rate,
         tb_nat_change,
+        tb_fertility,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
@@ -54,14 +58,27 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def read_estimates_and_projections(snap: Snapshot) -> Table:
+def read_estimates_and_projections_from_snap(short_name: str) -> Table:
+    # Read snap
+    snap = paths.load_snapshot(short_name)
+    # Read tables
     tb_estimates = snap.read(sheet_name="Estimates")
     tb_projections = snap.read(sheet_name="Medium")
+    # Merge tables
     tb = concat([tb_estimates, tb_projections], ignore_index=True)
     return tb
 
 
-def process_table(tb: Table, indicator_name: str) -> Table:
+def combine_fertility_tables(tb_tot: Table, tb_age: Table) -> Table:
+    columns = set(tb_tot.columns).intersection(set(tb_age.columns))
+    tb_age = tb_age.melt(list(columns), var_name="Age", value_name="Value")
+    tb_tot["Age"] = "all"
+    tb_fertility = concat([tb_age, tb_tot], ignore_index=True)
+
+    return tb_fertility
+
+
+def clean_table(tb: Table, indicator_name: str) -> Table:
     """Process growth rate data.
 
     From snapshot table to ETL-ready-cleaned table.
