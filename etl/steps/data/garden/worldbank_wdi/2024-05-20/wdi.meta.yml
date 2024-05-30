@@ -773,7 +773,7 @@ tables:
         display:
           name: Access to clean fuels and technologies for cooking
         presentation:
-          title_public: Access to clean fuels and technologies for cooking (% of population)
+          title_public: Share of population with access to clean fuels and technologies for cooking
       eg_egy_prim_pp_kd:
         title: Energy intensity level of primary energy (MJ/$2017 PPP GDP)
       eg_elc_accs_ru_zs:
@@ -795,7 +795,7 @@ tables:
         display:
           name: Coal
         presentation:
-          title_public: Electricity production from coal sources (% of total)
+          title_public: Share of total electricity production from coal
       eg_elc_fosl_zs:
         title: Electricity production from oil, gas and coal sources (% of total)
         short_unit: '%'
@@ -2547,7 +2547,8 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
         presentation:
-          title_public: GDP per capita, PPP (current international $)
+          title_public: GDP per capita
+          title_variant: In current international $
           topic_tags:
           - Economic Growth
       ny_gdp_pcap_pp_kd:
@@ -2560,7 +2561,8 @@ tables:
           isProjection: false
           numDecimalPlaces: 0
         presentation:
-          title_public: GDP per capita, PPP (constant 2017 international $)
+          title_public: GDP per capita
+          title_variant: In constant 2017 international $
           topic_tags:
           - Economic Growth
       ny_gdp_petr_rt_zs:
@@ -3421,7 +3423,8 @@ tables:
         display:
           name: Alcohol consumption
         presentation:
-          title_public: Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)
+          title_public: Total alcohol consumption per capit
+          title_variant: In liters of pure alcohol, projected estimates, 15+ years of age
       sh_alc_pcap_ma_li:
         title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of
           age)

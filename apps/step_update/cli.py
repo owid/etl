@@ -196,9 +196,9 @@ class StepUpdater:
             "update_state",
         ] = UpdateState.UP_TO_DATE.value
         # If a step has no charts and is not the latest version, it is archivable.
-        self.steps_df.loc[(self.steps_df["n_charts"] == 0) & (~self.steps_df["is_latest"]), "update_state"] = (
-            UpdateState.ARCHIVABLE.value
-        )
+        self.steps_df.loc[
+            (self.steps_df["n_charts"] == 0) & (~self.steps_df["is_latest"]), "update_state"
+        ] = UpdateState.ARCHIVABLE.value
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
