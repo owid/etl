@@ -38,6 +38,8 @@ log = get_logger()
 @click.option("--nat-change-rate", type=str, help="Path to rate natural change local file.")
 @click.option("--fertility-tot", type=str, help="Path to total fertility rate local file.")
 @click.option("--fertility-age", type=str, help="Path to age-specific fetility rate local file.")
+@click.option("--migration", type=str, help="Path to net-migration local file.")
+@click.option("--migration-rate", type=str, help="Path to net-migration rate local file.")
 def main(
     upload: bool,
     population: str | None = None,
@@ -45,6 +47,8 @@ def main(
     nat_change_rate: str | None = None,
     fertility_tot: str | None = None,
     fertility_age: str | None = None,
+    migration: str | None = None,
+    migration_rate: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
@@ -52,6 +56,8 @@ def main(
         (nat_change_rate, "un_wpp_nat_change_rate.xlsx"),
         (fertility_tot, "un_wpp_fert_rate_tot.xlsx"),
         (fertility_age, "un_wpp_fert_rate_age.xlsx"),
+        (migration, "un_wpp_migration.xlsx"),
+        (migration_rate, "un_wpp_migration_rate.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
