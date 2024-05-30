@@ -147,6 +147,9 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
         },
     )
 
+    # Scale
+    tb["deaths"] *= 1000
+
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
 
