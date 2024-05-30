@@ -645,6 +645,12 @@ class PathFinder:
         assert isinstance(snap, Snapshot)
         return snap
 
+    def read_snap_table(self, short_name: Optional[str] = None) -> Table:
+        """Load snapshot dependency. short_name defaults to the current step's short_name."""
+        snap = self.load_snapshot(short_name=short_name)
+        tb = snap.read()
+        return tb
+
     def load_dataset(
         self,
         short_name: Optional[str] = None,
