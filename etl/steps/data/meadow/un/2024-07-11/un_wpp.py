@@ -22,8 +22,13 @@ def run(dest_dir: str) -> None:
     paths.log.info("reading snapshots...")
     # Retrieve population snapshot
     snap = paths.load_snapshot("un_wpp_population.csv")
-    # Load data from snapshot
     tb_population = snap.read()
+    # Retrieve population snapshot
+    snap = paths.load_snapshot("un_wpp_growth_rate.xlsx")
+    tb_growth_rate = snap.read()
+    # Retrieve population snapshot
+    snap = paths.load_snapshot("un_wpp_nat_change_rate.xlsx")
+    tb_nat_change = snap.read()
 
     #
     # Process data.
