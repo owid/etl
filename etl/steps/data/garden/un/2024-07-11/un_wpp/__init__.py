@@ -44,10 +44,16 @@ def run(dest_dir: str) -> None:
     tb_population = process_population(tb_population)
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
-    tb_fertility = process_standard(tb_fertility)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
 
-    # Split estimates vs. pro`ections
+    # Drop 55-59 age group in fertility (is all zero!)
+    tb_fertility = process_standard(tb_fertility)
+    assert (
+        tb_fertility.loc[tb_fertility["age"] == "55-59", "fertility_rate"] == 0
+    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    tb_fertility = tb_fertility.loc[tb_fertility["age"] != "55-59"]
+
+    # Split estimates vs. projections
     tb_population = set_variant_to_estimates(tb_population)
     tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
     tb_nat_change = set_variant_to_estimates(tb_nat_change)
