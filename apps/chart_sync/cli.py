@@ -209,23 +209,17 @@ def cli(
                         #     )
                         #     continue
 
-                        # Not approved, update the chart, but notify us about it
-                        # TODO: should we distinguish between not approving because of laziness and not
-                        # approving because of change in prod?
+                        # Not approved, notify us about it
                         elif diff.unapproved:
                             log.warning(
-                                "chart_sync.unapproved_chart_update",
+                                "chart_sync.pending_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
                                 target_updatedAt=str(diff.target_chart.updatedAt),
                                 staging_created_at=str(staging_created_at),
                             )
-
                             _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
-
-                            if not dry_run:
-                                target_api.update_chart(chart_id, diff.source_chart.config)
                         else:
                             raise ValueError("Invalid chart diff state")
 
@@ -406,7 +400,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
     assert diff.target_chart
 
     message = f"""
-:warning: *ETL chart-sync: Unapproved Chart Update* from `{source}`
+:warning: *ETL chart-sync: Pending Chart Update Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
@@ -420,12 +414,12 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
     if config.SLACK_API_TOKEN and not dry_run:
         assert diff.target_chart
         slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#bot-testing", text=message)
+        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
 
 
 def _notify_slack_chart_create(source_chart_id: int, target_chart_id: int, source: str, dry_run: bool) -> None:
     message = f"""
-:warning: *ETL chart-sync: Unapproved New Chart* from `{source}`
+:warning: *ETL chart-sync: Pending New Chart Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
     """.strip()
 
@@ -433,7 +427,7 @@ def _notify_slack_chart_create(source_chart_id: int, target_chart_id: int, sourc
 
     if config.SLACK_API_TOKEN and not dry_run:
         slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#bot-testing", text=message)
+        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
 
 
 def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optional[str], exclude: Optional[str]):
