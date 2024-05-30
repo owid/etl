@@ -33,13 +33,30 @@ log = get_logger()
 ########################################################################################################################
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file-population", prompt=True, type=str, help="Path to local population file.")
-def main(upload: bool, path_to_file_population: str) -> None:
-    # Create a new snapshot.
-    snap = Snapshot(f"un/{SNAPSHOT_VERSION}/un_wpp_population.csv")
+@click.option("--population", type=str, help="Path to local population file.")
+@click.option("--growth-rate", type=str, help="Path to local population growth rate file.")
+@click.option("--nat-change-rate", type=str, help="Path to local rate natural change file.")
+def main(
+    upload: bool,
+    population: str | None = None,
+    growth_rate: str | None = None,
+    nat_change_rate: str | None = None,
+) -> None:
+    snapshot_paths = [
+        (population, "un_wpp_population.csv"),
+        (growth_rate, "un_wpp_growth_rate.xlsx"),
+        (nat_change_rate, "un_wpp_nat_change_rate.xlsx"),
+    ]
+    for paths in snapshot_paths:
+        if paths[0] is not None:
+            log.info(f"Importing {paths[1]}.")
+            # Create a new snapshot.
+            snap = Snapshot(f"un/{SNAPSHOT_VERSION}/{paths[1]}")
 
-    # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(filename=path_to_file_population, upload=upload)
+            # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+            snap.create_snapshot(filename=paths[0], upload=upload)
+        else:
+            log.warning(f"Skipping import for {paths[1]}.")
 
 
 ########################################################################################################################
