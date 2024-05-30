@@ -50,15 +50,16 @@ tables:
         unit: migrants per 1,000 population
         description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
 
-  # deaths:
-  #   death_rate:
-  #       title: Death rate
-  #       unit: deaths per 1,000 population
-  #       description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
-  #     deaths:
-  #       title: Deaths
-  #       unit: deaths
-  #       description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+  deaths:
+    variables:
+      death_rate:
+        title: Death rate
+        unit: deaths per 1,000 population
+        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
+      deaths:
+        title: Deaths
+        unit: deaths
+        description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
 
 
   # un_wpp:
