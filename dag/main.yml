@@ -225,12 +225,12 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
   # Global mobile money dataset (GSMA)
-  data://meadow/technology/2023-03-06/mobile_money:
-    - snapshot://technology/2023-03-06/mobile_money.xlsx
-  data://garden/technology/2023-03-06/mobile_money:
-    - data://meadow/technology/2023-03-06/mobile_money
-  data://grapher/technology/2023-03-06/mobile_money:
-    - data://garden/technology/2023-03-06/mobile_money
+  data://meadow/technology/2024-05-30/mobile_money:
+    - snapshot://technology/2024-05-30/mobile_money.xlsx
+  data://garden/technology/2024-05-30/mobile_money:
+    - data://meadow/technology/2024-05-30/mobile_money
+  data://grapher/technology/2024-05-30/mobile_money:
+    - data://garden/technology/2024-05-30/mobile_money
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
