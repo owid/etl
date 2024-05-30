@@ -33,19 +33,25 @@ log = get_logger()
 ########################################################################################################################
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--population", type=str, help="Path to local population file.")
-@click.option("--growth-rate", type=str, help="Path to local population growth rate file.")
-@click.option("--nat-change-rate", type=str, help="Path to local rate natural change file.")
+@click.option("--population", type=str, help="Path to population local file.")
+@click.option("--growth-rate", type=str, help="Path to population growth rate local file.")
+@click.option("--nat-change-rate", type=str, help="Path to rate natural change local file.")
+@click.option("--fertility-tot", type=str, help="Path to total fertility rate local file.")
+@click.option("--fertility-age", type=str, help="Path to age-specific fetility rate local file.")
 def main(
     upload: bool,
     population: str | None = None,
     growth_rate: str | None = None,
     nat_change_rate: str | None = None,
+    fertility_tot: str | None = None,
+    fertility_age: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
         (growth_rate, "un_wpp_growth_rate.xlsx"),
         (nat_change_rate, "un_wpp_nat_change_rate.xlsx"),
+        (fertility_tot, "un_wpp_fert_rate_tot.xlsx"),
+        (fertility_age, "un_wpp_fert_rate_age.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
