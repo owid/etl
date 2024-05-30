@@ -15,11 +15,12 @@ from slack_sdk import WebClient
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from apps.staging_sync.admin_api import AdminAPI
+from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
-from apps.wizard.utils.env import OWIDEnv, get_container_name
+from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl import grapher_model as gm
+from etl.config import get_container_name
 from etl.datadiff import _dict_diff
 from etl.db import read_sql
 
@@ -110,7 +111,7 @@ def cli(
 
     - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
 
-    **Example 1:** Run staging-sync in dry-run mode to see what charts will be updated
+    **Example 1:** Run chart-sync in dry-run mode to see what charts will be updated
 
     ```
     $ etl chart-sync staging-site-my-branch .env.prod.write --dry-run
@@ -136,7 +137,7 @@ def cli(
     """
     if _is_commit_sha(source):
         source = _get_git_branch_from_commit_sha(source)
-        log.info("staging_sync.use_branch", branch=source)
+        log.info("chart_sync.use_branch", branch=source)
 
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
     target_engine = OWIDEnv.from_staging_or_env_file(target).get_engine()
@@ -154,7 +155,7 @@ def cli(
             else:
                 chart_ids = _modified_chart_ids_by_admin(source_session)
 
-            log.info("staging_sync.start", n=len(chart_ids), chart_ids=chart_ids)
+            log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
             for chart_id in chart_ids:
                 diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
@@ -168,7 +169,7 @@ def cli(
                 # Exclude charts with variables whose catalogPath matches the provided string
                 if not _matches_include_exclude(diff.source_chart, source_session, include, exclude):
                     log.info(
-                        "staging_sync.skip",
+                        "chart_sync.skip",
                         slug=chart_slug,
                         reason="filtered by --include/--exclude",
                         chart_id=chart_id,
@@ -183,7 +184,7 @@ def cli(
                     # Configs are equal, no need to update
                     if diff.configs_are_equal():
                         log.info(
-                            "staging_sync.skip",
+                            "chart_sync.skip",
                             slug=diff.target_chart.config["slug"],
                             reason="identical chart already exists",
                             chart_id=chart_id,
@@ -194,7 +195,7 @@ def cli(
                     if chartdiff:
                         # Change has been approved, update the chart
                         if diff.approved:
-                            log.info("staging_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                            log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
 
@@ -202,7 +203,7 @@ def cli(
                         # Rejected chart diff
                         # elif diff.rejected:
                         #     log.info(
-                        #         "staging_sync.rejected",
+                        #         "chart_sync.rejected",
                         #         slug=chart_slug,
                         #         chart_id=chart_id,
                         #     )
@@ -213,7 +214,7 @@ def cli(
                         # approving because of change in prod?
                         elif diff.unapproved:
                             log.warning(
-                                "staging_sync.unapproved_chart_update",
+                                "chart_sync.unapproved_chart_update",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
@@ -233,7 +234,7 @@ def cli(
                         # warn if chart has been updated in production after the staging server got created
                         if diff.target_chart.updatedAt > min(staging_created_at, diff.source_chart.updatedAt):
                             log.warning(
-                                "staging_sync.chart_modified_in_target",
+                                "chart_sync.chart_modified_in_target",
                                 slug=chart_slug,
                                 target_updatedAt=str(diff.target_chart.updatedAt),
                                 source_updatedAt=str(diff.source_chart.updatedAt),
@@ -253,7 +254,7 @@ def cli(
                         # chart hasn't been updated in production, update it directly
                         if approve_revisions and revs and staging_created_at > diff.target_chart.updatedAt:
                             log.info(
-                                "staging_sync.update_chart",
+                                "chart_sync.update_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                             )
@@ -294,14 +295,14 @@ def cli(
                                     # chart revision already exists
                                     target_session.rollback()
                                     log.info(
-                                        "staging_sync.skip",
+                                        "chart_sync.skip",
                                         reason="revision already exists",
                                         slug=chart_slug,
                                         chart_id=chart_id,
                                     )
                                     continue
 
-                            log.info("staging_sync.create_chart_revision", slug=chart_slug, chart_id=chart_id)
+                            log.info("chart_sync.create_chart_revision", slug=chart_slug, chart_id=chart_id)
 
                 # Chart is new, create it
                 else:
@@ -319,7 +320,7 @@ def cli(
                         # Rejected chart diff
                         # elif diff.rejected:
                         #     log.info(
-                        #         "staging_sync.rejected",
+                        #         "chart_sync.rejected",
                         #         slug=chart_slug,
                         #         chart_id=chart_id,
                         #     )
@@ -328,7 +329,7 @@ def cli(
                         # Not approved, create the chart, but notify us about it
                         elif diff.unapproved:
                             log.warning(
-                                "staging_sync.create_unapproved_chart",
+                                "chart_sync.create_unapproved_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                             )
@@ -351,7 +352,7 @@ def cli(
                             resp = {"chartId": None}
 
                     log.info(
-                        "staging_sync.create_chart",
+                        "chart_sync.create_chart",
                         published=diff.source_chart.config.get("isPublished"),
                         slug=chart_slug,
                         new_chart_id=resp["chartId"],

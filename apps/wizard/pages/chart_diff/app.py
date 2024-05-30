@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from st_pages import add_indentation
 from structlog import get_logger
 
-from apps.staging_sync.cli import _modified_chart_ids_by_admin
+from apps.chart_sync.cli import _modified_chart_ids_by_admin
 from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.pages.chart_diff.config_diff import st_show_diff
 from apps.wizard.utils import Pagination, chart_html, set_states
