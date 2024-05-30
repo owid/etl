@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Origin, Table, TableMeta
+from owid.catalog.tables import concat
 from pandas.api.types import CategoricalDtype
 
 from etl.helpers import PathFinder, create_dataset
@@ -23,9 +24,12 @@ def run(dest_dir: str) -> None:
     # Retrieve population snapshot
     tb_population = paths.read_snap_table("un_wpp_population.csv")
     # Retrieve population snapshot
-    tb_growth_rate = paths.read_snap_table("un_wpp_growth_rate.xlsx")
+    snap = paths.load_snapshot("un_wpp_growth_rate.xlsx")
+    tb_growth_rate = read_estimates_and_projections(snap)
+
     # Retrieve population snapshot
-    tb_nat_change = paths.read_snap_table("un_wpp_nat_change_rate.xlsx")
+    snap = paths.load_snapshot("un_wpp_nat_change_rate.xlsx")
+    tb_nat_change = read_estimates_and_projections(snap)
 
     #
     # Process data.
@@ -48,6 +52,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
+
+
+def read_estimates_and_projections(snap: Snapshot) -> Table:
+    tb_estimates = snap.read(sheet_name="Estimates")
+    tb_projections = snap.read(sheet_name="Medium")
+    tb = concat([tb_estimates, tb_projections], ignore_index=True)
+    return tb
 
 
 def process_table(tb: Table, indicator_name: str) -> Table:
