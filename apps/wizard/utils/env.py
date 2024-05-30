@@ -1,6 +1,5 @@
 """Tools to handle OWID environment."""
 
-import re
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Literal, cast
@@ -9,6 +8,7 @@ from dotenv import dotenv_values
 from typing_extensions import Self
 
 from etl import config
+from etl.config import get_container_name
 from etl.db import Engine, get_engine
 
 OWIDEnvType = Literal["production", "local", "staging", "unknown"]
@@ -173,22 +173,6 @@ class OWIDEnv:
         Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
         """
         return f"{self.site}/grapher/thumbnail/{slug}.png"
-
-
-def _normalise_branch(branch_name):
-    return re.sub(r"[\/\._]", "-", branch_name)
-
-
-def get_container_name(branch_name):
-    normalized_branch = _normalise_branch(branch_name)
-
-    # Strip staging-site- prefix to add it back later
-    normalized_branch = normalized_branch.replace("staging-site-", "")
-
-    # Ensure the container name is less than 63 characters
-    container_name = f"staging-site-{normalized_branch[:50]}"
-    # Remove trailing hyphens
-    return container_name.rstrip("-")
 
 
 OWID_ENV = OWIDEnv()
