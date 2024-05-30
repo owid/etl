@@ -62,9 +62,11 @@ class ChartDiffModified:
                 target_chart = None
         else:
             target_chart = None
+
         # It can happen that both charts have the same ID, but are completely different (this
-        # happens when two charts are created independently and have different slugs)
-        if target_chart and source_chart.slug != target_chart.slug:
+        # happens when two charts are created independently on two servers). If they
+        # have same createdAt then they are the same chart.
+        if target_chart and source_chart.createdAt != target_chart.createdAt:
             target_chart = None
 
         # Checks
