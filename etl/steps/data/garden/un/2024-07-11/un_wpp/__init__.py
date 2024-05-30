@@ -11,7 +11,9 @@ import pandas as pd
 # from fertility import process as process_fertility
 from owid.catalog import Table
 from population import process as process_population
+from shared import harmonize_dimension
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -26,23 +28,37 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("un_wpp")
+
+    # Load tables
     tb_population = ds_meadow["population"].reset_index()
+    tb_growth_rate = ds_meadow["growth_rate"].reset_index()
+    tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
 
     #
     # Process data.
     #
     tb_population = process_population(tb_population)
+    tb_growth_rate = process_standard(tb_growth_rate)
+    tb_nat_change = process_standard(tb_nat_change)
 
-    # Split estimates vs. projections
-    tb_population["variant"] = tb_population["variant"].astype("string")
-    tb_population.loc[tb_population["year"] < YEAR_SPLIT, "variant"] = "estimates"
+    # Split estimates vs. pro`ections
+    tb_population = set_variant_to_estimates(tb_population)
+    tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
+    tb_nat_change = set_variant_to_estimates(tb_nat_change)
+
+    # Particular processing
+    tb_nat_change["natural_change_rate"] /= 10
 
     # Format
     tb_population = tb_population.format(["country", "year", "sex", "age", "variant"])
+    tb_growth_rate = tb_growth_rate.format(["country", "year", "sex", "age", "variant"])
+    tb_nat_change = tb_nat_change.format(["country", "year", "sex", "age", "variant"])
 
     # Build tables list for dataset
     tables = [
         tb_population,
+        tb_growth_rate,
+        tb_nat_change,
     ]
 
     #
@@ -50,11 +66,48 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def process_standard(tb: Table) -> Table:
+    """Process the population table."""
+    paths.log.info("Processing population variables...")
+
+    # Sanity check
+    assert tb.notna().all(axis=None), "Some NaNs detected"
+
+    # Remove location_type
+    tb = tb.drop(columns="location_type")
+
+    # Harmonize country names
+    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+
+    # Harmonize dimensions
+    tb = harmonize_dimension(
+        tb,
+        "variant",
+        mapping={"Medium variant": "medium"},
+    )
+
+    # Add missing dimensions
+    tb["sex"] = "all"
+    tb["age"] = "all"
+
+    return tb
+
+
+def set_variant_to_estimates(tb: Table) -> Table:
+    """For data before YEAR_SPLIT, make sure to have variant = 'estimates'."""
+    tb["variant"] = tb["variant"].astype("string")
+    tb.loc[tb["year"] < YEAR_SPLIT, "variant"] = "estimates"
+    return tb
 
 
 #################################################################################

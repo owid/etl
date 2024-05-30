@@ -12,6 +12,23 @@ tables:
         description_short: |-
           Population yearly increment. This is the difference between the population on 1st of July of the year indicated and the population on 1st of July of the previous year.
 
+  growth_rate:
+    variables:
+      growth_rate:
+        title: Growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+
+  natural_change_rate:
+    variables:
+      natural_change_rate:
+        title: Natural growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+
+
   # un_wpp:
   #   variables:
   #     birth_rate:

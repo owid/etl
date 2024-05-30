@@ -21,40 +21,41 @@ def run(dest_dir: str) -> None:
     #
     paths.log.info("reading snapshots...")
     # Retrieve population snapshot
-    snap = paths.load_snapshot("un_wpp_population.csv")
-    tb_population = snap.read()
+    tb_population = paths.read_snap_table("un_wpp_population.csv")
     # Retrieve population snapshot
-    snap = paths.load_snapshot("un_wpp_growth_rate.xlsx")
-    tb_growth_rate = snap.read()
+    tb_growth_rate = paths.read_snap_table("un_wpp_growth_rate.xlsx")
     # Retrieve population snapshot
-    snap = paths.load_snapshot("un_wpp_nat_change_rate.xlsx")
-    tb_nat_change = snap.read()
+    tb_nat_change = paths.read_snap_table("un_wpp_nat_change_rate.xlsx")
 
     #
     # Process data.
     #
-    # Get population data ready for ETL.
-    tb_population = process_population(tb_population)
+    # Process tables
+    tb_population = process_table(tb_population, "population")
+    tb_growth_rate = process_table(tb_growth_rate, "growth_rate")
+    tb_nat_change = process_table(tb_nat_change, "natural_change_rate")
 
     #
     # Save outputs.
     #
     tables = [
         tb_population,
+        tb_growth_rate,
+        tb_nat_change,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
 
 
-def process_population(tb: Table) -> Table:
-    """Process population data.
+def process_table(tb: Table, indicator_name: str) -> Table:
+    """Process growth rate data.
 
     From snapshot table to ETL-ready-cleaned table.
     """
-    paths.log.info("processing population data...")
+    paths.log.info("processing growth rate data...")
 
     COLUMNS = {
         "LocationName": "country",
@@ -63,8 +64,10 @@ def process_population(tb: Table) -> Table:
         "VariantName": "variant",
         "Sex": "sex",
         "Age": "age",
-        "Value": "population",
+        "Value": indicator_name,
     }
+    COLUMNS = {k: v for k, v in COLUMNS.items() if k in tb.columns}
+    COLUMNS_INDEX = [v for k, v in COLUMNS.items() if v not in {indicator_name}]
 
     # Column rename
     tb = tb.rename(columns=COLUMNS)
@@ -76,7 +79,7 @@ def process_population(tb: Table) -> Table:
     tb = tb.loc[tb["location_type"].isin(location_types)]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "location_type", "variant", "sex", "age"], short_name="population")
+    tb = tb.format(COLUMNS_INDEX, short_name=indicator_name)
 
     return tb
 
