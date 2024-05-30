@@ -47,14 +47,14 @@ tables:
         description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
       net_migration_rate:
         title: Net migration rate
-        unit: migrants per 1,000 population
+        unit: migrants per 1,000 people
         description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
 
   deaths:
     variables:
       death_rate:
         title: Death rate
-        unit: deaths per 1,000 population
+        unit: deaths per 1,000 people
         description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
       deaths:
         title: Deaths
