@@ -51,9 +51,6 @@ def process(tb: Table) -> Table:
         },
     )
 
-    # Format
-    tb = tb.format(["country", "year", "sex", "age", "variant"])
-
     return tb
 
 
