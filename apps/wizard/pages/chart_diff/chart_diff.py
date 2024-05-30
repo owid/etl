@@ -14,9 +14,11 @@ class ChartDiffModified:
     # Chart in target environment (if new in source environment, there won't be one)
     target_chart: Optional[gm.Chart]
     # Three state: 'approved', 'pending', 'rejected'
-    approval_status: gm.CHART_DIFF_STATUS
+    approval_status: gm.CHART_DIFF_STATUS | str
 
-    def __init__(self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS):
+    def __init__(
+        self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS | str
+    ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval_status = approval_status

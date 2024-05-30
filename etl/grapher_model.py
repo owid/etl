@@ -44,7 +44,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
