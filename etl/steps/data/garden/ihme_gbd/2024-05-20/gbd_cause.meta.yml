@@ -14,10 +14,10 @@ definitions:
       <% elif metric == "Rate" %>
       deaths per 100,000 people
       <% elif metric == "Percent" %>
-      share of total deaths
+      %
       <%- endif -%>
     short_unit: |-
-      <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from << cause.lower() >>, among individuals aged << age >>
@@ -68,7 +68,7 @@ definitions:
       share of total DALYs
       <%- endif -%>
     short_unit: |-
-      <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       DALYs from << cause.lower() >>, among individuals aged << age >>

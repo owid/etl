@@ -67,7 +67,7 @@ definitions:
       new cases per 100 people
       <%- endif -%>
     short_unit: |-
-      <% if metric == "Share" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
       New cases of << cause.lower() >>, among individuals aged << age >>
