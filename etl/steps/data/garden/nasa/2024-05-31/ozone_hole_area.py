@@ -3,8 +3,6 @@
 This step adds a new column: "country" with the value "World", since the data in this dataset
 is only for the world."""
 
-import pandas as pd
-from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
