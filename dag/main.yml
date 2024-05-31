@@ -401,7 +401,7 @@ steps:
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2024-05-20/patents_articles:
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2023-03-31/population
   data://grapher/research_development/2024-05-20/patents_articles:
     - data://garden/research_development/2024-05-20/patents_articles
@@ -698,7 +698,7 @@ steps:
   data://garden/growth/2024-05-16/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/worldbank_wdi/2023-05-29/wdi
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
 
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
