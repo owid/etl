@@ -1,10 +1,12 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Ozone Layer
+
 dataset:
-  description: |
-    Annual maximum and Antarctic stratospheric ozone hole area, resultant from the emission of ozone-depleting substances.
+  update_period_days: 365
 
-    Minimum and mean Southern Hemisphere daily ozone concentrations, measured in Dobson Units (DU).
-
-    This dataset should be next updated by the source every year. We will update it on Our World in Data soon after the new version is published. At the link above you can directly access the source page and see the latest available data.
 
 tables:
   ozone_hole_area:
@@ -13,7 +15,7 @@ tables:
       max_hole_area:
         title: Maximum ozone hole area
         short_unit: "km²"
-        unit: "square kilometres"
+        unit: "square kilometers"
         description_short: |
           The yearly maximum daily ozone hole area.
         description_key:
@@ -43,7 +45,7 @@ tables:
       mean_hole_area:
         title: Mean ozone hole area
         short_unit: "km²"
-        unit: "square kilometres"
+        unit: "square kilometers"
         description_short: |
           Ozone hole area mean (07 September - 13 October) for each year.
 
