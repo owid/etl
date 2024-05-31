@@ -7,6 +7,7 @@ meta:
 
       Minimum and mean Southern Hemisphere daily ozone concentrations, measured in Dobson Units (DU).
     date_published: "2024-05-16"
+    title_snapshot: Ozone hole are and concentration, Part 2
 
     # Citation
     producer: NASA Ozone Watch
@@ -21,8 +22,8 @@ meta:
 
     # License
     license:
-      name: CC BY 3.0 IGO
-      url: https://hdr.undp.org/copyright-and-terms-use
+      name: CC BY
+      url: https://science.data.nasa.gov/license/
 outs:
   - md5: 32f5399c97c8c71d1324c534bb64b4bc
     size: 1824
