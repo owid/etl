@@ -137,7 +137,7 @@ def run(dest_dir: str) -> None:
 
     # Load country tables from excel files one by one (to concatenate them later)
     country_tables = []
-    # needed to pad tables so they have the same format
+    # list needed to pad tables so they have the same format
     addl_cols = [
         "Unnamed: 3",
         "Unnamed: 4",
@@ -193,9 +193,12 @@ def run(dest_dir: str) -> None:
                 tb_from_excel[col] = "NaN"
             tb_from_excel = tb_from_excel.head(format["num_rows"])
 
+        # drop empty columns
         tb_from_excel.drop(labels=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], axis=1, inplace=True)
+        # change header and remove sub-header columns
         tb_from_excel.drop(labels=[0, 1], axis=0, inplace=True)
         tb_from_excel.columns = NEW_COLUMNS
+
         tb_from_excel["country"] = cty
         country_tables.append(tb_from_excel)
 
