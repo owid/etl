@@ -157,6 +157,8 @@ def cli(
 
             log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
+            charts_synced = 0
+
             for chart_id in chart_ids:
                 diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
 
@@ -196,6 +198,7 @@ def cli(
                         # Change has been approved, update the chart
                         if diff.approved:
                             log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                            charts_synced += 1
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
 
@@ -209,23 +212,17 @@ def cli(
                         #     )
                         #     continue
 
-                        # Not approved, update the chart, but notify us about it
-                        # TODO: should we distinguish between not approving because of laziness and not
-                        # approving because of change in prod?
+                        # Not approved, notify us about it
                         elif diff.unapproved:
                             log.warning(
-                                "chart_sync.unapproved_chart_update",
+                                "chart_sync.pending_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
                                 target_updatedAt=str(diff.target_chart.updatedAt),
                                 staging_created_at=str(staging_created_at),
                             )
-
                             _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
-
-                            if not dry_run:
-                                target_api.update_chart(chart_id, diff.source_chart.config)
                         else:
                             raise ValueError("Invalid chart diff state")
 
@@ -258,6 +255,7 @@ def cli(
                                 slug=chart_slug,
                                 chart_id=chart_id,
                             )
+                            charts_synced += 1
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
                         else:
@@ -275,6 +273,7 @@ def cli(
                                 createdAt=dt.datetime.utcnow(),
                                 updatedAt=dt.datetime.utcnow(),
                             )
+                            charts_synced += 1
                             if not dry_run:
                                 # delete previously submitted revisions
                                 (
@@ -311,11 +310,18 @@ def cli(
                     if chartdiff:
                         # New chart has been approved
                         if diff.approved:
+                            charts_synced += 1
                             if not dry_run:
                                 resp = target_api.create_chart(diff.source_chart.config)
                                 target_api.set_tags(resp["chartId"], chart_tags)
                             else:
                                 resp = {"chartId": None}
+                            log.info(
+                                "chart_sync.create_chart",
+                                published=diff.source_chart.config.get("isPublished"),
+                                slug=chart_slug,
+                                new_chart_id=resp["chartId"],
+                            )
                         # TODO: should we add rejected state?
                         # Rejected chart diff
                         # elif diff.rejected:
@@ -329,34 +335,33 @@ def cli(
                         # Not approved, create the chart, but notify us about it
                         elif diff.unapproved:
                             log.warning(
-                                "chart_sync.create_unapproved_chart",
+                                "chart_sync.new_unapproved_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
                             )
-
-                            if not dry_run:
-                                resp = target_api.create_chart(diff.source_chart.config)
-                                target_api.set_tags(resp["chartId"], chart_tags)
-                            else:
-                                resp = {"chartId": None}
-
-                            _notify_slack_chart_create(chart_id, resp["chartId"], str(source), dry_run)  # type: ignore
+                            _notify_slack_chart_create(chart_id, str(source), dry_run)
 
                         else:
                             raise ValueError("Invalid chart diff state")
                     else:
+                        charts_synced += 1
                         if not dry_run:
                             resp = target_api.create_chart(diff.source_chart.config)
                             target_api.set_tags(resp["chartId"], chart_tags)
                         else:
                             resp = {"chartId": None}
 
-                    log.info(
-                        "chart_sync.create_chart",
-                        published=diff.source_chart.config.get("isPublished"),
-                        slug=chart_slug,
-                        new_chart_id=resp["chartId"],
-                    )
+                        log.info(
+                            "chart_sync.create_chart",
+                            published=diff.source_chart.config.get("isPublished"),
+                            slug=chart_slug,
+                            new_chart_id=resp["chartId"],
+                        )
+
+    if charts_synced > 0:
+        print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
+    else:
+        print("\n[bold green]No charts synced[/bold green]")
 
     if not chartdiff:
         print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
@@ -406,7 +411,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
     assert diff.target_chart
 
     message = f"""
-:warning: *ETL chart-sync: Unapproved Chart Update* from `{source}`
+:warning: *ETL chart-sync: Pending Chart Update Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
@@ -420,20 +425,20 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModifi
     if config.SLACK_API_TOKEN and not dry_run:
         assert diff.target_chart
         slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#bot-testing", text=message)
+        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
 
 
-def _notify_slack_chart_create(source_chart_id: int, target_chart_id: int, source: str, dry_run: bool) -> None:
+def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool) -> None:
     message = f"""
-:warning: *ETL chart-sync: Unapproved New Chart* from `{source}`
-<http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
+:warning: *ETL chart-sync: Pending New Chart Not Synced* from `{source}`
+<http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart>
     """.strip()
 
     print(message)
 
     if config.SLACK_API_TOKEN and not dry_run:
         slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#bot-testing", text=message)
+        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
 
 
 def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optional[str], exclude: Optional[str]):

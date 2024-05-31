@@ -228,7 +228,7 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
 
     # Load GDP indicator(s)
     ## WDI
-    ds = Dataset(DATA_DIR / "garden/worldbank_wdi/2023-05-29/wdi")
+    ds = Dataset(DATA_DIR / "garden/worldbank_wdi/2024-05-20/wdi")
     tb_gdp_wdi = ds["wdi"].reset_index()[["year", "country", "ny_gdp_pcap_pp_kd"]]
     tb_gdp_wdi = tb_gdp_wdi.rename(
         columns={

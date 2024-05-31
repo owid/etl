@@ -25,6 +25,7 @@ tables:
     variables:
       p99p100_share_pretax:
         presentation:
+          title_public: Income share of the richest 1%
           title_variant: Before tax
           grapher_config:
             title: Income share of the richest 1% (before tax)
@@ -58,6 +59,7 @@ tables:
               - France
       p90p100_share_pretax:
         presentation:
+          title_public: Income share of the richest 10%
           title_variant: Before tax
           grapher_config:
             title: Income share of the richest 10% (before tax)
