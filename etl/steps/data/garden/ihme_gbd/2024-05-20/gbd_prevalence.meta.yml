@@ -122,6 +122,8 @@ tables:
           {definitions.value_prevalence.title}
         unit: |-
           {definitions.value_prevalence.unit}
+        short_unit: |-
+          {definitions.value_prevalence.short_unit}
         description_short: |-
           {definitions.value_prevalence.description_short}
         presentation:
@@ -138,6 +140,8 @@ tables:
           {definitions.value_incidence.title}
         unit: |-
           {definitions.value_incidence.unit}
+        short_unit: |-
+          {definitions.value_incidence.short_unit}
         description_short: |-
           {definitions.value_incidence.description_short}
         presentation:

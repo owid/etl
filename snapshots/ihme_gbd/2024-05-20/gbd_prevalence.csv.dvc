@@ -9,7 +9,7 @@ meta:
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence and incidence counts and rates for 371 diseases and injuries.
     date_published: "2024-05-17"
     # Citation
-    producer: Institute of Health Metrics and Evaluation, Global Burden of Disease Study
+    producer: IHME, Global Burden of Disease
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021) Results. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2022. Available from https://vizhub.healthdata.org/gbd-results/."
     attribution_short: "IHME-GBD"

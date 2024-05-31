@@ -12,10 +12,11 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_prevalence")
-    ds_garden.metadata.title = "GBD Prevalence"
+    ds_garden.metadata.title = "GBD Incidence"
+    ds_garden.metadata.short_name = "gbd_incidence"
     # Read table from garden dataset.
-    tb_prevalence = ds_garden["gbd_prevalence"]
-    # tb_incidence = ds_garden["gbd_incidence"]
+    # tb_prevalence = ds_garden["gbd_prevalence"]
+    tb_incidence = ds_garden["gbd_incidence"]
 
     #
     # Save outputs.
@@ -23,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
         dest_dir,
-        tables=[tb_prevalence],
+        tables=[tb_incidence],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )
