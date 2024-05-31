@@ -3,6 +3,8 @@ definitions:
     presentation:
       topic_tags:
         - Ozone Layer
+    processing_level: minor
+
 
 dataset:
   update_period_days: 365
