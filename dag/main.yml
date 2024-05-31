@@ -756,6 +756,17 @@ steps:
 
   ######################################################################################################################
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2024-05-20/wdi:
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+
+  data://garden/worldbank_wdi/2024-05-20/wdi:
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+    - data://meadow/worldbank_wdi/2024-05-20/wdi
+
+  data://grapher/worldbank_wdi/2024-05-20/wdi:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
