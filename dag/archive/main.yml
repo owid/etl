@@ -144,6 +144,17 @@ steps:
   data://explorers/emdat/2023-09-20/natural_disasters:
     - data://garden/emdat/2023-09-20/natural_disasters
 
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2023-05-29/wdi:
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+
+  data://garden/worldbank_wdi/2023-05-29/wdi:
+    - data://meadow/worldbank_wdi/2023-05-29/wdi
+    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
+
+  data://grapher/worldbank_wdi/2023-05-29/wdi:
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
