@@ -4,6 +4,7 @@ from zipfile import ZipFile
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -151,6 +152,8 @@ def run(dest_dir: str) -> None:
         "Unnamed: 12",
     ]
 
+    tb_from_excel = Table()
+
     for cty, cty_sheet in COUNTRY_MAP.items():
         if cty not in SPECIAL_CASES:
             # open excel file
@@ -209,17 +212,31 @@ def run(dest_dir: str) -> None:
     smoking_data_tb = smoking_data_tb[smoking_data_tb["year"].notna()]
     smoking_data_tb = smoking_data_tb[smoking_data_tb["manufactured_cigarettes_millions"].apply(is_string)]
 
+    # change data types to string
+    smoking_data_tb["year"] = smoking_data_tb["year"].astype(str)
+
     # remove duplicate data
     smoking_data_tb = smoking_data_tb.drop_duplicates(subset=["country", "year"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     smoking_data_tb = smoking_data_tb.format(["country", "year"])
 
+    # add metadata
+    smoking_data_tb.metadata.origins = [snap.m.origin]
+    smoking_data_tb.metadata.short_name = paths.short_name
+    smoking_data_tb.metadata.title = "International Smoking Statistics"
+
+    print(snap.metadata)
+    print(smoking_data_tb.metadata)
+
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
+    # Create a new meadow dataset with thex same metadata as the snapshot.
     ds_meadow = create_dataset(
-        dest_dir, tables=[smoking_data_tb], check_variables_metadata=True, default_metadata=snap.metadata
+        dest_dir,
+        tables=[smoking_data_tb],
+        default_metadata=snap.metadata,
+        check_variables_metadata=True,
     )
 
     # Save changes in the new meadow dataset.
