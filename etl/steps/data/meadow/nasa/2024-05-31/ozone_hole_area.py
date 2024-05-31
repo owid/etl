@@ -21,8 +21,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_1: Snapshot = paths.load_snapshot("ozone_hole_area_p1.txt")
-    snap_2: Snapshot = paths.load_snapshot("ozone_hole_area_p2.txt")
+    snap_1 = paths.load_snapshot("ozone_hole_area_p1.txt")
+    snap_2 = paths.load_snapshot("ozone_hole_area_p2.txt")
 
     # Load data from snapshot.
     df = build_df(snap_1, snap_2)
