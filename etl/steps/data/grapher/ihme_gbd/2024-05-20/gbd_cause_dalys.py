@@ -12,10 +12,11 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_cause")
-    ds_garden.metadata.title = "GBD Cause - Deaths"
+    ds_garden.metadata.title = "GBD Cause - DALYs"
+    ds_garden.metadata.short_name = "gbd_cause_dalys"
     # Read table from garden dataset.
-    tb_deaths = ds_garden["gbd_cause_deaths"]
-    # tb_dalys = ds_garden["gbd_cause_dalys"]
+    # tb_deaths = ds_garden["gbd_cause_deaths"]
+    tb_dalys = ds_garden["gbd_cause_dalys"]
 
     #
     # Process data.
@@ -26,7 +27,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_deaths], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb_dalys], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.
