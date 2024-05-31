@@ -79,15 +79,6 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
 
-  # World Development Indicators - WDI
-  data://meadow/worldbank_wdi/2023-05-29/wdi:
-    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
-  data://garden/worldbank_wdi/2023-05-29/wdi:
-    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
-    - data://meadow/worldbank_wdi/2023-05-29/wdi
-  data://grapher/worldbank_wdi/2023-05-29/wdi:
-    - data://garden/worldbank_wdi/2023-05-29/wdi
-
   data://meadow/worldbank_wdi/2022-05-26/wdi:
     - walden://worldbank_wdi/2022-05-26/wdi
   data://garden/worldbank_wdi/2022-05-26/wdi:
