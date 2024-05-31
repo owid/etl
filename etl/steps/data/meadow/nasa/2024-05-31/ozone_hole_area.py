@@ -114,7 +114,7 @@ def build_df(snap_1: Snapshot, snap_2: Snapshot) -> pd.DataFrame:
     # Merge
     df = df1.merge(df2, on="year")
     # Check dimensions
-    assert len(df) == len(df1) == len(df2), "Some rows went missing wen merged was done!"
+    assert len(df) == len(df1) == len(df2), "Some rows went missing when merged was done!"
     # Set dtypes
     df = df.astype(
         {
