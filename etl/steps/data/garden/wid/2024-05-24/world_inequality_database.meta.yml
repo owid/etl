@@ -24,6 +24,8 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       p99p100_share_pretax:
+        display:
+          name: Income share of the richest 1%
         presentation:
           title_variant: Before tax
           grapher_config:
@@ -57,6 +59,8 @@ tables:
               - China
               - France
       p90p100_share_pretax:
+        display:
+          name: Income share of the richest 10%
         presentation:
           title_variant: Before tax
           grapher_config:
