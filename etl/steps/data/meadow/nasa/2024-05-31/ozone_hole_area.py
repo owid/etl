@@ -6,6 +6,7 @@ from typing import List, Union
 
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog.tables import _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
@@ -30,7 +31,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = Table(df).format(["year"], short_name=paths.short_name)
+    # Initiate table
+    tb = Table(df)
+    tb = _add_table_and_variables_metadata_to_table(
+        tb,
+        snap_1.to_table_metadata(),
+        origin=snap_1.m.origin,
+    )
+
+    # Format
+    tb = tb.format(["year"], short_name=paths.short_name)
 
     #
     # Save outputs.
