@@ -12,9 +12,35 @@ dataset:
   update_period_days: 365
 
 
+# manufactured_cigarettes_millions
+# manufactured_cigarettes_per_adult_per_day
+# handrolled_cigarettes_millions
+# handrolled_cigarettes_per_adult_per_day
+# total_cigarettes_millions	total_cigarettes_per_adult_per_day
+# all_tobacco_products_tonnes
+# all_tobacco_products_grams_per_adult_per_day
+
 tables:
   cigarette_sales:
     variables:
+      testing_variable:
+         title: manufactured_cigarettes_millions
+         unit: Millions
+         short_unit: M
+         description_short: Annual sales numbers of manufactured cigarettes.
+         description_processing: None.
+         description_key: []
+         #description_from_producer: Total (annual) national sales for the year  of manufactured cigarettes.
+         processing_level: minor
+         presentation:
+           #attribution:
+           #attribution_short:
+           #faqs:
+           #grapher_config:
+           title_public: Total cigarette sales
+           #title_variant:
+           topic_tags: [Smoking]
+
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
@@ -49,5 +75,5 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
-      {}
+
 
