@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  tourists_per_1000:
+    variables:
+      tourists_per_1000:
+        title: Tourists per 1000 people
+        unit: "tourists per 1000 people"
+        description_short: "The number of tourists per 1000 people in the country."
+

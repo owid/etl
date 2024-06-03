@@ -741,6 +741,12 @@ steps:
   data://grapher/news/2024-05-23/gdelt_v2:
     - data://garden/news/2024-05-23/gdelt_v2
 
+  # Tourists per 1,000 people (custom dataset)
+  data://garden/tourism/2024-06-03/tourists_per_capita:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/demography/2023-03-31/population
+  data://grapher/tourism/2024-06-03/tourists_per_capita:
+    - data://garden/tourism/2024-06-03/tourists_per_capita
 
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
