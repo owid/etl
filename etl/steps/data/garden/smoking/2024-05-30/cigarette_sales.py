@@ -65,15 +65,17 @@ def run(dest_dir: str) -> None:
     # replace table with dataframe with fixed years, concat with empty df to keep metadata
     tb = pd.concat([tb[0:0], df_years_fixed])
 
-    # remove duplicate data (from hidden rows in excel sheet)
-    tb = tb.drop_duplicates(subset=["country", "year"])
-
     # harmonize countries
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    # remove duplicate data (from hidden rows in excel sheet)
+    tb = tb.drop_duplicates(subset=["country", "year"])
+
     tb = tb.format(["country", "year"])
 
+    tb.metadata.short_name = paths.short_name
+    tb.metadata.title = "International Smoking Statistics"
     #
     # Save outputs.
     #
