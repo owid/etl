@@ -71,7 +71,10 @@ for section in WIZARD_CONFIG["sections"]:
 
 # Show table of content (apps)
 page = st.navigation(pages)
-page.run()
+if page is not None:
+    page.run()
+else:
+    st.error("Pages could not be loaded!")
 
 ###########################################
 # Home app
