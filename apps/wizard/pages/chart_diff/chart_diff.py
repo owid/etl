@@ -122,19 +122,19 @@ class ChartDiffModified:
     def approve(self, session: Session) -> None:
         """Approve chart diff."""
         # Update status variable
-        self.set_status(session, gm.ChartStatus.APPROVED)
+        self.set_status(session, gm.ChartStatus.APPROVED.value)
 
     def reject(self, session: Session) -> None:
         """Reject chart diff."""
         # Update status variable
-        self.set_status(session, gm.ChartStatus.REJECTED)
+        self.set_status(session, gm.ChartStatus.REJECTED.value)
 
     def unreview(self, session: Session) -> None:
         """Set chart diff to pending."""
         # Update status variable
-        self.set_status(session, gm.ChartStatus.PENDING)
+        self.set_status(session, gm.ChartStatus.PENDING.value)
 
-    def set_status(self, session: Session, status: gm.CHART_DIFF_STATUS) -> None:
+    def set_status(self, session: Session, status: gm.CHART_DIFF_STATUS | str) -> None:
         """Update the state of the chart diff."""
         # Only perform action if status changes!
         if self.approval_status != status:
