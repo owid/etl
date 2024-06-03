@@ -48,21 +48,21 @@ definitions:
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized {definitions.sex} aged << age >> with << cause.lower() >>.
+      The estimated number of age-standardized {definitions.sex} with << cause.lower() >>.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex}.
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized {definitions.sex} aged << age >> with << cause.lower() >>, per 100,000 people.
+      The estimated number of age-standardized {definitions.sex} with << cause.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex}, per 100,000 people.
        <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100 people.
       <% elif metric == "Share" and age == 'Age-standardized'%>
-      The estimated number of age-standardized {definitions.sex} aged << age >> with << cause.lower() >>, per 100 people.
+      The estimated number of age-standardized {definitions.sex} with << cause.lower() >>, per 100 people.
       <% elif metric == "Share" and age == 'All ages'%>
-      The estimated number of current cases of << cause.lower() >> in {definitions.sex} aged << age >>, per 100 people.
+      The estimated number of current cases of << cause.lower() >> in {definitions.sex}, per 100 people.
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
