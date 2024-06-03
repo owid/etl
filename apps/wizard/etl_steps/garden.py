@@ -6,7 +6,6 @@ from typing import List, cast
 import streamlit as st
 from owid.catalog import Dataset
 from sqlalchemy.exc import OperationalError
-from st_pages import add_indentation
 from typing_extensions import Self
 
 import etl.grapher_model as gm
@@ -20,10 +19,6 @@ from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-# Page config
-st.set_page_config(page_title="Wizard: Create a Garden step", page_icon="🪄")
-add_indentation()
-
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("garden")
 

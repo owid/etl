@@ -12,7 +12,6 @@ import pyproj
 import streamlit as st
 from geographiclib.geodesic import Geodesic
 from owid.catalog import Dataset, Table
-from st_pages import add_indentation
 
 from etl.paths import DATA_DIR
 
@@ -55,9 +54,6 @@ OWID_NUM = (dt.datetime.now(dt.timezone.utc).date() - dt.date(2024, 2, 20)).days
 # Configuration of the session, and page layout.
 #
 ##########################################
-st.set_page_config(page_title="Wizard: owidle", layout="wide", page_icon="🪄")
-add_indentation()
-
 # Contains the number of guesses by the user
 st.session_state.num_guesses = st.session_state.get("num_guesses", 0)
 # Tells whether the user has succeded in guessing the correct country

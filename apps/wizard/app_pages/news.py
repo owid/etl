@@ -2,13 +2,10 @@
 from datetime import datetime
 
 import streamlit as st
-from st_pages import add_indentation
 
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from etl.config import ENV_IS_REMOTE
 
-st.set_page_config(page_title="Wizard: News", page_icon="🪄")
-add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("News 🗞️")
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")

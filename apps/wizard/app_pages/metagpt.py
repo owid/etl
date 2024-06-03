@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import List, cast
 
 import streamlit as st
-from st_pages import add_indentation
 from streamlit_ace import st_ace
 
 from apps.metagpt.cli import MetadataGPTUpdater
@@ -76,15 +75,9 @@ def set_run_gpt_to_false():
 
 
 # Page config
-st.set_page_config(
-    page_title="Wizard: Metadata Upgrader",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-)
 st.title("Metadata 🌟 **:gray[Upgrader]**")
 st.markdown("Migrate your metadata to the up-to-date standard using GPT.")
-add_indentation()
+
 
 # ACE config
 # Show metadata in text editors

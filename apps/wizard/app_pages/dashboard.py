@@ -8,13 +8,15 @@ import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.step_update.cli import NON_UPDATEABLE_IDENTIFIERS, StepUpdater, UpdateState
 from etl.config import ADMIN_HOST, ENV
 from etl.db import can_connect
 
+# st.set_page_config(
+#     layout="wide",
+# )
 ########################################
 # GLOBAL VARIABLES and SESSION STATE
 ########################################
@@ -47,17 +49,6 @@ if "reload_key" not in st.session_state:
 # Logging
 log = get_logger()
 
-
-########################################
-# PAGE CONFIG
-########################################
-st.set_page_config(
-    page_title="Wizard: ETL Dashboard",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-)
-add_indentation()
 
 ########################################
 # TITLE and DESCRIPTION

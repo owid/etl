@@ -6,7 +6,6 @@ from typing import List, cast
 
 import streamlit as st
 from owid.catalog import Dataset
-from st_pages import add_indentation
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.config import ENV_IS_REMOTE
@@ -85,12 +84,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
 
 
 # Page config
-st.set_page_config(
-    page_title="Wizard: Entity Harmonizer",
-    page_icon="🪄",
-)
 st.title("🎶 Entity Harmonizer")
-add_indentation()
 
 # Set states
 st.session_state["show_all"] = st.session_state.get("show_all", False)

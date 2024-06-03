@@ -9,7 +9,6 @@ from typing import Any, Dict, List, cast
 import pandas as pd
 import streamlit as st
 from owid import catalog
-from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from apps.wizard.utils import metadata_export_basic, set_states
@@ -18,16 +17,9 @@ from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
 # CONFIG
-st.set_page_config(
-    page_title="Wizard: Dataset Explorer",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-)
 st.session_state.export_metadata = st.session_state.get("export_metadata", False)
 
 st.title("🕵️ Dataset Explorer")
-add_indentation()
 
 COLORS = {
     "snapshot": "#FC9090",

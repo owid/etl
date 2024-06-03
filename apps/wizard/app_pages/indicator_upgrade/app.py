@@ -23,7 +23,6 @@ We use various session state indicators to control the flow of the app:
     - Set to False:
 """
 import streamlit as st
-from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.wizard import utils
@@ -36,24 +35,6 @@ from etl.match_variables import SIMILARITY_NAMES
 # logger
 log = get_logger()
 
-# Main app settings
-st.set_page_config(
-    page_title="Wizard: Indicator Upgrader",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-    menu_items={
-        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
-        "About": """
-    After a new dataset has been added to our database, we need to update the affected charts. These are the steps:
-    - Select the _old dataset_ and the _new dataset_.
-    - Map old indicators in the _old dataset_ to their corresponding new versions in the _new dataset_. This mapping tells Grapher how to "replace" old indicators with new ones.
-    - Review the mapping.
-    - Update all chart references
-    """,
-    },
-)
-add_indentation()
 st.title("Indicator 🧬 **:gray[Upgrader]**")
 st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)

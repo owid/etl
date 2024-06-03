@@ -6,7 +6,6 @@ references:
 from typing import Any, Dict, cast
 
 import streamlit as st
-from st_pages import add_indentation
 from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
@@ -27,8 +26,6 @@ from etl.config import load_env
 log = get_logger()
 
 # CONFIG
-st.set_page_config(page_title="Wizard: Ask the Expert", page_icon="🪄")
-add_indentation()
 ## Title/subtitle
 st.title("**Expert** 🧙")
 st.markdown("Ask the Expert any questions about ETL!")

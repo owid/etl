@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.utils.files import generate_step_to_channel
@@ -23,10 +22,6 @@ from apps.wizard.app_pages.fasttrack.utils import (
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
-
-# Page config
-st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
-add_indentation()
 
 
 # Reset states

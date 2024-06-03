@@ -5,7 +5,6 @@ from typing import List, cast
 
 import streamlit as st
 from sqlalchemy.exc import OperationalError
-from st_pages import add_indentation
 from typing_extensions import Self
 
 import etl.grapher_model as gm
@@ -19,10 +18,6 @@ from etl.paths import DAG_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-# Page config
-st.set_page_config(page_title="Wizard: Create a all steps", page_icon="🪄")
-add_indentation()
-
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("all")
 

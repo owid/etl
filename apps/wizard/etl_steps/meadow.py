@@ -5,7 +5,6 @@ from typing import cast
 
 import streamlit as st
 from owid.catalog import Dataset
-from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
@@ -17,10 +16,6 @@ from etl.steps import load_from_uri
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-
-# Page config
-st.set_page_config(page_title="Wizard: Create a Meadow step", page_icon="🪄")
-add_indentation()
 
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("meadow")
