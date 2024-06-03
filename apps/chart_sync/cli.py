@@ -202,17 +202,16 @@ def cli(
                             if not dry_run:
                                 target_api.update_chart(chart_id, diff.source_chart.config)
 
-                        # TODO: should we add rejected state?
                         # Rejected chart diff
-                        # elif diff.is_rejected:
-                        #     log.info(
-                        #         "chart_sync.is_rejected",
-                        #         slug=chart_slug,
-                        #         chart_id=chart_id,
-                        #     )
-                        #     continue
+                        elif diff.is_rejected:
+                            log.info(
+                                "chart_sync.is_rejected",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                            )
+                            continue
 
-                        # Not approved, notify us about it
+                        # Pending chart, notify us about it
                         elif diff.is_pending:
                             log.warning(
                                 "chart_sync.pending_chart",
@@ -322,15 +321,14 @@ def cli(
                                 slug=chart_slug,
                                 new_chart_id=resp["chartId"],
                             )
-                        # TODO: should we add rejected state?
                         # Rejected chart diff
-                        # elif diff.is_rejected:
-                        #     log.info(
-                        #         "chart_sync.is_rejected",
-                        #         slug=chart_slug,
-                        #         chart_id=chart_id,
-                        #     )
-                        #     continue
+                        elif diff.is_rejected:
+                            log.info(
+                                "chart_sync.is_rejected",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                            )
+                            continue
 
                         # Not approved, create the chart, but notify us about it
                         elif diff.is_pending:

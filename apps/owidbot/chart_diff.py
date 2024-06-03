@@ -22,13 +22,13 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
 
     if charts_df.empty:
         conclusion = "neutral"
-        title = "No new or modified charts"
-    elif charts_df.approved.all():
+        title = "No charts for review"
+    elif charts_df.is_reviewed.all():
         conclusion = "success"
-        title = "All charts are approved"
+        title = "All charts are reviewed"
     else:
         conclusion = "failure"
-        title = "Some charts are not approved"
+        title = "Some charts are not reviewed"
 
     if not dry_run:
         # Create the check run and complete it in a single command
@@ -83,7 +83,10 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
                 df.append(
                     {
                         "chart_id": diff.chart_id,
-                        "approved": diff.is_approved,
+                        "is_approved": diff.is_approved,
+                        "is_pending": diff.is_pending,
+                        "is_rejected": diff.is_rejected,
+                        "is_reviewed": diff.is_reviewed,
                         "is_new": diff.is_new,
                     }
                 )
@@ -93,14 +96,14 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
 
 def format_chart_diff(df: pd.DataFrame) -> str:
     if df.empty:
-        return "No new or modified charts."
+        return "No charts for review."
 
     new = df[df.is_new]
     modified = df[~df.is_new]
 
     return f"""
 <ul>
-    <li>{len(new)} new charts ({new.approved.sum()} approved)</li>
-    <li>{len(modified)} modified charts ({modified.approved.sum()} approved)</li>
+    <li>{len(new)} new charts ({new.is_reviewed.sum()} reviewed)</li>
+    <li>{len(modified)} modified charts ({modified.is_reviewed.sum()} reviewed)</li>
 </ul>
     """.strip()

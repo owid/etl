@@ -1352,7 +1352,6 @@ class Origin(Base):
         return origin
 
 
-# TODO: should we also add "rejected" status and exclude such charts from chart-sync?
 class ChartStatus(Enum):
     APPROVED = "approved"
     PENDING = "pending"
@@ -1396,7 +1395,7 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
-            return result.status
+            return result.status  # type: ignore
         else:
             return ChartStatus.PENDING.value
 
