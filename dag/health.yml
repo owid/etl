@@ -613,3 +613,5 @@ steps:
     - snapshot://smoking/2024-05-30/cigarette_sales.zip
   data://garden/smoking/2024-05-30/cigarette_sales:
     - data://meadow/smoking/2024-05-30/cigarette_sales
+  data://grapher/smoking/2024-05-30/cigarette_sales:
+    - data://garden/smoking/2024-05-30/cigarette_sales
