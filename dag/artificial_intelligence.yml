@@ -2,7 +2,7 @@ steps:
 
   # Artificial Intelligence (EPOCH, latest)
   data://meadow/artificial_intelligence/latest/epoch:
-    - snapshot://artificial_intelligence/latest/epoch.csv
+    - snapshot://artificial_intelligence/2024-06-03/epoch.csv
   data://garden/artificial_intelligence/latest/epoch:
     - data://meadow/artificial_intelligence/latest/epoch
   data://grapher/artificial_intelligence/latest/epoch:
