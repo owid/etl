@@ -306,7 +306,7 @@ def main():
             )
 
             # Hide approved (if option selected)
-            if st.session_state.hide_approved_charts:
+            if st.session_state.hide_reviewed_charts:
                 st.session_state.chart_diffs_filtered = {
                     k: v for k, v in st.session_state.chart_diffs.items() if not v.is_reviewed
                 }
