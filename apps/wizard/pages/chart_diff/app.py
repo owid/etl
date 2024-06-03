@@ -38,6 +38,7 @@ st.set_page_config(
 )
 add_indentation()
 st.session_state.hide_reviewed_charts = st.session_state.get("hide_reviewed_charts", False)
+st.session_state.arrange_charts_vertically = st.session_state.get("arrange_charts_vertically", False)
 
 
 ########################################
@@ -194,8 +195,22 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         if diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
+                st.write(st.session_state.get(f"arrange-charts-vertically-{diff.chart_id}", False))
+                st.write(st.session_state.arrange_charts_vertically)
+                arrange_vertical = (
+                    st.session_state.get(f"arrange-charts-vertically-{diff.chart_id}", False)
+                    | st.session_state.arrange_charts_vertically
+                )
                 # Chart diff
-                compare_charts(**kwargs_diff)
+                st_compare_charts(
+                    **kwargs_diff,
+                    arrange_vertical=arrange_vertical,
+                )
+                st.toggle(
+                    "Arrange charts vertically",
+                    key=f"arrange-charts-vertically-{diff.chart_id}",
+                    # on_change=None,
+                )
             with tab2:
                 assert diff.target_chart is not None
                 st_show_diff(diff.target_chart.config, diff.source_chart.config)
@@ -217,7 +232,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
                 st.markdown(text)
 
         elif diff.is_new:
-            compare_charts(**kwargs_diff)
+            st_compare_charts(**kwargs_diff)
 
 
 def pretty_date(chart):
@@ -233,9 +248,10 @@ def pretty_date(chart):
         return chart.updatedAt.strftime("%b %d, %Y %H:%M")
 
 
-def compare_charts(
+def st_compare_charts(
     source_chart,
     target_chart=None,
+    arrange_vertical=False,
 ) -> None:
     # Only one chart: new chart
     if target_chart is None:
@@ -243,28 +259,81 @@ def compare_charts(
         chart_html(source_chart.config, owid_env=SOURCE)
     # Two charts, actual diff
     else:
-        # Create two columns for the iframes
-        col1, col2 = st.columns(2)
-        prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
-        # Standard diff
-        if not prod_is_newer:
-            with col1:
-                st.markdown(f"Production ┃ _{pretty_date(target_chart)}_")
-                chart_html(target_chart.config, owid_env=TARGET)
-            with col2:
-                st.markdown(f":green[New version ┃ _{pretty_date(source_chart)}_]")
-                chart_html(source_chart.config, owid_env=SOURCE)
-        # Conflict with live
+        # Show charts
+        if arrange_vertical:
+            st_compare_charts_vertically(target_chart, source_chart)
         else:
-            with col1:
-                st.markdown(
-                    f":red[Production ┃ _{pretty_date(target_chart)}_] ⚠️",
-                    help="The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging.",
-                )
-                chart_html(target_chart.config, owid_env=TARGET)
-            with col2:
-                st.markdown(f"New version ┃ _{pretty_date(source_chart)}_")
-                chart_html(source_chart.config, owid_env=SOURCE)
+            st_compare_charts_horizontally(target_chart, source_chart)
+
+
+def st_compare_charts_vertically(target_chart, source_chart):
+    # Check if production's chart is newer
+    prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
+
+    # Define chart titles
+    text_production = _get_chart_text_production(prod_is_newer, target_chart)
+    text_staging = _get_text_staging(prod_is_newer, source_chart)
+
+    # Chart production
+    if prod_is_newer:
+        help_text = _get_chart_text_help_production()
+        st.markdown(text_production, help=help_text)
+    else:
+        st.markdown(text_production)
+    chart_html(target_chart.config, owid_env=TARGET)
+
+    # Chart staging
+    st.markdown(text_staging)
+    chart_html(source_chart.config, owid_env=SOURCE)
+
+
+def st_compare_charts_horizontally(target_chart, source_chart):
+    # Create two columns for the iframes
+    col1, col2 = st.columns(2)
+
+    # Check if production's chart is newer
+    prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
+
+    # Define chart titles
+    text_production = _get_chart_text_production(prod_is_newer, target_chart)
+    text_staging = _get_text_staging(prod_is_newer, source_chart)
+
+    with col1:
+        if prod_is_newer:
+            help_text = _get_chart_text_help_production()
+            st.markdown(text_production, help=help_text)
+        else:
+            st.markdown(text_production)
+        chart_html(target_chart.config, owid_env=TARGET)
+    with col2:
+        st.markdown(text_staging)
+        chart_html(source_chart.config, owid_env=SOURCE)
+
+
+def _get_chart_text_production(prod_is_newer: bool, production_chart):
+    # Everything is fine
+    if not prod_is_newer:
+        text_production = f"Production ┃ _{pretty_date(production_chart)}_"
+    # Conflict with live
+    else:
+        text_production = f":red[Production ┃ _{pretty_date(production_chart)}_] ⚠️"
+
+    return text_production
+
+
+def _get_chart_text_help_production():
+    return "The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging."
+
+
+def _get_text_staging(prod_is_newer: bool, staging_chart):
+    # Everything is fine
+    if not prod_is_newer:
+        text_staging = f":green[New version ┃ _{pretty_date(staging_chart)}_]"
+    # Conflict with live
+    else:
+        text_staging = f"New version ┃ _{pretty_date(staging_chart)}_"
+
+    return text_staging
 
 
 @st.cache_resource
@@ -285,10 +354,10 @@ def show_help_text():
         )
 
 
-def reject_chart_diffs(engine):
+def unreview_chart_diffs(engine):
     with Session(engine) as session:
         for _, chart_diff in st.session_state.chart_diffs.items():
-            chart_diff.reject(session)
+            chart_diff.unreview(session)
 
     ########################################
 
@@ -313,11 +382,10 @@ def main():
         )
 
         # Other options
-        # with st.popover("Other options"):
-        st.button(
-            "🔙 Unapprove all charts",
+        st.toggle(
+            "**Unreview** all charts",
             key="unapprove-all-charts",
-            on_click=lambda e=source_engine: reject_chart_diffs(e),
+            on_change=lambda e=source_engine: unreview_chart_diffs(e),
         )
 
         def hide_reviewed():
@@ -335,7 +403,19 @@ def main():
             else:
                 st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
-        st.toggle("Hide reviewed charts", key="hide-reviewed-charts", on_change=hide_reviewed)
+        def arrange_charts():
+            set_states(
+                {
+                    "arrange_charts_vertically": not st.session_state.arrange_charts_vertically,
+                }
+            )
+
+        st.toggle("**Hide** reviewed charts", key="hide-reviewed-charts", on_change=hide_reviewed)
+        st.toggle(
+            "Use **vertical arrangement** for chart diffs",
+            key="arrange-charts-vertically",
+            on_change=arrange_charts,
+        )
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:
@@ -366,9 +446,12 @@ def main():
         # Show modified/new charts
         with Session(source_engine) as source_session:
             with Session(target_engine) as target_session:
+                # Show modified charts
                 if chart_diffs_modified:
                     st.header("Modified charts")
-                    st.markdown(f"{len(chart_diffs_modified)} charts modified in [{OWID_ENV.name}]({OWID_ENV.site})")
+                    st.markdown(
+                        f"{len(chart_diffs_modified)} chart{'s' if len(chart_diffs_modified) > 1 else ''} modified in [{OWID_ENV.name}]({OWID_ENV.site})"
+                    )
 
                     modified_charts_pagination = Pagination(
                         chart_diffs_modified, items_per_page=CHART_PER_PAGE, pagination_key="pagination_modified"
@@ -382,6 +465,7 @@ def main():
                         "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
                     )
 
+                # Show new charts
                 if chart_diffs_new:
                     st.header("New charts")
                     st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
