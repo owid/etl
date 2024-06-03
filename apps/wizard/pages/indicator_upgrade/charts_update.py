@@ -125,4 +125,4 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
         st.exception(e)
     else:
         st.success("The charts were successfully updated! Review the changes with `chart diff`")
-        st_page_link("chart_diff")
+        st_page_link("chart-diff")

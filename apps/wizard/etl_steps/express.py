@@ -372,7 +372,7 @@ def remove_notebook(dataset_dir):
 # TITLE
 st.title("Create step 🐆 **:gray[Express]**")
 
-st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_! **Requires ETL expertise**.")
+st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!.")
 
 # SIDEBAR
 with st.sidebar:

@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Optional, get_args
+from typing import Optional
 
 import streamlit as st
 from sqlalchemy.exc import NoResultFound
@@ -9,11 +9,16 @@ from etl import grapher_model as gm
 
 
 class ChartDiffModified:
+    # Chart in source environment
     source_chart: gm.Chart
+    # Chart in target environment (if new in source environment, there won't be one)
     target_chart: Optional[gm.Chart]
-    approval_status: gm.CHART_DIFF_STATUS
+    # Three state: 'approved', 'pending', 'rejected'
+    approval_status: gm.CHART_DIFF_STATUS | str
 
-    def __init__(self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS):
+    def __init__(
+        self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS | str
+    ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval_status = approval_status
@@ -22,12 +27,20 @@ class ChartDiffModified:
         self.chart_id = source_chart.id
 
     @property
-    def approved(self) -> bool:
-        return self.approval_status == "approved"
+    def is_reviewed(self) -> bool:
+        return self.is_approved or self.is_rejected
 
     @property
-    def unapproved(self) -> bool:
-        return self.approval_status == "unapproved"
+    def is_approved(self) -> bool:
+        return self.approval_status == gm.ChartStatus.APPROVED.value
+
+    @property
+    def is_rejected(self) -> bool:
+        return self.approval_status == gm.ChartStatus.REJECTED.value
+
+    @property
+    def is_pending(self) -> bool:
+        return self.approval_status == gm.ChartStatus.PENDING.value
 
     @property
     def is_new(self):
@@ -80,6 +93,7 @@ class ChartDiffModified:
             source_chart.updatedAt,
             target_chart.updatedAt if target_chart else None,
         )
+        print("called DB for state, got:", approval_status)
 
         # Build object
         chart_diff = cls(source_chart, target_chart, approval_status)
@@ -99,19 +113,17 @@ class ChartDiffModified:
     def approve(self, session: Session) -> None:
         """Approve chart diff."""
         # Update status variable
-        self.set_status(session, "approved")
+        self.set_status(session, gm.ChartStatus.APPROVED)
 
-    def unapprove(self, session: Session) -> None:
-        """Unapprove chart diff."""
+    def reject(self, session: Session) -> None:
+        """Reject chart diff."""
         # Update status variable
-        self.set_status(session, "unapproved")
+        self.set_status(session, gm.ChartStatus.REJECTED)
 
-    def switch_state(self, session: Session) -> None:
-        """Switch the state of the chart diff. This will work only with two states: approved and unapproved."""
+    def unreview(self, session: Session) -> None:
+        """Set chart diff to pending."""
         # Update status variable
-        assert get_args(gm.CHART_DIFF_STATUS) == ("approved", "unapproved")
-        status = "approved" if self.unapproved else "unapproved"
-        self.set_status(session, status)
+        self.set_status(session, gm.ChartStatus.PENDING)
 
     def set_status(self, session: Session, status: gm.CHART_DIFF_STATUS) -> None:
         """Update the state of the chart diff."""
@@ -121,7 +133,6 @@ class ChartDiffModified:
             self.approval_status = status
 
             # Update approval status (in database)
-            st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
             assert self.chart_id
             if self.is_modified:
                 assert self.target_chart
@@ -129,8 +140,9 @@ class ChartDiffModified:
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
                 targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status="approved" if self.approved else "unapproved",
+                status=self.approval_status,
             )
+            st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
 
             session.add(approval)
             session.commit()

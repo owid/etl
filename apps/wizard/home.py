@@ -20,9 +20,14 @@ Wizard is a fundamental tool for data scientists at OWID to easily create ETL st
 """
 )
 
-with st.container(border=True):
-    st.markdown("Questions about the documentation? Ask the expert!")
-    st_page_link("expert", help="Ask the expert any documentation question!", use_container_width=True)
+
+st_page_link(
+    "expert",
+    label="Questions about ETL or Grapher? Ask the expert!",
+    help="Ask the expert any documentation question!",
+    use_container_width=True,
+    border=True,
+)
 
 # Generic tools
 ## Default styling for the cards (Wizard apps are presented as cards)
