@@ -5,7 +5,6 @@ from pathlib import Path
 
 import streamlit as st
 from st_pages import Page, Section, add_indentation, show_pages
-from streamlit_extras.switch_page_button import switch_page
 
 from apps.wizard.config import WIZARD_CONFIG
 from apps.wizard.home import st_show_home
@@ -87,11 +86,11 @@ st_show_home()
 if "page" in st.query_params:
     for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
         if st.query_params["page"] == step_name:
-            switch_page(step_props["title"])
+            st.switch_page(step_props["entrypoint"])
     for section in WIZARD_CONFIG["sections"]:
         for app in section["apps"]:
             if st.query_params["page"] == app["alias"]:
-                switch_page(app["title"])
+                st.switch_page(app["entrypoint"])
 
 # # Go to specific page if argument is passed
 # ## Home
