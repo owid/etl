@@ -56,7 +56,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/Chart%20Diff"><b>chart-diff</b></a>: {status}</summary>
+<summary><a href="http://{container_name}/etl/wizard/chart-diff"><b>chart-diff</b></a>: {status}</summary>
 {chart_diff}
 </details>
     """.strip()
