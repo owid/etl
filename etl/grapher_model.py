@@ -1400,7 +1400,7 @@ class ChartDiffApprovals(Base):
             return ChartStatus.PENDING.value
 
     @classmethod
-    def get_all(cls, session: Session, chart_id: int) -> Sequence[Any]:
+    def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
         """Get history of values."""
         result = session.scalars(
             select(cls)
