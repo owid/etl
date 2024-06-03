@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -32,18 +30,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
 
-    # Add East and West Germany together to get values for Germany 1945-1990
-    e_ger = tb[tb["country"] == "East Germany"]
-    w_ger = tb[tb["country"] == "West Germany"]
-    germanies_update = pr.concat([e_ger, w_ger])[COLS_WITH_DATA + ["year"]].groupby("year").sum()
-    germanies_update["country"] = "Germany"
+    # include West Germany values for Germany 1945-1990
+    tb = tb.replace("West Germany", "Germany")
 
-    germanies_update = germanies_update.rename_axis("year").reset_index()
-
-    tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
-    tb = pr.concat([tb, germanies_update])
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
