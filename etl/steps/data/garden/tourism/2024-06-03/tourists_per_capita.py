@@ -22,7 +22,8 @@ def run(dest_dir: str) -> None:
     #
     # Harmonize country names (income countries)
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
 
     # Add population
