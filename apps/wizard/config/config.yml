@@ -27,7 +27,7 @@ main:
     title: "Home"
     description: "App homepage"
     maintainer: "@lucas"
-    entrypoint: app.py
+    entrypoint: home.py
     emoji: "🏠"
   expert:
       title: "Expert"

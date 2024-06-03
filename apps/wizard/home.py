@@ -4,13 +4,21 @@ from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from streamlit_card import card
-from streamlit_extras.switch_page_button import switch_page
 
 from apps.wizard.config import WIZARD_CONFIG
 from apps.wizard.utils import st_page_link
 
 
 def st_show_home():
+    # Page config
+    st.title("Wizard 🪄")
+    st.markdown(
+        """
+    Wizard is a fundamental tool for data scientists at OWID to easily create ETL steps. Additionally, wizard provides a set of tools to explore and improve these steps.
+    """
+    )
+
+    # Expert link
     st_page_link(
         "expert",
         label="Questions about ETL or Grapher? Ask the expert!",
@@ -33,7 +41,11 @@ def st_show_home():
     }
 
     def create_card(
-        title: str, image_url: str, text: str | List[str] = "", custom_styles: Optional[Dict[str, Any]] = None
+        entrypoint: str,
+        title: str,
+        image_url: str,
+        text: str | List[str] = "",
+        custom_styles: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Create card."""
         styles = deepcopy(default_styles)
@@ -48,7 +60,7 @@ def st_show_home():
             on_click=lambda: None,
         )
         if go_to_page:
-            switch_page(title)
+            st.switch_page(entrypoint)
 
     #########################
     # ETL Steps
@@ -64,6 +76,7 @@ def st_show_home():
     # 1/ First row for [Snapshot, Meadow, Garden, Grapher]
     pages = [
         {
+            "entrypoint": steps[step]["entrypoint"],
             "title": steps[step]["title"],
             "image_url": steps[step]["image_url"],
         }
@@ -81,6 +94,7 @@ def st_show_home():
         col1, col2 = st.columns([1, 3])
         with col2:
             create_card(
+                entrypoint=steps["express"]["entrypoint"],
                 title=steps["express"]["title"],
                 image_url=steps["express"]["image_url"],
                 custom_styles={"height": "50px"},
@@ -89,6 +103,7 @@ def st_show_home():
     # 3/ FAST TRACK
     if steps["fasttrack"]["enable"]:
         create_card(
+            entrypoint=steps["fasttrack"]["entrypoint"],
             title=steps["fasttrack"]["title"],
             image_url=steps["fasttrack"]["image_url"],
             custom_styles={"height": "50px"},
@@ -112,7 +127,11 @@ def st_show_home():
                 if app["enable"]:
                     with columns[i]:
                         create_card(
+                            entrypoint=app["entrypoint"],
                             title=app["title"],
                             image_url=app["image_url"],
                             text=text,
                         )
+
+
+st_show_home()
