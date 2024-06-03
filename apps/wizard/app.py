@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide",
 )
 print("------------app")
-print(st.query_params)
+st.write(st.__version__)
 
 
 # Get current directory
