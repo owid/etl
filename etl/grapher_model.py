@@ -13,7 +13,7 @@ import json
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Sequence, Union, get_args
+from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
 import humps
 import pandas as pd
