@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("cigarette_sales")
+    ds_garden = paths.garden_dataset
 
     # Read table from garden dataset.
     tb = ds_garden["cigarette_sales"].reset_index()
@@ -36,11 +36,19 @@ def run(dest_dir: str) -> None:
     e_ger = tb[tb["country"] == "East Germany"]
     w_ger = tb[tb["country"] == "West Germany"]
     germanies_update = pr.concat([e_ger, w_ger])[COLS_WITH_DATA + ["year"]].groupby("year").sum()
+    germanies_update["country"] = "Germany"
+
+    germanies_update = germanies_update.rename_axis("year").reset_index()
+
+    tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
+    tb = pr.concat([tb, germanies_update])
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
+    tb = tb.format(["country", "year"])
+
     ds_grapher = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
