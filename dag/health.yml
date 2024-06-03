@@ -622,6 +622,8 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
 
   # GBD 2021 - GBD Mental Health
   data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
