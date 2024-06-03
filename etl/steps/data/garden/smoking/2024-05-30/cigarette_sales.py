@@ -49,9 +49,9 @@ def standardise_years(df):
                 end_year = int(timeframe[1])
                 if end_year < 100:
                     if end_year > (start_year % 100):
-                        end_year = int(round(start_year, -2) + end_year)
+                        end_year = int(np.floor(start_year / 100) * 100 + end_year)
                     elif end_year < (start_year % 100):
-                        end_year = int(round(start_year, -2) + end_year + 100)
+                        end_year = int(np.floor(start_year / 100) * 100 + end_year + 100)
                 elif end_year > 10000:
                     end_year = int(np.floor(end_year / 10))
                 for year_in_timeframe in range(start_year, end_year + 1):
