@@ -7,18 +7,30 @@ import streamlit as st
 from st_pages import Page, Section, add_indentation, show_pages
 from streamlit_extras.switch_page_button import switch_page
 
-from apps.wizard import utils
 from apps.wizard.config import WIZARD_CONFIG
+from apps.wizard.home import st_show_home
 
 # Logo
 # st.logo("docs/assets/logo.png")
 
+print("------------app")
+print(st.query_params)
+
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # Page config
-st.set_page_config(page_title="Wizard", page_icon="🪄")
-st.title("Wizard")
+st.set_page_config(page_title="Wizard: Home", page_icon="🪄")
+st.title("Wizard 🪄")
+st.markdown(
+    """
+Wizard is a fundamental tool for data scientists at OWID to easily create ETL steps. Additionally, wizard provides a set of tools to explore and improve these steps.
+"""
+)
 
+###########################################
+# DEFINE TOC
+###########################################
 # Initial apps (etl steps)
 toc = []
 for step in WIZARD_CONFIG["main"].values():
@@ -58,20 +70,39 @@ for section in WIZARD_CONFIG["sections"]:
 
 # Show table of content (apps)
 show_pages(toc)
-
-# Add indentation
 add_indentation()
 
-# Go to specific page if argument is passed
-## Home
-if utils.AppState.args.phase == "all":  # type: ignore
-    switch_page("Home")  # type: ignore
-## ETL step
-for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-    if utils.AppState.args.phase == step_name:  # type: ignore
-        switch_page(step_props["title"])  # type: ignore
-## Section
-for section in WIZARD_CONFIG["sections"]:
-    for app in section["apps"]:
-        if utils.AppState.args.phase == app["alias"]:  # type: ignore
-            switch_page(app["title"])  # type: ignore
+###########################################
+# Home app
+###########################################
+st_show_home()
+
+
+# # EXPERIMENTAL
+# # Get query parameters from the URL
+# # query_params = st.query_params
+###########################################
+# PAGE REDIRECT VIA QUERY PARAMS
+###########################################
+if "page" in st.query_params:
+    for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+        if st.query_params["page"] == step_name:
+            switch_page(step_props["title"])
+    for section in WIZARD_CONFIG["sections"]:
+        for app in section["apps"]:
+            if st.query_params["page"] == app["alias"]:
+                switch_page(app["title"])
+
+# # Go to specific page if argument is passed
+# ## Home
+# if utils.AppState.args.phase == "all":  # type: ignore
+#     switch_page("Home")  # type: ignore
+# ## ETL step
+# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+#     if utils.AppState.args.phase == step_name:  # type: ignore
+#         switch_page(step_props["title"])  # type: ignore
+# ## Section
+# for section in WIZARD_CONFIG["sections"]:
+#     for app in section["apps"]:
+#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
+#             switch_page(app["title"])  # type: ignore
