@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Optional
+from typing import List, Optional
 
 import streamlit as st
 from sqlalchemy.exc import NoResultFound
@@ -99,6 +99,15 @@ class ChartDiffModified:
         chart_diff = cls(source_chart, target_chart, approval_status)
 
         return chart_diff
+
+    def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
+        """Get history of chart diff."""
+        # Get history
+        history = gm.ChartDiffApprovals.get_all(
+            session,
+            chart_id=self.chart_id,
+        )
+        return history
 
     def sync(self, source_session: Session, target_session: Optional[Session] = None):
         """Sync chart diff."""

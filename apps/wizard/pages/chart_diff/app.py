@@ -102,9 +102,28 @@ def get_chart_diffs(
 
 def st_show(diff: ChartDiffModified, source_session, target_session=None) -> None:
     """Show the chart diff in Streamlit."""
+    # DISPLAY options
+    DISPLAY_STATE_OPTIONS = {
+        gm.ChartStatus.APPROVED.value: {
+            "label": "Approve",
+            "color": "green",
+            "icon": "✅",
+        },
+        gm.ChartStatus.REJECTED.value: {
+            "label": "Reject",
+            "color": "red",
+            "icon": "❌",
+        },
+        gm.ChartStatus.PENDING.value: {
+            "label": "Pending",
+            "color": "gray",
+            "icon": "⏳",
+        },
+    }
+
     # Define label
     print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
-    emoji = "✅" if diff.is_approved else ("❌" if diff.is_rejected else "⏳")
+    emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
     label = f"{emoji} {diff.source_chart.config['slug']}"
 
     # Define action for Toggle on change
@@ -158,28 +177,14 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
             )
 
         # Actions on chart diff: approve, pending, reject
-        options = {
-            gm.ChartStatus.APPROVED.value: {
-                "label": "Approve",
-                "color": "green",
-            },
-            gm.ChartStatus.REJECTED.value: {
-                "label": "Reject",
-                "color": "red",
-            },
-            gm.ChartStatus.PENDING.value: {
-                "label": "Pending",
-                "color": "gray",
-            },
-        }
-        option_names = list(options.keys())
+        option_names = list(DISPLAY_STATE_OPTIONS.keys())
         with col1:
             st.radio(
                 label="Approve or reject chart",
                 key=f"radio-{diff.chart_id}",
                 options=option_names,
                 horizontal=True,
-                format_func=lambda x: f":{options[x]['color']}-background[{options[x]['label']}]",
+                format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
                 index=option_names.index(diff.approval_status),  # type: ignore
                 on_change=lambda diff=diff, session=source_session: chart_state_change(diff, session),
                 # label_visibility="collapsed",
@@ -187,13 +192,30 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
         # Show diff
         if diff.is_modified:
-            tab1, tab2 = st.tabs(["Charts", "Config diff"])
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
                 # Chart diff
                 compare_charts(**kwargs_diff)
             with tab2:
                 assert diff.target_chart is not None
                 st_show_diff(diff.target_chart.config, diff.source_chart.config)
+            with tab3:
+                approvals = diff.get_all_approvals(source_session)
+
+                # Get text
+                text = ""
+                for counter, approval in enumerate(approvals):
+                    emoji = DISPLAY_STATE_OPTIONS[str(approval.status)]["icon"]
+                    color = DISPLAY_STATE_OPTIONS[str(approval.status)]["color"]
+                    text_ = f"{approval.updatedAt}: {emoji} :{color}[{approval.status}]"
+
+                    if counter == 0:
+                        text_ = f"**{text_}**"
+
+                    text += text_ + "\n\n"
+
+                st.markdown(text)
+
         elif diff.is_new:
             compare_charts(**kwargs_diff)
 

@@ -1399,6 +1399,20 @@ class ChartDiffApprovals(Base):
         else:
             return ChartStatus.PENDING.value
 
+    @classmethod
+    def get_all(cls, session: Session, chart_id: int) -> List[Any]:
+        """Get history of values."""
+        result = session.scalars(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                # cls.sourceUpdatedAt == source_updated_at,
+                # cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+        ).fetchall()
+        return result
+
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
     """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
