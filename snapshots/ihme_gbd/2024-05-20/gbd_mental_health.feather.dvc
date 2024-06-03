@@ -4,11 +4,10 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Impairments
-    description: "The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset provides estimates of the prevalence of the number of people living with impairments due to neglected tropical diseases."
+    title: Global Burden of Disease - Mental Health Prevalence
+    description: |-
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence of mental health conditions for a range of age-groups across males and females.
     date_published: "2024-05-17"
-    title_snapshot: Global Burden of Disease - Impairments from Neglected Tropical Diseases
-
     # Citation
     producer: IHME, Global Burden of Disease
     citation_full: |-
@@ -23,6 +22,6 @@ meta:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: 991442388d7a9ad0ec8e22a30672e429
-    size: 1418119354
-    path: impairments.csv
+  - md5: 6aba79313e08d94a6cef6163e02322a7
+    size: 227001018
+    path: gbd_mental_health.feather

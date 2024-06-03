@@ -4,12 +4,12 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Prevalence and Incidence
+    title: Global Burden of Disease - Deaths and DALYs
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence and incidence counts and rates for 371 diseases and injuries.
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the death and DALY counts and rates for 371 diseases and injuries.
     date_published: "2024-05-17"
     # Citation
-    producer: IHME, Global Burden of Disease
+    producer: "IHME, Global Burden of Disease"
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021) Results. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2022. Available from https://vizhub.healthdata.org/gbd-results/."
     attribution_short: "IHME-GBD"
@@ -22,6 +22,6 @@ meta:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: 7992fab7bb0ce5b0a5d4d1a5b94785ae
-    size: 5376380405
-    path: gbd_prevalence.csv
+  - md5: fb988d9bcac74483592aad07e0743da3
+    size: 998540002
+    path: gbd_cause.feather

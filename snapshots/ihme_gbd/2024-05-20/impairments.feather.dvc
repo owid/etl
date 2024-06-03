@@ -4,12 +4,13 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Deaths and DALYs
-    description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the death and DALY counts and rates for 371 diseases and injuries.
+    title: Global Burden of Disease - Impairments
+    description: "The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset provides estimates of the prevalence of the number of people living with impairments due to neglected tropical diseases."
     date_published: "2024-05-17"
+    title_snapshot: Global Burden of Disease - Impairments from Neglected Tropical Diseases
+
     # Citation
-    producer: "IHME, Global Burden of Disease"
+    producer: IHME, Global Burden of Disease
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021) Results. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2022. Available from https://vizhub.healthdata.org/gbd-results/."
     attribution_short: "IHME-GBD"
@@ -22,6 +23,6 @@ meta:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: 3bb446d6a6afa14395de04ab5a8f9269
-    size: 10567841404
-    path: gbd_cause.csv
+  - md5: 77fc6c998441b9bd14fa4a56f57b7a1a
+    size: 100880250
+    path: impairments.feather
