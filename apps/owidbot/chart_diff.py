@@ -54,9 +54,11 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
     else:
         status = "❌"
 
+    # TODO: Should be using plain /chart-diff instead of query redirect (this is a workaround)
+    # Waiting for https://github.com/streamlit/streamlit/issues/8388#issuecomment-2145524922 to be resolved
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/chart-diff"><b>chart-diff</b></a>: {status}</summary>
+<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status}</summary>
 {chart_diff}
 </details>
     """.strip()
