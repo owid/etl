@@ -635,6 +635,8 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/latest/avian_influenza_ah5n1:
     - data://garden/who/latest/avian_influenza_ah5n1
+
+  # International Smoking Statistics cigarette sales data
   data://meadow/smoking/2024-05-30/cigarette_sales:
     - snapshot://smoking/2024-05-30/cigarette_sales.zip
   data://garden/smoking/2024-05-30/cigarette_sales:
