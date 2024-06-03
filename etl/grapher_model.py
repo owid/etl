@@ -1411,7 +1411,7 @@ class ChartDiffApprovals(Base):
             )
             .order_by(cls.updatedAt.desc())
         ).fetchall()
-        return result
+        return list(result)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
