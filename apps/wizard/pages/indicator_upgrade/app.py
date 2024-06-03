@@ -2,10 +2,10 @@
 
 The code is structured as follows:
 
-- `__main__.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
-- `init_config.py`: Other app Initial configuration of the app. This includes setting up the session states andsettings.
+- `app.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
 - `dataset_selection.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating?"
 - `indicator_mapping.py`: Indicator mapping form. Map indicators from the old dataset to indicators in the new dataset.
+- `explore_mode.py`: All about the features needed to run on explore mode.
 - `charts_update.py`: Find out the charts affected by the submitted indicator mapping. Create the submission.
 - `utils.py`: Utility functions.
 
