@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
@@ -70,31 +71,31 @@ st.warning("- " + "\n\n- ".join(warn_msg))
 ########################################
 
 
-def get_chart_diffs(source_engine, target_engine) -> dict[int, ChartDiffModified]:
+def _get_chart_diff(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiffModified:
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
-            # Get IDs from modified charts
-            chart_ids = _modified_chart_ids_by_admin(source_session)
-            chart_diffs = {
-                chart_id: ChartDiffModified.from_chart_id(
-                    chart_id=chart_id,
-                    source_session=source_session,
-                    target_session=target_session,
-                )
-                for chart_id in chart_ids
-            }
+            return ChartDiffModified.from_chart_id(
+                chart_id=chart_id,
+                source_session=source_session,
+                target_session=target_session,
+            )
 
-            # TODO: parallelize it, doesn't work with current version of SQLALchemy
-            # from concurrent.futures import ThreadPoolExecutor, as_completed
-            # with ThreadPoolExecutor(max_workers=5) as executor:
-            #     chart_diffs_futures = {
-            #         chart_id: executor.submit(ChartDiffModified.from_chart_id, chart_id, source_session, target_session)
-            #         for chart_id in chart_ids
-            #     }
-            #     chart_diffs = {}
-            #     for chart_id, future in chart_diffs_futures.items():
 
-            #         chart_diffs[chart_id] = future.result()
+def get_chart_diffs(
+    source_engine: Engine, target_engine: Engine, max_workers: int = 10
+) -> dict[int, ChartDiffModified]:
+    with Session(source_engine) as source_session:
+        # Get IDs from modified charts
+        chart_ids = _modified_chart_ids_by_admin(source_session)
+
+    # Get all chart diffs in parallel
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        chart_diffs_futures = {
+            chart_id: executor.submit(_get_chart_diff, chart_id, source_engine, target_engine) for chart_id in chart_ids
+        }
+        chart_diffs = {}
+        for chart_id, future in chart_diffs_futures.items():
+            chart_diffs[chart_id] = future.result()
 
     return chart_diffs
 
@@ -297,15 +298,22 @@ def main():
             on_click=lambda e=source_engine: reject_chart_diffs(e),
         )
 
-        st.toggle(
-            "Hide reviewed charts",
-            key="hide-reviewed-charts",
-            on_change=lambda: set_states(
+        def hide_reviewed():
+            set_states(
                 {
                     "hide_reviewed_charts": not st.session_state.hide_reviewed_charts,
                 }
-            ),
-        )
+            )
+
+            # Hide approved (if option selected)
+            if st.session_state.hide_approved_charts:
+                st.session_state.chart_diffs_filtered = {
+                    k: v for k, v in st.session_state.chart_diffs.items() if not v.is_reviewed
+                }
+            else:
+                st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
+
+        st.toggle("Hide reviewed charts", key="hide-reviewed-charts", on_change=hide_reviewed)
 
     # Get actual charts
     if st.session_state.chart_diffs == {}:
@@ -317,12 +325,8 @@ def main():
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
     )
 
-    # Hide reviewed (if option selected)
-    if st.session_state.hide_reviewed_charts:
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs.items() if not v.is_reviewed
-        }
-    else:
+    # Init, can be changed by the toggle
+    if not hasattr(st.session_state, "chart_diffs_filtered"):
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
     # Modified / New charts

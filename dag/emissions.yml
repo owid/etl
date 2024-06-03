@@ -98,7 +98,7 @@ steps:
   # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
   data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
     - data://garden/gcp/2023-12-12/global_carbon_budget
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
   #
   # Jones et al. - National contributions to climate change.
   #

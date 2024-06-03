@@ -84,6 +84,12 @@ To refresh the MySQL database on the staging server, use the following command:
 ssh owid@staging-site-yourname 'cd owid-grapher && make refresh'
 ```
 
+then push an empty commit to trigger a new rebuild
+
+```sh
+git commit -m ":honeybee: trigger rebuild" --allow-empty && git push
+```
+
 **Note:** This will **delete all data on staging** and replace it with the latest data from the production database.
 
 #### Backup the Staging Server

@@ -11,7 +11,7 @@ steps:
     - data://garden/wid/2024-05-24/world_inequality_database
     - data://garden/lis/2023-08-30/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
 
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-03-27/world_bank_pip:
