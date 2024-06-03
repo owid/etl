@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-import pandas as pd
+import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -45,7 +45,7 @@ def standardise_years(df):
                     dict_from_row = row.to_dict()
                     dict_from_row["year"] = year_in_timeframe
                     new_df.append(dict_from_row)
-    return pd.DataFrame(new_df)
+    return pr.DataFrame(new_df)
 
 
 def run(dest_dir: str) -> None:
@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
     # Fix years column (change dtype to integer and expand timeframes)
     df_years_fixed = standardise_years(tb)
     # replace table with dataframe with fixed years, concat with empty df to keep metadata
-    tb = pd.concat([tb[0:0], df_years_fixed])
+    tb = pr.concat([tb[0:0], df_years_fixed])
 
     # harmonize countries
     tb = geo.harmonize_countries(
@@ -74,8 +74,6 @@ def run(dest_dir: str) -> None:
 
     tb = tb.format(["country", "year"])
 
-    tb.metadata.short_name = paths.short_name
-    tb.metadata.title = "International Smoking Statistics"
     #
     # Save outputs.
     #

@@ -3,7 +3,6 @@
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -129,6 +128,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("cigarette_sales.zip")
+    snap_meta = snap.to_table_metadata()
 
     # Load data from snapshot.
     zf = ZipFile(snap.path)
@@ -159,6 +159,8 @@ def run(dest_dir: str) -> None:
             # open excel file
             tb_from_excel = pr.read_excel(
                 zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
+                metadata=snap_meta,
+                origin=snap.metadata.origin,
                 sheet_name=cty_sheet["sheet_name"],
                 header=9,
             )
@@ -167,6 +169,8 @@ def run(dest_dir: str) -> None:
             tb_from_excel = pr.read_excel(
                 zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
                 sheet_name=cty_sheet["sheet_name"],
+                metadata=snap_meta,
+                origin=snap.metadata.origin,
                 header=2,
             )
 
@@ -174,6 +178,8 @@ def run(dest_dir: str) -> None:
             tb_from_excel = pr.read_excel(
                 zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
                 sheet_name=cty_sheet["sheet_name"],
+                metadata=snap_meta,
+                origin=snap.metadata.origin,
                 header=9,
             )
             tb_from_excel["Unnamed: 4"] = "NaN"
@@ -184,6 +190,8 @@ def run(dest_dir: str) -> None:
             tb_from_excel = pr.read_excel(
                 zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
                 sheet_name=cty_sheet["sheet_name"],
+                metadata=snap_meta,
+                origin=snap.metadata.origin,
                 header=format["header_row"],
                 usecols=format["cols"],
             )
@@ -206,7 +214,7 @@ def run(dest_dir: str) -> None:
         country_tables.append(tb_from_excel)
 
     # concatenate tables and delete rows without data
-    smoking_data_tb = pd.concat(country_tables)
+    smoking_data_tb = pr.concat(country_tables)
 
     # remove repeating headers
     smoking_data_tb = smoking_data_tb[smoking_data_tb["year"].notna()]
@@ -220,14 +228,6 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     smoking_data_tb = smoking_data_tb.format(["country", "year"])
-
-    # add metadata
-    smoking_data_tb.metadata.origins = [snap.m.origin]
-    smoking_data_tb.metadata.short_name = paths.short_name
-    smoking_data_tb.metadata.title = "International Smoking Statistics"
-
-    print(snap.metadata)
-    print(smoking_data_tb.metadata)
 
     # Save outputs.
     #
