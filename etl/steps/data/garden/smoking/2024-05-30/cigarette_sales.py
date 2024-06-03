@@ -11,6 +11,17 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COLS_WITH_DATA = [
+    "manufactured_cigarettes_millions",
+    "manufactured_cigarettes_per_adult_per_day",
+    "handrolled_cigarettes_millions",
+    "handrolled_cigarettes_per_adult_per_day",
+    "total_cigarettes_millions",
+    "total_cigarettes_per_adult_per_day",
+    "all_tobacco_products_tonnes",
+    "all_tobacco_products_grams_per_adult_per_day",
+]
+
 
 def standardise_years(df):
     new_df = []
@@ -66,6 +77,10 @@ def run(dest_dir: str) -> None:
     df_years_fixed = Table(standardise_years(tb), metadata=tb.metadata)
     # replace table with dataframe with fixed years, concat with empty df to keep metadata
     tb = pr.concat([tb[0:0], df_years_fixed])
+
+    # drop missing values
+    tb = tb.replace(0, "nan")
+    tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
 
     # harmonize countries
     tb = geo.harmonize_countries(
