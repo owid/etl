@@ -149,7 +149,7 @@ class ChartDiffModified:
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
                 targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status=self.approval_status,
+                status=self.approval_status,  # type: ignore
             )
             st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
 

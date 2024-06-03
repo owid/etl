@@ -13,7 +13,7 @@ import json
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union, get_args
 
 import humps
 import pandas as pd
@@ -1400,7 +1400,7 @@ class ChartDiffApprovals(Base):
             return ChartStatus.PENDING.value
 
     @classmethod
-    def get_all(cls, session: Session, chart_id: int) -> List[Any]:
+    def get_all(cls, session: Session, chart_id: int) -> Sequence[Any]:
         """Get history of values."""
         result = session.scalars(
             select(cls)
