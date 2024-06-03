@@ -5,7 +5,6 @@ from pathlib import Path
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-from st_pages import add_indentation
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -30,13 +29,6 @@ st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 ########################################
 # PAGE CONFIG
 ########################################
-st.set_page_config(
-    page_title="Wizard: Chart Diff",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-)
-add_indentation()
 st.session_state.hide_reviewed_charts = st.session_state.get("hide_reviewed_charts", False)
 st.session_state.arrange_charts_vertically = st.session_state.get("arrange_charts_vertically", False)
 
@@ -357,18 +349,8 @@ def unreview_chart_diffs(engine):
         for _, chart_diff in st.session_state.chart_diffs.items():
             chart_diff.unreview(session)
 
-    ########################################
 
-
-# MAIN
-########################################
-def main():
-    st.title("Chart ⚡ **:gray[Diff]**")
-    show_help_text()
-
-    # Get stuff from DB
-    source_engine, target_engine = get_engines()
-
+def st_show_options(source_engine, target_engine):
     with st.popover("Options"):
         st.button(
             "🔄 Refresh all charts",
@@ -415,6 +397,20 @@ def main():
             on_change=arrange_charts,
         )
 
+
+########################################
+# MAIN
+########################################
+def main():
+    st.title("Chart ⚡ **:gray[Diff]**")
+    show_help_text()
+
+    # Get stuff from DB
+    source_engine, target_engine = get_engines()
+
+    # Show options
+    st_show_options(source_engine, target_engine)
+
     # Get actual charts
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database..."):
@@ -429,56 +425,61 @@ def main():
     if not hasattr(st.session_state, "chart_diffs_filtered"):
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
-    # Modified / New charts
-    chart_diffs_modified = [
-        chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
-    ]
-    chart_diffs_new = [chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new]
-
-    # Show diffs
-    if len(st.session_state.chart_diffs) == 0:
-        st.warning("No chart modifications found in the staging environment.")
-    elif len(st.session_state.chart_diffs_filtered) == 0:
-        st.warning("All charts are approved. To view them, uncheck the 'Hide approved charts' toggle.")
+    if "slug" in st.query_params:
+        st.write(st.query_params["slug"])
     else:
-        # Show modified/new charts
-        with Session(source_engine) as source_session:
-            with Session(target_engine) as target_session:
-                # Show modified charts
-                if chart_diffs_modified:
-                    st.header("Modified charts")
-                    st.markdown(
-                        f"{len(chart_diffs_modified)} chart{'s' if len(chart_diffs_modified) > 1 else ''} modified in [{OWID_ENV.name}]({OWID_ENV.site})"
-                    )
+        # Modified / New charts
+        chart_diffs_modified = [
+            chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
+        ]
+        chart_diffs_new = [
+            chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new
+        ]
 
-                    modified_charts_pagination = Pagination(
-                        chart_diffs_modified, items_per_page=CHART_PER_PAGE, pagination_key="pagination_modified"
-                    )
-                    modified_charts_pagination.show_controls()
+        # Show diffs
+        if len(st.session_state.chart_diffs) == 0:
+            st.warning("No chart modifications found in the staging environment.")
+        elif len(st.session_state.chart_diffs_filtered) == 0:
+            st.warning("All charts are approved. To view them, uncheck the 'Hide approved charts' toggle.")
+        else:
+            # Show modified/new charts
+            with Session(source_engine) as source_session:
+                with Session(target_engine) as target_session:
+                    # Show modified charts
+                    if chart_diffs_modified:
+                        st.header("Modified charts")
+                        st.markdown(
+                            f"{len(chart_diffs_modified)} chart{'s' if len(chart_diffs_modified) > 1 else ''} modified in [{OWID_ENV.name}]({OWID_ENV.site})"
+                        )
 
-                    for chart_diff in modified_charts_pagination.get_page_items():
-                        st_show(chart_diff, source_session, target_session)
-                else:
-                    st.warning(
-                        "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                    )
+                        modified_charts_pagination = Pagination(
+                            chart_diffs_modified, items_per_page=CHART_PER_PAGE, pagination_key="pagination_modified"
+                        )
+                        modified_charts_pagination.show_controls()
 
-                # Show new charts
-                if chart_diffs_new:
-                    st.header("New charts")
-                    st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
+                        for chart_diff in modified_charts_pagination.get_page_items():
+                            st_show(chart_diff, source_session, target_session)
+                    else:
+                        st.warning(
+                            "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                        )
 
-                    new_charts_pagination = Pagination(
-                        chart_diffs_new, items_per_page=CHART_PER_PAGE, pagination_key="pagination_new"
-                    )
-                    new_charts_pagination.show_controls()
+                    # Show new charts
+                    if chart_diffs_new:
+                        st.header("New charts")
+                        st.markdown(f"{len(chart_diffs_new)} new charts in [{OWID_ENV.name}]({OWID_ENV.site})")
 
-                    for chart_diff in new_charts_pagination.get_page_items():
-                        st_show(chart_diff, source_session, target_session)
-                else:
-                    st.warning(
-                        "No chart new charts found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                    )
+                        new_charts_pagination = Pagination(
+                            chart_diffs_new, items_per_page=CHART_PER_PAGE, pagination_key="pagination_new"
+                        )
+                        new_charts_pagination.show_controls()
+
+                        for chart_diff in new_charts_pagination.get_page_items():
+                            st_show(chart_diff, source_session, target_session)
+                    else:
+                        st.warning(
+                            "No chart new charts found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                        )
 
 
 main()
