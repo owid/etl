@@ -195,8 +195,6 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         if diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
-                st.write(st.session_state.get(f"arrange-charts-vertically-{diff.chart_id}", False))
-                st.write(st.session_state.arrange_charts_vertically)
                 arrange_vertical = (
                     st.session_state.get(f"arrange-charts-vertically-{diff.chart_id}", False)
                     | st.session_state.arrange_charts_vertically
