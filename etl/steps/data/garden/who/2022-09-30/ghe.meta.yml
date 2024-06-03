@@ -27,27 +27,30 @@ dataset:
 tables:
   ghe:
     variables:
+
       death_count:
         title: Deaths
-        description: |
+        description_short: |
           Number of deaths for a given cause. All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths
         short_unit: ''
         display:
           name: Deaths
           numDecimalPlaces: 0
+
       death_rate100k:
         title: Death rate per 100,000 people
-        description: |
+        description_short: |
           Death rate (per 100,000 people) for a given cause. All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths per 100,000 people
         short_unit: ''
         display:
           name: Deaths per 100k
           numDecimalPlaces: 1
+
       daly_count:
         title: The number of Disability Adjusted Life Yeats (DALYs) lost
-        description: |
+        description_short: |
           **Rationale:**
           Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
           One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
@@ -65,9 +68,10 @@ tables:
         display:
           name: Disability adjusted life years
           numDecimalPlaces: 2
+
       daly_rate100k:
         title: DALYs per 100,000 people
-        description: |
+        description_short: |
           **Rationale:**
           Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
           One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
@@ -88,6 +92,7 @@ tables:
 
   ghe_suicides_ratio:
     variables:
+
       death_rate100k_ratio:
         title: Male to female suicide death rate ratio (age-standardized)
         description_short: Age-standardized suicide rate of males divided by the age-standardized suicide rate of females.
