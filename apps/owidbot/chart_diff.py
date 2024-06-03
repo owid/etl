@@ -49,7 +49,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
-    if charts_df.empty or charts_df.approved.all():
+    if charts_df.empty or charts_df.is_reviewed.all():
         status = "✅"
     else:
         status = "❌"
