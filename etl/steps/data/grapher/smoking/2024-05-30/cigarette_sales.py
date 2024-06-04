@@ -8,11 +8,11 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 COLS_WITH_DATA = [
-    "manufactured_cigarettes_millions",
+    "manufactured_cigarettes",
     "manufactured_cigarettes_per_adult_per_day",
-    "handrolled_cigarettes_millions",
+    "handrolled_cigarettes",
     "handrolled_cigarettes_per_adult_per_day",
-    "total_cigarettes_millions",
+    "total_cigarettes",
     "total_cigarettes_per_adult_per_day",
     "all_tobacco_products_tonnes",
     "all_tobacco_products_grams_per_adult_per_day",
@@ -70,10 +70,18 @@ def run(dest_dir: str) -> None:
 
     # include for Germany 1950-1990
     tb = pr.concat([tb, germany_tb])
+    # drop East and West Germany
+    tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
+
+    # removing any rows with all nan values/ duplicates
+    tb = tb.replace(0, "nan")
+    tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
+    tb = tb.drop_duplicates(subset=["country", "year"])
 
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
+
     tb = tb.format(["country", "year"])
 
     ds_grapher = create_dataset(
