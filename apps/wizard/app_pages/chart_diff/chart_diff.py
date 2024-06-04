@@ -58,6 +58,12 @@ class ChartDiffModified:
     def is_modified(self) -> bool:
         return self.target_chart is not None
 
+    @property
+    def slug(self) -> str:
+        if self.target_chart:
+            assert self.source_chart.config["slug"] == self.target_chart.config["slug"], "Slug mismatch!"
+        return self.source_chart.config["slug"]
+
     @classmethod
     def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
         """Get chart diff from chart id.

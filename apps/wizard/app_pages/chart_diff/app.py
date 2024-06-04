@@ -93,7 +93,7 @@ def get_chart_diffs(
     return chart_diffs
 
 
-def st_show(diff: ChartDiffModified, source_session, target_session=None) -> None:
+def st_show(diff: ChartDiffModified, source_session, target_session=None, expander: bool = True) -> None:
     """Show the chart diff in Streamlit."""
     # DISPLAY options
     DISPLAY_STATE_OPTIONS = {
@@ -117,7 +117,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
     # Define label
     print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
-    label = f"{emoji} {diff.source_chart.config['slug']}"
+    label = f"{emoji} {diff.slug}"
 
     # Define action for Toggle on change
     def chart_state_change(diff, session) -> None:
@@ -157,7 +157,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
         raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
 
     # Actually show stuff
-    with st.expander(label, not diff.is_reviewed):
+    def st_show_actually():
         col1, col2 = st.columns([1, 3])
 
         # Refresh
@@ -223,6 +223,12 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None) -> Non
 
         elif diff.is_new:
             st_compare_charts(**kwargs_diff)
+
+    if expander:
+        with st.expander(label, not diff.is_reviewed):
+            st_show_actually()
+    else:
+        st_show_actually()
 
 
 def pretty_date(chart):
@@ -424,8 +430,27 @@ def main():
 
     # Just show one slug
     if "slug" in st.query_params:
-        st.write(st.query_params["slug"])
-    # Show all of them
+        slugs = st.query_params.get_all("slug")
+        with Session(source_engine) as source_session:
+            with Session(target_engine) as target_session:
+                charts_match = [
+                    chart_diff
+                    for chart_diff in st.session_state.chart_diffs_filtered.values()
+                    if chart_diff.slug in slugs
+                ]
+                if len(charts_match) == 0:
+                    st.error(f"No chart diff with slug in {slugs}")
+                else:
+                    for chart_diff in charts_match:
+                        st_show(chart_diff, source_session, target_session, expander=True)
+                    st.button(
+                        label="See all chart diffs",
+                        key="see-all-charts",
+                        on_click=lambda: st.query_params.from_dict({}),
+                        type="primary",
+                    )
+
+    # Show all of the charts
     else:
         # Show options
         st_show_options(source_engine, target_engine)
