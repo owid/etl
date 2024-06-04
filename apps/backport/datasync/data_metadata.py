@@ -68,7 +68,6 @@ def variable_data_df_from_s3(
 
     with Session(engine) as session:
         res = add_entity_code_and_name(session, df)
-        log.info("5/ finished")
         return res
 
 
