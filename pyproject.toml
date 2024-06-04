@@ -69,7 +69,8 @@ pygithub = "^2.3.0"
 pandas = "2.2.1"
 sqlalchemy = "^2.0.30"
 pymysql = "^1.1.1"
-streamlit-nightly = "1.35.1.dev20240602"
+st-pages = "^0.4.5"
+streamlit = "^1.35.0"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
