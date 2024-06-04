@@ -1395,7 +1395,7 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
-            if result.status == "approved":
+            if result.status == "unapproved":
                 return ChartStatus.PENDING.value
             return result.status  # type: ignore
         else:
