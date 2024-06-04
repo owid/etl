@@ -5,7 +5,8 @@ from pathlib import Path
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-from st_copy_to_clipboard import st_copy_to_clipboard
+
+# from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -172,12 +173,12 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None, expand
 
         # Copy link
         with col3:
-            st.markdown(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
-            st_copy_to_clipboard(
-                text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
-                before_copy_label="🔗 Copy link",
-                after_copy_label="✅ Copy link",
-            )
+            st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
+            # st_copy_to_clipboard(
+            #     text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
+            #     before_copy_label="🔗 Copy link",
+            #     after_copy_label="✅ Copy link",
+            # )
 
         # Actions on chart diff: approve, pending, reject
         option_names = list(DISPLAY_STATE_OPTIONS.keys())
