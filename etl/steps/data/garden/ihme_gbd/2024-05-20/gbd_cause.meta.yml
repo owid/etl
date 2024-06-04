@@ -130,7 +130,7 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
-            <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
   gbd_cause_dalys:
     variables:
       value:
@@ -146,4 +146,4 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
-            <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
