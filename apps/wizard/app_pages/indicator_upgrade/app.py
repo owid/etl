@@ -45,7 +45,7 @@ st.set_page_config(
         "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
         "About": """
     After a new dataset has been added to our database, we need to update the affected charts. These are the steps:
-    - Select the _old dataset_ and the _new dataset_.
+    - Select the _new dataset_ and the _old dataset_.
     - Map old indicators in the _old dataset_ to their corresponding new versions in the _new dataset_. This mapping tells Grapher how to "replace" old indicators with new ones.
     - Review the mapping.
     - Update all chart references

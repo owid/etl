@@ -19,9 +19,18 @@ from etl import config
 
 log = get_logger()
 
-# from apps.wizard import utils as wizard_utils
-
-# wizard_utils.enable_bugsnag_for_streamlit()
+# Config
+st.set_page_config(
+    page_title="Wizard: Chart Diff",
+    layout="wide",
+    page_icon="🪄",
+    initial_sidebar_state="collapsed",
+    menu_items={
+        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
+        #     "About": """
+        # """,
+    },
+)
 
 CURRENT_DIR = Path(__file__).resolve().parent
 
