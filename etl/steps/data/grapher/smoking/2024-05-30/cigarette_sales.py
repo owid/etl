@@ -1,37 +1,52 @@
 """Load a garden dataset and create a grapher dataset."""
+import owid.catalog.processing as pr
 
-
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COLS_WITH_DATA = [
+    "manufactured_cigarettes_millions",
+    "manufactured_cigarettes_per_adult_per_day",
+    "handrolled_cigarettes_millions",
+    "handrolled_cigarettes_per_adult_per_day",
+    "total_cigarettes_millions",
+    "total_cigarettes_per_adult_per_day",
+    "all_tobacco_products_tonnes",
+    "all_tobacco_products_grams_per_adult_per_day",
+]
 
-def linear_pop_estimates(start_row, end_row):
-    """Linearly estimate population values between two rows."""
-    start_year = start_row["year"]
-    end_year = end_row["year"]
-    start_pop = start_row["population"]
-    end_pop = end_row["population"]
-
-    # Calculate the slope and intercept of the linear equation.
-    slope = (end_pop - start_pop) / (end_year - start_year)
-    intercept = start_pop - slope * start_year
-
-    # Calculate the population values for the years between start_year and end_year.
-    years = list(range(start_year + 1, end_year))
-    pops = [slope * year + intercept for year in years]
-
-    return [{"year": year, "population": pop} for year, pop in zip(years, pops)]
+MAN_KEY = "manufactured_cigarettes_per_adult_per_day"
+HAND_KEY = "handrolled_cigarettes_per_adult_per_day"
+TOTAL_KEY = "total_cigarettes_per_adult_per_day"
+ALL_KEY = "all_tobacco_products_grams_per_adult_per_day"
 
 
-def estimate_pops(tb_pop):
-    pops_ls = []
-    for idx, row in tb_pop.iterrows():
-        if idx == tb_pop.index[-1]:
-            break
-        pops_ls.extend(linear_pop_estimates(row, tb_pop.loc[idx + 1]))
-    return pops_ls
+def include_split_germany(tb, ds_population):
+    """Include data for Germany 1945-1990 in the table by taking weighted average of East and West Germany data"""
+    germany_tb = tb[tb["country"].isin(["West Germany", "East Germany"])]
+    germany_tb = geo.add_population_to_table(germany_tb, ds_population, interpolate_missing_population=True)
+
+    # calculate share of population for each year
+    added_pop = germany_tb[["year", "population"]].groupby("year").sum().reset_index()
+
+    for idx, row in germany_tb.iterrows():
+        germany_tb.loc[idx, "share_of_population"] = (
+            row["population"] / added_pop[added_pop["year"] == row["year"]]["population"].values[0]
+        )
+    # calculate share of cigarettes per adult for weighted average
+    germany_tb[MAN_KEY] = germany_tb[MAN_KEY] * germany_tb["share_of_population"]
+    germany_tb[HAND_KEY] = germany_tb[HAND_KEY] * germany_tb["share_of_population"]
+    germany_tb[TOTAL_KEY] = germany_tb[TOTAL_KEY] * germany_tb["share_of_population"]
+    germany_tb[ALL_KEY] = germany_tb[ALL_KEY] * germany_tb["share_of_population"]
+
+    # sum up values for weighted average
+    germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum()
+    germany_tb["country"] = "Germany"
+
+    return germany_tb
 
 
 def run(dest_dir: str) -> None:
@@ -47,27 +62,13 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # load population data
-    # ds_population = paths.load_dataset("population")
+    ds_population = paths.load_dataset("population")
 
-    # linearly estimate population values for East and West Germany
+    # Calculate weighted average for Germany 1950-1990
+    germany_tb = include_split_germany(tb, ds_population)
 
-    # e_ger = tb_pop[(tb_pop["country"] == "East Germany") & (tb_pop["year"] > 1900)]
-    # w_ger = tb_pop[(tb_pop["country"] == "West Germany") & (tb_pop["year"] > 1900)]
-
-    # e_ger_pop = pd.DataFrame(estimate_pops(e_ger))
-    # e_ger_pop["country"] = "East Germany"
-    # w_ger_pop = pd.DataFrame(estimate_pops(w_ger))
-    # w_ger_pop["country"] = "West Germany"
-
-    # germany_pop = Table(pd.concat([e_ger_pop, w_ger_pop]))
-    # germany_pop = germany_pop.format(["country", "year"])
-
-    # germany_tb = tb[tb["country"].isin(["West Germany", "East Germany"])].format(["country", "year"])
-
-    # germany_tb = geo.add_population_to_table(germany_tb, ds_population, interpolate_missing_population=True)
-
-    # include West Germany values for Germany 1945-1990
-    tb = tb.replace("West Germany", "Germany")
+    # include for Germany 1950-1990
+    tb = pr.concat([tb, germany_tb])
 
     # Save outputs.
     #
