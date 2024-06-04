@@ -20,19 +20,20 @@ dataset_new_debug = "Democracy and Human rights - OWID based on Varieties of Dem
 def sort_datasets_old(df: pd.DataFrame) -> pd.DataFrame:
     """Sort selectbox with old datasets based on selected new dataset."""
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
-        if "new_dataset_selectbox" not in st.session_state:
-            num_id = df.loc[df["migration_new"], "id"].iloc[0]
-        else:
-            num_id = st.session_state.new_dataset_selectbox.split("]")[0].replace("[", "")
-        column_sorting = f"score_{num_id}"
-
-        # Account for the case when user chooses "show all datasets" and then unselects the toggle!
-        if column_sorting not in df.columns:
-            num_id = df.loc[df["migration_new"], "id"].iloc[0]
+        with st.spinner("Updating the old dataset list..."):
+            if "new_dataset_selectbox" not in st.session_state:
+                num_id = df.loc[df["migration_new"], "id"].iloc[0]
+            else:
+                num_id = st.session_state.new_dataset_selectbox.split("]")[0].replace("[", "")
             column_sorting = f"score_{num_id}"
 
-        df = df.sort_values(column_sorting, ascending=False)
-        return df
+            # Account for the case when user chooses "show all datasets" and then unselects the toggle!
+            if column_sorting not in df.columns:
+                num_id = df.loc[df["migration_new"], "id"].iloc[0]
+                column_sorting = f"score_{num_id}"
+
+            df = df.sort_values(column_sorting, ascending=False)
+            return df
     return df
 
 
@@ -63,7 +64,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     # df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
     df = df.reset_index(drop=True)
 
-    # View optiosn
+    # View options
     with st.popover("View options"):
         st.markdown("Change the default dataset view.")
         st.toggle(
@@ -78,8 +79,6 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             on_change=set_states_if_form_is_modified,
             key="show_step_name",
         )
-
-    # Dataset selectboxes
 
     ## New dataset
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
