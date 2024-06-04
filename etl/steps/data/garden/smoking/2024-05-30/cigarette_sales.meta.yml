@@ -16,10 +16,10 @@ dataset:
 tables:
   cigarette_sales:
     variables:
-      manufactured_cigarettes_millions:
+      manufactured_cigarettes:
          title: Annual sales of manufactured cigarettes
-         unit: millions
-         short_unit: M
+         unit: cigarettes
+         short_unit: cigarettes
          description_short: Manufactured cigarettes sold in this country in this year.
          presentation:
            title_public: Manufactured cigarette sales
@@ -30,10 +30,10 @@ tables:
          description_short: Manufactured cigarettes sold in this country per adult per day.
          presentation:
            title_public: Manufactured cigarette sales per adult per day
-      handrolled_cigarettes_millions:
+      handrolled_cigarettes:
          title: Annual sales of hand-rolled cigarettes
-         unit: millions
-         short_unit: M
+         unit: cigarettes
+         short_unit: cigarettes
          description_short: Hand-rolled cigarettes sold in this country in this year.
          description_key:
           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
@@ -46,10 +46,10 @@ tables:
          description_short: Hand-rolled cigarettes sold in this country per adult per day.
          presentation:
            title_public: Hand-rolled cigarette sales per adult per day
-      total_cigarettes_millions:
+      total_cigarettes:
          title: Total annual sales of cigarettes
-         unit: millions
-         short_unit: M
+         unit: cigarettes
+         short_unit: cigarettes
          description_short: Total cigarettes sold in this country in this year.
          description_processing: Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
          presentation:

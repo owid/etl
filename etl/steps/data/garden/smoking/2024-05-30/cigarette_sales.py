@@ -12,11 +12,11 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 COLS_WITH_DATA = [
-    "manufactured_cigarettes_millions",
+    "manufactured_cigarettes",
     "manufactured_cigarettes_per_adult_per_day",
-    "handrolled_cigarettes_millions",
+    "handrolled_cigarettes",
     "handrolled_cigarettes_per_adult_per_day",
-    "total_cigarettes_millions",
+    "total_cigarettes",
     "total_cigarettes_per_adult_per_day",
     "all_tobacco_products_tonnes",
     "all_tobacco_products_grams_per_adult_per_day",
@@ -77,6 +77,19 @@ def run(dest_dir: str) -> None:
     df_years_fixed = Table(standardise_years(tb), metadata=tb.metadata)
     # replace table with dataframe with fixed years, concat with empty df to keep metadata
     tb = pr.concat([tb[0:0], df_years_fixed])
+
+    # convert million to actual values
+    tb["manufactured_cigarettes"] = tb["manufactured_cigarettes_millions"] * 1000000
+    tb["handrolled_cigarettes"] = tb["handrolled_cigarettes_millions"] * 1000000
+    tb["total_cigarettes"] = tb["total_cigarettes_millions"] * 1000000
+
+    tb = tb.drop(
+        columns=[
+            "manufactured_cigarettes_millions",
+            "handrolled_cigarettes_millions",
+            "total_cigarettes_millions",
+        ]
+    )
 
     # drop missing values
     tb = tb.replace(0, "nan")
