@@ -40,6 +40,7 @@ class OWIDEnv:
     """OWID environment."""
 
     _env_remote: OWIDEnvType | None
+    _env_local: OWIDEnvType | None
     conf: Config
 
     def __init__(
@@ -50,7 +51,7 @@ class OWIDEnv:
         # Remote environment: environment where the database is located
         self._env_remote = None
         # Local environment: environment where the code is running
-        self.env_local = ENV  # "production", "staging", "dev"
+        self._env_local = None  # "production", "staging", "dev"
 
     @property
     def env(self):
@@ -60,20 +61,28 @@ class OWIDEnv:
         raise ValueError(f"env_remote ({self.env_remote}) and env_local ({self.env_local}) are different.")
 
     @property
+    def env_local(self):
+        """Detect local environment."""
+        if self._env_local is None:
+            self._env_local = cast(OWIDEnvType, ENV)
+        return self._env_local
+
+    @property
     def env_remote(self):
         """Detect remote environment."""
-        # production
-        if self.conf.DB_NAME == "live_grapher":
-            self._env_remote = "production"
-        # local
-        elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
-            self._env_remote = "dev"
-        # other
-        elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
-            self._env_remote = "staging"
-        # unknown
-        else:
-            self._env_remote = "unknown"
+        if self._env_remote is None:
+            # production
+            if self.conf.DB_NAME == "live_grapher":
+                self._env_remote = "production"
+            # local
+            elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
+                self._env_remote = "dev"
+            # other
+            elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
+                self._env_remote = "staging"
+            # unknown
+            else:
+                self._env_remote = "unknown"
 
         return self._env_remote
 
@@ -196,7 +205,7 @@ class OWIDEnv:
         elif self.env_local == "production":
             return "https://etl.owid.io/wizard/"
         else:
-            return f"{self.site}/etl/wizard"
+            return f"{self.base_site}/etl/wizard"
 
 
 OWID_ENV = OWIDEnv()
