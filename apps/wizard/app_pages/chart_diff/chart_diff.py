@@ -99,7 +99,6 @@ class ChartDiffModified:
             source_chart.updatedAt,
             target_chart.updatedAt if target_chart else None,
         )
-        print("called DB for state, got:", approval_status)
 
         # Build object
         chart_diff = cls(source_chart, target_chart, approval_status)

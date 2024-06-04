@@ -570,15 +570,15 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, *, inplace: Literal[True]) -> None:
+    def reset_index(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
 
     @overload
-    def reset_index(self, *, inplace: Literal[False]) -> "Table":
+    def reset_index(self, *, inplace: Literal[False], **kwargs) -> "Table":
         ...
 
     @overload
-    def reset_index(self) -> "Table":
+    def reset_index(self, **kwargs) -> "Table":
         ...
 
     def reset_index(self, *args, **kwargs) -> Optional["Table"]:  # type: ignore
