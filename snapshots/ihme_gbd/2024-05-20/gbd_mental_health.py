@@ -8,9 +8,9 @@ Important - You need and account to access the data.
 * In 'GBD Estimate' select 'Cause of death or injury'
 * In Measure select 'Prevalence'
 * In Metric select 'Number', 'Percent' and 'Rate'
-* In Impairment select all under 'Mental Disorders' and 'Substance Use Disorders'
-* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
-* In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years', 10 to 14, '15-19', '20-24', '25-29', '30-34', 35-39, 40-44, 45-49, 50-54, 55-59, 60-64, 65-69,
+* In Cause select all under 'Mental Disorders' and 'Substance Use Disorders' including the top-level categories
+* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions', but not the top-level groups
+* In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years', 10 to 14, '15-19', '20-24', '25-29', '30-34', 35-39, 40-44, 45-49, 50-54, 55-59, 60-64, 65-69.
 * In Sex select 'Both'
 * In Year select 'Select all'
 
