@@ -312,7 +312,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
             )
             grid_indicators_header.caption(
                 "🔎",
-                help="Explore the distribution of the currently compared indnicators.",
+                help="Explore the distribution of the currently compared indicators.",
             )
 
             #################################
@@ -415,17 +415,12 @@ def reset_indicator_form() -> None:
         for k in st.session_state.keys()
         if str(k).startswith("auto-ignore-") or str(k).startswith("manual-ignore-")
     }
-    # Create dictionary with toggles set to False
-    toggles = {
-        str(k): False
-        for k in st.session_state.keys()
-        if str(k).startswith("auto-explore-") or str(k).startswith("manual-explore-")
-    }
+
+    # Create dictionary with widgets set to False
     set_states(
         {
             "ignore-all": False,
             **checks,
-            **toggles,
         }
     )
 
