@@ -10,6 +10,7 @@ It is often necessary to add `default=None` or `init=False` to make pyright happ
 """
 
 import json
+import random
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
@@ -1017,7 +1018,8 @@ class Variable(Base):
             )
             conflict = session.scalars(q).one_or_none()
             if conflict:
-                conflict.name = f"{conflict.name} (conflict)"
+                # modify the conflicting variable name, it'll be cleaned up later
+                conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
                 session.add(conflict)
                 session.commit()
 
