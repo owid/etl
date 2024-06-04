@@ -10,7 +10,6 @@ from apps.wizard.config import WIZARD_CONFIG
 # Logo
 # st.logo("docs/assets/logo.png")
 
-print("------------app")
 # st.write(st.__version__)
 
 
