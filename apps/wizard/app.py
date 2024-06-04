@@ -4,85 +4,61 @@ This is the page that is loaded when the app is started. It redirects to the hom
 from pathlib import Path
 
 import streamlit as st
+from st_pages import Page, Section, show_pages
 
 from apps.wizard.config import WIZARD_CONFIG
 
 # Logo
 # st.logo("docs/assets/logo.png")
 
-# st.write(st.__version__)
-
-
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
-
-###########################################
-# DEFINE PAGES
-###########################################
-pages = {}
-
+# Page config
+st.set_page_config(page_title="Wizard", page_icon="🪄")
+st.title("Wizard")
 
 # Initial apps (etl steps)
-pages_ = []
+toc = []
 for step in WIZARD_CONFIG["main"].values():
-    pages_.append(
-        st.Page(
-            page=str(CURRENT_DIR / step["entrypoint"]),
-            title=step["title"],
+    toc.append(
+        Page(
+            path=str(CURRENT_DIR / step["entrypoint"]),
+            name=step["title"],
             icon=step["emoji"],
-            url_path=step["title"].lower(),
-            default=step["title"] == "Home",
         )
     )
-pages["Overview"] = pages_
 
 # ETL steps
-pages_ = []
+toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
 for step in WIZARD_CONFIG["etl"]["steps"].values():
     if step["enable"]:
-        pages_.append(
-            st.Page(
-                page=str(CURRENT_DIR / step["entrypoint"]),
-                title=step["title"],
+        toc.append(
+            Page(
+                path=str(CURRENT_DIR / step["entrypoint"]),
+                name=step["title"],
                 icon=step["emoji"],
-                url_path=step["alias"],
             )
         )
-pages[WIZARD_CONFIG["etl"]["title"]] = pages_
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]
     if apps:
-        pages_ = []
+        toc.append(Section(section["title"]))
         for app in apps:
-            pages_.append(
-                st.Page(
-                    page=str(CURRENT_DIR / app["entrypoint"]),
-                    title=app["title"],
+            toc.append(
+                Page(
+                    path=str(CURRENT_DIR / app["entrypoint"]),
+                    name=app["title"],
                     icon=app["emoji"],
-                    url_path=app["alias"],
                 )
             )
-        pages[section["title"]] = pages_
 
 # Show table of content (apps)
-page = st.navigation(pages)
-if page is not None:
-    page.run()
-else:
-    st.error("Pages could not be loaded!")
+show_pages(toc)
 
-###########################################
-# Home app
-###########################################
-# st_show_home()
-
-
-# # EXPERIMENTAL
-# # Get query parameters from the URL
-# # query_params = st.query_params
-
+# Add indentation
+# add_indentation()
 
 # # Go to specific page if argument is passed
 # ## Home
