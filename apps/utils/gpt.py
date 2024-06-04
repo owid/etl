@@ -58,7 +58,7 @@ MODEL_RATES_1000_TOKEN = {
 class GPTResponse(ChatCompletion):
     """GPT response."""
 
-    _message_content_dix: Dict[str, Any] | None = None
+    message_content_dix: Dict[str, Any] | None = None
 
     def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:
         """Initialize OpenAI API wrapper."""
@@ -86,11 +86,11 @@ class GPTResponse(ChatCompletion):
         if self.message_content is None:
             raise ValueError("`message_content` is empty!")
         else:
-            if self._message_content_dix is None:
-                self._message_content_dix = yaml.safe_load(self.message_content)
+            if self.message_content_dix is None:
+                self.message_content_dix = yaml.safe_load(self.message_content)
             else:
                 raise ValueError("`message_content` is empty!")
-        return self._message_content_dix
+        return self.message_content_dix
 
     @property
     def cost(self) -> float | None:
