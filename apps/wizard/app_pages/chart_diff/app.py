@@ -40,6 +40,7 @@ st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 ########################################
 # PAGE CONFIG
 ########################################
+st.session_state.arrange_charts_vertically = st.session_state.get("arrange_charts_vertically", False)
 
 ########################################
 # LOAD ENVS
@@ -409,6 +410,7 @@ def st_show_options(source_engine, target_engine):
         st.toggle(
             "**Hide** reviewed charts",
             key="hide-reviewed-charts",
+            value="hide_reviewed" in st.query_params,
             on_change=hide_reviewed,  # type: ignore
         )
 
