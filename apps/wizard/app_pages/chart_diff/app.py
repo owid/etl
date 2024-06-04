@@ -172,6 +172,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None, expand
 
         # Copy link
         with col3:
+            st.markdown(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
             st_copy_to_clipboard(
                 text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
                 before_copy_label="🔗 Copy link",
