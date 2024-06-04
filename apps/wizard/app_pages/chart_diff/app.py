@@ -70,11 +70,10 @@ CHART_PER_PAGE = 10
 warn_msg += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
 st.warning("- " + "\n\n- ".join(warn_msg))
 
+
 ########################################
 # FUNCTIONS
 ########################################
-
-
 def _get_chart_diff(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiffModified:
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
@@ -185,12 +184,7 @@ def st_show(
         # Copy link
         if show_link:
             with col3:
-                st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
-                # st_copy_to_clipboard(
-                #     text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
-                #     before_copy_label="🔗 Copy link",
-                #     after_copy_label="✅ Copy link",
-                # )
+                st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&chart_id={diff.chart_id}")
 
         # Actions on chart diff: approve, pending, reject
         option_names = list(DISPLAY_STATE_OPTIONS.keys())
@@ -452,17 +446,17 @@ def main():
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
     # Just show one slug
-    if "slug" in st.query_params:
-        slugs = st.query_params.get_all("slug")
+    if "chart_id" in st.query_params:
+        chart_ids = list(map(int, st.query_params.get_all("chart_id")))
         with Session(source_engine) as source_session:
             with Session(target_engine) as target_session:
                 charts_match = [
                     chart_diff
                     for chart_diff in st.session_state.chart_diffs_filtered.values()
-                    if chart_diff.slug in slugs
+                    if chart_diff.chart_id in chart_ids
                 ]
                 if len(charts_match) == 0:
-                    st.error(f"No chart diff with slug in {slugs}")
+                    st.error(f"No chart diff with id in {chart_ids}")
                 else:
                     for chart_diff in charts_match:
                         st_show(chart_diff, source_session, target_session, expander=True)
