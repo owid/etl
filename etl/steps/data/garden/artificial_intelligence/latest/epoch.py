@@ -82,7 +82,7 @@ def run(dest_dir: str) -> None:
 
     # Drop columns that are not needed
     tb = tb.drop(
-        ["training_compute__flop", "training_time__hours", "organization", "authors", "country__from_organization"],
+        ["training_compute__flop", "training_time__hours", "organization",
         axis=1,
     )
     tb = tb.set_index(["days_since_1949", "system"], verify_integrity=True).sort_index()
