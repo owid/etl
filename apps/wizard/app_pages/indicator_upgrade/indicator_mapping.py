@@ -75,7 +75,7 @@ def st_show_score(similarity_max):
     st.markdown(f":{color}[**{similarity_max}%**]")
 
 
-def st_mappings_auto(indicator_mapping_auto, enable_explore_mode, cols, indicator_id_to_display, df_data):
+def st_mappings_auto(indicator_mapping_auto, enable_bulk_explore, cols, indicator_id_to_display, df_data):
     old_var_selectbox = []
     ignore_selectbox = []
     new_var_selectbox = []
@@ -125,27 +125,27 @@ def st_mappings_auto(indicator_mapping_auto, enable_explore_mode, cols, indicato
         new_var_selectbox.append(element)
         # Score
         grid_indicators_auto.markdown(":violet[**100%**]")
-        # (Optional) Explore mode
-        if enable_explore_mode:
-            ## Explore mode checkbox
-            show_explore = grid_indicators_auto.button(
-                label="🔎",
-                key=f"auto-explore-{i}",
-            )
-            if show_explore:
-                st_explore_indicator_dialog(
-                    df_data,
-                    indicator_old,
-                    indicator_new,
-                    indicator_id_to_display,
-                )  # type: ignore
+        ## Explore mode checkbox
+        show_explore = grid_indicators_auto.button(
+            label="🔎",
+            key=f"auto-explore-{i}",
+        )
+        if show_explore:
+            if not enable_bulk_explore:
+                df_data = get_indicator_data_cached([indicator_old, indicator_new])
+            st_explore_indicator_dialog(
+                df_data,
+                indicator_old,
+                indicator_new,
+                indicator_id_to_display,
+            )  # type: ignore
 
     return old_var_selectbox, ignore_selectbox, new_var_selectbox
 
 
 def st_mapping_manual(
     suggestions,
-    enable_explore_mode,
+    enable_bulk_explore,
     cols,
     indicator_id_to_display,
     old_var_selectbox,
@@ -201,20 +201,20 @@ def st_mapping_manual(
         # Score
         with grid_indicators_manual.container():
             st_show_score(similarity_max)
-        # (Optional) Explore mode
-        if enable_explore_mode:
-            ## Explore mode checkbox
-            show_explore = grid_indicators_manual.button(
-                label="🔎",
-                key=f"manual-explore-{i}",
-            )
-            if show_explore:
-                st_explore_indicator_dialog(
-                    df_data,
-                    indicator_old,
-                    indicator_new_manual,
-                    indicator_id_to_display,
-                )  # type: ignore
+        ## Explore mode checkbox
+        show_explore = grid_indicators_manual.button(
+            label="🔎",
+            key=f"manual-explore-{i}",
+        )
+        if show_explore:
+            if not enable_bulk_explore:
+                df_data = get_indicator_data_cached([indicator_old, indicator_new_manual])
+            st_explore_indicator_dialog(
+                df_data,
+                indicator_old,
+                indicator_new_manual,
+                indicator_id_to_display,
+            )  # type: ignore
 
     return old_var_selectbox, ignore_selectbox, new_var_selectbox
 
@@ -257,7 +257,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
 
     # [OPTIONAL] 1.5 EXPLORE MODE
     # Get data points
-    if search_form.enable_explore_mode:
+    if search_form.enable_bulk_explore:
         df_data = get_indicator_data_cached(list(set(old_indicators["id"]) | set(new_indicators["id"])))
     else:
         df_data = None
@@ -279,7 +279,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
                 "Map indicators from the old to the new dataset. The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
             )
             # Column proportions per row (out of 1)
-            cols = [10, 43, 43, 7, 4.5] if search_form.enable_explore_mode else [10, 45, 45, 5]
+            cols = [10, 43, 43, 7, 4.5]  # if search_form.enable_bulk_explore else [10, 45, 45, 5]
 
             #################################
             # 2.2/ Header: Titles, links, general checkboxes
@@ -291,8 +291,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
             grid_indicators_header.subheader("Old dataset")
             grid_indicators_header.subheader("New dataset")
             grid_indicators_header.empty()
-            if search_form.enable_explore_mode:
-                grid_indicators_header.empty()
+            grid_indicators_header.empty()
             # Row 2
             grid_indicators_header.checkbox(
                 "Skip",
@@ -311,11 +310,10 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
                 "Score",
                 help="Similarity score between the old indicator and the 'closest' new indicator (from 0 to 100%). Indicators with low scores are likely not to have a good match.",
             )
-            if search_form.enable_explore_mode:
-                grid_indicators_header.caption(
-                    "🔎",
-                    help="Explore the distribution of the currently compared indnicators.",
-                )
+            grid_indicators_header.caption(
+                "🔎",
+                help="Explore the distribution of the currently compared indicators.",
+            )
 
             #################################
             # 2.3/ Automatically mapped indicators
@@ -324,7 +322,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
             #################################
             old_var_selectbox, ignore_selectbox, new_var_selectbox = st_mappings_auto(
                 indicator_mapping_auto,
-                search_form.enable_explore_mode,
+                search_form.enable_bulk_explore,
                 cols,
                 indicator_id_to_display,
                 df_data,
@@ -337,7 +335,7 @@ def ask_and_get_indicator_mapping(search_form) -> "IndicatorConfig":
             #################################
             old_var_selectbox, ignore_selectbox, new_var_selectbox = st_mapping_manual(
                 suggestions,
-                search_form.enable_explore_mode,
+                search_form.enable_bulk_explore,
                 cols,
                 indicator_id_to_display,
                 old_var_selectbox,
@@ -400,7 +398,12 @@ def get_indicator_data_cached(indicator_ids: List[int]):
     with st.spinner(
         "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section."
     ):
-        df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in indicator_ids], workers=10)
+        df = variable_data_df_from_s3(
+            get_engine(),
+            variable_ids=[int(v) for v in indicator_ids],
+            workers=10,
+            value_as_str=False,
+        )
     return df
 
 
@@ -412,17 +415,12 @@ def reset_indicator_form() -> None:
         for k in st.session_state.keys()
         if str(k).startswith("auto-ignore-") or str(k).startswith("manual-ignore-")
     }
-    # Create dictionary with toggles set to False
-    toggles = {
-        str(k): False
-        for k in st.session_state.keys()
-        if str(k).startswith("auto-explore-") or str(k).startswith("manual-explore-")
-    }
+
+    # Create dictionary with widgets set to False
     set_states(
         {
             "ignore-all": False,
             **checks,
-            **toggles,
         }
     )
 
