@@ -58,7 +58,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         dataset_new = st.selectbox(
             label="New dataset",
             options=df["display_name"],
-            help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
+            help="Dataset containing the new variables. These will replace the old variables in our charts.",
             index=index_new,
         )
 
