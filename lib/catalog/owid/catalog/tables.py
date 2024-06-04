@@ -591,6 +591,9 @@ class Table(pd.DataFrame):
             t._fields = self._fields
             return t  # type: ignore
 
+    def astype(self, *args, **kwargs) -> "Table":
+        return super().astype(*args, **kwargs)  # type: ignore
+
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
         """Fix type signature of join."""
         t = super().join(other, *args, **kwargs)

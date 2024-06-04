@@ -24,7 +24,7 @@ steps:
   data://meadow/who/2021-07-01/ghe:
     - walden://who/2021-07-01/ghe
   data://meadow/who/2022-09-30/ghe:
-    - walden://who/2022-09-30/ghe
+    - snapshot://who/2022-09-30/ghe.feather
   data://garden/who/2021-07-01/ghe:
     - data://meadow/who/2021-07-01/ghe
     - data://garden/regions/2023-01-01/regions
