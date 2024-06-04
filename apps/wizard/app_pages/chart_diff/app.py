@@ -1,3 +1,4 @@
+import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
@@ -388,7 +389,20 @@ def st_show_options(source_engine, target_engine):
         else:
             st.query_params.pop("hide_reviewed", None)
 
+    def apply_search_filters():
+        # Chart ID filter
+        if st.session_state["chart-diff-filter-id"]:
+            st.query_params.update({"chart_id": st.session_state["chart-diff-filter-id"]})
+        else:
+            st.query_params.pop("chart_id", None)
+        # Slug filter
+        if st.session_state["chart-diff-filter-slug"] == "":
+            st.query_params.pop("chart_slug", None)
+        else:
+            st.query_params.update({"chart_slug": st.session_state["chart-diff-filter-slug"]})
+
     with st.popover("Options"):
+        # Main options
         st.button(
             "🔄 Refresh all charts",
             key="refresh-btn-general",
@@ -397,21 +411,42 @@ def st_show_options(source_engine, target_engine):
             ),
             help="Get the latest chart versions, both from the staging and production servers.",
         )
-
         st.button(
             "**Unreview** all charts",
             key="unapprove-all-charts",
             on_click=lambda e=source_engine: unreview_chart_diffs(e),
         )
 
+        # Filters
         st.markdown("#### Filters")
         st.toggle(
             "**Hide** reviewed charts",
             key="hide-reviewed-charts",
             value="hide_reviewed" in st.query_params,
             on_change=hide_reviewed,  # type: ignore
+            help="Show only chart diffs that are pending approval (or rejection).",
         )
+        with st.form("chart-diff-filters"):
+            st.multiselect(
+                label="Select chart IDs",
+                options=[c.chart_id for c in st.session_state.chart_diffs.values()],
+                default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
+                key="chart-diff-filter-id",
+                help="Filter chart diffs with charts with given IDs.",
+            )
+            st.text_input(
+                label="Search by slug name",
+                value=st.query_params.get("chart_slug", ""),  # type: ignore
+                placeholder="Search for a slug",
+                key="chart-diff-filter-slug",
+                help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
+            )
+            st.form_submit_button(
+                "Apply filters",
+                on_click=apply_search_filters,  # type: ignore
+            )
 
+        # Display options
         st.markdown("#### Display")
         st.toggle(
             "Use **vertical arrangement** for chart diffs",
@@ -431,8 +466,6 @@ def st_show_options(source_engine, target_engine):
             help="Select the number of charts to display per page.",
             index=0,
         )
-
-        # Other options
 
 
 def get_chart_diffs(source_engine, target_engine):
@@ -459,11 +492,26 @@ def filter_chart_diffs():
 
     This is based on the query parameters.
     """
+
+    def _slugs_match(chart_slug_1, chart_slug_2):
+        pattern = r"[,\s\-]+"
+        chart_slug_1 = set(re.split(pattern, chart_slug_1.lower()))
+        chart_slug_2 = set(re.split(pattern, chart_slug_2.lower()))
+        if chart_slug_1.intersection(chart_slug_2):
+            return True
+        return False
+
     # Filter based on query params
     if "chart_id" in st.query_params:
         chart_ids = list(map(int, st.query_params.get_all("chart_id")))
         st.session_state.chart_diffs_filtered = {
             k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
+        }
+    if "chart_slug" in st.query_params:
+        chart_slug = st.query_params.get("chart_slug", "")
+
+        st.session_state.chart_diffs_filtered = {
+            k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
         }
     if "hide_reviewed" in st.query_params:
         st.session_state.chart_diffs_filtered = {
