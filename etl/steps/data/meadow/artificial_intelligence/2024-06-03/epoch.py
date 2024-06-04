@@ -31,6 +31,8 @@ def run(dest_dir: str) -> None:
     cols = [
         "System",
         "Domain",
+        "Authors",
+        "Country (from Organization)",
         "Organization",
         "Organization categorization",
         "Publication date",
@@ -59,6 +61,9 @@ def run(dest_dir: str) -> None:
     # Replace the missing values in the system column with the organization column
     tb.loc[tb["System"].isna(), "System"] = tb.loc[tb["System"].isna(), "Organization"]
 
+    # If organization column is NaN as well replace the missing values in the system column with the authors column
+    condition = tb["System"].isna() & tb["Organization"].isna()
+    tb.loc[condition, "System"] = tb.loc[condition, "Authors"]
     # Check that there are no NaN values in the system column
     assert not tb["System"].isna().any(), "NaN values found in 'System' column after processing."
     #
