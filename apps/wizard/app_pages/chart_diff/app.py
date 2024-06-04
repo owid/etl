@@ -408,9 +408,6 @@ def main():
     # Get stuff from DB
     source_engine, target_engine = get_engines()
 
-    # Show options
-    st_show_options(source_engine, target_engine)
-
     # Get actual charts
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database..."):
@@ -425,9 +422,14 @@ def main():
     if not hasattr(st.session_state, "chart_diffs_filtered"):
         st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
+    # Just show one slug
     if "slug" in st.query_params:
         st.write(st.query_params["slug"])
+    # Show all of them
     else:
+        # Show options
+        st_show_options(source_engine, target_engine)
+
         # Modified / New charts
         chart_diffs_modified = [
             chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
