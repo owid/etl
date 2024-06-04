@@ -104,7 +104,9 @@ def get_chart_diffs(
     return chart_diffs
 
 
-def st_show(diff: ChartDiffModified, source_session, target_session=None, expander: bool = True) -> None:
+def st_show(
+    diff: ChartDiffModified, source_session, target_session=None, expander: bool = True, show_link: bool = True
+) -> None:
     """Show the chart diff in Streamlit."""
     # DISPLAY options
     DISPLAY_STATE_OPTIONS = {
@@ -181,13 +183,14 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None, expand
             )
 
         # Copy link
-        with col3:
-            st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
-            # st_copy_to_clipboard(
-            #     text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
-            #     before_copy_label="🔗 Copy link",
-            #     after_copy_label="✅ Copy link",
-            # )
+        if show_link:
+            with col3:
+                st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}")
+                # st_copy_to_clipboard(
+                #     text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
+                #     before_copy_label="🔗 Copy link",
+                #     after_copy_label="✅ Copy link",
+                # )
 
         # Actions on chart diff: approve, pending, reject
         option_names = list(DISPLAY_STATE_OPTIONS.keys())
@@ -463,12 +466,12 @@ def main():
                 else:
                     for chart_diff in charts_match:
                         st_show(chart_diff, source_session, target_session, expander=True)
-                    st.button(
-                        label="See all chart diffs",
-                        key="see-all-charts",
-                        on_click=lambda: st.query_params.from_dict({}),
-                        type="primary",
-                    )
+                st.button(
+                    label="See all chart diffs",
+                    key="see-all-charts",
+                    on_click=lambda: st.query_params.from_dict({}),
+                    type="primary",
+                )
 
     # Show all of the charts
     else:
