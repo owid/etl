@@ -1,0 +1,10 @@
+steps:
+
+  # Artificial Intelligence (EPOCH, latest)
+  data://meadow/artificial_intelligence/latest/epoch:
+    - snapshot://artificial_intelligence/latest/epoch.csv
+  data://garden/artificial_intelligence/latest/epoch:
+    - data://meadow/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch:
+    - data://garden/artificial_intelligence/latest/epoch
+
