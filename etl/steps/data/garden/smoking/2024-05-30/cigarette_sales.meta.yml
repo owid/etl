@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Smoking
@@ -20,77 +21,63 @@ tables:
          unit: millions
          short_unit: M
          description_short: Manufactured cigarettes sold in this country in this year.
-         processing_level: minor
          presentation:
            title_public: Manufactured cigarette sales
-           topic_tags: [Smoking]
       manufactured_cigarettes_per_adult_per_day:
          title: Manufactured cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Manufactured cigarettes sold in this country per adult per day.
-         processing_level: minor
          presentation:
            title_public: Manufactured cigarette sales per adult per day
-           topic_tags: [Smoking]
       handrolled_cigarettes_millions:
          title: Annual sales of hand-rolled cigarettes
          unit: millions
          short_unit: M
          description_short: Hand-rolled cigarettes sold in this country in this year.
-         description_key: [Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco]
-         processing_level: minor
+         description_key:
+          - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
          presentation:
            title_public: Hand-rolled cigarette sales
-           topic_tags: [Smoking]
       handrolled_cigarettes_per_adult_per_day:
          title: Hand-rolled cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Hand-rolled cigarettes sold in this country per adult per day.
-         processing_level: minor
          presentation:
            title_public: Hand-rolled cigarette sales per adult per day
-           topic_tags: [Smoking]
       total_cigarettes_millions:
          title: Total annual sales of cigarettes
          unit: millions
          short_unit: M
          description_short: Total cigarettes sold in this country in this year.
          description_processing: Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
-         processing_level: minor
          presentation:
            title_public: Total cigarette sales
-           topic_tags: [Smoking]
       total_cigarettes_per_adult_per_day:
          title: Total cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Total cigarettes sold in this country per adult per day.
          description_processing:  Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
-         processing_level: minor
          presentation:
            title_public: Total cigarette sales per adult per day
-           topic_tags: [Smoking]
       all_tobacco_products_tonnes:
          title: Sales of all tobacco products
          unit: tons
          short_unit: t
          description_short: Sales of all tobacco products in this country in this year.
-         description_key: [Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco in three main types—loose leaf, plug, and twist, or snuff, which is held in the mouth without chewing]
-         processing_level: minor
+         description_key:
+          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco in three main types—loose leaf, plug, and twist, or snuff, which is held in the mouth without chewing
          presentation:
            title_public: Sales of all tobacco products
-           topic_tags: [Smoking]
       all_tobacco_products_grams_per_adult_per_day:
          title: Sales of all tobacco products per adult per day
          unit: grams per adult per day
          short_unit: grams
          description_short: Sales of all tobacco products in this country per adult per day.
-         processing_level: minor
          presentation:
            title_public: Total cigarette sales per adult per day
-           topic_tags: [Smoking]
 
 
       # testing_variable:

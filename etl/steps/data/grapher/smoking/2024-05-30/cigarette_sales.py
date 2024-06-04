@@ -43,7 +43,7 @@ def include_split_germany(tb, ds_population):
     germany_tb[ALL_KEY] = germany_tb[ALL_KEY] * germany_tb["share_of_population"]
 
     # sum up values for weighted average
-    germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum()
+    germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum().reset_index()
     germany_tb["country"] = "Germany"
 
     return germany_tb
@@ -54,7 +54,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.garden_dataset
+
+    ds_garden = paths.load_dataset("cigarette_sales")
 
     # Read table from garden dataset.
     tb = ds_garden["cigarette_sales"].reset_index()
