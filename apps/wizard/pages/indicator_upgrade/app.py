@@ -158,9 +158,4 @@ if st.session_state.submitted_datasets and st.session_state.submitted_indicators
 ##########################################################################################
 if st.session_state.submitted_datasets and st.session_state.submitted_indicators and st.session_state.submitted_charts:
     if isinstance(charts, list) and len(charts) > 0:
-        try:
-            push_new_charts(charts, SCHEMA_CHART_CONFIG)
-        except Exception:
-            st.error(
-                "Something went wrong when trying to update the charts and pushing them to the database. Please try again or report the error #004001"
-            )
+        push_new_charts(charts, SCHEMA_CHART_CONFIG)

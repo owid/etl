@@ -11,6 +11,7 @@ from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
 from apps.wizard.pages.expert.prompts import (
+    SYSTEM_PROMPT_DATASETTE,
     SYSTEM_PROMPT_FULL,
     SYSTEM_PROMPT_GUIDES,
     SYSTEM_PROMPT_METADATA,
@@ -43,10 +44,11 @@ def ask_gpt(query, model):
 
 
 # GPT CONFIG
-MODEL_DEFAULT = "gpt-4-turbo-preview"
+MODEL_DEFAULT = "gpt-4o"
 MODELS_AVAILABLE = {
-    "gpt-3.5-turbo-0125": "GPT-3.5 Turbo (gpt-3.5-turbo-0125)",
-    "gpt-4-turbo-preview": "GPT-4 Turbo (gpt-4-turbo-preview)",
+    "gpt-4o": "GPT-4o",  # IN: US$5.00 / 1M tokens; OUT: US$15.00 / 1M tokens
+    "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
+    "gpt-3.5-turbo": "GPT 3.5 Turbo",  # IN: US$0.50 / 1M tokens; OUT: US$1.50 / 1M tokens  (gpt-3.5-turbo-0125)
 }
 MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
 
@@ -56,6 +58,7 @@ MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
 class Options:
     """Chat categories."""
 
+    DATASETTE = "Datasette"
     METADATA = "Metadata"
     START = "Setting up your environment"
     GUIDES = "How to use, tools, APIs, and guides"
@@ -69,9 +72,6 @@ def handle_feedback(feedback: Dict[str, Any]) -> None:
     """Handle feedback."""
     print("handle feedback")
     print(feedback)
-    # st.write(feedback)
-    # st.write(st.session_state.prompt)
-    # st.write(st.session_state.response)
     WizardDB().add_usage(
         question=st.session_state.messages[-2]["content"],
         answer=st.session_state.response,
@@ -101,6 +101,9 @@ def get_system_prompt() -> str:
         case Options.FULL:
             log.warning("Switching to 'All' system prompt.")
             system_prompt = SYSTEM_PROMPT_FULL
+        case Options.DATASETTE:
+            log.warning("Switching to 'DATASETTE' system prompt.")
+            system_prompt = SYSTEM_PROMPT_DATASETTE
         case Options.DEBUG:
             log.warning("Switching to 'DEBUG' system prompt.")
             system_prompt = ""
@@ -128,10 +131,10 @@ st.selectbox(
     options=[
         Options.FULL,
         Options.METADATA,
+        Options.DATASETTE,
         Options.START,
         Options.GUIDES,
         Options.PRINCIPLES,
-        # Options.DEBUG,
     ],
     index=1,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
@@ -139,14 +142,21 @@ st.selectbox(
     on_change=reset_messages,
 )
 
-## Examples
-EXAMPLE_QUERIES = [
-    "> In the metadata yaml file, which field should I use to disable the map tap view?",
-    "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
-    "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
-    "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-    "> What is the difference between an Origin and Dataset?",
-]
+## EXAMPLE QUERIES
+if st.session_state["category_gpt"] == Options.DATASETTE:
+    EXAMPLE_QUERIES = [
+        "> Which are our top 10 articles by pageviews?",
+        "> How many charts do we have that use only a single indicator?",
+        "> Do we have datasets whose indicators are not used in any chart?",
+    ]
+else:
+    EXAMPLE_QUERIES = [
+        "> In the metadata yaml file, which field should I use to disable the map tap view?",
+        "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
+        "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
+        "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+        "> What is the difference between an Origin and Dataset?",
+    ]
 with st.popover("See examples"):
     for example in EXAMPLE_QUERIES:
         st.markdown(example)
@@ -176,10 +186,10 @@ with st.sidebar:
         options=MODELS_AVAILABLE_LIST,
         format_func=lambda x: MODELS_AVAILABLE[x],
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
-        help="[Pricing](https://openai.com/pricing) | [Model list](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)",
+        help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
     )
-    ## See pricing list: https://openai.com/pricing (USD)
-    ## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
+    ## See pricing list: https://openai.com/api/pricing (USD)
+    ## See model list: https://platform.openai.com/docs/models/
 
     use_reduced_context = st.toggle(
         "Reduced context window",
@@ -198,8 +208,8 @@ with st.sidebar:
         st.number_input(
             "Max tokens",
             min_value=32,
-            max_value=2048,
-            value=512,
+            max_value=4096,
+            value=4096,
             step=32,
             help="The maximum number of tokens in the response.",
         )

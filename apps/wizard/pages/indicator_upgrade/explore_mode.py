@@ -2,7 +2,8 @@
 
 This is currently shown in the indicator upgrader, but might be moved to chart-diff in the future.
 """
-from typing import Dict, Tuple, cast
+from dataclasses import dataclass, field
+from typing import Dict, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -27,7 +28,10 @@ def st_explore_indicator_dialog(df, indicator_old, indicator_new, var_id_to_disp
 
     More on dialogs: https://docs.streamlit.io/develop/api-reference/execution-flow/st.dialog
     """
-    st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display)
+    if indicator_old == indicator_new:
+        st.error("Comparison failed, because old and new inidcators are the same.")
+    else:
+        st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display)
 
 
 # @st.cache_data(show_spinner=False)
@@ -60,7 +64,10 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     # 2/ Get similarity score
     score = get_similarity_score(df_indicators, indicator_old, indicator_new)
 
-    # 3/ Get names
+    # 3/ Get summary
+    summary = get_summary_diff(df_indicators, indicator_old, indicator_new, is_numeric)
+
+    # 4/ Get names
     name_old = var_id_to_display[indicator_old]
     name_new = var_id_to_display[indicator_new]
 
@@ -68,29 +75,64 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     st.markdown(f"New: `{name_new}`")
 
     # Check if there is any change
-    num_changes = (df_indicators[(indicator_old)] != df_indicators[indicator_new]).sum()
+    num_changes = (df_indicators[indicator_old] != df_indicators[indicator_new]).sum()
     if num_changes == 0:
         st.success("No changes in the data points!")
     else:
-        tab1, tab2 = st.tabs(["Summary", "Error distribution"])
+        # No change in datapoints. I.e. only show main tab.
+        if summary.num_datapoints_changed == 0:
+            st_show_tab_main(
+                score, summary, df_indicators, indicator_old, indicator_new, var_id_to_display, name_old, name_new
+            )
+        # Changes in datapoints. Show more tabs
+        else:
+            tab_names = ["Summary"]
+            if is_numeric:
+                tab_names.append("Error distribution")
+            if ((summary.num_categories_old < 10) & (summary.num_categories_new < 10)) | (not is_numeric):
+                tab_names.append("Confusion Matrix")
 
-        with tab1:
-            # 4/ Show score
-            st_show_score(score)
+            tabs = st.tabs(tab_names)
+            for tab, tab_name in zip(tabs, tab_names):
+                with tab:
+                    if tab_name == "Summary":
+                        st_show_tab_main(
+                            score,
+                            summary,
+                            df_indicators,
+                            indicator_old,
+                            indicator_new,
+                            var_id_to_display,
+                            name_old,
+                            name_new,
+                        )
+                    elif tab_name == "Error distribution":
+                        st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
+                    elif tab_name == "Confusion Matrix":
+                        df_ = df_indicators.copy()
+                        df_[indicator_old] = df_[indicator_old].fillna("None")
+                        df_[indicator_new] = df_[indicator_new].fillna("None")
+                        confusion_matrix = pd.crosstab(df_[indicator_old], df_[indicator_new], dropna=False)
+                        st.dataframe(confusion_matrix)
 
-            # 5/ other info (% of rows changed, number of rows changed)
-            st_show_details(df_indicators, indicator_old, indicator_new, is_numeric)
 
-            # Rename, remove equal datapoints
-            df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
-            df_indicators = df_indicators.rename(columns=var_id_to_display)
+def st_show_tab_main(
+    score, summary, df_indicators, indicator_old, indicator_new, var_id_to_display, name_old, name_new
+):
+    # 5/ Show score
+    if summary.num_datapoints_changed > 0:
+        st_show_score(score)
 
-            # 6/ Show dataframe with different rows
-            st.header("Changes in data points")
-            st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
-        with tab2:
-            # 7/ Show distribution of change
-            st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
+    # 6/ other info (% of rows changed, number of rows changed)
+    st_show_details(summary)
+
+    # Rename, remove equal datapoints
+    df_indicators = df_indicators.loc[df_indicators[(indicator_old)] != df_indicators[indicator_new]]
+    df_indicators = df_indicators.rename(columns=var_id_to_display)
+
+    # 7/ Show dataframe with different rows
+    st.header("Changes in data points")
+    st_show_dataframe(df_indicators, col_old=name_old, col_new=name_new)
 
 
 def correct_dtype(series: pd.Series) -> pd.Series:
@@ -220,7 +262,7 @@ def get_similarity_score(
     if COLUMN_ABS_RELATIVE_ERROR in df.columns:
         # Numeric values
         with pd.option_context("mode.use_inf_as_na", True):
-            score["rel_error"] = df.loc[:, COLUMN_ABS_RELATIVE_ERROR].dropna().mean().round(N_ROUND_DEC)
+            score["rel_error"] = round(df.loc[:, COLUMN_ABS_RELATIVE_ERROR].dropna().mean(), N_ROUND_DEC)
     if (COLUMN_LOG_ERROR not in df.columns) and (COLUMN_RELATIVE_ERROR not in df.columns):
         # Categorical values
         assert (column_old is not None) and (
@@ -232,6 +274,55 @@ def get_similarity_score(
         # score["num_totla"] = len(df)
 
     return score
+
+
+@dataclass
+class SummaryDiff:
+    num_nan_score: Optional[int] = None
+    num_rows_change_relative: float = field(default=0.0)
+    num_rows_start: int = field(default=0)
+    num_rows_changed: int = field(default=0)
+    num_datapoints_changed: int = field(default=0)
+    num_datapoints_new: int = field(default=0)
+    num_datapoints_lost: int = field(default=0)
+    num_categories_old: int = field(default=0)
+    num_categories_new: int = field(default=0)
+
+
+def get_summary_diff(df: pd.DataFrame, indicator_old: str, indicator_new: str, is_numeric: bool) -> SummaryDiff:
+    """Get summary of changes"""
+    summary = {}
+
+    # Number of unknown scores
+    if is_numeric:
+        num_nan_score = df[COLUMN_RELATIVE_ERROR].isna().sum()
+        summary["num_nan_score"] = num_nan_score
+
+    # Number of rows changed
+    nrows_0 = df.shape[0]
+    nrows_1 = (df[(indicator_old)] != df[indicator_new]).sum()
+    nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
+    summary["num_rows_start"] = nrows_0
+    summary["num_rows_changed"] = nrows_1
+    summary["num_rows_change_relative"] = nrows_change_relative
+
+    # Number of changes in datapoints
+    num_changes = _get_num_changes(df, indicator_old, indicator_new)
+    summary["num_datapoints_changed"] = num_changes
+
+    # Number of NAs is old indicator = new datapoints
+    num_nan_old = df[indicator_old].isna().sum()
+    summary["num_datapoints_new"] = num_nan_old
+
+    # Number of NAs is new indicator
+    num_nan_new = df[indicator_new].isna().sum()
+    summary["num_datapoints_lost"] = num_nan_new
+
+    # Get number of categories in old and new
+    summary["num_categories_old"] = df[indicator_old].nunique()
+    summary["num_categories_new"] = df[indicator_new].nunique()
+
+    return SummaryDiff(**summary)
 
 
 def st_show_score(score):
@@ -277,38 +368,41 @@ def st_show_score(score):
         st_show_error_diff(score)
 
 
-def st_show_details(df, indicator_old, indicator_new, is_numeric):
+def st_show_details(summary: SummaryDiff):
     # with col:
     text = []
     # Number of unknown scores
-    if is_numeric:
-        num_nan_score = df[COLUMN_RELATIVE_ERROR].isna().sum()
-        text.append(f"**{num_nan_score}** rows with unknown score")
+    if summary.num_nan_score is not None:
+        text.append(f"**{summary.num_nan_score}** rows with unknown score")
+
     # Number of rows changed
-    nrows_0 = df.shape[0]
-    nrows_1 = (df[(indicator_old)] != df[indicator_new]).sum()
-    nrows_change_relative = round(100 * nrows_1 / nrows_0, 1)
-    text.append(f"**{nrows_change_relative} %** of the rows changed ({nrows_1} out of {nrows_0})")
+    text.append(
+        f"**{summary.num_rows_change_relative} %** of the rows changed ({summary.num_rows_changed} out of {summary.num_rows_start})"
+    )
 
     # Changes in detail
     text_changes = []
 
     # Number of changes in datapoints
-    num_changes = len(df[df[(indicator_old)] != df[indicator_new]].dropna(subset=[indicator_old, indicator_new]))
-    text_changes.append(f"**{num_changes}** changes in datapoint values")
+    text_changes.append(f"**{summary.num_datapoints_changed}** changes in datapoint values")
+
     # Number of NAs is old indicator = new datapoints
-    num_nan_old = df[indicator_old].isna().sum()
-    if num_nan_old > 0:
-        text_changes.append(f"**{num_nan_old}** new datapoints")
+    if summary.num_datapoints_new > 0:
+        text_changes.append(f"**{summary.num_datapoints_new}** new datapoints")
+
     # Number of NAs is new indicator
-    num_nan_new = df[indicator_new].isna().sum()
-    if num_nan_new > 0:
-        text_changes.append(f"**{num_nan_new}** NAs in new indicator")
+    if summary.num_datapoints_lost > 0:
+        text_changes.append(f"**{summary.num_datapoints_lost}** NAs in new indicator")
 
     text_changes = "\n\t- " + "\n\t- ".join(text_changes)
 
     text = "## Sumary\n- " + "\n- ".join(text) + text_changes
     st.info(text)
+
+
+def _get_num_changes(df: pd.DataFrame, indicator_old: str, indicator_new: str) -> int:
+    num_changes = len(df[df[(indicator_old)] != df[indicator_new]].dropna(subset=[indicator_old, indicator_new]))
+    return num_changes
 
 
 def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
@@ -360,7 +454,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
-    if is_numeric:
+    if not is_numeric:
         # TODO: Show as a sankey diagram where the flow from old to new categories is shown.
         # Reshape
         df_cat = df.melt(id_vars=COLUMNS_INDEX, value_vars=[col_old, col_new], var_name="indicator", value_name="value")
