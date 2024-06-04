@@ -18,6 +18,10 @@ from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
+st.set_page_config(
+    page_title="Wizard: Snapshot",
+    page_icon="🪄",
+)
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema

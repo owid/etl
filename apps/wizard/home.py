@@ -8,6 +8,12 @@ from streamlit_card import card
 from apps.wizard.config import WIZARD_CONFIG
 from apps.wizard.utils import st_page_link
 
+st.set_page_config(
+    page_title="Wizard: Home",
+    page_icon="🪄",
+)
+st.text(st.__version__)
+
 
 def st_show_home():
     # Page config

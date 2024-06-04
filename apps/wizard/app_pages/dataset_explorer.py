@@ -17,6 +17,12 @@ from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
 # CONFIG
+st.set_page_config(
+    page_title="Wizard: Dataset Explorer",
+    layout="wide",
+    page_icon="🪄",
+    initial_sidebar_state="collapsed",
+)
 st.session_state.export_metadata = st.session_state.get("export_metadata", False)
 
 st.title("🕵️ Dataset Explorer")

@@ -16,7 +16,10 @@ from etl.steps import load_from_uri
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-
+st.set_page_config(
+    page_title="Wizard: Meadow",
+    page_icon="🪄",
+)
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("meadow")
 

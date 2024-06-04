@@ -15,6 +15,13 @@ from owid.catalog import Dataset, Table
 
 from etl.paths import DATA_DIR
 
+# Page config
+st.set_page_config(
+    page_title="Wizard: owidle",
+    layout="wide",
+    page_icon="🪄",
+)
+
 ##########################################
 #
 # NEW UPDATE MESSAGES

@@ -22,6 +22,12 @@ from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
+st.set_page_config(
+    page_title="Wizard: Ask the Expert",
+    page_icon="🪄",
+)
+
+
 # LOG
 log = get_logger()
 

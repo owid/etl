@@ -19,6 +19,10 @@ from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
+st.set_page_config(
+    page_title="Wizard: Garden",
+    page_icon="🪄",
+)
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("garden")
 

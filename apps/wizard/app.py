@@ -9,11 +9,9 @@ from apps.wizard.config import WIZARD_CONFIG
 
 # Logo
 # st.logo("docs/assets/logo.png")
-st.set_page_config(
-    layout="wide",
-)
+
 print("------------app")
-st.write(st.__version__)
+# st.write(st.__version__)
 
 
 # Get current directory

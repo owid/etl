@@ -14,9 +14,12 @@ from apps.step_update.cli import NON_UPDATEABLE_IDENTIFIERS, StepUpdater, Update
 from etl.config import ADMIN_HOST, ENV
 from etl.db import can_connect
 
-# st.set_page_config(
-#     layout="wide",
-# )
+st.set_page_config(
+    page_title="Wizard: ETL Dashboard",
+    layout="wide",
+    page_icon="🪄",
+    initial_sidebar_state="collapsed",
+)
 ########################################
 # GLOBAL VARIABLES and SESSION STATE
 ########################################

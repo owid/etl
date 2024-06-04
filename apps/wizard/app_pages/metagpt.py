@@ -14,6 +14,14 @@ from apps.metagpt.cli import MetadataGPTUpdater
 from etl.files import yaml_dump
 from etl.paths import SNAPSHOTS_DIR, STEP_DIR
 
+# Config
+st.set_page_config(
+    page_title="Wizard: Metadata Upgrader",
+    layout="wide",
+    page_icon="🪄",
+    initial_sidebar_state="collapsed",
+)
+
 
 ##################################################
 # CONFIGURATION

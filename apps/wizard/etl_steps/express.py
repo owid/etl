@@ -18,6 +18,10 @@ from etl.paths import DAG_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
+st.set_page_config(
+    page_title="Wizard: Express",
+    page_icon="🪄",
+)
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("all")
 

@@ -23,6 +23,9 @@ from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
 
+# Page config
+st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
+
 
 # Reset states
 def reset_states() -> None:

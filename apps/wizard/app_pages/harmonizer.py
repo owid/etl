@@ -13,6 +13,13 @@ from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
+# PAGE CONFIG
+st.set_page_config(
+    page_title="Wizard: Entity Harmonizer",
+    page_icon="🪄",
+)
+
+# Get session state
 path = None
 if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
     garden_vars = st.session_state["steps"]["garden"]

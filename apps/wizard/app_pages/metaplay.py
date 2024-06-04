@@ -13,6 +13,13 @@ from etl import config, paths
 from etl.command import main as etl_main
 from etl.db import get_session
 
+# Config
+st.set_page_config(
+    page_title="Wizard: Metadata Playground",
+    layout="wide",
+    page_icon="🪄",
+)
+
 ###################################################
 # Initial configuration ###########################
 ###################################################
