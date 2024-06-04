@@ -104,31 +104,6 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         on_change=set_states_if_form_is_modified,
     )
 
-    # col1, col2 = st.columns(2)
-    # with col1:
-    #     ## Old dataset
-    #     dataset_old = st.selectbox(
-    #         label="Old dataset",
-    #         options=sort_datasets_old(df)["display_name"],
-    #         help="Dataset containing variables to be replaced in our charts.",
-    #         index=0,
-    #         on_change=set_states_if_form_is_modified,
-    #     )
-    # with col2:
-    #     ## New dataset
-    #     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
-    #         options = df.loc[df["migration_new"], "display_name"]
-    #     else:
-    #         options = df["display_name"]
-    #     dataset_new = st.selectbox(
-    #         label="New dataset",
-    #         options=options,
-    #         help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
-    #         index=0,
-    #         key="new_dataset_selectbox",
-    #         on_change=set_states_if_form_is_modified,
-    #     )
-
     # Parameters
     col0, _ = st.columns([1, 2])
     with col0:
@@ -140,8 +115,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 on_change=set_states_if_form_is_modified,
             )
             enable_explore = st.toggle(
-                "Explore indicator mappings (Experimental)",
-                help="Compare the indicator mappings with tables and charts. This might take some time initially, as we need to download data values from S3",
+                "Explore indicator mappings (Bulk operation)",
+                help="Compare the indicator mappings with tables and charts. This might take some time initially, as we need to download _all_ data values from S3. Alternatively, you can explore the mappings later on (which will download only the data necessary for a specific comparison).",
                 value=False,
                 on_change=set_states_if_form_is_modified,
             )
