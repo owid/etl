@@ -43,7 +43,7 @@ st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 st.session_state.hide_reviewed_charts = st.session_state.get("hide_reviewed_charts", False)
 st.session_state.arrange_charts_vertically = st.session_state.get("arrange_charts_vertically", False)
 
-
+st.write(st.session_state)
 ########################################
 # LOAD ENVS
 ########################################
@@ -140,6 +140,7 @@ def st_show(
 
     # Define action for Refresh on click
     def refresh_on_click(source_session=source_session, target_session=None):
+        st.toast(f"updating chart diff {diff.chart_id}...")
         diff_new = ChartDiffModified.from_chart_id(
             chart_id=diff.chart_id,
             source_session=source_session,
@@ -392,6 +393,7 @@ def st_show_options(source_engine, target_engine):
         )
 
         def hide_reviewed():
+            st.toast("ENTERING -- hide")
             set_states(
                 {
                     "hide_reviewed_charts": not st.session_state.hide_reviewed_charts,
@@ -407,6 +409,7 @@ def st_show_options(source_engine, target_engine):
                 st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
         def arrange_charts():
+            st.toast("ENTERING -- arrange_charts")
             set_states(
                 {
                     "arrange_charts_vertically": not st.session_state.arrange_charts_vertically,
@@ -416,7 +419,7 @@ def st_show_options(source_engine, target_engine):
         st.toggle("**Hide** reviewed charts", key="hide-reviewed-charts", on_change=hide_reviewed)
         st.toggle(
             "Use **vertical arrangement** for chart diffs",
-            key="arrange-charts-vertically",
+            key="arrange-charts-vertically2",
             on_change=arrange_charts,
         )
 
