@@ -47,23 +47,25 @@ def _fetch_data_df_from_s3(variable_id: int):
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
 
-def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], workers: int = 1) -> pd.DataFrame:
+def variable_data_df_from_s3(
+    engine: Engine,
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    value_as_str: bool = True,
+) -> pd.DataFrame:
     """Fetch data from S3 and add entity code and name from DB."""
-    log.info("1/ getting data")
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
-    log.info("2/ building df")
     if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
         df = pd.concat(cast(List[pd.DataFrame], results))
     else:
         raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
     # we work with strings and convert to specific types later
-    log.info("3/ setting string")
-    df["value"] = df["value"].astype(str)
+    if value_as_str:
+        df["value"] = df["value"].astype("string")
 
-    log.info("4/ adding code/name")
     with Session(engine) as session:
         res = add_entity_code_and_name(session, df)
         log.info("5/ finished")
