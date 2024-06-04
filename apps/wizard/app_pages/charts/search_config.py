@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.pages.charts.variable_config import reset_variable_form
+from apps.wizard.app_pages.charts.variable_config import reset_variable_form
 from apps.wizard.utils import set_states
 
 log = get_logger()

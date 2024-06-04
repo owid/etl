@@ -5,7 +5,6 @@ from urllib import parse
 
 import requests
 import streamlit as st
-from st_pages import add_indentation
 
 from apps.utils.gpt import OpenAIWrapper
 
@@ -14,7 +13,6 @@ st.set_page_config(
     page_title="Data insight robot",
     page_icon="🪄",
 )
-add_indentation()
 st.title("💡 Data insighter")
 st.markdown("Generate data insights from a chart view.")
 

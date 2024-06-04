@@ -1397,9 +1397,25 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
+            if result.status == "unapproved":
+                return ChartStatus.PENDING.value
             return result.status  # type: ignore
         else:
             return ChartStatus.PENDING.value
+
+    @classmethod
+    def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
+        """Get history of values."""
+        result = session.scalars(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                # cls.sourceUpdatedAt == source_updated_at,
+                # cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+        ).fetchall()
+        return list(result)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

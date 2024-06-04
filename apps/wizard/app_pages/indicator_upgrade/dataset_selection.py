@@ -6,7 +6,7 @@ import streamlit as st
 from pydantic import BaseModel
 from structlog import get_logger
 
-from apps.wizard.pages.indicator_upgrade.indicator_mapping import reset_indicator_form
+from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import reset_indicator_form
 from apps.wizard.utils import set_states
 
 log = get_logger()

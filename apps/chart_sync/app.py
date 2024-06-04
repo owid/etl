@@ -2,7 +2,6 @@ import subprocess
 from pathlib import Path
 
 import streamlit as st
-from st_pages import add_indentation
 
 from apps.utils import run_command
 from apps.wizard import utils as wizard_utils
@@ -11,7 +10,6 @@ from etl import config
 wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
-add_indentation()
 
 
 def main():
@@ -97,5 +95,7 @@ def cli():
     subprocess.run(["streamlit", "run", f"{CURRENT_DIR}/app.py"])
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+
+main()

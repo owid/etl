@@ -4,10 +4,8 @@ This is the page that is loaded when the app is started. It redirects to the hom
 from pathlib import Path
 
 import streamlit as st
-from st_pages import Page, Section, add_indentation, show_pages
-from streamlit_extras.switch_page_button import switch_page
+from st_pages import Page, Section, show_pages
 
-from apps.wizard import utils
 from apps.wizard.config import WIZARD_CONFIG
 
 # Logo
@@ -60,18 +58,18 @@ for section in WIZARD_CONFIG["sections"]:
 show_pages(toc)
 
 # Add indentation
-add_indentation()
+# add_indentation()
 
-# Go to specific page if argument is passed
-## Home
-if utils.AppState.args.phase == "all":  # type: ignore
-    switch_page("Home")  # type: ignore
-## ETL step
-for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-    if utils.AppState.args.phase == step_name:  # type: ignore
-        switch_page(step_props["title"])  # type: ignore
-## Section
-for section in WIZARD_CONFIG["sections"]:
-    for app in section["apps"]:
-        if utils.AppState.args.phase == app["alias"]:  # type: ignore
-            switch_page(app["title"])  # type: ignore
+# # Go to specific page if argument is passed
+# ## Home
+# if utils.AppState.args.phase == "all":  # type: ignore
+#     switch_page("Home")  # type: ignore
+# ## ETL step
+# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+#     if utils.AppState.args.phase == step_name:  # type: ignore
+#         switch_page(step_props["title"])  # type: ignore
+# ## Section
+# for section in WIZARD_CONFIG["sections"]:
+#     for app in section["apps"]:
+#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
+#             switch_page(app["title"])  # type: ignore

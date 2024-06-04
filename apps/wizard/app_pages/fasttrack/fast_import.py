@@ -15,7 +15,7 @@ from structlog import get_logger
 
 from apps.utils.files import add_to_dag
 from apps.wizard import utils as wizard_utils
-from apps.wizard.pages.fasttrack.utils import _encrypt
+from apps.wizard.app_pages.fasttrack.utils import _encrypt
 from etl import grapher_model as gm
 from etl.compare import diff_print
 from etl.db import get_engine
