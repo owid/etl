@@ -220,6 +220,7 @@ def create_chart_comparison(config_1: Dict[str, Any], config_2: Dict[str, Any]) 
     return gm.SuggestedChartRevisions(
         chartId=chart_id,
         createdBy=int(GRAPHER_USER_ID),  # type: ignore
+        updatedBy=int(GRAPHER_USER_ID),  # type: ignore
         originalConfig=config_1,
         suggestedConfig=config_2,
         status="pending",
