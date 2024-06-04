@@ -174,5 +174,15 @@ class OWIDEnv:
         """
         return f"{self.site}/grapher/thumbnail/{slug}.png"
 
+    @property
+    def wizard_url(self) -> str:
+        """Get wizard url."""
+        if self.env_type_id == "local":
+            return "http://localhost:8503/"
+        elif self.env_type_id == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.site}/etl/wizard"
+
 
 OWID_ENV = OWIDEnv()
