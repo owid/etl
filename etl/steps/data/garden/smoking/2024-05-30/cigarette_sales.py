@@ -55,7 +55,8 @@ def standardise_years(df):
                 elif end_year > 10000:
                     end_year = int(np.floor(end_year / 10))
                 for year_in_timeframe in range(start_year, end_year + 1):
-                    dict_from_row = row.to_dict().update({"year": year_in_timeframe})
+                    dict_from_row = row.to_dict()
+                    dict_from_row.update({"year": year_in_timeframe})
                     new_df.append(dict_from_row)
     return pd.DataFrame(new_df)
 
