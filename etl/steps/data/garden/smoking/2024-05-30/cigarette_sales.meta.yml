@@ -27,7 +27,7 @@ tables:
          title: Manufactured cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
-         description_short: Manufactured cigarettes sold in this country per adult per day.
+         description_short: Daily sales of manufactured cigarettes to people aged 15 and over.
          presentation:
            title_public: Manufactured cigarette sales per adult per day
       handrolled_cigarettes:
@@ -43,7 +43,7 @@ tables:
          title: Hand-rolled cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
-         description_short: Hand-rolled cigarettes sold in this country per adult per day.
+         description_short: Daily sales of hand-rolled cigarettes to people aged 15 and over.
          presentation:
            title_public: Hand-rolled cigarette sales per adult per day
       total_cigarettes:
@@ -58,7 +58,7 @@ tables:
          title: Total cigarettes sold per adult per day
          unit: cigarettes per adult per day
          short_unit: cigarettes
-         description_short: Total cigarettes sold in this country per adult per day.
+         description_short: Daily sales of manufactured and hand-rolled cigarettes to people aged 15 and over.
          description_processing:  Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
          presentation:
            title_public: Total cigarette sales per adult per day
@@ -68,14 +68,16 @@ tables:
          short_unit: t
          description_short: Sales of all tobacco products in this country in this year.
          description_key:
-          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco in three main types—loose leaf, plug, and twist, or snuff, which is held in the mouth without chewing
+          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
          presentation:
            title_public: Sales of all tobacco products
       all_tobacco_products_grams_per_adult_per_day:
          title: Sales of all tobacco products per adult per day
          unit: grams per adult per day
          short_unit: grams
-         description_short: Sales of all tobacco products in this country per adult per day.
+         description_short: Daily sales of all tobacco products to people aged 15 and over.
+         description_key:
+          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
          presentation:
            title_public: Total cigarette sales per adult per day
 
