@@ -114,8 +114,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 help="Map indicators with the same name in the old and new datasets. \n\n**NOTE:** This is option is DISABLED when working with the same dataset (i.e. old dataset and new dataset are the same) and can't be changed via this checkbox.",
                 on_change=set_states_if_form_is_modified,
             )
-            enable_explore = st.toggle(
-                "Explore indicator mappings (Bulk operation)",
+            enable_bulk_explore = st.toggle(
+                "Bulk explore mode",
                 help="Compare the indicator mappings with tables and charts. This might take some time initially, as we need to download _all_ data values from S3. Alternatively, you can explore the mappings later on (which will download only the data necessary for a specific comparison).",
                 value=False,
                 on_change=set_states_if_form_is_modified,
@@ -156,7 +156,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         dataset_new_id=str(dataset_new_id),
         map_identical_indicators=map_identical,
         similarity_function_name=similarity_name,
-        enable_explore_mode=enable_explore,
+        enable_bulk_explore=enable_bulk_explore,
     )
 
 
@@ -178,7 +178,7 @@ class SearchConfigForm(BaseModel):
     dataset_new_id: str
     map_identical_indicators: bool
     similarity_function_name: str
-    enable_explore_mode: bool
+    enable_bulk_explore: bool
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""
