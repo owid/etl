@@ -5,6 +5,7 @@ from pathlib import Path
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -158,7 +159,7 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None, expand
 
     # Actually show stuff
     def st_show_actually():
-        col1, col2 = st.columns([1, 3])
+        col1, col2, col3 = st.columns([1, 1, 1])
 
         # Refresh
         with col2:
@@ -167,6 +168,14 @@ def st_show(diff: ChartDiffModified, source_session, target_session=None, expand
                 key=f"refresh-btn-{diff.chart_id}",
                 on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
                 help="Get the latest version of the chart from the staging server.",
+            )
+
+        # Copy link
+        with col3:
+            st_copy_to_clipboard(
+                text=f"{OWID_ENV.wizard_url}?page=chart-diff&slug={diff.slug}",
+                before_copy_label="🔗 Copy link",
+                after_copy_label="✅ Copy link",
             )
 
         # Actions on chart diff: approve, pending, reject

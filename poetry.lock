@@ -6410,6 +6410,21 @@ files = [
 htbuilder = "*"
 
 [[package]]
+name = "st-copy-to-clipboard"
+version = "0.1.6"
+description = "Streamlit component that allows you to copy text to the clipboard."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "st-copy-to-clipboard-0.1.6.tar.gz", hash = "sha256:76634e74384335f64d80469bfe2ca31d15806a140cb89490321764b235acaae6"},
+    {file = "st_copy_to_clipboard-0.1.6-py3-none-any.whl", hash = "sha256:2a3eed0beb550548b04ac8a4e12c0fb09726654a15c302acb035454948b01cd1"},
+]
+
+[package.dependencies]
+jinja2 = "*"
+streamlit = ">=1.2"
+
+[[package]]
 name = "stack-data"
 version = "0.6.2"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -7781,4 +7796,4 @@ test = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "c96f2246e09e0e315475c6a3c14fbac48f69484290173224aa349b63079ba9d2"
+content-hash = "585b9480b59d27ffaf4d2c510dc8386b5c8ee9500a34947b6d24d6b1c78c3cb6"

@@ -70,6 +70,7 @@ pandas = "2.2.1"
 sqlalchemy = "^2.0.30"
 pymysql = "^1.1.1"
 streamlit-nightly = "1.35.1.dev20240602"
+st-copy-to-clipboard = "^0.1.6"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
