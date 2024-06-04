@@ -189,7 +189,6 @@ def st_show(
         # Actions on chart diff: approve, pending, reject
         option_names = list(DISPLAY_STATE_OPTIONS.keys())
         with col1:
-            st.text(diff.approval_status)
             st.radio(
                 label="Approve or reject chart",
                 key=f"radio-{diff.chart_id}",
@@ -374,6 +373,21 @@ def unreview_chart_diffs(engine):
 
 
 def st_show_options(source_engine, target_engine):
+    def arrange_charts():
+        # st.toast("ENTERING -- arrange_charts")
+        set_states(
+            {
+                "arrange_charts_vertically": not st.session_state.arrange_charts_vertically,
+            }
+        )
+
+    def hide_reviewed():
+        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
+        if st.session_state["hide-reviewed-charts"]:
+            st.query_params.update({"hide_reviewed": ""})  # type: ignore
+        else:
+            st.query_params.pop("hide_reviewed", None)
+
     with st.popover("Options"):
         st.button(
             "🔄 Refresh all charts",
@@ -384,29 +398,13 @@ def st_show_options(source_engine, target_engine):
             help="Get the latest chart versions, both from the staging and production servers.",
         )
 
-        st.subheader("Filters")
-        # Other options
         st.button(
             "**Unreview** all charts",
             key="unapprove-all-charts",
             on_click=lambda e=source_engine: unreview_chart_diffs(e),
         )
 
-        def arrange_charts():
-            # st.toast("ENTERING -- arrange_charts")
-            set_states(
-                {
-                    "arrange_charts_vertically": not st.session_state.arrange_charts_vertically,
-                }
-            )
-
-        def hide_reviewed():
-            # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
-            if st.session_state["hide-reviewed-charts"]:
-                st.query_params.update({"hide_reviewed": ""})  # type: ignore
-            else:
-                st.query_params.pop("hide_reviewed", None)
-
+        st.markdown("#### Filters")
         st.toggle(
             "**Hide** reviewed charts",
             key="hide-reviewed-charts",
@@ -414,15 +412,16 @@ def st_show_options(source_engine, target_engine):
             on_change=hide_reviewed,  # type: ignore
         )
 
+        st.markdown("#### Display")
         st.toggle(
             "Use **vertical arrangement** for chart diffs",
             key="arrange-charts-vertically",
             on_change=arrange_charts,  # type: ignore
         )
-
         st.selectbox(
             "Number of charts per page",
             options=[
+                1,
                 10,
                 20,
                 50,
@@ -432,6 +431,8 @@ def st_show_options(source_engine, target_engine):
             help="Select the number of charts to display per page.",
             index=0,
         )
+
+        # Other options
 
 
 def get_chart_diffs(source_engine, target_engine):
@@ -494,8 +495,16 @@ def render_chart_diffs(source_session, target_session, chart_diffs, pagination_k
 # MAIN
 ########################################
 def main():
-    st.title("Chart ⚡ **:gray[Diff]**")
-    show_help_text()
+    st.title(
+        "Chart ⚡ **:gray[Diff]**",
+        help=f"""
+**Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
+
+It lists all those charts that have been modified in the `{OWID_ENV.name}` environment.
+
+If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
+""",
+    )
 
     # Get stuff from DB
     source_engine, target_engine = get_engines()
