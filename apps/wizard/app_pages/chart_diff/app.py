@@ -185,7 +185,7 @@ def st_show(
         # Copy link
         if show_link:
             with col3:
-                st.caption(f"{OWID_ENV.wizard_url}?page=chart-diff&chart_id={diff.chart_id}")
+                st.caption(f"**{OWID_ENV.wizard_url}?page=chart-diff&chart_id={diff.chart_id}**")
 
         # Actions on chart diff: approve, pending, reject
         option_names = list(DISPLAY_STATE_OPTIONS.keys())
@@ -456,7 +456,7 @@ def st_show_options(source_engine, target_engine):
         st.selectbox(
             "Number of charts per page",
             options=[
-                1,
+                # 1,
                 10,
                 20,
                 50,
