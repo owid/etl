@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Rename for plotting model domain as country in grapher
+    # Rename for plotting research affiliation as country in grapher
     tb = tb.rename(columns={"affiliation": "country"})
     tb = tb.set_index(["country", "year"])
 
