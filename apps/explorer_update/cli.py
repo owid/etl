@@ -171,6 +171,10 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     # Fetch variable data for the latest steps from the database.
     variable_data_new = get_variables_data(filter={"catalogPath": updateable["catalogPath_new"].tolist()})
 
+    if len(variable_data_new) == 0:
+        log.error("Unexpected error. Manually inspect this explorer.")
+        return None
+
     # Select and rename columns.
     variable_data_new = variable_data_new.rename(
         columns={"id": "id_new", "catalogPath": "catalogPath_new", "name": "name_new"}, errors="raise"
