@@ -96,12 +96,18 @@ def run(dest_dir: str) -> None:
             tb[column] = tb[column].replace("nan", "Not specified")
 
     # Find domains with total number of notable systems below 20
+    # Check for multiple entries in 'domain' separated by comma
+    multiple_domains = tb["domain"].str.contains(",")
+    # Replace entries in 'domain' that contain a comma with 'Multiple Domains'
+    tb.loc[multiple_domains, "domain"] = "Multiple domains"
+
+    # Find domains with total number of notable systems below 20
     domain_counts = tb["domain"].value_counts()
     domains_below_20 = domain_counts[domain_counts < 20].index.tolist()
 
     log.info(f"Domains with less than 20 notable systems that were reclassified to Other: {domains_below_20}")
     # Rename the domains with less than 10 notable systems to 'Other'
-    tb["domain_owid"] = tb["domain"].apply(lambda x: "Other" if x in domains_below_20 else x)
+    tb["domain"] = tb["domain"].apply(lambda x: "Other" if x in domains_below_20 else x)
 
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
