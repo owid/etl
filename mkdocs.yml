@@ -198,8 +198,11 @@ nav:
     - Contributing: "contributing.md"
   - Guides:
     - "guides/index.md"
-    - Adding data: "guides/adding-data.md"
-    - Indicator upgrade: "guides/indicator-upgrade.md"
+    - Our data workflow:
+      - "guides/data-workflow/index.md"
+      - Adding data: "guides/data-workflow/adding-data.md"
+      - Updating data: "guides/data-workflow/updating-data.md"
+      - Update charts: "guides/data-workflow/charts-update.md"
     - Wizard: "guides/wizard.md"
     - CLI: "guides/etl-cli.md"
     - Using different environments: "guides/environment.md"
