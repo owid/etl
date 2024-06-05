@@ -17,9 +17,9 @@ meta:
       - Cuba: Banned. Source: [Cubanet (2022-02-10).](https://www.cubanet.org/opiniones/corridas-de-toros-en-cuba-la-historia-no-contada/)
       - Dominican Republic: Partially banned. Source: [Law 1311, Declaring Bullfighting Cultural Heritage, approval published on April 15th, 2022.](https://memoriahistorica.senadord.gob.do/handle/123456789/23159) Although bullfighting is not banned, the bull cannot be harmed during the event. Bullfighting is practiced only in El Seibo province, where it is considered Cultural Heritage.
       - Ecuador: Not banned. Source: [People for the Ethical Treatment of Animals (PETA) Latino.](https://www.petalatino.com/blog/las-corridas-de-toros-siguen-siendo-legales-en-estos-paises/)
+      - France: Not banned. Source: [France24 (2022-11-24).](https://www.france24.com/en/europe/20221124-french-bid-to-ban-bullfighting-dropped-amid-obstruction-in-parliament) Although not banned nationally, bullfighting is only practiced in certain regions in the south of France.
       - Guatemala: Not banned. Source: [Portal taurino (2020-03-26).](http://www.portaltaurino.net/enciclopedia/doku.php/guatemala)
       - Honduras: Partially banned. Source: [Decree 115-2015, Animal Protection and Welfare Law, April 5th, 2016.](https://www.poderjudicial.gob.hn/CEDIJ/Leyes/Documents/Ley%20de%20Proteccion%20y%20Bienestar%20Animal.pdf) Although bullfighting is not banned, the use of spears, swords, fires or other objects that may kill or cause pain to the animal is prohibited.
-      - France: Not banned. Source: [France24 (2022-11-24).](https://www.france24.com/en/europe/20221124-french-bid-to-ban-bullfighting-dropped-amid-obstruction-in-parliament) Although not banned nationally, bullfighting is only practiced in certain regions in the south of France.
       - India: Not banned. Source: [The Times of India (2023-05-19).](https://timesofindia.indiatimes.com/india/supreme-court-upholds-tamil-nadu-law-passed-to-overturn-courts-jallikattu-ban/articleshow/100339245.cms?from=mdr) Indian bullfighting involves bulls wrestling against humans.
       - Italy: Banned. Source: [Humane Society International (2023).](https://www.hsi.org/news-resources/bullfighting/)
       - Mexico: Not banned. Source: [Humane Society International (2022-01-31).](https://www.hsi.org/news-resources/sinaloa-becomes-fifth-state-in-mexico-to-ban-bullfighting/) Although not banned nationally, bullfighting has been banned in various states, and [indefinitely suspended in Plaza Mexico](https://www.dw.com/es/juez-suspende-corridas-de-toros-en-la-mayor-plaza-de-m%C3%A9xico/a-62097769), in Mexico City, which is the biggest bullfighting ring in the world.
@@ -39,6 +39,6 @@ meta:
   license:
     name: CC BY 4.0
 outs:
-  - md5: 25ef4149a3b208a9d647ac82d02593c5
+  - md5: 778ac4ae1ea023d7a91947d252580e73
     size: 7119
     path: bullfighting_laws.csv

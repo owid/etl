@@ -131,6 +131,15 @@ def main(upload: bool) -> None:
             "https://www.petalatino.com/blog/las-corridas-de-toros-siguen-siendo-legales-en-estos-paises/",
             "",
         ),
+        (
+            "France",
+            "Not banned",
+            np.nan,
+            "Although not banned nationally, bullfighting is only practiced in certain regions in the south of France.",
+            "France24 (2022-11-24).",
+            "https://www.france24.com/en/europe/20221124-french-bid-to-ban-bullfighting-dropped-amid-obstruction-in-parliament",
+            "",
+        ),
         # I have found some evidence that bullfighting also takes place in Guatemala, but no good sources.
         (
             "Guatemala",
@@ -148,15 +157,6 @@ def main(upload: bool) -> None:
             "Although bullfighting is not banned, the use of spears, swords, fires or other objects that may kill or cause pain to the animal is prohibited.",
             "Decree 115-2015, Animal Protection and Welfare Law, April 5th, 2016.",
             "https://www.poderjudicial.gob.hn/CEDIJ/Leyes/Documents/Ley%20de%20Proteccion%20y%20Bienestar%20Animal.pdf",
-            "",
-        ),
-        (
-            "France",
-            "Not banned",
-            np.nan,
-            "Although not banned nationally, bullfighting is only practiced in certain regions in the south of France.",
-            "France24 (2022-11-24).",
-            "https://www.france24.com/en/europe/20221124-french-bid-to-ban-bullfighting-dropped-amid-obstruction-in-parliament",
             "",
         ),
         (
