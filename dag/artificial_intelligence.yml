@@ -16,7 +16,7 @@ steps:
 
   # Aggregates by domain
   data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/2024-06-03/epoch
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
 

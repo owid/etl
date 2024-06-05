@@ -30,7 +30,7 @@ tables:
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
         description_processing: >
-          To streamline the categorization of domains, domain categories with less than a total of ten notable AI systems since 1950 were grouped under the "Other" label.
+          To streamline the categorization of domains, domain categories with less than a total of twenty notable AI systems since 1950 were grouped under the "Other" label.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
