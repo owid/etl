@@ -43,9 +43,8 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints",
         "training_time__hours",
         "notability_criteria",
-        "approach",
     ]
-    # Store the origins metadata from the 'domain' column
+    # Store the origins metadata for later use
     origins = tb["domain"].metadata.origins
 
     # Drop the unused columns
@@ -55,7 +54,7 @@ def run(dest_dir: str) -> None:
     tb["publication_date"] = pd.to_datetime(tb["publication_date"])
     tb["year"] = tb["publication_date"].dt.year
 
-    # Split the 'country__from_organization' column by comma
+    # Split the 'country__from_organization' column by comma (several countries can exist in each cell)
     tb["country__from_organization"] = tb["country__from_organization"].str.split(",")
 
     # Explode the table to create separate rows for each country
@@ -74,6 +73,7 @@ def run(dest_dir: str) -> None:
 
     # Add the origins metadata to the 'number_of_systems' column
     country_year_tb["number_of_systems"].metadata.origins = origins
+
     # Set the short_name metadata of the table
     country_year_tb.metadata.short_name = SHORT_NAME
 
