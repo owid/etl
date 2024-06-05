@@ -28,11 +28,11 @@ We use various session state variables to control the flow of the app:
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.pages.charts.init_config import init_app, set_session_states
-from apps.wizard.pages.charts.search_config import build_dataset_form
-from apps.wizard.pages.charts.submission import create_submission, push_submission
-from apps.wizard.pages.charts.utils import get_datasets, get_schema
-from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
+from apps.wizard.app_pages.charts.init_config import init_app, set_session_states
+from apps.wizard.app_pages.charts.search_config import build_dataset_form
+from apps.wizard.app_pages.charts.submission import create_submission, push_submission
+from apps.wizard.app_pages.charts.utils import get_datasets, get_schema
+from apps.wizard.app_pages.charts.variable_config import ask_and_get_variable_mapping
 from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 

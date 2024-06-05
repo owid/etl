@@ -676,19 +676,27 @@ class Pagination:
 
     def show_controls(self) -> None:
         # Pagination controls
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, _ = st.columns([1, 1, 1, 3])
 
-        with col1:
-            if self.page > 1:
-                if st.button("Previous"):
-                    self.page -= 1
-                    st.rerun()
+        # Correct page number if exceeds maximum allowed
+        self.page = min(self.total_pages, self.page)
 
-        with col3:
-            if self.page < self.total_pages:
-                if st.button("Next"):
-                    self.page += 1
-                    st.rerun()
+        with st.container(border=True):
+            with col1:
+                if self.page > 1:
+                    if st.button("⏮️ Previous"):
+                        self.page -= 1
+                        st.rerun()
+                else:
+                    st.button("⏮️ Previous", disabled=True)
 
-        with col2:
-            st.write(f"Page {self.page} of {self.total_pages}")
+            with col3:
+                if self.page < self.total_pages:
+                    if st.button("Next ⏭️"):
+                        self.page += 1
+                        st.rerun()
+                else:
+                    st.button("Next ⏭️", disabled=True)
+
+            with col2:
+                st.text(f"Page {self.page} of {self.total_pages}")

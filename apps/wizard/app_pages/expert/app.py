@@ -6,11 +6,10 @@ references:
 from typing import Any, Dict, cast
 
 import streamlit as st
-from st_pages import add_indentation
 from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
-from apps.wizard.pages.expert.prompts import (
+from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_DATASETTE,
     SYSTEM_PROMPT_FULL,
     SYSTEM_PROMPT_GUIDES,
@@ -23,12 +22,16 @@ from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
+st.set_page_config(
+    page_title="Wizard: Ask the Expert",
+    page_icon="🪄",
+)
+
+
 # LOG
 log = get_logger()
 
 # CONFIG
-st.set_page_config(page_title="Wizard: Ask the Expert", page_icon="🪄")
-add_indentation()
 ## Title/subtitle
 st.title("**Expert** 🧙")
 st.markdown("Ask the Expert any questions about ETL!")

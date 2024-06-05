@@ -11,9 +11,9 @@ import streamlit as st
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore, validate_underscore
 
-from apps.wizard.pages.fasttrack.fast_import import FasttrackImport
-from apps.wizard.pages.fasttrack.load import load_data_from_csv, load_data_from_sheets
-from apps.wizard.pages.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, ValidationError, set_states
+from apps.wizard.app_pages.fasttrack.fast_import import FasttrackImport
+from apps.wizard.app_pages.fasttrack.load import load_data_from_csv, load_data_from_sheets
+from apps.wizard.app_pages.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, ValidationError, set_states
 from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
 
 

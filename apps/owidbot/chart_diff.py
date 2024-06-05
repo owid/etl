@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl.config import get_container_name
 
@@ -54,9 +54,11 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
     else:
         status = "❌"
 
+    # TODO: Should be using plain /chart-diff instead of query redirect (this is a workaround)
+    # Waiting for https://github.com/streamlit/streamlit/issues/8388#issuecomment-2145524922 to be resolved
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/Chart%20Diff"><b>chart-diff</b></a>: {status}</summary>
+<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status}</summary>
 {chart_diff}
 </details>
     """.strip()
@@ -67,7 +69,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 def call_chart_diff(branch: str) -> pd.DataFrame:
     source_engine = OWIDEnv.from_staging(branch).get_engine()
 
-    if OWID_ENV.env_type_id == "production":
+    if OWID_ENV.env_remote == "production":
         target_engine = OWID_ENV.get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")

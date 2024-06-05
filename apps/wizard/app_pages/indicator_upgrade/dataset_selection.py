@@ -6,7 +6,7 @@ import streamlit as st
 from pydantic import BaseModel
 from structlog import get_logger
 
-from apps.wizard.pages.indicator_upgrade.indicator_mapping import reset_indicator_form
+from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import reset_indicator_form
 from apps.wizard.utils import set_states
 
 log = get_logger()
@@ -20,19 +20,20 @@ dataset_new_debug = "Democracy and Human rights - OWID based on Varieties of Dem
 def sort_datasets_old(df: pd.DataFrame) -> pd.DataFrame:
     """Sort selectbox with old datasets based on selected new dataset."""
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
-        if "new_dataset_selectbox" not in st.session_state:
-            num_id = df.loc[df["migration_new"], "id"].iloc[0]
-        else:
-            num_id = st.session_state.new_dataset_selectbox.split("]")[0].replace("[", "")
-        column_sorting = f"score_{num_id}"
-
-        # Account for the case when user chooses "show all datasets" and then unselects the toggle!
-        if column_sorting not in df.columns:
-            num_id = df.loc[df["migration_new"], "id"].iloc[0]
+        with st.spinner("Updating the old dataset list..."):
+            if "new_dataset_selectbox" not in st.session_state:
+                num_id = df.loc[df["migration_new"], "id"].iloc[0]
+            else:
+                num_id = st.session_state.new_dataset_selectbox.split("]")[0].replace("[", "")
             column_sorting = f"score_{num_id}"
 
-        df = df.sort_values(column_sorting, ascending=False)
-        return df
+            # Account for the case when user chooses "show all datasets" and then unselects the toggle!
+            if column_sorting not in df.columns:
+                num_id = df.loc[df["migration_new"], "id"].iloc[0]
+                column_sorting = f"score_{num_id}"
+
+            df = df.sort_values(column_sorting, ascending=False)
+            return df
     return df
 
 
@@ -63,7 +64,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     # df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
     df = df.reset_index(drop=True)
 
-    # View optiosn
+    # View options
     with st.popover("View options"):
         st.markdown("Change the default dataset view.")
         st.toggle(
@@ -79,8 +80,6 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             key="show_step_name",
         )
 
-    # Dataset selectboxes
-
     ## New dataset
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
         options = df.loc[df["migration_new"], "display_name"]
@@ -89,7 +88,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     dataset_new = st.selectbox(
         label="**New dataset**",
         options=options,
-        help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
+        help="Dataset containing the new variables. These will replace the old variables in our charts.",
         index=0,
         key="new_dataset_selectbox",
         on_change=set_states_if_form_is_modified,
@@ -104,31 +103,6 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         on_change=set_states_if_form_is_modified,
     )
 
-    # col1, col2 = st.columns(2)
-    # with col1:
-    #     ## Old dataset
-    #     dataset_old = st.selectbox(
-    #         label="Old dataset",
-    #         options=sort_datasets_old(df)["display_name"],
-    #         help="Dataset containing variables to be replaced in our charts.",
-    #         index=0,
-    #         on_change=set_states_if_form_is_modified,
-    #     )
-    # with col2:
-    #     ## New dataset
-    #     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
-    #         options = df.loc[df["migration_new"], "display_name"]
-    #     else:
-    #         options = df["display_name"]
-    #     dataset_new = st.selectbox(
-    #         label="New dataset",
-    #         options=options,
-    #         help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
-    #         index=0,
-    #         key="new_dataset_selectbox",
-    #         on_change=set_states_if_form_is_modified,
-    #     )
-
     # Parameters
     col0, _ = st.columns([1, 2])
     with col0:
@@ -139,9 +113,9 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 help="Map indicators with the same name in the old and new datasets. \n\n**NOTE:** This is option is DISABLED when working with the same dataset (i.e. old dataset and new dataset are the same) and can't be changed via this checkbox.",
                 on_change=set_states_if_form_is_modified,
             )
-            enable_explore = st.toggle(
-                "Explore indicator mappings (Experimental)",
-                help="Compare the indicator mappings with tables and charts. This might take some time initially, as we need to download data values from S3",
+            enable_bulk_explore = st.toggle(
+                "Bulk explore mode",
+                help="Compare the indicator mappings with tables and charts. This might take some time initially, as we need to download _all_ data values from S3. Alternatively, you can explore the mappings later on (which will download only the data necessary for a specific comparison).",
                 value=False,
                 on_change=set_states_if_form_is_modified,
             )
@@ -181,7 +155,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         dataset_new_id=str(dataset_new_id),
         map_identical_indicators=map_identical,
         similarity_function_name=similarity_name,
-        enable_explore_mode=enable_explore,
+        enable_bulk_explore=enable_bulk_explore,
     )
 
 
@@ -203,7 +177,7 @@ class SearchConfigForm(BaseModel):
     dataset_new_id: str
     map_identical_indicators: bool
     similarity_function_name: str
-    enable_explore_mode: bool
+    enable_bulk_explore: bool
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""

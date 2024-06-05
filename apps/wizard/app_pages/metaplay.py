@@ -6,7 +6,6 @@ import webbrowser
 from pathlib import Path
 
 import streamlit as st
-from st_pages import add_indentation
 from streamlit_ace import st_ace
 
 import etl.grapher_model as gm
@@ -14,12 +13,17 @@ from etl import config, paths
 from etl.command import main as etl_main
 from etl.db import get_session
 
+# Config
+st.set_page_config(
+    page_title="Wizard: Metadata Playground",
+    layout="wide",
+    page_icon="🪄",
+)
+
 ###################################################
 # Initial configuration ###########################
 ###################################################
 # Set page config
-st.set_page_config(page_title="Wizard: Metadata Playground", layout="wide", page_icon="🪄")
-add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("Metadata  🏐 **:gray[Playground]**")
 st.markdown("Visualise how the metadata fields in the YAML files are shown in data pages.")

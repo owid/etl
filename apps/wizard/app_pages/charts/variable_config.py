@@ -10,7 +10,7 @@ from streamlit_extras.grid import grid
 from structlog import get_logger
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
-from apps.wizard.pages.charts.utils import get_variables_from_datasets
+from apps.wizard.app_pages.charts.utils import get_variables_from_datasets
 from apps.wizard.utils import set_states
 from apps.wizard.utils.env import OWID_ENV
 from etl.db import get_engine

@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from apps.wizard.pages.charts.variable_config import VariableConfig
+from apps.wizard.app_pages.charts.variable_config import VariableConfig
 from apps.wizard.utils import set_states
 
 # from etl.chart_revision.v2.base import ChartUpdater
@@ -228,7 +228,7 @@ def push_submission(submission_config: "SubmissionConfig") -> None:
         st.error(f"Something went wrong! {e}")
     else:
         st.balloons()
-        if OWID_ENV.env_type_id == "unknown":
+        if OWID_ENV.env_remote == "unknown":
             live_link = "https://owid.cloud/admin/suggested-chart-revisions/review"
             staging_link = "https://staging.owid.cloud/admin/suggested-chart-revisions/review"
             local_link = "http://localhost:3030/admin/suggested-chart-revisions/review"

@@ -6,7 +6,6 @@ from typing import List, cast
 
 import streamlit as st
 from owid.catalog import Dataset
-from st_pages import add_indentation
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.config import ENV_IS_REMOTE
@@ -14,6 +13,13 @@ from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
+# PAGE CONFIG
+st.set_page_config(
+    page_title="Wizard: Entity Harmonizer",
+    page_icon="🪄",
+)
+
+# Get session state
 path = None
 if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
     garden_vars = st.session_state["steps"]["garden"]
@@ -85,12 +91,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
 
 
 # Page config
-st.set_page_config(
-    page_title="Wizard: Entity Harmonizer",
-    page_icon="🪄",
-)
 st.title("🎶 Entity Harmonizer")
-add_indentation()
 
 # Set states
 st.session_state["show_all"] = st.session_state.get("show_all", False)

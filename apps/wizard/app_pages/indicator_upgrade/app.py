@@ -2,10 +2,10 @@
 
 The code is structured as follows:
 
-- `__main__.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
-- `init_config.py`: Other app Initial configuration of the app. This includes setting up the session states andsettings.
+- `app.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
 - `dataset_selection.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating?"
 - `indicator_mapping.py`: Indicator mapping form. Map indicators from the old dataset to indicators in the new dataset.
+- `explore_mode.py`: All about the features needed to run on explore mode.
 - `charts_update.py`: Find out the charts affected by the submitted indicator mapping. Create the submission.
 - `utils.py`: Utility functions.
 
@@ -23,20 +23,19 @@ We use various session state indicators to control the flow of the app:
     - Set to False:
 """
 import streamlit as st
-from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.wizard import utils
-from apps.wizard.pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
-from apps.wizard.pages.indicator_upgrade.dataset_selection import build_dataset_form
-from apps.wizard.pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
-from apps.wizard.pages.indicator_upgrade.utils import get_datasets, get_schema
+from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
+from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
+from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
+from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets, get_schema
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
 log = get_logger()
 
-# Main app settings
+# Config
 st.set_page_config(
     page_title="Wizard: Indicator Upgrader",
     layout="wide",
@@ -46,14 +45,13 @@ st.set_page_config(
         "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
         "About": """
     After a new dataset has been added to our database, we need to update the affected charts. These are the steps:
-    - Select the _old dataset_ and the _new dataset_.
+    - Select the _new dataset_ and the _old dataset_.
     - Map old indicators in the _old dataset_ to their corresponding new versions in the _new dataset_. This mapping tells Grapher how to "replace" old indicators with new ones.
     - Review the mapping.
     - Update all chart references
     """,
     },
 )
-add_indentation()
 st.title("Indicator 🧬 **:gray[Upgrader]**")
 st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)

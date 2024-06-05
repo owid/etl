@@ -6,6 +6,7 @@ Example usage:
 poetry run python -m ingests.wb_income_groups
 ```
 """
+
 import datetime as dt
 import tempfile
 import unicodedata

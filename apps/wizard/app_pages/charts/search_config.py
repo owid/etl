@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.pages.charts.variable_config import reset_variable_form
+from apps.wizard.app_pages.charts.variable_config import reset_variable_form
 from apps.wizard.utils import set_states
 
 log = get_logger()
@@ -58,7 +58,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         dataset_new = st.selectbox(
             label="New dataset",
             options=df["display_name"],
-            help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
+            help="Dataset containing the new variables. These will replace the old variables in our charts.",
             index=index_new,
         )
 
