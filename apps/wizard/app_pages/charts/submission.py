@@ -8,12 +8,12 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 import etl.grapher_model as gm
+from apps.utils.gpt import GPTResponse
 from apps.wizard.app_pages.charts.variable_config import VariableConfig
 from apps.wizard.utils import set_states
 
 # from etl.chart_revision.v2.base import ChartUpdater
 from apps.wizard.utils.env import OWID_ENV
-from apps.wizard.utils.gpt import GPTResponse
 from etl.chart_revision.v2.chartgpt import SYSTEM_PROMPT_TEXT, suggest_new_config_fields
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
