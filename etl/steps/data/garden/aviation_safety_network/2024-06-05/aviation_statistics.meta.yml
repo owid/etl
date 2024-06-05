@@ -5,7 +5,6 @@ definitions:
       - Air traffic figures are based on the number of airliner flight departures (not the number of passengers) per year.
       - Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
     presentation:
-      attribution_short: ASN
       topic_tags:
         - Transport
 
