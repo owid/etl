@@ -48,9 +48,6 @@ steps:
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
   # Others
-  data://grapher/who/2021-07-01/ghe:
-    - data://garden/who/2021-07-01/ghe
-    - data://garden/regions/2023-01-01/regions
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
   data://garden/living_planet/2020-09-10/lpd:
