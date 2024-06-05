@@ -63,7 +63,7 @@ In this section you will find guides for different use cases and tasks you might
 
     Standardize country names to use OWID's defaults.
 
--   __[:material-note-edit: &nbsp; Edit the docs](harmonize-countries)__
+-   __[:material-note-edit: &nbsp; Edit the docs](../dev/docs)__
 
     ---
 
