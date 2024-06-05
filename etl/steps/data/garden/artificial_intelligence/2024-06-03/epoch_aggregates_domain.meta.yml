@@ -46,7 +46,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  epoch:
+  epoch_aggregates_domain:
     variables:
       yearly_count:
         title: Annual number of AI systems by domain
