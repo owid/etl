@@ -4,7 +4,7 @@ status: new
 !!! warning
     Wizard is a living project, and is constantly being improved and new features are being added. Consequently, this documentation might be slightly out of sync.
 
-_The Wizard_ is OWID's ETL admin web app. It is an interactive [streamlit](https://streamlit.io/)-based web app that provides a user-friendly interface to manage our ETL catalog (including the creating of new ETL steps).
+_The Wizard_ is OWID's ETL admin tool. It is an interactive [streamlit](https://streamlit.io/)-based web app that provides a user-friendly interface to manage our ETL catalog.
 
 It was initially developed to ease the creating of ETL steps by means of templating, but it has evolved to more than that and now provides a wide range of functionalities in the ETL workflow.
 

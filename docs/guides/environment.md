@@ -3,10 +3,10 @@ status: new
 tags:
     - 👷 Staff
 ---
-!!! tip "`STAGING` over `ENV_FILE`"
+<!-- !!! tip "`STAGING` over `ENV_FILE`"
     Using `STAGING` variable is __recommended way__ over using `ENV_FILE` when working with staging servers. It is easier and more secure to use than `ENV_FILE`.
 
-    Hence, we do not recommend using `ENV_FILE` unless you are aware of what it comprises.
+    Hence, we do not recommend using `ENV_FILE` unless you are aware of what it comprises. -->
 
 
 In ETL, we often have to interact with a external services (including some of ours), such as our database, OpenAI models, cloud buckets, APIs, etc.
@@ -19,7 +19,13 @@ To this end, we work with `.env` files, where we define all the required environ
 
 ## Working with staging environments
 
-To use staging servers, use the environment variable `STAGING` to select which staging server to use.
+
+!!! tip
+
+    Set `STAGING=1` in your `.env` to automatically detect the staging server from the branch name.
+
+
+When working with staging servers, use the environment variable `STAGING` to select which staging server to use.
 
 Personal staging servers use usernames, and PR staging servers use the branch name. For example,
 
@@ -32,10 +38,6 @@ or
 ```
 STAGING=feature-123 etl run <short_name> --grapher
 ```
-
-!!! tip
-
-    Set `STAGING=1` in your `.env` to automatically detect the staging server from the branch name.
 
 
 ### Personal staging environment
