@@ -145,7 +145,15 @@ with col11:
     # Ask user to select metadata file
     metadata_file = st.selectbox("Select metadata file", paths, on_change=set_run_gpt_to_false)
     # Model name
-    model_name = st.selectbox(label="Model name", options=["gpt-3.5-turbo", "gpt-4-turbo-preview"], index=0)
+    model_name = st.selectbox(
+        label="Model name",
+        options=[
+            "gpt-3.5-turbo",
+            "gpt-4-turbo",
+            "gpt-4o",
+        ],
+        index=2,
+    )
     # Run GPT
     st.button("Run", type="primary", on_click=run_gpt)
 

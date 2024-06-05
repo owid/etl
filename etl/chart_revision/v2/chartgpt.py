@@ -22,7 +22,7 @@ from etl.db import get_engine
 MODELS_AVAILABLE = {
     "gpt-3.5": "gpt-3.5-turbo-0125",
     "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
-    "gpt-4": "gpt-4-turbo-preview",
+    "gpt-4": "gpt-4o",
 }
 
 MODEL_DEFAULT = "gpt-3.5"
