@@ -161,8 +161,6 @@ steps:
   data://garden/aviation_safety_network/2023-04-18/aviation_statistics:
     - data://meadow/aviation_safety_network/2023-04-18/aviation_statistics
     - data://garden/worldbank_wdi/2022-05-26/wdi
-  data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
-    - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
   data://grapher/aviation_safety_network/2023-04-18/aviation_statistics:
     - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
 
@@ -754,6 +752,19 @@ steps:
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  #
+  # Aviation Safety Network - Aviation Statistics.
+  #
+  data://meadow/aviation_safety_network/2024-06-05/aviation_statistics:
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
+  data://garden/aviation_safety_network/2024-06-05/aviation_statistics:
+    - data://meadow/aviation_safety_network/2024-06-05/aviation_statistics
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+  data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
+    - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
 include:
   - dag/open_numbers.yml

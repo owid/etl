@@ -155,6 +155,9 @@ steps:
   data://grapher/worldbank_wdi/2023-05-29/wdi:
     - data://garden/worldbank_wdi/2023-05-29/wdi
 
+  data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
+    - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
