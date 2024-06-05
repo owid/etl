@@ -27,7 +27,10 @@ log = get_logger()
 
 
 def get_changed_files(
-    current_branch: Optional[str] = None, base_branch: str = "master", repo_path: Union[Path, str] = BASE_DIR
+    current_branch: Optional[str] = None,
+    base_branch: str = "master-1",
+    repo_path: Union[Path, str] = BASE_DIR,
+    only_committed: bool = False,
 ) -> Dict[str, Dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch."""
     # Initialize a git repository object.
@@ -41,10 +44,13 @@ def get_changed_files(
         repo.git.checkout(current_branch)
 
     # Fetch latest changes from the remote to ensure diffs are accurate
-    repo.remotes.origin.fetch()
+    # repo.remotes.origin.fetch()
 
     # Get the diff between the current branch and the base branch, corrected command
-    diff_index = repo.git.diff(f"{base_branch}..{current_branch}", name_status=True, no_renames=True)
+    diff_index = repo.git.diff(f"origin/{base_branch}..origin/{current_branch}", name_status=True, no_renames=True)
+    if not only_committed:
+        # Include uncommitted changes
+        diff_index += "\n" + repo.git.diff(name_status=True, no_renames=True)
 
     # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
     # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
@@ -61,6 +67,10 @@ def get_changed_files(
             else:
                 # Not sure if this could happen.
                 log.error(f"Could not parse diff line: {line}")
+
+    if not only_committed:
+        # Add untracked files.
+        changes.update({file_path: {"status": "A", "diff": ""} for file_path in repo.untracked_files})
 
     return changes
 
