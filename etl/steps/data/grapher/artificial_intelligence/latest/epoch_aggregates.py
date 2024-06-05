@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates_approach"))
+    ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates"))
 
     # Read table from garden dataset.
     tb = ds_garden["epoch"]
@@ -23,8 +23,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Rename for plotting model domain as country in grapher
-    tb = tb.rename(columns={"approach": "country"})
+    # Rename for plotting model name as country in grapher
+    tb["country"] = "Total"
     tb = tb.set_index(["country", "year"])
 
     #
