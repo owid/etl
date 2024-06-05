@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
         "days_since_1949",
         "parameters",
         "training_dataset_size__datapoints",
-        "domain_owid",
+        "domain",
         "training_computation_petaflop",
     ]
     # Store the origins metadata for later use

@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     #
     # Rename for plotting research affiliation as country in grapher
     tb = tb.rename(columns={"organization_categorization": "country"})
-    tb = tb.set_index(["country", "year"])
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.
