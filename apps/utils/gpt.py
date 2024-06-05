@@ -66,7 +66,6 @@ MODEL_RATES_1000_TOKEN = {
 
 
 # Interface with GPT
-@dataclass
 class GPTResponse(ChatCompletion):
     """GPT response."""
 
