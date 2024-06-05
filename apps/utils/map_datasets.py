@@ -50,8 +50,9 @@ def get_changed_files(
     # Fetch the latest changes from the remote repository
     repo.remotes.origin.fetch()
 
-    # Find the common ancestor of the base branch and the current branch.
-    merge_base = repo.git.merge_base(f"origin/{base_branch}", f"origin/{current_branch}").strip()
+    # Find the common ancestor of the remote base branch and the current local branch.
+    # In other words, "merge_base" is the last common commit between those two branches.
+    merge_base = repo.git.merge_base(f"origin/{base_branch}", f"{current_branch}").strip()
 
     # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
     # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
@@ -59,14 +60,14 @@ def get_changed_files(
     changes = {}
 
     # Get the diff between the current branch and the base branch.
-    diff_index = repo.git.diff(f"{merge_base}..origin/{current_branch}", name_status=True, no_renames=True)
+    diff_index = repo.git.diff(f"{merge_base}..{current_branch}", name_status=True, no_renames=True)
     if diff_index:
         for line in diff_index.splitlines():
             parts = line.split("\t")
             if len(parts) == 2:
                 status, file_path = parts
                 # Fetch diff content.
-                diff_content = repo.git.diff(f"{merge_base}...origin/{current_branch}", "--", file_path, p=True)
+                diff_content = repo.git.diff(f"{merge_base}...{current_branch}", "--", file_path, p=True)
                 changes[file_path] = {"status": status, "diff": diff_content}
             else:
                 # Not sure if this could happen.
@@ -89,7 +90,7 @@ def get_changed_files(
     return changes
 
 
-def get_grapher_changes(files_changed, steps_df):
+def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.DataFrame) -> List[Dict[str, Any]]:
     steps_affected = []
     files_unidentified = []
     grapher_changes = []
