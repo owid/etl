@@ -41,7 +41,6 @@ def run(dest_dir: str) -> None:
         "Training dataset size (datapoints)",
         "Training time (hours)",
         "Notability criteria",
-        "Approach",
     ]
 
     # Check that the columns of interest are present

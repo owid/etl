@@ -15,17 +15,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates_domain"))
+    ds_garden = cast(Dataset, paths.load_dependency("epoch"))
 
     # Read table from garden dataset.
     tb = ds_garden["epoch"]
     tb = tb.reset_index()
+    # Rename for plotting model name as country in grapher
+    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
+    tb = tb.set_index(["country", "year"])
+
     #
     # Process data.
     #
-    # Rename for plotting model domain as country in grapher
-    tb = tb.rename(columns={"domain_owid": "country"})
-    tb = tb.set_index(["country", "year"])
 
     #
     # Save outputs.

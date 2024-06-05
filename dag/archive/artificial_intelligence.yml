@@ -1,6 +1,5 @@
 steps:
-
-  # Artificial Intelligence (EPOCH, latest)
+    # Artificial Intelligence (EPOCH)
   data://meadow/artificial_intelligence/latest/epoch:
     - snapshot://artificial_intelligence/latest/epoch.csv
   data://garden/artificial_intelligence/latest/epoch:
@@ -8,3 +7,25 @@ steps:
   data://grapher/artificial_intelligence/latest/epoch:
     - data://garden/artificial_intelligence/latest/epoch
 
+  # Artificial Intelligence (EPOCH, number of systems by country)
+  data://garden/artificial_intelligence/latest/epoch_system_countries:
+    - data://meadow/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_system_countries:
+    - data://garden/artificial_intelligence/latest/epoch_system_countries
+
+  # Aggregates by domain
+  data://garden/artificial_intelligence/latest/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/latest/epoch_aggregates_domain
+
+  # Aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_affiliation:
+
+  # Aggregates by machine learning approach
+  data://garden/artificial_intelligence/latest/epoch_aggregates_approach:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
+    - data://garden/artificial_intelligence/latest/epoch_aggregates_approach

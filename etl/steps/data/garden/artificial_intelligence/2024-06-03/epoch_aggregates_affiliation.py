@@ -13,18 +13,6 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     """
     Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of Researcher affiliation.
-
-    This function performs the following steps:
-    1. Load the epoch dataset.
-    2. Assert that the 'publication_date' column is of type datetime64.
-    3. Create a 'year' column derived from the 'publication_date' column.
-    4. Group the data by year and 'organization_categorization' and calculate the counts.
-    5. Pivot the table to get counts for each organization type in separate columns.
-    6. Melt the dataframe to long format for yearly and cumulative counts.
-    7. Merge the yearly and cumulative counts.
-    8. Set metadata for the aggregated table.
-    9. Create a new dataset with the aggregated table.
-    10. Save the new dataset.
     """
     log.info("epoch_aggregates_affiliation.start")
 
@@ -46,6 +34,18 @@ def run(dest_dir: str) -> None:
         tb.groupby(["year", "organization_categorization"]).size().reset_index(name="count")
     )
 
+    affiliations = [
+        "Academia and government collaboration",
+        "Academia and industry collaboration",
+        "Industry",
+        "Industry and government collaboration",
+        "Academia",
+        "Industry and research collective collaboration",
+        "Not specified",
+        "Academia and research collective collaboration",
+        "Research collective",
+        "Government",
+    ]
     # Pivot table for organization types
     df_pivot_org = organization_categorization_counts.pivot(
         index="year", columns="organization_categorization", values="count"
@@ -53,12 +53,7 @@ def run(dest_dir: str) -> None:
     # Melt dataframe to long format for yearly counts
     melted_df = df_pivot_org.melt(
         id_vars=["year"],
-        value_vars=[
-            "Academia",
-            "Academia and industry collaboration",
-            "Industry",
-            "Other",
-        ],
+        value_vars=affiliations,
         var_name="affiliation",
         value_name="yearly_count",
     )
@@ -71,12 +66,7 @@ def run(dest_dir: str) -> None:
     # Melt dataframe for cumulative counts
     melted_df_cumulative = df_pivot_org.melt(
         id_vars=["year"],
-        value_vars=[
-            "Academia",
-            "Academia and industry collaboration",
-            "Industry",
-            "Other",
-        ],
+        value_vars=affiliations,
         var_name="affiliation",
         value_name="cumulative_count",
     )

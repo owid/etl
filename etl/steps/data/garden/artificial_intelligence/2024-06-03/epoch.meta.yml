@@ -20,31 +20,29 @@ tables:
         unit: ''
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
-        description_processing: >
-          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
-
-          The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
+
+      domain_owid:
+        title: Domain
+        unit: ''
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_processing: >
+          To streamline the categorization of domains, domain categories with less than a total of ten notable AI systems since 1950 were grouped under the "Other" label.
+        display:
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+
       organization_categorization:
         title: Researcher affiliation
         unit: ''
         short_unit: ''
-        description_short: Describes the sector (Industry, Academia, or Collaboration) where the authors of an AI system have their primary affiliations.
+        description_short: Describes the sector where the authors of an AI system have their primary affiliations.
         description_from_producer: >
-            Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
-        description_processing: >
-          To streamline the categorization of researcher affiliations, the original data underwent the following transformations:
+            Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
 
-
-          **Consolidating Collaborations**:
-            - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
-
-          **Grouping Other Affiliations**:
-            - Affiliations explicitly labeled as "Research Collective" or "research collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
-
-          The aforementioned changes were implemented to make visualizations more coherent and concise.
       parameters:
         title: Number of parameters
         unit: ''
@@ -98,20 +96,6 @@ tables:
         presentation:
           grapher_config:
             title: Training computation
-
-      approach:
-          title: Approach
-          unit: ''
-          description_short: The type of machine learning technique used to train an AI system.
-          description_key:
-            - Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
-            - Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
-            - Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
-            - Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
-          display:
-            numDecimalPlaces: 0
-            zeroDay: '1949-01-01'
-            yearIsDay: true
 
       publication_date:
           title: Publication date

@@ -19,8 +19,8 @@ tables:
     variables:
       number_of_systems:
         title: Number of notable AI systems by country
-        unit: ''
+        unit: 'AI systems'
         short_unit: ''
         description_short: Total annual number of notable machine learning models attributed to the location of researchers’ affiliated institutions. {definitions.desc_update}
         description_processing: >
-          The number of notable AI systems by country is calculated by counting the number of machine learning models attributed to the location of researchers’ affiliated institutions. There can be several authors and affiliated institutions so
+          The number of notable AI systems by country is determined by tallying the number of machine learning models that are associated with the geographical location of the researchers' affiliated institutions. It's important to note that a single model can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries.
