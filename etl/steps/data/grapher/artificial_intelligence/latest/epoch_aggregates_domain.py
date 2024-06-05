@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Rename for plotting model domain as country in grapher
-    tb = tb.rename(columns={"domain_owid": "country"})
+    tb = tb.rename(columns={"domain": "country"})
     tb = tb.set_index(["country", "year"])
 
     #
