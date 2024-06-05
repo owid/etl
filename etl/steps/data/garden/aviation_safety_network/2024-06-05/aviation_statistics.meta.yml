@@ -17,6 +17,8 @@ tables:
         title: Fatal accidents per million commercial flights
         short_unit: ''
         unit: accidents
+        description_processing: |-
+          - Calculated by dividing the number of fatal accidents, from the Aviation Safety Network, by the number of worldwide departures, from the World Bank's World Development Indicators, and multiplying by 1,000,000.
       accidents_with_passenger_and_cargo_flights_including_hijacking_etc:
         title: Fatal accidents from commercial airliners
         short_unit: ''
@@ -29,10 +31,14 @@ tables:
         title: Fatalities per million flights
         short_unit: ''
         unit: fatalities
+        description_processing: |-
+          - Calculated by dividing the number of fatalities, from the Aviation Safety Network, by the number of worldwide departures, from the World Bank's World Development Indicators, and multiplying by 1,000,000.
       fatalities_per_million_passengers:
         title: Fatalities per million passengers
         short_unit: ''
         unit: fatalities
+        description_processing: |-
+          - Calculated by dividing the number of fatalities, from the Aviation Safety Network, by the number of worldwide passengers, from the World Bank's World Development Indicators, and multiplying by 1,000,000.
       fatalities_with_passenger_and_cargo_flights_including_hijacking_etc:
         title: Fatalities from commercial airliners
         short_unit: ''
@@ -49,10 +55,14 @@ tables:
         title: Million flights per fatal accident
         short_unit: ''
         unit: million flights
+        description_processing: |-
+          - Calculated by dividing the number of worldwide departures, from the World Bank's World Development Indicators, by the number of fatal accidents, from the Aviation Safety Network, and multiplying by 1,000,000.
       million_passengers_per_fatality:
         title: Million passengers per fatality
         short_unit: ''
         unit: million passengers
+        description_processing: |-
+          - Calculated by dividing the number of worldwide passengers, from the World Bank's World Development Indicators, by the number of fatalities, from the Aviation Safety Network, and multiplying by 1,000,000.
       passengers_carried:
         title: Passengers per year
         short_unit:  ''
