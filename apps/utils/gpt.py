@@ -1,6 +1,5 @@
 """Auxiliary classes, functions and variables."""
-from dataclasses import asdict, dataclass
-from datetime import date
+from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 import structlog
@@ -17,34 +16,47 @@ log = structlog.get_logger()
 MODEL_DEFAULT = "gpt-3.5-turbo"
 
 # PRICING (per 1,000 tokens)
-## See pricing list: https://openai.com/pricing (USD)
+## See pricing list: https://openai.com/api/pricing/ (USD)
 ## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
 RATE_DEFAULT_IN = 0.005
 MODEL_EQUIVALENCES = {
     # "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
-    "gpt-3.5-turbo": "gpt-3.5-turbo-0613" if date.today() >= date(2024, 2, 16) else "gpt-3.5-turbo-0125",
-    "gpt-4-turbo-preview": "gpt-4-0125-preview",
+    "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
+    "gpt-4-turbo-preview": "gpt-4-turbo-2024-04-09",
+    "gpt-4o": "gpt-4o-2024-05-13",
 }
 MODEL_RATES_1000_TOKEN = {
+    # GPT 3.5
     "gpt-3.5-turbo-0613": {
-        "in": 0.0015,
-        "out": 0.0020,
+        "in": 1.5 / 1000,
+        "out": 2 / 1000,
     },
     "gpt-3.5-turbo-0125": {
-        "in": 0.0005,
-        "out": 0.0015,
+        "in": 0.5 / 1000,
+        "out": 1.5 / 1000,
     },
+    # GPT 4
     "gpt-4-0125-preview": {
-        "in": 0.01,
-        "out": 0.03,
+        "in": 10 / 1000,
+        "out": 30 / 1000,
     },
     "gpt-4": {
-        "in": 0.03,
-        "out": 0.06,
+        "in": 30 / 1000,
+        "out": 60 / 1000,
     },
     "gpt-4-32k": {
-        "in": 0.06,
-        "out": 0.12,
+        "in": 60 / 1000,
+        "out": 120 / 1000,
+    },
+    # GPT 4 Turbo
+    "gpt-4-turbo-2024-04-09": {
+        "in": 10 / 1000,
+        "out": 30 / 1000,
+    },
+    # GPT 4o
+    "gpt-4o-2024-05-13": {
+        "in": 5 / 1000,
+        "out": 15 / 1000,
     },
 }
 MODEL_RATES_1000_TOKEN = {
@@ -54,11 +66,10 @@ MODEL_RATES_1000_TOKEN = {
 
 
 # Interface with GPT
-@dataclass
 class GPTResponse(ChatCompletion):
     """GPT response."""
 
-    message_content_dix: Dict[str, Any] | None = None
+    message_content_dix: Optional[Dict[str, Any]] = field(default_factory=dict)
 
     def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:
         """Initialize OpenAI API wrapper."""
@@ -86,7 +97,7 @@ class GPTResponse(ChatCompletion):
         if self.message_content is None:
             raise ValueError("`message_content` is empty!")
         else:
-            if self.message_content_dix is None:
+            if self.message_content_dix == {}:
                 self.message_content_dix = yaml.safe_load(self.message_content)
             else:
                 raise ValueError("`message_content` is empty!")

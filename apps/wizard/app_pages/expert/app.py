@@ -9,6 +9,7 @@ import streamlit as st
 from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
+from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_DATASETTE,
     SYSTEM_PROMPT_FULL,
@@ -19,7 +20,6 @@ from apps.wizard.app_pages.expert.prompts import (
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
-from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
 st.set_page_config(
