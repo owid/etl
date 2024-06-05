@@ -122,3 +122,12 @@ steps:
   # To be archived:
 
   ######################################################################################################################
+  #
+  # Bullfighting laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
+    - snapshot://animal_welfare/2024-06-04/bullfighting_laws.csv
+  data://garden/animal_welfare/2024-06-04/bullfighting_laws:
+    - data://meadow/animal_welfare/2024-06-04/bullfighting_laws
+  data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
+    - data://garden/animal_welfare/2024-06-04/bullfighting_laws
