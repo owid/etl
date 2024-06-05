@@ -210,7 +210,6 @@ nav:
     - Metadata in data pages: "guides/metadata-play.md"
     - Edit the documentation: "dev/docs.md"
     - OpenAI setup: "guides/openai.md"
-    - Using ChartGPT: "guides/chartgpt.md"
 
     # - Updating charts:
     #   - Submitting chart revisions: "guides/charts/updating-charts.md"
