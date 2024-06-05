@@ -292,6 +292,18 @@ def cli(
     - If it is a file-based explorer, ensure URLs to data catalog point to the latest version of the data.
     - If it is an indicator-based explorer, ensure variable ids correspond to the latest versions of the variables.
 
+    By default, this tool reads the database of your local (or staging) grapher.
+    But normally, you want to update explorers with the information (e.g. variable ids) from the production database.
+
+    Hence, after merging code to create a new dataset in production, wait for ETL to create the dataset, and then run:
+    ```
+    ENV_FILE=.env.production etl explorer-update
+    ```
+    (or, instead of `.env.production`, use whatever you call your production environment file).
+
+    Then you can check that your `owid-content` explorer files may have been updated.
+    If so, create a pull request in `owid-content` with those changes.
+
     """
 
     if isinstance(explorers_dir, str):
