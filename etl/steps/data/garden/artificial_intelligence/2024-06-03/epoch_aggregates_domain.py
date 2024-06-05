@@ -1,5 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
-import pandas as pd
+import shared as sh
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -21,17 +21,16 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset with no aggregations.
+    # Load the ds_meadow dataset.
     ds_meadow = paths.load_dataset("epoch")
 
     # Read table from meadow dataset.
     tb = ds_meadow["epoch"]
     tb = tb.reset_index()
+
     #
     # Process data.
     #
-    # Filter out rows where 'notability_criteria' is NaN and reset the index
-    tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
 
     # Define the columns that are not needed
     unused_columns = [
@@ -45,42 +44,12 @@ def run(dest_dir: str) -> None:
         "training_time__hours",
         "notability_criteria",
     ]
-    # Store the origins metadata for later use
-    origins = tb["domain"].metadata.origins
+    short_name = SHORT_NAME
 
-    # Drop the unused columns
-    tb = tb.drop(unused_columns, axis=1)
+    # Aggregate the data by domain
+    tb_agg = sh.calculate_aggregates(tb, "domain", short_name, unused_columns)
 
-    # Convert the 'publication_date' column to datetime format and extract the year
-    tb["publication_date"] = pd.to_datetime(tb["publication_date"])
-    tb["year"] = tb["publication_date"].dt.year
-
-    # Split the 'country__from_organization' column by comma (several countries can exist in each cell)
-    tb["domain"] = tb["domain"].str.split(",")
-
-    # Explode the table to create separate rows for each country
-    tb_exploded = tb.explode("domain")
-
-    # Drop duplicates where the year, system and country are the same
-    tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", "domain"])
-
-    # Group by year and country and count the number of systems
-    tb_agg = tb_unique.groupby(["year", "domain"]).size().reset_index(name="yearly_count")
-
-    # Sort the DataFrame by year and domain
-    tb_agg = tb_agg.sort_values(["domain", "year"])
-
-    # Calculate the cumulative count
-    tb_agg["cumulative_count"] = tb_agg.groupby("domain")["yearly_count"].cumsum()
-
-    # Add the origins metadata to the columns
-    for col in ["yearly_count", "cumulative_count"]:
-        tb_agg[col].metadata.origins = origins
-
-    # Set the short_name metadata of the table
-    tb_agg.metadata.short_name = SHORT_NAME
-
-    # Set the index to year and country
+    # Set the index to year and domain
     tb_agg = tb_agg.set_index(["year", "domain"], verify_integrity=True)
 
     #

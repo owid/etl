@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
-import owid.catalog.processing as pr
+import pandas as pd
+import shared as sh
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -8,6 +9,7 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+SHORT_NAME = paths.short_name
 
 
 def run(dest_dir: str) -> None:
@@ -16,70 +18,55 @@ def run(dest_dir: str) -> None:
     """
     log.info("epoch_aggregates_affiliation.start")
 
+    #
     # Load inputs.
-    ds_meadow = paths.load_dataset("epoch")
+    #
+    # Load the the garden dataset without aggregations.
+    ds_garden = paths.load_dataset("epoch")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["epoch"]
+    tb = ds_garden["epoch"]
     tb = tb.reset_index()
+
+    # Define the columns that are not needed
+    unused_columns = [
+        "days_since_1949",
+        "parameters",
+        "training_dataset_size__datapoints",
+        "domain_owid",
+        "training_computation_petaflop",
+    ]
+    # Store the origins metadata for later use
+    origins = tb["organization_categorization"].metadata.origins
+
+    # Drop the unused columns
+    tb = tb.drop(unused_columns, axis=1)
 
     # Ensure 'publication_date' column type is datetime64
     assert tb["publication_date"].dtype == "datetime64[ns]", "publication_date column is not of type datetime64"
-
-    # Create a 'year' column
     tb["year"] = tb["publication_date"].dt.year
 
-    # Group by 'year' and 'organization_categorization' and calculate counts
-    organization_categorization_counts = (
-        tb.groupby(["year", "organization_categorization"]).size().reset_index(name="count")
-    )
+    # Store the origins metadata for later use
+    origins = tb["organization_categorization"].metadata.origins
 
-    affiliations = [
-        "Academia and government collaboration",
-        "Academia and industry collaboration",
-        "Industry",
-        "Industry and government collaboration",
-        "Academia",
-        "Industry and research collective collaboration",
-        "Not specified",
-        "Academia and research collective collaboration",
-        "Research collective",
-        "Government",
-    ]
-    # Pivot table for organization types
-    df_pivot_org = organization_categorization_counts.pivot(
-        index="year", columns="organization_categorization", values="count"
-    ).reset_index()
-    # Melt dataframe to long format for yearly counts
-    melted_df = df_pivot_org.melt(
-        id_vars=["year"],
-        value_vars=affiliations,
-        var_name="affiliation",
-        value_name="yearly_count",
-    )
+    # Group by year and country and count the number of systems
+    tb_agg = tb.groupby(["year", "organization_categorization"], observed=False).size().reset_index(name="yearly_count")
 
-    # Replace columns with their cumulative sums
-    for column in df_pivot_org.columns:
-        if column not in ["year"]:
-            df_pivot_org[f"{column}"] = df_pivot_org[column].cumsum()
+    # Add the origins metadata to the 'number_of_systems' column
+    tb_agg["yearly_count"].metadata.origins = origins
 
-    # Melt dataframe for cumulative counts
-    melted_df_cumulative = df_pivot_org.melt(
-        id_vars=["year"],
-        value_vars=affiliations,
-        var_name="affiliation",
-        value_name="cumulative_count",
-    )
+    # Calculate the cumulative count
+    tb_agg["cumulative_count"] = tb_agg.groupby("organization_categorization", observed=False)["yearly_count"].cumsum()
 
-    # Merge yearly and cumulative counts
-    df_merged = pr.merge(melted_df_cumulative, melted_df, on=["year", "affiliation"]).copy_metadata(from_table=tb)
+    # Add the origins metadata to the columns
+    for col in ["yearly_count", "cumulative_count"]:
+        tb_agg[col].metadata.origins = origins
 
-    # Create the aggregated table
-    tb_agg = df_merged.underscore().set_index(["year", "affiliation"], verify_integrity=True)
+    # Set the short_name metadata of the table
+    tb_agg.metadata.short_name = SHORT_NAME
 
-    # Set metadata
-    for column in tb_agg:
-        tb_agg[column].metadata.origins = tb["organization_categorization"].metadata.origins
+    # Set the index to year and country
+    tb_agg = tb_agg.set_index(["year", "organization_categorization"], verify_integrity=True)
 
     # Save outputs.
     ds_garden = create_dataset(dest_dir, tables=[tb_agg])

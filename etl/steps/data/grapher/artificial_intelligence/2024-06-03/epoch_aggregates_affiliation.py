@@ -18,13 +18,13 @@ def run(dest_dir: str) -> None:
     ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates_affiliation"))
 
     # Read table from garden dataset.
-    tb = ds_garden["epoch"]
+    tb = ds_garden["epoch_aggregates_affiliation"]
     tb = tb.reset_index()
     #
     # Process data.
     #
     # Rename for plotting research affiliation as country in grapher
-    tb = tb.rename(columns={"affiliation": "country"})
+    tb = tb.rename(columns={"organization_categorization": "country"})
     tb = tb.set_index(["country", "year"])
 
     #
