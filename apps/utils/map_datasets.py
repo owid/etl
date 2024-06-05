@@ -28,7 +28,7 @@ log = get_logger()
 
 def get_changed_files(
     current_branch: Optional[str] = None,
-    base_branch: str = "master-1",
+    base_branch: Optional[str] = None,
     repo_path: Union[Path, str] = BASE_DIR,
     only_committed: bool = False,
 ) -> Dict[str, Dict[str, str]]:
@@ -42,6 +42,16 @@ def get_changed_files(
     else:
         # Otherwise, switch to the given branch to compare from.
         repo.git.checkout(current_branch)
+
+    if base_branch is None:
+        # If not specified, use "master" branch.
+        # However, the logic is a bit different depending on whether we are working locally or on a staging server.
+        if "master-1" in [branch.name for branch in repo.branches]:
+            # If there is a "master-1" branch, that means we are on a staging server.
+            base_branch = "master-1"
+        else:
+            # If not specified, use the default base branch.
+            base_branch = "master"
 
     # Fetch latest changes from the remote to ensure diffs are accurate
     # repo.remotes.origin.fetch()
