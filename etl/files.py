@@ -4,6 +4,7 @@
 
 import hashlib
 import io
+import json
 import os
 import re
 import subprocess
@@ -11,8 +12,9 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Literal, Optional, Set, TextIO, Union
 
+import pandas as pd
 import ruamel.yaml
 import yaml
 from ruamel.yaml import YAML
@@ -75,6 +77,11 @@ def checksum_str(s: str) -> str:
     return hashlib.md5(s.encode()).hexdigest()
 
 
+def checksum_dict(d: Dict[str, Any]) -> str:
+    "Return the md5 hex digest of the dictionary."
+    return checksum_str(json.dumps(d, default=str))
+
+
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
     "Return the md5 hex digest of the file without using cache."
     chunk_size = 2**20
@@ -112,6 +119,28 @@ def checksum_file(filename: Union[str, Path]) -> str:
         CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
+
+
+def checksum_df(df: pd.DataFrame, index=True, method: Literal["md5", "pandas"] = "md5") -> str:
+    """Return the md5 hex digest of dataframe.
+    :param method: 'md5' uses hashlib.md5, 'pandas' uses pandas hash_pandas_object. md5 is faster
+        for most of our use cases. pandas might be faster for dataframes with >1M rows.
+    """
+    # NOTE: I tried joblib.hash, but it was much slower than pandas hash
+    if method == "md5":
+        _hash = hashlib.md5()
+        for col in df.columns:
+            _hash.update(df[col].values.tobytes())
+
+        if index:
+            _hash.update(df.index.values.tobytes())
+
+        return _hash.hexdigest()
+
+    elif method == "pandas":
+        return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
+    else:
+        raise ValueError(f"Invalid method: {method}")
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
