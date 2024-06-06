@@ -61,6 +61,14 @@ def standardise_years(df):
     return pd.DataFrame(new_df)
 
 
+def col_to_int(df, col):
+    df[col] = df[col].astype(pd.Int64Dtype())
+
+
+def col_to_float(df, col):
+    df[col] = pd.to_numeric(df[col], errors="coerce").astype("float64")
+
+
 def run(dest_dir: str) -> None:
     # Load inputs.
     #
@@ -91,8 +99,11 @@ def run(dest_dir: str) -> None:
         ]
     )
 
-    # drop missing values
-    tb = tb.replace(0, "nan")
+    # reorder columns
+    tb = tb[COLS_WITH_DATA]
+
+    # set 0 to nan and drop missing values
+    tb = tb.replace(0, pd.NA)
     tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
 
     # harmonize countries
@@ -102,9 +113,17 @@ def run(dest_dir: str) -> None:
     # remove duplicate data (from hidden rows in excel sheet)
     tb = tb.drop_duplicates(subset=["country", "year"])
 
+    # set appropriate data types
+    tb = col_to_int(tb, "manufactured_cigarettes")
+    tb = col_to_int(tb, "handrolled_cigarettes")
+    tb = col_to_int(tb, "total_cigarettes")
+    tb = col_to_float(tb, "manufactured_cigarettes_per_adult_per_day")
+    tb = col_to_float(tb, "handrolled_cigarettes_per_adult_per_day")
+    tb = col_to_float(tb, "all_tobacco_products_tonnes")
+    tb = col_to_float(tb, "all_tobacco_products_grams_per_adult_per_day")
+
     tb = tb.format(["country", "year"])
 
-    #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
