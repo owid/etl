@@ -139,6 +139,27 @@ def st_show_approval_history(diff, source_session):
     st.markdown(text)
 
 
+def compare_chart_configs(c1, c2):
+    keys = set(c1.keys()).union(c2.keys())
+    diff_list = []
+
+    KEYS_IGNORE = {
+        "bakedGrapherURL",
+        "adminBaseUrl",
+        "dataApiUrl",
+        "version",
+    }
+    for key in keys:
+        if key in KEYS_IGNORE:
+            continue
+        value1 = c1.get(key)
+        value2 = c2.get(key)
+        if value1 != value2:
+            diff_list.append({"key": key, "value1": value1, "value2": value2})
+
+    return diff_list
+
+
 def st_show(
     diff: ChartDiffModified, source_session, target_session=None, expander: bool = True, show_link: bool = True
 ) -> None:
@@ -227,7 +248,41 @@ def st_show(
 
         # Show diff
         if diff.is_modified:
-            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+            prod_is_newer = diff.target_chart.updatedAt > diff.source_chart.updatedAt  # type: ignore
+
+            if not prod_is_newer:
+                tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
+                with tab2b:
+                    st.warning(
+                        "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
+                    )
+                    config_compare = compare_chart_configs(diff.target_chart.config, diff.source_chart.config)  # type: ignore
+
+                    if config_compare:
+                        with st.form("conflict-resolve-form"):
+                            st.markdown("### Conflict resolver")
+                            st.markdown(
+                                "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
+                            )
+                            for field in config_compare:
+                                st.radio(
+                                    f"**{field['key']}**",
+                                    options=[field["value1"], field["value2"]],
+                                    format_func=lambda x: f"{field['value1']} `PROD`"
+                                    if x == field["value1"]
+                                    else f"{field['value2']} `staging`",
+                                    key=f"conflict-{field['key']}",
+                                    # horizontal=True,
+                                )
+                                st.text_input(
+                                    "Custom value",
+                                    label_visibility="collapsed",
+                                    placeholder="Enter a custom value",
+                                    key=f"conflict-custom-{field['key']}",
+                                )
+                            st.form_submit_button("Resolve", help="This will update the chart in the staging server.")
+            else:
+                tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
                 arrange_vertical = st.session_state.get(
                     f"arrange-charts-vertically-{diff.chart_id}", False
@@ -236,6 +291,8 @@ def st_show(
                 st_compare_charts(
                     **kwargs_diff,
                     arrange_vertical=arrange_vertical,
+                    # Check if production's chart is newer
+                    prod_is_newer=prod_is_newer,
                 )
                 st.toggle(
                     "Arrange charts vertically",
@@ -279,6 +336,7 @@ def st_compare_charts(
     source_chart,
     target_chart=None,
     arrange_vertical=False,
+    prod_is_newer=False,
 ) -> None:
     # Only one chart: new chart
     if target_chart is None:
@@ -286,21 +344,18 @@ def st_compare_charts(
         chart_html(source_chart.config, owid_env=SOURCE)
     # Two charts, actual diff
     else:
+        # Define chart titles
+        text_production = _get_chart_text_production(prod_is_newer, target_chart)
+        text_staging = _get_text_staging(prod_is_newer, source_chart)
+
         # Show charts
         if arrange_vertical:
-            st_compare_charts_vertically(target_chart, source_chart)
+            st_compare_charts_vertically(target_chart, source_chart, text_production, text_staging, prod_is_newer)
         else:
-            st_compare_charts_horizontally(target_chart, source_chart)
+            st_compare_charts_horizontally(target_chart, source_chart, text_production, text_staging, prod_is_newer)
 
 
-def st_compare_charts_vertically(target_chart, source_chart):
-    # Check if production's chart is newer
-    prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
-
-    # Define chart titles
-    text_production = _get_chart_text_production(prod_is_newer, target_chart)
-    text_staging = _get_text_staging(prod_is_newer, source_chart)
-
+def st_compare_charts_vertically(target_chart, source_chart, text_production, text_staging, prod_is_newer):
     # Chart production
     if prod_is_newer:
         help_text = _get_chart_text_help_production()
@@ -314,16 +369,9 @@ def st_compare_charts_vertically(target_chart, source_chart):
     chart_html(source_chart.config, owid_env=SOURCE)
 
 
-def st_compare_charts_horizontally(target_chart, source_chart):
+def st_compare_charts_horizontally(target_chart, source_chart, text_production, text_staging, prod_is_newer):
     # Create two columns for the iframes
     col1, col2 = st.columns(2)
-
-    # Check if production's chart is newer
-    prod_is_newer = target_chart.updatedAt > source_chart.updatedAt
-
-    # Define chart titles
-    text_production = _get_chart_text_production(prod_is_newer, target_chart)
-    text_staging = _get_text_staging(prod_is_newer, source_chart)
 
     with col1:
         if prod_is_newer:
