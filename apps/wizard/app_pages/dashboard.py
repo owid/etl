@@ -405,6 +405,8 @@ function(params){{
         return {{'color': 'black', 'backgroundColor': 'orange'}}
     }} else if (params.value === "{UpdateState.ARCHIVABLE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'blue'}}
+    }} else if (params.value === "{UpdateState.UNUSED.value}") {{
+        return {{'color': 'black', 'backgroundColor': 'lightblue'}}
     }} else {{
         return {{'color': 'black', 'backgroundColor': 'yellow'}}
     }}
