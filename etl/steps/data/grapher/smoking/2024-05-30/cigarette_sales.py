@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -74,7 +75,7 @@ def run(dest_dir: str) -> None:
     tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
 
     # removing any rows with all nan values/ duplicates
-    tb = tb.replace(0, "nan")
+    tb = tb.replace(0, pd.NA)
     tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
     tb = tb.drop_duplicates(subset=["country", "year"])
 

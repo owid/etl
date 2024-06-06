@@ -121,6 +121,26 @@ NEW_COLUMNS = [
     "all_tobacco_products_grams_per_adult_per_day",
 ]
 
+ORIGINAL_COLUMNS = [
+    "Year",
+    "Manufactured cigarettes",
+    "Unnamed: 2",
+    "Unnamed: 3",
+    "Hand-rolled cigarettes",
+    "Unnamed: 5",
+    "Unnamed: 6",
+    "Total cigarettes",
+    "Unnamed: 8",
+    "Unnamed: 9",
+    "All tobacco products",
+    "Unnamed: 11",
+    "Unnamed: 12",
+]
+
+
+def is_not_string(value):
+    return not isinstance(value, str)
+
 
 def run(dest_dir: str) -> None:
     #
@@ -163,6 +183,7 @@ def run(dest_dir: str) -> None:
                 origin=snap.metadata.origin,
                 sheet_name=cty_sheet["sheet_name"],
                 header=9,
+                names=ORIGINAL_COLUMNS,
             )
 
         elif cty == "Germany":
@@ -206,6 +227,7 @@ def run(dest_dir: str) -> None:
 
         # drop empty columns
         tb_from_excel.drop(labels=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], axis=1, inplace=True)
+
         # change header and remove sub-header columns
         tb_from_excel.drop(labels=[0, 1], axis=0, inplace=True)
         tb_from_excel.columns = NEW_COLUMNS
@@ -218,7 +240,7 @@ def run(dest_dir: str) -> None:
 
     # remove repeating headers
     smoking_data_tb = smoking_data_tb[smoking_data_tb["year"].notna()]
-    smoking_data_tb = smoking_data_tb[smoking_data_tb["manufactured_cigarettes_millions"].apply(is_string)]
+    smoking_data_tb = smoking_data_tb[smoking_data_tb["manufactured_cigarettes_millions"].apply(is_not_string)]
 
     # change data types to string
     smoking_data_tb["year"] = smoking_data_tb["year"].astype(str)
@@ -241,7 +263,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
-
-
-def is_string(value):
-    return not isinstance(value, str)

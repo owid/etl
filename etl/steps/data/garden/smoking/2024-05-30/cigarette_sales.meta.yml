@@ -23,6 +23,8 @@ tables:
          description_short: Manufactured cigarettes sold in this country in this year.
          presentation:
            title_public: Manufactured cigarette sales
+         display:
+            numDecimalPlaces: 0
       manufactured_cigarettes_per_adult_per_day:
          title: Manufactured cigarettes sold per adult per day
          unit: cigarettes per adult per day
@@ -30,6 +32,8 @@ tables:
          description_short: Daily sales of manufactured cigarettes to people aged 15 and over.
          presentation:
            title_public: Manufactured cigarette sales per adult per day
+         display:
+            numDecimalPlaces: 1
       handrolled_cigarettes:
          title: Annual sales of hand-rolled cigarettes
          unit: cigarettes
@@ -39,6 +43,8 @@ tables:
           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
          presentation:
            title_public: Hand-rolled cigarette sales
+         display:
+            numDecimalPlaces: 0
       handrolled_cigarettes_per_adult_per_day:
          title: Hand-rolled cigarettes sold per adult per day
          unit: cigarettes per adult per day
@@ -46,6 +52,8 @@ tables:
          description_short: Daily sales of hand-rolled cigarettes to people aged 15 and over.
          presentation:
            title_public: Hand-rolled cigarette sales per adult per day
+         display:
+            numDecimalPlaces: 1
       total_cigarettes:
          title: Total annual sales of cigarettes
          unit: cigarettes
@@ -54,6 +62,8 @@ tables:
          description_processing: Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
          presentation:
            title_public: Total cigarette sales
+         display:
+            numDecimalPlaces: 0
       total_cigarettes_per_adult_per_day:
          title: Total cigarettes sold per adult per day
          unit: cigarettes per adult per day
@@ -62,6 +72,8 @@ tables:
          description_processing:  Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
          presentation:
            title_public: Total cigarette sales per adult per day
+         display:
+            numDecimalPlaces: 1
       all_tobacco_products_tonnes:
          title: Sales of all tobacco products
          unit: tons
@@ -71,6 +83,8 @@ tables:
           - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
          presentation:
            title_public: Sales of all tobacco products
+         display:
+            numDecimalPlaces: 1
       all_tobacco_products_grams_per_adult_per_day:
          title: Sales of all tobacco products per adult per day
          unit: grams per adult per day
@@ -80,6 +94,8 @@ tables:
           - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
          presentation:
            title_public: Total cigarette sales per adult per day
+         display:
+            numDecimalPlaces: 1
 
 
       # testing_variable:
