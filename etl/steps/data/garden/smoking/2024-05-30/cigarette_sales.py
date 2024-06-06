@@ -61,14 +61,6 @@ def standardise_years(df):
     return pd.DataFrame(new_df)
 
 
-def col_to_int(df, col):
-    df[col] = df[col].astype(pd.Int64Dtype())
-
-
-def col_to_float(df, col):
-    df[col] = pd.to_numeric(df[col], errors="coerce").astype("float64")
-
-
 def run(dest_dir: str) -> None:
     # Load inputs.
     #
@@ -110,8 +102,13 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
     # remove duplicate data (from hidden rows in excel sheet)
     tb = tb.drop_duplicates(subset=["country", "year"])
+
+    # convert columns to numeric:
+    for col in COLS_WITH_DATA:
+        tb[col] = pd.to_numeric(tb[col], errors="coerce")
 
     tb = tb.format(["country", "year"])
 
