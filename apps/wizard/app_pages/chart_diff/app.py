@@ -33,6 +33,24 @@ st.set_page_config(
     },
 )
 
+# Variables
+DISPLAY_STATE_OPTIONS = {
+    gm.ChartStatus.APPROVED.value: {
+        "label": "Approve",
+        "color": "green",
+        "icon": "✅",
+    },
+    gm.ChartStatus.REJECTED.value: {
+        "label": "Reject",
+        "color": "red",
+        "icon": "❌",
+    },
+    gm.ChartStatus.PENDING.value: {
+        "label": "Pending",
+        "color": "gray",
+        "icon": "⏳",
+    },
+}
 CURRENT_DIR = Path(__file__).resolve().parent
 
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
@@ -103,33 +121,35 @@ def get_chart_diffs_from_grapher(
     return chart_diffs
 
 
+def st_show_approval_history(diff, source_session):
+    """Show history of approvals of a chart-diff."""
+    approvals = diff.get_all_approvals(source_session)
+    # Get text
+    text = ""
+    for counter, approval in enumerate(approvals):
+        emoji = DISPLAY_STATE_OPTIONS[str(approval.status)]["icon"]
+        color = DISPLAY_STATE_OPTIONS[str(approval.status)]["color"]
+        text_ = f"{approval.updatedAt}: {emoji} :{color}[{approval.status}]"
+
+        if counter == 0:
+            text_ = f"**{text_}**"
+
+        text += text_ + "\n\n"
+
+    st.markdown(text)
+
+
 def st_show(
     diff: ChartDiffModified, source_session, target_session=None, expander: bool = True, show_link: bool = True
 ) -> None:
     """Show the chart diff in Streamlit."""
     # DISPLAY options
-    DISPLAY_STATE_OPTIONS = {
-        gm.ChartStatus.APPROVED.value: {
-            "label": "Approve",
-            "color": "green",
-            "icon": "✅",
-        },
-        gm.ChartStatus.REJECTED.value: {
-            "label": "Reject",
-            "color": "red",
-            "icon": "❌",
-        },
-        gm.ChartStatus.PENDING.value: {
-            "label": "Pending",
-            "color": "gray",
-            "icon": "⏳",
-        },
-    }
-
     # Define label
     print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
     label = f"{emoji} {diff.slug}"
+    if diff.is_new:
+        label += " 🆕"
 
     # Define action for Toggle on change
     def chart_state_change(diff, session) -> None:
@@ -171,7 +191,7 @@ def st_show(
 
     # Actually show stuff
     def st_show_actually():
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns(4)
 
         # Refresh
         with col2:
@@ -222,24 +242,14 @@ def st_show(
                 assert diff.target_chart is not None
                 st_show_diff(diff.target_chart.config, diff.source_chart.config)
             with tab3:
-                approvals = diff.get_all_approvals(source_session)
-
-                # Get text
-                text = ""
-                for counter, approval in enumerate(approvals):
-                    emoji = DISPLAY_STATE_OPTIONS[str(approval.status)]["icon"]
-                    color = DISPLAY_STATE_OPTIONS[str(approval.status)]["color"]
-                    text_ = f"{approval.updatedAt}: {emoji} :{color}[{approval.status}]"
-
-                    if counter == 0:
-                        text_ = f"**{text_}**"
-
-                    text += text_ + "\n\n"
-
-                st.markdown(text)
+                st_show_approval_history(diff, source_session)
 
         elif diff.is_new:
-            st_compare_charts(**kwargs_diff)
+            tab1, tab2 = st.tabs(["Chart", "Change history"])
+            with tab1:
+                st_compare_charts(**kwargs_diff)
+            with tab2:
+                st_show_approval_history(diff, source_session)
 
     if expander:
         with st.expander(label, not diff.is_reviewed):
