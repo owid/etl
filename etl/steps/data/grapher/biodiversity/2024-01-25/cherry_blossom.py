@@ -16,6 +16,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["cherry_blossom"]
+
+    # TODO: remove me
+    tb["average_20_years"] += 5
+
     #
     # Save outputs.
     #

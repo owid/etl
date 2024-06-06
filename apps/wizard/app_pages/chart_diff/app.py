@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 # from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
-from apps.chart_sync.cli import _modified_chart_ids_by_admin
+from apps.chart_sync.cli import modified_chart_ids
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
@@ -81,7 +81,8 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
     """
     # Get IDs from modified charts
     with Session(SOURCE_ENGINE) as source_session:
-        chart_ids = _modified_chart_ids_by_admin(source_session)
+        with Session(TARGET_ENGINE) as target_session:
+            chart_ids = modified_chart_ids(source_session, target_session)
 
     # Get all chart diffs in parallel
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
