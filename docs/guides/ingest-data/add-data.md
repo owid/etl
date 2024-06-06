@@ -38,7 +38,8 @@ There are different ways you can add data to the catalog, depending on your tech
 ## Using Wizard (recommended)
 
 !!! info
-    Learn more about Wizard in [this dedicated guideline](wizard.md)
+    Learn more about Wizard in [this dedicated guideline](wizard.md).
+
 
 The Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
 
@@ -50,11 +51,29 @@ etlwiz
 
 And then go to [localhost:8053](localhost:8053). In there, you will see all options available in Wizard. For the purpose of this guide, we are just interested in those that fall under the section "ETL Steps", with which you can create Snapshot, Meadow, Garden and Grapher steps (and, alternatively, also Fast-Track steps).
 
+
+!!! tip "Use Express to quickly create Meadow-Garden-Grapher steps at once"
+
+    We have an "Express" mode which creates the three steps at once. This is useful when you have a simple dataset that doesn't require complex processing.
+
+
 When creating a step, you will be presented with a form to fill in the metadata of the step (fields such as `namespace`, `version`, `date_published`, etc.). Based on your input, it will generate the required files in the appropriate `snapshots/` or `etl/` directories.
 
-**Wizard will guide you through the whole process, describing all the steps you need to follow to successfully create a new ETL step.**
+!!! note "Wizard will guide you through"
 
-!!! info
+    **Wizard will guide you through the whole process, describing all the steps you need to follow to successfully create a new ETL step.**
+
+### Adding the dataset to Grapher
+Once you have created all the steps, you can run them _and_ push the final version to Grapher with
+
+```
+etl run <short_name> --grapher
+```
+
+
+
+
+!!! info "Report issues with Wizard"
     Minor issues with wizard<br>
     [Add a comment to this central issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/1563)<br>
 

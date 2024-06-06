@@ -22,7 +22,9 @@ In this section you will find guides for different use cases and tasks you might
 
     ***
 
-    Wizard is a self-contained webapp that helps you with most of your ETL work.
+    Wizard is our ETL admin tool, which helps us with most of ETL work.
+
+    It provides various tools to create ETL steps, improve existing ones, and more.
 
 -   **[:octicons-terminal-16: &nbsp; our CLI](etl-cli)**
 

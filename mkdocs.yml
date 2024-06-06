@@ -200,7 +200,7 @@ nav:
       - Contributing: "contributing.md"
   - Guides:
       - "guides/index.md"
-      - Our data workflow:
+      - Ingest data:
           - "guides/ingest-data/index.md"
           - Adding data: "guides/ingest-data/add-data.md"
           - Updating data: "guides/ingest-data/update-data.md"
