@@ -145,7 +145,7 @@ def st_show(
     """Show the chart diff in Streamlit."""
     # DISPLAY options
     # Define label
-    print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
+    # print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
     label = f"{emoji} {'[**NEW**] ' if diff.is_new else ''}{diff.slug}"
 
@@ -382,6 +382,8 @@ def unreview_chart_diffs(engine):
 
 
 def st_show_options(source_engine, target_engine):
+    """Show options pane."""
+
     def arrange_charts():
         # st.toast("ENTERING -- arrange_charts")
         set_states(
@@ -398,82 +400,102 @@ def st_show_options(source_engine, target_engine):
             st.query_params.pop("hide_reviewed", None)
 
     def apply_search_filters():
+        def _apply_search_filters(session_key, query_key):
+            if st.session_state[session_key]:
+                st.query_params.update({query_key: st.session_state[session_key]})
+            else:
+                st.query_params.pop(query_key, None)
+
         # Chart ID filter
-        if st.session_state["chart-diff-filter-id"]:
-            st.query_params.update({"chart_id": st.session_state["chart-diff-filter-id"]})
-        else:
-            st.query_params.pop("chart_id", None)
+        _apply_search_filters("chart-diff-filter-id", "chart_id")
         # Slug filter
-        if st.session_state["chart-diff-filter-slug"] == "":
-            st.query_params.pop("chart_slug", None)
-        else:
-            st.query_params.update({"chart_slug": st.session_state["chart-diff-filter-slug"]})
+        _apply_search_filters("chart-diff-filter-slug", "chart_slug")
+        # if st.session_state["chart-diff-filter-slug"] == "":
+        #     st.query_params.pop("chart_slug", None)
+        # else:
+        #     st.query_params.update({"chart_slug": st.session_state["chart-diff-filter-slug"]})
+        # Change type filter
+        _apply_search_filters("chart-diff-change-type", "change_type")
 
-    with st.popover("Options"):
-        # Main options
-        st.button(
-            "🔄 Refresh all charts",
-            key="refresh-btn-general",
-            on_click=lambda source_engine=source_engine, target_engine=target_engine: set_states(
-                {"chart_diffs": get_chart_diffs_from_grapher(source_engine, target_engine)}
-            ),
-            help="Get the latest chart versions, both from the staging and production servers.",
-        )
-        st.button(
-            "**Unreview** all charts",
-            key="unapprove-all-charts",
-            on_click=lambda e=source_engine: unreview_chart_diffs(e),
-        )
+    with st.popover("Options", use_container_width=True):
+        col1, col2, col3 = st.columns(3)
 
-        # Filters
-        st.markdown("#### Filters")
-        st.toggle(
-            "**Hide** reviewed charts",
-            key="hide-reviewed-charts",
-            value="hide_reviewed" in st.query_params,
-            on_change=hide_reviewed,  # type: ignore
-            help="Show only chart diffs that are pending approval (or rejection).",
-        )
-        with st.form("chart-diff-filters"):
-            st.multiselect(
-                label="Select chart IDs",
-                options=[c.chart_id for c in st.session_state.chart_diffs.values()],
-                default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
-                key="chart-diff-filter-id",
-                help="Filter chart diffs with charts with given IDs.",
+        # Buttons (refresh, unreview)
+        with col3:
+            st.button(
+                "🔄 Refresh all charts",
+                key="refresh-btn-general",
+                on_click=lambda source_engine=source_engine, target_engine=target_engine: set_states(
+                    {"chart_diffs": get_chart_diffs_from_grapher(source_engine, target_engine)}
+                ),
+                help="Get the latest chart versions, both from the staging and production servers.",
             )
-            st.text_input(
-                label="Search by slug name",
-                value=st.query_params.get("chart_slug", ""),  # type: ignore
-                placeholder="Search for a slug",
-                key="chart-diff-filter-slug",
-                help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
-            )
-            st.form_submit_button(
-                "Apply filters",
-                on_click=apply_search_filters,  # type: ignore
-            )
+            st.divider()
+            with st.container(border=True):
+                st.markdown("Danger zone ⚠️")
+                st.button(
+                    "**Unreview** all charts",
+                    key="unapprove-all-charts",
+                    on_click=lambda e=source_engine: unreview_chart_diffs(e),
+                )
 
-        # Display options
-        st.markdown("#### Display")
-        st.toggle(
-            "Use **vertical arrangement** for chart diffs",
-            key="arrange-charts-vertically",
-            on_change=arrange_charts,  # type: ignore
-        )
-        st.selectbox(
-            "Number of charts per page",
-            options=[
-                # 1,
-                10,
-                20,
-                50,
-                100,
-            ],
-            key="charts-per-page",
-            help="Select the number of charts to display per page.",
-            index=0,
-        )
+        with col1:
+            # Filters
+            st.markdown("#### Filters")
+            st.toggle(
+                "**Hide** reviewed charts",
+                key="hide-reviewed-charts",
+                value="hide_reviewed" in st.query_params,
+                on_change=hide_reviewed,  # type: ignore
+                help="Show only chart diffs that are pending approval (or rejection).",
+            )
+            with st.form("chart-diff-filters"):
+                st.multiselect(
+                    label="Select chart IDs",
+                    options=[c.chart_id for c in st.session_state.chart_diffs.values()],
+                    default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
+                    key="chart-diff-filter-id",
+                    help="Filter chart diffs with charts with given IDs.",
+                )
+                st.text_input(
+                    label="Search by slug name",
+                    value=st.query_params.get("chart_slug", ""),  # type: ignore
+                    placeholder="Search for a slug",
+                    key="chart-diff-filter-slug",
+                    help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
+                )
+                st.multiselect(
+                    label="Chart changes type",
+                    options=["modified", "new"],
+                    default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
+                    key="chart-diff-change-type",
+                    help="Show new charts, and/or modified charts.",
+                )
+                st.form_submit_button(
+                    "Apply filters",
+                    on_click=apply_search_filters,  # type: ignore
+                )
+        with col2:
+            # Display options
+            st.markdown("#### Display")
+            st.toggle(
+                "Use **vertical arrangement** for chart diffs",
+                key="arrange-charts-vertically",
+                on_change=arrange_charts,  # type: ignore
+            )
+            st.selectbox(
+                "Number of charts per page",
+                options=[
+                    # 1,
+                    10,
+                    20,
+                    50,
+                    100,
+                ],
+                key="charts-per-page",
+                help="Select the number of charts to display per page.",
+                index=0,
+            )
 
 
 def get_chart_diffs(source_engine, target_engine):
@@ -522,26 +544,38 @@ def filter_chart_diffs():
         st.session_state.chart_diffs_filtered = {
             k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
         }
+    if "change_type" in st.query_params:
+        change_types = st.query_params.get_all("change_type")
+        st.session_state.chart_diffs_filtered = {
+            k: v
+            for k, v in st.session_state.chart_diffs_filtered.items()
+            if (v.is_modified and "modified" in change_types) or (v.is_new and "new" in change_types)
+        }
 
 
 def render_chart_diffs(source_session, target_session, chart_diffs, pagination_key) -> None:
     """Display chart diffs."""
-    # Information
-    num_charts = len(chart_diffs)
-    num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-    text = f"{num_charts_reviewed}/{num_charts} charts reviewed."
-    st.markdown(text)
+    with st.container(border=True):
+        # Title of navitation
+        st.markdown("##### Navigation")
+        # Information
+        num_charts = len(chart_diffs)
+        num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
+        text = f"{num_charts_reviewed}/{num_charts} charts reviewed."
+        st.markdown(text)
 
-    # Pagination
-    modified_charts_pagination = Pagination(
-        chart_diffs,
-        items_per_page=st.session_state["charts-per-page"],
-        pagination_key=pagination_key,
-    )
-    modified_charts_pagination.show_controls()
+        # Pagination
+        modified_charts_pagination = Pagination(
+            chart_diffs,
+            items_per_page=st.session_state["charts-per-page"],
+            pagination_key=pagination_key,
+        )
+        modified_charts_pagination.show_controls()
 
-    for chart_diff in modified_charts_pagination.get_page_items():
-        st_show(chart_diff, source_session, target_session)
+    # st.divider()
+    with st.container(border=True):
+        for chart_diff in modified_charts_pagination.get_page_items():
+            st_show(chart_diff, source_session, target_session)
 
 
 ########################################
@@ -559,7 +593,7 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
 """,
     )
 
-    # Get stuff from DB
+    # Create connections to DB
     source_engine, target_engine = get_engines()
 
     # Get actual charts

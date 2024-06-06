@@ -676,7 +676,7 @@ class Pagination:
 
     def show_controls(self) -> None:
         # Pagination controls
-        col1, col2, col3, _ = st.columns([1, 1, 1, 3])
+        col1, col2, col3 = st.columns([1, 1, 1])
 
         # Correct page number if exceeds maximum allowed
         self.page = min(self.total_pages, self.page)
