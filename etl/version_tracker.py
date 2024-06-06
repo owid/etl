@@ -615,7 +615,13 @@ class VersionTracker:
             )
             for dependencies in steps_active_df["all_active_dependencies"]
         ]
-
+        # Add a column with the number of dependencies from the external channel.
+        steps_active_df["external_usages"] = [
+            [usage for usage in usages if steps_dict[usage]["channel"] == "external"]
+            for usages in steps_active_df["all_active_usages"]
+        ]
+        # Add a column with the total number of external usages.
+        steps_active_df["n_external_usages"] = [len(usage) for usage in steps_active_df["external_usages"]]
         # Add a column with the update state.
         # By default, the state is unknown.
         steps_active_df["update_state"] = UpdateState.UNKNOWN.value
@@ -641,9 +647,12 @@ class VersionTracker:
             ),
             "update_state",
         ] = UpdateState.UP_TO_DATE.value
-        # If a step has no charts and is not the latest version, it is archivable.
+        # If a step is not the latest version, has no charts, and no external usages, it is archivable.
         steps_active_df.loc[
-            (steps_active_df["n_charts"] == 0) & (~steps_active_df["is_latest"]), "update_state"
+            (steps_active_df["n_charts"] == 0)
+            & (steps_active_df["n_external_usages"] == 0)
+            & (~steps_active_df["is_latest"]),
+            "update_state",
         ] = UpdateState.ARCHIVABLE.value
 
         # Add update state to archived steps.
@@ -923,7 +932,6 @@ class VersionTracker:
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
-        # TODO
         steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
 
         # Add column for the total number of all dependencies and usges.
@@ -1079,11 +1087,23 @@ class VersionTracker:
                 additional_info=dataset_urls,
             )
 
+    def check_that_all_steps_have_update_state(self) -> None:
+        """Check that all steps have an update state."""
+        missing_update_state = self.steps_df[
+            (self.steps_df["update_state"].isnull()) | (self.steps_df["update_state"] == UpdateState.UNKNOWN)
+        ]["step"].tolist()
+        self._log_warnings_and_errors(
+            message="Some steps have no update state:",
+            list_affected=missing_update_state,
+            warning_or_error="error",
+        )
+
     def apply_sanity_checks(self) -> None:
         """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
         self.check_that_active_dependencies_are_not_archived()
         self.check_that_all_steps_have_a_script()
+        self.check_that_all_steps_have_update_state()
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
