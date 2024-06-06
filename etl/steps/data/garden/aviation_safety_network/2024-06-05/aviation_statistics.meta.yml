@@ -2,8 +2,7 @@ definitions:
   common:
     description_key:
       - Fatal accidents, hijacking incidents and numbers of fatalities are based on airliners of 14+ passengers, and do not include corporate jet and military transport accidents.
-      - Air traffic figures are based on the number of airliner flight departures (not the number of passengers) per year.
-      - Information contained in the Aviation Safety Network database is based on information from official sources (authorities, safety boards).
+      - Information contained in the Aviation Safety Network database is based on information from official sources, such as authorities and safety boards.
     presentation:
       topic_tags:
         - Transport
