@@ -147,7 +147,13 @@ def st_show(
     # Define label
     # print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
-    label = f"{emoji} {'[**NEW**] ' if diff.is_new else ''}{diff.slug}"
+    label = f"{emoji} {diff.slug}"
+    tags = []
+    if diff.is_new:
+        tags.append(" :blue-background[**NEW**]")
+    if diff.is_draft:
+        tags.append(" :gray-background[**DRAFT**]")
+    label += f":break[{' '.join(tags)}]"
 
     # Define action for Toggle on change
     def chart_state_change(diff, session) -> None:
@@ -552,16 +558,22 @@ def filter_chart_diffs():
             if (v.is_modified and "modified" in change_types) or (v.is_new and "new" in change_types)
         }
 
+    # Return boolean if there was any filter applied (except for hiding approved charts)
+    if "chart_id" in st.query_params or "chart_slug" in st.query_params or "change_type" in st.query_params:
+        return True
+    return False
+
 
 def render_chart_diffs(source_session, target_session, chart_diffs, pagination_key) -> None:
     """Display chart diffs."""
     with st.container(border=True):
         # Title of navitation
-        st.markdown("##### Navigation")
+        # st.markdown("##### Navigation")
         # Information
+        num_charts_total = len(st.session_state.chart_diffs)
         num_charts = len(chart_diffs)
         num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-        text = f"{num_charts_reviewed}/{num_charts} charts reviewed."
+        text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed (showing {num_charts} after filtering)."
         st.markdown(text)
 
         # Pagination
@@ -570,12 +582,31 @@ def render_chart_diffs(source_session, target_session, chart_diffs, pagination_k
             items_per_page=st.session_state["charts-per-page"],
             pagination_key=pagination_key,
         )
-        modified_charts_pagination.show_controls()
+        ## Show controls only if needed
+        if len(chart_diffs) > st.session_state["charts-per-page"]:
+            modified_charts_pagination.show_controls()
 
     # st.divider()
     with st.container(border=True):
         for chart_diff in modified_charts_pagination.get_page_items():
             st_show(chart_diff, source_session, target_session)
+
+
+def create_copy_button(text_to_copy):
+    button_id = "copyButton" + text_to_copy
+
+    button_html = f"""<button id="{button_id}">Copy</button>
+    <script>
+    document.getElementById("{button_id}").onclick = function() {{
+        navigator.clipboard.writeText("{text_to_copy}").then(function() {{
+            console.log('Async: Copying to clipboard was successful!');
+        }}, function(err) {{
+            console.error('Async: Could not copy text: ', err);
+        }});
+    }}
+    </script>"""
+
+    st.markdown(button_html, unsafe_allow_html=True)
 
 
 ########################################
@@ -603,7 +634,7 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
         st.warning("No chart modifications found in the staging environment.")
     else:
         # Filter based on query params
-        filter_chart_diffs()
+        _ = filter_chart_diffs()
 
         # Show all of the charts
         st_show_options(source_engine, target_engine)
