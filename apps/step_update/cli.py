@@ -104,12 +104,6 @@ NON_UPDATEABLE_IDENTIFIERS = [
     "meadow/climate/global_sea_level",
 ]
 
-# List of dependencies to ignore when calculating the update state.
-# This is done to avoid a certain common dependency (e.g. hyde) to make all steps appear as needing a major update.
-DEPENDENCIES_TO_IGNORE = [
-    "snapshot://hyde/2017/general_files.zip",
-]
-
 
 class StepUpdater:
     def __init__(self, dry_run: bool = False, interactive: bool = True):
@@ -135,70 +129,6 @@ class StepUpdater:
         self.steps_df = self.tracker.steps_df.copy()
         # Select only active steps.
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
-        # Add steps update state.
-        self.add_steps_update_state()
-
-    def add_steps_update_state(self) -> None:
-        # To speed up calculations, create a dictionary with all info in steps_df.
-        steps_dict = self.steps_df.set_index("step").to_dict(orient="index")
-
-        # Add a column with the dependencies that are not their latest version.
-        self.steps_df["updateable_dependencies"] = [
-            [
-                dependency
-                for dependency in dependencies
-                if (dependency not in DEPENDENCIES_TO_IGNORE) and (not steps_dict[dependency]["is_latest"])
-            ]
-            for dependencies in self.steps_df["all_active_dependencies"]
-        ]
-
-        # Add a column with the total number of dependencies that are not their latest version.
-        self.steps_df["n_updateable_dependencies"] = [
-            len(dependencies) for dependencies in self.steps_df["updateable_dependencies"]
-        ]
-        # Number of snapshot dependencies that are not their latest version.
-        self.steps_df["n_updateable_snapshot_dependencies"] = [
-            sum(
-                [
-                    not steps_dict[dependency]["is_latest"]
-                    if steps_dict[dependency]["channel"] == "snapshot"
-                    else False
-                    for dependency in dependencies
-                    if dependency not in DEPENDENCIES_TO_IGNORE
-                ]
-            )
-            for dependencies in self.steps_df["all_active_dependencies"]
-        ]
-
-        # Add a column with the update state.
-        # By default, the state is unknown.
-        self.steps_df["update_state"] = UpdateState.UNKNOWN.value
-        # If there is a newer version of the step, it is outdated.
-        self.steps_df.loc[~self.steps_df["is_latest"], "update_state"] = UpdateState.OUTDATED.value
-        # If there are any dependencies that are not their latest version, it needs a minor update.
-        # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
-        self.steps_df.loc[
-            (self.steps_df["is_latest"]) & (self.steps_df["n_updateable_dependencies"] > 0), "update_state"
-        ] = UpdateState.MINOR_UPDATE.value
-        # If there are any snapshot dependencies that are not their latest version, it needs a major update.
-        self.steps_df.loc[
-            (self.steps_df["is_latest"]) & (self.steps_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
-        ] = UpdateState.MAJOR_UPDATE.value
-        # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
-        # then the step is up to date (in other words, we are not aware of any possible update).
-        self.steps_df.loc[
-            (self.steps_df["update_period_days"] == 0)
-            | (
-                (self.steps_df["is_latest"])
-                & (self.steps_df["n_updateable_snapshot_dependencies"] == 0)
-                & (self.steps_df["n_updateable_dependencies"] == 0)
-            ),
-            "update_state",
-        ] = UpdateState.UP_TO_DATE.value
-        # If a step has no charts and is not the latest version, it is archivable.
-        self.steps_df.loc[
-            (self.steps_df["n_charts"] == 0) & (~self.steps_df["is_latest"]), "update_state"
-        ] = UpdateState.ARCHIVABLE.value
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""

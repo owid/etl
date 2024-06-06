@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -25,6 +26,23 @@ GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
 
 # Get current date (used to estimate the number of days until the next update of each step).
 TODAY = datetime.now().strftime("%Y-%m-%d")
+
+# List of dependencies to ignore when calculating the update state.
+# This is done to avoid a certain common dependency (e.g. hyde) to make all steps appear as needing a major update.
+DEPENDENCIES_TO_IGNORE = [
+    "snapshot://hyde/2017/general_files.zip",
+]
+
+
+# Define labels for update states.
+class UpdateState(Enum):
+    UNKNOWN = "Unknown"
+    UP_TO_DATE = "No updates known"
+    OUTDATED = "Outdated"
+    MINOR_UPDATE = "Minor update possible"
+    MAJOR_UPDATE = "Major update possible"
+    ARCHIVABLE = "Archivable"
+    ARCHIVED = "Archived"
 
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
@@ -562,6 +580,80 @@ class VersionTracker:
 
         return step_attributes
 
+    def _add_steps_update_state(self, steps_df: pd.DataFrame) -> pd.DataFrame:
+        # Separate active and inactive steps.
+        steps_active_df = steps_df[steps_df["state"] == "active"].reset_index()
+        steps_inactive_df = steps_df[steps_df["state"] == "archive"].reset_index()
+
+        # To speed up calculations, create a dictionary with all info in steps_df.
+        steps_dict = steps_active_df.set_index("step").to_dict(orient="index")
+
+        # Add a column with the dependencies that are not their latest version.
+        steps_active_df["updateable_dependencies"] = [
+            [
+                dependency
+                for dependency in dependencies
+                if (dependency not in DEPENDENCIES_TO_IGNORE) and (not steps_dict[dependency]["is_latest"])
+            ]
+            for dependencies in steps_active_df["all_active_dependencies"]
+        ]
+
+        # Add a column with the total number of dependencies that are not their latest version.
+        steps_active_df["n_updateable_dependencies"] = [
+            len(dependencies) for dependencies in steps_active_df["updateable_dependencies"]
+        ]
+        # Number of snapshot dependencies that are not their latest version.
+        steps_active_df["n_updateable_snapshot_dependencies"] = [
+            sum(
+                [
+                    not steps_dict[dependency]["is_latest"]
+                    if steps_dict[dependency]["channel"] == "snapshot"
+                    else False
+                    for dependency in dependencies
+                    if dependency not in DEPENDENCIES_TO_IGNORE
+                ]
+            )
+            for dependencies in steps_active_df["all_active_dependencies"]
+        ]
+
+        # Add a column with the update state.
+        # By default, the state is unknown.
+        steps_active_df["update_state"] = UpdateState.UNKNOWN.value
+        # If there is a newer version of the step, it is outdated.
+        steps_active_df.loc[~steps_active_df["is_latest"], "update_state"] = UpdateState.OUTDATED.value
+        # If there are any dependencies that are not their latest version, it needs a minor update.
+        # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
+        steps_active_df.loc[
+            (steps_active_df["is_latest"]) & (steps_active_df["n_updateable_dependencies"] > 0), "update_state"
+        ] = UpdateState.MINOR_UPDATE.value
+        # If there are any snapshot dependencies that are not their latest version, it needs a major update.
+        steps_active_df.loc[
+            (steps_active_df["is_latest"]) & (steps_active_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
+        ] = UpdateState.MAJOR_UPDATE.value
+        # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
+        # then the step is up to date (in other words, we are not aware of any possible update).
+        steps_active_df.loc[
+            (steps_active_df["update_period_days"] == 0)
+            | (
+                (steps_active_df["is_latest"])
+                & (steps_active_df["n_updateable_snapshot_dependencies"] == 0)
+                & (steps_active_df["n_updateable_dependencies"] == 0)
+            ),
+            "update_state",
+        ] = UpdateState.UP_TO_DATE.value
+        # If a step has no charts and is not the latest version, it is archivable.
+        steps_active_df.loc[
+            (steps_active_df["n_charts"] == 0) & (~steps_active_df["is_latest"]), "update_state"
+        ] = UpdateState.ARCHIVABLE.value
+
+        # Add update state to archived steps.
+        steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value
+
+        # Concatenate active and inactive steps.
+        steps_df = pd.concat([steps_active_df, steps_inactive_df], ignore_index=True)
+
+        return steps_df
+
     @staticmethod
     def _add_columns_with_different_step_versions(steps_df: pd.DataFrame) -> pd.DataFrame:
         steps_df = steps_df.copy()
@@ -732,7 +824,7 @@ class VersionTracker:
         return steps_df
 
     def _create_steps_df(self) -> pd.DataFrame:
-        # Initialise steps_df with core columns
+        # Initialise steps_df with core columns.
         steps_df = self._init_steps_df_ndim()
 
         if self.connect_to_db:
@@ -740,7 +832,7 @@ class VersionTracker:
             steps_df = self._add_info_from_db(steps_df=steps_df)
 
             # Add columns with the date and the number of days until the next update.
-            steps_df = add_days_to_update_columns(steps_df=steps_df)
+            steps_df = _add_days_to_update_columns(steps_df=steps_df)
         else:
             # Add empty columns.
             for column in (
@@ -780,6 +872,10 @@ class VersionTracker:
         # Add column that is true if the step is the latest version.
         steps_df["is_latest"] = False
         steps_df.loc[steps_df["version"] == steps_df["latest_version"], "is_latest"] = True
+
+        # Add update state to steps_df.
+        # TODO: Merge logic of the following function with the one below calculating archivable steps.
+        steps_df = self._add_steps_update_state(steps_df=steps_df)
 
         return steps_df
 
@@ -1034,7 +1130,7 @@ def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool =
     VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
 
 
-def add_days_to_update_columns(steps_df):
+def _add_days_to_update_columns(steps_df):
     """Add columns to steps dataframe with the date of next update and the number of days until the next update.
 
     We currently don't have a clear way to calculate the expected date of update of a dataset.
