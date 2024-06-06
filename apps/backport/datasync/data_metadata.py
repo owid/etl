@@ -98,7 +98,7 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
         missing_entities = set(unique_entities) - set(entities.entityId)
         raise ValueError(f"Missing entities in the database: {missing_entities}")
 
-    return pd.merge(df, entities, on="entityId")
+    return pd.merge(df, entities.astype({"entityName": "category", "entityCode": "category"}), on="entityId")
 
 
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
