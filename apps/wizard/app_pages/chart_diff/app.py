@@ -250,7 +250,8 @@ def st_show(
         if diff.is_modified:
             prod_is_newer = diff.target_chart.updatedAt > diff.source_chart.updatedAt  # type: ignore
 
-            if not prod_is_newer:
+            # CONFLICT RESOLVER
+            if prod_is_newer:
                 tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
                 with tab2b:
                     st.warning(
@@ -621,7 +622,9 @@ def render_chart_diffs(source_session, target_session, chart_diffs, pagination_k
         num_charts_total = len(st.session_state.chart_diffs)
         num_charts = len(chart_diffs)
         num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-        text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed (showing {num_charts} after filtering)."
+        text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
+        if num_charts != num_charts_total:
+            text += f" Showing {num_charts} after filtering."
         st.markdown(text)
 
         # Pagination
