@@ -117,7 +117,7 @@ def run(dest_dir: str) -> None:
     # Replace domains with less than 20 systems with 'Other'
     domain_counts = tb["domain"].value_counts()
 
-    tb["domain"] = tb["domain"].where(tb["domain"].map(affiliation_counts) >= 20, "Other")
+    tb["domain"] = tb["domain"].where(tb["domain"].map(domain_counts) >= 20, "Other")
     # Get the domains that were reclassified to 'Other'
     reclassified_domains = domain_counts[domain_counts < 20].index.tolist()
 
