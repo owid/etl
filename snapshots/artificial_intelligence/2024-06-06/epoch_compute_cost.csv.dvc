@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The rising costs of training frontier AI models
+    description: |-
+      This dataset provides a comprehensive analysis of the costs associated with training frontier AI models, with a focus on estimating the magnitude and growth of these expenses. It includes detailed cost components for various AI models, considering hardware, energy, cloud rental, and staff expenses. The dataset is based on a detailed cost model developed to fill the gap in public data on AI training costs. The data covers the period from 2016 to the projected costs for 2027.
+    date_published: "2024-05-31"
+    version_producer: 2024-05-31
+    description_snapshot: |-
+      This data is specifically from Figure 1 of the paper. 
+
+    # Citation
+    producer: Epoch
+    citation_full: |-
+      Ben Cottier, Robi Rahman, Loredana Fattorini, Nestor Maslej, and David Owen. ‘The rising costs of training frontier AI models’. ArXiv [cs.CY], 2024. arXiv. https://arxiv.org/abs/2405.21015.
+
+    # Files
+    url_main: https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models
+    date_accessed: 2024-06-06
+
+    # License
+    license:
+      name: Public data
+
+outs:
+  - md5: 721b41548872317b4df6b22e48b252fc
+    size: 17394
+    path: epoch_compute_cost.csv
