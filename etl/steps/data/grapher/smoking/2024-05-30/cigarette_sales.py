@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 import owid.catalog.processing as pr
-import pandas as pd
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -50,6 +49,11 @@ def include_split_germany(tb, ds_population):
     return germany_tb
 
 
+def cast_to_float(df, col):
+    df[col] = df[col].astype("Float64")
+    return df
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -74,10 +78,9 @@ def run(dest_dir: str) -> None:
     # drop East and West Germany
     tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
 
-    # removing any rows with all nan values/ duplicates
-    tb = tb.replace(0, pd.NA)
-    tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
-    tb = tb.drop_duplicates(subset=["country", "year"])
+    # cast columns to correct data types
+    for col in COLS_WITH_DATA:
+        tb = cast_to_float(tb, col)
 
     # Save outputs.
     #
