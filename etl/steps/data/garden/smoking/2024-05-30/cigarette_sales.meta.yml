@@ -93,7 +93,7 @@ tables:
          description_key:
           - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
          presentation:
-           title_public: Total cigarette sales per adult per day
+           title_public: Sales of all tobacco products per adult per day
          display:
             numDecimalPlaces: 1
 
