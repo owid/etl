@@ -89,6 +89,19 @@ def run(dest_dir: str) -> None:
     expected_values_set = set(expected_values)
     assert unique_values_set == expected_values_set, "Unexpected affiliations in organization_categorization column"
 
+    # Replace affiliation of researchers with less than 20 systems with 'Other'
+    affiliation_counts = tb["organization_categorization"].value_counts()
+
+    tb["organization_categorization"] = tb["organization_categorization"].where(
+        tb["organization_categorization"].map(affiliation_counts) >= 20, "Other"
+    )
+    # Get the organizations that were reclassified to 'Other'
+    reclassified_organizations = affiliation_counts[affiliation_counts < 20].index.tolist()
+
+    log.info(
+        f"Affiliations of researchers with less than 20 notable systems that were reclassified to 'Other': {', '.join(reclassified_organizations)}"
+    )
+
     # Replace nans with Unspecified in each column to avoid issues when calculating sume of notable systems
     columns = ["organization_categorization", "domain", "organization"]
     for column in columns:
@@ -101,14 +114,16 @@ def run(dest_dir: str) -> None:
     # Replace entries in 'domain' that contain a comma with 'Multiple Domains'
     tb.loc[multiple_domains, "domain"] = "Multiple domains"
 
-    # Find domains with total number of notable systems below 20
+    # Replace domains with less than 20 systems with 'Other'
     domain_counts = tb["domain"].value_counts()
-    domains_below_20 = domain_counts[domain_counts < 20].index.tolist()
 
-    log.info(f"Domains with less than 20 notable systems that were reclassified to Other: {domains_below_20}")
-    # Rename the domains with less than 10 notable systems to 'Other'
-    tb["domain"] = tb["domain"].apply(lambda x: "Other" if x in domains_below_20 else x)
+    tb["domain"] = tb["domain"].where(tb["domain"].map(affiliation_counts) >= 20, "Other")
+    # Get the domains that were reclassified to 'Other'
+    reclassified_domains = domain_counts[domain_counts < 20].index.tolist()
 
+    log.info(
+        f"Domains with less than 20 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
+    )
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 
