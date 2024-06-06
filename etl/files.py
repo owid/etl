@@ -12,7 +12,7 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Literal, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
 import pandas as pd
 import ruamel.yaml
@@ -121,27 +121,12 @@ def checksum_file(filename: Union[str, Path]) -> str:
     return CACHE_CHECKSUM_FILE[key]
 
 
-def checksum_df(df: pd.DataFrame, index=True, method: Literal["md5", "pandas"] = "pandas") -> str:
-    """Return the md5 hex digest of dataframe.
-    :param method: 'md5' uses hashlib.md5, 'pandas' uses pandas hash_pandas_object. md5 is faster
-        for most of our use cases. pandas might be faster for dataframes with >1M rows.
+def checksum_df(df: pd.DataFrame, index=True) -> str:
+    """Return the md5 hex digest of dataframe. It is only useful for large dataframes. For smaller
+    ones (<1M rows), it's better to use checksum_dict or checksum_str.
     """
     # NOTE: I tried joblib.hash, but it was much slower than pandas hash
-    # TODO: remove this method, it's not consistent
-    if method == "md5":
-        _hash = hashlib.md5()
-        for col in df.columns:
-            _hash.update(df[col].values.tobytes())
-
-        if index:
-            _hash.update(df.index.values.tobytes())
-
-        return _hash.hexdigest()
-
-    elif method == "pandas":
-        return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
-    else:
-        raise ValueError(f"Invalid method: {method}")
+    return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:

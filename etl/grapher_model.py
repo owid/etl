@@ -939,8 +939,6 @@ class Variable(Base):
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
         Index("variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True),
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
-        Index("idx_dataChecksum", "dataChecksum", unique=True),
-        Index("idx_metadataChecksum", "metadataChecksum", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
