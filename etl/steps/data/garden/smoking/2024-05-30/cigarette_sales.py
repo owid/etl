@@ -100,7 +100,7 @@ def run(dest_dir: str) -> None:
     )
 
     # reorder columns
-    tb = tb[COLS_WITH_DATA]
+    tb = tb[["year", "country"] + COLS_WITH_DATA]
 
     # set 0 to nan and drop missing values
     tb = tb.replace(0, pd.NA)
@@ -112,15 +112,6 @@ def run(dest_dir: str) -> None:
     )
     # remove duplicate data (from hidden rows in excel sheet)
     tb = tb.drop_duplicates(subset=["country", "year"])
-
-    # set appropriate data types
-    tb = col_to_int(tb, "manufactured_cigarettes")
-    tb = col_to_int(tb, "handrolled_cigarettes")
-    tb = col_to_int(tb, "total_cigarettes")
-    tb = col_to_float(tb, "manufactured_cigarettes_per_adult_per_day")
-    tb = col_to_float(tb, "handrolled_cigarettes_per_adult_per_day")
-    tb = col_to_float(tb, "all_tobacco_products_tonnes")
-    tb = col_to_float(tb, "all_tobacco_products_grams_per_adult_per_day")
 
     tb = tb.format(["country", "year"])
 
