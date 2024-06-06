@@ -7,6 +7,7 @@ import streamlit as st
 from st_pages import Page, Section, show_pages
 
 from apps.wizard.config import WIZARD_CONFIG
+from apps.wizard.utils import AppState
 
 # Logo
 # st.logo("docs/assets/logo.png")
@@ -60,16 +61,19 @@ show_pages(toc)
 # Add indentation
 # add_indentation()
 
-# # Go to specific page if argument is passed
-# ## Home
-# if utils.AppState.args.phase == "all":  # type: ignore
-#     switch_page("Home")  # type: ignore
-# ## ETL step
-# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-#     if utils.AppState.args.phase == step_name:  # type: ignore
-#         switch_page(step_props["title"])  # type: ignore
-# ## Section
-# for section in WIZARD_CONFIG["sections"]:
-#     for app in section["apps"]:
-#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
-#             switch_page(app["title"])  # type: ignore
+###########################################################################
+# FROM TERMINAL COMMAND
+# Go to specific page if argument is passed
+# TODO: when switching to native MPA v2, this might lead to errors
+###########################################################################
+if AppState.args.phase == "all":  # type: ignore
+    st.switch_page("home.py")  # type: ignore
+## ETL step
+for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+    if AppState.args.phase == step_name:  # type: ignore
+        st.switch_page(step_props["entrypoint"])  # type: ignore
+## Section
+for section in WIZARD_CONFIG["sections"]:
+    for app in section["apps"]:
+        if AppState.args.phase == app["alias"]:  # type: ignore
+            st.switch_page(app["entrypoint"])  # type: ignore

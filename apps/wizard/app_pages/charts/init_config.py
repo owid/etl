@@ -2,6 +2,7 @@
 import streamlit as st
 
 from apps.wizard import utils
+from apps.wizard.utils import st_page_link
 
 st.session_state["step_name"] = "charts"
 APP_STATE = utils.AppState()
@@ -26,6 +27,11 @@ def init_app() -> None:
     """,
         },
     )
+
+    st.error("This page is no longer maintained.")
+    st_page_link("indicator-upgrade")
+    st.divider()
+
     st.title("Charts 🌟 **:gray[Upgrader]**")
     st.markdown("Replace the usage from the variables in a dataset with the variables from another dataset..")
     with st.sidebar:
