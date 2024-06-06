@@ -72,7 +72,7 @@ git fetch && git rebase origin/master && git push -f
 ### PR staging environment
 Whenever you create a pull request in the etl repository, a dedicated staging server is automatically created. This server runs the OWID admin site and database, and includes all the changes from your PR (e.g. new datasets). This allows you to test your changes before they are merged into the live site.
 
-These servers are useful to share your changes with other members of the team, and, for instance, to [create chart revisions](indicator-upgrade#match-old-indicators-to-new-ones).
+These servers are useful to share your changes with other members of the team, and, for instance, to [update charts with new indicators](ingest-data/update-charts.md#match-old-indicators-to-new-ones).
 
 !!! info "Learn more about [PR staging servers](../staging-servers)"
 

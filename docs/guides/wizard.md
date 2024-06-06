@@ -82,7 +82,7 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 - **Indicator Upgrader**: Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
 - **Chart diff**: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
 
-!!! info "Learn more about this flow in [Indicator upgrade](indicator-upgrade.md) section"
+!!! info "Learn more about this flow in [Update charts](ingest-data/update-charts.md) section"
 
 ### Data tools
 

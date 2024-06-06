@@ -8,68 +8,66 @@ In this section you will find guides for different use cases and tasks you might
 
 <div class="grid cards" markdown>
 
-- **[:material-download: &nbsp; Add data to the catalog](data-workflow/adding-data)**
+-   **[:material-arrow-up-bold-hexagon-outline: &nbsp; Upgrade indicators](ingest-data)**
 
-  ***
+    ***
 
-  Create all ETL steps to import a new dataset to our catalog.
+    Create new datasets or update old ones from our ETL catalog. Update charts.
 
-- **[:material-arrow-up-bold-hexagon-outline: &nbsp; Upgrade indicators](data-workflow/adding-data)**
+    - [Add datasets](ingest-data/add-data)
+    - [Update datasets](ingest-data/update-data)
+    - [Update charts](ingest-data/update-charts)
 
-  ***
+-  **[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)**
 
-  Whenever you update a dataset, you need to upgrade all indicator references so that all charts reflect this update.
+    ***
 
-- **[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)**
+    Wizard is a self-contained webapp that helps you with most of your ETL work.
 
-  ***
+-   **[:octicons-terminal-16: &nbsp; our CLI](etl-cli)**
 
-  Wizard is a self-contained webapp that helps you with most of your ETL work.
+    ***
 
-- **[:octicons-terminal-16: &nbsp; our CLI](data-workflow/adding-data)**
+    We also have a CLI, so that you can do some tasks from your terminal.
 
-  ***
+-  **[:octicons-globe-16: &nbsp; Using different environments](environment)**
 
-  We also have a CLI, so that you can do some tasks from your terminal.
+    ***
 
-- **[:octicons-globe-16: &nbsp; Using different environments](environment)**
+    All our tooling can be executed in different environments. Learn how to use them.
 
-  ***
+-   **[:material-server: &nbsp; Staging servers](staging-servers)**
 
-  All our tooling can be executed in different environments. Learn how to use them.
+    ***
 
-- **[:material-server: &nbsp; Staging servers](data-workflow/adding-data)**
+    What are they? And how do we actually work with them?
 
-  ***
+-   **[:fontawesome-solid-bone: &nbsp; Backport datasets](backport)**
 
-  What are they? And how do we actually work with them?
+    ***
 
-- **[:fontawesome-solid-bone: &nbsp; Backport datasets](data-workflow/adding-data)**
+    We use backporting to add legacy datasets to our catalog.
 
-  ***
+-   **[:octicons-lock-16: &nbsp; Import private datasets](private-import)**
 
-  We use backporting to add legacy datasets to our catalog.
+    ***
 
-- **[:octicons-lock-16: &nbsp; Import private datasets](private-import)**
+    Import private datasets.
 
-  ***
+-   **[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)**
 
-  Import private datasets.
+    ***
 
-- **[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)**
+    Standardize country names to use OWID's defaults.
 
-  ***
+-   **[:material-note-edit: &nbsp; Edit the docs](../dev/docs)**
 
-  Standardize country names to use OWID's defaults.
+    ***
 
-- **[:material-note-edit: &nbsp; Edit the docs](../dev/docs)**
+    Improve, update our documentation.
 
-  ***
+-   **[:simple-openai: &nbsp; OpenAI setup ](openai)**
 
-  Improve, update our documentation.
+    ***
 
-- **[:simple-openai: &nbsp; OpenAI setup ](openai)**
-
-  ***
-
-  We use backporting to add legacy datasets to our catalog.
+    We use backporting to add legacy datasets to our catalog.
