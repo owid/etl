@@ -121,12 +121,13 @@ def checksum_file(filename: Union[str, Path]) -> str:
     return CACHE_CHECKSUM_FILE[key]
 
 
-def checksum_df(df: pd.DataFrame, index=True, method: Literal["md5", "pandas"] = "md5") -> str:
+def checksum_df(df: pd.DataFrame, index=True, method: Literal["md5", "pandas"] = "pandas") -> str:
     """Return the md5 hex digest of dataframe.
     :param method: 'md5' uses hashlib.md5, 'pandas' uses pandas hash_pandas_object. md5 is faster
         for most of our use cases. pandas might be faster for dataframes with >1M rows.
     """
     # NOTE: I tried joblib.hash, but it was much slower than pandas hash
+    # TODO: remove this method, it's not consistent
     if method == "md5":
         _hash = hashlib.md5()
         for col in df.columns:

@@ -1,3 +1,5 @@
+import pandas as pd
+
 from etl import files
 
 
@@ -67,3 +69,10 @@ def test_checksum_file_regions(tmp_path):
     checksum2 = files.checksum_file(tmp_path / "regions.yml")
 
     assert checksum1 == checksum2
+
+
+# def test_checksum_df():
+#     # df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "x", "y"]})
+#     df = pd.DataFrame({"b": ["x", "x", "y"]})
+#     print(df["b"].values)
+#     assert files.checksum_df(df) == "c4c885df809ecb46f4fa73d8b58a7b48"

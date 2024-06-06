@@ -317,22 +317,45 @@ def upsert_table(
         # process data and metadata
         var_data = variable_data(df)
         var_metadata = variable_metadata(session, db_variable_id, df)
+
+        var_data_str = json.dumps(var_data, default=str)
         var_metadata_str = json.dumps(var_metadata, default=str)
 
+        # t = time.time()
+        # files.checksum_dict(var_data)
+        # t_dict = time.time() - t
+
+        # t = time.time()
+        # _checksum_data(df)
+        # t_df = time.time() - t
+
+        # print(f"t_dict: {t_dict:.4f}, t_df: {t_df:.4f}")
+
         # get hashes for data and metadata
-        checksum_data = _checksum_data(df)
+        # checksum_data = _checksum_data(df)
+        checksum_data = _checksum_data(var_data_str)
         checksum_metadata = _checksum_metadata(var_metadata_str)
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
             futures = []
+
+            # if db_variable_id == 902183:
+            # log.info("checksums", db=db_variable.dataChecksum, computed=checksum_data)
+
             if db_variable.dataChecksum != checksum_data:
                 db_variable.dataChecksum = checksum_data
-                futures.append(executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path()))
+                futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+                log.info("upsert_table.uploaded_data", variable_id=db_variable_id)
+            else:
+                log.info("upsert_table.match_checksum_data")
 
             if db_variable.metadataChecksum != checksum_metadata:
                 db_variable.metadataChecksum = checksum_metadata
                 futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
+                log.info("upsert_table.uploaded_metadata", variable_id=db_variable_id)
+            else:
+                log.info("upsert_table.match_checksum_metadata")
 
             # commit new checksums
             if futures:
@@ -342,6 +365,7 @@ def upsert_table(
                 # Wait for futures to complete in case exceptions are raised
                 [f.result() for f in futures]
 
+        verbose = True
         if verbose:
             if futures:
                 log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
@@ -516,10 +540,17 @@ def _get_entity_name(session: Session, entity_id: int) -> str:
     return entity.name if entity else ""
 
 
-def _checksum_data(df: pd.DataFrame) -> str:
+# def _checksum_data(df: pd.DataFrame) -> str:
+#     t = time.time()
+#     checksum_data = files.checksum_df(df[["year", "entityId", "value"]], index=False)
+#     log.info("upsert_table.checksum_data", time=round(time.time() - t, 4), n=len(df))
+#     return checksum_data
+
+
+def _checksum_data(var_data_str: str) -> str:
     t = time.time()
-    checksum_data = files.checksum_df(df[["year", "entityId", "value"]], index=False)
-    log.info("upsert_table.checksum_data", time=round(time.time() - t, 4), n=len(df))
+    checksum_data = files.checksum_str(var_data_str)
+    log.info("upsert_table.checksum_data", time=round(time.time() - t, 4))
     return checksum_data
 
 
