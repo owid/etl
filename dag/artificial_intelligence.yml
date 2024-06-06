@@ -1,6 +1,6 @@
 steps:
 
-  # Artificial Intelligence (EPOCH)
+  # Main EPOCH dataset
   data://meadow/artificial_intelligence/2024-06-03/epoch:
     - snapshot://artificial_intelligence/2024-06-03/epoch.csv
   data://garden/artificial_intelligence/2024-06-03/epoch:
@@ -8,23 +8,29 @@ steps:
   data://grapher/artificial_intelligence/2024-06-03/epoch:
     - data://garden/artificial_intelligence/2024-06-03/epoch
 
-  # Artificial Intelligence (EPOCH, number of systems by country)
-  data://garden/artificial_intelligence/2024-06-03/epoch_system_countries:
+  # EPOCH aggregates by country
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
     - data://meadow/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch_system_countries:
-    - data://garden/artificial_intelligence/2024-06-03/epoch_system_countries
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
 
-  # Aggregates by domain
+  # EPOCH aggregates by domain
   data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
     - data://meadow/artificial_intelligence/2024-06-03/epoch
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
 
-  # Aggregates by researcher affiliaiton
+  # EPOCH aggregates by researcher affiliaiton
   data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
     - data://garden/artificial_intelligence/2024-06-03/epoch
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
+
+  # EPOCH aggregates by organization
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
 
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2024-02-15/epoch_llms:

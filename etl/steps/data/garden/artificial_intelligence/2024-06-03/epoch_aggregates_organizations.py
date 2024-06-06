@@ -34,27 +34,20 @@ def run(dest_dir: str) -> None:
     unused_columns = [
         "domain",
         "authors",
-        "organization",
+        "country__from_organization",
         "organization_categorization",
         "parameters",
         "training_compute__flop",
         "training_dataset_size__datapoints",
-        "training_time__hours",
         "notability_criteria",
     ]
     short_name = SHORT_NAME
 
     # Aggregate the data by country
-    tb_agg = sh.calculate_aggregates(tb, "country__from_organization", short_name, unused_columns)
-
-    # Rename the 'country__from_organization' column to 'country'
-    tb_agg = tb_agg.rename(columns={"country__from_organization": "country"})
-
-    # Harmonize the country names
-    tb_agg = geo.harmonize_countries(df=tb_agg, countries_file=paths.country_mapping_path)
+    tb_agg = sh.calculate_aggregates(tb, "organization", short_name, unused_columns)
 
     # Set the index to year and country
-    tb_agg = tb_agg.set_index(["year", "country"], verify_integrity=True)
+    tb_agg = tb_agg.set_index(["year", "organization"], verify_integrity=True)
 
     #
     # Save outputs.

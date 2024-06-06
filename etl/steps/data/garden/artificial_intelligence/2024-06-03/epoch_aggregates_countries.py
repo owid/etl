@@ -2,6 +2,7 @@
 import shared as sh
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -13,10 +14,7 @@ SHORT_NAME = paths.short_name
 
 
 def run(dest_dir: str) -> None:
-    """
-    Generate aggregated table for total yearly and cumulative number of notable AI systems for each domain.
-    """
-    log.info("epoch_aggregates_domain.start")
+    log.info("epoch.start")
 
     #
     # Load inputs.
@@ -34,8 +32,8 @@ def run(dest_dir: str) -> None:
 
     # Define the columns that are not needed
     unused_columns = [
+        "domain",
         "authors",
-        "country__from_organization",
         "organization",
         "organization_categorization",
         "parameters",
@@ -45,11 +43,17 @@ def run(dest_dir: str) -> None:
     ]
     short_name = SHORT_NAME
 
-    # Aggregate the data by domain
-    tb_agg = sh.calculate_aggregates(tb, "domain", short_name, unused_columns)
+    # Aggregate the data by country
+    tb_agg = sh.calculate_aggregates(tb, "country__from_organization", short_name, unused_columns)
 
-    # Set the index to year and domain
-    tb_agg = tb_agg.set_index(["year", "domain"], verify_integrity=True)
+    # Rename the 'country__from_organization' column to 'country'
+    tb_agg = tb_agg.rename(columns={"country__from_organization": "country"})
+
+    # Harmonize the country names
+    tb_agg = geo.harmonize_countries(df=tb_agg, countries_file=paths.country_mapping_path)
+
+    # Set the index to year and country
+    tb_agg = tb_agg.set_index(["year", "country"], verify_integrity=True)
 
     #
     # Save outputs.
@@ -60,4 +64,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("epoch_aggregates_domain.end")
+    log.info("epoch.end")

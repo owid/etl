@@ -15,10 +15,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("epoch_system_countries")
+    ds_garden: Dataset = paths.load_dependency("epoch_aggregates_countries")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["epoch_system_countries"]
+    tb_garden = ds_garden["epoch_aggregates_countries"]
     #
     # Save outputs.
     #
