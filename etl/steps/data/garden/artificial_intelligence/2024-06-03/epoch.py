@@ -10,6 +10,8 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+print(1)
+
 
 def run(dest_dir: str) -> None:
     log.info("epoch.start")
