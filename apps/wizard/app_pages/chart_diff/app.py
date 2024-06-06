@@ -147,9 +147,7 @@ def st_show(
     # Define label
     print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
     emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
-    label = f"{emoji} {diff.slug}"
-    if diff.is_new:
-        label += " 🆕"
+    label = f"{emoji} {'[**NEW**] ' if diff.is_new else ''}{diff.slug}"
 
     # Define action for Toggle on change
     def chart_state_change(diff, session) -> None:
@@ -191,7 +189,7 @@ def st_show(
 
     # Actually show stuff
     def st_show_actually():
-        col1, col2, col3 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
 
         # Refresh
         with col2:
@@ -490,9 +488,6 @@ def get_chart_diffs(source_engine, target_engine):
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
     )
 
-    if len(st.session_state.chart_diffs) == 0:
-        st.warning("No chart modifications found in the staging environment.")
-
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
@@ -570,40 +565,35 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
     # Get actual charts
     get_chart_diffs(source_engine, target_engine)
 
-    # Filter based on query params
-    filter_chart_diffs()
-
-    # Show all of the charts
-    st_show_options(source_engine, target_engine)
-
-    # Show diffs
-    if len(st.session_state.chart_diffs_filtered) == 0:
-        st.warning("All charts are approved. To view them, uncheck the 'Hide approved charts' toggle.")
+    if len(st.session_state.chart_diffs) == 0:
+        st.warning("No chart modifications found in the staging environment.")
     else:
-        # Get (i) modified and (ii) new charts
-        # chart_diffs_modified = [
-        #     chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
-        # ]
-        # chart_diffs_new = [
-        #     chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new
-        # ]
+        # Filter based on query params
+        filter_chart_diffs()
 
-        # Show changed charts (modified, new, etc.)
-        with Session(source_engine) as source_session:
-            with Session(target_engine) as target_session:
-                # Show modified charts
-                if st.session_state.chart_diffs_filtered:
-                    # Render chart diffs
-                    render_chart_diffs(
-                        source_session,
-                        target_session,
-                        st.session_state.chart_diffs_filtered,
-                        "pagination_modified",
-                    )
-                else:
-                    st.warning(
-                        "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                    )
+        # Show all of the charts
+        st_show_options(source_engine, target_engine)
+
+        # Show diffs
+        if len(st.session_state.chart_diffs_filtered) == 0:
+            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+        else:
+            # Show changed charts (modified, new, etc.)
+            with Session(source_engine) as source_session:
+                with Session(target_engine) as target_session:
+                    # Show modified charts
+                    if st.session_state.chart_diffs_filtered:
+                        # Render chart diffs
+                        render_chart_diffs(
+                            source_session,
+                            target_session,
+                            [chart for chart in st.session_state.chart_diffs_filtered.values()],
+                            "pagination_modified",
+                        )
+                    else:
+                        st.warning(
+                            "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                        )
 
 
 # [{OWID_ENV.name}]({OWID_ENV.site})
