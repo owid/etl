@@ -396,7 +396,7 @@ def st_show_details(summary: SummaryDiff):
 
     text_changes = "\n\t- " + "\n\t- ".join(text_changes)
 
-    text = "## Sumary\n- " + "\n- ".join(text) + text_changes
+    text = "## Summary\n- " + "\n- ".join(text) + text_changes
     st.info(text)
 
 
