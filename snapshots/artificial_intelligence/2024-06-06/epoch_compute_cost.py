@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset. The dataset was provided to us directly by the authors on Slack."""
 
 from pathlib import Path
 

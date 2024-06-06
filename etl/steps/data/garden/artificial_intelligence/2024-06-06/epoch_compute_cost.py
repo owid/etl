@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     # Add metadata to the publication date column
     tb["publication_date"].metadata.origins = tb["cost__inflation_adjusted"].metadata.origins
     tb = tb.format(["days_since_1949", "system"])
+
     #
     # Save outputs.
     #
