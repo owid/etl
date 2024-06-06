@@ -434,11 +434,11 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
     tab_names = []
     if len(df_changes) > 0:
-        tab_names.append(f"**{len(df_changes)}** Datapoint changes")
+        tab_names.append(f"Datapoint changes **({len(df_changes)})**")
     if len(df_new) > 0:
-        tab_names.append(f"**{len(df_new)}** New datapoints")
+        tab_names.append(f"New datapoints **({len(df_new)})**")
     if len(df_missing) > 0:
-        tab_names.append(f"**{len(df_missing)}** Missing datapoints")
+        tab_names.append(f"Missing datapoints **({len(df_missing)})** ")
 
     if tab_names:
         tabs = st.tabs(tab_names)
