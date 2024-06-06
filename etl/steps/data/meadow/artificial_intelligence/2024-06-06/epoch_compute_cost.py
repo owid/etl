@@ -23,8 +23,6 @@ def run(dest_dir: str) -> None:
         "System",
         "Domain",
         "Publication date",
-        "Organization",
-        "Country (from Organization)",
         "Cost (inflation-adjusted)",
     ]
 

@@ -14,10 +14,6 @@ tables:
         unit: ''
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
-        description_processing: >
-          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
-
-          The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
@@ -28,11 +24,6 @@ tables:
           description_short: The date when the AI system was first published.
           description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
-      country__from_organization:
-        title: Country of organization
-        unit: ''
-        description_short: The country where the organization responsible for the AI system is located.
-
       cost__inflation_adjusted:
         title: Cost (inflation-adjusted)
         unit: 'constant 2023 US$'
@@ -42,9 +33,3 @@ tables:
           The cost of developing the AI system was adjusted for inflation using the Consumer Price Index (CPI) for the United States. The CPI was used to account for the changes in the price level of consumer goods and services over time. The inflation-adjusted cost is presented in 2023 US dollars.
         display:
           numDecimalPlaces: 0
-      organization:
-        title: Organization
-        unit: ''
-        description_short: The organization responsible for developing the AI system.
-        description_key:
-          - The organization that developed the AI system. This field includes a wide range of entities, such as research institutions, universities, private companies, and government agencies.
