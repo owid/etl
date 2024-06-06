@@ -571,36 +571,28 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
         st.warning("All charts are approved. To view them, uncheck the 'Hide approved charts' toggle.")
     else:
         # Get (i) modified and (ii) new charts
-        chart_diffs_modified = [
-            chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
-        ]
-        chart_diffs_new = [
-            chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new
-        ]
+        # chart_diffs_modified = [
+        #     chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_modified
+        # ]
+        # chart_diffs_new = [
+        #     chart_diff for chart_diff in st.session_state.chart_diffs_filtered.values() if chart_diff.is_new
+        # ]
 
-        # Show modified/new charts
+        # Show changed charts (modified, new, etc.)
         with Session(source_engine) as source_session:
             with Session(target_engine) as target_session:
                 # Show modified charts
-                if chart_diffs_modified:
-                    # Title
-                    st.header("Modified charts")
+                if st.session_state.chart_diffs_filtered:
                     # Render chart diffs
-                    render_chart_diffs(source_session, target_session, chart_diffs_modified, "pagination_modified")
-                else:
-                    st.warning(
-                        "No chart modifications found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                    render_chart_diffs(
+                        source_session,
+                        target_session,
+                        st.session_state.chart_diffs_filtered,
+                        "pagination_modified",
                     )
-
-                # Show new charts
-                if chart_diffs_new:
-                    # Title
-                    st.header("New charts")
-                    # Render
-                    render_chart_diffs(source_session, target_session, chart_diffs_new, "pagination_new")
                 else:
                     st.warning(
-                        "No chart new charts found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                        "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
                     )
 
 
