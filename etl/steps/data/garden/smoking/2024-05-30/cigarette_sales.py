@@ -95,7 +95,7 @@ def run(dest_dir: str) -> None:
     tb = tb[["year", "country"] + COLS_WITH_DATA]
 
     # set 0 to nan and drop missing values
-    tb = tb.replace(0, pd.NA)
+    tb = tb.replace(0, np.nan)
     tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
 
     # harmonize countries
@@ -105,10 +105,6 @@ def run(dest_dir: str) -> None:
 
     # remove duplicate data (from hidden rows in excel sheet)
     tb = tb.drop_duplicates(subset=["country", "year"])
-
-    # convert columns to numeric:
-    for col in COLS_WITH_DATA:
-        tb[col] = pd.to_numeric(tb[col], errors="coerce")
 
     tb = tb.format(["country", "year"])
 
