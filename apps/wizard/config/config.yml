@@ -86,26 +86,29 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
+
   - title: "Charts"
     description: |-
       Create chart revisions, and synchronize aproved revisions between servers.
     apps:
-      - title: "Chart Upgrader"
-        alias: charts
-        entrypoint: app_pages/charts/__main__.py
-        description: Prepare chart revisions
-        maintainer: "@lucas"
-        emoji: "🌟"
-        image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync"
-        alias: chart-sync
-        entrypoint: ../chart_sync/app.py
-        description: Sync charts between servers
-        maintainer: "@mojmir"
-        emoji: "🔄"
-        image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
-        disable:
-          "staging": True
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: app_pages/indicator_upgrade/app.py
+      description: Update indicator references in charts
+      maintainer: "@lucas"
+      emoji: "🧬"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+      disable:
+        production: True
+    - title: "Chart Diff"
+      alias: chart-diff
+      entrypoint: app_pages/chart_diff/app.py
+      description: Chart differences
+      maintainer: "@mojmir"
+      emoji: "⚡"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+      disable:
+        production: True
 
   - title: "Data tools"
     description: |-
@@ -140,30 +143,6 @@ sections:
         emoji: "💡"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
 
-  - title: "Charts v2"
-    description: |-
-      THIS SECTION IS IN DEVELOPMENT! Create chart revisions, and synchronize aproved revisions between servers.
-    apps:
-    - title: "Indicator Upgrader"
-      alias: indicator-upgrade
-      entrypoint: app_pages/indicator_upgrade/app.py
-      description: Update indicator references in charts
-      maintainer: "@lucas"
-      emoji: "🧬"
-      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
-      disable:
-        production: True
-    - title: "Chart Diff"
-      alias: chart-diff
-      entrypoint: app_pages/chart_diff/app.py
-      description: Chart differences
-      maintainer: "@mojmir"
-      emoji: "⚡"
-      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
-      disable:
-        production: True
-
-
   - title: "Metadata"
     description: |-
       Tools to improve our metadata or learn how to use it.
@@ -189,6 +168,27 @@ sections:
           "production": True
           "staging": True
 
+  - title: "Charts (legacy)"
+    description: |-
+      Create chart revisions, and synchronize aproved revisions between servers.
+    apps:
+      - title: "Chart Upgrader"
+        alias: charts
+        entrypoint: app_pages/charts/__main__.py
+        description: Prepare chart revisions
+        maintainer: "@lucas"
+        emoji: "🌟"
+        image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
+      - title: "Chart Sync"
+        alias: chart-sync
+        entrypoint: ../chart_sync/app.py
+        description: Sync charts between servers
+        maintainer: "@mojmir"
+        emoji: "🔄"
+        image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+        disable:
+          "staging": True
+          
   - title: "Others"
     description: |-
       Other helpful tools in the ETL ecosystem.
