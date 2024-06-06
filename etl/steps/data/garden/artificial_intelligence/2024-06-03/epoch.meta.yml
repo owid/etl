@@ -20,6 +20,8 @@ tables:
         unit: ''
         short_unit: ''
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_processing: >
+          In cases where multiple domains were associated with a system, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true

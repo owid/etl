@@ -19,7 +19,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  epoch_system_countries:
+  epoch_aggregates_countries:
     variables:
       yearly_count:
         title: Annual number of AI systems by country

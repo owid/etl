@@ -6,7 +6,10 @@ definitions:
       topic_tags:
         - Artificial Intelligence
     description_short: Describes the sector where the authors of an AI system have their primary affiliations.
-    description_from_producer: Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+    description_from_producer: >
+          The distinction is documented in [Academia and Industry](https://docs.google.com/document/d/1wyJmDOWDEKItg0QhO5cpsNAgHq4aHOxQQZnTfzm34gI/edit).
+          Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+          Possible values: Industry, Research Collective, Academia, Industry - Academia Collaboration (Industry leaning), Industry - Academia Collaboration (Academia leaning), Non-profit
     unit: 'AI systems'
     short_unit: ''
     display:

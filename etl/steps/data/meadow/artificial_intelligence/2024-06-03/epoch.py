@@ -39,7 +39,6 @@ def run(dest_dir: str) -> None:
         "Parameters",
         "Training compute (FLOP)",
         "Training dataset size (datapoints)",
-        "Training time (hours)",
         "Notability criteria",
     ]
 
