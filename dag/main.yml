@@ -554,8 +554,6 @@ steps:
     - snapshot://ivs/2023-11-27/integrated_values_survey.csv
   data://garden/ivs/2023-11-27/integrated_values_survey:
     - data://meadow/ivs/2023-11-27/integrated_values_survey
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
   data://grapher/ivs/2023-11-27/integrated_values_survey:
     - data://garden/ivs/2023-11-27/integrated_values_survey
 
