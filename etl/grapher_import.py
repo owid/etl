@@ -483,6 +483,8 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
+        con.commit()
+
         log.warning(
             "cleanup_ghost_variables.end",
             size=result.rowcount,
@@ -508,6 +510,7 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: 
                 {"dataset_id": dataset_id},
             )
         if result.rowcount > 0:
+            con.commit()
             log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
