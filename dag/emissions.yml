@@ -134,3 +134,12 @@ steps:
   # Older versions that can safely be archived at any point, if needed.
 
   ######################################################################################################################
+  #
+  # Net zero tracker (2023-10-10).
+  #
+  data://meadow/emissions/2024-06-07/net_zero_tracker:
+    - snapshot://emissions/2024-06-07/net_zero_tracker.xlsx
+  data://garden/emissions/2024-06-07/net_zero_tracker:
+    - data://meadow/emissions/2024-06-07/net_zero_tracker
+  data://grapher/emissions/2024-06-07/net_zero_tracker:
+    - data://garden/emissions/2024-06-07/net_zero_tracker
