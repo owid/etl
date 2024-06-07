@@ -69,8 +69,10 @@ for section in WIZARD_CONFIG["sections"]:
             )
         pages[section["title"]] = pages_
 
-# Show table of content (apps)
+# Create navigation
 page = st.navigation(pages)
+
+# Run navigation
 if page is not None:
     page.run()
 else:
