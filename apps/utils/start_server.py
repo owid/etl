@@ -9,10 +9,6 @@ Usage:
 
 The resulting draft pull request will be new_branch -> base_branch.
 
-To create a GitHub token, go to GitHub settings. On the left, at the bottom, choose Developer settings.
-Then, choose "Personal access tokens" and "Tokens (classic)". Click on "Generate new token (classic)".
-Give it a name (e.g., "etl-work"), set an expiration time, and select the scope "repo".
-Then, click on Generate token. Copy the token and save it in your .env file as GITHUB_TOKEN.
 """
 
 from typing import Optional
@@ -45,7 +41,16 @@ GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
 )
 def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> None:
     if not GITHUB_TOKEN:
-        log.error("Define GITHUB_TOKEN in your ETL .env file. Then run this tool again.")
+        log.error(
+            """A github token is needed. To create one:
+- Go to: https://github.com/settings/tokens
+- Click on the dropdown "Generate new token" and select "Generate new token (classic)".
+- Give the token a name (e.g., "etl-work"), set an expiration time, and select the scope "repo".
+- Click on "Generate token".
+- Copy the token and save it in your .env file as GITHUB_TOKEN.
+- Run this tool again.
+"""
+        )
         return
 
     # Initialize a repos object at the root folder of the etl repos.
