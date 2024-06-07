@@ -54,13 +54,22 @@ WARN_MSG += ["This tool is being developed! Please report any issues you encount
 ########################################
 # FUNCTIONS
 ########################################
-def _get_chart_diff(chart_id: int) -> ChartDiffModified:
-    with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-        return ChartDiffModified.from_chart_id(
-            chart_id=chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
+
+
+def get_chart_diffs():
+    """Get chart diffs."""
+    # Get actual charts
+    if st.session_state.chart_diffs == {}:
+        with st.spinner("Getting charts from database..."):
+            st.session_state.chart_diffs = get_chart_diffs_from_grapher()
+
+    # Sort charts
+    st.session_state.chart_diffs = dict(
+        sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
+    )
+
+    # Init, can be changed by the toggle
+    st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
 
 def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffModified]:
@@ -77,13 +86,66 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffMo
     # Get all chart diffs in parallel
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         chart_diffs_futures = {
-            chart_id: executor.submit(_get_chart_diff, chart_id, SOURCE_ENGINE, TARGET_ENGINE) for chart_id in chart_ids
+            chart_id: executor.submit(_get_chart_diff_from_grapher, chart_id) for chart_id in chart_ids
         }
         chart_diffs = {}
         for chart_id, future in chart_diffs_futures.items():
             chart_diffs[chart_id] = future.result()
 
     return chart_diffs
+
+
+def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiffModified:
+    with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
+        return ChartDiffModified.from_chart_id(
+            chart_id=chart_id,
+            source_session=source_session,
+            target_session=target_session,
+        )
+
+
+def filter_chart_diffs():
+    """Filter chart diffs to display.
+
+    This is based on the query parameters.
+    """
+
+    def _slugs_match(chart_slug_1, chart_slug_2):
+        pattern = r"[,\s\-]+"
+        chart_slug_1 = set(re.split(pattern, chart_slug_1.lower()))
+        chart_slug_2 = set(re.split(pattern, chart_slug_2.lower()))
+        if chart_slug_1.intersection(chart_slug_2):
+            return True
+        return False
+
+    # Filter based on query params
+    if "chart_id" in st.query_params:
+        chart_ids = list(map(int, st.query_params.get_all("chart_id")))
+        st.session_state.chart_diffs_filtered = {
+            k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
+        }
+    if "chart_slug" in st.query_params:
+        chart_slug = st.query_params.get("chart_slug", "")
+
+        st.session_state.chart_diffs_filtered = {
+            k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
+        }
+    if "hide_reviewed" in st.query_params:
+        st.session_state.chart_diffs_filtered = {
+            k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
+        }
+    if "change_type" in st.query_params:
+        change_types = st.query_params.get_all("change_type")
+        st.session_state.chart_diffs_filtered = {
+            k: v
+            for k, v in st.session_state.chart_diffs_filtered.items()
+            if (v.is_modified and "modified" in change_types) or (v.is_new and "new" in change_types)
+        }
+
+    # Return boolean if there was any filter applied (except for hiding approved charts)
+    if "chart_id" in st.query_params or "chart_slug" in st.query_params or "change_type" in st.query_params:
+        return True
+    return False
 
 
 def set_chart_diffs_to_pending(engine: Engine) -> None:
@@ -219,66 +281,6 @@ def _show_options():
         # Buttons (refresh, unreview)
         with col3:
             _show_options_misc()
-
-
-def get_chart_diffs():
-    """Get chart diffs."""
-    # Get actual charts
-    if st.session_state.chart_diffs == {}:
-        with st.spinner("Getting charts from database..."):
-            st.session_state.chart_diffs = get_chart_diffs_from_grapher()
-
-    # Sort charts
-    st.session_state.chart_diffs = dict(
-        sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
-    )
-
-    # Init, can be changed by the toggle
-    st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
-
-
-def filter_chart_diffs():
-    """Filter chart diffs to display.
-
-    This is based on the query parameters.
-    """
-
-    def _slugs_match(chart_slug_1, chart_slug_2):
-        pattern = r"[,\s\-]+"
-        chart_slug_1 = set(re.split(pattern, chart_slug_1.lower()))
-        chart_slug_2 = set(re.split(pattern, chart_slug_2.lower()))
-        if chart_slug_1.intersection(chart_slug_2):
-            return True
-        return False
-
-    # Filter based on query params
-    if "chart_id" in st.query_params:
-        chart_ids = list(map(int, st.query_params.get_all("chart_id")))
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
-        }
-    if "chart_slug" in st.query_params:
-        chart_slug = st.query_params.get("chart_slug", "")
-
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
-        }
-    if "hide_reviewed" in st.query_params:
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
-        }
-    if "change_type" in st.query_params:
-        change_types = st.query_params.get_all("change_type")
-        st.session_state.chart_diffs_filtered = {
-            k: v
-            for k, v in st.session_state.chart_diffs_filtered.items()
-            if (v.is_modified and "modified" in change_types) or (v.is_new and "new" in change_types)
-        }
-
-    # Return boolean if there was any filter applied (except for hiding approved charts)
-    if "chart_id" in st.query_params or "chart_slug" in st.query_params or "change_type" in st.query_params:
-        return True
-    return False
 
 
 def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
