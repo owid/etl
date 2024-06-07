@@ -101,21 +101,38 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     else:
         index = 0
 
+    def _dataset_new_selectbox_on_change():
+        # If the new dataset changes, ensure the old dataset changes accordingly.
+        set_states(
+            {"old_dataset_selectbox": sort_datasets_old(df).reset_index(drop=True)[f"display_{column_display}"].iloc[0]}
+        )
+        set_states_if_form_is_modified()
+
     dataset_new = st.selectbox(
         label="**New dataset**",
         options=options[f"display_{column_display}"],
         help="Dataset containing the new variables. These will replace the old variables in our charts.",
         index=index,
         key="new_dataset_selectbox",
-        on_change=set_states_if_form_is_modified,
+        on_change=_dataset_new_selectbox_on_change,
     )
 
+    options = sort_datasets_old(df).reset_index(drop=True)
+    if "old_dataset_selectbox" in st.session_state:
+        index = options[
+            (options["display_name"] == st.session_state["old_dataset_selectbox"])
+            | (options["display_step"] == st.session_state["old_dataset_selectbox"])
+        ].index.item()
+    else:
+        index = 0
+    # index = 0
     ## Old dataset
     dataset_old = st.selectbox(
         label="**Old dataset**: Select the dataset that you are updating",
-        options=sort_datasets_old(df)[f"display_{column_display}"],
+        options=options[f"display_{column_display}"],
         help="Dataset containing variables to be replaced in our charts.",
-        index=0,
+        index=index,
+        key="old_dataset_selectbox",
         on_change=set_states_if_form_is_modified,
     )
 
