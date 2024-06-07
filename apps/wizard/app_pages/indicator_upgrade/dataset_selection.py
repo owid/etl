@@ -77,7 +77,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     with st.popover("View options"):
         st.markdown("Change the default dataset view.")
         st.toggle(
-            "Show all datasets",
+            "Show all datasets (manual mapping)",
             help="Show all datasets, including those not detected by the grapher.",
             on_change=set_states_if_form_is_modified,
             key="show_all_datasets",
@@ -103,9 +103,14 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     def _dataset_new_selectbox_on_change():
         # If the new dataset changes, ensure the old dataset changes accordingly.
-        set_states(
-            {"old_dataset_selectbox": sort_datasets_old(df).reset_index(drop=True)[f"display_{column_display}"].iloc[0]}
-        )
+        if not st.session_state.show_all_datasets:
+            set_states(
+                {
+                    "old_dataset_selectbox": sort_datasets_old(df)
+                    .reset_index(drop=True)[f"display_{column_display}"]
+                    .iloc[0]
+                }
+            )
         set_states_if_form_is_modified()
 
     dataset_new = st.selectbox(
