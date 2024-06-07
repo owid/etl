@@ -978,6 +978,8 @@ class Variable(Base):
     grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName

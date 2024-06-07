@@ -10,7 +10,9 @@ Usage:
 """
 
 import datetime
+import json
 import os
+import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
@@ -29,10 +31,11 @@ from apps.backport.datasync.data_metadata import (
     variable_data,
     variable_metadata,
 )
-from apps.backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_string
 from etl import config
 from etl.db import get_engine
 
+from . import files
 from . import grapher_helpers as gh
 from . import grapher_model as gm
 
@@ -260,6 +263,9 @@ def upsert_table(
                 max_year = max(years)
                 timespan = f"{min_year}-{max_year}"
 
+        # sort table to get deterministic checksum later on
+        table = table.sort_index()
+
         table.reset_index(inplace=True)
 
         source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
@@ -311,17 +317,37 @@ def upsert_table(
         var_data = variable_data(df)
         var_metadata = variable_metadata(session, db_variable_id, df)
 
+        var_data_str = json.dumps(var_data, default=str)
+        var_metadata_str = json.dumps(var_metadata, default=str)
+
+        checksum_data = _checksum_data(var_data_str)
+        checksum_metadata = _checksum_metadata(var_metadata_str)
+
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            futures = [
-                executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path()),
-                executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path()),
-            ]
-            # Wait for futures to complete in case exceptions are raised
-            [f.result() for f in futures]
+            futures = []
+
+            if db_variable.dataChecksum != checksum_data:
+                db_variable.dataChecksum = checksum_data
+                futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+
+            if db_variable.metadataChecksum != checksum_metadata:
+                db_variable.metadataChecksum = checksum_metadata
+                futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
+
+            # commit new checksums
+            if futures:
+                session.add(db_variable)
+                session.commit()
+
+                # Wait for futures to complete in case exceptions are raised
+                [f.result() for f in futures]
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            if futures:
+                log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            else:
+                log.info("upsert_table.skipped_upload_to_s3", size=len(table), variable_id=db_variable_id)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
@@ -489,3 +515,14 @@ def _get_entity_name(session: Session, entity_id: int) -> str:
     q = select(gm.Entity).where(gm.Entity.id == entity_id)
     entity = session.scalars(q).one_or_none()
     return entity.name if entity else ""
+
+
+def _checksum_data(var_data_str: str) -> str:
+    return files.checksum_str(var_data_str)
+
+
+def _checksum_metadata(var_metadata_str: str) -> str:
+    # ignore updatedAt and checksums
+    return files.checksum_str(
+        re.sub(r'("updatedAt"|"dataChecksum"|"metadataChecksum"): "[^"]*"', r'\1: ""', var_metadata_str)
+    )

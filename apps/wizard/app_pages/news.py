@@ -19,7 +19,7 @@ if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
     st.stop()
 
 # GPT
-MODEL_NAME = "gpt-4-turbo-preview"
+MODEL_NAME = "gpt-4o"
 # Map window types
 WINDOW_TYPES = {
     "7d": "Last 7 days",
