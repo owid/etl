@@ -160,164 +160,205 @@ def compare_chart_configs(c1, c2):
     return diff_list
 
 
+class ChartDiffDisplayer:
+    """Handle a chart-diff and display it.
+
+    Showing a chart-diff involves showing various parts: the visualisation of the chart, the diff of the chart config, the history of approvals, and various controls."""
+
+    def __init__(
+        self,
+        diff: ChartDiffModified,
+        source_session,
+        target_session=None,
+        expander: bool = True,
+        show_link: bool = True,
+    ):
+        self.diff = diff
+        self.source_session = source_session
+        self.target_session = target_session
+        self.expander = expander
+        self.show_link = show_link
+
+    @property
+    def box_label(self):
+        """Label of the expander box.
+
+        This contains the state of the approval (by means of an emoji), the slug of the chart, and any tags (like "NEW" or "DRAFT").
+        """
+        emoji = DISPLAY_STATE_OPTIONS[self.diff.approval_status]["icon"]  # type: ignore
+        label = f"{emoji} {self.diff.slug}"
+        tags = []
+        if self.diff.is_new:
+            tags.append(" :blue-background[**NEW**]")
+        if self.diff.is_draft:
+            tags.append(" :gray-background[**DRAFT**]")
+        label += f":break[{' '.join(tags)}]"
+        return label
+
+    @property
+    def kwargs_diff(self):
+        # Get the right arguments for the toggle, button and diff show
+        if self.diff.is_modified:
+            # Arguments for the toggle
+            # label_tgl = "Approved new chart version"
+
+            # Arguments for diff
+            return {
+                "source_chart": self.diff.source_chart,
+                "target_chart": self.diff.target_chart,
+            }
+        elif self.diff.is_new:
+            # Arguments for the toggle
+            # label_tgl = "Approved new chart"
+
+            # Arguments for diff
+            return {
+                "source_chart": self.diff.source_chart,
+            }
+        else:
+            raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
+
+    def show(self):
+        # Define action for Toggle on change
+        def chart_state_change(diff, session) -> None:
+            # print(st.session_state.chart_diffs[diff.chart_id].approval_status)
+            with st.spinner():
+                status = st.session_state[f"radio-{diff.chart_id}"]
+                diff.set_status(session=session, status=status)
+
+        # Define action for Refresh on click
+        def refresh_on_click(source_session=self.source_session, target_session=None):
+            # st.toast(f"updating chart diff {diff.chart_id}...")
+            diff_new = ChartDiffModified.from_chart_id(
+                chart_id=self.diff.chart_id,
+                source_session=source_session,
+                target_session=target_session,
+            )
+            st.session_state.chart_diffs[self.diff.chart_id] = diff_new
+
+        # Actually show stuff
+        def st_show_actually():
+            col1, col2, col3 = st.columns(3)
+
+            # Refresh
+            with col2:
+                st.button(
+                    "🔄 Refresh",
+                    key=f"refresh-btn-{self.diff.chart_id}",
+                    on_click=lambda s=self.source_session, t=self.target_session: refresh_on_click(s, t),
+                    help="Get the latest version of the chart from the staging server.",
+                )
+
+            # Copy link
+            if self.show_link:
+                with col3:
+                    st.caption(f"**{OWID_ENV.wizard_url}?page=chart-diff&chart_id={self.diff.chart_id}**")
+
+            # Actions on chart diff: approve, pending, reject
+            option_names = list(DISPLAY_STATE_OPTIONS.keys())
+            with col1:
+                st.radio(
+                    label="Approve or reject chart",
+                    key=f"radio-{self.diff.chart_id}",
+                    options=option_names,
+                    horizontal=True,
+                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
+                    index=option_names.index(self.diff.approval_status),  # type: ignore
+                    on_change=lambda diff=self.diff, session=self.source_session: chart_state_change(diff, session),
+                    # label_visibility="collapsed",
+                )
+
+            # Show diff
+            if self.diff.is_modified:
+                prod_is_newer = self.diff.target_chart.updatedAt > self.diff.source_chart.updatedAt  # type: ignore
+
+                # CONFLICT RESOLVER
+                if prod_is_newer:
+                    tab1, tab2, tab2b, tab3 = st.tabs(
+                        ["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"]
+                    )
+                    with tab2b:
+                        st.warning(
+                            "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
+                        )
+                        config_compare = compare_chart_configs(
+                            self.diff.target_chart.config, self.diff.source_chart.config
+                        )  # type: ignore
+
+                        if config_compare:
+                            with st.form("conflict-resolve-form"):
+                                st.markdown("### Conflict resolver")
+                                st.markdown(
+                                    "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
+                                )
+                                for field in config_compare:
+                                    st.radio(
+                                        f"**{field['key']}**",
+                                        options=[field["value1"], field["value2"]],
+                                        format_func=lambda x: f"{field['value1']} `PROD`"
+                                        if x == field["value1"]
+                                        else f"{field['value2']} `staging`",
+                                        key=f"conflict-{field['key']}",
+                                        # horizontal=True,
+                                    )
+                                    st.text_input(
+                                        "Custom value",
+                                        label_visibility="collapsed",
+                                        placeholder="Enter a custom value",
+                                        key=f"conflict-custom-{field['key']}",
+                                    )
+                                st.form_submit_button(
+                                    "Resolve", help="This will update the chart in the staging server."
+                                )
+                else:
+                    tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+                with tab1:
+                    arrange_vertical = st.session_state.get(
+                        f"arrange-charts-vertically-{self.diff.chart_id}", False
+                    ) | st.session_state.get("arrange-charts-vertically", False)
+                    # Chart diff
+                    st_compare_charts(
+                        **self.kwargs_diff,
+                        arrange_vertical=arrange_vertical,
+                        # Check if production's chart is newer
+                        prod_is_newer=prod_is_newer,
+                    )
+                    st.toggle(
+                        "Arrange charts vertically",
+                        key=f"arrange-charts-vertically-{self.diff.chart_id}",
+                        # on_change=None,
+                    )
+                with tab2:
+                    assert self.diff.target_chart is not None
+                    st_show_diff(self.diff.target_chart.config, self.diff.source_chart.config)
+                with tab3:
+                    st_show_approval_history(self.diff, self.source_session)
+
+            elif self.diff.is_new:
+                tab1, tab2 = st.tabs(["Chart", "Change history"])
+                with tab1:
+                    st_compare_charts(**self.kwargs_diff)
+                with tab2:
+                    st_show_approval_history(self.diff, self.source_session)
+
+        if self.expander:
+            with st.expander(self.box_label, not self.diff.is_reviewed):
+                st_show_actually()
+        else:
+            st_show_actually()
+
+
 def st_show(
     diff: ChartDiffModified, source_session, target_session=None, expander: bool = True, show_link: bool = True
 ) -> None:
     """Show the chart diff in Streamlit."""
-    # DISPLAY options
-    # Define label
-    # print("Showing diff, state:", diff.is_approved, diff.is_rejected, diff.is_pending)
-    emoji = DISPLAY_STATE_OPTIONS[diff.approval_status]["icon"]  # type: ignore
-    label = f"{emoji} {diff.slug}"
-    tags = []
-    if diff.is_new:
-        tags.append(" :blue-background[**NEW**]")
-    if diff.is_draft:
-        tags.append(" :gray-background[**DRAFT**]")
-    label += f":break[{' '.join(tags)}]"
-
-    # Define action for Toggle on change
-    def chart_state_change(diff, session) -> None:
-        # print(st.session_state.chart_diffs[diff.chart_id].approval_status)
-        with st.spinner():
-            status = st.session_state[f"radio-{diff.chart_id}"]
-            diff.set_status(session=session, status=status)
-
-    # Define action for Refresh on click
-    def refresh_on_click(source_session=source_session, target_session=None):
-        # st.toast(f"updating chart diff {diff.chart_id}...")
-        diff_new = ChartDiffModified.from_chart_id(
-            chart_id=diff.chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
-        st.session_state.chart_diffs[diff.chart_id] = diff_new
-
-    # Get the right arguments for the toggle, button and diff show
-    if diff.is_modified:
-        # Arguments for the toggle
-        # label_tgl = "Approved new chart version"
-
-        # Arguments for diff
-        kwargs_diff = {
-            "source_chart": diff.source_chart,
-            "target_chart": diff.target_chart,
-        }
-    elif diff.is_new:
-        # Arguments for the toggle
-        # label_tgl = "Approved new chart"
-
-        # Arguments for diff
-        kwargs_diff = {
-            "source_chart": diff.source_chart,
-        }
-    else:
-        raise ValueError("chart_diff show have flags `is_modified = not is_new`.")
-
-    # Actually show stuff
-    def st_show_actually():
-        col1, col2, col3 = st.columns(3)
-
-        # Refresh
-        with col2:
-            st.button(
-                "🔄 Refresh",
-                key=f"refresh-btn-{diff.chart_id}",
-                on_click=lambda s=source_session, t=target_session: refresh_on_click(s, t),
-                help="Get the latest version of the chart from the staging server.",
-            )
-
-        # Copy link
-        if show_link:
-            with col3:
-                st.caption(f"**{OWID_ENV.wizard_url}?page=chart-diff&chart_id={diff.chart_id}**")
-
-        # Actions on chart diff: approve, pending, reject
-        option_names = list(DISPLAY_STATE_OPTIONS.keys())
-        with col1:
-            st.radio(
-                label="Approve or reject chart",
-                key=f"radio-{diff.chart_id}",
-                options=option_names,
-                horizontal=True,
-                format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
-                index=option_names.index(diff.approval_status),  # type: ignore
-                on_change=lambda diff=diff, session=source_session: chart_state_change(diff, session),
-                # label_visibility="collapsed",
-            )
-
-        # Show diff
-        if diff.is_modified:
-            prod_is_newer = diff.target_chart.updatedAt > diff.source_chart.updatedAt  # type: ignore
-
-            # CONFLICT RESOLVER
-            if prod_is_newer:
-                tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
-                with tab2b:
-                    st.warning(
-                        "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
-                    )
-                    config_compare = compare_chart_configs(diff.target_chart.config, diff.source_chart.config)  # type: ignore
-
-                    if config_compare:
-                        with st.form("conflict-resolve-form"):
-                            st.markdown("### Conflict resolver")
-                            st.markdown(
-                                "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
-                            )
-                            for field in config_compare:
-                                st.radio(
-                                    f"**{field['key']}**",
-                                    options=[field["value1"], field["value2"]],
-                                    format_func=lambda x: f"{field['value1']} `PROD`"
-                                    if x == field["value1"]
-                                    else f"{field['value2']} `staging`",
-                                    key=f"conflict-{field['key']}",
-                                    # horizontal=True,
-                                )
-                                st.text_input(
-                                    "Custom value",
-                                    label_visibility="collapsed",
-                                    placeholder="Enter a custom value",
-                                    key=f"conflict-custom-{field['key']}",
-                                )
-                            st.form_submit_button("Resolve", help="This will update the chart in the staging server.")
-            else:
-                tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-            with tab1:
-                arrange_vertical = st.session_state.get(
-                    f"arrange-charts-vertically-{diff.chart_id}", False
-                ) | st.session_state.get("arrange-charts-vertically", False)
-                # Chart diff
-                st_compare_charts(
-                    **kwargs_diff,
-                    arrange_vertical=arrange_vertical,
-                    # Check if production's chart is newer
-                    prod_is_newer=prod_is_newer,
-                )
-                st.toggle(
-                    "Arrange charts vertically",
-                    key=f"arrange-charts-vertically-{diff.chart_id}",
-                    # on_change=None,
-                )
-            with tab2:
-                assert diff.target_chart is not None
-                st_show_diff(diff.target_chart.config, diff.source_chart.config)
-            with tab3:
-                st_show_approval_history(diff, source_session)
-
-        elif diff.is_new:
-            tab1, tab2 = st.tabs(["Chart", "Change history"])
-            with tab1:
-                st_compare_charts(**kwargs_diff)
-            with tab2:
-                st_show_approval_history(diff, source_session)
-
-    if expander:
-        with st.expander(label, not diff.is_reviewed):
-            st_show_actually()
-    else:
-        st_show_actually()
+    ChartDiffDisplayer(
+        diff=diff,
+        source_session=source_session,
+        target_session=target_session,
+        expander=expander,
+        show_link=show_link,
+    ).show()
 
 
 def pretty_date(chart):
