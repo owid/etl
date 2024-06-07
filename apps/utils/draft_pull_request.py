@@ -1,10 +1,10 @@
 """This script creates a new draft pull request in GitHub, which starts a new staging server.
 
 Usage:
-- If you use this script from the master branch on your local ETL repo, specify a --new-branch argument.
-  This will create a new local branch, which will be pushed to remote.
 - If you have already created a new local branch, run this script without specifying any argument.
   The 'master' branch will be assumed as the base branch of the new draft pull request.
+- If you are in the master branch on your local ETL repo, specify a --new-branch argument.
+  This will create a new local branch, which will be pushed to remote to create a new draft pull request.
 - If you want the base branch to be different from 'master', specify it with the --base-branch argument.
 
 The resulting draft pull request will be new_branch -> base_branch.
@@ -15,7 +15,7 @@ from typing import Optional
 
 import click
 import requests
-from git import Repo
+from git import Repo, GitCommandError
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -29,7 +29,7 @@ log = get_logger()
 GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
 
 
-@click.command(name="start-server", cls=RichCommand, help=__doc__)
+@click.command(name="draft-pr", cls=RichCommand, help=__doc__)
 @click.option(
     "--new-branch",
     type=str,
@@ -93,8 +93,13 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
                 "or switch to the new branch and run this tool without specifying a new branch."
             )
             return
-        log.info("Create new branch and switch to it.")
-        repo.git.checkout("-b", new_branch)
+        try:
+            log.info(f"Switch to base branch '{base_branch}', create a new branch from there, and switch to it.")
+            repo.git.checkout(base_branch)
+            repo.git.checkout("-b", new_branch)
+        except GitCommandError as e:
+            log.error(f"Failed to create a new branch from '{base_branch}':\n{e}")
+            return
 
     # Ensure the new branch does not already exist in remote.
     if new_branch in remote_branches:
@@ -104,23 +109,23 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
         )
         return
 
-    log.info("Creating an empty commit.")
-    repo.git.commit("--allow-empty", "-m", "Start a new staging server")
+    # log.info("Creating an empty commit.")
+    # repo.git.commit("--allow-empty", "-m", "Start a new staging server")
 
-    log.info("Pushing the new branch to remote.")
-    repo.git.push("origin", new_branch)
+    # log.info("Pushing the new branch to remote.")
+    # repo.git.push("origin", new_branch)
 
-    log.info("Creating a draft pull request.")
-    headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-    data = {
-        "title": f":construction: Draft PR for branch {new_branch}",
-        "head": new_branch,
-        "base": base_branch,
-        "body": "",
-        "draft": True,
-    }
-    response = requests.post(GITHUB_API_URL, json=data, headers=headers)
-    if response.status_code == 201:
-        log.info("Draft pull request created successfully.")
-    else:
-        log.error(f"Failed to create draft pull request:\n{response.json()}")
+    # log.info("Creating a draft pull request.")
+    # headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    # data = {
+    #     "title": f":construction: Draft PR for branch {new_branch}",
+    #     "head": new_branch,
+    #     "base": base_branch,
+    #     "body": "",
+    #     "draft": True,
+    # }
+    # response = requests.post(GITHUB_API_URL, json=data, headers=headers)
+    # if response.status_code == 201:
+    #     log.info("Draft pull request created successfully.")
+    # else:
+    #     log.error(f"Failed to create draft pull request:\n{response.json()}")
