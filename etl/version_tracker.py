@@ -264,9 +264,8 @@ class VersionTracker:
 
     """
 
-    # List of steps known to be archivable, for which we don't want to see warnings.
-    # We keep them in the active dag for technical reasons.
-    KNOWN_ARCHIVABLE_STEPS = [
+    # List of steps known to be archivable (or unused), that we want to keep in the active dag for technical reasons.
+    ARCHIVABLE_STEPS_TO_KEEP = [
         DAG_TEMP_STEP,
         "data://explorers/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy",
@@ -279,6 +278,11 @@ class VersionTracker:
         "data://meadow/dummy/2020-01-01/dummy_full",
         "snapshot://dummy/2020-01-01/dummy.csv",
         "snapshot://dummy/2020-01-01/dummy_full.csv",
+        "data://examples/examples/latest/jupytext_example",
+        "data://examples/examples/latest/notebook_example",
+        "data://examples/examples/latest/script_example",
+        "data://examples/examples/latest/vs_code_cells_example",
+        "data-private://examples/examples/latest/private_example",
     ]
 
     # List of metrics to fetch related to analytics.
@@ -624,6 +628,16 @@ class VersionTracker:
             & (steps_active_df["version"].apply(_days_since_step_creation) > MAX_NUM_DAYS_BEFORE_ARCHIVABLE),
             "update_state",
         ] = UpdateState.ARCHIVABLE.value
+
+        # There are special steps that, even though they are archivable or unused, we want to keep in the active dag.
+        steps_active_df.loc[
+            steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"
+        ] = UpdateState.UP_TO_DATE.value
+
+        # All explorers and external steps should be considered up to date.
+        steps_active_df.loc[
+            steps_active_df["channel"].isin(["explorers", "external"]), "update_state"
+        ] = UpdateState.UP_TO_DATE.value
 
         # Add update state to archived steps.
         steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value
