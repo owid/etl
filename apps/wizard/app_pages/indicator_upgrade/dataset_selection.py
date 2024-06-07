@@ -51,8 +51,17 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     # st.dataframe(df)
     # Build dataset display name
-    df["display_name"] = "[" + df["id"].astype(str) + "] " + df[column_display]
+
+    df["display_step"] = "[" + df["id"].astype(str) + "] " + df["step"]
+    df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
+    display_step_to_id_mapping = df.set_index("display_step")["id"].to_dict()
+
+    def display_to_id_mapping(display):
+        try:
+            return display_name_to_id_mapping[display]
+        except KeyError:
+            return display_step_to_id_mapping[display]
 
     # Header
     st.header(
@@ -82,14 +91,21 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     ## New dataset
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
-        options = df.loc[df["migration_new"], "display_name"]
+        options = df[df["migration_new"]].reset_index(drop=True)
     else:
-        options = df["display_name"]
+        options = df.reset_index(drop=True)
+
+    if "new_dataset_selectbox" in st.session_state:
+        dataset_new_id = display_to_id_mapping(st.session_state["new_dataset_selectbox"])
+        index = options[options["id"] == dataset_new_id].index.item()
+    else:
+        index = 0
+
     dataset_new = st.selectbox(
         label="**New dataset**",
-        options=options,
+        options=options[f"display_{column_display}"],
         help="Dataset containing the new variables. These will replace the old variables in our charts.",
-        index=0,
+        index=index,
         key="new_dataset_selectbox",
         on_change=set_states_if_form_is_modified,
     )
@@ -97,7 +113,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     ## Old dataset
     dataset_old = st.selectbox(
         label="**Old dataset**: Select the dataset that you are updating",
-        options=sort_datasets_old(df)["display_name"],
+        options=sort_datasets_old(df)[f"display_{column_display}"],
         help="Dataset containing variables to be replaced in our charts.",
         index=0,
         on_change=set_states_if_form_is_modified,
@@ -122,7 +138,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             similarity_name = st.selectbox(
                 label="Similarity matching function",
                 options=similarity_names,
-                help="Select the prefered function for matching indicators. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
+                help="Select the preferred function for matching indicators. Find more details at https://www.analyticsvidhya.com/blog/2021/07/fuzzy-string-matching-a-hands-on-guide/",
                 on_change=set_states_if_form_is_modified,
             )
 
@@ -146,8 +162,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         reset_indicator_form()
 
     # Get IDs of datasets
-    dataset_old_id = display_name_to_id_mapping[dataset_old]
-    dataset_new_id = display_name_to_id_mapping[dataset_new]
+    dataset_old_id = display_to_id_mapping(dataset_old)
+    dataset_new_id = display_to_id_mapping(dataset_new)
     set_states({"migration_new_id": dataset_new_id})
 
     return SearchConfigForm(
