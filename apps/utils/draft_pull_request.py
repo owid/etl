@@ -94,7 +94,7 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
             )
             return
         try:
-            log.info(f"Switch to base branch '{base_branch}', create a new branch from there, and switch to it.")
+            log.info(f"Switching to base branch '{base_branch}', creating new branch from there, and switching to it.")
             repo.git.checkout(base_branch)
             repo.git.checkout("-b", new_branch)
         except GitCommandError as e:
@@ -110,7 +110,7 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
         return
 
     log.info("Creating an empty commit.")
-    repo.git.commit("--allow-empty", "-m", "Start a new staging server")
+    repo.git.commit("--allow-empty", "-m", f"Start a new staging server for branch '{new_branch}'")
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", new_branch)
