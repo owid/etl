@@ -126,10 +126,16 @@ def st_show_home():
     #########################
     # Sections
     #########################
+    section_legacy = None
     for section in WIZARD_CONFIG["sections"]:
         apps = [app for app in section["apps"] if app["enable"]]
+
+        # Skip legacy (show later)
         if section["title"] == "Legacy":
+            section_legacy = section
             continue
+
+        # Show section
         if apps:
             st.markdown(f"## {section['title']}")
             st.markdown(section["description"])
@@ -149,12 +155,12 @@ def st_show_home():
                             text=text,
                         )
     # Show legacy
-    if "Legacy" in {s["title"] for s in WIZARD_CONFIG["sections"]}:
-        apps = [app for app in section["apps"] if app["enable"]]
+    if section_legacy:
+        apps = [app for app in section_legacy["apps"] if app["enable"]]
         if apps:
             st.divider()
-            st.markdown(f"## {section['title']}")
-            st.warning(section["description"])
+            st.markdown(f"## {section_legacy['title']}")
+            st.warning(section_legacy["description"])
             columns = st.columns(len(apps))
             for i, app in enumerate(apps):
                 text = [
