@@ -143,6 +143,25 @@ sections:
         emoji: "💡"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
 
+  - title: "Misc"
+    description: |-
+      Other helpful tools in the ETL ecosystem.
+    apps:
+      - title: "News"
+        alias: news
+        description: "Latest ETL news"
+        maintainer: "@lucas"
+        entrypoint: app_pages/news.py
+        emoji: "🗞️"
+        image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
+      - title: "owidle"
+        alias: owidle
+        description: "Guess the country game!"
+        maintainer: "@lucas"
+        entrypoint: app_pages/owidle.py
+        emoji: "👾"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
+
   - title: "Metadata"
     description: |-
       Tools to improve our metadata or learn how to use it.
@@ -168,9 +187,9 @@ sections:
           "production": True
           "staging": True
 
-  - title: "Charts (legacy)"
+  - title: "Legacy"
     description: |-
-      Create chart revisions, and synchronize aproved revisions between servers.
+      The pages below are legacy now. They are kept in case the new pages are not working properly.
     apps:
       - title: "Chart Upgrader"
         alias: charts
@@ -188,22 +207,3 @@ sections:
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
         disable:
           "staging": True
-          
-  - title: "Others"
-    description: |-
-      Other helpful tools in the ETL ecosystem.
-    apps:
-      - title: "News"
-        alias: news
-        description: "Latest ETL news"
-        maintainer: "@lucas"
-        entrypoint: app_pages/news.py
-        emoji: "🗞️"
-        image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
-      - title: "owidle"
-        alias: owidle
-        description: "Guess the country game!"
-        maintainer: "@lucas"
-        entrypoint: app_pages/owidle.py
-        emoji: "👾"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"

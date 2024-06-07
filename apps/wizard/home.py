@@ -12,7 +12,7 @@ st.set_page_config(
     page_title="Wizard: Home",
     page_icon="🪄",
 )
-st.text(st.__version__)
+st.text(f"streamlit {st.__version__}")
 
 
 def st_show_home():
@@ -43,7 +43,10 @@ def st_show_home():
             "margin": "0",
             "font-size": ".8rem",
             "font-family": "Helvetica",
-        }
+        },
+        "filter": {
+            "background-color": "rgba(0, 0, 0, 0.5)"  # <- make the image not dimmed anymore
+        },
     }
 
     def create_card(
@@ -52,9 +55,13 @@ def st_show_home():
         image_url: str,
         text: str | List[str] = "",
         custom_styles: Optional[Dict[str, Any]] = None,
+        small: bool = False,
     ) -> None:
         """Create card."""
         styles = deepcopy(default_styles)
+        if small:
+            styles["card"]["height"] = "50px"
+
         if custom_styles:
             styles["card"].update(custom_styles)
         go_to_page = card(
@@ -62,6 +69,7 @@ def st_show_home():
             image=image_url,
             text=text,
             # text=f"Press {i + 1}",
+            # text=["This is a test card", "This is a subtext"],
             styles=styles,
             on_click=lambda: None,
         )
@@ -93,7 +101,7 @@ def st_show_home():
         columns = st.columns(len(pages))
         for i, page in enumerate(pages):
             with columns[i]:
-                create_card(**page)
+                create_card(**page, small=True)
 
     # 2 EXPRESS
     if steps["fasttrack"]["enable"]:
@@ -118,11 +126,41 @@ def st_show_home():
     #########################
     # Sections
     #########################
+    section_legacy = None
     for section in WIZARD_CONFIG["sections"]:
         apps = [app for app in section["apps"] if app["enable"]]
+
+        # Skip legacy (show later)
+        if section["title"] == "Legacy":
+            section_legacy = section
+            continue
+
+        # Show section
         if apps:
             st.markdown(f"## {section['title']}")
             st.markdown(section["description"])
+            columns = st.columns(len(apps))
+            for i, app in enumerate(apps):
+                text = [
+                    app["description"],
+                ]
+                # if "maintainer" in app:
+                #     text.append(f"maintainer: {app['maintainer']}")
+                if app["enable"]:
+                    with columns[i]:
+                        create_card(
+                            entrypoint=app["entrypoint"],
+                            title=app["title"],
+                            image_url=app["image_url"],
+                            text=text,
+                        )
+    # Show legacy
+    if section_legacy:
+        apps = [app for app in section_legacy["apps"] if app["enable"]]
+        if apps:
+            st.divider()
+            st.markdown(f"## {section_legacy['title']}")
+            st.warning(section_legacy["description"])
             columns = st.columns(len(apps))
             for i, app in enumerate(apps):
                 text = [
