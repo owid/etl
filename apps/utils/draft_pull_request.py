@@ -15,7 +15,7 @@ from typing import Optional
 
 import click
 import requests
-from git import Repo, GitCommandError
+from git import GitCommandError, Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
@@ -109,23 +109,23 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
         )
         return
 
-    # log.info("Creating an empty commit.")
-    # repo.git.commit("--allow-empty", "-m", "Start a new staging server")
+    log.info("Creating an empty commit.")
+    repo.git.commit("--allow-empty", "-m", "Start a new staging server")
 
-    # log.info("Pushing the new branch to remote.")
-    # repo.git.push("origin", new_branch)
+    log.info("Pushing the new branch to remote.")
+    repo.git.push("origin", new_branch)
 
-    # log.info("Creating a draft pull request.")
-    # headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-    # data = {
-    #     "title": f":construction: Draft PR for branch {new_branch}",
-    #     "head": new_branch,
-    #     "base": base_branch,
-    #     "body": "",
-    #     "draft": True,
-    # }
-    # response = requests.post(GITHUB_API_URL, json=data, headers=headers)
-    # if response.status_code == 201:
-    #     log.info("Draft pull request created successfully.")
-    # else:
-    #     log.error(f"Failed to create draft pull request:\n{response.json()}")
+    log.info("Creating a draft pull request.")
+    headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    data = {
+        "title": f":construction: Draft PR for branch {new_branch}",
+        "head": new_branch,
+        "base": base_branch,
+        "body": "",
+        "draft": True,
+    }
+    response = requests.post(GITHUB_API_URL, json=data, headers=headers)
+    if response.status_code == 201:
+        log.info("Draft pull request created successfully.")
+    else:
+        log.error(f"Failed to create draft pull request:\n{response.json()}")
