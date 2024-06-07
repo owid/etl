@@ -13,7 +13,7 @@ tables:
         title: Domain
         unit: ''
         short_unit: ''
-        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_short: Specific area, application, or field in which an AI system is designed to operate.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
@@ -29,7 +29,7 @@ tables:
         unit: 'constant 2023 US$'
         short_unit: '$'
         description_short: The cost of developing the AI system, adjusted for inflation.
-        description_from_producer: >
+        description_from_producer: |-
           The cost of developing the AI system was adjusted for inflation using the Consumer Price Index (CPI) for the United States. The CPI was used to account for the changes in the price level of consumer goods and services over time. The inflation-adjusted cost is presented in 2023 US dollars.
         display:
           numDecimalPlaces: 0

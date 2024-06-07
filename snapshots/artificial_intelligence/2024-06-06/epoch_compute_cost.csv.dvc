@@ -9,7 +9,7 @@ meta:
     date_published: "2024-05-31"
     version_producer: 2024-05-31
     description_snapshot: |-
-      This data is specifically from Figure 1 of the paper. 
+      This data is specifically from Figure 1 of the paper.
 
     # Citation
     producer: Epoch
@@ -22,7 +22,7 @@ meta:
 
     # License
     license:
-      name: Public data
+      name: CC BY 4.0
 
 outs:
   - md5: 721b41548872317b4df6b22e48b252fc
