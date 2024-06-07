@@ -557,9 +557,9 @@ class VersionTracker:
             )
             for dependencies in steps_active_df["all_active_dependencies"]
         ]
-        # Add a column with the number of dependencies from the external channel.
+        # Add a column with the number of dependencies from the explorers and external channels.
         steps_active_df["external_usages"] = [
-            [usage for usage in usages if steps_dict[usage]["channel"] == "external"]
+            [usage for usage in usages if steps_dict[usage]["channel"] in ["explorers", "external"]]
             for usages in steps_active_df["all_active_usages"]
         ]
         # Add a column with the total number of external usages.
