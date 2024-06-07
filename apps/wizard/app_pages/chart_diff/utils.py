@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
@@ -25,3 +27,37 @@ else:
 @st.cache_resource
 def get_engines() -> tuple[Engine, Engine]:
     return SOURCE.engine, TARGET.engine
+
+
+def prettify_date(chart):
+    """Obtain prettified date from a chart.
+
+    Format is:
+        - Previous years: `Jan 10, 2020 10:15`
+        - This year: `Mar 15, 10:15` (no need to explicitly show the year)
+    """
+    if chart.updatedAt.year == datetime.now().date().year:
+        return chart.updatedAt.strftime("%b %d, %H:%M")
+    else:
+        return chart.updatedAt.strftime("%b %d, %Y %H:%M")
+
+
+def compare_chart_configs(c1, c2):
+    keys = set(c1.keys()).union(c2.keys())
+    diff_list = []
+
+    KEYS_IGNORE = {
+        "bakedGrapherURL",
+        "adminBaseUrl",
+        "dataApiUrl",
+        "version",
+    }
+    for key in keys:
+        if key in KEYS_IGNORE:
+            continue
+        value1 = c1.get(key)
+        value2 = c2.get(key)
+        if value1 != value2:
+            diff_list.append({"key": key, "value1": value1, "value2": value2})
+
+    return diff_list

@@ -25,7 +25,7 @@ class ChartDiffModified:
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
-        self._target_is_newer = None
+        self._in_conflict = None
 
     @property
     def is_reviewed(self) -> bool:
@@ -81,13 +81,13 @@ class ChartDiffModified:
         return cast(str, self.source_chart.config["slug"])
 
     @property
-    def target_is_newer(self) -> bool:
+    def in_conflict(self) -> bool:
         """Check if the chart in target is newer than the source."""
-        if self._target_is_newer is None:
+        if self._in_conflict is None:
             if self.target_chart is None:
                 return False
-            self._target_is_newer = self.target_chart.updatedAt > self.source_chart.updatedAt
-        return self._target_is_newer
+            self._in_conflict = self.target_chart.updatedAt > self.source_chart.updatedAt
+        return self._in_conflict
 
     @classmethod
     def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
