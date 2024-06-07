@@ -282,8 +282,9 @@ class ChartDiffDisplayer:
                             "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
                         )
                         config_compare = compare_chart_configs(
-                            self.diff.target_chart.config, self.diff.source_chart.config
-                        )  # type: ignore
+                            self.diff.target_chart.config,  # type: ignore
+                            self.diff.source_chart.config,
+                        )
 
                         if config_compare:
                             with st.form("conflict-resolve-form"):
