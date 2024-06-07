@@ -141,11 +141,8 @@ def add_population(
 
     # Optimize memory
     # NOTE: pd.merge is converting categoricals to objects for some reason
-    df = df.astype(
-        {
-            "age": "category",
-            "country": "category",
-        }
-    )
+    df.country = df.country.astype("category")
+    if "age" in df.columns:
+        df.age = df.age.astype("category")
 
     return df
