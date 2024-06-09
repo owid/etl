@@ -230,11 +230,19 @@ class ChartDiffShow:
 
         st.code(diff_string, line_numbers=True, language="diff")
 
-    def _show_conflict_resolver(self) -> None:
+    def _show_conflict_resolver_options(self) -> None:
         """Resolve conflicts between charts in target and source.
 
         Sometimes, someone might edit a chart in production while we work on it on staging.
         """
+        if st.button(
+            "⚠️ Resolve conflict",
+            help="This will update the chart in the staging server.",
+        ):
+            self._show_conflict_resolver()
+
+    @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
+    def _show_conflict_resolver(self) -> None:
         st.warning(
             "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
         )
@@ -253,9 +261,9 @@ class ChartDiffShow:
                     st.radio(
                         f"**{field['key']}**",
                         options=[field["value1"], field["value2"]],
-                        format_func=lambda x: f"{field['value1']} `PROD`"
+                        format_func=lambda x: f"`PROD`: {field['value1']}"
                         if x == field["value1"]
-                        else f"{field['value2']} `staging`",
+                        else f"`STAG`: {field['value2']}",
                         key=f"conflict-{field['key']}",
                         # horizontal=True,
                     )
@@ -293,18 +301,23 @@ class ChartDiffShow:
 
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
+        # Show conflict resolver if there is conflict
+        if self.diff.in_conflict:
+            self._show_conflict_resolver_options()
+
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
-            if not self.diff.in_conflict:
-                tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-            else:
-                # Resolve conflict
-                tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
-                with tab2b:
-                    self._show_conflict_resolver()
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+            # if not self.diff.in_conflict:
+            #     tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+            # else:
+            #     # Resolve conflict
+            #     tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
+            #     with tab2b:
+            #         self._show_conflict_resolver()
             with tab1:
                 self._show_chart_comparison()
             with tab2:
