@@ -1,0 +1,14 @@
+dataset:
+  title: 'Draft: Joe – Difference in Gini, 1993-2018, PIP vs WID data'
+  description: ''
+  licenses:
+    - {}
+tables:
+  draft_joe_gini_diff_1993_2018:
+    variables:
+      wid_gini_difference_1993_2018:
+        title: wid_gini_difference_1993_2018
+        unit: ''
+      pip_gini_difference_1993_2018:
+        title: pip_gini_difference_1993_2018
+        unit: ''
