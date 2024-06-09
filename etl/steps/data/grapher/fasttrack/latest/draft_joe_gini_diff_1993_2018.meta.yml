@@ -18,3 +18,9 @@ tables:
       pip_gini_relative_difference_1993_2018:
         title: pip_gini_relative_difference_1993_2018
         unit: ''
+      region:
+        title: region
+        unit: ''
+      population_in_2018:
+        title: population_in_2018
+        unit: ''

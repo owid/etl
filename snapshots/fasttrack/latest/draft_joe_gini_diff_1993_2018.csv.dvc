@@ -3,13 +3,13 @@ meta:
     producer: Joe draft of PIP and WID
     title: Joe draft of PIP and WID
     url_download: |-
-      gAAAAABmZdPqrBV_ZLSyhrdMPBea8r0vYSbxB7K2qWNZRDNWvbXy3B3bF5POaMAAfYCLQBfOFcB06iIfLSgi_YFILprCJXat53RH9SD3sFZl4Pwwo-OU7jkNpKTRybC6n2khJnWfHvQzAIPWKJrWmEQrGa84LA4_IwW4itao2ftV8sVGYfzyCJpsAWTkzNVulRQgRbm7XCkDaqFs_mbrsX-tN-3phi8ct2gbEKKkW2r7xNL5xui4aobYMPYBptpeG9AEbIAS_h8C
+      gAAAAABmZdWPqRcBsp_V8ot6IYjch94CYCp8HG6tQAzVeYQrb7cd3NSdhuDDTBmkUOjNHQmDbjmBZpKHxnW_8ejEoVE-cf1aVxsc280_PNxhEv3wh7PZ53qdsapUnaXl6EzDMs3UUa0hCF3iiXretaFl_ayLcQK9RVBcvnDstRlfwclIGXNRteWgXgDO10dV6P1j4vhLlBh7oegokkUCnwI2UReM9MNMtJ-pSzHbW6qAlifdbXpzr6wG1AYj6JKxSU93zEqCvWtl
     date_accessed: '2024-06-09'
   name: 'Draft: Joe – Difference in Gini, 1993-2018, PIP vs WID data'
   description: ''
   license: {}
   is_public: false
 outs:
-  - md5: b5cc63510c96ce4830c907c8b92480b5
-    size: 6790
+  - md5: 8baef56631a9b5ca10ef58ef0822b5c9
+    size: 9323
     path: draft_joe_gini_diff_1993_2018.csv
