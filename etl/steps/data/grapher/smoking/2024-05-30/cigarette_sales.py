@@ -17,11 +17,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["cigarette_sales"].reset_index()
 
-    # Process data.
-
-    # drop East and West Germany as to not confuse people (they are combined in Germany 1950-1990)
-    tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
-
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
