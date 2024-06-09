@@ -85,7 +85,7 @@ def include_split_germany(tb, ds_population):
     germany_tb[ALL_KEY] = germany_tb[ALL_KEY] * germany_tb["share_of_population"]
 
     # sum up values for weighted average
-    germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum().reset_index()
+    germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum(min_count=1).reset_index()
     germany_tb["country"] = "Germany"
 
     return germany_tb
@@ -129,21 +129,26 @@ def run(dest_dir: str) -> None:
 
     # Calculate weighted average for Germany 1950-1990
     germany_tb = include_split_germany(tb, ds_population)
-    # include for Germany 1950-1990
+
+    # include data for Germany 1950-1990
     tb = pr.concat([tb, germany_tb])
 
     # reorder columns
     tb = tb[["year", "country"] + COLS_WITH_DATA]
 
-    # set 0 to nan and drop missing values
-    tb = tb.replace(0, np.nan)
+    # drop rows with no data (nan values)
     tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
+
+    # drop rows with zeros and NaNs
+    tb_temp = tb.fillna(0)
+    rows_to_drop = tb_temp[(tb_temp[COLS_WITH_DATA] == 0).all(axis=1)].index
+    tb = tb.drop(rows_to_drop)
 
     # cast columns to float
     for col in COLS_WITH_DATA:
         tb = cast_to_float(tb, col)
 
-    # harmonize countries
+    # harmonize countries (also exclude east and west germany)
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )

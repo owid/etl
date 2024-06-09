@@ -246,7 +246,7 @@ def run(dest_dir: str) -> None:
     smoking_data_tb["year"] = smoking_data_tb["year"].astype(str)
 
     # remove duplicate data
-    smoking_data_tb = smoking_data_tb.drop_duplicates(subset=["country", "year"])
+    smoking_data_tb = smoking_data_tb.drop_duplicates(subset=["country", "year"], keep="last")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     smoking_data_tb = smoking_data_tb.format(["country", "year"])
