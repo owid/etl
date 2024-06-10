@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
     tb = add_metadata(tb, metadata_tb)
 
     # Set an appropriate index and sort.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["country", "year"])
 
     # Combine maternity and paternity leave indicators (time only available TO each parent)
     tb["total_maternity_leave_to"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"]

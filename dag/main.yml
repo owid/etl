@@ -612,7 +612,7 @@ steps:
 
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/wb/2023-12-29/gender_statistics
+    - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
