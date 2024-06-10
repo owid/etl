@@ -1,74 +1,104 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page."""
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page.
+
+NOTE: This only works with >1.35 (nightly) version of Streamlit.
+"""
 from pathlib import Path
 
 import streamlit as st
-from st_pages import Page, Section, add_indentation, show_pages
-from streamlit_extras.switch_page_button import switch_page
 
-from apps.wizard import utils
 from apps.wizard.config import WIZARD_CONFIG
+
+# Logo
+# st.logo("docs/assets/logo.png")
+
+# st.write(st.__version__)
+
 
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
-# Page config
-st.set_page_config(page_title="Wizard", page_icon="🪄")
-st.title("Wizard")
+
+###########################################
+# DEFINE PAGES
+###########################################
+pages = {}
+
 
 # Initial apps (etl steps)
-toc = []
+pages_ = []
 for step in WIZARD_CONFIG["main"].values():
-    toc.append(
-        Page(
-            path=str(CURRENT_DIR / step["entrypoint"]),
-            name=step["title"],
+    pages_.append(
+        st.Page(
+            page=str(step["entrypoint"]),
+            title=step["title"],
             icon=step["emoji"],
+            url_path=step["title"].lower(),
+            default=step["title"] == "Home",
         )
     )
+pages["Overview"] = pages_
 
 # ETL steps
-toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
+pages_ = []
 for step in WIZARD_CONFIG["etl"]["steps"].values():
     if step["enable"]:
-        toc.append(
-            Page(
-                path=str(CURRENT_DIR / step["entrypoint"]),
-                name=step["title"],
+        pages_.append(
+            st.Page(
+                page=str(step["entrypoint"]),
+                title=step["title"],
                 icon=step["emoji"],
+                url_path=step["alias"],
             )
         )
+pages[WIZARD_CONFIG["etl"]["title"]] = pages_
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]
     if apps:
-        toc.append(Section(section["title"]))
+        pages_ = []
         for app in apps:
-            toc.append(
-                Page(
-                    path=str(CURRENT_DIR / app["entrypoint"]),
-                    name=app["title"],
+            pages_.append(
+                st.Page(
+                    page=str(app["entrypoint"]),
+                    title=app["title"],
                     icon=app["emoji"],
+                    url_path=app["alias"],
                 )
             )
+        pages[section["title"]] = pages_
 
-# Show table of content (apps)
-show_pages(toc)
+# Create navigation
+page = st.navigation(pages)
 
-# Add indentation
-add_indentation()
+# Run navigation
+if page is not None:
+    page.run()
+else:
+    st.error("Pages could not be loaded!")
 
-# Go to specific page if argument is passed
-## Home
-if utils.AppState.args.phase == "all":  # type: ignore
-    switch_page("Home")  # type: ignore
-## ETL step
-for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-    if utils.AppState.args.phase == step_name:  # type: ignore
-        switch_page(step_props["title"])  # type: ignore
-## Section
-for section in WIZARD_CONFIG["sections"]:
-    for app in section["apps"]:
-        if utils.AppState.args.phase == app["alias"]:  # type: ignore
-            switch_page(app["title"])  # type: ignore
+###########################################
+# Home app
+###########################################
+# st_show_home()
+
+
+# # EXPERIMENTAL
+# # Get query parameters from the URL
+# # query_params = st.query_params
+
+
+# # Go to specific page if argument is passed
+# ## Home
+# if utils.AppState.args.phase == "all":  # type: ignore
+#     switch_page("Home")  # type: ignore
+# ## ETL step
+# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+#     if utils.AppState.args.phase == step_name:  # type: ignore
+#         switch_page(step_props["title"])  # type: ignore
+# ## Section
+# for section in WIZARD_CONFIG["sections"]:
+#     for app in section["apps"]:
+#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
+#             switch_page(app["title"])  # type: ignore

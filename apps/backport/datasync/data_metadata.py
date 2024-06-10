@@ -9,6 +9,7 @@ import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from structlog import get_logger
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
@@ -16,6 +17,8 @@ from tenacity.wait import wait_fixed
 
 from etl import config
 from etl.db import read_sql
+
+log = get_logger()
 
 
 def _fetch_data_df_from_s3(variable_id: int):
@@ -44,7 +47,12 @@ def _fetch_data_df_from_s3(variable_id: int):
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
 
 
-def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], workers: int = 1) -> pd.DataFrame:
+def variable_data_df_from_s3(
+    engine: Engine,
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    value_as_str: bool = True,
+) -> pd.DataFrame:
     """Fetch data from S3 and add entity code and name from DB."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
@@ -55,10 +63,12 @@ def variable_data_df_from_s3(engine: Engine, variable_ids: List[int] = [], worke
         raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
     # we work with strings and convert to specific types later
-    df["value"] = df["value"].astype(str)
+    if value_as_str:
+        df["value"] = df["value"].astype("string")
 
     with Session(engine) as session:
-        return add_entity_code_and_name(session, df)
+        res = add_entity_code_and_name(session, df)
+        return res
 
 
 def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
@@ -88,7 +98,7 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
         missing_entities = set(unique_entities) - set(entities.entityId)
         raise ValueError(f"Missing entities in the database: {missing_entities}")
 
-    return pd.merge(df, entities, on="entityId")
+    return pd.merge(df, entities.astype({"entityName": "category", "entityCode": "category"}), on="entityId")
 
 
 def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:

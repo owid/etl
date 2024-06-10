@@ -21,13 +21,8 @@ steps:
     - data://garden/who/2022-07-17/who_vaccination
 
   # WHO Global Health Estimates
-  data://meadow/who/2021-07-01/ghe:
-    - walden://who/2021-07-01/ghe
   data://meadow/who/2022-09-30/ghe:
     - walden://who/2022-09-30/ghe
-  data://garden/who/2021-07-01/ghe:
-    - data://meadow/who/2021-07-01/ghe
-    - data://garden/regions/2023-01-01/regions
   data://garden/who/2022-09-30/ghe:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
@@ -36,9 +31,6 @@ steps:
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
 
-  #WHO - Global Health Observatory (Incomplete; waiting for WHO API update)
-  data://meadow/who/2021-07-01/gho:
-    - walden://who/2021-07-01/gho
   # WHO - Global Health Observatory (only suicides variable)
   data://meadow/who/2023-03-09/gho_suicides:
     - snapshot://who/2023-03-09/gho_suicides.json

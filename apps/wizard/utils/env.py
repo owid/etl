@@ -7,11 +7,12 @@ from typing import Literal, cast
 from dotenv import dotenv_values
 from typing_extensions import Self
 
+from apps.wizard.config import WIZARD_PORT
 from etl import config
-from etl.config import get_container_name
+from etl.config import ENV, get_container_name
 from etl.db import Engine, get_engine
 
-OWIDEnvType = Literal["production", "local", "staging", "unknown"]
+OWIDEnvType = Literal["production", "dev", "staging", "unknown"]
 
 
 @dataclass
@@ -38,7 +39,8 @@ class UnknownOWIDEnv(Exception):
 class OWIDEnv:
     """OWID environment."""
 
-    env_type_id: OWIDEnvType
+    _env_remote: OWIDEnvType | None
+    _env_local: OWIDEnvType | None
     conf: Config
 
     def __init__(
@@ -46,20 +48,43 @@ class OWIDEnv:
         conf: Config | None = None,
     ) -> None:
         self.conf = conf or cast(Config, config)
-        self.env_type_id = self.detect_env_type()
+        # Remote environment: environment where the database is located
+        self._env_remote = None
+        # Local environment: environment where the code is running
+        self._env_local = None  # "production", "staging", "dev"
 
-    def detect_env_type(self: Self) -> OWIDEnvType:
-        """Detect environment type."""
-        # production
-        if self.conf.DB_NAME == "live_grapher":
-            return "production"
-        # local
-        elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
-            return "local"
-        # other
-        elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
-            return "staging"
-        return "unknown"
+    @property
+    def env(self):
+        """Environment one's in. Only works if remote and local environment are the same."""
+        if self.env_remote == self.env_local:
+            return self.env_remote
+        raise ValueError(f"env_remote ({self.env_remote}) and env_local ({self.env_local}) are different.")
+
+    @property
+    def env_local(self):
+        """Detect local environment."""
+        if self._env_local is None:
+            self._env_local = cast(OWIDEnvType, ENV)
+        return self._env_local
+
+    @property
+    def env_remote(self):
+        """Detect remote environment."""
+        if self._env_remote is None:
+            # production
+            if self.conf.DB_NAME == "live_grapher":
+                self._env_remote = "production"
+            # local
+            elif self.conf.DB_NAME == "grapher" and self.conf.DB_USER == "grapher":
+                self._env_remote = "dev"
+            # other
+            elif self.conf.DB_NAME == "owid" and self.conf.DB_USER == "owid":
+                self._env_remote = "staging"
+            # unknown
+            else:
+                self._env_remote = "unknown"
+
+        return self._env_remote
 
     @classmethod
     def from_staging(cls, branch: str) -> Self:
@@ -93,31 +118,29 @@ class OWIDEnv:
     @property
     def site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "production":
+        if self.env_remote == "production":
             return "https://ourworldindata.org"
-        elif self.env_type_id == "local":
+        elif self.env_remote == "dev":
             return "http://localhost:3030"
-        elif self.env_type_id == "staging":
+        elif self.env_remote == "staging":
             return f"http://{self.conf.DB_HOST}"
         return None
 
     @property
     def name(self) -> str:
         """Get site."""
-        if self.env_type_id == "production":
-            return "production"
-        elif self.env_type_id == "local":
-            return "local"
-        elif self.env_type_id == "staging":
+        if self.env_remote in {"production", "dev"}:
+            return self.env_remote
+        elif self.env_remote == "staging":
             return f"{self.conf.DB_HOST}"
-        raise ValueError(f"Unknown env_type_id (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})")
+        raise ValueError(f"Unknown env_remote (DB_NAME/DB_USER={self.conf.DB_NAME}/{self.conf.DB_USER})")
 
     @property
     def base_site(self) -> str | None:
         """Get site."""
-        if self.env_type_id == "production":
+        if self.env_remote == "production":
             return "https://admin.owid.io"
-        elif self.env_type_id in ["local", "staging"]:
+        elif self.env_remote in ["dev", "staging"]:
             return self.site
         return None
 
@@ -132,11 +155,11 @@ class OWIDEnv:
     @property
     def api_site(self: Self) -> str:
         """Get api url."""
-        if self.env_type_id == "production":
+        if self.env_remote == "production":
             return "https://api.ourworldindata.org"
-        elif self.env_type_id == "staging":
+        elif self.env_remote == "staging":
             return f"https://api-staging.owid.io/{self.conf.DB_HOST}"
-        elif self.env_type_id == "local":
+        elif self.env_remote == "dev":
             return "http://localhost:8000"
         else:
             raise UnknownOWIDEnv()
@@ -173,6 +196,16 @@ class OWIDEnv:
         Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png
         """
         return f"{self.site}/grapher/thumbnail/{slug}.png"
+
+    @property
+    def wizard_url(self) -> str:
+        """Get wizard url."""
+        if self.env_local == "dev":
+            return f"http://localhost:{WIZARD_PORT}/"
+        elif self.env_local == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.base_site}/etl/wizard"
 
 
 OWID_ENV = OWIDEnv()

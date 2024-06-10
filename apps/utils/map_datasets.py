@@ -27,10 +27,12 @@ log = get_logger()
 
 
 def get_changed_files(
-    current_branch: Optional[str] = None, base_branch: str = "master", repo_path: Union[Path, str] = BASE_DIR
+    current_branch: Optional[str] = None,
+    base_branch: Optional[str] = None,
+    repo_path: Union[Path, str] = BASE_DIR,
+    only_committed: bool = False,
 ) -> Dict[str, Dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch."""
-    # Initialize a git repository object.
     repo = Repo(repo_path)
 
     if current_branch is None:
@@ -40,32 +42,55 @@ def get_changed_files(
         # Otherwise, switch to the given branch to compare from.
         repo.git.checkout(current_branch)
 
-    # Fetch latest changes from the remote to ensure diffs are accurate
+    if base_branch is None:
+        # If not specified, use "master" branch.
+        # However, if there is a "master-1" branch, that means we are on a staging server; if so, use "master-1".
+        base_branch = "master-1" if "master-1" in [branch.name for branch in repo.branches] else "master"
+
+    # Fetch the latest changes from the remote repository
     repo.remotes.origin.fetch()
 
-    # Get the diff between the current branch and the base branch, corrected command
-    diff_index = repo.git.diff(f"{base_branch}..{current_branch}", name_status=True, no_renames=True)
+    # Find the common ancestor of the remote base branch and the current local branch.
+    # In other words, "merge_base" is the last common commit between those two branches.
+    merge_base = repo.git.merge_base(f"origin/{base_branch}", f"{current_branch}").strip()
 
     # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
     # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
     # * diff_content shows the difference between files.
     changes = {}
+
+    # Get the diff between the current branch and the base branch.
+    diff_index = repo.git.diff(f"{merge_base}..{current_branch}", name_status=True, no_renames=True)
     if diff_index:
         for line in diff_index.splitlines():
             parts = line.split("\t")
             if len(parts) == 2:
                 status, file_path = parts
-                # Fetching diff content.
-                diff_content = repo.git.diff(f"{base_branch}...{current_branch}", "--", file_path, p=True)
+                # Fetch diff content.
+                diff_content = repo.git.diff(f"{merge_base}...{current_branch}", "--", file_path, p=True)
                 changes[file_path] = {"status": status, "diff": diff_content}
             else:
                 # Not sure if this could happen.
                 log.error(f"Could not parse diff line: {line}")
 
+    if not only_committed:
+        # Include uncommitted changes
+        uncommitted_diff = repo.git.diff(name_status=True, no_renames=True)
+        if uncommitted_diff:
+            for line in uncommitted_diff.splitlines():
+                parts = line.split("\t")
+                if len(parts) == 2:
+                    status, file_path = parts
+                    diff_content = repo.git.diff("--", file_path, p=True)
+                    changes[file_path] = {"status": status, "diff": diff_content}
+
+        # Add untracked files.
+        changes.update({file_path: {"status": "A", "diff": ""} for file_path in repo.untracked_files})
+
     return changes
 
 
-def get_grapher_changes(files_changed, steps_df):
+def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.DataFrame) -> List[Dict[str, Any]]:
     steps_affected = []
     files_unidentified = []
     grapher_changes = []

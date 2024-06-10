@@ -12,6 +12,7 @@ It is often necessary to add `default=None` or `init=False` to make pyright happ
 import json
 import random
 from datetime import date, datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
@@ -44,7 +45,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
@@ -977,6 +978,8 @@ class Variable(Base):
     grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -1353,8 +1356,17 @@ class Origin(Base):
         return origin
 
 
-# TODO: should we also add "rejected" status and exclude such charts from chart-sync?
-CHART_DIFF_STATUS = Literal["approved", "unapproved"]
+class ChartStatus(Enum):
+    APPROVED = "approved"
+    PENDING = "pending"
+    REJECTED = "rejected"
+
+
+CHART_DIFF_STATUS = Literal[
+    ChartStatus.APPROVED,
+    ChartStatus.PENDING,
+    ChartStatus.REJECTED,
+]
 
 
 class ChartDiffApprovals(Base):
@@ -1374,10 +1386,8 @@ class ChartDiffApprovals(Base):
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
-    def latest_chart_status(
-        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
-    ) -> CHART_DIFF_STATUS:
-        """Load the latest approval of the chart. If there's none, return 'unapproved'."""
+    def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
+        """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
         result = session.scalars(
             select(cls)
             .where(
@@ -1389,9 +1399,25 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
-            return result.status
+            if result.status == "unapproved":
+                return ChartStatus.PENDING.value
+            return result.status  # type: ignore
         else:
-            return "unapproved"
+            return ChartStatus.PENDING.value
+
+    @classmethod
+    def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
+        """Get history of values."""
+        result = session.scalars(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                # cls.sourceUpdatedAt == source_updated_at,
+                # cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+        ).fetchall()
+        return list(result)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

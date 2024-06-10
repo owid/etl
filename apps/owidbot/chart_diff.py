@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl.config import get_container_name
 
@@ -22,13 +22,13 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
 
     if charts_df.empty:
         conclusion = "neutral"
-        title = "No new or modified charts"
-    elif charts_df.approved.all():
+        title = "No charts for review"
+    elif charts_df.is_reviewed.all():
         conclusion = "success"
-        title = "All charts are approved"
+        title = "All charts are reviewed"
     else:
         conclusion = "failure"
-        title = "Some charts are not approved"
+        title = "Some charts are not reviewed"
 
     if not dry_run:
         # Create the check run and complete it in a single command
@@ -49,14 +49,16 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
-    if charts_df.empty or charts_df.approved.all():
+    if charts_df.empty or charts_df.is_reviewed.all():
         status = "✅"
     else:
         status = "❌"
 
+    # TODO: Should be using plain /chart-diff instead of query redirect (this is a workaround)
+    # Waiting for https://github.com/streamlit/streamlit/issues/8388#issuecomment-2145524922 to be resolved
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/Chart%20Diff"><b>chart-diff</b></a>: {status}</summary>
+<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status}</summary>
 {chart_diff}
 </details>
     """.strip()
@@ -67,7 +69,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 def call_chart_diff(branch: str) -> pd.DataFrame:
     source_engine = OWIDEnv.from_staging(branch).get_engine()
 
-    if OWID_ENV.env_type_id == "production":
+    if OWID_ENV.env_remote == "production":
         target_engine = OWID_ENV.get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
@@ -83,7 +85,10 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
                 df.append(
                     {
                         "chart_id": diff.chart_id,
-                        "approved": diff.approved,
+                        "is_approved": diff.is_approved,
+                        "is_pending": diff.is_pending,
+                        "is_rejected": diff.is_rejected,
+                        "is_reviewed": diff.is_reviewed,
                         "is_new": diff.is_new,
                     }
                 )
@@ -93,14 +98,14 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
 
 def format_chart_diff(df: pd.DataFrame) -> str:
     if df.empty:
-        return "No new or modified charts."
+        return "No charts for review."
 
     new = df[df.is_new]
     modified = df[~df.is_new]
 
     return f"""
 <ul>
-    <li>{len(new)} new charts ({new.approved.sum()} approved)</li>
-    <li>{len(modified)} modified charts ({modified.approved.sum()} approved)</li>
+    <li>{len(new)} new charts ({new.is_reviewed.sum()} reviewed)</li>
+    <li>{len(modified)} modified charts ({modified.is_reviewed.sum()} reviewed)</li>
 </ul>
     """.strip()
