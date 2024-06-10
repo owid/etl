@@ -42,6 +42,7 @@ SOURCE_ENGINE, TARGET_ENGINE = get_engines()
 ########################################
 st.session_state.chart_diffs = st.session_state.get("chart_diffs", {})
 st.session_state.arrange_charts_vertically = st.session_state.get("arrange_charts_vertically", False)
+st.session_state.conflicts_resolved_text = st.session_state.get("conflicts_resolved_text", {})
 
 ########################################
 # LOAD VARIABLES

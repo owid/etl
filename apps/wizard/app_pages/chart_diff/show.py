@@ -245,7 +245,7 @@ class ChartDiffShow:
     @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
     def _show_conflict_resolver(self) -> None:
         """Show conflict resolver in modal page."""
-        st_show_conflict_resolver(self.diff.source_chart.config, self.diff.target_chart.config)
+        st_show_conflict_resolver(self.diff)
 
     def _show_approval_history(self):
         """Show history of approvals of a chart-diff."""

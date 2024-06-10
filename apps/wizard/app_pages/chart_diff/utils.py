@@ -40,24 +40,3 @@ def prettify_date(chart):
         return chart.updatedAt.strftime("%b %d, %H:%M")
     else:
         return chart.updatedAt.strftime("%b %d, %Y %H:%M")
-
-
-def compare_chart_configs(c1, c2):
-    keys = set(c1.keys()).union(c2.keys())
-    diff_list = []
-
-    KEYS_IGNORE = {
-        "bakedGrapherURL",
-        "adminBaseUrl",
-        "dataApiUrl",
-        "version",
-    }
-    for key in keys:
-        if key in KEYS_IGNORE:
-            continue
-        value1 = c1.get(key)
-        value2 = c2.get(key)
-        if value1 != value2:
-            diff_list.append({"key": key, "value1": value1, "value2": value2})
-
-    return diff_list
