@@ -77,7 +77,7 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
     - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
-    -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
+    - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
 
   # DeepFakes
   data://garden/artificial_intelligence/2023-06-14/ai_deepfakes:
@@ -271,3 +271,9 @@ steps:
     - data://meadow/artificial_intelligence/2024-04-02/dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
     - data://garden/artificial_intelligence/2024-04-02/dynabench
+  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
+  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
+  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost

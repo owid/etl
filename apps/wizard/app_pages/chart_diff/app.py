@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
@@ -72,7 +72,7 @@ def get_chart_diffs():
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
 
-def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffModified]:
+def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
     """Get chart diffs from Grapher.
 
     This means, checking for chart changes in the database.
@@ -95,9 +95,9 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffMo
     return chart_diffs
 
 
-def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiffModified:
+def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiff:
     with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-        return ChartDiffModified.from_chart_id(
+        return ChartDiff.from_chart_id(
             chart_id=chart_id,
             source_session=source_session,
             target_session=target_session,
@@ -283,32 +283,39 @@ def _show_options():
             _show_options_misc()
 
 
+
+def make_text_summary(chart_diffs):
+    """Text summarizing the state of the revision."""
+    num_charts_total = len(st.session_state.chart_diffs)
+    num_charts = len(chart_diffs)
+    num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
+    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
+    if num_charts != num_charts_total:
+        text += f" Showing {num_charts} after filtering."
+    return text
+
+
 def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
     """Display chart diffs."""
     # Pagination menu
     with st.container(border=True):
         # Information
-        num_charts_total = len(st.session_state.chart_diffs)
-        num_charts = len(chart_diffs)
-        num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-        text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
-        if num_charts != num_charts_total:
-            text += f" Showing {num_charts} after filtering."
+        text = make_text_summary(chart_diffs)
         st.markdown(text)
 
         # Pagination
-        modified_charts_pagination = Pagination(
+        pagination = Pagination(
             chart_diffs,
             items_per_page=st.session_state["charts-per-page"],
             pagination_key=pagination_key,
         )
         ## Show controls only if needed
         if len(chart_diffs) > st.session_state["charts-per-page"]:
-            modified_charts_pagination.show_controls()
+            pagination.show_controls()
 
     # Show charts
     with Session(TARGET_ENGINE) as target_session:
-        for chart_diff in modified_charts_pagination.get_page_items():
+        for chart_diff in pagination.get_page_items():
             st_show(chart_diff, source_session, target_session)
 
 
@@ -349,7 +356,7 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
                 with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
                     render_chart_diffs(
                         [chart for chart in st.session_state.chart_diffs_filtered.values()],
-                        "pagination_modified",
+                        "pagination",
                         source_session,
                         target_session,
                     )

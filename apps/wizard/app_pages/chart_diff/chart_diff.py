@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from etl import grapher_model as gm
 
 
-class ChartDiffModified:
+class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
     # Chart in target environment (if new in source environment, there won't be one)

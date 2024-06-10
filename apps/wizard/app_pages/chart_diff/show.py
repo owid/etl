@@ -11,7 +11,7 @@ import streamlit as st
 from sqlalchemy.orm import Session
 
 import etl.grapher_model as gm
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, compare_chart_configs, prettify_date
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
@@ -46,7 +46,7 @@ class ChartDiffShow:
 
     def __init__(
         self,
-        diff: ChartDiffModified,
+        diff: ChartDiff,
         source_session: Session,
         target_session: Optional[Session] = None,
         expander: bool = True,
@@ -89,7 +89,7 @@ class ChartDiffShow:
 
     def _pull_latest_chart(self):
         """Get latest chart version from database."""
-        diff_new = ChartDiffModified.from_chart_id(
+        diff_new = ChartDiff.from_chart_id(
             chart_id=self.diff.chart_id,
             source_session=self.source_session,
             target_session=self.target_session,
@@ -281,7 +281,9 @@ class ChartDiffShow:
 
                 st_ace(
                     # label="Resolution",
-                    value=str(field["value1"]), language="json", wrap=True,
+                    value=str(field["value1"]),
+                    language="json",
+                    wrap=True,
                 )
 
                 # with col2:
@@ -339,13 +341,6 @@ class ChartDiffShow:
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-            # if not self.diff.in_conflict:
-            #     tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-            # else:
-            #     # Resolve conflict
-            #     tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
-            #     with tab2b:
-            #         self._show_conflict_resolver()
             with tab1:
                 self._show_chart_comparison()
             with tab2:
@@ -372,7 +367,7 @@ class ChartDiffShow:
 
 
 def st_show(
-    diff: ChartDiffModified,
+    diff: ChartDiff,
     source_session: Session,
     target_session: Optional[Session] = None,
     expander: bool = True,
