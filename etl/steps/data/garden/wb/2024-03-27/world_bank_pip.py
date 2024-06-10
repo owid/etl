@@ -852,11 +852,12 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True).copy()
     tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True).copy()
+    tb_inc_or_cons = tb.copy()
     tb_inc_or_cons_unsmoothed = tb.copy()
 
-    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons_unsmoothed)
+    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons)
 
-    tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons_unsmoothed)
+    tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
 
     # If both inc and cons are available in a given year, drop inc (legacy)
     tb_inc_or_cons_unsmoothed = remove_duplicates_inc_cons(tb_inc_or_cons_unsmoothed)
