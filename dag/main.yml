@@ -234,6 +234,8 @@ steps:
     - data://garden/technology/2023-03-16/hcctad
 
   # Happiness report
+  data://meadow/happiness/2024-06-09/happiness:
+    - snapshot://happiness/2024-06-09/happiness.xls
   data://meadow/happiness/2023-03-20/happiness:
     - snapshot://happiness/2023-03-20/happiness.xls
   data://meadow/happiness/2022-03-20/happiness:
