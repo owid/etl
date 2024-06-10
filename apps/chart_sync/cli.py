@@ -385,9 +385,7 @@ def _get_git_branch_from_commit_sha(commit_sha: str) -> str:
         raise ValueError(f"No closed pull requests found for commit {commit_sha}")
 
 
-def _load_revisions(
-    source_session: Session, chart_id: int, diff: ChartDiff
-) -> List[gm.SuggestedChartRevisions]:
+def _load_revisions(source_session: Session, chart_id: int, diff: ChartDiff) -> List[gm.SuggestedChartRevisions]:
     assert diff.target_chart
 
     revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
