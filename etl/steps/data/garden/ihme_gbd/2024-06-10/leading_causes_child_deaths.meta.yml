@@ -1,6 +1,4 @@
 definitions:
-  attribution: &attribution IHME - Global Burden of Disease Study (2019)
-  attribution_short: &attribution_short IHME - GBD (2019)
   description_key: &description_key
     - For each country-year the disease or injury that caused the most deaths according to the [IHME - Global Burden of Disease Study (2019)](https://ghdx.healthdata.org/gbd-2019).
   common:
@@ -10,7 +8,6 @@ definitions:
 
 
 dataset:
-  title: Leading causes of death in all ages and under-fives (IHME - GBD, 2019)
   update_period_days: 365
 tables:
   leading_cause_level_1_in_all_ages:
