@@ -244,7 +244,7 @@ class ChartDiffShow:
         )
 
         if config_compare:
-            with st.form("conflict-resolve-form"):
+            with st.form(f"conflict-form-{self.diff.chart_id}"):
                 st.markdown("### Conflict resolver")
                 st.markdown(
                     "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
@@ -256,14 +256,14 @@ class ChartDiffShow:
                         format_func=lambda x: f"{field['value1']} `PROD`"
                         if x == field["value1"]
                         else f"{field['value2']} `staging`",
-                        key=f"conflict-{field['key']}",
+                        key=f"conflict-radio-{self.diff.chart_id}-{field['key']}",
                         # horizontal=True,
                     )
                     st.text_input(
                         "Custom value",
                         label_visibility="collapsed",
                         placeholder="Enter a custom value",
-                        key=f"conflict-custom-{field['key']}",
+                        key=f"conflict-custom-{self.diff.chart_id}-{field['key']}",
                     )
                 st.form_submit_button("Resolve", help="This will update the chart in the staging server.")
 
