@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl import grapher_model as gm
@@ -160,7 +160,7 @@ def cli(
             charts_synced = 0
 
             for chart_id in chart_ids:
-                diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
+                diff = ChartDiff.from_chart_id(chart_id, source_session, target_session)
 
                 chart_slug = diff.source_chart.config["slug"]
 
@@ -386,7 +386,7 @@ def _get_git_branch_from_commit_sha(commit_sha: str) -> str:
 
 
 def _load_revisions(
-    source_session: Session, chart_id: int, diff: ChartDiffModified
+    source_session: Session, chart_id: int, diff: ChartDiff
 ) -> List[gm.SuggestedChartRevisions]:
     assert diff.target_chart
 
@@ -405,7 +405,7 @@ def _load_revisions(
     return revs
 
 
-def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModified, dry_run: bool) -> None:
+def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
     assert diff.target_chart
 
     message = f"""

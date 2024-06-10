@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
@@ -72,7 +72,7 @@ def get_chart_diffs():
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
 
-def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffModified]:
+def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
     """Get chart diffs from Grapher.
 
     This means, checking for chart changes in the database.
@@ -95,9 +95,9 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiffMo
     return chart_diffs
 
 
-def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiffModified:
+def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiff:
     with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-        return ChartDiffModified.from_chart_id(
+        return ChartDiff.from_chart_id(
             chart_id=chart_id,
             source_session=source_session,
             target_session=target_session,
