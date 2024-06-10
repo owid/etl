@@ -30,6 +30,11 @@ def run(dest_dir: str) -> None:
 
     assert not tb[["system", "days_since_1949"]].isnull().any().any(), "Index columns should not have NaN values"
 
+    # Replace these entries with 'Multimodal'
+    tb["domain"] = tb["domain"].astype(str)
+    tb.loc[tb["domain"].str.contains("Multimodal"), "domain"] = "Multimodal"
+    tb.loc[tb["domain"].str.contains("Vision,Image generation"), "domain"] = "Vision and image generation"
+
     # Add metadata to the publication date column
     tb["publication_date"].metadata.origins = tb["cost__inflation_adjusted"].metadata.origins
     tb = tb.format(["days_since_1949", "system"])
