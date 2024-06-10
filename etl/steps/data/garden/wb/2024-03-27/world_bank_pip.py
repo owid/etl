@@ -193,8 +193,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
-    tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
+    tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011_unsmoothed, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
+    tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017_unsmoothed, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
 
     # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
     tb_inc_or_cons_2017 = regional_headcount(tb_inc_or_cons_2017)
@@ -205,6 +205,11 @@ def run(dest_dir: str) -> None:
     # Add metadata by code
     tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
     tb_cons_2011 = add_metadata_vars(tb_garden=tb_cons_2011, ppp_version=2011, welfare_type="consumption")
+    tb_inc_or_cons_2011_unsmoothed = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2011_unsmoothed,
+        ppp_version=2011,
+        welfare_type="income_consumption_unsmoothed",
+    )
     tb_inc_or_cons_2011 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2011,
         ppp_version=2011,
@@ -213,6 +218,11 @@ def run(dest_dir: str) -> None:
 
     tb_inc_2017 = add_metadata_vars(tb_garden=tb_inc_2017, ppp_version=2017, welfare_type="income")
     tb_cons_2017 = add_metadata_vars(tb_garden=tb_cons_2017, ppp_version=2017, welfare_type="consumption")
+    tb_inc_or_cons_2017_unsmoothed = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2017_unsmoothed,
+        ppp_version=2017,
+        welfare_type="income_consumption_unsmoothed",
+    )
     tb_inc_or_cons_2017 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2017,
         ppp_version=2017,
@@ -236,10 +246,12 @@ def run(dest_dir: str) -> None:
     index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
     tb_inc_2011 = tb_inc_2011.format(keys=index_cols)
     tb_cons_2011 = tb_cons_2011.format(keys=index_cols)
+    tb_inc_or_cons_2011_unsmoothed = tb_inc_or_cons_2011_unsmoothed.format(keys=index_cols)
     tb_inc_or_cons_2011 = tb_inc_or_cons_2011.format(keys=index_cols)
 
     tb_inc_2017 = tb_inc_2017.format(keys=index_cols)
     tb_cons_2017 = tb_cons_2017.format(keys=index_cols)
+    tb_inc_or_cons_2017_unsmoothed = tb_inc_or_cons_2017_unsmoothed.format(keys=index_cols)
     tb_inc_or_cons_2017 = tb_inc_or_cons_2017.format(keys=index_cols)
 
     tb_percentiles_2011 = tb_percentiles_2011.format(keys=index_cols_percentiles)
@@ -835,15 +847,15 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True).copy()
     tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True).copy()
-    tb_inc_or_cons = tb.copy()
+    tb_inc_or_cons_unsmoothed = tb.copy()
 
     # If both inc and cons are available in a given year, drop inc
 
-    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons)
+    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons_unsmoothed)
 
-    tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
+    tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons_unsmoothed)
 
-    return tb_inc, tb_cons, tb_inc_or_cons
+    return tb_inc, tb_cons, tb_inc_or_cons_unsmoothed, tb_inc_or_cons
 
 
 def create_smooth_inc_cons_series(tb: Table) -> Table:
@@ -957,6 +969,8 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
     """
     Check for jumps in the dataset, which can be caused by combining income and consumption estimates for one country series.
     """
+    tb = tb.copy()
+
     # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
 
     # Define columns to check: all the headcount ratio columns
