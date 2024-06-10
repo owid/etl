@@ -844,7 +844,7 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
     return tb_2011, tb_2017
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
+def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
     """
     Separate income and consumption data
     """
