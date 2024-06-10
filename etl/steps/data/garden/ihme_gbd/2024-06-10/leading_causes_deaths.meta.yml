@@ -13,7 +13,7 @@ tables:
     title: Leading causes of death in all ages, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
     description: "The leading broad cause of death from the Global Burden of Disease Study (2019) in all ages. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
     variables:
-      variable:
+      leading_deaths_level_1:
         title: The leading cause of death in all ages (level 1)
         description_key: *description_key
         unit: ""
@@ -22,28 +22,28 @@ tables:
   leading_cause_level_2_in_all_ages:
     title: Leading causes of death in all ages, based on IHME GBD cause level 2. There are 22 broad categories in level 2.
     variables:
-      variable:
+      leading_deaths_level_2:
         title: The leading cause of death in all ages (level 2)
         description_key: *description_key
         unit: ""
   leading_cause_level_3_in_all_ages:
     title: Leading causes of death in all ages, based on IHME GBD cause level 3. There are 169 categories in level 3.
     variables:
-      variable:
+      leading_deaths_level_3:
         title: The leading cause of death in all ages (level 3)
         description_key: *description_key
         unit: ""
   leading_cause_level_4_in_all_ages:
     title: Leading causes of death in all ages, based on IHME GBD cause level 4. There are 165 categories in level 4.
     variables:
-      variable:
+      leading_deaths_level_4:
         title: The leading cause of death in all ages (level 4)
         description_key: *description_key
         unit: ""
   leading_cause_level_owid_all_ages_in_all_ages:
     title: Leading causes of death in all ages, based on OWIDs mix of IHME GBD hierarchies.
     variables:
-      variable:
+      leading_deaths_level_owid:
         title: The leading cause of death in all ages (OWID mix)
         description_key: *description_key
         unit: ""

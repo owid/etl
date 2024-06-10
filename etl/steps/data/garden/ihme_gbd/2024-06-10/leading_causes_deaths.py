@@ -42,6 +42,7 @@ def run(dest_dir: str) -> None:
                 age_group=age_group,
                 tb_cause=tb_cause,
                 level_causes=level_causes,
+                level=level,
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
             # Make the disease names more readable
@@ -74,7 +75,9 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], short_name: str) -> Table:
+def create_hierarchy_table(
+    age_group: str, tb_cause: Table, level_causes: List[str], short_name: str, level: str
+) -> Table:
     """
     For each level_cause find the relevant table in ds_cause and create a table with the leading cause of death in each country-year
 
@@ -91,6 +94,7 @@ def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[s
     tb_out = pr.multi_merge(tb_out, on=["country", "year"], how="outer", validate="one_to_one")
     # Melt the table from wide to long to make it easier to groupby
     long_tb = pr.melt(tb_out, id_vars=["country", "year"])
+    long_tb = long_tb.rename(columns={"variable": f"leading_deaths_level_{level}"})
     # Find the cause of death with the highest number of deaths in each country-year
     leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)["value"].idxmax()
     leading_causes_tb = long_tb.loc[leading_causes_idx]
