@@ -283,7 +283,6 @@ def _show_options():
             _show_options_misc()
 
 
-
 def make_text_summary(chart_diffs):
     """Text summarizing the state of the revision."""
     num_charts_total = len(st.session_state.chart_diffs)
