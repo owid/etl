@@ -21,6 +21,8 @@ tables:
          unit: cigarettes
          short_unit: cigarettes
          description_short: Manufactured cigarettes sold in this country in this year.
+         description_key:
+           - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Manufactured cigarette sales
          display:
@@ -30,6 +32,8 @@ tables:
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Daily sales of manufactured cigarettes to people aged 15 and over.
+         description_key:
+           - The time series for Germany includes a population weighted average for West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Manufactured cigarette sales per adult per day
          display:
@@ -41,6 +45,8 @@ tables:
          description_short: Hand-rolled cigarettes sold in this country in this year.
          description_key:
           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
+          - For Latvia, Papyrosi cigarettes are counted instead of loose tobacco/ hand-rolled cigarettes.
+          - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Hand-rolled cigarette sales
          display:
@@ -50,6 +56,10 @@ tables:
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Daily sales of hand-rolled cigarettes to people aged 15 and over.
+         description_key:
+           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
+           - For Latvia, Papyrosi cigarettes are counted instead of loose tobacco/ hand-rolled cigarettes.
+           - The time series for Germany includes a population weighted average for West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Hand-rolled cigarette sales per adult per day
          display:
@@ -59,7 +69,9 @@ tables:
          unit: cigarettes
          short_unit: cigarettes
          description_short: Total cigarettes sold in this country in this year.
-         description_processing: Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
+         description_key:
+         - Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
+         - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Total cigarette sales
          display:
@@ -69,7 +81,9 @@ tables:
          unit: cigarettes per adult per day
          short_unit: cigarettes
          description_short: Daily sales of manufactured and hand-rolled cigarettes to people aged 15 and over.
-         description_processing:  Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
+         description_key:
+         - Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
+         - The time series for Germany includes a population weighted average for West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Total cigarette sales per adult per day
          display:
@@ -80,7 +94,8 @@ tables:
          short_unit: t
          description_short: Sales of all tobacco products in this country in this year.
          description_key:
-          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
+          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing.
+          - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Sales of all tobacco products
          display:
@@ -91,46 +106,10 @@ tables:
          short_unit: grams
          description_short: Daily sales of all tobacco products to people aged 15 and over.
          description_key:
-          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing
+          - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing.
+          - The time series for Germany includes a population weighted average for West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
            title_public: Sales of all tobacco products per adult per day
          display:
             numDecimalPlaces: 1
-
-
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-
 
