@@ -25,8 +25,8 @@ def run(dest_dir: str) -> None:
     tb_cause = tb_cause[tb_cause["metric"] == "Number"]
     tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
     # We'll iterate through each level of the hierarchy to find the leading cause of death in under-fives in each country-year
-    levels = [2, 3, 4, "owid_all_ages", "owid_under_5"]
-    age_groups = ["<5 years", "All ages"]
+    levels = [1, 2, 3, 4, "owid_all_ages", "owid_under_5"]
+    age_groups = ["All ages"]
 
     tb_out = []
     for level in levels:
@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
             # Make the disease names more readable
-            tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy, level=level)
+            # tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy, level=level)
             tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
             tb_out.append(tb_level)
 
@@ -74,7 +74,7 @@ def run(dest_dir: str) -> None:
 
 def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], short_name: str) -> Table:
     """
-    For each level_cause find the relevent table in ds_cause and create a table with the leading cause of death in each country-year
+    For each level_cause find the relevant table in ds_cause and create a table with the leading cause of death in each country-year
 
     """
     tb_out = []
@@ -114,13 +114,13 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     # Add more succinct disease names
 
     disease_dict = {
-        "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
-        "Neonatal preterm birth": "Preterm birth",
+        # "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
+        # "Neonatal preterm birth": "Preterm birth",
         "Exposure to forces of nature": "Natural disasters",
         "Neoplasms": "Cancer",
     }
 
-    tb[disease_col] = tb[disease_col].replace(disease_dict)
+    tb[disease_col] = tb[disease_col].replace(disease_dict, errors="raise")
 
     return tb
 
