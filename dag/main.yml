@@ -257,6 +257,11 @@ steps:
   data://meadow/happiness/2012-03-20/happiness:
     - snapshot://happiness/2012-03-20/happiness.xlsx
 
+  data://garden/happiness/2024-06-09/happiness:
+    - data://meadow/happiness/2024-06-09/happiness
+    - data://garden/happiness/2023-03-20/happiness
+    - data://garden/demography/2023-03-31/population
+
   data://garden/happiness/2023-03-20/happiness:
     - data://meadow/happiness/2023-03-20/happiness
     - data://meadow/happiness/2022-03-20/happiness
