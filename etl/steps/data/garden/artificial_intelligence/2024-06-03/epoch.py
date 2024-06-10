@@ -30,59 +30,47 @@ def run(dest_dir: str) -> None:
     columns = ["system", "domain", "organization_categorization"]
     tb[columns] = tb[columns].astype(str)
 
-    # Function to categorize organization entries
-    def categorize(entry):
-        # Define mapping of keywords to categories
-        categories = {
-            "Academia",
-            "Industry",
-            "Research collective",
-            "Government",
-        }
+    def simplify_entry(entry):
+        """
+        Simplifies an entry of organization categories which can include many entries of Industry, Academia etc.
+        Removes duplicates, ensures all words except the first one start with a lower case letter,and joins the categories with ", " and " and " before the last one.
+        """
+        # Check for "nan"
+        if entry == "nan":
+            return "Not specified"
 
-        # Define special cases
-        special_cases = {
-            ("Academia", "Industry"): "Academia and industry collaboration",
-            ("Academia", "Research collective"): "Academia and research collective collaboration",
-            ("Academia", "Government"): "Academia and government collaboration",
-            ("Industry", "Government"): "Industry and government collaboration",
-            ("Industry", "Research collective"): "Industry and research collective collaboration",
-        }
+        # Split the entry into categories, convert to set to remove duplicates
+        categories = sorted(set(entry.split(",")))
 
-        entries = set(entry.split(","))
-        matched_categories = {category for category in categories if category in entries}
+        # Make sure all words except the first one start with a lower case letter
+        categories = [categories[0]] + [category.lower() for category in categories[1:]]
 
-        # Check for special cases
-        for keywords, category in special_cases.items():
-            # Assert that the there are at most 2 organization categories
-            assert (
-                len(keywords) <= 2
-            ), "Each AI system should have at most 2 types of organization categories. If more than 2, need to update the special_cases dictionary"
-            if set(keywords).issubset(matched_categories):
-                return category
+        # Join the categories with ", " and " and " before the last one
+        if len(categories) > 1:
+            simplified_entry = ", ".join(categories[:-1]) + " and " + categories[-1]
+        else:
+            simplified_entry = categories[0]
 
-        # Check for standard cases
-        if len(matched_categories) == 1:
-            return next(iter(matched_categories))
+        return simplified_entry
 
-        paths.log.info(f" {entry} entry in organization column was classified as Not specified")
-        return "Not specified"
+    tb["organization_categorization"] = tb["organization_categorization"].apply(simplify_entry)
 
-    # Clean up organizations
-    tb["organization_categorization"] = tb["organization_categorization"].apply(categorize)
     # Get the unique values in the organization_categorization column and compare them to expected affiliations
     unique_values = set(tb["organization_categorization"])
     expected_values = {
-        "Academia and government collaboration",
-        "Academia and industry collaboration",
         "Industry",
-        "Industry and government collaboration",
         "Academia",
-        "Industry and research collective collaboration",
-        "Not specified",
-        "Academia and research collective collaboration",
-        "Research collective",
         "Government",
+        "Academia and industry",
+        "Academia and research collective",
+        "Industry and research collective",
+        "Academia, industry and research collective",
+        "Government and industry",
+        "Research collective",
+        "Academia, government and industry",
+        "Academia and government",
+        "Academia, government, industry and research collective",
+        "Not specified",
     }
     assert unique_values == expected_values, "Unexpected affiliations in organization_categorization column"
 
