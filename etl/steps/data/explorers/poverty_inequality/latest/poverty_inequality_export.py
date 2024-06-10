@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from garden datasets.
-    tb_pip = ds_pip["income_consumption_unsmoothed_2017"].reset_index()
+    tb_pip = ds_pip["income_consumption_2017_unsmoothed"].reset_index()
     tb_lis = ds_lis["luxembourg_income_study"].reset_index()
     tb_wid = ds_wid["world_inequality_database"].reset_index()
     tb_lis_adults = ds_lis["luxembourg_income_study_adults"].reset_index()

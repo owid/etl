@@ -208,8 +208,9 @@ def run(dest_dir: str) -> None:
     tb_inc_or_cons_2011_unsmoothed = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2011_unsmoothed,
         ppp_version=2011,
-        welfare_type="income_consumption_unsmoothed",
+        welfare_type="income_consumption",
     )
+    tb_inc_or_cons_2011_unsmoothed.m.short_name = "income_consumption_2011_unsmoothed"
     tb_inc_or_cons_2011 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2011,
         ppp_version=2011,
@@ -221,8 +222,10 @@ def run(dest_dir: str) -> None:
     tb_inc_or_cons_2017_unsmoothed = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2017_unsmoothed,
         ppp_version=2017,
-        welfare_type="income_consumption_unsmoothed",
+        welfare_type="income_consumption",
     )
+    tb_inc_or_cons_2017_unsmoothed.m.short_name = "income_consumption_2017_unsmoothed"
+    tb
     tb_inc_or_cons_2017 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2017,
         ppp_version=2017,
@@ -288,9 +291,11 @@ def run(dest_dir: str) -> None:
         [
             tb_inc_2011,
             tb_cons_2011,
+            tb_inc_or_cons_2011_unsmoothed,
             tb_inc_or_cons_2011,
             tb_inc_2017,
             tb_cons_2017,
+            tb_inc_or_cons_2017_unsmoothed,
             tb_inc_or_cons_2017,
             tb_inc_2011_2017,
             tb_cons_2011_2017,
@@ -849,11 +854,12 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True).copy()
     tb_inc_or_cons_unsmoothed = tb.copy()
 
-    # If both inc and cons are available in a given year, drop inc
-
     tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons_unsmoothed)
 
     tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons_unsmoothed)
+
+    # If both inc and cons are available in a given year, drop inc (legacy)
+    tb_inc_or_cons_unsmoothed = remove_duplicates_inc_cons(tb_inc_or_cons_unsmoothed)
 
     return tb_inc, tb_cons, tb_inc_or_cons_unsmoothed, tb_inc_or_cons
 
@@ -1019,6 +1025,23 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             "check_diff_welfare_type",
         ]
     )
+
+    return tb
+
+
+def remove_duplicates_inc_cons(tb: Table) -> Table:
+    """
+    Remove duplicates in the income and consumption data
+    This is only for legacy purposes, because we don't use this for OWID, but we do for Joe's PhD
+    """
+    # Flag duplicates – indicating multiple welfare_types
+    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
+    tb = tb.sort_values(by=["ppp_version", "country", "year", "reporting_level", "welfare_type"], ignore_index=True)
+    tb["duplicate_flag"] = tb.duplicated(subset=["ppp_version", "country", "year", "reporting_level"])
+
+    # Drop income where income and consumption are available
+    tb = tb[(~tb["duplicate_flag"]) | (tb["welfare_type"] == "consumption")]
+    tb.drop(columns=["duplicate_flag"], inplace=True)
 
     return tb
 
