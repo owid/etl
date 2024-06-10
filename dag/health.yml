@@ -113,7 +113,7 @@ steps:
 
   # IHME GBD Leading cause of child deaths - update
   data://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
-    - snapshot://ihme_gbd/2024-06-10/cause_hierarchy.xlsx
+    - snapshot://ihme_gbd/2024-06-10/cause_hierarchy.csv
   data://garden/ihme_gbd/2024-06-10/leading_causes_child_deaths:
     - data://garden/ihme_gbd/2024-05-20/gbd_cause
     - data://meadow/ihme_gbd/2024-06-10/cause_hierarchy

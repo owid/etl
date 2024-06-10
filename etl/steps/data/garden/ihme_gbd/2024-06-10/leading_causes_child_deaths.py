@@ -164,9 +164,10 @@ def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
         "Chronic kidney disease",
         "Poisonings",
         "Protein-energy malnutrition",
-        "Road injury",
+        "Road injuries",
         "Fire, heat, and hot substances",
         "Acute hepatitis",
+        "COVID-19",
     ]
 
     under_five = [
@@ -190,20 +191,25 @@ def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
         "Neonatal encephalopathy due to birth asphyxia and trauma",
         "Meningitis",
         "Other neonatal disorders",
-        "Whooping cough",
         "Diarrheal diseases",
         "Fire, heat, and hot substances",
         "Road injuries",
         "Tuberculosis",
         "HIV/AIDS",
         "Drowning",
-        "Malaria" "Syphilis",
+        "Malaria",
+        "Syphilis",
+        "COVID-19",
     ]
+    missing_items = [item for item in all_ages if item not in tb_hierarchy["cause_name"].values]
+    assert len(missing_items) == 0, f"{missing_items} not in list, check spelling"
     msk_all_ages = tb_hierarchy["cause_name"].isin(all_ages)
     tb_hierarchy_all_ages = tb_hierarchy[msk_all_ages]
     tb_hierarchy_all_ages = tb_hierarchy_all_ages.copy()
     tb_hierarchy_all_ages["level"] = "owid_all_ages"
 
+    missing_items_u5 = [item for item in under_five if item not in tb_hierarchy["cause_name"].values]
+    assert len(missing_items_u5) == 0, f"{missing_items_u5} not in list, check spelling"
     msk_under_five = tb_hierarchy["cause_name"].isin(under_five)
     tb_hierarchy_under_five = tb_hierarchy[msk_under_five]
     tb_hierarchy_under_five = tb_hierarchy_under_five.copy()

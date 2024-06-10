@@ -6,9 +6,11 @@ as a csv and then upload it via create_snapshot.
 
 Download the file directly from here:
 
-    https://ghdx.healthdata.org/record/ihme-data/gbd-2019-cause-rei-and-location-hierarchies
+   https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
      - Click on Files (5) tab
      - Download 'Cause Hierarchy [XLSX]'
+     - Save as a csv
+     - Manual upload here
 
 """
 
@@ -24,11 +26,12 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def main(upload: bool, path_to_file: str) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/cause_hierarchy.xlsx")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/cause_hierarchy.csv")
     # Download file snapshot to data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload)
+    snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
 if __name__ == "__main__":
