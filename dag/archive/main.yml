@@ -195,7 +195,7 @@ steps:
     - data://meadow/wb/2023-12-29/gender_statistics
   data://grapher/wb/2023-12-29/gender_statistics:
     - data://garden/wb/2023-12-29/gender_statistics
-    -
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
