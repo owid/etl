@@ -225,7 +225,6 @@ def run(dest_dir: str) -> None:
         welfare_type="income_consumption",
     )
     tb_inc_or_cons_2017_unsmoothed.m.short_name = "income_consumption_2017_unsmoothed"
-    tb
     tb_inc_or_cons_2017 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2017,
         ppp_version=2017,

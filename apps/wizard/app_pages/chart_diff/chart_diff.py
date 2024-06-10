@@ -141,6 +141,9 @@ class ChartDiff:
             target_df = target_chart.load_variables_checksums(target_session)
             source_df, target_df = source_df.align(target_df)
             modified_checksum = source_df != target_df
+
+            # If checksum has not been filled yet, assume unchanged
+            modified_checksum[target_df.isna()] = False
         else:
             modified_checksum = None
 
@@ -157,11 +160,11 @@ class ChartDiff:
         changes = []
         if self.modified_checksum is not None:
             if self.modified_checksum["dataChecksum"].any():
-                changes.append("DATA CHANGE")
+                changes.append("data")
             if self.modified_checksum["metadataChecksum"].any():
-                changes.append("METADATA CHANGE")
+                changes.append("metadata")
         if self.target_chart and not self.configs_are_equal():
-            changes.append("CONFIG CHANGE")
+            changes.append("config")
         return changes
 
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
@@ -223,7 +226,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("version", "id", "isPublished")
+        exclude_keys = ("version", "id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
         config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
         config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
         return config_1 == config_2

@@ -2,7 +2,7 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 import click
 import pandas as pd
@@ -153,7 +153,7 @@ def cli(
             if chart_id:
                 chart_ids = {chart_id}
             else:
-                chart_ids = modified_chart_ids(source_session, target_session)
+                chart_ids = modified_charts_by_admin(source_session, target_session)
 
             log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
@@ -488,7 +488,7 @@ def _chart_config_diff(
     )
 
 
-def modified_chart_ids(source_session: Session, target_session: Session) -> Set[int]:
+def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
     """Get charts that have been modified in staging. It includes chart with different
     config, data or metadata checksums. It assumes that all changes on staging server are
     done by Admin user with ID = 1."""
@@ -513,10 +513,12 @@ def modified_chart_ids(source_session: Session, target_session: Session) -> Set[
     where = """
         -- only compare datasets or charts that have been updated on staging server
         -- by Admin user
-        (c.lastEditedByUserId = 1 or c.publishedByUserId = 1)
-        or
-        -- include all charts from datasets that have been updated
-        (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
+        (
+            (c.lastEditedByUserId = 1 or c.publishedByUserId = 1)
+            or
+            -- include all charts from datasets that have been updated
+            (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
+        )
     """
     source_df = read_sql(base_q + where, source_session)
 
@@ -533,14 +535,20 @@ def modified_chart_ids(source_session: Session, target_session: Session) -> Set[
     # NOTE: new charts will be already in source
     source_df, target_df = source_df.align(target_df, join="left")
 
-    # get charts / variables with differing checksums
-    cols = ["dataChecksum", "metadataChecksum", "chartChecksum"]
-    ix = (source_df[cols] != target_df[cols]).any(axis=1)
-
-    source_df = source_df[ix]
-    target_df = target_df[ix]
-
-    return set(source_df.index.get_level_values("chartId").unique())
+    # return differences in data / metadata / config
+    diff = (
+        (source_df != target_df)
+        .groupby("chartId")
+        .max()
+        .rename(
+            columns={
+                "dataChecksum": "dataEdited",
+                "metadataChecksum": "metadataEdited",
+                "chartChecksum": "configEdited",
+            }
+        )
+    )
+    return diff
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:

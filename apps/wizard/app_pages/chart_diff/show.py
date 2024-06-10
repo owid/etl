@@ -72,7 +72,7 @@ class ChartDiffShow:
         if self.diff.is_draft:
             tags.append(" :gray-background[**DRAFT**]")
         for change in self.diff.checksum_changes():
-            tags.append(f":red-background[**{change}**]")
+            tags.append(f":red-background[**{change.upper()} CHANGE**]")
         label += f":break[{' '.join(tags)}]"
         return label
 
