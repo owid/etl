@@ -22,7 +22,8 @@ RATE_DEFAULT_IN = 0.005
 MODEL_EQUIVALENCES = {
     # "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
     "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
-    "gpt-4-turbo-preview": "gpt-4-turbo-2024-04-09",
+    "gpt-4-turbo-preview": "gpt-4-0125-preview",
+    "gpt-4-turbo": "gpt-4-turbo-2024-04-09",
     "gpt-4o": "gpt-4o-2024-05-13",
 }
 MODEL_RATES_1000_TOKEN = {

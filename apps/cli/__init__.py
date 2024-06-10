@@ -73,6 +73,7 @@ SUBGROUPS = {
             "run-python-step": "etl.run_python_step.main",
             "map-datasets": "apps.utils.map_datasets.cli",
             "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
+            "draft-pr": "apps.utils.draft_pull_request.cli",
         },
     },
     "b": {

@@ -1,25 +1,32 @@
 ---
 status: new
 tags:
-    - 👷 Staff
+  - 👷 Staff
 ---
-!!! tip "`STAGING` over `ENV_FILE`"
+
+<!-- !!! tip "`STAGING` over `ENV_FILE`"
     Using `STAGING` variable is __recommended way__ over using `ENV_FILE` when working with staging servers. It is easier and more secure to use than `ENV_FILE`.
 
-    Hence, we do not recommend using `ENV_FILE` unless you are aware of what it comprises.
-
+    Hence, we do not recommend using `ENV_FILE` unless you are aware of what it comprises. -->
 
 In ETL, we often have to interact with a external services (including some of ours), such as our database, OpenAI models, cloud buckets, APIs, etc.
 
 To this end, we work with `.env` files, where we define all the required environment variables. An example template is available in the root directory of the repository (see [.env.example](https://github.com/owid/etl/blob/master/.env.example)). Based on this file, staff members create their own `.env` file.
 
-
 !!! note "Which environment is used?"
-    By default, your commands will load all the environment variables defined in `.env`. In case you want to use another file, you can use the prefix `ENV_FILE=.env.name` before the command. E.g. `ENV_FILE=.env.name etl run ...` or `ENV_FILE=.env.name etlwiz charts`.
+By default, your commands will load all the environment variables defined in `.env`. In case you want to use another file, you can use the prefix `ENV_FILE=.env.name` before the command. E.g. `ENV_FILE=.env.name etl run ...` or `ENV_FILE=.env.name etlwiz charts`.
+
+    **The use of `ENV_FILE` is not recommended** unless you are aware of what it comprises.
 
 ## Working with staging environments
 
-To use staging servers, use the environment variable `STAGING` to select which staging server to use.
+!!! tip "Recommended"
+
+    Set `STAGING=1` in your `.env` to automatically detect the staging server from the branch name.
+
+    This way, you can simply run `etl run <short_name>` without setting `STAGING` variable each time.
+
+When working with staging servers, use the environment variable `STAGING` to select which staging server to use.
 
 Personal staging servers use usernames, and PR staging servers use the branch name. For example,
 
@@ -33,12 +40,8 @@ or
 STAGING=feature-123 etl run <short_name> --grapher
 ```
 
-!!! tip
-
-    Set `STAGING=1` in your `.env` to automatically detect the staging server from the branch name.
-
-
 ### Personal staging environment
+
 Working with a personal remote staging server is an alternative to working with a local environment. It is very easy to set up and you don't have to worry about cloning [owid-grapher](https://github.com/owid/owid-grapher).
 
 To set it up, follow these steps:
@@ -58,19 +61,22 @@ Staging server staging-site-yourname created
 ```
 
 If you want to run ETL against a staging server, use `STAGING=yourname` flag. For instance
+
 ```
 STAGING=yourname etl ... --grapher
 ```
 
 Note that personal staging servers go rapidly out of sync (contrary to PR staging servers), and are not meant to be used for long-term development but rather for quick tests. To update your server to the most recent changes, rebase and push back to your branch
+
 ```
 git fetch && git rebase origin/master && git push -f
 ```
 
 ### PR staging environment
+
 Whenever you create a pull request in the etl repository, a dedicated staging server is automatically created. This server runs the OWID admin site and database, and includes all the changes from your PR (e.g. new datasets). This allows you to test your changes before they are merged into the live site.
 
-These servers are useful to share your changes with other members of the team, and, for instance, to [create chart revisions](indicator-upgrade#match-old-indicators-to-new-ones).
+These servers are useful to share your changes with other members of the team, and, for instance, to [update charts with new indicators](ingest-data/update-charts.md#match-old-indicators-to-new-ones).
 
 !!! info "Learn more about [PR staging servers](../staging-servers)"
 
@@ -122,8 +128,8 @@ for instance
 
 http://staging-site-mojmir:8881/explorers/who/latest/flu/flu.csv
 
-
 ## Commonly used environment variables
+
 `.env` files can have some of the following variables defined in them:
 
 - `OPENAI_API_KEY`: OpenAI API key. Used to access OpenAI's models.
@@ -132,9 +138,9 @@ http://staging-site-mojmir:8881/explorers/who/latest/flu/flu.csv
 - `DEBUG`: Set to `1` to enable debug mode (faster local development).
 - `STAGING`: Set to `1` to automatically detect STAGING from branch name or to name of the staging server.
 - Other variables to access our database:
-    - `GRAPHER_USER_ID`: The user ID of the Grapher database. Used to label user's contribution in the database.
-    - `DB_USER`: The user of the database.
-    - `DB_NAME`: The name of the database.
-    - `DB_PASS`: The password of the database.
-    - `DB_PORT`: The port of the database.
-    - `DB_HOST`: The host of the database (e.g. IP).
+  - `GRAPHER_USER_ID`: The user ID of the Grapher database. Used to label user's contribution in the database.
+  - `DB_USER`: The user of the database.
+  - `DB_NAME`: The name of the database.
+  - `DB_PASS`: The password of the database.
+  - `DB_PORT`: The port of the database.
+  - `DB_HOST`: The host of the database (e.g. IP).

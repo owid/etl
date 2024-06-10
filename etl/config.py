@@ -177,7 +177,7 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 6
+ETL_EPOCH = 5
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
@@ -208,6 +208,9 @@ OWIDBOT_APP_PRIVATE_KEY_PATH = env.get("OWIDBOT_APP_PRIVATE_KEY_PATH", None)
 OWIDBOT_APP_CLIENT_ID = env.get("OWIDBOT_APP_CLIENT_ID", None)
 # get it from https://github.com/settings/installations
 OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
+
+# Load github token (only used for creating PRs from the command line).
+GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
 
 def enable_bugsnag() -> None:

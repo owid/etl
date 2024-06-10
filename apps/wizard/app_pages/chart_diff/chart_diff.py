@@ -47,6 +47,10 @@ class ChartDiffModified:
         return not self.is_modified
 
     @property
+    def is_draft(self) -> bool:
+        return self.source_chart.publishedAt is None
+
+    @property
     def latest_update(self) -> dt.datetime:
         """Get latest time of change (either be staging or live)."""
         if self.target_chart is None:
