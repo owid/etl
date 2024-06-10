@@ -297,18 +297,18 @@ def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, tar
         st.markdown(text)
 
         # Pagination
-        modified_charts_pagination = Pagination(
+        pagination = Pagination(
             chart_diffs,
             items_per_page=st.session_state["charts-per-page"],
             pagination_key=pagination_key,
         )
         ## Show controls only if needed
         if len(chart_diffs) > st.session_state["charts-per-page"]:
-            modified_charts_pagination.show_controls()
+            pagination.show_controls()
 
     # Show charts
     with Session(TARGET_ENGINE) as target_session:
-        for chart_diff in modified_charts_pagination.get_page_items():
+        for chart_diff in pagination.get_page_items():
             st_show(chart_diff, source_session, target_session)
 
 
@@ -349,7 +349,7 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
                 with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
                     render_chart_diffs(
                         [chart for chart in st.session_state.chart_diffs_filtered.values()],
-                        "pagination_modified",
+                        "pagination",
                         source_session,
                         target_session,
                     )
