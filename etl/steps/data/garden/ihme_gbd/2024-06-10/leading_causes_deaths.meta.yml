@@ -40,7 +40,7 @@ tables:
         title: The leading cause of death in all ages (level 4)
         description_key: *description_key
         unit: ""
-  leading_cause_level_owid_all_ages_in_all_ages:
+  leading_cause_level_owid_in_all_ages:
     title: Leading causes of death in all ages, based on OWIDs mix of IHME GBD hierarchies.
     variables:
       leading_deaths_level_owid:

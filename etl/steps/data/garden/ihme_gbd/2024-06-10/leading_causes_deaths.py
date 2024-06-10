@@ -25,9 +25,9 @@ def run(dest_dir: str) -> None:
     tb_hierarchy = tb_hierarchy[tb_hierarchy["yld_only"].isna()]
     tb_cause["cause_name_underscore"] = tb_cause["cause"].apply(underscore)
     tb_cause = tb_cause[tb_cause["metric"] == "Number"]
-    tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
+    tb_hierarchy = add_owid_hierarchy(tb_hierarchy, owid_level_name="owid")
     # We'll iterate through each level of the hierarchy to find the leading cause of death in under-fives in each country-year
-    levels = [1, 2, 3, 4, "owid_all_ages"]
+    levels = [1, 2, 3, 4, "owid"]
     age_groups = ["All ages"]
 
     tb_out = []
@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
                 tb_cause=tb_cause,
                 level_causes=level_causes,
                 level=level,
-                short_name=f"leading_cause_level_{level}_in_{age_group}",
+                short_name=f"leading_cause_level_{level}_in_{age_group.lower().replace(' ', '_')}",
             )
             # Make the disease names more readable
             # tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy, level=level)
@@ -120,8 +120,6 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     # Add more succinct disease names
 
     disease_dict = {
-        # "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
-        # "Neonatal preterm birth": "Preterm birth",
         "Exposure to forces of nature": "Natural disasters",
         "Neoplasms": "Cancer",
     }
@@ -131,7 +129,7 @@ def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
     return tb
 
 
-def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
+def add_owid_hierarchy(tb_hierarchy: Table, owid_level_name: str) -> Table:
     """
     At OWID we use a mixture of level 2 and 3 GBD causes of death, to limit the number of causes shown on a chart.
     These are the causes of death we show in our causes of death charts e.g. https://ourworldindata.org/grapher/causes-of-death-in-children-under-5
@@ -171,54 +169,13 @@ def add_owid_hierarchy(tb_hierarchy: Table) -> Table:
         "Acute hepatitis",
         "COVID-19",
     ]
-
-    under_five = [
-        "Lower respiratory infections",
-        "Invasive Non-typhoidal Salmonella (iNTS)",
-        "Interpersonal violence",
-        "Nutritional deficiencies",
-        "Acute hepatitis",
-        "Neoplasms",
-        "Measles",
-        "Digestive diseases",
-        "Cirrhosis and other chronic liver diseases",
-        "Chronic kidney disease",
-        "Cardiovascular diseases",
-        "Congenital birth defects",
-        "Neonatal preterm birth",
-        "Environmental heat and cold exposure",
-        "Neonatal sepsis and other neonatal infections",
-        "Exposure to forces of nature",
-        "Diabetes mellitus",
-        "Neonatal encephalopathy due to birth asphyxia and trauma",
-        "Meningitis",
-        "Other neonatal disorders",
-        "Diarrheal diseases",
-        "Fire, heat, and hot substances",
-        "Road injuries",
-        "Tuberculosis",
-        "HIV/AIDS",
-        "Drowning",
-        "Malaria",
-        "Syphilis",
-        "COVID-19",
-    ]
     missing_items = [item for item in all_ages if item not in tb_hierarchy["cause_name"].values]
     assert len(missing_items) == 0, f"{missing_items} not in list, check spelling"
     msk_all_ages = tb_hierarchy["cause_name"].isin(all_ages)
     tb_hierarchy_all_ages = tb_hierarchy[msk_all_ages]
     tb_hierarchy_all_ages = tb_hierarchy_all_ages.copy()
-    tb_hierarchy_all_ages["level"] = "owid_all_ages"
+    tb_hierarchy_all_ages["level"] = owid_level_name
 
-    missing_items_u5 = [item for item in under_five if item not in tb_hierarchy["cause_name"].values]
-    assert len(missing_items_u5) == 0, f"{missing_items_u5} not in list, check spelling"
-    msk_under_five = tb_hierarchy["cause_name"].isin(under_five)
-    tb_hierarchy_under_five = tb_hierarchy[msk_under_five]
-    tb_hierarchy_under_five = tb_hierarchy_under_five.copy()
-    tb_hierarchy_under_five["level"] = "owid_under_5"
-
-    tb_hierarchy = pr.concat(
-        [tb_hierarchy_all_ages, tb_hierarchy_under_five, tb_hierarchy], ignore_index=True
-    ).drop_duplicates()
+    tb_hierarchy = pr.concat([tb_hierarchy_all_ages, tb_hierarchy], ignore_index=True).drop_duplicates()
 
     return tb_hierarchy
