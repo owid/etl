@@ -42,6 +42,7 @@ class OWIDEnv:
     _env_remote: OWIDEnvType | None
     _env_local: OWIDEnvType | None
     conf: Config
+    _engine: Engine | None
 
     def __init__(
         self: Self,
@@ -52,6 +53,8 @@ class OWIDEnv:
         self._env_remote = None
         # Local environment: environment where the code is running
         self._env_local = None  # "production", "staging", "dev"
+        # Engine (cached)
+        self._engine = None
 
     @property
     def env(self):
@@ -112,8 +115,18 @@ class OWIDEnv:
         return cls.from_staging(staging_or_env_file)
 
     def get_engine(self) -> Engine:
-        """Get engine for env."""
+        """Get engine for env.
+
+        DEPRECATED: Use property `engine` property instead.
+        """
         return get_engine(self.conf.__dict__)
+
+    @property
+    def engine(self) -> Engine:
+        """Get engine for env."""
+        if self._engine is None:
+            self._engine = get_engine(self.conf.__dict__)
+        return self._engine
 
     @property
     def site(self) -> str | None:

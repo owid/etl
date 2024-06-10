@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl.config import get_container_name
 
@@ -81,7 +81,7 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
             modified_chart_ids = _modified_chart_ids_by_admin(source_session)
 
             for chart_id in modified_chart_ids:
-                diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
+                diff = ChartDiff.from_chart_id(chart_id, source_session, target_session)
                 df.append(
                     {
                         "chart_id": diff.chart_id,
