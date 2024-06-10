@@ -49,29 +49,20 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     else:
         column_display = "name"
 
-    # st.dataframe(df)
-    # Build dataset display name
-
-    df["display_step"] = "[" + df["id"].astype(str) + "] " + df["step"]
+    # Create a column to display the dataset by its dataset id followed by its title.
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
+    # Create a dictionary mapping from that display to dataset id.
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
+    # Create a column to display the dataset by its dataset id followed by its ETL step.
+    df["display_step"] = "[" + df["id"].astype(str) + "] " + df["step"]
+    # Create a dictionary mapping from that display to dataset id.
     display_step_to_id_mapping = df.set_index("display_step")["id"].to_dict()
-
-    def display_to_id_mapping(display):
-        try:
-            return display_name_to_id_mapping[display]
-        except KeyError:
-            return display_step_to_id_mapping[display]
 
     # Header
     st.header(
         "Dataset update",
         help="Variable mapping will be done from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts.",
     )
-
-    # Sort datasets by updatedAt
-    # df = df.sort_values("updatedAt", ascending=False).reset_index(drop=True)
-    df = df.reset_index(drop=True)
 
     # View options
     with st.popover("View options"):
@@ -91,18 +82,31 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     ## New dataset
     if st.session_state.is_any_migration and not st.session_state.show_all_datasets:
+        # If a new dataset mapping has been detected (and if the "Show all datasets" option is not activated)
+        # the dropdown of new datasets should only show the detected new datasets.
         options = df[df["migration_new"]].reset_index(drop=True)
     else:
+        # Otherwise, show all datasets in grapher.
         options = df.reset_index(drop=True)
 
     if "new_dataset_selectbox" in st.session_state:
-        dataset_new_id = display_to_id_mapping(st.session_state["new_dataset_selectbox"])
+        # Find the dataset id of the new dataset chosen from the dropdown.
+        dataset_new_id = display_name_to_id_mapping.get(
+            st.session_state["new_dataset_selectbox"]
+        ) or display_step_to_id_mapping.get(st.session_state["new_dataset_selectbox"])
+        # Find the position of that dataset among the options to show in the new datasets dropdown.
+        # The dropdown will now start on this position.
         index = options[options["id"] == dataset_new_id].index.item()
     else:
+        # If no new dataset has been chosen yet, the new datasets dropdown should start from the beginning.
         index = 0
 
     def _dataset_new_selectbox_on_change():
-        # If the new dataset changes, ensure the old dataset changes accordingly.
+        # This function will be executed when a new dataset is chosen from the dropdown.
+        # If "Show all datasets" is activated, nothing should happen.
+        # Otherwise, we want that the choice of new dataset alters the old dataset.
+        # (But note that, if the old dataset changes, we don't want the new dataset to change).
+        # So, if the new dataset changes, ensure the old dataset changes accordingly.
         if not st.session_state.show_all_datasets:
             set_states(
                 {
@@ -113,6 +117,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             )
         set_states_if_form_is_modified()
 
+    # New dataset dropdown.
     dataset_new = st.selectbox(
         label="**New dataset**",
         options=options[f"display_{column_display}"],
@@ -122,16 +127,21 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         on_change=_dataset_new_selectbox_on_change,
     )
 
+    ## Old dataset
+    # Prepare the list of options to show in the old dataset dropdown.
     options = sort_datasets_old(df).reset_index(drop=True)
     if "old_dataset_selectbox" in st.session_state:
+        # If the user chooses a dataset from the dropdown, find the position of that dataset in the list.
+        # The dropdown will stay in that dataset.
         index = options[
             (options["display_name"] == st.session_state["old_dataset_selectbox"])
             | (options["display_step"] == st.session_state["old_dataset_selectbox"])
         ].index.item()
     else:
+        # If no old dataset has been yet chosen, start the list from the beginning.
         index = 0
-    # index = 0
-    ## Old dataset
+
+    # Old dataset dropdown.
     dataset_old = st.selectbox(
         label="**Old dataset**: Select the dataset that you are updating",
         options=options[f"display_{column_display}"],
@@ -183,10 +193,9 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         )
         reset_indicator_form()
 
-    # Get IDs of datasets
-    dataset_old_id = display_to_id_mapping(dataset_old)
-    dataset_new_id = display_to_id_mapping(dataset_new)
-    set_states({"migration_new_id": dataset_new_id})
+    # Get IDs of the chosen old and new datasets.
+    dataset_old_id = display_name_to_id_mapping.get(dataset_old) or display_step_to_id_mapping.get(dataset_old)
+    dataset_new_id = display_name_to_id_mapping.get(dataset_new) or display_step_to_id_mapping.get(dataset_new)
 
     return SearchConfigForm(
         dataset_old_id=str(dataset_old_id),
