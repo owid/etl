@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     tb_cause = tb_cause[tb_cause["metric"] == "Number"]
     tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
     # We'll iterate through each level of the hierarchy to find the leading cause of death in under-fives in each country-year
-    levels = [1, 2, 3, 4, "owid_all_ages", "owid_under_5"]
+    levels = [1, 2, 3, 4, "owid_all_ages"]
     age_groups = ["All ages"]
 
     tb_out = []
