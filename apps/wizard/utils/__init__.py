@@ -562,7 +562,7 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     if "label" not in kwargs:
         kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
     if "icon" not in kwargs:
-        kwargs["icon"] = PAGES_BY_ALIAS[alias]["emoji"]
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
 
     if border:
         with st.container(border=True):
