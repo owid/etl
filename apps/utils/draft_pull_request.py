@@ -3,7 +3,7 @@
 Usage:
 - If you have already created a new local branch, run this script without specifying any argument.
   The 'master' branch will be assumed as the base branch of the new draft pull request.
-- If you are in the master branch on your local ETL repo, specify a --new-branch argument.
+- If you are in the master branch on your local ETL repo, pass the name of the new branch as an argument.
   This will create a new local branch, which will be pushed to remote to create a new draft pull request.
 - If you want the base branch to be different from 'master', specify it with the --base-branch argument.
 
@@ -30,11 +30,11 @@ GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
 
 
 @click.command(name="draft-pr", cls=RichCommand, help=__doc__)
-@click.option(
-    "--new-branch",
+@click.argument(
+    "new-branch",
     type=str,
     default=None,
-    help="Name of new branch to create (if not given, current branch will be used).",
+    required=False,
 )
 @click.option(
     "--base-branch", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
@@ -94,7 +94,9 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
             )
             return
         try:
-            log.info(f"Switching to base branch '{base_branch}', creating new branch from there, and switching to it.")
+            log.info(
+                f"Switching to base branch '{base_branch}', creating new branch '{new_branch}' from there, and switching to it."
+            )
             repo.git.checkout(base_branch)
             repo.git.checkout("-b", new_branch)
         except GitCommandError as e:
