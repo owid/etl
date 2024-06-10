@@ -96,7 +96,10 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         ) or display_step_to_id_mapping.get(st.session_state["new_dataset_selectbox"])
         # Find the position of that dataset among the options to show in the new datasets dropdown.
         # The dropdown will now start on this position.
-        index = options[options["id"] == dataset_new_id].index.item()
+        if dataset_new_id in set(options["id"]):
+            index = options[options["id"] == dataset_new_id].index.item()
+        else:
+            index = 0
     else:
         # If no new dataset has been chosen yet, the new datasets dropdown should start from the beginning.
         index = 0
