@@ -1,7 +1,7 @@
 from typing import Any, List
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
@@ -15,15 +15,18 @@ log = get_logger()
 def run(dest_dir: str) -> None:
     # Load in the cause of death data and hierarchy of causes data
     ds_cause = paths.load_dataset("gbd_cause")
+    tb_cause = ds_cause["gbd_cause_deaths"].reset_index()
     ds_hierarchy = paths.load_dataset("cause_hierarchy")
     tb_hierarchy = ds_hierarchy["cause_hierarchy"].reset_index()
 
     # Underscore the hierarchy cause names to match tb_cause
     tb_hierarchy["cause_name_underscore"] = tb_hierarchy["cause_name"].apply(underscore)
+    tb_cause["cause_name_underscore"] = tb_cause["cause"].apply(underscore)
+    tb_cause = tb_cause[tb_cause["metric"] == "Number"]
     tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
     # We'll iterate through each level of the hierarchy to find the leading cause of death in under-fives in each country-year
     levels = [1, 2, 3, 4, "owid_all_ages", "owid_under_5"]
-    age_groups = ["under_5", "all_ages"]
+    age_groups = ["<5 years", "All ages"]
 
     tb_out = []
     for level in levels:
@@ -35,7 +38,7 @@ def run(dest_dir: str) -> None:
             # Create table with leading cause of death at this level for each country-year
             tb_level = create_hierarchy_table(
                 age_group=age_group,
-                ds_cause=ds_cause,
+                tb_cause=tb_cause,
                 level_causes=level_causes,
                 short_name=f"leading_cause_level_{level}_in_{age_group}",
             )
@@ -69,34 +72,27 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_hierarchy_table(age_group: str, ds_cause: Dataset, level_causes: List[str], short_name: str) -> Table:
+def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], short_name: str) -> Table:
     """
     For each level_cause find the relevent table in ds_cause and create a table with the leading cause of death in each country-year
 
     """
     tb_out = []
     for cause in level_causes:
-        cause_table_name = cause + f"__both_sexes__{age_group}"
-        tb = ds_cause[cause_table_name].reset_index()
-        assert tb.shape[0] > 0, f"Table {cause_table_name} is empty"
-        death_col = f"deaths_that_are_from_{cause}__in_both_sexes_aged_{age_group}"
-        if death_col in tb.columns:
-            cols = ["country", "year", death_col]
-            tb = tb[cols]
-            tb = tb.rename(columns={death_col: cause}, errors="raise")
-            tb_out.append(tb)
+        tb = tb_cause[(tb_cause["cause_name_underscore"] == cause) & (tb_cause["age"] == age_group)]
+        assert tb.shape[0] > 0, f"Table {cause} is empty"
+        cols = ["country", "year", "value"]
+        tb = tb[cols]
+        tb = tb.rename(columns={"value": cause}, errors="raise")
+        tb_out.append(tb)
 
-    tb_out = pr.concat(tb_out, ignore_index=True)
+    tb_out = pr.multi_merge(tb_out, on=["country", "year"], how="outer", validate="one_to_one")
     # Melt the table from wide to long to make it easier to groupby
-    long_tb = pr.melt(
-        tb_out, id_vars=["country", "year"], var_name=f"disease_{short_name}", value_name=f"deaths_{short_name}"
-    )
-    long_tb = long_tb.dropna(how="any")
+    long_tb = pr.melt(tb_out, id_vars=["country", "year"])
     # Find the cause of death with the highest number of deaths in each country-year
-    long_tb[f"disease_{short_name}"] = long_tb[f"disease_{short_name}"].astype(str)
-    leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)[f"deaths_{short_name}"].idxmax()
+    leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)["value"].idxmax()
     leading_causes_tb = long_tb.loc[leading_causes_idx]
-    leading_causes_tb = leading_causes_tb.drop(columns=[f"deaths_{short_name}"])
+    leading_causes_tb = leading_causes_tb.drop(columns=["value"])
     leading_causes_tb.metadata.short_name = short_name
 
     return leading_causes_tb
