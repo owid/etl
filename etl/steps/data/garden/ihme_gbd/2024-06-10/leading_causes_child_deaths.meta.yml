@@ -1,0 +1,133 @@
+definitions:
+  attribution: &attribution IHME - Global Burden of Disease Study (2019)
+  attribution_short: &attribution_short IHME - GBD (2019)
+  description_key: &description_key
+    - For each country-year the disease or injury that caused the most deaths according to the [IHME - Global Burden of Disease Study (2019)](https://ghdx.healthdata.org/gbd-2019).
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+
+
+dataset:
+  title: Leading causes of death in all ages and under-fives (IHME - GBD, 2019)
+  update_period_days: 365
+tables:
+  leading_cause_level_1_in_all_ages:
+    title: Leading causes of death in all ages, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
+    description: "The leading broad cause of death from the Global Burden of Disease Study (2019) in all ages. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
+    variables:
+      disease_leading_cause_level_1_in_all_ages:
+        title: The leading cause of death in all ages (level 1)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          title_public: Leading causes of death
+  leading_cause_level_1_in_under_5:
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
+    description: "The leading broad cause of death from the Global Burden of Disease Study (2019) in under-five. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
+    variables:
+      disease_leading_cause_level_1_in_under_5:
+        title: The leading cause of death in under-fives (level 1)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
+  leading_cause_level_2_in_all_ages:
+    title: Leading causes of death in all ages, based on IHME GBD cause level 2. There are 22 broad categories in level 2.
+    variables:
+      disease_leading_cause_level_2_in_all_ages:
+        title: The leading cause of death in all ages (level 2)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+  leading_cause_level_2_in_under_5:
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 2. There are 22 broad categories in level 2.
+    variables:
+      disease_leading_cause_level_2_in_under_5:
+        title: The leading cause of death in under-fives (level 2)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
+  leading_cause_level_3_in_all_ages:
+    title: Leading causes of death in all ages, based on IHME GBD cause level 3. There are 169 categories in level 3.
+    variables:
+      disease_leading_cause_level_3_in_all_ages:
+        title: The leading cause of death in all ages (level 3)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+  leading_cause_level_3_in_under_5:
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 3. There are 169 categories in level 3.
+    variables:
+      disease_leading_cause_level_3_in_under_5:
+        title: The leading cause of death in under-fives (level 3)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
+  leading_cause_level_4_in_all_ages:
+    title: Leading causes of death in all ages, based on IHME GBD cause level 4. There are 165 categories in level 4.
+    variables:
+      disease_leading_cause_level_4_in_all_ages:
+        title: The leading cause of death in all ages (level 4)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+  leading_cause_level_4_in_under_5:
+    title: Leading causes of death in under-fives, based on IHME GBD cause level 4. There are 165 categories in level 4.
+    variables:
+      disease_leading_cause_level_4_in_under_5:
+        title: The leading cause of death in under-fives (level 4)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
+  leading_cause_level_owid_all_ages_in_all_ages:
+    title: Leading causes of death in all ages, based on OWIDs mix of IHME GBD hierarchies.
+    variables:
+      disease_leading_cause_level_owid_all_ages_in_all_ages:
+        title: The leading cause of death in all ages (OWID mix)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+  leading_cause_level_owid_under_5_in_under_5:
+    title: Leading causes of death in under-fives, based on OWIDs mix of IHME GBD hierarchies.
+    variables:
+      disease_leading_cause_level_owid_under_5_in_under_5:
+        title: The leading cause of death in under-fives (OWID mix)
+        description_key: *description_key
+        unit: ""
+        presentation:
+          attribution: *attribution
+          attribution_short: *attribution_short
+          topic_tags:
+            - Causes of Death
+            - Child & Infant Mortality
