@@ -21,6 +21,8 @@ def run(dest_dir: str) -> None:
 
     # Underscore the hierarchy cause names to match tb_cause
     tb_hierarchy["cause_name_underscore"] = tb_hierarchy["cause_name"].apply(underscore)
+    # Dropping out the rows which are only in the yld_only column (years lost to disease) - typically diseases that don't cause deaths e.g. tooth caries
+    tb_hierarchy = tb_hierarchy[tb_hierarchy["yld_only"].isna()]
     tb_cause["cause_name_underscore"] = tb_cause["cause"].apply(underscore)
     tb_cause = tb_cause[tb_cause["metric"] == "Number"]
     tb_hierarchy = add_owid_hierarchy(tb_hierarchy)
