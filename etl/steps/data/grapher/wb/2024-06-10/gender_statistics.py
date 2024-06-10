@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dependency("gender_statistics")
+    ds_garden = paths.load_dataset("gender_statistics")
 
     # Read table from garden dataset.
     tb = ds_garden["gender_statistics"]
