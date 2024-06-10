@@ -1,20 +1,14 @@
-"""Load a meadow dataset and create a garden dataset."""
+""" Generate aggregated table for total yearly and cumulative number of notable AI systems for each organization."""
 import shared as sh
-from structlog import get_logger
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Short name
-SHORT_NAME = paths.short_name
 
 
 def run(dest_dir: str) -> None:
-    log.info("epoch.start")
+    paths.log.info("epoch_aggregates_organizations.start")
 
     #
     # Load inputs.
@@ -41,13 +35,12 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints",
         "notability_criteria",
     ]
-    short_name = SHORT_NAME
 
-    # Aggregate the data by country
-    tb_agg = sh.calculate_aggregates(tb, "organization", short_name, unused_columns)
+    # Aggregate the data by organization
+    tb_agg = sh.calculate_aggregates(tb, "organization", paths.short_name, unused_columns)
 
-    # Set the index to year and country
-    tb_agg = tb_agg.set_index(["year", "organization"], verify_integrity=True)
+    # Set the index to year and organization
+    tb_agg = tb_agg.format(["year", "organization"])
 
     #
     # Save outputs.
@@ -58,4 +51,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("epoch.end")
+    paths.log.info("epoch_aggregates_organizations.end")

@@ -1,22 +1,13 @@
-"""Load a meadow dataset and create a garden dataset."""
-import pandas as pd
-import shared as sh
-from structlog import get_logger
+""" Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
 from etl.helpers import PathFinder, create_dataset
 
-log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-SHORT_NAME = paths.short_name
 
 
 def run(dest_dir: str) -> None:
-    """
-    Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of Researcher affiliation.
-    """
-    log.info("epoch_aggregates_affiliation.start")
+    paths.log.info("epoch_aggregates_affiliation.start")
 
     #
     # Load inputs.
@@ -63,13 +54,13 @@ def run(dest_dir: str) -> None:
         tb_agg[col].metadata.origins = origins
 
     # Set the short_name metadata of the table
-    tb_agg.metadata.short_name = SHORT_NAME
+    tb_agg.metadata.short_name = paths.short_name
 
     # Set the index to year and country
-    tb_agg = tb_agg.set_index(["year", "organization_categorization"], verify_integrity=True)
+    tb_agg = tb_agg.format(["year", "organization_categorization"])
 
     # Save outputs.
     ds_garden = create_dataset(dest_dir, tables=[tb_agg])
     ds_garden.save()
 
-    log.info("epoch_aggregates_affiliation.end")
+    paths.log.info("epoch_aggregates_affiliation.end")

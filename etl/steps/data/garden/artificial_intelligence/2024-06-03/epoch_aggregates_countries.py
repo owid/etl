@@ -1,20 +1,15 @@
-"""Load a meadow dataset and create a garden dataset."""
+""" Generate aggregated table for total yearly and cumulative number of notable AI systems in each country."""
 import shared as sh
-from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
-log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Short name
-SHORT_NAME = paths.short_name
 
 
 def run(dest_dir: str) -> None:
-    log.info("epoch.start")
+    paths.log.info("epoch_aggregates_countries.start")
 
     #
     # Load inputs.
@@ -41,10 +36,9 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints",
         "notability_criteria",
     ]
-    short_name = SHORT_NAME
 
     # Aggregate the data by country
-    tb_agg = sh.calculate_aggregates(tb, "country__from_organization", short_name, unused_columns)
+    tb_agg = sh.calculate_aggregates(tb, "country__from_organization", paths.short_name, unused_columns)
 
     # Rename the 'country__from_organization' column to 'country'
     tb_agg = tb_agg.rename(columns={"country__from_organization": "country"})
@@ -53,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb_agg = geo.harmonize_countries(df=tb_agg, countries_file=paths.country_mapping_path)
 
     # Set the index to year and country
-    tb_agg = tb_agg.set_index(["year", "country"], verify_integrity=True)
+    tb_agg = tb_agg.format(["year", "country"])
 
     #
     # Save outputs.
@@ -64,4 +58,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("epoch.end")
+    paths.log.info("epoch_aggregates_countries.end")

@@ -22,14 +22,15 @@ meta:
       The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models."
     # Citation
     producer: Epoch
-    citation_full: 'Epoch, ‘Parameter, Compute and Data Trends in Machine Learning’. Published online at epochai.org. Retrieved from: ‘https://epochai.org/mlinputs/visualization’ [online resource]'
+    citation_full: "Epoch AI, ‘Parameter, Compute and Data Trends in Machine Learning’. Published online at epochai.org. Retrieved from: ‘https://epochai.org/data/epochdb/visualization’ [online resource]"
     # Files
     url_main: https://epochai.org/mlinputs/visualization
     url_download: https://epochai.org/data/epochdb/all_systems.csv
     date_accessed: 2024-06-03
     # License
     license:
-      name: Public domain
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
 outs:
   - md5: e0b014cecc217f9d473b8c38e680ce1c
     size: 2001765

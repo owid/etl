@@ -9,7 +9,7 @@ definitions:
     unit: 'AI systems'
     short_unit: ''
     description_short: Total annual number of notable machine learning models developed by various organizations. {definitions.desc_update}
-    description_processing: >
+    description_processing: |-
       The count of notable AI systems per organization is derived by tallying the instances of machine learning models associated with each organization. It's important to note that a single machine learning model can be associated with multiple organizations. The classification into organizations is determined by the specific entities that primarily contributed to the development of the AI system.
     description_from_producer: Multiple-select multiple-choice of organization(s) who created the system. In the spreadsheet, this field is formatted as a string, with multiple organizations separated by commas.
 # Learn more about the available fields:

@@ -19,14 +19,11 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["epoch"]
-    tb = tb.reset_index()
     #
     # Process data.
     #
     # Rename for plotting model name as country in grapher
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
-
+    tb = tb.rename_index_names({"system": "country", "dats_since_1949": "year"})
     #
     # Save outputs.
     #

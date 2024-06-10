@@ -1,9 +1,4 @@
 """Load a garden dataset and create a grapher dataset."""
-
-from typing import cast
-
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
 # Get paths and naming conventions for current step.
@@ -15,18 +10,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("epoch_aggregates_organizations"))
+    ds_garden = paths.load_dataset("epoch_aggregates_organizations")
 
     # Read table from garden dataset.
     tb = ds_garden["epoch_aggregates_organizations"]
-    tb = tb.reset_index()
     #
     # Process data.
     #
     # Rename for plotting model domain as country in grapher
-    tb = tb.rename(columns={"organization": "country"})
-    tb = tb.set_index(["country", "year"])
-
+    tb = tb.rename_index_names(
+        {
+            "organization": "country",
+        }
+    )
     #
     # Save outputs.
     #
