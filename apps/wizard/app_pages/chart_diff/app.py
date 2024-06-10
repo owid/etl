@@ -283,17 +283,23 @@ def _show_options():
             _show_options_misc()
 
 
+def make_text_summary(chart_diffs):
+    """Text summarizing the state of the revision."""
+    num_charts_total = len(st.session_state.chart_diffs)
+    num_charts = len(chart_diffs)
+    num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
+    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
+    if num_charts != num_charts_total:
+        text += f" Showing {num_charts} after filtering."
+    return text
+
+
 def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
     """Display chart diffs."""
     # Pagination menu
     with st.container(border=True):
         # Information
-        num_charts_total = len(st.session_state.chart_diffs)
-        num_charts = len(chart_diffs)
-        num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-        text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
-        if num_charts != num_charts_total:
-            text += f" Showing {num_charts} after filtering."
+        text = make_text_summary(chart_diffs)
         st.markdown(text)
 
         # Pagination
