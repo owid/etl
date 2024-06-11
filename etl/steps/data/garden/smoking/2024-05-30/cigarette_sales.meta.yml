@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
+    processing_level: major
     presentation:
       topic_tags:
         - Smoking
