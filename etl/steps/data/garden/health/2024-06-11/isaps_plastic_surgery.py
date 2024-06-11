@@ -28,10 +28,15 @@ def run(dest_dir: str) -> None:
         }
     )
 
+    # Normalise procedure names
+    tb["procedure_name"] = tb["procedure_name"].str.lower()
+
     # Groupbys
     tb_all_0 = tb.groupby(["country", "year"], as_index=False, observed=True)[["num_procedures"]].sum()
     tb_all_1 = tb.groupby(["country", "year", "category_1"], as_index=False, observed=True)[["num_procedures"]].sum()
-    tb_all_2 = tb.groupby(["country", "year", "category_1", "category_2"], as_index=False, observed=True)[["num_procedures"]].sum()
+    tb_all_2 = tb.groupby(["country", "year", "category_1", "category_2"], as_index=False, observed=True)[
+        ["num_procedures"]
+    ].sum()
     tb = concat([tb, tb_all_0, tb_all_1, tb_all_2])
 
     columns = ["category_1", "category_2", "procedure_name"]
