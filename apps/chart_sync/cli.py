@@ -522,6 +522,10 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     """
     source_df = read_sql(base_q + where, source_session)
 
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited", "configEdited"]).set_index("chartId")
+
     # read those charts from target
     where = """
         c.id in %(chart_ids)s
