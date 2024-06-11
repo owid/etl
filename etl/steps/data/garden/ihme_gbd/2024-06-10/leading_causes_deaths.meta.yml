@@ -5,6 +5,7 @@ definitions:
     presentation:
       topic_tags:
         - Causes of Death
+    processing_level: major
 
 dataset:
   update_period_days: 365

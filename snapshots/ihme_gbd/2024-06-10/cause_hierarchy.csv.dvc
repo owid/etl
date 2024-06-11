@@ -5,12 +5,10 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Cause Hierarchy
+    title: Global Burden of Disease, Cause Hierarchy
     description: |-
       The hierarchy of diseases and injuries included in the Global Burden of Disease Study.
     date_published: "2024-05-17"
-    title_snapshot: Global Burden of Disease Study - Cause Hierarchy
-
     # Citation
     producer: "IHME, Global Burden of Disease"
     citation_full: |-

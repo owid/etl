@@ -14,7 +14,7 @@ def run(
 
     # Load data from snapshot.
     tb = snap.read(underscore=True)
-    tb = tb.set_index(["cause_name"], verify_integrity=True)
+    tb = tb.format(["cause_name"])
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.

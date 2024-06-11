@@ -3,13 +3,11 @@ from typing import List
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.utils import underscore
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
 # naming conventions
 paths = PathFinder(__file__)
-log = get_logger()
 
 
 def run(dest_dir: str) -> None:
@@ -32,9 +30,9 @@ def run(dest_dir: str) -> None:
 
     tb_out = []
     for level in levels:
-        log.info(f"Processing level {level}")
+        paths.log.info(f"Processing level {level}")
         for age_group in age_groups:
-            log.info(f"Processing age group {age_group}")
+            paths.log.info(f"Processing age group {age_group}")
             # Get the causes at this level
             level_causes = tb_hierarchy[tb_hierarchy["level"] == level]["cause_name"].to_list()
             # Create table with leading cause of death at this level for each country-year
@@ -43,9 +41,10 @@ def run(dest_dir: str) -> None:
                 tb_cause=tb_cause,
                 level_causes=level_causes,
                 level=level,
-                short_name=f"leading_cause_level_{level}_in_{age_group.lower().replace(' ', '_')}",
             )
-            tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
+            tb_level = tb_level.format(
+                ["country", "year"], short_name=f"leading_cause_level_{level}_in_{age_group.lower().replace(' ', '_')}"
+            )
             tb_out.append(tb_level)
 
     # Removing the tables where the age group doesn't match the hierarchy
@@ -73,9 +72,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_hierarchy_table(
-    age_group: str, tb_cause: Table, level_causes: List[str], short_name: str, level: str
-) -> Table:
+def create_hierarchy_table(age_group: str, tb_cause: Table, level_causes: List[str], level: str) -> Table:
     """
     For each level_cause find the relevant table in ds_cause and create a table with the leading cause of death in each country-year
 
@@ -94,7 +91,6 @@ def create_hierarchy_table(
     leading_causes_tb = tb_out.loc[leading_causes_idx]
     leading_causes_tb = leading_causes_tb.drop(columns=["value"])
     leading_causes_tb = leading_causes_tb.rename(columns={"cause": f"leading_deaths_level_{level}"})
-    leading_causes_tb.metadata.short_name = short_name
 
     return leading_causes_tb
 
