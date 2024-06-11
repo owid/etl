@@ -133,39 +133,45 @@ def filter_chart_diffs():
             return True
         return False
 
-    # Filter based on query params
-    if "chart_id" in st.query_params:
-        chart_ids = list(map(int, st.query_params.get_all("chart_id")))
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
-        }
-    if "chart_slug" in st.query_params:
-        chart_slug = st.query_params.get("chart_slug", "")
+    # Show all charts regardless of query params
+    if "show_all" in st.query_params:
+        st.session_state.chart_diffs_filtered = {k: v for k, v in st.session_state.chart_diffs_filtered.items()}
+    else:
+        # Filter based on query params
+        if "chart_id" in st.query_params:
+            chart_ids = list(map(int, st.query_params.get_all("chart_id")))
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
+            }
+        if "chart_slug" in st.query_params:
+            chart_slug = st.query_params.get("chart_slug", "")
 
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
-        }
-    if "hide_reviewed" in st.query_params:
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
-        }
-    if "modified_or_new" in st.query_params:
-        modified_or_new = st.query_params.get_all("modified_or_new")
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
+            }
+        if "hide_reviewed" in st.query_params:
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
+            }
+        if "modified_or_new" in st.query_params:
+            modified_or_new = st.query_params.get_all("modified_or_new")
+            st.session_state.chart_diffs_filtered = {
+                k: v
+                for k, v in st.session_state.chart_diffs_filtered.items()
+                if (v.is_modified and "modified" in modified_or_new) or (v.is_new and "new" in modified_or_new)
+            }
+        if "change_type" in st.query_params:
+            # keep chart diffs with at least one change type (could be data, metadata or config)
+            change_types = st.query_params.get_all("change_type")
+        else:
+            # filter to changed config by default
+            change_types = ["config"]
+
         st.session_state.chart_diffs_filtered = {
             k: v
             for k, v in st.session_state.chart_diffs_filtered.items()
-            if (v.is_modified and "modified" in modified_or_new) or (v.is_new and "new" in modified_or_new)
+            if set(v.checksum_changes()) & set(change_types)
         }
-    if "change_type" in st.query_params:
-        # keep chart diffs with at least one change type (could be data, metadata or config)
-        change_types = st.query_params.get_all("change_type")
-    else:
-        # filter to changed config by default
-        change_types = ["config"]
-
-    st.session_state.chart_diffs_filtered = {
-        k: v for k, v in st.session_state.chart_diffs_filtered.items() if set(v.checksum_changes()) & set(change_types)
-    }
 
     # Return boolean if there was any filter applied (except for hiding approved charts)
     if (
@@ -192,6 +198,13 @@ def _show_options_filters():
             st.query_params.update({"hide_reviewed": ""})  # type: ignore
         else:
             st.query_params.pop("hide_reviewed", None)
+
+    def show_all():
+        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
+        if st.session_state["show-all-charts"]:
+            st.query_params.update({"show_all": ""})  # type: ignore
+        else:
+            st.query_params.pop("show_all", None)
 
     def apply_search_filters():
         """Apply filters.
@@ -221,6 +234,13 @@ def _show_options_filters():
         on_change=hide_reviewed,  # type: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
+    st.toggle(
+        "**Show** all charts",
+        key="show-all-charts",
+        value="show_all" in st.query_params,
+        on_change=show_all,  # type: ignore
+        help="Show all charts. This option ignores all the filters. If you want to apply any filter, uncheck this option.",
+    )
     with st.form("chart-diff-filters"):
         st.multiselect(
             label="Select chart IDs",
@@ -228,6 +248,7 @@ def _show_options_filters():
             default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
             key="chart-diff-filter-id",
             help="Filter chart diffs with charts with given IDs.",
+            placeholder="Select chart IDs",
         )
         st.text_input(
             label="Search by slug name",
@@ -242,6 +263,7 @@ def _show_options_filters():
             default=[change for change in st.query_params.get_all("modified_or_new")],  # type: ignore
             key="chart-diff-modified-or-new",
             help="Show new charts, and/or modified charts.",
+            placeholder="modified, new",
         )
         st.multiselect(
             label="Chart changes type",
@@ -249,6 +271,7 @@ def _show_options_filters():
             default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
             key="chart-diff-change-type",
             help="Show charts with changes in data, metadata, or config.",
+            placeholder="config, data, metadata",
         )
         st.form_submit_button(
             "Apply filters",
