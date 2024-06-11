@@ -4,8 +4,6 @@ This is the page that is loaded when the app is started. It redirects to the hom
 
 NOTE: This only works with >1.35 (nightly) version of Streamlit.
 """
-from pathlib import Path
-
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
@@ -61,6 +59,9 @@ for section in WIZARD_CONFIG["sections"]:
             )
         pages[section["title"]] = pages_
 
+###########################################
+# RUN PAGES
+###########################################
 # Create navigation
 page = st.navigation(pages)
 
@@ -71,29 +72,5 @@ else:
     st.error("Pages could not be loaded!")
 
 
+# LOGO
 st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))
-
-###########################################
-# Home app
-###########################################
-# st_show_home()
-
-
-# # EXPERIMENTAL
-# # Get query parameters from the URL
-# # query_params = st.query_params
-
-
-# # Go to specific page if argument is passed
-# ## Home
-# if utils.AppState.args.phase == "all":  # type: ignore
-#     switch_page("Home")  # type: ignore
-# ## ETL step
-# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-#     if utils.AppState.args.phase == step_name:  # type: ignore
-#         switch_page(step_props["title"])  # type: ignore
-# ## Section
-# for section in WIZARD_CONFIG["sections"]:
-#     for app in section["apps"]:
-#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
-#             switch_page(app["title"])  # type: ignore
