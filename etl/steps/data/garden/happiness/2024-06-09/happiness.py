@@ -47,17 +47,18 @@ def run(dest_dir: str) -> None:
     # add population to table
     tb = geo.add_population_to_dataframe(tb, tb_population)
 
-    # add regions to table
-    aggregations = {"population": "sum"}
-    tb = geo.add_regions_to_table(
+    # add regions with overall population to table
+    aggr_pop = {"population": "sum"}
+    helper_tb = geo.add_regions_to_table(
         tb,
-        aggregations=aggregations,
+        aggregations=aggr_pop,
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
-        year_col="date",
     )
+
+    helper_tb["cantril_times_pop"]
 
     tb = tb.format(["country", "year"])
 
