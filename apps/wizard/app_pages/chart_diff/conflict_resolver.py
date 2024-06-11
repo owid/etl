@@ -8,7 +8,7 @@ import streamlit as st
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from etl.chart_revision.v3.schema import validate_chart_config_and_set_defaults
+from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
 
 ENVIRONMENT_IDS = {
     1: "PRODUCTION",
