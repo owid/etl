@@ -562,7 +562,7 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     if "label" not in kwargs:
         kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
     if "icon" not in kwargs:
-        kwargs["icon"] = PAGES_BY_ALIAS[alias]["emoji"]
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
 
     if border:
         with st.container(border=True):
@@ -683,20 +683,22 @@ class Pagination:
 
         with st.container(border=True):
             with col1:
+                key = f"previous-{self.pagination_key}"
                 if self.page > 1:
-                    if st.button("⏮️ Previous"):
+                    if st.button("⏮️ Previous", key=key):
                         self.page -= 1
                         st.rerun()
                 else:
-                    st.button("⏮️ Previous", disabled=True)
+                    st.button("⏮️ Previous", disabled=True, key=key)
 
             with col3:
+                key = f"next-{self.pagination_key}"
                 if self.page < self.total_pages:
-                    if st.button("Next ⏭️"):
+                    if st.button("Next ⏭️", key=key):
                         self.page += 1
                         st.rerun()
                 else:
-                    st.button("Next ⏭️", disabled=True)
+                    st.button("Next ⏭️", disabled=True, key=key)
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")

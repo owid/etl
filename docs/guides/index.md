@@ -8,17 +8,17 @@ In this section you will find guides for different use cases and tasks you might
 
 <div class="grid cards" markdown>
 
--   **[:material-arrow-up-bold-hexagon-outline: &nbsp; Upgrade indicators](ingest-data)**
+-   **[:material-arrow-up-bold-hexagon-outline: &nbsp; Data work](data-work)**
 
     ***
 
     Create new datasets or update old ones from our ETL catalog. Update charts.
 
-    - [Add datasets](ingest-data/add-data)
-    - [Update datasets](ingest-data/update-data)
-    - [Update charts](ingest-data/update-charts)
+    - [Add datasets](data-work/add-data)
+    - [Update datasets](data-work/update-data)
+    - [Update charts](data-work/update-charts)
 
--  **[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)**
+-   **[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)**
 
     ***
 
@@ -32,7 +32,7 @@ In this section you will find guides for different use cases and tasks you might
 
     We also have a CLI, so that you can do some tasks from your terminal.
 
--  **[:octicons-globe-16: &nbsp; Using different environments](environment)**
+-   **[:octicons-globe-16: &nbsp; Using different environments](environment)**
 
     ***
 

@@ -8,8 +8,8 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.utils.map_datasets import get_changed_files, get_grapher_changes
-from etl.chart_revision.v3.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
+from etl.indicator_upgrade.schema import get_schema_chart_config
 from etl.version_tracker import VersionTracker
 
 # Logger

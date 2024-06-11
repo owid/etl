@@ -76,6 +76,8 @@ def _variable_meta():
         "descriptionProcessing": None,
         "sourceName": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
         "sourceDescription": '{"link": "https://www.gapminder.org/data/documentation/gd003/", "retrievedDate": "October 8, 2021", "additionalInfo": "Our World in Data builds...", "dataPublishedBy": "Gapminder (v6); United Nations - Population Division (2022); HYDE (v3.2); World Bank", "dataPublisherSource": null}',
+        "dataChecksum": "123",
+        "metadataChecksum": "456",
     }
 
 

@@ -122,6 +122,7 @@ STAGING = load_STAGING()
 
 # if STAGING is used, override ENV values
 if STAGING is not None:
+    GRAPHER_USER_ID = 1  # use Admin user when working with staging
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
