@@ -1,5 +1,5 @@
 dataset:
-  update_period_days: 368
+  update_period_days: 365
 tables:
   cherry_blossom:
     variables:

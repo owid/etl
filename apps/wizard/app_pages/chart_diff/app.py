@@ -15,6 +15,7 @@ from apps.wizard.app_pages.chart_diff.show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
 from apps.wizard.utils.env import OWID_ENV
+from etl import config
 
 log = get_logger()
 
@@ -47,8 +48,16 @@ st.session_state.arrange_charts_vertically = st.session_state.get("arrange_chart
 # LOAD VARIABLES
 ########################################
 CHART_PER_PAGE = 10
-WARN_MSG += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
-# st.warning("- " + "\n\n- ".join(warn_msg))
+# WARN_MSG += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
+
+if str(config.GRAPHER_USER_ID) != "1":
+    WARN_MSG.append(
+        "`GRAPHER_USER_ID` from your .env is not set to 1 (Admin user). Please modify your .env or use STAGING=1 flag to set it automatically. "
+        "All changes on staging servers must be done with Admin user."
+    )
+
+if WARN_MSG:
+    st.warning("- " + "\n\n- ".join(WARN_MSG))
 
 
 ########################################
