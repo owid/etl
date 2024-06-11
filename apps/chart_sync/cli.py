@@ -502,7 +502,11 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         cd.chartId,
         v.dataChecksum,
         v.metadataChecksum,
-        MD5(c.config) as chartChecksum
+        MD5(c.config) as chartChecksum,
+        c.lastEditedByUserId as chartLastEditedByUserId,
+        c.publishedByUserId as chartPublishedByUserId,
+        d.dataEditedByUserId,
+        d.metadataEditedByUserId
     from chart_dimensions as cd
     join charts as c on cd.chartId = c.id
     join variables as v on cd.variableId = v.id
@@ -553,6 +557,20 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
             }
         )
     )
+    diff = diff[["dataEdited", "metadataEdited", "configEdited"]]
+
+    # If chart hasn't been edited by Admin, then make `configEdited` false
+    # This can happen when you merge master to your branch and staging rebuilds a dataset.
+    # Then dataset will be edited by Admin and will be included, but your charts might be outdated
+    # compared to production. Hence, only consider config updates for charts edited by Admin.
+    chart_ids = source_df[
+        (source_df.chartLastEditedByUserId != 1) & (source_df.chartPublishedByUserId != 1)
+    ].index.get_level_values("chartId")
+    diff.loc[chart_ids, "configEdited"] = False
+
+    # Remove charts with no changes
+    diff = diff[diff.any(axis=1)]
+
     return diff
 
 

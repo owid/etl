@@ -92,6 +92,8 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
     # Get IDs from modified charts
     with Session(SOURCE_ENGINE) as source_session:
         with Session(TARGET_ENGINE) as target_session:
+            # NOTE: this fetches all charts with data & metadata & config changes. This could be wasteful if
+            # user only wants to show config changes.
             df = modified_charts_by_admin(source_session, target_session)
             # Get chart its with at least one type of change
             chart_ids = set(df.index[df.any(axis=1)])

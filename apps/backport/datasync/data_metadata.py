@@ -203,7 +203,11 @@ def _variable_metadata(
 ) -> Dict[str, Any]:
     row = db_variable_row
 
-    variable = row
+    # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
+    # feedback loop with changing checksums
+    row.pop("dataChecksum", None)
+    row.pop("metadataChecksum", None)
+
     sourceId = row.pop("sourceId")
     sourceName = row.pop("sourceName")
     sourceDescription = row.pop("sourceDescription")
@@ -238,7 +242,7 @@ def _variable_metadata(
     )
 
     variableMetadata = dict(
-        **_omit_nullable_values(variable),
+        **_omit_nullable_values(row),
         nonRedistributable=bool(nonRedistributable),
         display=display,
         schemaVersion=schemaVersion,
@@ -298,7 +302,8 @@ def _variable_metadata(
     # convert timestamp to string
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
     for col in ("createdAt", "updatedAt"):
-        variableMetadata[col] = variableMetadata[col].strftime(time_format)
+        if col in variableMetadata:
+            variableMetadata[col] = variableMetadata[col].strftime(time_format)
 
     # add origins
     variableMetadata["origins"] = _move_population_origin_to_end(
