@@ -10,7 +10,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
 
 tables:
@@ -20,7 +20,6 @@ tables:
          title: Annual sales of manufactured cigarettes
          unit: cigarettes
          short_unit: cigarettes
-         description_short: Manufactured cigarettes sold in this country in this year.
          description_key:
            - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
@@ -42,9 +41,8 @@ tables:
          title: Annual sales of hand-rolled cigarettes
          unit: cigarettes
          short_unit: cigarettes
-         description_short: Hand-rolled cigarettes sold in this country in this year.
          description_key:
-          - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
+          - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco.
           - For Latvia, Papyrosi cigarettes are counted instead of loose tobacco/ hand-rolled cigarettes.
           - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
@@ -57,7 +55,7 @@ tables:
          short_unit: cigarettes
          description_short: Daily sales of hand-rolled cigarettes to people aged 15 and over.
          description_key:
-           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco
+           - Estimates of hand-rolled cigarette consumption are based on the sales of loose tobacco.
            - For Latvia, Papyrosi cigarettes are counted instead of loose tobacco/ hand-rolled cigarettes.
            - The time series for Germany includes a population weighted average for West and East Germany cigarette sales for the 1948-1989 period.
          presentation:
@@ -68,7 +66,6 @@ tables:
          title: Total annual sales of cigarettes
          unit: cigarettes
          short_unit: cigarettes
-         description_short: Total cigarettes sold in this country in this year.
          description_key:
          - Total cigarette sales are the sum of manufactured and hand-rolled cigarette sales. Where one or the other is missing, total cigarette sales data is also not available.
          - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
@@ -92,7 +89,6 @@ tables:
          title: Sales of all tobacco products
          unit: tons
          short_unit: t
-         description_short: Sales of all tobacco products in this country in this year.
          description_key:
           - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing.
           - The time series for Germany includes the sum of West and East Germany cigarette sales for the 1948-1989 period.
@@ -103,7 +99,7 @@ tables:
       all_tobacco_products_grams_per_adult_per_day:
          title: Sales of all tobacco products per adult per day
          unit: grams per adult per day
-         short_unit: grams
+         short_unit: g
          description_short: Daily sales of all tobacco products to people aged 15 and over.
          description_key:
           - Data includes cigarettes, cigars and smokeless tobacco, such as chewing tobacco or snuff, which is held in the mouth without chewing.

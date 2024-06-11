@@ -5,14 +5,13 @@ meta:
     # Data product / Snapshot
     title: International Smoking Statistics
     date_published: "2016-12-19"
-    title_snapshot: International Smoking Statistics - Cigarette Sales
 
     # Citation
-    producer: Barbara Forey, Jan Hamling, John Hamling, Alison Thornton, Peter Lee
+    producer: Forey et al.
     attribution: International Smoking Statistics (2016)
     citation_full: |-
-      International Smoking Statistics WEB Edition
-      © Barbara Forey, Jan Hamling, John Hamling, Alison Thornton, Peter Lee, 2006-2016
+      P N Lee Statistics and Computing Ltd - International Smoking Statistics WEB Edition.
+      Barbara Forey, Jan Hamling, John Hamling, Alison Thornton, Peter Lee (2006-2016).
 
     # Files
     url_main: http://www.pnlee.co.uk/ISS.htm
@@ -21,6 +20,7 @@ meta:
     # License
     license:
       name: © Barbara Forey, Jan Hamling, John Hamling, Alison Thornton, Peter Lee, 2006-2016
+      url: http://www.pnlee.co.uk/ISS.htm
 
 outs:
   - md5: 6ef4798882a75d8f7f5ab9b3bc251c28

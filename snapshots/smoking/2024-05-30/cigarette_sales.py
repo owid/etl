@@ -1,4 +1,9 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset. Snapshot is created from local zip folder and uploaded to S3.
+Local data files are obtained the following way:
+- source: http://www.pnlee.co.uk/ISS.htm at ISS WEB edition
+- download all XLS files (for each country seperately) (e.g. http://www.pnlee.co.uk/Downloads/ISS/ISS-Australia_120111.xls for Australia)
+- compress them to a single zip file
+"""
 
 from pathlib import Path
 
