@@ -1,6 +1,7 @@
 import datetime as dt
-from typing import List, Optional, cast
+from typing import List, Optional
 
+import pandas as pd
 import streamlit as st
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -15,9 +16,16 @@ class ChartDiff:
     target_chart: Optional[gm.Chart]
     # Three state: 'approved', 'pending', 'rejected'
     approval_status: gm.CHART_DIFF_STATUS | str
+    # DataFrame for all variables with columns dataChecksum and metadataChecksum
+    # If True, then the checksum has changed
+    modified_checksum: Optional[pd.DataFrame]
 
     def __init__(
-        self, source_chart: gm.Chart, target_chart: Optional[gm.Chart], approval_status: gm.CHART_DIFF_STATUS | str
+        self,
+        source_chart: gm.Chart,
+        target_chart: Optional[gm.Chart],
+        approval_status: gm.CHART_DIFF_STATUS | str,
+        modified_checksum: Optional[pd.DataFrame] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
@@ -26,6 +34,7 @@ class ChartDiff:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
         self._in_conflict = None
+        self.modified_checksum = modified_checksum
 
     @property
     def is_reviewed(self) -> bool:
@@ -78,7 +87,7 @@ class ChartDiff:
         """
         if self.target_chart:
             assert self.source_chart.config["slug"] == self.target_chart.config["slug"], "Slug mismatch!"
-        return cast(str, self.source_chart.config["slug"])
+        return self.source_chart.config.get("slug", "no-slug")
 
     @property
     def in_conflict(self) -> bool:
@@ -124,12 +133,39 @@ class ChartDiff:
             source_chart.updatedAt,
             target_chart.updatedAt if target_chart else None,
         )
-        print("called DB for state, got:", approval_status)
+
+        # Load checksums for underlying indicators
+        # TODO: is this fast enough for large datasets? maybe we should avoid dataframes at all
+        if target_chart and target_session is not None:
+            source_df = source_chart.load_variables_checksums(source_session)
+            target_df = target_chart.load_variables_checksums(target_session)
+            source_df, target_df = source_df.align(target_df)
+            modified_checksum = source_df != target_df
+
+            # If checksum has not been filled yet, assume unchanged
+            modified_checksum[target_df.isna()] = False
+        else:
+            modified_checksum = None
 
         # Build object
-        chart_diff = cls(source_chart, target_chart, approval_status)
+        chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
 
         return chart_diff
+
+    def checksum_changes(self) -> list[str]:
+        """Return list of chart changes."""
+        if self.is_new:
+            return []
+
+        changes = []
+        if self.modified_checksum is not None:
+            if self.modified_checksum["dataChecksum"].any():
+                changes.append("data")
+            if self.modified_checksum["metadataChecksum"].any():
+                changes.append("metadata")
+        if self.target_chart and not self.configs_are_equal():
+            changes.append("config")
+        return changes
 
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
@@ -190,7 +226,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("version", "id", "isPublished")
+        exclude_keys = ("version", "id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
         config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
         config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
         return config_1 == config_2
