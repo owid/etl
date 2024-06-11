@@ -746,6 +746,19 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
+  # Equaldex dataset
+  data://meadow/lgbt_rights/2024-06-03/equaldex:
+    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
+
+  data://garden/lgbt_rights/2024-06-03/equaldex:
+    - data://meadow/lgbt_rights/2024-06-03/equaldex
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+
+  data://grapher/lgbt_rights/2024-06-03/equaldex:
+    - data://garden/lgbt_rights/2024-06-03/equaldex
 
 include:
   - dag/open_numbers.yml
