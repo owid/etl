@@ -8,6 +8,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+REGIONS = geo.REGIONS
+
 
 def run(dest_dir: str) -> None:
     #
@@ -17,6 +19,12 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("happiness", version="2024-06-09")
     ds_prev_years = paths.load_dataset("happiness", channel="garden", version="2023-03-20")
     ds_population = paths.load_dataset("population", channel="garden")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table datasets.
     tb_this_year = ds_meadow["happiness"].reset_index()
@@ -36,9 +44,20 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # add population weighted averages
+    # add population to table
     tb = geo.add_population_to_dataframe(tb, tb_population)
-    tb = geo.add_regions_to_table(tb, paths.region_mapping_path)
+
+    # add regions to table
+    aggregations = {"population": "sum"}
+    tb = geo.add_regions_to_table(
+        tb,
+        aggregations=aggregations,
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        year_col="date",
+    )
 
     tb = tb.format(["country", "year"])
 
