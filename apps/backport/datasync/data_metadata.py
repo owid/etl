@@ -203,7 +203,11 @@ def _variable_metadata(
 ) -> Dict[str, Any]:
     row = db_variable_row
 
-    variable = row
+    # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
+    # feedback loop with changing checksums
+    row.pop("dataChecksum", None)
+    row.pop("metadataChecksum", None)
+
     sourceId = row.pop("sourceId")
     sourceName = row.pop("sourceName")
     sourceDescription = row.pop("sourceDescription")
@@ -238,7 +242,7 @@ def _variable_metadata(
     )
 
     variableMetadata = dict(
-        **_omit_nullable_values(variable),
+        **_omit_nullable_values(row),
         nonRedistributable=bool(nonRedistributable),
         display=display,
         schemaVersion=schemaVersion,
