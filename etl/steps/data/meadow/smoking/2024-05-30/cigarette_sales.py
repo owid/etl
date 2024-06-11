@@ -4,8 +4,8 @@ from zipfile import ZipFile
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
-# from owid.catalog import Table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -169,7 +169,7 @@ def run(dest_dir: str) -> None:
         "Unnamed: 12",
     ]
 
-    # tb_from_excel = Table()
+    tb_from_excel = Table()
 
     for cty, cty_sheet in COUNTRY_MAP.items():
         if cty not in SPECIAL_CASES:
