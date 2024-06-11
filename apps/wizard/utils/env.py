@@ -220,5 +220,15 @@ class OWIDEnv:
         else:
             return f"{self.base_site}/etl/wizard"
 
+    @property
+    def wizard_url_remote(self) -> str:
+        """Get wizard url (in remote server)."""
+        if self.env_remote == "dev":
+            return f"http://localhost:{WIZARD_PORT}/"
+        elif self.env_remote == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.base_site}/etl/wizard"
+
 
 OWID_ENV = OWIDEnv()
