@@ -184,11 +184,15 @@ def filter_chart_diffs():
     return False
 
 
+@st.experimental_dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
-    with Session(engine) as session:
-        for _, chart_diff in st.session_state.chart_diffs.items():
-            chart_diff.unreview(session)
+    st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
+    if st.button("Yes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                chart_diff.unreview(session)
+        st.rerun()
 
 
 def _show_options_filters():
@@ -235,11 +239,11 @@ def _show_options_filters():
         help="Show only chart diffs that are pending approval (or rejection).",
     )
     st.toggle(
-        "**Show** all charts",
+        "**Show all charts** (ignores all filters)",
         key="show-all-charts",
         value="show_all" in st.query_params,
         on_change=show_all,  # type: ignore
-        help="Show all charts. This option ignores all the filters. If you want to apply any filter, uncheck this option.",
+        help="Show all charts. This option ignores all the filters.\n\nIf you want to apply any filter, uncheck this option.",
     )
     with st.form("chart-diff-filters"):
         st.multiselect(
@@ -320,12 +324,13 @@ def _show_options_misc():
     st.divider()
     with st.container(border=True):
         st.markdown("Danger zone ⚠️")
-        st.button(
-            "Set _all_ charts to **Pending**",
+        if st.button(
+            "Set all charts to **Pending**",
             key="unapprove-all-charts",
-            on_click=lambda s=SOURCE_ENGINE: set_chart_diffs_to_pending(s),
+            # on_click=lambda e=SOURCE_ENGINE: set_chart_diffs_to_pending(e),
             help="This sets the status of all chart diffs to 'Pending'. This means that you will need to review them again.",
-        )
+        ):
+            set_chart_diffs_to_pending(SOURCE_ENGINE)
 
 
 def _show_options():
