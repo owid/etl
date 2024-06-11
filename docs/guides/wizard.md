@@ -47,7 +47,6 @@ In the following sections we try to give a brief overview of each of the section
   <figcaption>Wizard as of 5th June 2024.</figcaption>
 </figure>
 
-
 ### Create ETL steps
 
 This section is dedicated to the creation of new ETL steps, including **Snapshot**, **Meadow**, **Garden** and **Grapher** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
@@ -57,7 +56,6 @@ There is also **Express**, which creates a meadow, garden and grapher step in on
 In each step creation, a form is presented to the user so that they can fill in the necessary metadata fields. Based on the input, new files (e.g. python scripts, metadata YAML files, etc.) are created and modifications to existing ones (e.g. the DAG) are done.
 
 After submitting each of the forms, a short guideline is shown so that the user knows what they need to do next.
-
 
 <figure markdown="span">
   ![ETL-steps](../assets/etl.gif)
@@ -82,7 +80,7 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 - **Indicator Upgrader**: Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
 - **Chart diff**: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
 
-!!! info "Learn more about this flow in [Update charts](ingest-data/update-charts.md) section"
+!!! info "Learn more about this flow in [Update charts](data-work/update-charts.md) section"
 
 ### Data tools
 
