@@ -139,4 +139,10 @@ def add_population(
     df = df.merge(df_pop, how="left", left_on=columns_merge_df, right_on=columns_merge_pop, suffixes=("", "_extra"))
     df = df[columns_input + ["population"]]
 
+    # Optimize memory
+    # NOTE: pd.merge is converting categoricals to objects for some reason
+    df.country = df.country.astype("category")
+    if "age" in df.columns:
+        df.age = df.age.astype("category")
+
     return df

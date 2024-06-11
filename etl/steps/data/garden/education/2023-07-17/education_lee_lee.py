@@ -59,10 +59,6 @@ def run(dest_dir: str) -> None:
 
     # Extract enrollment rates from the World Bank Education Dataset starting from 2010
     enrolment_wb = extract_related_world_bank_data(tb_wdi)
-    # Add origins metadata to the WDI table (remove when the WDI dataset is updated with new metadata)
-    from etl.data_helpers.misc import add_origins_to_wdi
-
-    enrolment_wb = add_origins_to_wdi(enrolment_wb)
 
     # Get the list of columns from the World Bank dataset
     world_bank_indicators = enrolment_wb.columns

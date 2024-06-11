@@ -21,13 +21,8 @@ steps:
     - data://garden/who/2022-07-17/who_vaccination
 
   # WHO Global Health Estimates
-  data://meadow/who/2021-07-01/ghe:
-    - walden://who/2021-07-01/ghe
   data://meadow/who/2022-09-30/ghe:
     - walden://who/2022-09-30/ghe
-  data://garden/who/2021-07-01/ghe:
-    - data://meadow/who/2021-07-01/ghe
-    - data://garden/regions/2023-01-01/regions
   data://garden/who/2022-09-30/ghe:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
@@ -36,9 +31,6 @@ steps:
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
 
-  #WHO - Global Health Observatory (Incomplete; waiting for WHO API update)
-  data://meadow/who/2021-07-01/gho:
-    - walden://who/2021-07-01/gho
   # WHO - Global Health Observatory (only suicides variable)
   data://meadow/who/2023-03-09/gho_suicides:
     - snapshot://who/2023-03-09/gho_suicides.json
@@ -551,13 +543,13 @@ steps:
     - snapshot://health/2024-04-22/gpei_funding.xlsx
   data://garden/health/2024-04-22/gpei_funding:
     - data://meadow/health/2024-04-22/gpei_funding
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding
 
   # IHME GBD - Burden of Disease (2021) - Impairments from NTDs
   data-private://meadow/ihme_gbd/2024-05-20/impairments:
-    - snapshot-private://ihme_gbd/2024-05-20/impairments.csv
+    - snapshot-private://ihme_gbd/2024-05-20/impairments.feather
   data-private://garden/ihme_gbd/2024-05-20/impairments:
     - data-private://meadow/ihme_gbd/2024-05-20/impairments
     - data://garden/regions/2023-01-01/regions
@@ -600,6 +592,40 @@ steps:
     - data://meadow/neglected_tropical_diseases/2024-05-18/funding
   data://grapher/neglected_tropical_diseases/2024-05-18/funding:
     - data://garden/neglected_tropical_diseases/2024-05-18/funding
+
+  # GBD 2021 - GBD Deaths and DALYs
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_cause:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_cause.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_cause
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause_dalys:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+
+  # GBD 2021 - GBD Prevalence
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_prevalence.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
+
+  # GBD 2021 - GBD Mental Health
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health
 
   # WHO Avian Influenza H5N1
   data://meadow/who/latest/avian_influenza_ah5n1:
