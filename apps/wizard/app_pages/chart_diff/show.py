@@ -129,15 +129,18 @@ class ChartDiffShow:
 
         # Status of chart diff: approve, pending, reject
         with col1:
-            st.radio(
-                label="Approve or reject chart",
-                key=f"radio-{self.diff.chart_id}",
-                options=self.status_names,
-                horizontal=True,
-                format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
-                index=self.status_names.index(self.diff.approval_status),  # type: ignore
-                on_change=self._push_status,
-            )
+            if self.diff.in_conflict:
+                self._show_conflict_resolver_options()
+            else:
+                st.radio(
+                    label="Approve or reject chart",
+                    key=f"radio-{self.diff.chart_id}",
+                    options=self.status_names,
+                    horizontal=True,
+                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
+                    index=self.status_names.index(self.diff.approval_status),  # type: ignore
+                    on_change=self._push_status,
+                )
 
         # Refresh chart
         with col2:
@@ -275,10 +278,6 @@ class ChartDiffShow:
 
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
-        # Show conflict resolver if there is conflict
-        if self.diff.in_conflict:
-            self._show_conflict_resolver_options()
-
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 
