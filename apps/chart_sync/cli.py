@@ -568,7 +568,8 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     ].index.get_level_values("chartId")
     diff.loc[chart_ids, "configEdited"] = False
 
-    print(diff)
+    # Remove charts with no changes
+    diff = diff[diff.any(axis=1)]
 
     return diff
 

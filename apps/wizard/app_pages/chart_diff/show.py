@@ -240,6 +240,7 @@ class ChartDiffShow:
         """
         if st.button(
             "⚠️ Resolve conflict",
+            key=f"resolve-conflict-{self.diff.slug}",
             help="This will update the chart in the staging server.",
         ):
             self._show_conflict_resolver()
