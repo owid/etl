@@ -24,6 +24,6 @@ meta:
       name: 2022 International Society of Aesthetic Plastic Surgery
 
 outs:
-  - md5: b0e4dbc1e7d93b92853404c45d4066ab
-    size: 139823
+  - md5: 42023802219c1334bf5abe6ccbf5d0d0
+    size: 62830
     path: isaps_plastic_surgery.xlsx
