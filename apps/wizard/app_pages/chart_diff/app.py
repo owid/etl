@@ -334,7 +334,7 @@ def _show_summary_top(chart_diffs):
     # Signal filtering (if any)
     if num_charts != num_charts_total:
         st.warning(
-            f"Some charts are hidden due to filtering. Listing {num_charts} charts (from a total of {num_charts_total})."
+            f"**Some charts are hidden due to filtering**. Listing {num_charts} charts (from a total of {num_charts_total})."
         )
 
 
