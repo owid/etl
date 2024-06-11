@@ -14,9 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("leading_causes_deaths")
 
     # Read table from garden dataset.
-    all_tb = []
-    for tb in ds_garden.table_names:
-        all_tb.append(ds_garden[tb])
+    all_tb = [ds_garden[tb_name] for tb_name in ds_garden.table_names]
     #
     # Save outputs.
     #
