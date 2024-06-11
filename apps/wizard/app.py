@@ -9,15 +9,7 @@ from pathlib import Path
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-
-# Logo
-# st.logo("docs/assets/logo.png")
-
-# st.write(st.__version__)
-
-
-# Get current directory
-CURRENT_DIR = Path(__file__).parent
+from etl.paths import DOCS_DIR
 
 ###########################################
 # DEFINE PAGES
@@ -78,7 +70,8 @@ if page is not None:
 else:
     st.error("Pages could not be loaded!")
 
-st.logo(str(CURRENT_DIR / "docs/assets/wizard-logo.png"))
+
+st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))
 
 ###########################################
 # Home app
