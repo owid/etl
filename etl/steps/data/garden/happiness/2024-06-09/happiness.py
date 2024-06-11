@@ -47,18 +47,25 @@ def run(dest_dir: str) -> None:
     # add population to table
     tb = geo.add_population_to_dataframe(tb, tb_population)
 
-    # add regions with overall population to table
-    aggr_pop = {"population": "sum"}
-    helper_tb = geo.add_regions_to_table(
+    # calculate population weighted averages by multiplying the population with the cantril ladder score
+    # and then summing and dividing by the total population
+    tb["cantril_times_pop"] = tb["cantril_ladder_score"] * tb["population"]
+
+    aggr_score = {"cantril_times_pop": "sum", "population": "sum"}
+    tb = geo.add_regions_to_table(
         tb,
-        aggregations=aggr_pop,
+        aggregations=aggr_score,
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
 
-    helper_tb["cantril_times_pop"]
+    # Divide the sum of the cantril ladder score times population by the total population
+    tb["cantril_ladder_score"] = tb["cantril_times_pop"] / tb["population"]
+
+    # drop unneeded columns
+    tb = tb.drop(columns=["cantril_times_pop", "population"])
 
     tb = tb.format(["country", "year"])
 

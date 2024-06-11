@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
     presentation:
       topic_tags:
         - Happiness & Life Satisfaction
@@ -15,6 +16,32 @@ dataset:
 tables:
   happiness:
     variables:
+      cantril_ladder_score:
+        title: Cantril ladder score
+        unit: ""
+        short_unit: ""
+        description_short: Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
+        description_processing: Average of regions is calculated by taking a population-weighted average over all countries within that region.
+        description_key:
+          - The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale.
+          - The rankings are calculated by the source based on nationally representative samples for the three years prior to the year of the report, so that data for the 2024 report will draw from survey data from 2021-2023. We show the data for final year of the three-year survey period, i.e. we show the 2021-2023 survey data as 2023.
+          - The only exception is the data for the 2012 report, which uses survey data from 2005-2011, we show this data as the final year of the survey data - 2011.
+          - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
+          - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
+        presentation:
+          attribution_short: WHR
+        display:
+          numDecimalPlaces: 2
+
+
+
+
+
+
+
+
+
+
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
@@ -49,5 +76,4 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
-      {}
 
