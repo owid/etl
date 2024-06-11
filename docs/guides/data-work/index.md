@@ -4,7 +4,7 @@ tags:
   - 👷 Staff
 ---
 
-# Ingest data
+# Data work
 
 Adding and updating datasets in ETL is part of our routinary work. To this end, we've simplified the process as much as possible. Find below the list of the steps involved in the workflow. Click on each step to learn more about it.
 

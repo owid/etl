@@ -28,8 +28,10 @@ tables:
         title: Cost (inflation-adjusted)
         unit: 'constant 2023 US$'
         short_unit: '$'
-        description_short: The cost of developing the AI system, adjusted for inflation.
+        description_short: The cost of developing the AI system expressed in 2023 US dollars, adjusted for inflation.
         description_from_producer: |-
           The cost of developing the AI system was adjusted for inflation using the Consumer Price Index (CPI) for the United States. The CPI was used to account for the changes in the price level of consumer goods and services over time. The inflation-adjusted cost is presented in 2023 US dollars.
         display:
           numDecimalPlaces: 0
+          name: Cost
+
