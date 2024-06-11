@@ -81,7 +81,7 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
             diffs = modified_charts_by_admin(source_session, target_session)
 
             # Get only charts with modified chart config
-            modified_chart_ids = set(diffs.index[diffs.chartChecksum])
+            modified_chart_ids = set(diffs.index[diffs.configEdited])
 
             for chart_id in modified_chart_ids:
                 diff = ChartDiff.from_chart_id(chart_id, source_session, target_session)
