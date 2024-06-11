@@ -153,7 +153,10 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             with col3:
-                st.caption(f"**{OWID_ENV.wizard_url}?page=chart-diff&chart_id={self.diff.chart_id}**")
+                query_params = f"page=chart-diff&chart_id={self.diff.chart_id}"
+                st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+                if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
+                    st.caption(f"`SHARE`: **{OWID_ENV.wizard_url_remote}?{query_params}**")
 
     def _show_chart_comparison(self) -> None:
         """Show charts (horizontally or vertically)."""
