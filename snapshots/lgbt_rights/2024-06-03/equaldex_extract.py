@@ -27,6 +27,7 @@ from typing import List, Tuple
 import pandas as pd
 import requests
 from structlog import get_logger
+from tqdm import tqdm
 
 # Set directory path
 PARENT_DIR = Path(__file__).parent.absolute()
@@ -75,7 +76,7 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
         log.fatal("API key not found. Please add your Equaldex API key to the .env file.")
 
     # For each country in the list
-    for country in country_list:
+    for country in tqdm(country_list, desc="Extracting data from countries"):
         # Define query parameters
         querystring = {
             "regionid": country,
@@ -102,7 +103,7 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
             country_name = response_dict["regions"]["region"]["name"]
 
         except Exception:
-            country_name = ""
+            continue
 
         # Get the list of issues available
         try:
@@ -121,6 +122,8 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
                 indices_data.loc[0, variable] = None
 
         # Only concatenate if we have at least one column not null
+        # Drop all null columns
+        indices_data = indices_data.dropna(axis=1, how="all")
         if not indices_data.isnull().all().all():
             # Concatenate data from previous countries with current country
             df_indices = pd.concat([df_indices, indices_data], ignore_index=True)
@@ -145,7 +148,6 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
                 )
 
             except Exception:
-                log.warning(f"{country_name}: No historical data for {issue}")
                 historical_data = pd.DataFrame()
 
             # Add country name column to the dataframe
@@ -160,9 +162,9 @@ def extract_from_api(country_list: List[str]) -> Tuple[pd.DataFrame, pd.DataFram
             df_historical = pd.concat([df_historical, historical_data], ignore_index=True)
             df_current = pd.concat([df_current, current_data], ignore_index=True)
 
-    # Error message with a summary of countries with no data
+    # Info message with a summary of countries with no data
     if countries_no_data:
-        log.error(f"Data was not found for the following {len(countries_no_data)} countries: \n{countries_no_data}")
+        log.info(f"Data was not found for the following {len(countries_no_data)} countries: \n{countries_no_data}")
 
     # Move country and issue to the beginning
     cols_to_move = ["country", "issue"]
