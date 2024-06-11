@@ -153,7 +153,8 @@ def cli(
             if chart_id:
                 chart_ids = {chart_id}
             else:
-                chart_ids = modified_charts_by_admin(source_session, target_session)
+                diffs = modified_charts_by_admin(source_session, target_session)
+                chart_ids = set(diffs.index[diffs.configEdited])
 
             log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
