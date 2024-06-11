@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
