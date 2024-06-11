@@ -32,7 +32,7 @@ for step in WIZARD_CONFIG["main"].values():
         st.Page(
             page=str(step["entrypoint"]),
             title=step["title"],
-            icon=step["emoji"],
+            icon=step["icon"],
             url_path=step["title"].lower(),
             default=step["title"] == "Home",
         )
@@ -47,7 +47,7 @@ for step in WIZARD_CONFIG["etl"]["steps"].values():
             st.Page(
                 page=str(step["entrypoint"]),
                 title=step["title"],
-                icon=step["emoji"],
+                icon=step["icon"],
                 url_path=step["alias"],
             )
         )
@@ -63,7 +63,7 @@ for section in WIZARD_CONFIG["sections"]:
                 st.Page(
                     page=str(app["entrypoint"]),
                     title=app["title"],
-                    icon=app["emoji"],
+                    icon=app["icon"],
                     url_path=app["alias"],
                 )
             )

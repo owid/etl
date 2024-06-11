@@ -63,7 +63,7 @@ def load_wizard_config():  # -> Any:
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    _app_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
+    _app_properties_expected = ["title", "entrypoint", "icon", "image_url"]
     pages_properties_expected = _app_properties_expected + ["alias", "description"]
     etl_steps_properties_expected = _app_properties_expected
 

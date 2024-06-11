@@ -25,7 +25,7 @@
 #         Page(
 #             path=str(CURRENT_DIR / step["entrypoint"]),
 #             name=step["title"],
-#             icon=step["emoji"],
+#             icon=step["icon"],
 #         )
 #     )
 
@@ -37,7 +37,7 @@
 #             Page(
 #                 path=str(CURRENT_DIR / step["entrypoint"]),
 #                 name=step["title"],
-#                 icon=step["emoji"],
+#                 icon=step["icon"],
 #             )
 #         )
 
@@ -51,7 +51,7 @@
 #                 Page(
 #                     path=str(CURRENT_DIR / app["entrypoint"]),
 #                     name=app["title"],
-#                     icon=app["emoji"],
+#                     icon=app["icon"],
 #                 )
 #             )
 

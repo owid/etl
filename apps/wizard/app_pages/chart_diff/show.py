@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 
 import etl.grapher_model as gm
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
-from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, compare_chart_configs, prettify_date
+from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
+from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
 
@@ -232,42 +233,21 @@ class ChartDiffShow:
 
         st.code(diff_string, line_numbers=True, language="diff")
 
-    def _show_conflict_resolver(self) -> None:
+    def _show_conflict_resolver_options(self) -> None:
         """Resolve conflicts between charts in target and source.
 
         Sometimes, someone might edit a chart in production while we work on it on staging.
         """
-        st.warning(
-            "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
-        )
-        config_compare = compare_chart_configs(
-            self.diff.target_chart.config,  # type: ignore
-            self.diff.source_chart.config,
-        )
+        if st.button(
+            "⚠️ Resolve conflict",
+            help="This will update the chart in the staging server.",
+        ):
+            self._show_conflict_resolver()
 
-        if config_compare:
-            with st.form(f"conflict-form-{self.diff.chart_id}"):
-                st.markdown("### Conflict resolver")
-                st.markdown(
-                    "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
-                )
-                for field in config_compare:
-                    st.radio(
-                        f"**{field['key']}**",
-                        options=[field["value1"], field["value2"]],
-                        format_func=lambda x: f"{field['value1']} `PROD`"
-                        if x == field["value1"]
-                        else f"{field['value2']} `staging`",
-                        key=f"conflict-radio-{self.diff.chart_id}-{field['key']}",
-                        # horizontal=True,
-                    )
-                    st.text_input(
-                        "Custom value",
-                        label_visibility="collapsed",
-                        placeholder="Enter a custom value",
-                        key=f"conflict-custom-{self.diff.chart_id}-{field['key']}",
-                    )
-                st.form_submit_button("Resolve", help="This will update the chart in the staging server.")
+    @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
+    def _show_conflict_resolver(self) -> None:
+        """Show conflict resolver in modal page."""
+        st_show_conflict_resolver(self.diff)
 
     def _show_approval_history(self):
         """Show history of approvals of a chart-diff."""
@@ -295,18 +275,16 @@ class ChartDiffShow:
 
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
+        # Show conflict resolver if there is conflict
+        if self.diff.in_conflict:
+            self._show_conflict_resolver_options()
+
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
-            if not self.diff.in_conflict:
-                tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-            else:
-                # Resolve conflict
-                tab1, tab2, tab2b, tab3 = st.tabs(["Charts", "Config diff", "⚠️ Conflict resolver", "Change history"])
-                with tab2b:
-                    self._show_conflict_resolver()
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:

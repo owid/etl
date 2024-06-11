@@ -218,10 +218,16 @@ class ChartDiff:
                 targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
                 status=self.approval_status,  # type: ignore
             )
-            st.toast(f"Updating state for **chart {self.chart_id}** to `{self.approval_status}`")
-
             session.add(approval)
             session.commit()
+
+        match status:
+            case gm.ChartStatus.APPROVED.value:
+                st.toast(f":green[Chart {self.chart_id} has been **approved**]", icon="✅")
+            case gm.ChartStatus.REJECTED.value:
+                st.toast(f":red[Chart {self.chart_id} has been **rejected**]", icon="❌")
+            case gm.ChartStatus.PENDING.value:
+                st.toast(f"**Resetting** state for chart {self.chart_id}.", icon=":material/restart_alt:")
 
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
