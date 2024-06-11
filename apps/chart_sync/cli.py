@@ -2,7 +2,7 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 import click
 import pandas as pd
@@ -153,7 +153,7 @@ def cli(
             if chart_id:
                 chart_ids = {chart_id}
             else:
-                chart_ids = _modified_chart_ids_by_admin(source_session)
+                chart_ids = modified_charts_by_admin(source_session, target_session)
 
             log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
@@ -488,30 +488,67 @@ def _chart_config_diff(
     )
 
 
-def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
-    """Get charts created by Admin user with ID = 1 on a staging server. These charts have been
-    modified on the staging server and are candidates for syncing back to production."""
-    q = """
-    -- modified charts
+def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
+    """Get charts that have been modified in staging. It includes chart with different
+    config, data or metadata checksums. It assumes that all changes on staging server are
+    done by Admin user with ID = 1."""
+    # TODO: we could aggregate it by charts and get a combined checksum, for now we want
+    #   a view with variable granularity
+    # get modified charts and charts from modified datasets
+    base_q = """
     select
-        id as chartId
-    from charts
-    where (publishedByUserId = 1 or lastEditedByUserId = 1)
-
-    union
-
-    -- charts revisions that were approved on staging, such charts would have publishedByUserId
-    -- of the user that ran etlwiz locally, but would be updated by Admin
-    -- the chart must be published
-    select
-        chartId
-    from suggested_chart_revisions
-    where updatedBy = 1 and status = 'approved' and chartId in (
-        select id from charts
-    )
+        v.id as variableId,
+        cd.chartId,
+        v.dataChecksum,
+        v.metadataChecksum,
+        MD5(c.config) as chartChecksum
+    from chart_dimensions as cd
+    join charts as c on cd.chartId = c.id
+    join variables as v on cd.variableId = v.id
+    join datasets as d on v.datasetId = d.id
+    where
     """
+    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
+    #   set automatically if you use STAGING env variable.
+    where = """
+        -- only compare datasets or charts that have been updated on staging server
+        -- by Admin user
+        (
+            (c.lastEditedByUserId = 1 or c.publishedByUserId = 1)
+            or
+            -- include all charts from datasets that have been updated
+            (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
+        )
+    """
+    source_df = read_sql(base_q + where, source_session)
 
-    return set(read_sql(q, session.bind).chartId.tolist())  # type: ignore
+    # read those charts from target
+    where = """
+        c.id in %(chart_ids)s
+    """
+    target_df = read_sql(base_q + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())})
+
+    source_df = source_df.set_index(["chartId", "variableId"])
+    target_df = target_df.set_index(["chartId", "variableId"])
+
+    # align dataframes with left join (so that source has non-null values)
+    # NOTE: new charts will be already in source
+    source_df, target_df = source_df.align(target_df, join="left")
+
+    # return differences in data / metadata / config
+    diff = (
+        (source_df != target_df)
+        .groupby("chartId")
+        .max()
+        .rename(
+            columns={
+                "dataChecksum": "dataEdited",
+                "metadataChecksum": "metadataEdited",
+                "chartChecksum": "configEdited",
+            }
+        )
+    )
+    return diff
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:

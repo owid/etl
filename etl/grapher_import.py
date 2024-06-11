@@ -337,11 +337,11 @@ def upsert_table(
 
             # commit new checksums
             if futures:
-                session.add(db_variable)
-                session.commit()
-
                 # Wait for futures to complete in case exceptions are raised
                 [f.result() for f in futures]
+
+                session.add(db_variable)
+                session.commit()
 
         if verbose:
             if futures:

@@ -9,12 +9,13 @@ from sqlalchemy.orm import Session
 # from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
-from apps.chart_sync.cli import _modified_chart_ids_by_admin
+from apps.chart_sync.cli import modified_charts_by_admin
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
 from apps.wizard.utils.env import OWID_ENV
+from etl import config
 
 log = get_logger()
 
@@ -47,8 +48,16 @@ st.session_state.arrange_charts_vertically = st.session_state.get("arrange_chart
 # LOAD VARIABLES
 ########################################
 CHART_PER_PAGE = 10
-WARN_MSG += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
-# st.warning("- " + "\n\n- ".join(warn_msg))
+# WARN_MSG += ["This tool is being developed! Please report any issues you encounter in `#proj-new-data-workflow`"]
+
+if str(config.GRAPHER_USER_ID) != "1":
+    WARN_MSG.append(
+        "`GRAPHER_USER_ID` from your .env is not set to 1 (Admin user). Please modify your .env or use STAGING=1 flag to set it automatically. "
+        "All changes on staging servers must be done with Admin user."
+    )
+
+if WARN_MSG:
+    st.warning("- " + "\n\n- ".join(WARN_MSG))
 
 
 ########################################
@@ -81,7 +90,10 @@ def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
     """
     # Get IDs from modified charts
     with Session(SOURCE_ENGINE) as source_session:
-        chart_ids = _modified_chart_ids_by_admin(source_session)
+        with Session(TARGET_ENGINE) as target_session:
+            df = modified_charts_by_admin(source_session, target_session)
+            # Get chart its with at least one type of change
+            chart_ids = set(df.index[df.any(axis=1)])
 
     # Get all chart diffs in parallel
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -134,16 +146,31 @@ def filter_chart_diffs():
         st.session_state.chart_diffs_filtered = {
             k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
         }
-    if "change_type" in st.query_params:
-        change_types = st.query_params.get_all("change_type")
+    if "modified_or_new" in st.query_params:
+        modified_or_new = st.query_params.get_all("modified_or_new")
         st.session_state.chart_diffs_filtered = {
             k: v
             for k, v in st.session_state.chart_diffs_filtered.items()
-            if (v.is_modified and "modified" in change_types) or (v.is_new and "new" in change_types)
+            if (v.is_modified and "modified" in modified_or_new) or (v.is_new and "new" in modified_or_new)
         }
+    if "change_type" in st.query_params:
+        # keep chart diffs with at least one change type (could be data, metadata or config)
+        change_types = st.query_params.get_all("change_type")
+    else:
+        # filter to changed config by default
+        change_types = ["config"]
+
+    st.session_state.chart_diffs_filtered = {
+        k: v for k, v in st.session_state.chart_diffs_filtered.items() if set(v.checksum_changes()) & set(change_types)
+    }
 
     # Return boolean if there was any filter applied (except for hiding approved charts)
-    if "chart_id" in st.query_params or "chart_slug" in st.query_params or "change_type" in st.query_params:
+    if (
+        "chart_id" in st.query_params
+        or "chart_slug" in st.query_params
+        or "modified_or_new" in st.query_params
+        or "change_type" in st.query_params
+    ):
         return True
     return False
 
@@ -178,6 +205,8 @@ def _show_options_filters():
         _apply_search_filters("chart-diff-filter-id", "chart_id")
         # Slug filter
         _apply_search_filters("chart-diff-filter-slug", "chart_slug")
+        # Modified or new filter
+        _apply_search_filters("chart-diff-modified-or-new", "modified_or_new")
         # Change type filter
         _apply_search_filters("chart-diff-change-type", "change_type")
 
@@ -205,11 +234,18 @@ def _show_options_filters():
             help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
         )
         st.multiselect(
-            label="Chart changes type",
+            label="Chart modified / new",
             options=["modified", "new"],
+            default=[change for change in st.query_params.get_all("modified_or_new")],  # type: ignore
+            key="chart-diff-modified-or-new",
+            help="Show new charts, and/or modified charts.",
+        )
+        st.multiselect(
+            label="Chart changes type",
+            options=["data", "metadata", "config"],
             default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
             key="chart-diff-change-type",
-            help="Show new charts, and/or modified charts.",
+            help="Show charts with changes in data, metadata, or config.",
         )
         st.form_submit_button(
             "Apply filters",
