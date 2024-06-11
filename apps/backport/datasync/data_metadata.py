@@ -302,7 +302,8 @@ def _variable_metadata(
     # convert timestamp to string
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
     for col in ("createdAt", "updatedAt"):
-        variableMetadata[col] = variableMetadata[col].strftime(time_format)
+        if col in variableMetadata:
+            variableMetadata[col] = variableMetadata[col].strftime(time_format)
 
     # add origins
     variableMetadata["origins"] = _move_population_origin_to_end(
