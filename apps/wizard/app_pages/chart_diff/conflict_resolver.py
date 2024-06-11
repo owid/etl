@@ -68,10 +68,10 @@ class ChartDiffConflictResolver:
             # Show the fields values
             col1, col2 = st.columns(2)
             with col1:
-                with st.expander("PRODUCTION"):
+                with st.expander("PRODUCTION", expanded=True):
                     st.write(field["value1"])
             with col2:
-                with st.expander("STAGING"):
+                with st.expander("STAGING", expanded=True):
                     st.write(field["value2"])
 
             # Merge editor
