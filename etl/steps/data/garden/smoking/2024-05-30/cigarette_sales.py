@@ -156,6 +156,9 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # remove USSR data after 1991 (overlaps with data on country level)
+    tb = tb[~((tb["country"] == "USSR") & (tb["year"] > 1991))]
+
     # remove duplicate data (from hidden rows in excel sheet)
     tb = tb.drop_duplicates(subset=["country", "year"])
     tb = tb.format(["country", "year"])
