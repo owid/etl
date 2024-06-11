@@ -635,3 +635,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/latest/avian_influenza_ah5n1:
     - data://garden/who/latest/avian_influenza_ah5n1
+
+  # ISAPS, Plastic Surgery (2010-2022)
+  data://meadow/health/2024-06-11/isaps_plastic_surgery:
+    - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
+  data://garden/health/2024-06-11/isaps_plastic_surgery:
+    - data://meadow/health/2024-06-11/isaps_plastic_surgery
+  data://grapher/health/2024-06-11/isaps_plastic_surgery:
+    - data://garden/health/2024-06-11/isaps_plastic_surgery
