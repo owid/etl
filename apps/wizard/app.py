@@ -78,6 +78,8 @@ if page is not None:
 else:
     st.error("Pages could not be loaded!")
 
+st.logo(str(CURRENT_DIR / "docs/assets/wizard-logo.png"))
+
 ###########################################
 # Home app
 ###########################################
