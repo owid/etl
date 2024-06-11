@@ -22,14 +22,14 @@ COLS_WITH_DATA = [
     "all_tobacco_products_grams_per_adult_per_day",
 ]
 
-MAN_KEY = "manufactured_cigarettes_per_adult_per_day"
-HAND_KEY = "handrolled_cigarettes_per_adult_per_day"
-TOTAL_KEY = "total_cigarettes_per_adult_per_day"
-ALL_KEY = "all_tobacco_products_grams_per_adult_per_day"
 
-
-def standardise_years(df):
-    new_df = []
+def standardize_years(df):
+    """Standardise years column in the table by expanding timeframes and converting to integer.
+    - If year is a single year (e.g. 1980), directly convert to integer.
+    - If year is year with a footnote (e.g. 1980/1), convert to integer by removing the footnote.
+    - If year is a year with a decimal (e.g. 1980.1), convert to integer by removing the decimal.
+    - If year is a timeframe (e.g. 1980-1990), expand to individual years with the same data."""
+    list_rows = []
     for __, row in df.iterrows():
         year = row["year"]
         year_int = -1
@@ -37,37 +37,45 @@ def standardise_years(df):
         try:
             year_int = int(year)
             dict_from_row["year"] = year_int
-            new_df.append(dict_from_row)
+            list_rows.append(dict_from_row)
             continue
         except ValueError:
-            if "." in year:
+            if "." in year:  # year with decimal
                 year_int = int(year.split(".")[0])
-            elif "/" in year:
+            elif "/" in year:  # year with footnote
                 year_int = int(year.split("/")[0])
-            if year_int > 0:
+            if year_int > 0:  # year with decimal or footnote
                 dict_from_row["year"] = year_int
-                new_df.append(dict_from_row)
+                list_rows.append(dict_from_row)
                 continue
-            elif "-" in year:  # timeframe given in excel
+            elif "-" in year:  # timeframe given in excel (e.g. 1980-1990)
                 timeframe = year.split("-")
                 start_year = int(timeframe[0])
                 end_year = int(timeframe[1])
-                if end_year < 100:
+                if end_year < 100:  # if end year is given as two digits (e.g. 1980-90)
                     if end_year > (start_year % 100):
                         end_year = int(np.floor(start_year / 100) * 100 + end_year)
                     elif end_year < (start_year % 100):
                         end_year = int(np.floor(start_year / 100) * 100 + end_year + 100)
-                elif end_year > 10000:
+                elif (
+                    end_year > 10000
+                ):  # special case: some end years have a footnote that shows up as an extra digit (e.g. 1980-19901)
                     end_year = int(np.floor(end_year / 10))
-                for year_in_timeframe in range(start_year, end_year + 1):
+                for year_in_timeframe in range(start_year, end_year + 1):  # expand timeframe to individual years
                     dict_from_row = row.to_dict()
                     dict_from_row.update({"year": year_in_timeframe})
-                    new_df.append(dict_from_row)
-    return pd.DataFrame(new_df)
+                    list_rows.append(dict_from_row)
+    return pd.DataFrame(list_rows)
 
 
 def include_split_germany(tb, ds_population):
     """Include data for Germany 1945-1990 in the table by taking weighted average of East and West Germany data"""
+
+    col_manufactured = "manufactured_cigarettes_per_adult_per_day"
+    col_handrolled = "handrolled_cigarettes_per_adult_per_day"
+    col_total_cigarettes = "total_cigarettes_per_adult_per_day"
+    col_all_tobacco = "all_tobacco_products_grams_per_adult_per_day"
+
     germany_tb = tb[tb["country"].isin(["West Germany", "East Germany"])]
     germany_tb = geo.add_population_to_table(germany_tb, ds_population, interpolate_missing_population=True)
 
@@ -79,21 +87,16 @@ def include_split_germany(tb, ds_population):
             row["population"] / added_pop[added_pop["year"] == row["year"]]["population"].values[0]
         )
     # calculate share of cigarettes per adult for weighted average
-    germany_tb[MAN_KEY] = germany_tb[MAN_KEY] * germany_tb["share_of_population"]
-    germany_tb[HAND_KEY] = germany_tb[HAND_KEY] * germany_tb["share_of_population"]
-    germany_tb[TOTAL_KEY] = germany_tb[TOTAL_KEY] * germany_tb["share_of_population"]
-    germany_tb[ALL_KEY] = germany_tb[ALL_KEY] * germany_tb["share_of_population"]
+    germany_tb[col_manufactured] = germany_tb[col_manufactured] * germany_tb["share_of_population"]
+    germany_tb[col_handrolled] = germany_tb[col_handrolled] * germany_tb["share_of_population"]
+    germany_tb[col_total_cigarettes] = germany_tb[col_total_cigarettes] * germany_tb["share_of_population"]
+    germany_tb[col_all_tobacco] = germany_tb[col_all_tobacco] * germany_tb["share_of_population"]
 
     # sum up values for weighted average
     germany_tb = germany_tb[COLS_WITH_DATA + ["year"]].groupby("year").sum(min_count=1).reset_index()
     germany_tb["country"] = "Germany"
 
     return germany_tb
-
-
-def cast_to_float(df, col):
-    df[col] = df[col].astype("Float64")
-    return df
 
 
 def run(dest_dir: str) -> None:
@@ -110,14 +113,12 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Fix years column (change dtype to integer and expand timeframes)
-    df_years_fixed = Table(standardise_years(tb), metadata=tb.metadata)
-    # replace table with dataframe with fixed years, concat with empty df to keep metadata
-    tb = pr.concat([tb[0:0], df_years_fixed])
+    tb = Table(standardize_years(tb)).copy_metadata(tb)
 
     # convert million to actual values
-    tb["manufactured_cigarettes"] = tb["manufactured_cigarettes_millions"] * 1000000
-    tb["handrolled_cigarettes"] = tb["handrolled_cigarettes_millions"] * 1000000
-    tb["total_cigarettes"] = tb["total_cigarettes_millions"] * 1000000
+    tb["manufactured_cigarettes"] = tb["manufactured_cigarettes_millions"] * 1e6
+    tb["handrolled_cigarettes"] = tb["handrolled_cigarettes_millions"] * 1e6
+    tb["total_cigarettes"] = tb["total_cigarettes_millions"] * 1e6
 
     tb = tb.drop(
         columns=[
@@ -133,20 +134,22 @@ def run(dest_dir: str) -> None:
     # include data for Germany 1950-1990
     tb = pr.concat([tb, germany_tb])
 
+    # exclude East/ West Germany
+    tb = tb[(tb["country"] != "East Germany") & (tb["country"] != "West Germany")]
+
     # reorder columns
     tb = tb[["year", "country"] + COLS_WITH_DATA]
 
-    # drop rows with no data (nan values)
+    # drop rows with no data (rows with only NaN values)
     tb = tb.dropna(how="all", subset=COLS_WITH_DATA)
 
-    # drop rows with zeros and NaNs
+    # drop rows with no data (rows where some entries are 0 and some entries are NaN or all entries are zeros)
     tb_temp = tb.fillna(0)
     rows_to_drop = tb_temp[(tb_temp[COLS_WITH_DATA] == 0).all(axis=1)].index
     tb = tb.drop(rows_to_drop)
 
     # cast columns to float
-    for col in COLS_WITH_DATA:
-        tb = cast_to_float(tb, col)
+    tb = tb.astype({column: "Float64" for column in COLS_WITH_DATA})
 
     # harmonize countries (also exclude east and west germany)
     tb = geo.harmonize_countries(

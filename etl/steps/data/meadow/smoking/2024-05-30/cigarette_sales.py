@@ -3,8 +3,9 @@
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+import pandas as pd
 
+# from owid.catalog import Table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -138,10 +139,6 @@ ORIGINAL_COLUMNS = [
 ]
 
 
-def is_not_string(value):
-    return not isinstance(value, str)
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -157,7 +154,7 @@ def run(dest_dir: str) -> None:
     # Process data
 
     # Load country tables from excel files one by one (to concatenate them later)
-    country_tables = []
+    country_tables_ls = []
     # list needed to pad tables so they have the same format
     addl_cols = [
         "Unnamed: 3",
@@ -172,13 +169,13 @@ def run(dest_dir: str) -> None:
         "Unnamed: 12",
     ]
 
-    tb_from_excel = Table()
+    # tb_from_excel = Table()
 
     for cty, cty_sheet in COUNTRY_MAP.items():
         if cty not in SPECIAL_CASES:
             # open excel file
             tb_from_excel = pr.read_excel(
-                zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
+                zf.open(f"{folder_name}{cty_sheet['file_name']}"),
                 metadata=snap_meta,
                 origin=snap.metadata.origin,
                 sheet_name=cty_sheet["sheet_name"],
@@ -188,7 +185,7 @@ def run(dest_dir: str) -> None:
 
         elif cty == "Germany":
             tb_from_excel = pr.read_excel(
-                zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
+                zf.open(f"{folder_name}{cty_sheet['file_name']}"),
                 sheet_name=cty_sheet["sheet_name"],
                 metadata=snap_meta,
                 origin=snap.metadata.origin,
@@ -197,19 +194,19 @@ def run(dest_dir: str) -> None:
 
         elif cty == "USSR and fSU":
             tb_from_excel = pr.read_excel(
-                zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
+                zf.open(f"{folder_name}{cty_sheet['file_name']}"),
                 sheet_name=cty_sheet["sheet_name"],
                 metadata=snap_meta,
                 origin=snap.metadata.origin,
                 header=9,
             )
-            tb_from_excel["Unnamed: 4"] = "NaN"
-            tb_from_excel["Unnamed: 5"] = "NaN"
+            tb_from_excel["Unnamed: 4"] = pd.NA
+            tb_from_excel["Unnamed: 5"] = pd.NA
 
         elif cty in FORMAT_SPECIAL_CASES.keys():
             format = FORMAT_SPECIAL_CASES[cty]
             tb_from_excel = pr.read_excel(
-                zf.open("{}{}".format(folder_name, cty_sheet["file_name"])),
+                zf.open(f"{folder_name}{cty_sheet['file_name']}"),
                 sheet_name=cty_sheet["sheet_name"],
                 metadata=snap_meta,
                 origin=snap.metadata.origin,
@@ -226,37 +223,39 @@ def run(dest_dir: str) -> None:
             tb_from_excel = tb_from_excel.head(format["num_rows"])
 
         # drop empty columns
-        tb_from_excel.drop(labels=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], axis=1, inplace=True)
+        tb_from_excel = tb_from_excel.drop(
+            columns=["Unnamed: 3", "Unnamed: 6", "Unnamed: 9", "Unnamed: 12"], axis=1, errors="raise"
+        )
 
         # change header and remove sub-header columns
         tb_from_excel.drop(labels=[0, 1], axis=0, inplace=True)
         tb_from_excel.columns = NEW_COLUMNS
 
         tb_from_excel["country"] = cty
-        country_tables.append(tb_from_excel)
+        country_tables_ls.append(tb_from_excel)
 
     # concatenate tables and delete rows without data
-    smoking_data_tb = pr.concat(country_tables)
+    tb_smoking = pr.concat(country_tables_ls)
 
     # remove repeating headers
-    smoking_data_tb = smoking_data_tb[smoking_data_tb["year"].notna()]
-    smoking_data_tb = smoking_data_tb[smoking_data_tb["manufactured_cigarettes_millions"].apply(is_not_string)]
+    tb_smoking = tb_smoking.dropna(subset=["year"])
+    tb_smoking = tb_smoking[tb_smoking["manufactured_cigarettes_millions"].apply(lambda x: not isinstance(x, str))]
 
-    # change data types to string
-    smoking_data_tb["year"] = smoking_data_tb["year"].astype(str)
+    # change data types to string (since there are some special characters/ ranges in the data e.g. "1950-1954")
+    tb_smoking["year"] = tb_smoking["year"].astype(str)
 
     # remove duplicate data
-    smoking_data_tb = smoking_data_tb.drop_duplicates(subset=["country", "year"], keep="last")
+    tb_smoking = tb_smoking.drop_duplicates(subset=["country", "year"], keep="last")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    smoking_data_tb = smoking_data_tb.format(["country", "year"])
+    tb_smoking = tb_smoking.format(["country", "year"])
 
     # Save outputs.
     #
     # Create a new meadow dataset with thex same metadata as the snapshot.
     ds_meadow = create_dataset(
         dest_dir,
-        tables=[smoking_data_tb],
+        tables=[tb_smoking],
         default_metadata=snap.metadata,
         check_variables_metadata=True,
     )

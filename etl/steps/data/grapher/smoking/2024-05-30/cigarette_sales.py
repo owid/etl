@@ -15,14 +15,11 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("cigarette_sales")
 
     # Read table from garden dataset.
-    tb = ds_garden["cigarette_sales"].reset_index()
+    tb = ds_garden["cigarette_sales"]
 
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-
-    tb = tb.format(["country", "year"])
-
     ds_grapher = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
