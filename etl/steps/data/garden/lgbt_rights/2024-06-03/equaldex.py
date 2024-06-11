@@ -234,11 +234,10 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
 
     # Rename categories
     for issue in issue_list:
-        paths.log.info(f"Map values for {issue}")
         tb[issue] = map_series(
             series=tb[issue],
             mapping=CATEGORIES_RENAMING[issue],
-            warn_on_missing_mappings=True,
+            warn_on_missing_mappings=False,
             warn_on_unused_mappings=False,
             show_full_warning=False,
         )
