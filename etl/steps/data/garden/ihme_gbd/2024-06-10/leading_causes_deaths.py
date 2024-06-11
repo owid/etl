@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
         for age_group in age_groups:
             log.info(f"Processing age group {age_group}")
             # Get the causes at this level
-            level_causes = tb_hierarchy[tb_hierarchy["level"] == level]["cause_name_underscore"].to_list()
+            level_causes = tb_hierarchy[tb_hierarchy["level"] == level]["cause_name"].to_list()
             # Create table with leading cause of death at this level for each country-year
             tb_level = create_hierarchy_table(
                 age_group=age_group,
@@ -45,8 +45,6 @@ def run(dest_dir: str) -> None:
                 level=level,
                 short_name=f"leading_cause_level_{level}_in_{age_group.lower().replace(' ', '_')}",
             )
-            # Make the disease names more readable
-            # tb_level = clean_disease_names(tb=tb_level, tb_hierarchy=tb_hierarchy, level=level)
             tb_level = tb_level.set_index(["country", "year"], verify_integrity=True)
             tb_out.append(tb_level)
 
@@ -84,49 +82,21 @@ def create_hierarchy_table(
     """
     tb_out = []
     for cause in level_causes:
-        tb = tb_cause[(tb_cause["cause_name_underscore"] == cause) & (tb_cause["age"] == age_group)]
+        tb = tb_cause[(tb_cause["cause"] == cause) & (tb_cause["age"] == age_group)]
         assert tb.shape[0] > 0, f"Table {cause} is empty"
-        cols = ["country", "year", "value"]
+        cols = ["country", "year", "cause", "value"]
         tb = tb[cols]
-        tb = tb.rename(columns={"value": cause}, errors="raise")
+        # tb = tb.rename(columns={"value": cause}, errors="raise")
         tb_out.append(tb)
 
-    tb_out = pr.multi_merge(tb_out, on=["country", "year"], how="outer", validate="one_to_one")
-    # Melt the table from wide to long to make it easier to groupby
-    long_tb = pr.melt(tb_out, id_vars=["country", "year"])
-    long_tb = long_tb.rename(columns={"variable": f"leading_deaths_level_{level}"})
-    # Find the cause of death with the highest number of deaths in each country-year
-    leading_causes_idx = long_tb.groupby(["country", "year"], observed=True)["value"].idxmax()
-    leading_causes_tb = long_tb.loc[leading_causes_idx]
+    tb_out = pr.concat(tb_out, ignore_index=True, sort=False, verify_integrity=True)
+    leading_causes_idx = tb_out.groupby(["country", "year"], observed=True)["value"].idxmax()
+    leading_causes_tb = tb_out.loc[leading_causes_idx]
     leading_causes_tb = leading_causes_tb.drop(columns=["value"])
+    leading_causes_tb = leading_causes_tb.rename(columns={"cause": f"leading_deaths_level_{level}"})
     leading_causes_tb.metadata.short_name = short_name
 
     return leading_causes_tb
-
-
-def clean_disease_names(tb: Table, tb_hierarchy: Table, level: Any) -> Table:
-    """
-    Making the underscored disease names more readable using the original hierarchy table
-
-    """
-
-    tb_hierarchy = tb_hierarchy[tb_hierarchy["level"] == level][["cause_name", "cause_name_underscore"]]
-    disease_col = [item for item in tb.columns if "disease_" in item]
-    disease_col = disease_col[0]
-    tb = tb.merge(tb_hierarchy, how="inner", left_on=disease_col, right_on="cause_name_underscore")
-    tb = tb.drop(columns=["cause_name_underscore", disease_col])
-    tb = tb.rename(columns={"cause_name": disease_col})
-
-    # Add more succinct disease names
-
-    disease_dict = {
-        "Exposure to forces of nature": "Natural disasters",
-        "Neoplasms": "Cancer",
-    }
-
-    tb[disease_col] = tb[disease_col].replace(disease_dict, errors="raise")
-
-    return tb
 
 
 def add_owid_hierarchy(tb_hierarchy: Table, owid_level_name: str) -> Table:
