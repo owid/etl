@@ -2,11 +2,13 @@ import json
 from copy import deepcopy
 from typing import cast
 
+import requests
 import streamlit as st
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
+from etl.chart_revision.v3.schema import validate_chart_config_and_set_defaults
 
 ENVIRONMENT_IDS = {
     1: "PRODUCTION",
@@ -117,11 +119,14 @@ class ChartDiffConflictResolver:
                 else:
                     config[field_key] = as_valid_json(field_resolution)
 
+            # Verify config
+            config_new = validate_chart_config_and_set_defaults(config, schema=get_schema())
+
             # Push to staging
             api = AdminAPI(SOURCE.engine, grapher_user_id=1)
             api.update_chart(
                 chart_id=self.diff.chart_id,
-                chart_config=config,
+                chart_config=config_new,
             )
             print(config)
         if rerun:
@@ -165,6 +170,13 @@ def compare_chart_configs(c1, c2):
             )
 
     return diff_list
+
+
+def get_schema(schema_version: str = "004"):
+    return requests.get(
+        f"https://files.ourworldindata.org/schemas/grapher-schema.{schema_version}.json",
+        timeout=20,
+    ).json()
 
 
 def st_show_conflict_resolver(diff: ChartDiff) -> None:
