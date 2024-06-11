@@ -119,6 +119,15 @@ class ChartDiffConflictResolver:
                 else:
                     config[field_key] = as_valid_json(field_resolution)
 
+            # Get rid of special fields
+            fields_remove = [
+                "bakedGrapherURL",
+                "adminBaseUrl",
+                "dataApiUrl",
+            ]
+            for field in fields_remove:
+                config.pop(field, None)
+
             # Verify config
             config_new = validate_chart_config_and_set_defaults(config, schema=get_schema())
 
