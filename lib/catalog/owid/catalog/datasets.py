@@ -22,6 +22,7 @@ from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
 from .processing_log import disable_processing_log
 from .properties import metadata_property
+from .tables import Table
 
 FileFormat = Literal["csv", "feather", "parquet"]
 
@@ -185,6 +186,18 @@ class Dataset:
                 table = self[table_name]
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
+
+    @property
+    def tables(self) -> list[Table]:
+        """Get all dataset tables.
+
+        TODO: should probably store as class attribute. I'm just afraid that tables could be huge?
+        """
+        tables = []
+        for table_name in self.table_names:
+            with disable_processing_log():
+                tables.append(self[table_name])
+        return tables
 
     def update_metadata(
         self,
