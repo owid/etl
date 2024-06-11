@@ -402,6 +402,7 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
             "numDecimalPlaces": 0,
             "tolerance": 0,
         }
+        meta.presentation = VariablePresentationMeta(title_public=meta.title)
     elif count_or_pop == "pop":
         meta = VariableMeta(
             title=f"{col.capitalize()} - {status.capitalize()} (Population)",
@@ -416,10 +417,9 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
             "numDecimalPlaces": 0,
             "tolerance": 0,
         }
+        meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     else:
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
-    return meta
+    return meta  # type: ignore
