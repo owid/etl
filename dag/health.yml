@@ -636,6 +636,15 @@ steps:
   data://grapher/who/latest/avian_influenza_ah5n1:
     - data://garden/who/latest/avian_influenza_ah5n1
 
+  # International Smoking Statistics cigarette sales data
+  data://meadow/smoking/2024-05-30/cigarette_sales:
+    - snapshot://smoking/2024-05-30/cigarette_sales.zip
+  data://garden/smoking/2024-05-30/cigarette_sales:
+    - data://meadow/smoking/2024-05-30/cigarette_sales
+    - data://garden/demography/2023-03-31/population
+  data://grapher/smoking/2024-05-30/cigarette_sales:
+    - data://garden/smoking/2024-05-30/cigarette_sales
+
   # ISAPS, Plastic Surgery (2010-2022)
   data://meadow/health/2024-06-11/isaps_plastic_surgery:
     - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
@@ -643,3 +652,4 @@ steps:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
+
