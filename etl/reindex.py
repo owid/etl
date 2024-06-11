@@ -16,7 +16,7 @@ from etl.paths import DATA_DIR
 config.enable_bugsnag()
 
 
-@click.command(name="d publish")
+@click.command(name="reindex")
 @click.option(
     "--channel",
     "-c",
