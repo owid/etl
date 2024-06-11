@@ -25,7 +25,7 @@ tables:
           <% elif (category_1 != 'all') and (category_2 != 'all') and (procedure_name == 'all') %>
           Number of aesthetic << category_1 >> procedures, << category_2 >>
           <% else %>
-          Number of aesthetic << category_1 >> procedures << category_2 >>, << procedure_name >>
+          Number of aesthetic << category_1 >> procedures, << category_2 >>, << procedure_name.title() >>
           <% endif %>
         description_short: |-
           Number of cosmetic procedures performed in a given year.
