@@ -103,7 +103,7 @@ sections:
     - title: "Chart Diff"
       alias: chart-diff
       entrypoint: app_pages/chart_diff/app.py
-      description: Compare charts in staging and production
+      description: Compare charts in staging and prod
       maintainer: "@mojmir"
       icon: ":material/difference:"
       image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
@@ -169,7 +169,7 @@ sections:
 
   - title: "Metadata"
     description: |-
-      Tools to improve our metadata or learn how to use it.
+      Improve our metadata or learn how to use it.
     apps:
       - title: "Meta Upgrader"
         description: "Migrate old metadata to new format."
