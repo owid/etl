@@ -617,7 +617,7 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kw
 
     chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
     chart_config_tmp["adminBaseUrl"] = owid_env.base_site
-    chart_config_tmp["dataApiUrl"] = owid_env.indicators_url
+    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
     HTML = f"""
     <!DOCTYPE html>
