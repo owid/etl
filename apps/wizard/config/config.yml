@@ -87,14 +87,14 @@ etl:
 
 sections:
 
-  - title: "Charts"
+  - title: "Data tools"
     description: |-
-      Create chart revisions, and synchronize aproved revisions between servers.
+      Update indicators & charts in staging.
     apps:
     - title: "Indicator Upgrader"
       alias: indicator-upgrade
       entrypoint: app_pages/indicator_upgrade/app.py
-      description: Update indicator references in charts
+      description: Migrate indicators in charts
       maintainer: "@lucas"
       icon: ":material/upgrade:"
       image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
@@ -103,14 +103,21 @@ sections:
     - title: "Chart Diff"
       alias: chart-diff
       entrypoint: app_pages/chart_diff/app.py
-      description: Chart differences
+      description: Compare charts in staging and production
       maintainer: "@mojmir"
       icon: ":material/difference:"
       image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
       disable:
         production: True
+    - title: "Harmonizer"
+      alias: harmonizer
+      description: "Harmonize a column of a table"
+      maintainer: "@lucas"
+      entrypoint: app_pages/harmonizer.py
+      icon: ":material/music_note:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
 
-  - title: "Data tools"
+  - title: "Monitoring"
     description: |-
       Control panel for ETL steps.
     apps:
@@ -128,13 +135,11 @@ sections:
         entrypoint: app_pages/dataset_explorer.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
-      - title: "Harmonizer"
-        alias: harmonizer
-        description: "Harmonize a column of a table"
-        maintainer: "@lucas"
-        entrypoint: app_pages/harmonizer.py
-        icon: ":material/music_note:"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+
+  - title: "Research"
+    description: |-
+      Research tools.
+    apps:
       - title: "Insighter"
         alias: insighter
         description: "Data insights with GPT"
@@ -187,23 +192,23 @@ sections:
           "production": True
           "staging": True
 
-  - title: "Legacy"
-    description: |-
-      The pages below are legacy now. They are kept in case the new pages are not working properly.
-    apps:
-      - title: "Chart Upgrader"
-        alias: charts
-        entrypoint: app_pages/charts/__main__.py
-        description: Prepare chart revisions
-        maintainer: "@lucas"
-        icon: ":material/upgrade:"
-        image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync"
-        alias: chart-sync
-        entrypoint: ../chart_sync/app.py
-        description: Sync charts between servers
-        maintainer: "@mojmir"
-        icon: ":material/sports_volleyball:"
-        image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
-        disable:
-          "staging": True
+legacy:
+  description: |-
+    The pages below are legacy now. They are kept in case the new pages are not working properly.
+  apps:
+    - title: "Chart Upgrader"
+      alias: charts
+      entrypoint: app_pages/charts/__main__.py
+      description: Prepare chart revisions
+      maintainer: "@lucas"
+      icon: ":material/upgrade:"
+      image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
+    - title: "Chart Sync"
+      alias: chart-sync
+      entrypoint: ../chart_sync/app.py
+      description: Sync charts between servers
+      maintainer: "@mojmir"
+      icon: ":material/sports_volleyball:"
+      image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+      disable:
+        "staging": True
