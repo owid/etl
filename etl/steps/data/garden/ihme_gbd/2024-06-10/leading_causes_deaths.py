@@ -47,17 +47,6 @@ def run(dest_dir: str) -> None:
             )
             tb_out.append(tb_level)
 
-    # Removing the tables where the age group doesn't match the hierarchy
-    tb_out = [
-        tb
-        for tb in tb_out
-        if tb.metadata.short_name
-        not in [
-            "leading_cause_level_owid_under_5_in_all_ages",
-            "leading_cause_level_owid_all_ages_in_under_5",
-        ]
-    ]
-
     # Save outputs.
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -65,7 +54,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=tb_out,
         check_variables_metadata=True,
-        default_metadata=ds_cause.metadata,
+        default_metadata=ds_hierarchy.metadata,
     )
 
     # Save changes in the new garden dataset.
