@@ -64,10 +64,15 @@ def add_regional_aggregates(
 
     # TODO: maybe we could update pr.concat to work with categoricals if pandas can't handle them and converts
     # them to objects
-    tb_rate = Table(dataframes.concatenate([tb_rate, tb_rate_regions], ignore_index=True)).copy_metadata(tb_rate)
+    # NOTE: we need to copy the object from `copy_metadata` because it is lost during the concatenation
+    #  we should implement a better pr.concat function
+    tb_rate_copy = tb_rate.copy(deep=False)
+    tb_rate = Table(dataframes.concatenate([tb_rate, tb_rate_regions], ignore_index=True)).copy_metadata(tb_rate_copy)
+    tb_number_percent_copy = tb_number_percent.copy(deep=False)
     tb_out = Table(dataframes.concatenate([tb_number_percent, tb_rate], ignore_index=True)).copy_metadata(
-        tb_number_percent
+        tb_number_percent_copy
     )
+    assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
     return tb_out
 
