@@ -240,7 +240,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("version", "id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
+        exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
         config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
         config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
         return config_1 == config_2
