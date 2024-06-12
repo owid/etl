@@ -38,10 +38,10 @@ def st_show_home():
     default_styles = {
         "card": {
             "width": "100%",
-            "height": "100px",
+            "height": "80px",
             "padding": "0px",
             "margin": "0px",
-            "font-size": ".75rem",
+            "font-size": ".8rem",
             "font-family": "Helvetica",
         },
         "filter": {
