@@ -84,7 +84,6 @@ submission_config = None
 
 # config
 st.session_state.is_any_migration = st.session_state.get("is_any_migration", False)
-st.session_state.migration_new_id = st.session_state.get("migration_new_id", None)
 st.session_state.show_all_datasets = st.session_state.get("show_all_datasets", False)
 st.session_state.show_step_name = st.session_state.get("show_step_name", False)
 

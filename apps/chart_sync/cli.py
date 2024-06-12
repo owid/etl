@@ -179,6 +179,15 @@ def cli(
                     )
                     continue
 
+                # Rejected diffs are skipped
+                if diff.is_rejected:
+                    log.info(
+                        "chart_sync.is_rejected",
+                        slug=chart_slug,
+                        chart_id=chart_id,
+                    )
+                    continue
+
                 # Map variable IDs from source to target
                 diff.source_chart = diff.source_chart.migrate_to_db(source_session, target_session)
 
@@ -205,12 +214,7 @@ def cli(
 
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Pending chart, notify us about it
                         elif diff.is_pending:
@@ -324,12 +328,7 @@ def cli(
                             )
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Not approved, create the chart, but notify us about it
                         elif diff.is_pending:
