@@ -17,7 +17,7 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from apps.wizard.utils.env import OWIDEnv
-from etl import config
+from etl import config, files
 from etl.db import read_sql
 
 log = get_logger()
@@ -244,11 +244,6 @@ def _variable_metadata(
 ) -> Dict[str, Any]:
     row = db_variable_row
 
-    # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
-    # feedback loop with changing checksums
-    row.pop("dataChecksum", None)
-    row.pop("metadataChecksum", None)
-
     sourceId = row.pop("sourceId")
     sourceName = row.pop("sourceName")
     sourceDescription = row.pop("sourceDescription")
@@ -402,3 +397,30 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 def _omit_nullable_values(d: dict) -> dict:
     return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}
+
+
+def checksum_data_str(var_data_str: str) -> str:
+    return files.checksum_str(var_data_str)
+
+
+def checksum_metadata(meta: Dict[str, Any]) -> str:
+    """Calculate checksum for metadata. It modifies the metadata dict!"""
+    # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
+    # feedback loop with changing checksums
+    meta.pop("dataChecksum", None)
+    meta.pop("metadataChecksum", None)
+
+    # Drop all IDs. If we create the same dataset on the staging server, it might have different
+    # IDs, but the metadata should be the same.
+    meta.pop("id", None)
+    meta.pop("datasetId", None)
+    for origin in meta.get("origins", []):
+        origin.pop("id", None)
+
+    # Drop dimensions to make it faster. It is captured in `dataChecksum` anyway
+    meta.pop("dimensions", None)
+
+    # Ignore updatedAt timestamps
+    meta.pop("updatedAt", None)
+
+    return files.checksum_str(json.dumps(meta, default=str))
