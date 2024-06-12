@@ -90,6 +90,15 @@ class ChartDiffShow:
             status = st.session_state[f"radio-{self.diff.chart_id}"]
             self.diff.set_status(session=session, status=status)
 
+            # Notify user
+            match status:
+                case gm.ChartStatus.APPROVED.value:
+                    st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
+                case gm.ChartStatus.REJECTED.value:
+                    st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
+                case gm.ChartStatus.PENDING.value:
+                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+
     def _pull_latest_chart(self):
         """Get latest chart version from database."""
         diff_new = ChartDiff.from_chart_id(
