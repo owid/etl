@@ -88,9 +88,6 @@ class ChartDiffShow:
         else:
             self.openai_api = None
 
-        # Cache
-        self._checksum_changes: List[str] | None = None
-
     @property
     def box_label(self):
         """Label of the expander box.
@@ -104,8 +101,11 @@ class ChartDiffShow:
             tags.append(" :blue-background[**NEW**]")
         if self.diff.is_draft:
             tags.append(" :gray-background[**DRAFT**]")
-        for change in self.checksum_changes:
+        for change in self.diff.change_types:
             tags.append(f":red-background[**{change.upper()} CHANGE**]")
+
+        # Add TAG if modified and no change_types is provided
+
         label += f":break[{' '.join(tags)}]"
         return label
 
@@ -120,17 +120,6 @@ class ChartDiffShow:
         status = list(DISPLAY_STATE_OPTIONS.keys())
         status = [s for s in status if s not in {gm.ChartStatus.REJECTED.value}]
         return status
-
-    @property
-    def checksum_changes(self) -> List[str]:
-        """List with names of checksum changes."""
-        if self._checksum_changes is None:
-            self._checksum_changes = self.diff.checksum_changes()
-        return self._checksum_changes
-
-    def clean_cache(self) -> None:
-        """Clean temporary cached variables."""
-        self._checksum_changes = None
 
     def _push_status(self, session: Optional[Session] = None) -> None:
         """Change state of the ChartDiff based on session state."""
@@ -221,12 +210,7 @@ class ChartDiffShow:
 
         # Status of chart diff: approve, pending, reject
         with col1:
-            if self.diff.is_modified & (("data" in self.checksum_changes) | ("metadata" in self.checksum_changes)):
-                # approval_status = (
-                #     self.diff.approval_status
-                #     if self.diff.approval_status != gm.ChartStatus.REJECTED.value
-                #     else gm.ChartStatus.PENDING.value
-                # )
+            if self.diff.is_modified & (("data" in self.diff.change_types) | ("metadata" in self.diff.change_types)):
                 st.radio(
                     label="Did you review the chart?",
                     key=f"radio-{self.diff.chart_id}",
@@ -467,7 +451,7 @@ class ChartDiffShow:
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 
-        if "metadata" in self.checksum_changes:
+        if "metadata" in self.diff.change_types:
             self._show_metadata_diff()
 
         # SHOW MODIFIED CHART
