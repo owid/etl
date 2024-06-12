@@ -105,8 +105,11 @@ class ChartDiffShow:
             tags.append(f":red-background[**{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
-
-        label += f":break[{' '.join(tags)}]"
+        if (self.diff.is_modified) and (tags == []):
+            label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
+        else:
+            label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
+            # label += f":break[{' '.join(tags)}]"
         return label
 
     @property
@@ -480,8 +483,6 @@ class ChartDiffShow:
                 self._show()
         else:
             self._show()
-
-        self.clean_cache()
 
 
 def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
