@@ -170,7 +170,7 @@ def filter_chart_diffs():
         st.session_state.chart_diffs_filtered = {
             k: v
             for k, v in st.session_state.chart_diffs_filtered.items()
-            if set(v.checksum_changes()) & set(change_types)
+            if set(v.checksum_changes()) & set(change_types) or v.is_new
         }
 
     # Return boolean if there was any filter applied (except for hiding approved charts)

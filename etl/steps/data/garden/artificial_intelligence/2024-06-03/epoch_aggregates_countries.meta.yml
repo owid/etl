@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    unit: 'AI systems'
+    short_unit: ''
+    description_short: Total annual number of notable machine learning models attributed to the location of researchers’ affiliated institutions. {definitions.desc_update}
+    description_processing: The number of notable AI systems by country is determined by tallying the number of machine learning models that are associated with the geographical location of the researchers' affiliated institutions. It's important to note that a single model can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+
+dataset:
+  update_period_days: 31
+  title: Notable AI systems by country
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_aggregates_countries:
+    variables:
+      yearly_count:
+        title: Annual number of AI systems by country
+
+      cumulative_count:
+        title: Cumulative number of AI systems by country

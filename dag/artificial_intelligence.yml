@@ -1,30 +1,36 @@
 steps:
 
-  # Artificial Intelligence (EPOCH, latest)
-  data://meadow/artificial_intelligence/latest/epoch:
-    - snapshot://artificial_intelligence/latest/epoch.csv
-  data://garden/artificial_intelligence/latest/epoch:
-    - data://meadow/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch:
-    - data://garden/artificial_intelligence/latest/epoch
+  # Main EPOCH dataset
+  data://meadow/artificial_intelligence/2024-06-03/epoch:
+    - snapshot://artificial_intelligence/2024-06-03/epoch.csv
+  data://garden/artificial_intelligence/2024-06-03/epoch:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
 
-  # Aggregates by domain
-  data://garden/artificial_intelligence/latest/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/latest/epoch_aggregates_domain
+  # EPOCH aggregates by country
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
 
-  # Aggregates by researcher affiliaiton
-  data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation
+  # EPOCH aggregates by domain
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
 
-  # Aggregates by machine learning approach
-  data://garden/artificial_intelligence/latest/epoch_aggregates_approach:
-    - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
-    - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
+  # EPOCH aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
+
+  # EPOCH aggregates by organization
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
 
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2024-02-15/epoch_llms:
