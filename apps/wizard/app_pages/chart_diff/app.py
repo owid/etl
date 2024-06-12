@@ -165,7 +165,7 @@ def filter_chart_diffs():
             change_types = st.query_params.get_all("change_type")
         else:
             # filter to changed config by default
-            change_types = ["config"]
+            change_types = ["new", "config"]
 
         st.session_state.chart_diffs_filtered = {
             k: v
@@ -177,7 +177,7 @@ def filter_chart_diffs():
     if (
         "chart_id" in st.query_params
         or "chart_slug" in st.query_params
-        or "modified_or_new" in st.query_params
+        # or "modified_or_new" in st.query_params
         or "change_type" in st.query_params
     ):
         return True
@@ -225,8 +225,6 @@ def _show_options_filters():
         _apply_search_filters("chart-diff-filter-id", "chart_id")
         # Slug filter
         _apply_search_filters("chart-diff-filter-slug", "chart_slug")
-        # Modified or new filter
-        _apply_search_filters("chart-diff-modified-or-new", "modified_or_new")
         # Change type filter
         _apply_search_filters("chart-diff-change-type", "change_type")
 
@@ -246,6 +244,18 @@ def _show_options_filters():
         help="Show all charts. This option ignores all the filters.\n\nIf you want to apply any filter, uncheck this option.",
     )
     with st.form("chart-diff-filters"):
+        default = [change for change in st.query_params.get_all("change_type")]
+        if not default:
+            default = ["new", "config"]
+        st.multiselect(
+            label="Chart changes type",
+            options=["new", "data", "metadata", "config"],
+            format_func=lambda x: x if x == "new" else f"modified {x}",
+            default=default,  # type: ignore
+            key="chart-diff-change-type",
+            help="Show new charts or modified ones with changes in data, metadata, or config.",
+            placeholder="config, data, metadata",
+        )
         st.multiselect(
             label="Select chart IDs",
             options=[c.chart_id for c in st.session_state.chart_diffs.values()],
@@ -261,22 +271,7 @@ def _show_options_filters():
             key="chart-diff-filter-slug",
             help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
         )
-        st.multiselect(
-            label="Chart modified / new",
-            options=["modified", "new"],
-            default=[change for change in st.query_params.get_all("modified_or_new")],  # type: ignore
-            key="chart-diff-modified-or-new",
-            help="Show new charts, and/or modified charts.",
-            placeholder="modified, new",
-        )
-        st.multiselect(
-            label="Chart changes type",
-            options=["data", "metadata", "config"],
-            default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
-            key="chart-diff-change-type",
-            help="Show charts with changes in data, metadata, or config. This only applies to modified charts (new charts will be shown if not filtered out).",
-            placeholder="config, data, metadata",
-        )
+
         st.form_submit_button(
             "Apply filters",
             on_click=apply_search_filters,  # type: ignore
