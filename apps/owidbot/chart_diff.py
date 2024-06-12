@@ -119,9 +119,11 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     num_charts_new_reviewed = new.is_reviewed.sum()
 
     return f"""
-{num_charts_reviewed}/{num_charts} reviewed charts
 <ul>
-    <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified})</li>
-    <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+    <li>{num_charts_reviewed}/{num_charts} reviewed charts</li>
+    <ul>
+        <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
+        <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+    </ul>
 </ul>
     """.strip()
