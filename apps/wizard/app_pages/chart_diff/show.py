@@ -12,7 +12,10 @@ import streamlit as st
 from sqlalchemy.orm import Session
 
 import etl.grapher_model as gm
-from apps.backport.datasync.data_metadata import variable_metadata_df_from_s3
+from apps.backport.datasync.data_metadata import (
+    filter_out_fields_in_metadata_for_checksum,
+    variable_metadata_df_from_s3,
+)
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
@@ -307,6 +310,11 @@ class ChartDiffShow:
             # Generate diffs
             meta_diffs = {}
             for source, target, indicator_id in zip(metadata_source, metadata_target, source_ids):
+                # Filter fields not relevant for comparison
+                source = filter_out_fields_in_metadata_for_checksum(source)
+                target = filter_out_fields_in_metadata_for_checksum(target)
+
+                # Get meta json diff
                 meta_diff = compare_dictionaries(source, target)  # type: ignore
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff

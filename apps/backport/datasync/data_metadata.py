@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+from copy import deepcopy
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
@@ -405,22 +406,32 @@ def checksum_data_str(var_data_str: str) -> str:
 
 def checksum_metadata(meta: Dict[str, Any]) -> str:
     """Calculate checksum for metadata. It modifies the metadata dict!"""
+    # Drop fields not needed for checksum computation
+    meta = filter_out_fields_in_metadata_for_checksum(meta)
+
+    return files.checksum_str(json.dumps(meta, default=str))
+
+
+def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:
+    """Drop fields that are not needed to estimate the checksum."""
+    meta_ = deepcopy(meta)
+
     # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
     # feedback loop with changing checksums
-    meta.pop("dataChecksum", None)
-    meta.pop("metadataChecksum", None)
+    meta_.pop("dataChecksum", None)
+    meta_.pop("metadataChecksum", None)
 
     # Drop all IDs. If we create the same dataset on the staging server, it might have different
     # IDs, but the metadata should be the same.
-    meta.pop("id", None)
-    meta.pop("datasetId", None)
-    for origin in meta.get("origins", []):
+    meta_.pop("id", None)
+    meta_.pop("datasetId", None)
+    for origin in meta_.get("origins", []):
         origin.pop("id", None)
 
     # Drop dimensions to make it faster. It is captured in `dataChecksum` anyway
-    meta.pop("dimensions", None)
+    meta_.pop("dimensions", None)
 
     # Ignore updatedAt timestamps
-    meta.pop("updatedAt", None)
+    meta_.pop("updatedAt", None)
 
-    return files.checksum_str(json.dumps(meta, default=str))
+    return meta_
