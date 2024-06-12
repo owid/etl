@@ -274,7 +274,7 @@ def _show_options_filters():
             options=["data", "metadata", "config"],
             default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
             key="chart-diff-change-type",
-            help="Show charts with changes in data, metadata, or config.",
+            help="Show charts with changes in data, metadata, or config. This only applies to modified charts (new charts will be shown if not filtered out).",
             placeholder="config, data, metadata",
         )
         st.form_submit_button(
