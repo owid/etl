@@ -228,7 +228,6 @@ class ChartDiff:
             session.add(approval)
             session.commit()
 
-
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
