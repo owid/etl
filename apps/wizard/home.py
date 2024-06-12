@@ -11,19 +11,19 @@ from apps.wizard.utils import st_page_link
 st.set_page_config(
     page_title="Wizard: Home",
     page_icon="🪄",
+    layout="wide",
 )
-st.text(f"streamlit {st.__version__}")
+
+MAX_COLS_PER_ROW = 3
 
 
 def st_show_home():
     # Page config
-    st.title("Wizard 🪄")
-    st.markdown(
-        """
-    Wizard is a fundamental tool for data scientists at OWID to easily create ETL steps. Additionally, wizard provides a set of tools to explore and improve these steps.
-    """
-    )
-
+    cols = st.columns([10, 3])
+    with cols[0]:
+        st.title("Wizard 🪄")
+    with cols[1]:
+        st.caption(f"streamlit {st.__version__}")
     # Expert link
     st_page_link(
         "expert",
@@ -37,15 +37,21 @@ def st_show_home():
     ## Default styling for the cards (Wizard apps are presented as cards)
     default_styles = {
         "card": {
-            "width": "150",
+            "width": "100%",
             "height": "100px",
-            "padding": "0",
-            "margin": "0",
-            "font-size": ".8rem",
+            "padding": "0px",
+            "margin": "0px",
+            "font-size": ".75rem",
             "font-family": "Helvetica",
         },
         "filter": {
-            "background-color": "rgba(0, 0, 0, 0.5)"  # <- make the image not dimmed anymore
+            "background-color": "rgba(0, 0, 0, 0.55)"  # <- make the image not dimmed anymore
+        },
+        "text": {
+            "font-size": "1rem",
+            # "font-weight": "normal",
+            "margin": "0px",
+            "padding": "0px",
         },
     }
 
@@ -93,6 +99,7 @@ def st_show_home():
             "entrypoint": steps[step]["entrypoint"],
             "title": steps[step]["title"],
             "image_url": steps[step]["image_url"],
+            # "alias": step,
         }
         for step in ["snapshot", "meadow", "garden", "grapher"]
         if steps[step]["enable"]
@@ -126,40 +133,65 @@ def st_show_home():
     #########################
     # Sections
     #########################
-    section_legacy = None
-    for section in WIZARD_CONFIG["sections"]:
-        apps = [app for app in section["apps"] if app["enable"]]
+    # Determine number of rows
+    sections = WIZARD_CONFIG["sections"]
+    num_sections = len(sections)
+    num_rows = num_sections // MAX_COLS_PER_ROW + 1
 
-        # Skip legacy (show later)
-        if section["title"] == "Legacy":
-            section_legacy = section
-            continue
+    for row in range(num_rows):
+        cols = st.columns(MAX_COLS_PER_ROW)
+        for i, section in enumerate(sections[row * MAX_COLS_PER_ROW : (row + 1) * MAX_COLS_PER_ROW]):
+            with cols[i]:
+                st.markdown(f"## {section['title']}")
+                st.markdown(section["description"])
+                apps = [app for app in section["apps"] if app["enable"]]
+                for app in apps:
+                    text = [
+                        app["description"],
+                    ]
+                    create_card(
+                        entrypoint=app["entrypoint"],
+                        title=app["title"],
+                        image_url=app["image_url"],
+                        text=text,
+                    )
 
-        # Show section
-        if apps:
-            st.markdown(f"## {section['title']}")
-            st.markdown(section["description"])
-            columns = st.columns(len(apps))
-            for i, app in enumerate(apps):
-                text = [
-                    app["description"],
-                ]
-                # if "maintainer" in app:
-                #     text.append(f"maintainer: {app['maintainer']}")
-                if app["enable"]:
-                    with columns[i]:
-                        create_card(
-                            entrypoint=app["entrypoint"],
-                            title=app["title"],
-                            image_url=app["image_url"],
-                            text=text,
-                        )
+    # section_legacy = None
+    # for section in WIZARD_CONFIG["sections"]:
+    #     apps = [app for app in section["apps"] if app["enable"]]
+
+    #     # Skip legacy (show later)
+    #     if section["title"] == "Legacy":
+    #         section_legacy = section
+    #         continue
+
+    #     # Show section
+    #     if apps:
+    #         st.markdown(f"## {section['title']}")
+    #         st.markdown(section["description"])
+    #         columns = st.columns(len(apps))
+    #         for i, app in enumerate(apps):
+    #             text = [
+    #                 app["description"],
+    #             ]
+    #             # if "maintainer" in app:
+    #             #     text.append(f"maintainer: {app['maintainer']}")
+    #             if app["enable"]:
+    #                 with columns[i]:
+    #                     create_card(
+    #                         entrypoint=app["entrypoint"],
+    #                         title=app["title"],
+    #                         image_url=app["image_url"],
+    #                         text=text,
+    #                     )
+
+    st.divider()
+
     # Show legacy
-    if section_legacy:
+    if "legacy" in WIZARD_CONFIG:
+        section_legacy = WIZARD_CONFIG["legacy"]
         apps = [app for app in section_legacy["apps"] if app["enable"]]
         if apps:
-            st.divider()
-            st.markdown(f"## {section_legacy['title']}")
             st.warning(section_legacy["description"])
             columns = st.columns(len(apps))
             for i, app in enumerate(apps):

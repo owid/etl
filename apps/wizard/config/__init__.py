@@ -49,6 +49,10 @@ def load_wizard_config():  # -> Any:
     for section in config["sections"]:
         for app in section["apps"]:
             app["enable"] = _get_enable(app)
+    ## Section legacy
+    if "legacy" in config:
+        for app in config["legacy"]["apps"]:
+            app["enable"] = _get_enable(app)
 
     # Add alias if not there by lowering the title
     for _, step in config["etl"]["steps"].items():
