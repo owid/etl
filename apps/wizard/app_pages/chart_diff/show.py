@@ -38,6 +38,23 @@ DISPLAY_STATE_OPTIONS = {
         "icon": "⏳",
     },
 }
+DISPLAY_STATE_OPTIONS_BINARY = {
+    gm.ChartStatus.APPROVED.value: {
+        "label": "Reviewed",
+        "color": "green",
+        "icon": "✅",
+    },
+    # gm.ChartStatus.REJECTED.value: {
+    #     "label": "Unreviewed",
+    #     "color": "gray",
+    #     "icon": "⏳",
+    # },
+    gm.ChartStatus.PENDING.value: {
+        "label": "Unreviewed",
+        "color": "gray",
+        "icon": "⏳",
+    },
+}
 # Help message if there is a conflict between production and staging (i.e. someone edited chart in production while we did on staging)
 CONFLICT_HELP_MESSAGE = "The chart in production was modified after creating the staging server. Please resolve the conflict by integrating the latest changes from production into staging."
 
@@ -95,6 +112,13 @@ class ChartDiffShow:
         return list(DISPLAY_STATE_OPTIONS.keys())
 
     @property
+    def status_names_binary(self) -> List[str]:
+        """List with names of accepted statuses."""
+        status = list(DISPLAY_STATE_OPTIONS.keys())
+        status = [s for s in status if s not in {gm.ChartStatus.REJECTED.value}]
+        return status
+
+    @property
     def checksum_changes(self) -> List[str]:
         """List with names of checksum changes."""
         if self._checksum_changes is None:
@@ -119,6 +143,21 @@ class ChartDiffShow:
                     st.toast(f":green[Chart {self.diff.chart_id} has been **approved**]", icon="✅")
                 case gm.ChartStatus.REJECTED.value:
                     st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
+                case gm.ChartStatus.PENDING.value:
+                    st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+
+    def _push_status_binary(self, session: Optional[Session] = None) -> None:
+        """Change state of the ChartDiff based on session state."""
+        if session is None:
+            session = self.source_session
+        with st.spinner():
+            status = st.session_state[f"radio-{self.diff.chart_id}"]
+            self.diff.set_status(session=session, status=status)
+
+            # Notify user
+            match status:
+                case gm.ChartStatus.APPROVED.value:
+                    st.toast(f":green[Chart {self.diff.chart_id} has been **reviewed**]", icon="✅")
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
@@ -179,15 +218,32 @@ class ChartDiffShow:
 
         # Status of chart diff: approve, pending, reject
         with col1:
-            st.radio(
-                label="Approve or reject chart",
-                key=f"radio-{self.diff.chart_id}",
-                options=self.status_names,
-                horizontal=True,
-                format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
-                index=self.status_names.index(self.diff.approval_status),  # type: ignore
-                on_change=self._push_status,
-            )
+            if self.diff.is_modified & ("config" not in self.checksum_changes):
+                # approval_status = (
+                #     self.diff.approval_status
+                #     if self.diff.approval_status != gm.ChartStatus.REJECTED.value
+                #     else gm.ChartStatus.PENDING.value
+                # )
+                st.radio(
+                    label="Did you review the chart?",
+                    key=f"radio-{self.diff.chart_id}",
+                    options=self.status_names_binary,
+                    horizontal=True,
+                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]",
+                    index=self.status_names_binary.index(self.diff.approval_status),  # type: ignore
+                    on_change=self._push_status_binary,
+                    help="Note that the changes in the chart come from ETL changes (metadata/data) and therefore there is no way to reject them at this stage. If you are not happy with the changes, please look at the ETL steps involved. We present them to you here as a sanity check, and ask you to review them for correctness.",
+                )
+            else:
+                st.radio(
+                    label="Approve or reject chart",
+                    key=f"radio-{self.diff.chart_id}",
+                    options=self.status_names,
+                    horizontal=True,
+                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
+                    index=self.status_names.index(self.diff.approval_status),  # type: ignore
+                    on_change=self._push_status,
+                )
 
         # Refresh chart
         with col2:
