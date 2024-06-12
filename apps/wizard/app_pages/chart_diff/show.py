@@ -255,23 +255,24 @@ class ChartDiffShow:
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 
+            # Placeholder for GPT summary
+            container = st.container()
+
             # Show diffs
-            with st.expander("See complete diff", expanded=False):
+            with st.expander("See complete diff", expanded=True):
                 for (indicator_id, meta_diff), source in zip(meta_diffs.items(), metadata_source):
                     st.markdown(f"**Indicator ID: {indicator_id}**")
                     if ("catalogPath" in source) and (source["catalogPath"] != ""):
                         st.caption(source["catalogPath"])
                     st_show_diff(meta_diff)
 
-            # GPT-summary
-            with st.expander("GPT summary", expanded=True):
+            with container:
                 self._show_metadata_diff_gpt_summary(meta_diffs)
 
     @st.cache_data(show_spinner=False)
     def _show_metadata_diff_gpt_summary(_self, meta_diffs) -> None:
         """Summarise differences in metadata using GPT."""
         if _self.openai_api is not None:
-            st.divider()
             api = OpenAIWrapper()
             with st.chat_message("assistant"):
                 # Ask GPT (stream)
