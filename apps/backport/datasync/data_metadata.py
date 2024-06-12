@@ -6,6 +6,7 @@ from urllib.error import HTTPError, URLError
 
 import numpy as np
 import pandas as pd
+import requests
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -15,6 +16,7 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
+from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl.db import read_sql
 
@@ -69,6 +71,45 @@ def variable_data_df_from_s3(
     with Session(engine) as session:
         res = add_entity_code_and_name(session, df)
         return res
+
+
+def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any] | None:
+    try:
+        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
+        # NOTE: increase wait time or attempts if we hit the limit too often
+        for attempt in Retrying(
+            wait=wait_fixed(2),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+        ):
+            with attempt:
+                if env is not None:
+                    url = env.indicator_metadata_url(variable_id)
+                else:
+                    url = config.variable_metadata_url(variable_id)
+                return requests.get(url).json()
+    # no data on S3
+    except HTTPError:
+        return {}
+
+
+def variable_metadata_df_from_s3(
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    env: OWIDEnv | None = None,
+) -> List[Dict[str, Any]]:
+    """Fetch data from S3 and add entity code and name from DB."""
+    args = [variable_ids]
+    if env:
+        args += [[env for _ in range(len(variable_ids))]]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(_fetch_metadata_from_s3, *args))
+
+    if not (isinstance(results, list) and all(isinstance(res, dict) for res in results)):
+        raise TypeError(f"results must be a list of dictionaries, got {type(results)}")
+
+    return results  # type: ignore
 
 
 def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
