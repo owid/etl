@@ -108,8 +108,7 @@ class ChartDiffShow:
         if (self.diff.is_modified) and (tags == []):
             label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
         else:
-            label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
-            # label += f":break[{' '.join(tags)}]"
+            label += f":break[{' '.join(tags)}]"
         return label
 
     @property
