@@ -3,6 +3,11 @@ from typing import List
 import pandas as pd
 from owid.catalog import Table
 
+from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
 
 def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_columns: List[str]) -> Table:
     """
@@ -36,11 +41,24 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode(agg_column)
 
-    # Convert the column to category type so that the missing values will be considered as 0
-    tb_exploded[agg_column] = tb_exploded[agg_column].astype("category")
-
     # Drop duplicates where the year, system and country/domain are the same
     tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
+
+    # Replace system domains with less than 20 notable systems with 'Other'
+    if agg_column == "domain":
+        # Replace domains with less than 20 systems with 'Other'
+        domain_counts = tb_unique["domain"].value_counts()
+
+        tb_unique["domain"] = tb_unique["domain"].where(tb_unique["domain"].map(domain_counts) >= 20, "Other")
+        # Get the domains that were reclassified to 'Other'
+        reclassified_domains = domain_counts[domain_counts < 20].index.tolist()
+        domain_counts = tb_unique["domain"].value_counts()
+
+        paths.log.info(
+            f"Domains with less than 20 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
+        )
+    # Convert the column to category type so that the missing values will be considered as 0
+    tb_unique[agg_column] = tb_unique[agg_column].astype("category")
 
     # Group by year and country/domain and count the number of systems (consider all categories which will assume 0 for missing values)
     tb_agg = tb_unique.groupby(["year", agg_column], observed=False).size().reset_index(name="yearly_count")
