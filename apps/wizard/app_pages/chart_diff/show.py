@@ -218,7 +218,7 @@ class ChartDiffShow:
 
         # Status of chart diff: approve, pending, reject
         with col1:
-            if self.diff.is_modified & ("config" not in self.checksum_changes):
+            if self.diff.is_modified & (("data" in self.checksum_changes) | ("metadata" in self.checksum_changes)):
                 # approval_status = (
                 #     self.diff.approval_status
                 #     if self.diff.approval_status != gm.ChartStatus.REJECTED.value
