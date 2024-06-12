@@ -5,13 +5,15 @@ If you want to learn more about it, start from its `show` method.
 """
 import difflib
 import json
-from typing import Any, Dict, List, Optional
+import os
+from typing import Any, Dict, List, Optional, cast
 
 import streamlit as st
 from sqlalchemy.orm import Session
 
 import etl.grapher_model as gm
 from apps.backport.datasync.data_metadata import variable_metadata_df_from_s3
+from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
@@ -59,6 +61,14 @@ class ChartDiffShow:
         self.target_session = target_session
         self.expander = expander
         self.show_link = show_link
+
+        # OpenAI
+        if "OPENAI_API_KEY" in os.environ:
+            self.openai_api = OpenAIWrapper()
+        else:
+            self.openai_api = None
+
+        # Cache
         self._checksum_changes: List[str] | None = None
 
     @property
@@ -225,21 +235,70 @@ class ChartDiffShow:
         # Get indicator IDs from source & target
         source_ids = [x["variableId"] for x in self.diff.source_chart.config["dimensions"]]
         target_ids = [x["variableId"] for x in self.diff.target_chart.config["dimensions"]]
+
+        # Only continue if IDs in prod and staging match!
         if set(source_ids) != set(target_ids):
             st.warning(
                 f"List of indicators in source and target differs. Can't render this section.\n\nSOURCE: {source_ids}\n\nTARGET: {target_ids}"
             )
         elif source_ids:
+            # Get metadata from S3
             with st.spinner("Getting metadata from S3..."):
                 # Get metadata from source & target
                 metadata_source = variable_metadata_df_from_s3(source_ids, env=SOURCE)
                 metadata_target = variable_metadata_df_from_s3(source_ids, env=TARGET)
 
+            # Generate diffs
+            meta_diffs = {}
             for source, target, indicator_id in zip(metadata_source, metadata_target, source_ids):
-                st.markdown(f"**Indicator ID: {indicator_id}**")
-                if "catalogPath" in source and source["catalogPath"] != "":
-                    st.caption(source["catalogPath"])
-                _show_dict_diff(source, target)  # type: ignore
+                meta_diff = compare_dictionaries(source, target)  # type: ignore
+                if meta_diff:
+                    meta_diffs[indicator_id] = meta_diff
+
+            # Show diffs
+            with st.expander("See complete diff", expanded=False):
+                for indicator_id, meta_diff in meta_diffs.items():
+                    st.markdown(f"**Indicator ID: {indicator_id}**")
+                    if "catalogPath" in source and source["catalogPath"] != "":
+                        st.caption(source["catalogPath"])
+                    st_show_diff(meta_diff)
+
+            # GPT-summary
+            with st.expander("GPT summary", expanded=True):
+                self._show_metadata_diff_gpt_summary(meta_diffs)
+
+    @st.cache_data
+    def _show_metadata_diff_gpt_summary(_self, meta_diffs) -> None:
+        """Summarise differences in metadata using GPT."""
+        if _self.openai_api is not None:
+            st.divider()
+            api = OpenAIWrapper()
+            with st.chat_message("assistant"):
+                # Ask GPT (stream)
+                messages = [
+                    {
+                        "role": "system",
+                        "content": "You will be presented with the diffs of various indicator config files. Please summarise at a high-level what the main differences are. The diffs are given by means of a dictionary, with key (indicator ID) and value (indicator config diff).",
+                    },
+                    {
+                        "role": "user",
+                        "content": str(meta_diffs),
+                    },
+                ]
+                stream = api.chat.completions.create(
+                    model="gpt-4o",
+                    messages=messages,  # type: ignore
+                    temperature=0.15,
+                    max_tokens=1000,
+                    stream=True,
+                )
+                response = cast(str, st.write_stream(stream))
+
+            # Print cost information
+            text_in = "\n".join([m["content"] for m in messages])
+            cost, num_tokens = get_cost_and_tokens(text_in, response, "gpt-4o")
+            cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+            st.info(cost_msg)
 
     def _show_chart_comparison(self) -> None:
         """Show charts (horizontally or vertically)."""
