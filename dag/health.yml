@@ -108,8 +108,8 @@ steps:
   data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths:
     - data://garden/ihme_gbd/2019/gbd_cause
     - data://meadow/ihme_gbd/2023-10-04/cause_hierarchy
-  #data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
-  #  - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
+  data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
+    - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
 
   # IHME GBD Leading cause of  deaths - update
   data://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
