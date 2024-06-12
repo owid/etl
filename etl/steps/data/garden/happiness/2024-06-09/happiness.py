@@ -8,7 +8,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = geo.REGIONS
+
+REGIONS = {reg: reg_dict for reg, reg_dict in geo.REGIONS.items() if reg != "European Union (27)"}
+REGIONS.update({"World": {}})
 
 
 def run(dest_dir: str) -> None:
@@ -29,7 +31,6 @@ def run(dest_dir: str) -> None:
     # Read table datasets.
     tb_this_year = ds_meadow["happiness"].reset_index()
     tb_prev_years = ds_prev_years["happiness"]
-    tb_population = ds_population["population"]
 
     # combine meadow data with previous years
     tb_this_year["cantril_ladder_score"] = tb_this_year["ladder_score"]
@@ -41,11 +42,14 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    # Process data.
-    #
+    # Process data (add population weighted averages for continents & income groups)
+
+    # save data of Northern Cyrpus and Somaliland to concat later (they do not have population in population dataset)
+    tb_countries_wo_population = tb[tb["country"].isin(["Northern Cyprus", "Somaliland"])]
+    tb = tb[~tb["country"].isin(["Northern Cyprus", "Somaliland"])]
 
     # add population to table
-    tb = geo.add_population_to_dataframe(tb, tb_population)
+    tb = geo.add_population_to_table(tb, ds_population)
 
     # calculate population weighted averages by multiplying the population with the cantril ladder score
     # and then summing and dividing by the total population
@@ -67,9 +71,11 @@ def run(dest_dir: str) -> None:
     # drop unneeded columns
     tb = tb.drop(columns=["cantril_times_pop", "population"])
 
+    # add back Northern Cyprus and Somaliland
+    tb = pr.concat([tb, tb_countries_wo_population], ignore_index=True)
+
     tb = tb.format(["country", "year"])
 
-    #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
