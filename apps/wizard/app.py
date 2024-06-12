@@ -4,20 +4,10 @@ This is the page that is loaded when the app is started. It redirects to the hom
 
 NOTE: This only works with >1.35 (nightly) version of Streamlit.
 """
-from pathlib import Path
-
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-
-# Logo
-# st.logo("docs/assets/logo.png")
-
-# st.write(st.__version__)
-
-
-# Get current directory
-CURRENT_DIR = Path(__file__).parent
+from etl.paths import DOCS_DIR
 
 ###########################################
 # DEFINE PAGES
@@ -32,7 +22,7 @@ for step in WIZARD_CONFIG["main"].values():
         st.Page(
             page=str(step["entrypoint"]),
             title=step["title"],
-            icon=step["emoji"],
+            icon=step["icon"],
             url_path=step["title"].lower(),
             default=step["title"] == "Home",
         )
@@ -47,7 +37,7 @@ for step in WIZARD_CONFIG["etl"]["steps"].values():
             st.Page(
                 page=str(step["entrypoint"]),
                 title=step["title"],
-                icon=step["emoji"],
+                icon=step["icon"],
                 url_path=step["alias"],
             )
         )
@@ -63,12 +53,15 @@ for section in WIZARD_CONFIG["sections"]:
                 st.Page(
                     page=str(app["entrypoint"]),
                     title=app["title"],
-                    icon=app["emoji"],
+                    icon=app["icon"],
                     url_path=app["alias"],
                 )
             )
         pages[section["title"]] = pages_
 
+###########################################
+# RUN PAGES
+###########################################
 # Create navigation
 page = st.navigation(pages)
 
@@ -78,27 +71,6 @@ if page is not None:
 else:
     st.error("Pages could not be loaded!")
 
-###########################################
-# Home app
-###########################################
-# st_show_home()
 
-
-# # EXPERIMENTAL
-# # Get query parameters from the URL
-# # query_params = st.query_params
-
-
-# # Go to specific page if argument is passed
-# ## Home
-# if utils.AppState.args.phase == "all":  # type: ignore
-#     switch_page("Home")  # type: ignore
-# ## ETL step
-# for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-#     if utils.AppState.args.phase == step_name:  # type: ignore
-#         switch_page(step_props["title"])  # type: ignore
-# ## Section
-# for section in WIZARD_CONFIG["sections"]:
-#     for app in section["apps"]:
-#         if utils.AppState.args.phase == app["alias"]:  # type: ignore
-#             switch_page(app["title"])  # type: ignore
+# LOGO
+st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))

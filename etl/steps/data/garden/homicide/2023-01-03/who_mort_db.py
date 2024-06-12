@@ -205,7 +205,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
         ],
         axis=1,
     )
-    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"]).sum()
+    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"], observed=True).sum()
     df_age["death_rate_per_100_000_population"] = (
         df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
     ) * 100000

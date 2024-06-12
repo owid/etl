@@ -42,6 +42,7 @@ class OWIDEnv:
     _env_remote: OWIDEnvType | None
     _env_local: OWIDEnvType | None
     conf: Config
+    _engine: Engine | None
 
     def __init__(
         self: Self,
@@ -52,6 +53,8 @@ class OWIDEnv:
         self._env_remote = None
         # Local environment: environment where the code is running
         self._env_local = None  # "production", "staging", "dev"
+        # Engine (cached)
+        self._engine = None
 
     @property
     def env(self):
@@ -112,8 +115,18 @@ class OWIDEnv:
         return cls.from_staging(staging_or_env_file)
 
     def get_engine(self) -> Engine:
-        """Get engine for env."""
+        """Get engine for env.
+
+        DEPRECATED: Use property `engine` property instead.
+        """
         return get_engine(self.conf.__dict__)
+
+    @property
+    def engine(self) -> Engine:
+        """Get engine for env."""
+        if self._engine is None:
+            self._engine = get_engine(self.conf.__dict__)
+        return self._engine
 
     @property
     def site(self) -> str | None:
@@ -203,6 +216,16 @@ class OWIDEnv:
         if self.env_local == "dev":
             return f"http://localhost:{WIZARD_PORT}/"
         elif self.env_local == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.base_site}/etl/wizard"
+
+    @property
+    def wizard_url_remote(self) -> str:
+        """Get wizard url (in remote server)."""
+        if self.env_remote == "dev":
+            return f"http://localhost:{WIZARD_PORT}/"
+        elif self.env_remote == "production":
             return "https://etl.owid.io/wizard/"
         else:
             return f"{self.base_site}/etl/wizard"
