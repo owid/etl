@@ -8,7 +8,7 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.utils.map_datasets import get_grapher_changes
-from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
+from etl.db import config, get_all_datasets, get_connection, get_dataset_charts, get_variables_in_dataset
 from etl.git import get_changed_files
 from etl.indicator_upgrade.schema import get_schema_chart_config
 from etl.version_tracker import VersionTracker
@@ -41,6 +41,7 @@ def get_datasets_new() -> pd.DataFrame:
 
     # Add column marking migrations
     steps_df_grapher["migration_new"] = False
+    steps_df_grapher["new_dataset_mappable"] = False
     if grapher_changes:
         dataset_ids = [g["new"]["id"] for g in grapher_changes]
         steps_df_grapher.loc[steps_df_grapher["id"].isin(dataset_ids), "migration_new"] = True
@@ -48,16 +49,41 @@ def get_datasets_new() -> pd.DataFrame:
         ## Criteria:
         for g in grapher_changes:
             col_name = f"score_{g['new']['id']}"
+
+            # Create a filter to select the new dataset.
+            filter_new = steps_df_grapher["id"] == g["new"]["id"]
             ##  - First options should be those detected by grapher_changes ('old' keyword)
             if "old" in g:
                 steps_df_grapher.loc[steps_df_grapher["id"] == g["old"]["id"], col_name] = 200
+                # This is a new dataset that does have an old counterpart (hence is mappable).
+                steps_df_grapher.loc[filter_new, "new_dataset_mappable"] = True
+
             ##  - Then, we should just fuzzy match the step short_names (and names to account for old datasets not in ETL)
             score_step = steps_df_grapher["step"].apply(lambda x: fuzz.ratio(g["new"]["step"], x))
             score_name = steps_df_grapher["name"].apply(lambda x: fuzz.ratio(g["new"]["name"], x))
             steps_df_grapher[col_name] = (score_step + score_name) / 2
 
             ## Set own dataset as last
-            steps_df_grapher.loc[steps_df_grapher["id"] == g["new"]["id"], col_name] = -1
+            steps_df_grapher.loc[filter_new, col_name] = -1
+
+        if "new_dataset_selectbox" not in st.session_state:
+            # If indicator upgrader has been restarted, ensure the new dataset selected has not already been mapped.
+            # Add column with the number of charts of new dataset, and then sort steps_df_grapher by that column.
+            # This way, the new datasets dropdown will always start with a dataset that has not yet been mapped.
+            # NOTE: This could be taken from version tracker, but restarting version tracker takes time, so it's better to get
+            # this info directly from db.
+            new_dataset_charts = get_dataset_charts(dataset_ids=dataset_ids)
+            new_dataset_charts["n_new_charts"] = new_dataset_charts["chart_ids"].apply(len)  # type: ignore
+            steps_df_grapher = (
+                steps_df_grapher.merge(
+                    new_dataset_charts[["dataset_id", "n_new_charts"]].rename(columns={"dataset_id": "id"}),  # type: ignore
+                    on="id",
+                    how="left",
+                )
+                .sort_values(["new_dataset_mappable", "n_new_charts"], ascending=[False, True], na_position="last")
+                .reset_index(drop=True)
+            )
+
     st.session_state.is_any_migration = steps_df_grapher["migration_new"].any()
     return steps_df_grapher
 
