@@ -257,9 +257,9 @@ class ChartDiffShow:
 
             # Show diffs
             with st.expander("See complete diff", expanded=False):
-                for indicator_id, meta_diff in meta_diffs.items():
+                for (indicator_id, meta_diff), source in zip(meta_diffs.items(), metadata_source):
                     st.markdown(f"**Indicator ID: {indicator_id}**")
-                    if "catalogPath" in source and source["catalogPath"] != "":
+                    if ("catalogPath" in source) and (source["catalogPath"] != ""):
                         st.caption(source["catalogPath"])
                     st_show_diff(meta_diff)
 
