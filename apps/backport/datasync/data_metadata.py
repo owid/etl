@@ -1,11 +1,13 @@
 import concurrent.futures
 import json
+from copy import deepcopy
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Union, cast
 from urllib.error import HTTPError, URLError
 
 import numpy as np
 import pandas as pd
+import requests
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -15,6 +17,7 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
+from apps.wizard.utils.env import OWIDEnv
 from etl import config, files
 from etl.db import read_sql
 
@@ -69,6 +72,45 @@ def variable_data_df_from_s3(
     with Session(engine) as session:
         res = add_entity_code_and_name(session, df)
         return res
+
+
+def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any] | None:
+    try:
+        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
+        # NOTE: increase wait time or attempts if we hit the limit too often
+        for attempt in Retrying(
+            wait=wait_fixed(2),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+        ):
+            with attempt:
+                if env is not None:
+                    url = env.indicator_metadata_url(variable_id)
+                else:
+                    url = config.variable_metadata_url(variable_id)
+                return requests.get(url).json()
+    # no data on S3
+    except HTTPError:
+        return {}
+
+
+def variable_metadata_df_from_s3(
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    env: OWIDEnv | None = None,
+) -> List[Dict[str, Any]]:
+    """Fetch data from S3 and add entity code and name from DB."""
+    args = [variable_ids]
+    if env:
+        args += [[env for _ in range(len(variable_ids))]]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(_fetch_metadata_from_s3, *args))
+
+    if not (isinstance(results, list) and all(isinstance(res, dict) for res in results)):
+        raise TypeError(f"results must be a list of dictionaries, got {type(results)}")
+
+    return results  # type: ignore
 
 
 def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
@@ -364,22 +406,32 @@ def checksum_data_str(var_data_str: str) -> str:
 
 def checksum_metadata(meta: Dict[str, Any]) -> str:
     """Calculate checksum for metadata. It modifies the metadata dict!"""
+    # Drop fields not needed for checksum computation
+    meta = filter_out_fields_in_metadata_for_checksum(meta)
+
+    return files.checksum_str(json.dumps(meta, default=str))
+
+
+def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:
+    """Drop fields that are not needed to estimate the checksum."""
+    meta_ = deepcopy(meta)
+
     # Drop checksums, they shouldn't be part of variable metadata, otherwise we get a
     # feedback loop with changing checksums
-    meta.pop("dataChecksum", None)
-    meta.pop("metadataChecksum", None)
+    meta_.pop("dataChecksum", None)
+    meta_.pop("metadataChecksum", None)
 
     # Drop all IDs. If we create the same dataset on the staging server, it might have different
     # IDs, but the metadata should be the same.
-    meta.pop("id", None)
-    meta.pop("datasetId", None)
-    for origin in meta.get("origins", []):
+    meta_.pop("id", None)
+    meta_.pop("datasetId", None)
+    for origin in meta_.get("origins", []):
         origin.pop("id", None)
 
     # Drop dimensions to make it faster. It is captured in `dataChecksum` anyway
-    meta.pop("dimensions", None)
+    meta_.pop("dimensions", None)
 
     # Ignore updatedAt timestamps
-    meta.pop("updatedAt", None)
+    meta_.pop("updatedAt", None)
 
-    return files.checksum_str(json.dumps(meta, default=str))
+    return meta_
