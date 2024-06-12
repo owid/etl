@@ -29,7 +29,7 @@ tables:
           - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
           - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
         presentation:
-          attribution: World Happiness Report (2011-2024)
+          attribution: World Happiness Report (2012-2024)
           attribution_short: WHR
           title_public: Self-reported life satisfaction
         display:
