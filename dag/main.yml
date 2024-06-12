@@ -269,15 +269,6 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
     - data://garden/happiness/2023-03-20/happiness
 
-  # Equaldex dataset
-  data://meadow/lgbt_rights/2023-04-13/equaldex:
-    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
-    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
-  data://garden/lgbt_rights/2023-04-13/equaldex:
-    - data://meadow/lgbt_rights/2023-04-13/equaldex
-  data://grapher/lgbt_rights/2023-04-13/equaldex:
-    - data://garden/lgbt_rights/2023-04-13/equaldex
-
   # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
