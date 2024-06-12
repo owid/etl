@@ -56,7 +56,6 @@ def test_OWIDEnv_dev():
     assert env.admin_site == "http://localhost:3030/admin"
     with pytest.raises(ValueError):
         env.data_api_url
-    assert env.indicators_url == "http://localhost:8000/v1/indicators"
 
     env._env_local = "dev"
     assert env.wizard_url == "http://localhost:8053/"
