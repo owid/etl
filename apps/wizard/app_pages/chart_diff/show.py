@@ -5,12 +5,13 @@ If you want to learn more about it, start from its `show` method.
 """
 import difflib
 import json
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from sqlalchemy.orm import Session
 
 import etl.grapher_model as gm
+from apps.backport.datasync.data_metadata import variable_metadata_df_from_s3
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
@@ -58,6 +59,7 @@ class ChartDiffShow:
         self.target_session = target_session
         self.expander = expander
         self.show_link = show_link
+        self._checksum_changes: List[str] | None = None
 
     @property
     def box_label(self):
@@ -72,7 +74,7 @@ class ChartDiffShow:
             tags.append(" :blue-background[**NEW**]")
         if self.diff.is_draft:
             tags.append(" :gray-background[**DRAFT**]")
-        for change in self.diff.checksum_changes():
+        for change in self.checksum_changes:
             tags.append(f":red-background[**{change.upper()} CHANGE**]")
         label += f":break[{' '.join(tags)}]"
         return label
@@ -81,6 +83,17 @@ class ChartDiffShow:
     def status_names(self) -> List[str]:
         """List with names of accepted statuses."""
         return list(DISPLAY_STATE_OPTIONS.keys())
+
+    @property
+    def checksum_changes(self) -> List[str]:
+        """List with names of checksum changes."""
+        if self._checksum_changes is None:
+            self._checksum_changes = self.diff.checksum_changes()
+        return self._checksum_changes
+
+    def clean_cache(self) -> None:
+        """Clean temporary cached variables."""
+        self._checksum_changes = None
 
     def _push_status(self, session: Optional[Session] = None) -> None:
         """Change state of the ChartDiff based on session state."""
@@ -132,6 +145,24 @@ class ChartDiffShow:
 
         return text_staging
 
+    def _show_conflict_resolver(self) -> None:
+        """Resolve conflicts between charts in target and source.
+
+        Sometimes, someone might edit a chart in production while we work on it on staging.
+        """
+        if st.button(
+            "⚠️ Resolve conflict",
+            key=f"resolve-conflict-{self.diff.slug}",
+            help="This will update the chart in the staging server.",
+            type="primary",
+        ):
+            self._show_conflict_resolver_modal()
+
+    @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
+    def _show_conflict_resolver_modal(self) -> None:
+        """Show conflict resolver in modal page."""
+        st_show_conflict_resolver(self.diff)
+
     def _show_chart_diff_controls(self):
         # Three columns: status, refresh, link
         col1, col2, col3 = st.columns([2, 1, 3])
@@ -168,6 +199,47 @@ class ChartDiffShow:
                     )
                 else:
                     st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+
+    def _show_metadata_diff(self) -> None:
+        """Show metadata diff (if applicable).
+
+        Come chart-diffs might be triggered by changes in metadata. This allows the user to explore this changes.
+
+        Note that to access the metadata, one needs to retrieve the JSON metadata files from the S3 bucket.
+        """
+        if st.button(
+            "🔎 Metadata differences",
+            f"btn-meta-diff-{self.diff.chart_id}",
+        ):
+            self._show_metadata_diff_modal()
+
+    @st.experimental_dialog("Metadata differences", width="large")  # type: ignore
+    def _show_metadata_diff_modal(self) -> None:
+        """Show metadata diff in a modal page."""
+        # Sanity checks
+        assert (
+            self.diff.is_modified
+        ), "Metadata diff should only be shown for modified charts! Please report this issue."
+        assert self.diff.target_chart is not None, "Chart detected as modified but target_chart is None!"
+
+        # Get indicator IDs from source & target
+        source_ids = [x["variableId"] for x in self.diff.source_chart.config["dimensions"]]
+        target_ids = [x["variableId"] for x in self.diff.target_chart.config["dimensions"]]
+        if set(source_ids) != set(target_ids):
+            st.warning(
+                f"List of indicators in source and target differs. Can't render this section.\n\nSOURCE: {source_ids}\n\nTARGET: {target_ids}"
+            )
+        elif source_ids:
+            with st.spinner("Getting metadata from S3..."):
+                # Get metadata from source & target
+                metadata_source = variable_metadata_df_from_s3(source_ids, env=SOURCE)
+                metadata_target = variable_metadata_df_from_s3(source_ids, env=TARGET)
+
+            for source, target, indicator_id in zip(metadata_source, metadata_target, source_ids):
+                st.markdown(f"**Indicator ID: {indicator_id}**")
+                if "catalogPath" in source and source["catalogPath"] != "":
+                    st.caption(source["catalogPath"])
+                _show_dict_diff(source, target)  # type: ignore
 
     def _show_chart_comparison(self) -> None:
         """Show charts (horizontally or vertically)."""
@@ -236,37 +308,7 @@ class ChartDiffShow:
         config_1 = self.diff.target_chart.config
         config_2 = self.diff.source_chart.config
 
-        config_1 = json.dumps(config_1, indent=4)
-        config_2 = json.dumps(config_2, indent=4)
-
-        diff = difflib.unified_diff(
-            config_1.splitlines(keepends=True),
-            config_2.splitlines(keepends=True),
-            fromfile="production",
-            tofile="staging",
-        )
-
-        diff_string = "".join(diff)
-
-        st.code(diff_string, line_numbers=True, language="diff")
-
-    def _show_conflict_resolver_options(self) -> None:
-        """Resolve conflicts between charts in target and source.
-
-        Sometimes, someone might edit a chart in production while we work on it on staging.
-        """
-        if st.button(
-            "⚠️ Resolve conflict",
-            key=f"resolve-conflict-{self.diff.slug}",
-            help="This will update the chart in the staging server.",
-            type="primary",
-        ):
-            self._show_conflict_resolver()
-
-    @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
-    def _show_conflict_resolver(self) -> None:
-        """Show conflict resolver in modal page."""
-        st_show_conflict_resolver(self.diff)
+        _show_dict_diff(config_1, config_2)
 
     def _show_approval_history(self):
         """Show history of approvals of a chart-diff."""
@@ -296,10 +338,13 @@ class ChartDiffShow:
         """
         # Ask user to resolve conflicts
         if self.diff.in_conflict:
-            self._show_conflict_resolver_options()
+            self._show_conflict_resolver()
 
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
+
+        if "metadata" in self.checksum_changes:
+            self._show_metadata_diff()
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
@@ -327,6 +372,42 @@ class ChartDiffShow:
                 self._show()
         else:
             self._show()
+
+        self.clean_cache()
+
+
+def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
+    """Get diff of two dictionaries.
+
+    Useful for chart config diffs, indicator metadata diffs, etc.
+    """
+    d1 = json.dumps(dix_1, indent=4)
+    d2 = json.dumps(dix_2, indent=4)
+
+    diff = difflib.unified_diff(
+        d1.splitlines(keepends=True),
+        d2.splitlines(keepends=True),
+        fromfile="production",
+        tofile="staging",
+    )
+
+    diff_string = "".join(diff)
+
+    return diff_string
+
+
+def st_show_diff(diff_str):
+    """Display diff."""
+    st.code(diff_str, line_numbers=True, language="diff")
+
+
+def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
+    """Show diff of two dictionaries.
+
+    Used to show chart config diffs, indicator metadata diffs, etc.
+    """
+    diff_str = compare_dictionaries(dix_1, dix_2)
+    st_show_diff(diff_str)
 
 
 def st_show(
