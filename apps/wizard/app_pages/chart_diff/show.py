@@ -267,7 +267,7 @@ class ChartDiffShow:
             with st.expander("GPT summary", expanded=True):
                 self._show_metadata_diff_gpt_summary(meta_diffs)
 
-    @st.cache_data
+    @st.cache_data(show_spinner=False)
     def _show_metadata_diff_gpt_summary(_self, meta_diffs) -> None:
         """Summarise differences in metadata using GPT."""
         if _self.openai_api is not None:
