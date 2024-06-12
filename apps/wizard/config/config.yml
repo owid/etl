@@ -142,6 +142,13 @@ sections:
         entrypoint: app_pages/datainsight_robot.py
         icon: ":material/lightbulb:"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+      - title: "Map Brackets Generator"
+        alias: map_brackets
+        entrypoint: app_pages/map_brackets.py
+        description: WIP
+        maintainer: "@pablo"
+        icon: ":material/tv_gen:"
+        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
 
   - title: "Misc"
     description: |-
