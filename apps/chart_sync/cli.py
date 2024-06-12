@@ -539,6 +539,14 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     source_df = source_df.set_index(["chartId", "variableId"])
     target_df = target_df.set_index(["chartId", "variableId"])
 
+    # charts not edited by Admin and with null checksums should be excluded
+    ix = (
+        (source_df.chartLastEditedByUserId != 1)
+        & (source_df.chartPublishedByUserId != 1)
+        & (source_df.dataChecksum.isnull() | source_df.metadataChecksum.isnull())
+    )
+    source_df = source_df[~ix]
+
     # align dataframes with left join (so that source has non-null values)
     # NOTE: new charts will be already in source
     source_df, target_df = source_df.align(target_df, join="left")
