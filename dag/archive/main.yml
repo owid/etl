@@ -196,6 +196,15 @@ steps:
   data://grapher/wb/2023-12-29/gender_statistics:
     - data://garden/wb/2023-12-29/gender_statistics
 
+  # Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+    - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+    - data://garden/lgbt_rights/2023-04-13/equaldex
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
