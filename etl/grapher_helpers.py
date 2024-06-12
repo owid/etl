@@ -6,11 +6,12 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 import jinja2
 import numpy as np
 import pandas as pd
+import pymysql
+import sqlalchemy
 import structlog
 from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
-from pymysql import IntegrityError
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -328,7 +329,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     {"name": name},
                 )
                 session.commit()
-            except IntegrityError:
+            except (pymysql.IntegrityError, sqlalchemy.exc.IntegrityError):
                 # If another process inserted the same entity before us, we can
                 # safely ignore the error and fetch the ID
                 pass

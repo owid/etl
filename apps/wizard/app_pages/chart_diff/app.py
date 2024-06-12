@@ -133,39 +133,45 @@ def filter_chart_diffs():
             return True
         return False
 
-    # Filter based on query params
-    if "chart_id" in st.query_params:
-        chart_ids = list(map(int, st.query_params.get_all("chart_id")))
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
-        }
-    if "chart_slug" in st.query_params:
-        chart_slug = st.query_params.get("chart_slug", "")
+    # Show all charts regardless of query params
+    if "show_all" in st.query_params:
+        st.session_state.chart_diffs_filtered = {k: v for k, v in st.session_state.chart_diffs_filtered.items()}
+    else:
+        # Filter based on query params
+        if "chart_id" in st.query_params:
+            chart_ids = list(map(int, st.query_params.get_all("chart_id")))
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
+            }
+        if "chart_slug" in st.query_params:
+            chart_slug = st.query_params.get("chart_slug", "")
 
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
-        }
-    if "hide_reviewed" in st.query_params:
-        st.session_state.chart_diffs_filtered = {
-            k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
-        }
-    if "modified_or_new" in st.query_params:
-        modified_or_new = st.query_params.get_all("modified_or_new")
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
+            }
+        if "hide_reviewed" in st.query_params:
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
+            }
+        if "modified_or_new" in st.query_params:
+            modified_or_new = st.query_params.get_all("modified_or_new")
+            st.session_state.chart_diffs_filtered = {
+                k: v
+                for k, v in st.session_state.chart_diffs_filtered.items()
+                if (v.is_modified and "modified" in modified_or_new) or (v.is_new and "new" in modified_or_new)
+            }
+        if "change_type" in st.query_params:
+            # keep chart diffs with at least one change type (could be data, metadata or config)
+            change_types = st.query_params.get_all("change_type")
+        else:
+            # filter to changed config by default
+            change_types = ["config"]
+
         st.session_state.chart_diffs_filtered = {
             k: v
             for k, v in st.session_state.chart_diffs_filtered.items()
-            if (v.is_modified and "modified" in modified_or_new) or (v.is_new and "new" in modified_or_new)
+            if set(v.checksum_changes()) & set(change_types) or v.is_new
         }
-    if "change_type" in st.query_params:
-        # keep chart diffs with at least one change type (could be data, metadata or config)
-        change_types = st.query_params.get_all("change_type")
-    else:
-        # filter to changed config by default
-        change_types = ["config"]
-
-    st.session_state.chart_diffs_filtered = {
-        k: v for k, v in st.session_state.chart_diffs_filtered.items() if set(v.checksum_changes()) & set(change_types)
-    }
 
     # Return boolean if there was any filter applied (except for hiding approved charts)
     if (
@@ -178,11 +184,15 @@ def filter_chart_diffs():
     return False
 
 
+@st.experimental_dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
-    with Session(engine) as session:
-        for _, chart_diff in st.session_state.chart_diffs.items():
-            chart_diff.unreview(session)
+    st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
+    if st.button("Yes", type="primary"):
+        with Session(engine) as session:
+            for _, chart_diff in st.session_state.chart_diffs.items():
+                chart_diff.unreview(session)
+        st.rerun()
 
 
 def _show_options_filters():
@@ -192,6 +202,13 @@ def _show_options_filters():
             st.query_params.update({"hide_reviewed": ""})  # type: ignore
         else:
             st.query_params.pop("hide_reviewed", None)
+
+    def show_all():
+        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
+        if st.session_state["show-all-charts"]:
+            st.query_params.update({"show_all": ""})  # type: ignore
+        else:
+            st.query_params.pop("show_all", None)
 
     def apply_search_filters():
         """Apply filters.
@@ -221,6 +238,13 @@ def _show_options_filters():
         on_change=hide_reviewed,  # type: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
+    st.toggle(
+        "**Show all charts** (ignores all filters)",
+        key="show-all-charts",
+        value="show_all" in st.query_params,
+        on_change=show_all,  # type: ignore
+        help="Show all charts. This option ignores all the filters.\n\nIf you want to apply any filter, uncheck this option.",
+    )
     with st.form("chart-diff-filters"):
         st.multiselect(
             label="Select chart IDs",
@@ -228,6 +252,7 @@ def _show_options_filters():
             default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
             key="chart-diff-filter-id",
             help="Filter chart diffs with charts with given IDs.",
+            placeholder="Select chart IDs",
         )
         st.text_input(
             label="Search by slug name",
@@ -242,6 +267,7 @@ def _show_options_filters():
             default=[change for change in st.query_params.get_all("modified_or_new")],  # type: ignore
             key="chart-diff-modified-or-new",
             help="Show new charts, and/or modified charts.",
+            placeholder="modified, new",
         )
         st.multiselect(
             label="Chart changes type",
@@ -249,6 +275,7 @@ def _show_options_filters():
             default=[change for change in st.query_params.get_all("change_type")],  # type: ignore
             key="chart-diff-change-type",
             help="Show charts with changes in data, metadata, or config.",
+            placeholder="config, data, metadata",
         )
         st.form_submit_button(
             "Apply filters",
@@ -297,12 +324,13 @@ def _show_options_misc():
     st.divider()
     with st.container(border=True):
         st.markdown("Danger zone ⚠️")
-        st.button(
-            "Set _all_ charts to **Pending**",
+        if st.button(
+            "Set all charts to **Pending**",
             key="unapprove-all-charts",
-            on_click=lambda s=SOURCE_ENGINE: set_chart_diffs_to_pending(s),
+            # on_click=lambda e=SOURCE_ENGINE: set_chart_diffs_to_pending(e),
             help="This sets the status of all chart diffs to 'Pending'. This means that you will need to review them again.",
-        )
+        ):
+            set_chart_diffs_to_pending(SOURCE_ENGINE)
 
 
 def _show_options():
@@ -322,15 +350,18 @@ def _show_options():
             _show_options_misc()
 
 
-def make_text_summary(chart_diffs):
+def _show_summary_top(chart_diffs):
     """Text summarizing the state of the revision."""
+    # Review status
     num_charts_total = len(st.session_state.chart_diffs)
     num_charts = len(chart_diffs)
     num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
     text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
+    st.markdown(text)
+
+    # Signal filtering (if any)
     if num_charts != num_charts_total:
-        text += f" Showing {num_charts} after filtering."
-    return text
+        st.warning(f"**Some charts are hidden due to filtering**. {num_charts}/{num_charts_total} charts listed.")
 
 
 def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
@@ -338,8 +369,7 @@ def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, tar
     # Pagination menu
     with st.container(border=True):
         # Information
-        text = make_text_summary(chart_diffs)
-        st.markdown(text)
+        _show_summary_top(chart_diffs)
 
         # Pagination
         pagination = Pagination(

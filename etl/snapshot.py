@@ -119,9 +119,12 @@ class Snapshot:
 
         assert len(self.metadata.outs) == 1
         file_size = self.path.stat().st_size
-        # Compare file size if it's larger than 10MB, otherwise compare md5
+        # Compare file size if it's larger than 20MB, otherwise compare md5
         # This should be pretty safe and speeds up the process significantly
-        if file_size >= 10 * 2**20:  # 10MB
+        # NOTE: on 2024-06-12 this caused a discrepancy between production and staging
+        # for snapshot://climate/latest/weekly_wildfires.csv.dvc. Data was slightly updated, but
+        # the file size was the same. This should be a very rare case.
+        if file_size >= 20 * 2**20:  # 20MB
             return file_size != self.m.outs[0]["size"]
         else:
             return checksum_file(self.path.as_posix()) != self.m.outs[0]["md5"]
