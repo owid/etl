@@ -44,18 +44,18 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     # Drop duplicates where the year, system and country/domain are the same
     tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
 
-    # Replace system domains with less than 20 notable systems with 'Other'
+    # Replace system domains with less than 10 notable systems with 'Other'
     if agg_column == "domain":
-        # Replace domains with less than 20 systems with 'Other'
+        # Replace domains with less than 10 systems with 'Other'
         domain_counts = tb_unique["domain"].value_counts()
 
-        tb_unique["domain"] = tb_unique["domain"].where(tb_unique["domain"].map(domain_counts) >= 20, "Other")
+        tb_unique["domain"] = tb_unique["domain"].where(tb_unique["domain"].map(domain_counts) >= 10, "Other")
         # Get the domains that were reclassified to 'Other'
-        reclassified_domains = domain_counts[domain_counts < 20].index.tolist()
+        reclassified_domains = domain_counts[domain_counts < 10].index.tolist()
         domain_counts = tb_unique["domain"].value_counts()
 
         paths.log.info(
-            f"Domains with less than 20 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
+            f"Domains with less than 10 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
         )
     # Convert the column to category type so that the missing values will be considered as 0
     tb_unique[agg_column] = tb_unique[agg_column].astype("category")
