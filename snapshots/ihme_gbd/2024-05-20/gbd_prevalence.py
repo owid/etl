@@ -6,9 +6,9 @@ Important - You need and account to access the data.
 
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
-* In Measure select 'Deaths' and 'DALYs'
+* In Measure select 'Prevalence' and 'Incidence'
 * In Metric select 'Number' and 'Rate'
-* In Impairment select 'Select all causes'
+* In Cause select 'Select all causes'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years'
 * In Sex select 'Both'

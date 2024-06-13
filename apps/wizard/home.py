@@ -142,19 +142,20 @@ def st_show_home():
         cols = st.columns(MAX_COLS_PER_ROW)
         for i, section in enumerate(sections[row * MAX_COLS_PER_ROW : (row + 1) * MAX_COLS_PER_ROW]):
             with cols[i]:
-                st.markdown(f"## {section['title']}")
-                st.markdown(section["description"])
                 apps = [app for app in section["apps"] if app["enable"]]
-                for app in apps:
-                    text = [
-                        app["description"],
-                    ]
-                    create_card(
-                        entrypoint=app["entrypoint"],
-                        title=app["title"],
-                        image_url=app["image_url"],
-                        text=text,
-                    )
+                if apps:
+                    st.markdown(f"## {section['title']}")
+                    st.markdown(section["description"])
+                    for app in apps:
+                        text = [
+                            app["description"],
+                        ]
+                        create_card(
+                            entrypoint=app["entrypoint"],
+                            title=app["title"],
+                            image_url=app["image_url"],
+                            text=text,
+                        )
 
     # section_legacy = None
     # for section in WIZARD_CONFIG["sections"]:

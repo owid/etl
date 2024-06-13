@@ -15,7 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb_garden = ds_garden["epoch_aggregates_countries"]
-    print(tb_garden)
     #
     # Save outputs.
     #
