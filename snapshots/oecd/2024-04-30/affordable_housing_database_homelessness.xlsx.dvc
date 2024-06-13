@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Affordable Housing Database (AHD)
+    description: |-
+      The OECD Affordable Housing Database (AHD) helps countries monitor access to good-quality affordable housing and strengthen the knowledge base for policy evaluation. It brings together cross-national information from OECD countries, Key Partners and EU member states.
+
+
+      The database groups indicators along three dimensions: housing market, housing conditions and affordability, and public policies towards affordable housing. Each indicator presents data, relevant definitions and methodology, and key results. Indicators also discuss comparability, data issues, and, where relevant, include the raw data or descriptive information across countries.
+    date_published: "2024-04-30"
+    title_snapshot: "OECD Affordable Housing Database (AHD) - Housing conditions: People experiencing homelessness"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024). Affordable Housing Database (AHD) - Housing conditions: People experiencing homelessness, https://www.oecd.org/housing/data/affordable-housing-database/
+
+    # Files
+    url_main: https://www.oecd.org/housing/data/affordable-housing-database/
+    url_download: https://www.oecd.org/els/family/HC3-1-Population-experiencing-homelessness.xlsx
+    date_accessed: 2024-05-24
+
+    # License
+    license:
+      name: © OECD 2024
+      url: https://www.oecd.org/termsandconditions/
+
+outs:
+  - md5: 5294ff25c46ff69f5bac13541ef59de8
+    size: 197990
+    path: affordable_housing_database_homelessness.xlsx

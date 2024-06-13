@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: "Country mentions in GDELT 2.0 Events"
+  update_period_days: 365
+
+
+tables:
+  gdelt_v2:
+    variables:
+      num_events:
+        title: Number of articles with a mention of the country
+        description_short: |-
+          Count of the events in the GDELT database that have a country as an actor.
+        unit: "events"
+
+      num_events_relative:
+        title: Share of events with a mention of a country
+        unit: "events per 100,000 events"
+        description_short: Share of events in GDELT that have a country as an actor. Events with continents, regions or undetermined actors have been left out.
+

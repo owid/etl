@@ -3,10 +3,13 @@ import datetime as dt
 import hashlib
 import os
 import time
-from typing import Any, Literal, Optional, Tuple
+from contextlib import contextmanager
+from typing import Any, Generator, Literal, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
 
@@ -46,10 +49,9 @@ class WizardDB:
                 "feedback": feedback,
                 "feedback_text": feedback_text,
             }
-            conn = st.connection(DB_NAME)
-            with conn.session as s:
+            with create_session(DB_NAME) as s:
                 s.execute(
-                    query,
+                    text(query),
                     params=query_params,
                 )
                 s.commit()
@@ -81,11 +83,10 @@ class WizardDB:
             # Get IDs to update
             ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
-            conn = st.connection(DB_NAME)
-            with conn.session as s:
-                s.execute(f"DELETE FROM pull_requests WHERE ID IN {ids};")
+            with create_session(DB_NAME) as s:
+                s.execute(text(f"DELETE FROM pull_requests WHERE ID IN {ids};"))
                 s.execute(
-                    query,
+                    text(query),
                     data_values,
                 )
                 s.commit()
@@ -96,11 +97,10 @@ class WizardDB:
         """Get PR data from database."""
         data = []
         if DB_IS_SET_UP:
-            conn = st.connection(DB_NAME)
-            with conn.session as s:
+            with create_session(DB_NAME) as s:
                 query = f"SELECT * FROM {TB_PR} WHERE date_created >= :date_created;"
                 data = s.execute(
-                    query,
+                    text(query),
                     {"date_created": dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=num_days)},
                 )
                 data = data.fetchall()
@@ -120,10 +120,9 @@ class WizardDB:
                 "summary": summary,
                 "window_type": window_type,
             }
-            conn = st.connection(DB_NAME)
-            with conn.session as s:
+            with create_session(DB_NAME) as s:
                 s.execute(
-                    query,
+                    text(query),
                     params=query_params,
                 )
                 s.commit()
@@ -134,8 +133,7 @@ class WizardDB:
         """Get nmews (latest) from DB."""
         data = []
         if DB_IS_SET_UP:
-            conn = st.connection(DB_NAME)
-            with conn.session as s:
+            with create_session(DB_NAME) as s:
                 # query = f"SELECT SUMMARY, DATE FROM {TB_NS} WHERE DATE(DATE) = DATE('now', 'utc') AND window_type = :window_type;"
                 query = f"""SELECT SUMMARY, DATE, COST, ABS(strftime('%s', DATE) - strftime('%s', 'now')) AS time_difference
                 FROM {TB_NS}
@@ -143,7 +141,7 @@ class WizardDB:
                 ORDER BY time_difference ASC
                 LIMIT 1;
                 """
-                data = s.execute(query, params={"window_type": window_type})
+                data = s.execute(text(query), params={"window_type": window_type})
                 data = data.fetchall()
         if data:
             if len(data) > 1:
@@ -153,6 +151,13 @@ class WizardDB:
                 data[0][1],
                 data[0][2],
             )
+
+
+@contextmanager
+def create_session(db_name: str) -> Generator[Session, None, None]:
+    conn = st.connection(db_name)
+    with conn.session as s:
+        yield s
 
 
 def _prepare_query_insert(tb_name: str, fields: Tuple[Any]) -> str:

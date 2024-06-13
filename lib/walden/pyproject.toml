@@ -6,7 +6,7 @@ authors = ["Our World in Data <tech@ourworldindata.org>"]
 packages = [{ include = "owid" }]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = ">=3.9,<4.0.0"
 jsonschema = ">=3.2.0"
 click = ">=8.0.1"
 sh = ">=1.14.2"

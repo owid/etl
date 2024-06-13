@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Vaccination schedule for Poliomyelitis
+    description: |-
+      The vaccine scheduler table summarizes the current vaccination schedule for young children, adolescents, and adults for Poliomyelitis. The data is updated regularly with the most recent official country reporting collected through the WHO/UNICEF joint reporting process.
+    date_published: "2023"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Vaccination schedule for Poliomyelitis, World Health Organization (2023)
+    attribution_short: WHO
+
+    # Files
+    url_main: https://immunizationdata.who.int/global/wiise-detail-page/vaccination-schedule-for-poliomyelitis?ISO_3_CODE=&TARGETPOP_GENERAL=
+    date_accessed: 2024-04-22
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 20ba0e602678e001650b42f243732227
+    size: 99425
+    path: polio_vaccine_schedule.xlsx

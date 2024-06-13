@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "owid-catalog"
-version = "0.3.9"
+version = "0.3.11"
 description = "Core data types used by OWID for managing data."
 authors = ["Our World in Data <tech@ourworldindata.org>"]
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/owid/owid-grapher-py"
 homepage = "https://github.com/owid/owid-grapher-py"
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.12"
+python = ">=3.9,<4"
 pandas = "^2.2.1"
 jsonschema = ">=3.2.0"
 pyarrow = ">=10.0.1"

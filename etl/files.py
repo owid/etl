@@ -4,6 +4,7 @@
 
 import hashlib
 import io
+import json
 import os
 import re
 import subprocess
@@ -13,6 +14,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
+import pandas as pd
 import ruamel.yaml
 import yaml
 from ruamel.yaml import YAML
@@ -75,6 +77,11 @@ def checksum_str(s: str) -> str:
     return hashlib.md5(s.encode()).hexdigest()
 
 
+def checksum_dict(d: Dict[str, Any]) -> str:
+    "Return the md5 hex digest of the dictionary."
+    return checksum_str(json.dumps(d, default=str))
+
+
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
     "Return the md5 hex digest of the file without using cache."
     chunk_size = 2**20
@@ -112,6 +119,14 @@ def checksum_file(filename: Union[str, Path]) -> str:
         CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
+
+
+def checksum_df(df: pd.DataFrame, index=True) -> str:
+    """Return the md5 hex digest of dataframe. It is only useful for large dataframes. For smaller
+    ones (<1M rows), it's better to use checksum_dict or checksum_str.
+    """
+    # NOTE: I tried joblib.hash, but it was much slower than pandas hash
+    return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
