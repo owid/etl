@@ -13,7 +13,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
+<<<<<<< HEAD
     snap = paths.load_snapshot("gbd_mental_health.csv")
+=======
+    snap = paths.load_snapshot("gbd_mental_health.feather")
+>>>>>>> master
 
     # Load data from snapshot.
     tb = snap.read()

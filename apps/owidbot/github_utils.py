@@ -6,9 +6,12 @@ import github.PullRequest
 import github.Repository
 import jwt
 import requests
+import structlog
 from github import Auth, Github
 
 from etl import config
+
+log = structlog.get_logger()
 
 
 def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repository.Repository:
@@ -28,7 +31,8 @@ def get_pr(repo: github.Repository.Repository, branch_name: str) -> github.PullR
     if len(pulls) == 0:
         raise AssertionError(f"No open PR found for branch {branch_name}")
     elif len(pulls) > 1:
-        raise AssertionError(f"More than one open PR found for branch {branch_name}")
+        log.warning(f"More than one open PR found for branch {branch_name}. Taking the most recent one.")
+        pulls = pulls[-1:]
 
     return pulls[0]
 

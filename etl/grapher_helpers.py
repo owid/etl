@@ -1,5 +1,4 @@
 import copy
-from copy import deepcopy
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
@@ -7,11 +6,12 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 import jinja2
 import numpy as np
 import pandas as pd
+import pymysql
+import sqlalchemy
 import structlog
 from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
-from pymysql import IntegrityError
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -85,8 +85,7 @@ def _yield_wide_table(
     :param trim_long_short_name: If true and there's a short name longer than 255 characters, we trim it to 240 characters
         and add a hash from its short name to the end to make it unique.
     """
-    table = copy.deepcopy(table)
-    table.metadata = copy.deepcopy(table.metadata)
+    table = table.copy(deep=False)
 
     # Validation
     if "year" not in table.primary_key:
@@ -330,7 +329,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     {"name": name},
                 )
                 session.commit()
-            except IntegrityError:
+            except (pymysql.IntegrityError, sqlalchemy.exc.IntegrityError):
                 # If another process inserted the same entity before us, we can
                 # safely ignore the error and fetch the ID
                 pass
@@ -368,7 +367,7 @@ def country_to_entity_id(
     :param by: use `name` if you use country names, `code` if you use ISO codes
     """
     # fill entities from DB
-    db_entities = _get_entities_from_db(set(country), by=by, engine=engine)
+    db_entities = _get_entities_from_db(set(country.unique()), by=by, engine=engine)
     entity_id = country.map(db_entities).astype(float)
 
     # create entities in DB
@@ -376,7 +375,9 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix]), engine=engine)).astype(float)
+        entity_id[ix] = (
+            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)
+        )
 
     assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
 
@@ -507,7 +508,7 @@ def _adapt_table_for_grapher(
         Adapted table, ready to be inserted into grapher.
 
     """
-    table = deepcopy(table)
+    table = table.copy(deep=False)
 
     variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
     variable_titles_counts = variable_titles.value_counts()
@@ -524,8 +525,6 @@ def _adapt_table_for_grapher(
 
     assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."
-
-    table[country_col] = table[country_col].astype(str)
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True, engine=engine)

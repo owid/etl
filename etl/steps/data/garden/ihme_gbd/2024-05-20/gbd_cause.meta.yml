@@ -14,10 +14,17 @@ definitions:
       <% elif metric == "Rate" %>
       deaths per 100,000 people
       <% elif metric == "Percent" %>
+<<<<<<< HEAD
       share of total deaths
       <%- endif -%>
     short_unit: |-
       <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+=======
+      %
+      <%- endif -%>
+    short_unit: |-
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+>>>>>>> master
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from << cause.lower() >>, among individuals aged << age >>
@@ -68,7 +75,11 @@ definitions:
       share of total DALYs
       <%- endif -%>
     short_unit: |-
+<<<<<<< HEAD
       <% if metric == "Percent" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+=======
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+>>>>>>> master
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       DALYs from << cause.lower() >>, among individuals aged << age >>
@@ -130,7 +141,11 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
+<<<<<<< HEAD
             <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+=======
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+>>>>>>> master
   gbd_cause_dalys:
     variables:
       value:
@@ -146,4 +161,8 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
+<<<<<<< HEAD
             <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+=======
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+>>>>>>> master

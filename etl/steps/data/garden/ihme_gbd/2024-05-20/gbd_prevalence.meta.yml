@@ -16,7 +16,11 @@ definitions:
       cases per 100 people
       <%- endif -%>
     short_unit: |-
+<<<<<<< HEAD
       <% if metric == "Share" %>"%"<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+=======
+      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+>>>>>>> master
     title: |-
       <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
       Current cases of << cause.lower() >>, among individuals aged << age >>
@@ -66,6 +70,11 @@ definitions:
       <% elif metric == "Share" %>
       new cases per 100 people
       <%- endif -%>
+<<<<<<< HEAD
+=======
+    short_unit: |-
+      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+>>>>>>> master
     title: |-
       <% if metric == "Number"  and (age != 'Age-standardized' and age != 'All ages')%>
       New cases of << cause.lower() >>, among individuals aged << age >>
@@ -122,6 +131,11 @@ tables:
           {definitions.value_prevalence.title}
         unit: |-
           {definitions.value_prevalence.unit}
+<<<<<<< HEAD
+=======
+        short_unit: |-
+          {definitions.value_prevalence.short_unit}
+>>>>>>> master
         description_short: |-
           {definitions.value_prevalence.description_short}
         presentation:
@@ -130,7 +144,11 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
+<<<<<<< HEAD
             <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+=======
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+>>>>>>> master
   gbd_incidence:
     variables:
       value:
@@ -138,6 +156,11 @@ tables:
           {definitions.value_incidence.title}
         unit: |-
           {definitions.value_incidence.unit}
+<<<<<<< HEAD
+=======
+        short_unit: |-
+          {definitions.value_incidence.short_unit}
+>>>>>>> master
         description_short: |-
           {definitions.value_incidence.description_short}
         presentation:
@@ -146,4 +169,8 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
+<<<<<<< HEAD
             <% if metric == 'Number' %>0<% else %>2<%- endif -%>
+=======
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+>>>>>>> master

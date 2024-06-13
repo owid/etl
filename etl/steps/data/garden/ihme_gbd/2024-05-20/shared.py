@@ -2,6 +2,10 @@ from typing import Dict, List
 
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+<<<<<<< HEAD
+=======
+from owid.datautils import dataframes
+>>>>>>> master
 
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
@@ -59,11 +63,27 @@ def add_regional_aggregates(
     # Calculate rates per 100,000 for regions
     tb_rate_regions["value"] = (tb_rate_regions["value"] / tb_rate_regions["population"]) * 100000
     tb_rate_regions["metric"] = "Rate"
+<<<<<<< HEAD
     tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)
     tb_out = pr.concat(
         [tb_number_percent, tb_rate],
         ignore_index=True,
     )
+=======
+    tb_rate_regions = tb_rate_regions.astype({"metric": "category"})
+
+    # TODO: maybe we could update pr.concat to work with categoricals if pandas can't handle them and converts
+    # them to objects
+    # NOTE: we need to copy the object from `copy_metadata` because it is lost during the concatenation
+    #  we should implement a better pr.concat function
+    tb_rate_copy = tb_rate.copy(deep=False)
+    tb_rate = Table(dataframes.concatenate([tb_rate, tb_rate_regions], ignore_index=True)).copy_metadata(tb_rate_copy)
+    tb_number_percent_copy = tb_number_percent.copy(deep=False)
+    tb_out = Table(dataframes.concatenate([tb_number_percent, tb_rate], ignore_index=True)).copy_metadata(
+        tb_number_percent_copy
+    )
+    assert tb_out.age.m.origins
+>>>>>>> master
     tb_out = tb_out.drop(columns="population")
     return tb_out
 
@@ -77,5 +97,9 @@ def add_share_population(tb: Table) -> Table:
     tb_share["metric"] = "Share"
     tb_share["value"] = tb_share["value"] / 1000
 
+<<<<<<< HEAD
     tb = pr.concat([tb, tb_share], ignore_index=True)
+=======
+    tb = pr.concat([tb, tb_share], ignore_index=True).astype({"metric": "category"})
+>>>>>>> master
     return tb

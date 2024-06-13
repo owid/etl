@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import pandas as pd
+=======
+>>>>>>> master
 from owid.catalog import Table
 
 
