@@ -34,8 +34,11 @@ class ChartDiff:
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
-        self._in_conflict = None
         self.modified_checksum = modified_checksum
+
+        # Cached
+        self._in_conflict = None
+        self._change_types = None
 
     @property
     def is_reviewed(self) -> bool:
@@ -99,6 +102,42 @@ class ChartDiff:
             self._in_conflict = self.target_chart.updatedAt > self.source_chart.updatedAt
         return self._in_conflict
 
+    @property
+    def change_types(self) -> list[str]:
+        """Return list of chart changes.
+
+        This only applies if is_modified is True (i.e. is_new is False).
+
+        Possible change types are:
+            - data: changes in data
+            - metadata: changes in metadata
+            - config: changes in chart config
+
+        If the chartdiff concerns a new chart, this returns an empty list.
+        """
+        if self._change_types is None:
+            # Get change types
+            self._change_types = []
+            if not self.is_new:
+                if self.modified_checksum is not None:
+                    if self.modified_checksum["dataChecksum"].any():
+                        self._change_types.append("data")
+                    if self.modified_checksum["metadataChecksum"].any():
+                        self._change_types.append("metadata")
+                # if chart hasn't been edited by Admin, then disregard config change (it could come from having out of sync MySQL
+                # against master)
+                if (
+                    self.target_chart
+                    and not self.configs_are_equal()
+                    and self.source_chart.lastEditedByUserId == ADMIN_GRAPHER_USER_ID
+                ):
+                    self._change_types.append("config")
+
+                # TODO: Should uncomment this maybe?
+                # assert self._change_types != [], "No changes detected!"
+
+        return self._change_types
+
     @classmethod
     def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
         """Get chart diff from chart id.
@@ -152,27 +191,6 @@ class ChartDiff:
         chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
 
         return chart_diff
-
-    def checksum_changes(self) -> list[str]:
-        """Return list of chart changes."""
-        if self.is_new:
-            return []
-
-        changes = []
-        if self.modified_checksum is not None:
-            if self.modified_checksum["dataChecksum"].any():
-                changes.append("data")
-            if self.modified_checksum["metadataChecksum"].any():
-                changes.append("metadata")
-        # if chart hasn't been edited by Admin, then disregard config change (it could come from having out of sync MySQL
-        # against master)
-        if (
-            self.target_chart
-            and not self.configs_are_equal()
-            and self.source_chart.lastEditedByUserId == ADMIN_GRAPHER_USER_ID
-        ):
-            changes.append("config")
-        return changes
 
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
