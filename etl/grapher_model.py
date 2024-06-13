@@ -102,6 +102,25 @@ class Entity(Base):
     code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
+    @classmethod
+    def load_entity_mapping(cls, session: Session, entity_ids: List[int]) -> Dict[int, str]:
+        q = text(
+            """
+        select
+            *
+        from entities
+        where id in :entity_ids
+        """
+        )
+        # Use a dictionary to pass parameters
+        stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        rows = session.execute(stm).scalars().all()
+
+        # Convert the list of rows to a dictionary with id as key
+        entity_dict = {entity.id: entity.name for entity in rows}
+
+        return entity_dict
+
 
 class Namespace(Base):
     __tablename__ = "namespaces"
