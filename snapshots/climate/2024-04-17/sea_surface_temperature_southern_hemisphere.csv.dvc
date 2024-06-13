@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: Met Office Hadley Centre
+    title: Hadley Centre's Sea Surface Temperature (HadSST)
+    title_snapshot: Hadley Centre's Sea Surface Temperature (HadSST) - Southern hemisphere
+    citation_full: |-
+      Met Office Hadley Centre - Hadley Centre's Sea Surface Temperature (HadSST).
+
+      Kennedy, J. J., Rayner, N. A., Atkinson, C. P., & Killick, R.
+      E. (2019). An ensemble data set of sea-surface temperature change from 1850:
+      the Met Office Hadley Centre HadSST.4.0.0.0 data set. Journal of Geophysical
+      Research: Atmospheres, 124. https://doi.org/10.1029/2018JD029867
+    attribution: Met Office Hadley Centre - Hadley Centre's Sea Surface Temperature (HadSST) (2024)
+    attribution_short: Met Office
+    version_producer: 4.0.1.0
+    url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
+    url_download: https://www.metoffice.gov.uk/hadobs/hadsst4/data/csv/HadSST.4.0.1.0_monthly_SHEM.csv
+    date_accessed: '2024-04-17'
+    date_published: '2024-02-19'
+    license:
+      name: Open Government Licence v3
+      url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
+outs:
+  - md5: fdddc1523485ea4688c1c38fe067353b
+    size: 153344
+    path: sea_surface_temperature_southern_hemisphere.csv

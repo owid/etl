@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Human Climate Horizons (2024). Climate Impact Lab and the United Nations Human Development Programme.
+    title: heat_deaths_undp_climate_horizons
+    citation_full: Human Climate Horizons (2024). Climate Impact Lab and the United Nations Human Development Programme.
+    url_main: https://horizons.hdr.undp.org
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSShxBAJZc1UZzNNC9tu_0YTuCvH05S1VMkwLUdHA4doY8XmnleH9wngCPMqLMzRSZj_BRdJRC78bNA/pub?output=csv
+    date_accessed: '2024-05-02'
+  name: Heat-related deaths (UNDP, 2024)
+  description: The estimated increase in heat-related deaths per 100,000 people in a RCP4.5 warming scenario.
+  license: {}
+outs:
+  - md5: 69a3ea492a3cb70e66f173a30c03982a
+    size: 16354
+    path: heat_deaths_undp_climate_horizons.csv

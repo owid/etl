@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: minor
+    description_processing: |-
+      The amount of heat in the ocean, or ocean heat content, is an important indicator of climate change because the oceans ultimately absorb a large portion of the extra energy that greenhouse gases trap near the Earth's surface. Ocean heat content also plays an important role in the Earth's climate system because heat from ocean surface waters provides energy for storms and thereby influences weather patterns.
+    description_short: Measured in 10²² Joules.
+    unit: 10²² Joules
+    short_unit: 10²² J
+
+dataset:
+  title: Ocean Heat Content
+  update_period_days: 0
+
+tables:
+  ocean_heat_content:
+    title: Ocean Heat Content
+    variables:
+      ocean_heat_content_iap_2000m:
+        title: Annual average ocean heat content for the 0-2000 meters layer, according to IAP
+      ocean_heat_content_noaa_2000m:
+        title: Annual average ocean heat content for the 0-2000 meters layer, according to NOAA
+      ocean_heat_content_mri_2000m:
+        title: Annual average ocean heat content for the 0-2000 meters layer, according to MRI/JMA
+      ocean_heat_content_mri_700m:
+        title: Annual average ocean heat content for the 0-700 meters layer, according to MRI/JMA
+      ocean_heat_content_noaa_700m:
+        title: Annual average ocean heat content for the 0-700 meters layer, according to NOAA
+      ocean_heat_content_iap_700m:
+        title: Annual average ocean heat content for the 0-700 meters layer, according to IAP
+      ocean_heat_content_csiro_700m:
+        title: Annual average ocean heat content for the 0-700 meters layer, according to CSIRO

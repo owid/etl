@@ -25,7 +25,7 @@ definitions:
   safely_managed_sanitation_desc: &safely_managed_sanitation_desc |
     Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
   basic_drinking_water_desc: &basic_drinking_water_desc |
-    Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+    Basic drinking water services are defined as an improved drinking water source, provided collection time is not more than 30 minutes for a roundtrip including queuing.
   limited_drinking_water_desc: &limited_drinking_water_desc |
     Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
   improved_drinking_water_desc: &improved_drinking_water_desc |

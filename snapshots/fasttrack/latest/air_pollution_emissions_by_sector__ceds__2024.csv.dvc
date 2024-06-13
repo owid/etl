@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Unknown
+    url: ''
+    source_data_url: Air pollution emissions by sector (CEDS, 2024).csv
+    date_accessed: '2024-04-26'
+  name: DRAFT Air pollution emissions by sector (CEDS, 2024)
+  description: ''
+  license: {}
+outs:
+  - md5: fa580b352c8881afdb19441060581fd1
+    size: 31770915
+    path: air_pollution_emissions_by_sector__ceds__2024.csv

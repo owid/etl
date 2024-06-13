@@ -8,7 +8,7 @@ import argparse
 from typing import List
 
 import pandas as pd
-from MySQLdb.connections import Connection
+from pymysql.connections import Connection
 from structlog import get_logger
 
 from etl import db

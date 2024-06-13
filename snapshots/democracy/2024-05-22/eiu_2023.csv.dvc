@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Democracy Index 2023: Age of Conflict"
+    description: |-
+      The Economist Intelligence Unit's Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime". A full methodology and explanations can be found in the Appendix.
+
+      This edition of the Democracy Index examines the state of global democracy in 2023. The global results are discussed in this introduction, and the results by region are analysed in greater detail in the section entitled "Democracy around the regions in 2023" (see page 35). The good news is that the number of countries classified as democracies increased by two, to 74, in 2023. However, measured by other metrics, the year was not an auspicious one for democracy. The global average index score fell to 5.23, down from 5.29 in 2022. This is in keeping with a general trend of regression and stagnation in recent years, and it marks a new low since the index began in 2006. Most of the regression occurred among the non-democracies classified as "hybrid regimes" and "authoritarian regimes". Between 2022 and 2023 the average score for "authoritarian regimes" fell by 0.12 points and that for "hybrid regimes" by 0.07 points. The year-on-year decline in the average score of the "full democracies" and "flawed democracies" was modest by comparison, falling by 0.01 and 0.03 points respectively. This suggests that non-democratic regimes are becoming more entrenched, and "hybrid regimes" are struggling to democratise.
+
+      According to our measure of democracy, almost half of the world's population live in a democracy of some sort (45.4%). Only 7.8% reside in a "full democracy", down from 8.9% in 2015; this percentage fell after the US was demoted from a "full democracy" to a "flawed democracy" in 2016. More than one-third of the world's population live under authoritarian rule (39.4%), a share that has been creeping up in recent years.
+
+      According to the 2023 Democracy Index, 74 of the 167 countries and territories covered by the model are democracies of some type. The number of "full democracies" (those scoring more than 8.00 out of 10) remained at 24 in 2023, the same as the previous year. The number of "flawed democracies" increased from 48 in 2022 to 50 in 2023. Of the remaining 95 countries in our index, 34 are classified as "hybrid regimes", combining elements of formal democracy and authoritarianism, and 59 are classified as "authoritarian regimes". For a full explanation of the index methodology and categories, see page 63.
+
+      The title of this year's Democracy Index report is Age of Conflict. The world's democracies seem powerless to prevent wars from breaking out around the globe and less adept at managing conflict at home. In 2023 wars in Africa, Europe and the Middle East caused immense suffering and undermined prospects for positive political change. As US hegemony is increasingly contested, China vies for global influence, and emerging powers such as Saudi Arabia and Turkey assert their interests, the international order is becoming more unstable. Meanwhile, even the world's most developed democracies are struggling to manage political and social conflict at home, suggesting that the democratic model developed during the eight decades after the second world war is no longer working. We explore these developments in an essay in the second section of the report, and examine the relationship between democracy and conflict at home and abroad.
+    date_published: "2024-02-15"
+
+    # Citation
+    producer: Economist Intelligence Unit
+    citation_full: |-
+      Economist Intelligence Unit. (2024, February 15). Democracy Index 2023: Age of Conflict. Retrieved from Economist Group.
+
+    # Files
+    url_main: https://www.economistgroup.com/group-news/economist-intelligence/eius-2023-democracy-index-conflict-and-polarisation-drive-a-new-low-for
+    date_accessed: 2024-05-22
+
+    # License
+    license:
+      name: The Economist Intelligence Unit Limited
+      url: https://www.eiu.com/n/terms/
+outs:
+  - md5: 9cb52886ce257775f015964cbe4f106e
+    size: 6996
+    path: eiu_2023.csv

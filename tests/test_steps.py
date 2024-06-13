@@ -6,6 +6,7 @@
 Test that the different step types work as expected.
 """
 
+import json
 import random
 import shutil
 import string
@@ -21,6 +22,7 @@ from etl.steps import (
     BackportStepPrivate,
     DataStep,
     DataStepPrivate,
+    SnapshotStep,
     Step,
     compile_steps,
     filter_to_subgraph,
@@ -174,3 +176,24 @@ def test_select_dirty_steps():
 def test_get_etag():
     etag = get_etag("https://raw.githubusercontent.com/owid/owid-grapher/master/README.md")
     assert etag
+
+
+def test_SnapshotStep_checksum_output(tmp_path):
+    """SnapshotStep checksum should depenet on metadata in .dvc file"""
+    meta = {"origin": {"producer": "A"}, "outs": [{"md5": "123"}]}
+
+    with patch("etl.paths.SNAPSHOTS_DIR", new=tmp_path / "snapshots") as snapshots_dir:
+        snapshots_dir.mkdir()
+        snapshot_dvc = snapshots_dir / "A.dvc"
+        with open(snapshot_dvc, "w") as f:
+            json.dump(meta, f)
+
+        step = SnapshotStep("A")
+        assert step.checksum_output() == "1867a4e329be8bb3c12a727513b931e8"
+
+        # change metadata
+        meta["origin"]["producer"] = "B"
+        with open(snapshot_dvc, "w") as f:
+            json.dump(meta, f)
+
+        assert step.checksum_output() == "a43b0c67d958884a0bc6487dcf5f4bca"

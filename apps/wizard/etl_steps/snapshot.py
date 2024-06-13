@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import streamlit as st
-from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.utils.files import generate_step
@@ -19,11 +18,10 @@ from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-st.set_page_config(page_title="Wizard: Create a Snapshot step", page_icon="🪄")
-add_indentation()
-
-# Page config
-# st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
+st.set_page_config(
+    page_title="Wizard: Snapshot",
+    page_icon="🪄",
+)
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 # Get properties for origin in schema

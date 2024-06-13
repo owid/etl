@@ -47,3 +47,5 @@ tables:
         title: Solar photovoltaic module prices
         unit: "2022 USD/Watt"
         short_unit: "$/W"
+        presentation:
+          title_public: Solar photovoltaic module prices

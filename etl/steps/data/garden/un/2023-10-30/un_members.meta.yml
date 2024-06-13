@@ -7,7 +7,8 @@ definitions:
     processing_level: major
     description_short: Membership is defined along current countries and their borders.
 
-  expanded_list: The list of current UN members has been expanded with non-member states not included in the original list. Added states include Taiwan, Palestine and Kosovo, among others.
+  expanded_list: |-
+    The list of current UN members has been expanded with non-member entities we can map but are not included in the original list. Added entities include Taiwan, Palestine and Kosovo, among others.
 
 
 # Learn more about the available fields:

@@ -21,7 +21,6 @@ log = structlog.get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
 SEX_MAPPING = {
     "Both sexes": "both sexes",
     "Female": "female",

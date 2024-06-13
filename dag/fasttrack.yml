@@ -156,3 +156,37 @@ steps:
     - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
   data://grapher/fasttrack/latest/gpei:
     - snapshot://fasttrack/latest/gpei.csv
+  data-private://grapher/fasttrack/latest/conflict_deaths_combined:
+    - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
+  data://grapher/fasttrack/2024-04-17/qubits:
+    - snapshot://fasttrack/2024-04-17/qubits.csv
+  data://grapher/fasttrack/latest/pig_production_bartlett:
+    - snapshot://fasttrack/latest/pig_production_bartlett.csv
+  data://grapher/fasttrack/2024-04-22/supercomputers:
+    - snapshot://fasttrack/2024-04-22/supercomputers.csv
+  data-private://grapher/fasttrack/2024-04-25/joe_phd_short_period:
+    - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds:
+    - snapshot://fasttrack/latest/air_pollution_ceds.csv
+  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
+    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
+    - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv
+  data://grapher/fasttrack/latest/lives_saved_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_vaccination_who.csv
+  data://grapher/fasttrack/latest/heat_deaths_undp_climate_horizons:
+    - snapshot://fasttrack/latest/heat_deaths_undp_climate_horizons.csv
+  data://grapher/fasttrack/latest/infant_mortality_vaccination_shattock:
+    - snapshot://fasttrack/latest/infant_mortality_vaccination_shattock.csv
+  data://grapher/fasttrack/latest/cumulative_lives_saved_vaccination_shattock:
+    - snapshot://fasttrack/latest/cumulative_lives_saved_vaccination_shattock.csv
+  data://grapher/fasttrack/latest/heat_deaths_climate_historical:
+    - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
+  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
+    - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
+  data://grapher/fasttrack/latest/air_conditioning_rate_iea:
+    - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
+  data://grapher/fasttrack/latest/projections_air_conditioners_iea:
+    - snapshot://fasttrack/latest/projections_air_conditioners_iea.csv
+  data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1993_2018:
+    - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1993_2018.csv
