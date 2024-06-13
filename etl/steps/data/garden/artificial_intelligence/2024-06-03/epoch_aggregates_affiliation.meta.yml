@@ -1,11 +1,12 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
   common:
     processing_level: major
     presentation:
       topic_tags:
         - Artificial Intelligence
-    description_short: Describes the sector where the authors of an AI system have their primary affiliations.
+    description_short: Describes the sector where the authors of a notable AI system have their primary affiliations. {definitions.desc_update}
     description_from_producer: |-
           The distinction is documented in [Academia and Industry](https://docs.google.com/document/d/1wyJmDOWDEKItg0QhO5cpsNAgHq4aHOxQQZnTfzm34gI/edit).
           Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
@@ -29,5 +30,6 @@ tables:
     variables:
       yearly_count:
         title: Annual number of AI systems by researcher affiliation
+
       cumulative_count:
         title: Cumulative number of AI systems by researcher affiliation
