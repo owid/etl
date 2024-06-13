@@ -27,6 +27,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: be14d07d002bc70df31747151d5d6702
-    size: 1186556325
+  - md5: 3c9597f8f7602de6db2a0b1907baf2a0
+    size: 1249232743
     path: un_wpp_population.csv

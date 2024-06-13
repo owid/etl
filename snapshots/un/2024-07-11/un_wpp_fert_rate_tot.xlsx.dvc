@@ -27,6 +27,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: 503644dc2d1739fbe9f0df585901dfdf
-    size: 2039242
+  - md5: 1f729360b16d333f1d3088b9ac3c727e
+    size: 2130479
     path: un_wpp_fert_rate_tot.xlsx

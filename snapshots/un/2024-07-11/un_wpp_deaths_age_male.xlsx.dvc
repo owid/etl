@@ -25,6 +25,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: c698bbfc8f449da608efaf4fbbe4f129
-    size: 7161744
+  - md5: 362d85530df174da6d5ebc052a2348cf
+    size: 7549187
     path: un_wpp_deaths_age_male.xlsx

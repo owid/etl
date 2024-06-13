@@ -25,6 +25,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: 4ed028a55a6941ec66e7414df2d2ab3d
-    size: 1981216
+  - md5: a60e50dc23682e7fd4364015e197df6b
+    size: 2069937
     path: un_wpp_death_rate.xlsx

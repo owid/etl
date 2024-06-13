@@ -27,6 +27,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: cee03e121b16612e510fde089cfbe67b
-    size: 1995756
+  - md5: 885477804cd63471b9bfb9f2539a03f6
+    size: 2085082
     path: un_wpp_nat_change_rate.xlsx

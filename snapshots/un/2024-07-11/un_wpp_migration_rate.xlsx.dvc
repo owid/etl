@@ -25,6 +25,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://population.un.org/wpp/Download/Standard/MostUsed/
 outs:
-  - md5: b9976bcfd63e20de878d3c77aaab828d
-    size: 1976869
+  - md5: 2c3a490119c86f128d67cd85988ea057
+    size: 2065006
     path: un_wpp_migration_rate.xlsx
