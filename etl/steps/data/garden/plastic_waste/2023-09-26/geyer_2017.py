@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -27,8 +28,8 @@ def run(dest_dir: str) -> None:
     for year in range(2016, 2019):  # 2019 is the stop value and is not included
         last_value = tb.loc[tb.index[-1], "plastic_production"]  # Getting the last value in the 'Value' column
         new_value = last_value * (1 + growth_rate)  # Calculating the value for the new year
-        new_row = {"country": "World", "year": year, "plastic_production": new_value}  # Creating a new row
-        tb = tb.append(new_row, ignore_index=True)  # Adding the new row to the DataFrame
+        new_row = pd.Series({"country": "World", "year": year, "plastic_production": new_value})  # Creating a new row
+        tb.loc[len(tb)] = new_row
     tb["plastic_production"] = tb["plastic_production"] * 1e6  # Convert to millions
 
     # Add data from OECD for 2019

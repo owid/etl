@@ -1,10 +1,13 @@
+---
+tags:
+    - 👷 Staff
+---
 # Meta Update Tool
 
-This tool, accessible via the command `etl metadata upgrader`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: 'snapshot' and 'grapher'.
+This tool, accessible via the command `etl metadata-upgrade`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: `snapshot` and `grapher`.
 
-For 'grapher' metadata files, the tool completes the `description_from_producer`, `description_key`, and `description_short` fields, thereby enriching the metadata with more detailed information.
-
-For 'snapshot' metadata files, the tool updates old, out-of-date files to a new format that is compatible with datapages.
+- **Grapher**: The tool completes the `description_from_producer`, `description_key`, and `description_short` fields, thereby enriching the metadata with more detailed information.
+- **Snapshot**: The tool updates old, out-of-date files to a new format that is compatible with datapages.
 
 ## Usage
 The main function is set up as a command-line interface (CLI). It takes three arguments:
@@ -38,16 +41,3 @@ The `etl metadata-upgrade` tool handles 'snapshot' and 'grapher' metadata files 
 - The GPT model is used to fill out specific fields for each variable in the metadata file.
 - The fields include 'description_from_producer', 'description_key', and 'description_short'.
 - The GPT model is given a system prompt that includes the old metadata and instructions for filling out the fields.
-
-
-## Setting Up OpenAI API Key
-
-The `etl metadata-upgrade` tool requires the `OPENAI_API_KEY` environment variable to function properly. This is the API key provided by OpenAI for accessing their GPT model.
-
-To obtain the API key, you need to sign up on the [OpenAI platform](https://openai.com). After signing up, you can find your API key in the account [settings](https://platform.openai.com/api-keys). For more information see OpenAI [FAQs](https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key)
-
-Once you have the API key, set it as an environment variable in your development environment. For example, in a Unix-based system, you can add the following line to your `.bashrc` or `.zshrc`:
-
-```bash
-export OPENAI_API_KEY='your-api-key'
-```

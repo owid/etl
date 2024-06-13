@@ -39,23 +39,46 @@ def run(dest_dir: str) -> None:
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
-    # Process aux table
+    # Process country codes
     #
     paths.log.info("Processing country codes table...")
     # Keep good columns
-    tb_codes = tb_codes[["ISO-CODE", "Country"]]
+    tb_codes_countries = tb_codes[["ISO-CODE", "Country"]].copy()
     # Strip country names
-    tb_codes["Country"] = tb_codes["Country"].str.strip()
-    # Assert
-    assert (tb_codes["ISO-CODE"] == 826).sum() == 3, "There should be three countries with ISO code 826!"
+    tb_codes_countries["Country"] = tb_codes_countries["Country"].str.strip()
+
+    # Fix bug in ISO 826
+    ## Assertion
+    assert (tb_codes_countries["ISO-CODE"] == 826).sum() == 3, "There should be three countries with ISO code 826!"
     assert "United Kingdom" in set(
-        tb_codes[tb_codes["ISO-CODE"] == 826]["Country"]
+        tb_codes_countries[tb_codes_countries["ISO-CODE"] == 826]["Country"]
     ), "United Kingdom should be in the list of countries with ISO code 826!"
-    # Filter spurious entries
-    mask = (tb_codes["ISO-CODE"] == 826) & (tb_codes["Country"] != "United Kingdom")
-    tb_codes = tb_codes[~mask]
+    ## Filter spurious entries
+    mask = (tb_codes_countries["ISO-CODE"] == 826) & (tb_codes_countries["Country"] != "United Kingdom")
+    tb_codes_countries = tb_codes_countries[~mask]
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_codes = tb_codes.underscore().set_index(["iso_code"], verify_integrity=True).sort_index()
+    tb_codes_countries = tb_codes_countries.underscore().set_index(["iso_code"], verify_integrity=True).sort_index()
+    # Unique table short name
+    tb_codes_countries.metadata.short_name = "country_codes"
+
+    #
+    # Process region codes
+    #
+    tb_codes_regions = tb_codes[["IMAGE region name", "Country name"]].copy()
+    # Rename columns
+    tb_codes_regions = tb_codes_regions.rename(
+        columns={
+            "IMAGE region name": "region",
+            "Country name": "country",
+        }
+    )
+    # Strip country names
+    tb_codes_regions["country"] = tb_codes_regions["country"].str.strip()
+    # Set index
+    tb_codes_regions = tb_codes_regions.set_index("country", verify_integrity=True)
+    # Unique table short name
+    tb_codes_regions.metadata.short_name = "region_mapping"
 
     #
     # Save outputs.
@@ -64,7 +87,8 @@ def run(dest_dir: str) -> None:
     # Create list of tables
     tables = [
         tb,
-        tb_codes,
+        tb_codes_countries,
+        tb_codes_regions,
     ]
 
     # Create a new meadow dataset with the same metadata as the snapshot.

@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = Dataset(DATA_DIR / "meadow/homicide/2023-01-03/who_mort_db")
     tb_meadow = ds_meadow["who_mort_db"]
 
-    df = pd.DataFrame(tb_meadow)
+    df = pd.DataFrame(tb_meadow).astype({"number_of_deaths": float})
 
     log.info("who_mort_db.exclude_countries")
     df = exclude_countries(df)
@@ -92,7 +92,7 @@ def run(dest_dir: str) -> None:
 def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
     sex_dict = {"All": "Both Sexes", "Male": "Males", "Female": "Females", "Unknown": "Unknown sex"}
     age_dict = {"Age_all": "All ages", "Age_unknown": "Unknown age"}
-    df = df.replace({"sex": sex_dict, "age_group_code": age_dict})
+    df = df.astype({"sex": str, "age_group_code": str}).replace({"sex": sex_dict, "age_group_code": age_dict})
 
     return df
 
@@ -205,7 +205,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
         ],
         axis=1,
     )
-    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"]).sum()
+    df_age = df_age.groupby(["country", "year", "sex", "age_group_code"], observed=True).sum()
     df_age["death_rate_per_100_000_population"] = (
         df_age["number_of_deaths"].div(df_age["population"]).replace(np.inf, np.nan)
     ) * 100000

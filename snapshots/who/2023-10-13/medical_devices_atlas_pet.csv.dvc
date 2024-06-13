@@ -19,8 +19,7 @@ meta:
 
       The **WHO Baseline Country Survey on Medical Devices** was developed in 2009. The aim was to determine the health technology areas that required support in countries and regions. It was launched in February 2010. In 2013, it was updated and re-launched as the Global Atlas of Medical Devices. The GAMD was updated in 2017, and the 2022 update is under development.
     date_published: '2022'
-    title_snapshot: Global atlas of medical devices - Positron Emission Tomography
-      (PET)
+    title_snapshot: Global atlas of medical devices - Positron Emission Tomography (PET)
     description_snapshot: |-
       The dataset comprises information sourced from the Global Atlas of Medical Devices (GAMD) regarding the Positron Emission Tomography (PET) density per million population.
     # Citation
@@ -30,8 +29,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main:
-      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+    url_main: https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
     date_accessed: 2023-10-13
 
     # License
@@ -41,6 +39,6 @@ meta:
 
 wdir: ../../../data/snapshots/who/2023-10-13
 outs:
-- md5: 53dc9817e8d9f5d8e472b3d97997487e
-  size: 53910
-  path: medical_devices_atlas_pet.csv
+  - md5: 89f1eb5661cb937a709e441188b5e937
+    size: 53910
+    path: medical_devices_atlas_pet.csv

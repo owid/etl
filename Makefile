@@ -23,11 +23,12 @@ help:
 	@echo '  make format-all 	Format code (including modules in lib/)'
 	@echo '  make full      	Fetch all data and run full transformations'
 	@echo '  make grapher   	Publish supported datasets to Grapher'
+	@echo '  make sync.catalog  Sync catalog from R2 into local data/ folder'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make api   		Start the ETL API on port 8081'
 	@echo '  make fasttrack 	Start Fast-track on port 8082'
-	@echo '  make staging-sync 	Start Staging-sync on port 8083'
+	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
@@ -70,7 +71,7 @@ watch: .venv
 	fi
 	touch .sanity-check
 
-test: check-formatting lint check-typing unittest version-tracker
+test: check-formatting check-linting check-typing unittest version-tracker
 
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
@@ -118,6 +119,14 @@ prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
 	poetry run etl d prune
 
+# Syncing catalog is useful if you want to avoid rebuilding it locally from scratch
+# which could take a few hours. This will download ~10gb from the main channels
+# (meadow, garden, open_numbers) and is especially useful when we increase ETL_EPOCH
+# or update regions.
+sync.catalog: .venv
+	@echo '==> Sync catalog from R2 into local data/ folder (~10gb)'
+	rclone copy owid-r2:owid-catalog/ data/ --verbose --fast-list --transfers=64 --checkers=64 --include "/meadow/**" --include "/garden/**" --include "/open_numbers/**"
+
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
 	poetry run etl run --grapher
@@ -145,9 +154,9 @@ fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
 	poetry run fasttrack --skip-auto-open --port 8082
 
-staging-sync: .venv
-	@echo '==> Starting Staging-sync on http://localhost:8083/'
-	poetry run streamlit run apps/staging_sync/app.py --server.port 8083
+chart-sync: .venv
+	@echo '==> Starting Chart-sync on http://localhost:8083/'
+	poetry run streamlit run apps/chart_sync/app.py --server.port 8083
 
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'

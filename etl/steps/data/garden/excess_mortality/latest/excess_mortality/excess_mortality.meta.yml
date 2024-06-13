@@ -52,8 +52,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       p_avg_0_14:
         title: p_avg_0_14
         # title: Excess mortality P-scores (5-year average baseline, 0–14)
@@ -70,8 +70,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       p_avg_15_64:
         title: p_avg_15_64
         # title: Excess mortality P-scores (5-year average baseline, 15–64)
@@ -88,8 +88,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       p_avg_65_74:
         title: p_avg_65_74
         # title: Excess mortality P-scores (5-year average baseline, 65–74)
@@ -106,8 +106,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       p_avg_75_84:
         title: p_avg_75_84
         # title: Excess mortality P-scores (5-year average baseline, 75–84)
@@ -124,8 +124,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       p_avg_85p:
         title: p_avg_85p
         # title: Excess mortality P-scores (5-year average baseline, 85+)
@@ -142,8 +142,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
 
       # p_proj_*
       p_proj_all_ages:
@@ -163,8 +163,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       p_proj_0_14:
         title: p_proj_0_14
@@ -183,8 +183,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       p_proj_15_64:
         title: p_proj_15_64
@@ -203,8 +203,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       p_proj_65_74:
         title: p_proj_65_74
@@ -223,8 +223,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       p_proj_75_84:
         title: p_proj_75_84
@@ -243,8 +243,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       p_proj_85p:
         title: p_proj_85p
@@ -263,8 +263,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
 
       # deaths_*_all_ages
@@ -277,8 +277,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2011_all_ages:
         title: deaths_2011_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -288,8 +288,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2012_all_ages:
         title: deaths_2012_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -299,8 +299,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2013_all_ages:
         title: deaths_2013_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -310,8 +310,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2014_all_ages:
         title: deaths_2014_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -321,8 +321,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: World Mortality Dataset (2023)
-          - name: Human Mortality Database (2023)
+          - name: World Mortality Dataset (2024)
+          - name: Human Mortality Database (2024)
       deaths_2015_all_ages:
         title: deaths_2015_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
@@ -337,8 +337,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2016_all_ages:
         title: deaths_2016_all_ages
         # title: Number of deaths (weekly or monthly, 2016)
@@ -353,8 +353,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2017_all_ages:
         title: deaths_2017_all_ages
         # title: Number of deaths (weekly or monthly, 2017)
@@ -369,8 +369,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2018_all_ages:
         title: deaths_2018_all_ages
         # title: Number of deaths (weekly or monthly, 2018)
@@ -385,8 +385,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2019_all_ages:
         title: deaths_2019_all_ages
         # title: Number of deaths (weekly or monthly, 2019)
@@ -401,8 +401,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020)
@@ -417,8 +417,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2021_all_ages:
         title: deaths_2021_all_ages
         # title: Number of deaths (weekly or monthly, 2021)
@@ -433,8 +433,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2022_all_ages:
         title: deaths_2022_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -449,8 +449,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_2023_all_ages:
         title: deaths_2023_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
@@ -465,8 +465,24 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
+      deaths_2024_all_ages:
+        title: deaths_2024_all_ages
+        # title: Number of deaths (weekly or monthly, 2022)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)
@@ -481,8 +497,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
 
       # other metrics
       excess_proj_all_ages:
@@ -499,8 +515,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       excess_per_million_proj_all_ages:
         title: excess_per_million_proj_all_ages
@@ -516,8 +532,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       average_deaths_2015_2019_all_ages:
         title: average_deaths_2015_2019_all_ages
@@ -532,8 +548,8 @@ tables:
           - *license-hmd
           - *license-wmd
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       projected_deaths_since_2020_all_ages:
         title: projected_deaths_since_2020_all_ages
         # title: Projected number of deaths (2020–2022, all ages)
@@ -564,8 +580,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       cum_proj_deaths_all_ages:
         title: cum_proj_deaths_all_ages
@@ -597,8 +613,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       cum_excess_per_million_proj_all_ages:
         title: cum_excess_per_million_proj_all_ages
@@ -615,8 +631,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       # auxiliary columns
       time:
@@ -630,8 +646,8 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
       time_unit:
         title: Time unit
@@ -644,6 +660,6 @@ tables:
           - *license-wmd
           - *license-xm_kk
         sources:
-          - name: Human Mortality Database (2023)
-          - name: World Mortality Dataset (2023)
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)

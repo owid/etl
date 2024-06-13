@@ -22,7 +22,7 @@ graph LR
 upstream --> snapshot --> etl --> catalog[on-disk catalog]
 ```
 
-We secondly keep record all data dependencies in a directed graph or DAG (see YAML files from [`dag/`](https://github.com/owid/etl/blob/master/dag/main.yml)), and forbid steps from using any data as input that isn't explicitly declared as a dependency. This means that the result of any step is a pure function of its inputs.
+We secondly keep record all data dependencies in a directed graph or DAG (see YAML files from [`dag/`](https://github.com/owid/etl/blob/master/dag/)), and forbid steps from using any data as input that isn't explicitly declared as a dependency. This means that the result of any step is a pure function of its inputs.
 
 ## Checksums for safe caching
 

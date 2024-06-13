@@ -59,10 +59,6 @@ def run(dest_dir: str) -> None:
 
     # Extract enrollment rates from the World Bank Education Dataset starting from 2010
     enrolment_wb = extract_related_world_bank_data(tb_wdi)
-    # Add origins metadata to the WDI table (remove when the WDI dataset is updated with new metadata)
-    from etl.data_helpers.misc import add_origins_to_wdi
-
-    enrolment_wb = add_origins_to_wdi(enrolment_wb)
 
     # Get the list of columns from the World Bank dataset
     world_bank_indicators = enrolment_wb.columns
@@ -74,13 +70,17 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Replace age group values with descriptive labels
-    tb["age_group"] = tb["age_group"].replace(
-        {
-            "15.0-64.0": "Youth and Adults (15-64 years)",
-            "15.0-24.0": "Youth (15-24 years)",
-            "25.0-64.0": "Adults (25-64 years)",
-            "not specified": "Age not specified",
-        }
+    tb["age_group"] = (
+        tb["age_group"]
+        .astype(str)
+        .replace(
+            {
+                "15.0-64.0": "Youth and Adults (15-64 years)",
+                "15.0-24.0": "Youth (15-24 years)",
+                "25.0-64.0": "Adults (25-64 years)",
+                "not specified": "Age not specified",
+            }
+        )
     )
 
     # Prepare enrollment and attainment data

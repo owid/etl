@@ -17,8 +17,7 @@ meta:
 
     # Files
     url_main: https://www.imf.org/en/Publications/WEO/weo-database/2023/October
-    url_download: 
-      https://www.imf.org/-/media/Files/Publications/WEO/WEO-Database/2023/WEOOct2023all.ashx
+    url_download: https://www.imf.org/-/media/Files/Publications/WEO/WEO-Database/2023/WEOOct2023all.ashx
     date_accessed: 2023-11-02
 
     # License
@@ -28,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/imf/2023-11-02
 outs:
-- md5: 2c63c189e84979591623273e64028872
-  size: 9984224
-  path: world_economic_outlook.xls
+  - md5: f81178dcdf1add4d400adf29feaec8d9
+    size: 9984224
+    path: world_economic_outlook.xls

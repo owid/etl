@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
 
     # Read snapshot
     tb = snap.read()
+
     #
     # Process data.
     #

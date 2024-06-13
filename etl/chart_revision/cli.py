@@ -3,20 +3,13 @@ import traceback
 import rich_click as click
 from structlog import get_logger
 
-from etl.chart_revision.v1.cli import main as main_v1
-
-# TBD
-from etl.chart_revision.v1.deprecated import ChartRevisionSuggester
 from etl.chart_revision.v2.cli import main as main_v2
 from etl.config import DEBUG
 
 log = get_logger()
-# Available versions
-VERSIONS = ["0", "1", "2"]
-VERSION_DEFAULT = max(VERSIONS)
 
 
-@click.command()
+@click.command(name="chart-upgrade")
 @click.argument(
     "mapping-file",
     type=str,
@@ -27,24 +20,14 @@ VERSION_DEFAULT = max(VERSIONS)
     default=None,
     help="Assign a reason for the suggested chart revision.",
 )
-@click.option(
-    "-u",
-    "--use-version",
-    type=click.Choice(VERSIONS),
-    default=VERSION_DEFAULT,
-    help="Choose the backend version to use. By default uses latest version.",
-)
 def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:
     """Generate chart revisions in Grapher using `MAPPING_FILE` JSON file.
 
-    # Description
     `MAPPING_FILE` is a JSON file mapping "old variables" to "new" ones. Typically old variables belong to a dataset that you want to deprecate and replace with a new one, which contains the "new variables".
 
     **Note 1:** Make sure that you are connected to the database. By default, it connects to Grapher based on the environment file found in the project's root directory "path/to/etl/.env".
 
-    **Note 2:** You should use the default `--use-version` option value, unless you are aware of the changes in the backend.
-
-    ## Example
+    **Example:**
 
     ```json
     /* file: variable-mapping.json */
@@ -53,17 +36,9 @@ def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:
         2033: 147396
     }
     ```
-
-    # Reference
     """
     try:
-        if use_version == "0":
-            suggester = ChartRevisionSuggester.from_json(mapping_file, revision_reason)
-            suggester.suggest()
-        elif use_version == "1":
-            main_v1(mapping_file, revision_reason)
-        elif use_version == "2":
-            main_v2(mapping_file, revision_reason)
+        main_v2(mapping_file, revision_reason)
 
     except Exception as e:
         log.error(e)

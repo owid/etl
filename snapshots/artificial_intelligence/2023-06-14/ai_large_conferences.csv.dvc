@@ -7,13 +7,11 @@ meta:
 
   publication_date: '2023-03-24'
   source_name: AI Index (2023)
-  source_published_by: The AI Index 2023 Annual Report, AI Index Steering Committee,
-    Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023.
+  source_published_by: The AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023.
   url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
   source_data_url: https://drive.google.com/uc?export=download&id=1LlEwGnFxr8WDITu4uh6GYoUojvC4mSm-
   file_extension: csv
-  license_url:
-    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   license_name: Public domain
   date_accessed: 2023-06-14
   is_public: true
@@ -21,6 +19,6 @@ meta:
     Data from AI Index report on annual attendance of large conferences (split by type). It should be interpreted with caution given that many conferences in the last few years have had virtual or hybrid formats. Conference organisers report that measuring the exact attendance numbers at virtual conferences is difficult, as virtual conferences allow for higher attendance of researchers from around the world.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 7b0ac1d11a5a47f85dcaa039a80d7538
-  size: 1522
-  path: ai_large_conferences.csv
+  - md5: 7187f9f53dc1090f746654206a1ac309
+    size: 1522
+    path: ai_large_conferences.csv

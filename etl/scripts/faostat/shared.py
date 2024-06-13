@@ -22,26 +22,31 @@ SNAPSHOTS_FILE_EXTENSION = "zip"
 FAO_DATA_URL = "http://www.fao.org/faostat/en/#data"
 # Metadata source name.
 SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
+# Short attribution.
+ATTRIBUTION_SHORT = "FAOSTAT"
 # Metadata related to license.
 LICENSE_URL = "http://www.fao.org/contact-us/terms/db-terms-of-use/en"
 LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
+# Maximum number of characters for item_code.
+# WARNING: These definitions should coincide with those given in the shared module of the garden step.
+# FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
+# So we will convert it into a string of this number of characters (integers will be prepended with zeros).
+N_CHARACTERS_ITEM_CODE = 8
+# Idem for faostat_sdgb and faostat_fs (that have different, longer item codes with digits and letters).
+N_CHARACTERS_ITEM_CODE_EXTENDED = 15
+# Maximum number of characters for element_code (integers will be prepended with zeros).
+N_CHARACTERS_ELEMENT_CODE = 6
 # Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [
     # Cost and Affordability of a Healthy Diet.
     "cahd",
-    # Land, Inputs and Sustainability: Fertilizers indicators.
-    "ef",
     # Climate Change: Emissions intensities.
     "ei",
     # Land, Inputs and Sustainability: Livestock Patterns.
     "ek",
-    # Land, Inputs and Sustainability: Land use indicators.
-    "el",
     # Land, Inputs and Sustainability: Livestock Manure.
     "emn",
-    # Land, Inputs and Sustainability: Pesticides indicators.
-    "ep",
     # Land, Inputs and Sustainability: Soil nutrient budget.
     "esb",
     # Discontinued archives and data series: Food Aid Shipments (WFP).
@@ -54,8 +59,6 @@ INCLUDED_DATASETS_CODES = [
     "fo",
     # Food Security and Nutrition: Suite of Food Security Indicators.
     "fs",
-    # Energy use.
-    "gn",
     # Credit to Agriculture.
     "ic",
     # Land, Inputs and Sustainability: Land Cover.
@@ -84,8 +87,18 @@ INCLUDED_DATASETS_CODES = [
     "tcl",
     # Trade: Trade Indices.
     "ti",
+    # Removed from the list (as they have not been used and were causing issues).
     # World Census of Agriculture.
-    "wcad",
+    # "wcad",
+    # Energy use.
+    # "gn",
+    # The following domains used to exist in FAOSTAT, but they have been removed.
+    # Land, Inputs and Sustainability: Fertilizers indicators.
+    # "ef",
+    # Land, Inputs and Sustainability: Land use indicators.
+    # "el",
+    # Land, Inputs and Sustainability: Pesticides indicators.
+    # "ep",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their

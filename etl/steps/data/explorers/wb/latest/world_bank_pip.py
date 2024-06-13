@@ -24,7 +24,16 @@ def run(dest_dir: str) -> None:
     # Drop variables not used in the explorers and rows with missing values
     tb_inc_or_cons_2017 = drop_columns_and_rows(
         tb=tb_inc_or_cons_2017,
-        drop_list=["above", "between", "poverty_severity", "watts", "headcount_215_regions", "surveys_past_decade"],
+        drop_list=[
+            "above",
+            "between",
+            "poverty_severity",
+            "watts",
+            "headcount_215_regions",
+            "surveys_past_decade",
+            "reporting_level",
+            "welfare_type",
+        ],
     )
 
     # Create a separate table for PIP inequality data
@@ -77,7 +86,9 @@ def import_rest_of_tables(ds_garden: Dataset) -> list:
         ]
     ]:
         tb = ds_garden[table]
-        tb = drop_columns_and_rows(tb=tb, drop_list=["above", "between", "poverty_severity", "watts"])
+        tb = drop_columns_and_rows(
+            tb=tb, drop_list=["above", "between", "poverty_severity", "watts", "reporting_level", "welfare_type"]
+        )
         rest_of_tables.append(tb)
 
     return rest_of_tables

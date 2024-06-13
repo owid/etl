@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Boix-Miller-Rosato (BMR) dichotomous coding of democracy (1800-2020)
+    description: |-
+      This dataset covers all sovereign countries (including micro-states) from 1800 to 2020. Generally, we use United Nations membership to define when micro-states enter the data set. We thank Benjamin A.T. Graham and his students at USC (Valeria Flores-Cadena, Jiaming Shi, Affan Rahman, and Apurvi Bhartia) for providing their own democracy ratings and supporting information as part of a class project.
+
+      The authors argue that their measure’s distinguishing features—a concrete, dichotomous coding and a long time span—are of critical value to empirical work on democracy. Inspired by Robert Dahl, they define a country as democratic if it satisfies conditions for both contestation and participation. Specifically, democracies feature political leaders chosen through free and fair elections and satisfy a threshold value of suffrage. 
+    date_published: "2022"
+    version_producer: 4
+
+    # Citation
+    producer: Boix-Miller-Rosato
+    citation_full: |-
+      Carles Boix, Michael K. Miller, and Sebastian Rosato. 2013. “A Complete Data Set of
+      Political Regimes, 1800-2007.” Comparative Political Studies 46(12): 1523-54.
+
+    # Files
+    url_main: https://sites.google.com/site/mkmtwo/data?authuser=0
+    url_download: https://drive.usercontent.google.com/u/1/uc?id=1P9fBqJejGktGLlRMSDgTkjyKMnVFcXac&export=download
+    date_accessed: 2024-03-07
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/deed.en
+
+outs:
+  - md5: 40dcce1cf6214c34d14cdae9014b3a8a
+    size: 792636
+    path: bmr.csv

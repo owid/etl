@@ -40,7 +40,7 @@ meta:
     date_accessed: 2024-01-30
     date_published: 2024-01-04
     license:
-      name: Public domain
+      name: Copyright © 2024 YouGov PLC
       url: https://today.yougov.com/about/terms
     version_producer: '2024-01-04'
 wdir: ../../../data/snapshots/artificial_intelligence/2024-01-30

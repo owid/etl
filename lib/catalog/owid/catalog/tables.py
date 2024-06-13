@@ -31,14 +31,14 @@ import rdata
 import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
-from pandas.util._decorators import rewrite_axis_style_signature
 
 from owid.repack import repack_frame
 
 from . import processing_log as pl
-from . import variables
+from . import variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
+    DatasetMeta,
     License,
     Origin,
     Source,
@@ -425,10 +425,24 @@ class Table(pd.DataFrame):
             and self._fields == table._fields
         )
 
-    @rewrite_axis_style_signature(
-        "mapper",
-        [("copy", True), ("inplace", False), ("level", None), ("errors", "ignore")],
-    )
+    @overload
+    def rename(
+        self,
+        mapper: Any = None,
+        *,
+        inplace: Literal[True],
+        **kwargs: Any,
+    ) -> None:
+        ...
+
+    @overload
+    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table":
+        ...
+
+    @overload
+    def rename(self, *args: Any, **kwargs: Any) -> "Table":
+        ...
+
     def rename(self, *args: Any, **kwargs: Any) -> Optional["Table"]:
         """Rename columns while keeping their metadata."""
         inplace = kwargs.get("inplace")
@@ -689,6 +703,68 @@ class Table(pd.DataFrame):
 
         return t
 
+    def format(
+        self,
+        keys: Optional[Union[str, List[str]]] = None,
+        verify_integrity: bool = True,
+        underscore: bool = True,
+        sort_rows: bool = True,
+        sort_columns: bool = False,
+        short_name: Optional[str] = None,
+        **kwargs,
+    ) -> "Table":
+        """Format the table according to OWID standards.
+
+        This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
+
+        ```
+        tb.format(["country", "year"])
+        ```
+
+        is equivalent to
+
+        ```
+        tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+        ```
+
+        NOTE: You can use default `tb.format()`, which uses keys = ['country', 'year'].
+
+        Parameters
+        ----------
+        keys : Optional[Union[str, List[str]], optional
+            Index columns. If none is given, will use ["country", "year"].
+        verify_integrity : bool, optional
+            Verify that there is only one entry per index, by default True.
+        underscore : bool, optional
+            Underscore column names, by default True.
+        sort_rows : bool, optional
+            Sort rows by index (ascending), by default True.
+        sort_columns : bool, optional
+            Sort columns (ascending), by default False.
+        short_name : Optional[str], optional
+            Short name to assign to the output table.
+        kwargs : Any
+            Passed to `Table.underscore` method.
+        """
+        t = self
+        # Underscore
+        if underscore:
+            t = t.underscore(**kwargs)
+        # Set index
+        if keys is None:
+            keys = ["country", "year"]
+        t = t.set_index(keys, verify_integrity=verify_integrity)
+        if sort_columns:
+            t = t.sort_index(axis=1)
+        # Sort rows
+        if sort_rows:
+            t = t.sort_index(axis=0)
+        # Rename table.
+        if short_name:
+            t.metadata.short_name = short_name
+
+        return t
+
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
@@ -703,6 +779,9 @@ class Table(pd.DataFrame):
             )
 
         return cast("Table", tb)
+
+    def drop(self, *args, **kwargs) -> "Table":
+        return cast(Table, super().drop(*args, **kwargs))
 
     def update_log(
         self,
@@ -746,7 +825,7 @@ class Table(pd.DataFrame):
             )
         return self
 
-    def sort_values(self, by: str, *args, **kwargs) -> "Table":
+    def sort_values(self, by: Union[str, List[str]], *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
             if isinstance(by, str):
@@ -852,28 +931,9 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
+    def groupby(self, *args, **kwargs) -> "TableGroupBy":
         """Groupby that preserves metadata."""
-        if observed is False and args:
-            by_list = [args[0]] if isinstance(args[0], str) else args[0]
-            for by in by_list:
-                if isinstance(by, str):
-                    try:
-                        by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
-                    except AttributeError:
-                        by_type = by
-                elif isinstance(by, pd.Series):
-                    by_type = by.dtype
-                else:
-                    by_type = "unknown"
-                if isinstance(by_type, str) and by_type == "category":
-                    log.warning(
-                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
-                    )
-
-        return TableGroupBy(
-            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
-        )
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
@@ -885,7 +945,7 @@ class Table(pd.DataFrame):
 
         for column in [column for column in self.columns if column not in ignore_columns]:
             if not self[column].metadata.origins:
-                log.warning(f"Variable {column} has no origins.")
+                warnings.warn(f"Variable {column} has no origins.", warnings.NoOriginsWarning)
 
     def rename_index_names(self, renames: Dict[str, str]) -> "Table":
         """Rename index."""
@@ -895,19 +955,29 @@ class Table(pd.DataFrame):
         tb = tb.set_index(column_idx_new)
         return tb
 
-    def fillna(self, value, **kwargs) -> "Table":
+    def fillna(self, value=None, **kwargs) -> "Table":
         """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
         table."""
-        tb = super().fillna(value, **kwargs)
+        if value is not None:
+            tb = super().fillna(value, **kwargs)
 
-        if type(value) == type(self):
-            for column in tb.columns:
-                if column in value.columns:
-                    tb._fields[column] = variables.combine_variables_metadata(
-                        variables=[tb[column], value[column]], operation="fillna", name=column
-                    )
+            if type(value) == type(self):
+                for column in tb.columns:
+                    if column in value.columns:
+                        tb._fields[column] = variables.combine_variables_metadata(
+                            variables=[tb[column], value[column]], operation="fillna", name=column
+                        )
+        else:
+            tb = super().fillna(**kwargs)
 
+        tb = cast(Table, tb)
         return tb
+
+    @classmethod
+    def from_records(cls, *args, **kwargs) -> "Table":
+        """Calling Table.from_records returns a Table, but does not call __init__ and misses metadata."""
+        df = super().from_records(*args, **kwargs)
+        return Table(df)
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -960,7 +1030,7 @@ class TableGroupBy:
             return func
         else:
             self.__annotations__[name] = VariableGroupBy
-            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name], self.metadata)
 
     @overload
     def __getitem__(self, key: str) -> "VariableGroupBy":
@@ -975,7 +1045,7 @@ class TableGroupBy:
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
             self.__annotations__[key] = VariableGroupBy
-            return VariableGroupBy(self.groupby[key], key, self._fields[key])
+            return VariableGroupBy(self.groupby[key], key, self._fields[key], self.metadata)
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
@@ -1002,12 +1072,18 @@ class TableGroupBy:
 
 
 class VariableGroupBy:
-    def __init__(self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta):
+    def __init__(
+        self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta, table_metadata: TableMeta
+    ):
         self.groupby = groupby
         self.metadata = metadata
         self.name = name
+        self.table_metadata = table_metadata
 
     def __getattr__(self, funcname) -> Callable[..., "Table"]:
+        if funcname == "groupings":
+            return self.groupby.groupings
+
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             # out = getattr(self.groupby, funcname)(*args, **kwargs)
@@ -1017,6 +1093,7 @@ class VariableGroupBy:
             # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
             if isinstance(out, Table):
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
+                out.metadata = self.table_metadata.copy()
                 return out
             elif isinstance(out, variables.Variable):
                 out.metadata = self.metadata.copy()
@@ -1048,7 +1125,16 @@ def merge(
     # Create merged table.
     tb = Table(
         pd.merge(
-            left=left, right=right, how=how, on=on, left_on=left_on, right_on=right_on, suffixes=suffixes, **kwargs
+            # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
+            # It is necessary to copy metadata here to avoid mutating passed left.
+            left=left.copy(deep=False),
+            right=right.copy(deep=False),
+            how=how,
+            on=on,
+            left_on=left_on,
+            right_on=right_on,
+            suffixes=suffixes,
+            **kwargs,
         )
     )
 
@@ -1119,7 +1205,37 @@ def concat(
     **kwargs,
 ) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
-    table = Table(pd.concat(objs=objs, axis=axis, join=join, ignore_index=ignore_index, **kwargs))  # type: ignore
+    with warnings.catch_warnings():
+        warnings.simplefilter(action="ignore", category=FutureWarning)
+        table = Table(
+            pd.concat(
+                objs=objs,
+                axis=axis,  # type: ignore
+                join=join,
+                ignore_index=ignore_index,
+                **kwargs,
+            )
+        )
+        ################################################################################################################
+        # In pandas 2.2.1, pd.concat() does not return a copy when one of the input dataframes is empty.
+        # This causes the following unexpected behavior:
+        # df_0 = pd.DataFrame({"a": ["original value"]})
+        # df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+        # df_0.loc[:, "a"] = "new value"
+        # df_1["a"]  # This will return "new value" instead of "original value".
+        # In pandas `1.4.0`, the behavior was as expected (returning "original value").
+        # Note that this happens even if `copy=True` is passed to `pd.concat()`.
+        if any([len(obj) == 0 for obj in objs]):
+            if pd.__version__ != "2.2.1":
+                # Check if patch is no longer needed.
+                df_0 = pd.DataFrame({"a": ["original value"]})
+                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                df_0.loc[:, "a"] = "new value"
+                if df_1["a"].item() != "new value":
+                    log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")
+            # Ensure concat returns a copy.
+            table = table.copy()
+        ################################################################################################################
 
     if (axis == 1) or (axis == "columns"):
         # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
@@ -1236,13 +1352,17 @@ def pivot(
     short_name: Optional[str] = None,
     **kwargs,
 ) -> Table:
+    if index is not None:
+        kwargs["index"] = index
+    if columns is not None:
+        kwargs["columns"] = columns
+    if values is not None:
+        kwargs["values"] = values
+
     # Get the new pivot table.
     table = Table(
         pd.pivot(
             data=data,
-            index=index,
-            columns=columns,
-            values=values,
             **kwargs,
         )
     )
@@ -1335,7 +1455,7 @@ def read_fwf(
 
 
 def read_feather(
-    filepath: Union[str, Path],
+    filepath: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
     origin: Optional[Origin] = None,
     underscore: bool = False,
@@ -1539,18 +1659,22 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
 
 def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     # Make a list of all sources of all variables in all tables.
-    sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(sources).tolist()
+    sources = []
+    for table in tables:
+        for column in list(table.all_columns):
+            # Get unique array of tuples of source fields (respecting the order).
+            sources += [source for source in table._fields[column].sources if source not in sources]
+    return sources
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
-    licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(licenses).tolist()
+    licenses = []
+    for table in tables:
+        for column in list(table.all_columns):
+            # Get unique array of tuples of source fields (respecting the order).
+            licenses += [license for license in table._fields[column].licenses if license not in licenses]
+    return licenses
 
 
 def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
@@ -1574,15 +1698,39 @@ def combine_tables_description(tables: List[Table]) -> Optional[str]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
+def combine_tables_datasetmeta(tables: List[Table]) -> Optional[DatasetMeta]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="dataset")
+
+
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
     title = combine_tables_title(tables=tables)
     description = combine_tables_description(tables=tables)
+    dataset = combine_tables_datasetmeta(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name
-    metadata = TableMeta(title=title, description=description, short_name=short_name)
+    metadata = TableMeta(title=title, description=description, short_name=short_name, dataset=dataset)
 
     return metadata
+
+
+def combine_tables_update_period_days(tables: List[Table]) -> Optional[int]:
+    # NOTE: This is a metadata field that is extracted from the dataset, not the table itself.
+
+    # Gather all update_period_days from all tables (technically, from their dataset metadata).
+    update_period_days_gathered = [
+        getattr(table.metadata.dataset, "update_period_days")
+        for table in tables
+        if getattr(table.metadata, "dataset") and getattr(table.metadata.dataset, "update_period_days")
+    ]
+    if len(update_period_days_gathered) > 0:
+        # Get minimum period of all tables.
+        update_period_days_combined = min(update_period_days_gathered)
+    else:
+        # If no table had update_period_days defined, return None.
+        update_period_days_combined = None
+
+    return update_period_days_combined
 
 
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
@@ -1594,7 +1742,8 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
         for column in table.columns:
             for field in fields:
                 if not getattr(table[column].metadata, field):
-                    log.warning(f"Table {table_name}, column {column} has no {field}.")
+                    warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
+                    warnings.warn(f"Table {table_name}, column {column} has no {field}.", warning_class)
 
 
 def _resolve_collisions(
@@ -1622,6 +1771,29 @@ def _resolve_collisions(
         else:
             raise NotImplementedError()
     return new_cols
+
+
+def multi_merge(tables: List[Table], *args, **kwargs) -> Table:
+    """Merge multiple tables.
+
+    This is a helper function when merging more than two tables on common columns.
+
+    Parameters
+    ----------
+    tables : List[Table]
+        Tables to merge.
+
+    Returns
+    -------
+    combined : Table
+        Merged table.
+
+    """
+    combined = tables[0].copy()
+    for table in tables[1:]:
+        combined = combined.merge(table, *args, **kwargs)
+
+    return combined
 
 
 def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[variables.Variable]:

@@ -3,7 +3,6 @@ import webbrowser
 from typing import Any, Dict, List, Optional
 
 import click
-import pandas as pd
 import structlog
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Source, Table
 from rich import print
@@ -11,19 +10,19 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import BASE_DIR, DAG_FILE, DATA_DIR, STEP_DIR
 
 log = structlog.get_logger()
 
 
-@click.command(cls=RichCommand)
+@click.command(name="metadata-migrate", cls=RichCommand)
 @click.option(
     "--chart-slug",
     "-c",
@@ -71,7 +70,6 @@ def cli(
 ) -> None:
     """Generate (or update) the metadata YAML in a Grapher step based on an existing chart.
 
-    # Description
     This process pre-fills the indicator with all available metadata from the existing dataset (in the old format) and adds grapher
     configuration taken from the chart config (accessed via its chart slug).
 
@@ -82,7 +80,6 @@ def cli(
     **Note:** It is designed for use with the --chart-slug option. The use of --uri in conjunction with other options
     has not been as thoroughly tested.
 
-    ## Examples
     **Example 1:** Show generated YAML in console
 
     ```
@@ -94,8 +91,6 @@ def cli(
     ```
     STAGING=mojmir etl metadata-migrate --chart-slug political-regime
     ```
-
-    # Reference
     """
     assert config.STAGING, "You have to run this as STAGING=mystaging etl metadata-migrate ..."
 
@@ -112,7 +107,7 @@ def cli(
         select config from charts
         where slug = '{chart_slug}'
         """
-        df = pd.read_sql(q, engine)
+        df = read_sql(q, engine)
         if df.empty:
             raise ValueError(f"no chart found for slug {chart_slug}")
 
@@ -363,7 +358,7 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
         d.version = '{ds_meta.version}' and
         d.shortName = '{ds_meta.short_name}'
     """
-    cf = pd.read_sql(q, engine)
+    cf = read_sql(q, engine)
     if len(cf) == 0:
         log.warning(f"no chart found for variable {col}")
         return {}

@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-04
 outs:
-- md5: 9614a70dc736faad4b255302737876ac
-  size: 170279
-  path: drug_resistance_surveillance.csv
+  - md5: 63549e2ab0f94513c92138e3724ec537
+    size: 170279
+    path: drug_resistance_surveillance.csv

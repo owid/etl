@@ -28,7 +28,7 @@ log = structlog.get_logger()
 
 
 # Main CLI command setup with Click
-@click.command(cls=RichCommand)
+@click.command(name="chart-upgrade", cls=RichCommand)
 @click.option(
     "--path-to-file",
     prompt=True,
@@ -51,10 +51,7 @@ log = structlog.get_logger()
 def main(path_to_file: str, output_dir: str, overwrite: bool, model: str) -> None:
     """Process and update metadata using chatGPT tool.
 
-    # Description
     You can learn more about this tool in our [official documentation](https://docs.owid.io/projects/etl/architecture/metadata/).
-
-    # Reference
     """
     log.info("Starting metadata update process.")
 

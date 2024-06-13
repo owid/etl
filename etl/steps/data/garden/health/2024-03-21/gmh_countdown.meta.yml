@@ -1,0 +1,149 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+
+    presentation:
+      topic_tags:
+        - Mental Health
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1095
+  title: Countdown for Global Mental Health 2030 - WHO Mental Health Atlas 2020
+
+tables:
+  gmh_countdown:
+    variables:
+      collection_of_data_at_facility_level_on_number_of_involuntary_admissions:
+        title: Collection of data at facility level on number of involuntary admissions
+        unit: ''
+        short_unit: ''
+
+      existence_of_indicators_targets_to_monitor_implementation_of_policies_plans:
+        title: Existence of indicators/targets to monitor implementation of policies/plans
+        unit: ''
+        short_unit: ''
+
+      extent_to_which_countries_offer_programs_for_promotion_and_prevention:
+        title: Extent to which countries offer programs for promotion and prevention
+        unit: ''
+        short_unit: ''
+
+      extent_to_which_the_law_complies_with_international_human_rights_instruments:
+        title: Extent to which the law complies with international human rights instruments
+        unit: ''
+        short_unit: ''
+
+      extent_to_which_the_policy_plan_complies_with_international_human_rights_instruments:
+        title: Extent to which the policy/plan complies with international human rights instruments
+        unit: ''
+        short_unit: ''
+
+      frequency_of_key_mental_health_system_data_collection:
+        title: Frequency of key mental health system data collection
+        unit: ''
+        short_unit: ''
+
+      functional_integration_of_mental_health_into_primary_care:
+        title: Functional integration of mental health into primary care
+        unit: ''
+        short_unit: ''
+
+      mental_health_outpatient_visits__rate_per_100000_population:
+        title: Mental health outpatient visits
+        unit: 'per 100,000'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      percentage_of_inpatients_staying_less_than_1_year_in_mental_hospitals:
+        title: Percentage of inpatients staying less than 1 year in mental hospitals
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      percentage_of_mental_health_inpatients_who_receive_timely_diagnosis__treatment_and_follow_up_for_physical_health_conditions:
+        title: Percentage of mental health inpatients who receive timely diagnosis, treatment and follow-up for physical health conditions
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      percentage_of_mental_hospital_admissions_that_are_involuntary:
+        title: Percentage of mental hospital admissions that are involuntary
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      presence_of_a_national_stand_alone_policy_or_plan_for_mental_health:
+        title: Presence of a national stand-alone policy or plan for mental health
+        unit: ''
+        short_unit: ''
+
+      presence_of_national_stand_alone_law_for_mental_health:
+        title: Presence of national stand-alone law for mental health
+        unit: ''
+        short_unit: ''
+
+      proportion_of_people_with_mental_health_conditions_who_receive_social_support:
+        title: Proportion of people with mental health conditions who receive social support
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      proportion_of_persons_with_psychosis_using_services_over_the_last_12_months__pct:
+        title: Proportion of people with psychosis using services over the last 12 months
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      psychosocial_interventions_for_mental_health_conditions_are_available_and_provided_at_primary_care_level:
+        title: Psychosocial interventions for mental health conditions are available and provided at primary care level
+        unit: ''
+        short_unit: ''
+
+
+      total_mental_health_expenditure_as_a_percentage_of_total_health_expenditure:
+        title: Total mental health expenditure as a percentage of total health expenditure
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      total_mental_health_beds__number_per_100_000_population:
+        title: Total mental health beds per 100,000 population
+        unit: 'per 100,000 population'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      total_number_of_all_other_mental_health_professionals__per_100_000_population:
+        title: Total number of all other mental health professionals per 100,000 population
+        unit: 'per 100,000 population'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      total_number_of_psychiatrists__per_100_000_population:
+        title: Total number of psychiatrists per 100,000 population
+        unit: 'per 100,000 population'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      whether_the_care_and_treatment_of_persons_with_major_mental_disorders__psychosis__bipolar_disorder__depression__is_included_in_the_national_health_insurance_or_reimbursement_scheme:
+        title: Whether the care and treatment of persons with major mental disorders (psychosis, bipolar disorder, depression) is included in the national health insurance or reimbursement scheme
+        unit: ''
+        short_unit: ''
+
+      whether_the_majority_of_persons_pay_nothing__fully_insured__or_at_most_20pct_towards_the_cost_of_their_mental_health_services:
+        title: Whether the majority of persons pay nothing, fully insured, or at most 20% towards the cost of their mental health services
+        unit: ''
+        short_unit: ''

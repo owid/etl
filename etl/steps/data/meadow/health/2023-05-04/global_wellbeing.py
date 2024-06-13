@@ -49,7 +49,13 @@ def run(dest_dir: str) -> None:
     # Table object does not accept MultiLevel columns, therefore we do this reshaping here in Meadow
     log.info("global_wellbeing: unpivot")
     col_id = df.columns[:3]
-    df = df.melt(id_vars=list(col_id), var_name=["question", "answer"], value_name="share")
+    df = df.melt(id_vars=list(col_id), value_name="share")
+    df = df.rename(
+        columns={
+            "variable_0": "question",
+            "variable_1": "answer",
+        }
+    )
 
     # Create index columns
     log.info("global_wellbeing: build index columns")

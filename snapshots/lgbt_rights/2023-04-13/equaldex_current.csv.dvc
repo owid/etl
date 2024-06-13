@@ -19,6 +19,6 @@ meta:
     This version of the dataset contains only the current situation of each issue.
 wdir: ../../../data/snapshots/lgbt_rights/2023-04-13
 outs:
-- md5: 44aa5dd079016b650bea94c3c510c9f4
-  size: 498404
-  path: equaldex_current.csv
+  - md5: c4c64fc0876e9c8da8e1f967c1a71c84
+    size: 498404
+    path: equaldex_current.csv

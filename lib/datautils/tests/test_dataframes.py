@@ -1082,7 +1082,7 @@ class TestCombineTwoOverlappingDataFrames:
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
-                "var_a": [0, 1, 2, 30],
+                "var_a": [0.0, 1.0, 2.0, 30.0],
                 "var_b": ["0", "1", "2", np.nan],
                 "var_c": [np.nan, "10", "20", "30"],
             }
@@ -1104,7 +1104,7 @@ class TestCombineTwoOverlappingDataFrames:
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
-                "var_a": [0, 10, 20, 30],
+                "var_a": [0.0, 10.0, 20.0, 30.0],
                 "var_b": ["0", "1", "2", np.nan],
                 "var_c": [np.nan, "10", "20", "30"],
             }
@@ -1131,7 +1131,7 @@ class TestCombineTwoOverlappingDataFrames:
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
-                "var_a": [0, 10, 20, 30],
+                "var_a": [0.0, 10.0, 20.0, 30.0],
                 "var_c": [np.nan, "10", "20", "30"],
                 "var_b": ["0", "1", "2", np.nan],
             }
@@ -1158,7 +1158,7 @@ class TestCombineTwoOverlappingDataFrames:
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
-                "var_a": [0, 10, 2, 30],
+                "var_a": [0.0, 10.0, 2.0, 30.0],
                 "var_b": ["0", "1", "2", np.nan],
                 "var_c": [np.nan, "10", "20", "30"],
             }
@@ -1194,7 +1194,7 @@ class TestCombineTwoOverlappingDataFrames:
         expected = pd.DataFrame(
             {
                 "year": [2000, 2001, 2002, 2003],
-                "var_a": [0, 1, 2, 30],
+                "var_a": [0.0, 1.0, 2.0, 30.0],
                 "var_b": ["0", "1", "2", np.nan],
                 "var_c": [np.nan, "10", "20", "30"],
             }
@@ -1232,7 +1232,7 @@ class TestCombineTwoOverlappingDataFrames:
                     "country_b",
                     "country_b",
                 ],
-                "var_a": [1, 0, 2, 20, 3, 30],
+                "var_a": [1.0, 0.0, 2.0, 20.0, 3.0, 30.0],
                 "var_b": ["1", "0", "2", np.nan, "3", np.nan],
                 "var_c": [np.nan, np.nan, "10", "20", np.nan, "30"],
             }

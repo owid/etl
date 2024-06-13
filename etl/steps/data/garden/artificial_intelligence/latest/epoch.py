@@ -33,21 +33,21 @@ def run(dest_dir: str) -> None:
     for column in ["system", "domain", "organization_categorization", "approach"]:
         tb[column] = tb[column].astype(str)
 
-    # Clean up researcher affiliation in column 'organization_categorization'
-    organization_mapping = {
-        "Industry - Academia Collaboration": "Academia and industry collaboration",
-        "Industry - Academia collaboration": "Academia and industry collaboration",
-        "Industry - Academia Collaboration (Academia leaning)": "Academia and industry collaboration",
-        "Industry - Academia Collaboration (Academia Leaning)": "Academia and industry collaboration",
-        "Industry - Academia Collaboration (Industry Leaning)": "Academia and industry collaboration",
-        "Industry - Academia Collaboration (Industry leaning)": "Academia and industry collaboration",
-        "Research Collective": "Other",
-        "Research collective": "Other",
-        "Government": "Other",
-        "Non-profit": "Other",
-    }
+    # Function to categorize entries
+    def categorize(entry):
+        entries = entry.split(",")
+        if "Academia" in entry and "Industry" in entry:
+            return "Academia and industry collaboration"
+        elif all(e == "Academia" for e in entries):
+            return "Academia"
+        elif all(e == "Industry" for e in entries):
+            return "Industry"
+        else:
+            return "Other"
 
-    tb["organization_categorization"] = tb["organization_categorization"].replace(organization_mapping)
+    # Apply categorize function to the column
+    tb["organization_categorization"] = tb["organization_categorization"].apply(categorize)
+    tb["organization_categorization"] = tb["organization_categorization"].astype(str)
 
     # Clean up system names
     tb["system"] = tb["system"].replace({"Univeristy": "University", "Nvidia": "NVIDIA"}, regex=True)
@@ -60,8 +60,8 @@ def run(dest_dir: str) -> None:
         tb[column] = tb[column].replace("nan", "Not specified")
     # Find domains with total numbrt of notable systems below 10
     domain_counts = tb["domain"].value_counts()
-    domains_below_10 = domain_counts[domain_counts < 10].index.tolist()
-    log.info(f"Domains with less than 10 notable systems that were reclassified to Other: {domains_below_10}")
+    domains_below_10 = domain_counts[domain_counts < 20].index.tolist()
+    log.info(f"Domains with less than 20 notable systems that were reclassified to Other: {domains_below_10}")
     # Rename the domains with less than 10 notable systems to 'Other'
     tb["domain"] = tb["domain"].apply(lambda x: "Other" if x in domains_below_10 else x)
 

@@ -1,25 +1,23 @@
 """Grapher phase."""
-import os
 from pathlib import Path
 from typing import cast
 
 import streamlit as st
-from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from etl.paths import DAG_DIR, GRAPHER_DIR
+from etl.paths import DAG_DIR
 
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-# Page config
-st.set_page_config(page_title="Wizard: Create a Grapher step", page_icon="🪄")
-add_indentation()
-
+st.set_page_config(
+    page_title="Wizard: Grapher",
+    page_icon="🪄",
+)
 # Available namespaces
-OPTIONS_NAMESPACES = sorted(os.listdir(GRAPHER_DIR))
+OPTIONS_NAMESPACES = utils.get_namespaces("grapher")
 
 
 # Get current directory
@@ -304,7 +302,7 @@ if submitted:
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
-        utils.update_wizard_config(form=form)
+        utils.update_wizard_defaults_from_form(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")

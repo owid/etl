@@ -157,7 +157,7 @@ def preprocess_data(dataframes, texts):
         # Add 'question' name the answer column as a 'country' columns
         question = texts[index]
         dataframe["question"] = question
-        dataframe.rename(columns={column_names[0]: "answer"}, inplace=True)
+        dataframe.rename(columns={column_names.iloc[0]: "answer"}, inplace=True)
 
         # Reset the index
         dataframe.reset_index(drop=True, inplace=True)

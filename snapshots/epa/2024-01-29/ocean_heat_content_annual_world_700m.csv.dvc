@@ -27,6 +27,6 @@ meta:
       url: https://edg.epa.gov/epa_data_license.html
 wdir: ../../../data/snapshots/epa/2024-01-29
 outs:
-- md5: ebbe4344007e753240afc9ea3dcf75cd
-  size: 3919
-  path: ocean_heat_content_annual_world_700m.csv
+  - md5: 909371e229b3a4f40427659b376d5432
+    size: 3919
+    path: ocean_heat_content_annual_world_700m.csv

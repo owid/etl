@@ -12,8 +12,8 @@ Most of the time, the prefix will either be `snapshot` or `data`. The former is 
 
 | Prefix      | Description                          |
 | ----------- | ------------------------------------ |
-| `snapshot`       | Used for [`snapshot`](../workflow/snapshot.md) steps. |
-| `data`       | Used for [`meadow`](../workflow/meadow.md), [`garden`](../workflow/garden.md), [`grapher`](../workflow/grapher.md) and most of the ETL steps where we operate with curated [Datasets](../common-format/#datasets-owidcatalogdataset).|
+| `snapshot`       | Used for [`snapshot`](../../workflow/#snapshot) steps. |
+| `data`       | Used for [`meadow`](../../workflow/#meadow), [`garden`](../../workflow/#garden), [`grapher`](../../workflow/#grapher) and most of the ETL steps where we operate with curated [Datasets](../common-format/#datasets-owidcatalogdataset).|
 | `walden`    | :warning: Deprecated. Used before the introduction of `snapshot`. |
 | `backport`    | Used to import datasets from the OWID database that are not present in the ETL. |
 
@@ -50,7 +50,7 @@ where
 
 | Prefix      | Description                          |
 | ----------- | ------------------------------------ |
-| `channel`       | Denotes the curation level of the dataset. Possible values include [`meadow`](../workflow/meadow.md), [`garden`](../workflow/garden.md), [`grapher`](../workflow/grapher.md), [`explorers`](../workflow/other-steps/explorers.md). |
+| `channel`       | Denotes the curation level of the dataset. Possible values include [`meadow`](../../workflow#meadow), [`garden`](../../workflow#garden), [`grapher`](../../workflow#grapher), [`explorers`](../../workflow/other-steps#explorers). |
 | `namespace`       | Used to group datasets from similar topics or sources. Namespace are typically source names (e.g. `un`) or topic names (e.g. `health`).|
 | `version`    | Version of the file. Typically, we use the date the file was downloaded in the format `YYYY-mm-dd`. |
 | `dataset-name`    | Short name of the curated dataset (e.g. `un_wpp`). |

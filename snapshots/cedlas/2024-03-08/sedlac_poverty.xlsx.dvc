@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
+    description: |-
+      The Socio-Economic Database for Latin America and the Caribbean (SEDLAC) includes statistics on poverty and other distributional and social variables from all Latin American and several Caribbean (LAC) countries. All statistics are computed from microdata from major household surveys carried out in these countries using a homogenous methodology (data permitting). Statistics are updated periodically.
+
+      SEDLAC allows users to monitor trends in poverty and other distributional and social indicators in the region. The dataset is available as Excel tables with information for each country/year, accompanied by graphs, maps, and reports.
+
+      The Center for Distributional, Labor and Social Studies (CEDLAS) of the Universidad Nacional de La Plata, in partnership with World Bank’s Poverty and Equity Group, have developed the Socio-Economic Database for Latin America and the Caribbean (SEDLAC) with the purpose of improving the timely access to key socio-economic statistics, including indicators on poverty, inequality, income, employment, access to services, education, health, housing, social programs, and numerous demographics.
+    date_published: "2024-01-01"
+    title_snapshot: Socio-Economic Database for Latin America and the Caribbean (SEDLAC) - Poverty
+
+    # Citation
+    producer: SEDLAC (CEDLAS and The World Bank)
+    citation_full: |-
+      Socio-Economic Database for Latin America and the Caribbean (CEDLAS and The World Bank)
+    attribution_short: SEDLAC
+
+    # Files
+    url_main: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
+    url_download: https://www.cedlas.econo.unlp.edu.ar/wp/wp-content/uploads/2023_Act2_poverty_LAC-web.xlsx
+    date_accessed: 2024-03-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/#1496160514336-bdc44a1d-8955
+outs:
+  - md5: 251ee45d4fc914bb72cf52c2fbfe7dd9
+    size: 2237299
+    path: sedlac_poverty.xlsx

@@ -1,0 +1,14 @@
+steps:
+  #
+  # YouGov - Dietary choices of Brits.
+  #
+  data://meadow/survey/2024-04-01/dietary_choices_uk:
+    - snapshot://survey/2024-04-01/dietary_choices_uk.xlsx
+  data://garden/survey/2024-04-01/dietary_choices_uk:
+    - data://meadow/survey/2024-04-01/dietary_choices_uk
+  data://grapher/survey/2024-04-01/dietary_choices_uk:
+    - data://garden/survey/2024-04-01/dietary_choices_uk
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+  ######################################################################################################################

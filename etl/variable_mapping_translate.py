@@ -9,10 +9,12 @@ from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
+from etl.db import read_sql
+
 log = structlog.get_logger()
 
 
-@click.command(help=__doc__)
+@click.command(name="variable-mapping-translate", help=__doc__)
 @click.option(
     "-e1",
     "--env-file-1",
@@ -50,15 +52,12 @@ log = structlog.get_logger()
 def main_cli(env_file_1: str, env_file_2: str, mapping_file_1: str, mapping_file_2: str) -> None:
     """Translate the variable mapping dictionary from from one environment to another.
 
-    # Description
     Generate equivalent variable mapping file for the new DB. This is because the variable IDs for the same variables may differ between environments (local, staging or production environments).
     If you have the variable mapping for one of the environments, you can easily obtain the equivalent for another environment using this command.
 
     A common use case is when you have the mapping for your local environment and wish to have the equivalent for the production environment. Instead
     of creating yet again the mapping for the production environment, simply run this command which will 'translate' the mapping you found for your
     local environment to one that is consistent with the production environment's variable IDs.
-
-    # Reference
     """
     var_translator = VariableMappingTranslate.from_files(
         config_file_1=env_file_1,
@@ -125,7 +124,7 @@ def _read_vars_from_env(path: str) -> Dict[str, Any]:
 
 def _build_engine(conf: Dict[str, str]) -> Engine:
     """Build SQL connection object"""
-    return create_engine("mysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**conf))
+    return create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**conf))
 
 
 def variable_mapping_translate(sql_1: Engine, sql_2: Engine, mapping: Dict[str, str]) -> Dict[str, str]:
@@ -194,8 +193,7 @@ def _run_query_mapping_to_df(sql: Engine, variable_ids: Tuple[str, ...]) -> pd.D
         left join datasets on variables.datasetId=datasets.id
         where variables.id in %(variable_ids)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(query, sql, params={"variable_ids": variable_ids})
-    return df
+    return read_sql(query, sql, params={"variable_ids": variable_ids})
 
 
 def _build_dfs(sql: Engine, mapping: Dict[str, str]) -> Tuple[pd.DataFrame, pd.DataFrame]:

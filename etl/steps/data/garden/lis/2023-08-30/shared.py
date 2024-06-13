@@ -503,13 +503,13 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
 ##############################################################################################################
 
 var_dict_distribution = {
-    # "avg": {
-    #     "title": "Average",
-    #     "description": "The mean income per year within each percentile.",
-    #     "unit": "international-$ in 2017 prices",
-    #     "short_unit": "$",
-    #     "numDecimalPlaces": 0,
-    # },
+    "avg": {
+        "title": "Average",
+        "description": "The mean income per year within each percentile.",
+        "unit": "international-$ in 2017 prices",
+        "short_unit": "$",
+        "numDecimalPlaces": 0,
+    },
     "share": {
         "title": "Share",
         "description": "The share of income received by each percentile.",

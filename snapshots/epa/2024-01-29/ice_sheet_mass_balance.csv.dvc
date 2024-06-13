@@ -32,6 +32,6 @@ meta:
       url: https://edg.epa.gov/epa_data_license.html
 wdir: ../../../data/snapshots/epa/2024-01-29
 outs:
-- md5: b5ddce405590e06ce836c09b6b12a985
-  size: 25986
-  path: ice_sheet_mass_balance.csv
+  - md5: 4855164ffa55ddf71df690fadceac94c
+    size: 25986
+    path: ice_sheet_mass_balance.csv

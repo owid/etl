@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     #
     # Checks.
     #
-    grapher_checks(ds_grapher)
+    grapher_checks(ds_grapher, warn_title_public=False)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

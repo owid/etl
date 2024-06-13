@@ -16,6 +16,7 @@ from owid.catalog import Dataset
 from rapidfuzz import process
 from rich_click.rich_command import RichCommand
 
+from etl.exceptions import RegionDatasetNotFound
 from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
 custom_style_fancy = questionary.Style(
@@ -34,7 +35,7 @@ custom_style_fancy = questionary.Style(
 )
 
 
-@click.command(cls=RichCommand)
+@click.command(name="harmonize", cls=RichCommand)
 @click.argument("data_file")
 @click.argument("column")
 @click.argument("output_file")
@@ -57,7 +58,6 @@ def harmonize(
 ) -> None:
     """Generate a dictionary with the mapping of country names to OWID's canonical names.
 
-    # Description
     Harmonize the country names in `COLUMN` of a `DATA_FILE` (CSV or feather) and save the mapping to `OUTPUT_FILE` as a JSON file. The harmonization process is done according to OWID's canonical country names.
 
     The harmonization process is done interactively, where the user is prompted with a list of ambiguous country names and asked to select the correct country name from a list of suggestions (ranked by similarity).
@@ -69,8 +69,6 @@ def harmonize(
 
 
     If a mapping file already exists, it will resume where the mapping file left off.
-
-    # Examples
     """
 
     df = read_table(data_file)
@@ -217,7 +215,12 @@ class CountryRegionMapper:
     valid_names: Set[str]
 
     def __init__(self) -> None:
-        tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
+        try:
+            tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
+        except FileNotFoundError:
+            raise RegionDatasetNotFound(
+                "Region dataset not found. Please run `etl run regions` to generate it locally. It should live in `data/`."
+            )
         rc_df = tb_regions[["name", "short_name", "region_type", "is_historical", "defined_by"]]
         # Convert strings of lists of aliases into lists of aliases.
         tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]

@@ -17,31 +17,40 @@ import re
 import sys
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Type, cast
+from typing import Any, Callable, Dict, List, Optional, cast
 
 import bugsnag
-import jsonref
-import jsonschema
 import streamlit as st
-from MySQLdb import OperationalError
+import streamlit.components.v1 as components
 from owid.catalog import Dataset
-from pydantic import BaseModel
+from pymysql import OperationalError
 from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
+from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
+from apps.wizard.utils.env import OWIDEnv
+from apps.wizard.utils.step_form import StepForm
 from etl import config
 from etl.db import get_connection
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
-    BASE_DIR,
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
+    STEPS_GARDEN_DIR,
+    STEPS_GRAPHER_DIR,
+    STEPS_MEADOW_DIR,
 )
 from etl.steps import load_dag
+
+__all__ = [
+    "load_wizard_defaults",
+    "update_wizard_defaults_from_form",
+    "StepForm",
+]
 
 # Logger
 log = get_logger()
@@ -77,11 +86,9 @@ MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
+MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
 
-# PATH WIZARD CONFIG
-WIZARD_VARIABLES_CONFIG = BASE_DIR / ".wizard"
-
-
+# Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",
     "short_name": "dummy",
@@ -97,6 +104,30 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+
+
+def get_namespaces(step_type: str) -> List[str]:
+    """Get list with namespaces.
+
+    Looks for namespaces in `etl/steps/data/<step_type>/`.
+    """
+    match step_type:
+        case "meadow":
+            folders = sorted(item for item in STEPS_MEADOW_DIR.iterdir() if item.is_dir())
+        case "garden":
+            folders = sorted(item for item in STEPS_GARDEN_DIR.iterdir() if item.is_dir())
+        case "grapher":
+            folders = sorted(item for item in STEPS_GRAPHER_DIR.iterdir() if item.is_dir())
+        case "all":
+            folders = sorted(
+                item
+                for item in [*STEPS_MEADOW_DIR.iterdir(), *STEPS_GARDEN_DIR.iterdir(), *STEPS_GRAPHER_DIR.iterdir()]
+                if item.is_dir()
+            )
+        case _:
+            raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
+    namespaces = [folder.name for folder in folders]
+    return namespaces
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
@@ -120,7 +151,15 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express"]
+    dataset_edit: Dict[str, Dataset | None] = {
+        "snapshot": None,
+        "meadow": None,
+        "garden": None,
+        "grapher": None,
+        "express": None,
+    }
+    _previous_step: str | None = None
 
     def __init__(self: "AppState") -> None:
         """Construct variable."""
@@ -138,18 +177,21 @@ class AppState:
         self.default_steps = {step: {} for step in self.steps}
 
         # Load config from .wizard
-        config = load_wizard_config()
+        defaults = load_wizard_defaults()
         # Add defaults (these are used when not value is found in current or previous step)
         self.default_steps["snapshot"]["snapshot_version"] = DATE_TODAY
         self.default_steps["snapshot"]["origin.date_accessed"] = DATE_TODAY
 
+        self.default_steps["express"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["express"]["version"] = DATE_TODAY
+
         self.default_steps["meadow"]["version"] = DATE_TODAY
         self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
-        self.default_steps["meadow"]["generate_notebook"] = config["template"]["meadow"]["generate_notebook"]
+        self.default_steps["meadow"]["generate_notebook"] = defaults["template"]["meadow"]["generate_notebook"]
 
         self.default_steps["garden"]["version"] = DATE_TODAY
         self.default_steps["garden"]["meadow_version"] = DATE_TODAY
-        self.default_steps["garden"]["generate_notebook"] = config["template"]["garden"]["generate_notebook"]
+        self.default_steps["garden"]["generate_notebook"] = defaults["template"]["garden"]["generate_notebook"]
 
         self.default_steps["grapher"]["version"] = DATE_TODAY
         self.default_steps["grapher"]["garden_version"] = DATE_TODAY
@@ -158,6 +200,14 @@ class AppState:
         """Check that the value for step is valid."""
         if self.step is None or self.step not in self.steps:
             raise ValueError(f"Step {self.step} not in {self.steps}.")
+
+    def reset_dataset_to_edit(self: "AppState") -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = None
+
+    def set_dataset_to_edit(self: "AppState", ds: Dataset) -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = ds
 
     def get_variables_of_step(self: "AppState") -> Dict[str, Any]:
         """Get variables of a specific step.
@@ -208,23 +258,27 @@ class AppState:
         value_step = self.state_step.get(key)
         # st.write(f"value_step: {value_step}")
         if value_step is not None:
+            # st.code(1)
             return value_step
         # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
-        key = key.replace(f"{self.step}.", f"{self.previous_step}.")
-        value_previous_step = st.session_state["steps"][self.previous_step].get(key)
+        key = key.replace(f"{self.step}.", f"{previous_step}.")
+        value_previous_step = st.session_state["steps"][previous_step].get(key)
         # st.write(f"value_previous_step: {value_previous_step}")
         if value_previous_step is not None:
+            # st.code(2)
             return value_previous_step
         # (3) If none, use self.default_steps
         value_defaults = self.default_steps[self.step].get(key)
         # st.write(f"value_defaults: {value_defaults}")
         if value_defaults is not None:
+            # st.code(3)
             return value_defaults
         # (4) Use default_last as last resource
         if default_last is None:
             raise ValueError(
                 f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
             )
+        # st.code(4)
         return cast(str | bool | int, default_last)
 
     def display_error(self: "AppState", key: str) -> None:
@@ -236,25 +290,37 @@ class AppState:
                 st.error(msg)
 
     @property
-    def previous_step(self: "AppState") -> str:
+    def previous_step(self: "AppState") -> str | None:
         """Get the name of the previous step.
 
         E.g. 'snapshot' is the step prior to 'meadow', etc.
         """
-        self._check_step()
-        idx = max(self.steps.index(self.step) - 1, 0)
-        return self.steps[idx]
+        if self._previous_step is None:
+            self._check_step()
+            if self.step not in {"explorer", "express"}:
+                idx = max(self.steps.index(self.step) - 1, 0)
+                self._previous_step = self.steps[idx]
+            elif self.step == "express":
+                self._previous_step = "snapshot"
+        return self._previous_step
 
     def st_widget(
         self: "AppState",
         st_widget: Callable,
         default_last: Optional[str | bool | int] = "",
+        dataset_field_name: Optional[str] = None,
         **kwargs: Optional[str | int | List[str]],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        default_value = self.default_value(key, default_last=default_last)
+        if self.dataset_edit[self.step] is not None:
+            if dataset_field_name:
+                default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+            else:
+                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
+        else:
+            default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Special behaviour for multiselect
@@ -262,10 +328,14 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else 0
+                index = options.index(default_value) if default_value in options else 0  # type: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
-            elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
+            elif (
+                ("value" not in kwargs)
+                or ("value" in kwargs and kwargs.get("value") is None)
+                or self.dataset_edit[self.step]
+            ):
                 kwargs["value"] = default_value
         elif "default" not in kwargs:
             kwargs["default"] = default_value
@@ -288,147 +358,6 @@ class AppState:
             args = parser.parse_args()
             st.session_state["args"] = args
         return st.session_state["args"]
-
-
-class StepForm(BaseModel):
-    """Form abstract class."""
-
-    errors: Dict[str, Any] = {}
-    step_name: str
-
-    def __init__(self: Self, **kwargs: str | int) -> None:
-        """Construct parent class."""
-        super().__init__(**kwargs)
-        self.validate()
-
-    @classmethod
-    def filter_relevant_fields(cls: Type[Self], step_name: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Filter relevant fields from form."""
-        return {k.replace(f"{step_name}.", ""): v for k, v in data.items() if k.startswith(f"{step_name}.")}
-
-    @classmethod
-    def from_state(cls: Type[Self]) -> Self:
-        """Build object from session_state variables."""
-        session_state = cast(Dict[str, Any], dict(st.session_state))
-        data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
-        # st.write(data)
-        return cls(**data)
-
-    def validate(self: Self) -> None:
-        """Validate form fields."""
-        raise NotImplementedError("Needs to be implemented in the child class!")
-
-    @property
-    def metadata(self: Self) -> None:
-        """Get metadata as dictionary."""
-        raise NotADirectoryError("Needs to be implemented in the child class!")
-
-    def to_yaml(self: Self, path: Path) -> None:
-        """Export form (metadata) to yaml file."""
-        with open(path, "w") as f:
-            assert self.metadata
-            f.write(ruamel_dump(self.metadata))
-
-    def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
-        """Validate form fields against schema.
-
-        Note that not all form fields are present in the schema (some do not belong to metadata, but are needed to generate the e.g. dataset URI)
-        """
-        if ignore_keywords == []:
-            ignore_keywords = []
-        # Validator
-        validator = jsonschema.Draft7Validator(schema)
-        # Plain JSON
-        schema_full = jsonref.replace_refs(schema)
-        # Process each error
-        errors = sorted(validator.iter_errors(self.metadata), key=str)  # get all validation errors
-        for error in errors:
-            # Get error type
-            error_type = error.validator
-            if error_type not in {"required", "type", "pattern"}:
-                raise Exception(f"Unknown error type {error_type} with message '{error.message}'")
-            # Get field values
-            values = self.get_invalid_field(error, schema_full)
-            # Get uri of problematic field
-            uri = error.json_path.replace("$.meta.", "")
-            # Some fixes when error type is "required"
-            if error_type == "required":
-                # Get uri and values for the actual field!
-                # Note that for errors that are of type 'required', this might contain the top level field. E.g., suppose 'origin.title' is required;
-                # this requirement is defined at 'origin' level, hence error.schema_path will point to 'origin' and not 'origin.title'.
-                field_name = self._get_required_field_name(error)
-                uri = f"{uri}.{field_name}"
-                values = values["properties"][field_name]
-                if "errorMessage" not in values:
-                    # print("DEBUG, replaced errormsg")
-                    values["errorMessage"] = error.message.replace("'", "`")
-            # Save error message
-            if "errorMessage" in values:
-                self.errors[uri] = values["errorMessage"]
-            else:
-                self.errors[uri] = error.message
-            print("DEBUG", uri, error.message, values["errorMessage"])
-
-    def get_invalid_field(self: Self, error, schema_full) -> Any:
-        """Get all key-values for the field that did not validate.
-
-        Note that for errors that are of type 'required', this might contain the top level field. E.g., suppose 'origin.title' is required;
-        this requirement is defined at 'origin' level, hence error.schema_path will point to 'origin' and not 'origin.title'.
-        """
-        # print("schema_path:", error.schema_path)
-        # print("validator_value:", error.validator_value)
-        # print("absolute_schema_path:", error.absolute_schema_path)
-        # print("relative_path:", error.relative_path)
-        # print("absolute_path:", error.absolute_path)
-        # print("json_path:", error.json_path)
-        queue = list(error.schema_path)[:-1]
-        # print(queue)
-        values = deepcopy(schema_full)
-        for key in queue:
-            values = values[key]
-        return values
-
-    def _get_required_field_name(self: Self, error):
-        """Get required field name
-
-        Required field names are defined by the field containing these. Hence, when there is an error, the path points to the top level field,
-        not the actual one that is required and is missing.
-        """
-        rex = r"'(.*)' is a required property"
-        field_name = re.findall(rex, error.message)[0]
-        return field_name
-
-    def check_required(self: Self, fields_names: List[str]) -> None:
-        """Check that all fields in `fields_names` are not empty."""
-        for field_name in fields_names:
-            attr = getattr(self, field_name)
-            print(field_name, attr)
-            if attr in ["", []]:
-                self.errors[field_name] = f"`{field_name}` is a required property"
-
-    def check_snake(self: Self, fields_names: List[str]) -> None:
-        """Check that all fields in `fields_names` are in snake case."""
-        for field_name in fields_names:
-            attr = getattr(self, field_name)
-            if not is_snake(attr):
-                self.errors[field_name] = f"`{field_name}` must be in snake case"
-
-    def check_is_version(self: Self, fields_names: List[str]) -> None:
-        """Check that all fields in `fields_names` are in snake case."""
-        for field_name in fields_names:
-            attr = getattr(self, field_name)
-            rex = r"^\d{4}-\d{2}-\d{2}$|^\d{4}$|^latest$"
-            if not re.fullmatch(rex, attr):
-                self.errors[field_name] = f"`{field_name}` must have format YYYY-MM-DD, YYYY or 'latest'"
-
-
-def is_snake(s: str) -> bool:
-    """Check that `s` is in snake case.
-
-    First character is not allowed to be a number!
-    """
-    rex = r"[a-z][a-z0-9]+(?:_[a-z0-9]+)*"
-    return bool(re.fullmatch(rex, s))
 
 
 def extract(error_message: str) -> List[Any]:
@@ -458,10 +387,10 @@ def preview_file(file_path: str | Path, language: str = "python") -> None:
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content: str, dag_path: str | Path) -> None:
+def preview_dag_additions(dag_content: str, dag_path: str | Path, expanded: bool = False) -> None:
     """Preview DAG additions."""
     if dag_content:
-        with st.expander(f"File: `{dag_path}`", expanded=False):
+        with st.expander(f"File: `{dag_path}`", expanded=expanded):
             st.code(dag_content, "yaml")
 
 
@@ -534,34 +463,6 @@ def warning_metadata_unstable() -> None:
     st.warning(
         "Documentation for new metadata is almost complete, but still being finalised based on feedback. Feel free to open a [new issue](https://github.com/owid/etl/issues/new) for any question of suggestion!"
     )
-
-
-def load_wizard_config() -> Dict[str, Any]:
-    """Load default wizard config."""
-    if os.path.exists(WIZARD_VARIABLES_CONFIG):
-        with open(WIZARD_VARIABLES_CONFIG, "r") as f:
-            return json.load(f)
-    return {
-        "template": {
-            "meadow": {"generate_notebook": False},
-            "garden": {"generate_notebook": False},
-        }
-    }
-
-
-def update_wizard_config(form: StepForm) -> None:
-    """Update wizard config file."""
-    # Load config
-    config = load_wizard_config()
-
-    # Update config
-    if form.step_name in ["meadow", "garden"]:
-        form_dix = form.dict()
-        config["template"][form.step_name]["generate_notebook"] = form_dix.get("generate_notebook", False)
-
-    # Export config
-    with open(WIZARD_VARIABLES_CONFIG, "w") as f:
-        json.dump(config, f)
 
 
 def render_responsive_field_in_form(
@@ -641,7 +542,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -649,26 +550,26 @@ def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        st.session_state[key] = value
+        if only_if_not_exists:
+            st.session_state[key] = st.session_state.get(key, value)
+        else:
+            st.session_state[key] = value
 
 
 def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
     if border:
         with st.container(border=True):
-            st.page_link(
-                page=PAGES_BY_ALIAS[alias]["entrypoint"],
-                label=PAGES_BY_ALIAS[alias]["title"],
-                icon=PAGES_BY_ALIAS[alias]["emoji"],
-                **kwargs,
-            )
+            st.page_link(**kwargs)
     else:
-        st.page_link(
-            page=PAGES_BY_ALIAS[alias]["entrypoint"],
-            label=PAGES_BY_ALIAS[alias]["title"],
-            icon=PAGES_BY_ALIAS[alias]["emoji"],
-            **kwargs,
-        )
+        st.page_link(**kwargs)
 
 
 st.cache_data
@@ -709,3 +610,98 @@ def enable_bugsnag_for_streamlit():
         return original_handler(exception)
 
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
+
+
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+    chart_config_tmp = deepcopy(chart_config)
+
+    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
+    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
+
+    HTML = f"""
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link
+            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+            rel="stylesheet"
+            />
+            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+        </head>
+        <body class="StandaloneGrapherOrExplorerPage">
+            <main>
+                <figure data-grapher-src></figure>
+            </main>
+            <div class="site-tools"></div>
+            <script>
+                document.cookie = "isAdmin=true;max-age=31536000"
+            </script>
+            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+            <script type="module">
+                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            </script>
+        </body>
+    </html>
+    """
+
+    components.html(HTML, height=height, **kwargs)
+
+
+class Pagination:
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+        self.items = items
+        self.items_per_page = items_per_page
+        self.pagination_key = pagination_key
+
+        # Initialize session state for the current page
+        if self.pagination_key not in st.session_state:
+            self.page = 1
+
+    @property
+    def page(self):
+        return st.session_state[self.pagination_key]
+
+    @page.setter
+    def page(self, value):
+        st.session_state[self.pagination_key] = value
+
+    @property
+    def total_pages(self) -> int:
+        return (len(self.items) - 1) // self.items_per_page + 1
+
+    def get_page_items(self) -> list[Any]:
+        page = self.page
+        start_idx = (page - 1) * self.items_per_page
+        end_idx = start_idx + self.items_per_page
+        return self.items[start_idx:end_idx]
+
+    def show_controls(self) -> None:
+        # Pagination controls
+        col1, col2, col3 = st.columns([1, 1, 1])
+
+        # Correct page number if exceeds maximum allowed
+        self.page = min(self.total_pages, self.page)
+
+        with st.container(border=True):
+            with col1:
+                key = f"previous-{self.pagination_key}"
+                if self.page > 1:
+                    if st.button("⏮️ Previous", key=key):
+                        self.page -= 1
+                        st.rerun()
+                else:
+                    st.button("⏮️ Previous", disabled=True, key=key)
+
+            with col3:
+                key = f"next-{self.pagination_key}"
+                if self.page < self.total_pages:
+                    if st.button("Next ⏭️", key=key):
+                        self.page += 1
+                        st.rerun()
+                else:
+                    st.button("Next ⏭️", disabled=True, key=key)
+
+            with col2:
+                st.text(f"Page {self.page} of {self.total_pages}")

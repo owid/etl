@@ -3,8 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and  Hygiene
-      (JMP) - Households
+    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and  Hygiene (JMP) - Households
     description: |-
       The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     date_published: 2024-02-01
@@ -16,8 +15,7 @@ meta:
       The JMP database includes over 5,000 national data sources with information on WASH in households including nationally representative household surveys, censuses and administrative reports.
 
     # Citation
-    producer: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and       Hygiene
-      (JMP)
+    producer: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and       Hygiene (JMP)
     citation_full: |-
       World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP; 2023). Estimates for drinking water, sanitation and hygiene services by country (2000-2022) [dataset]. World Health Organization and UNICEF [original data].
     attribution_short: WHO/UNICEF JMP
@@ -32,6 +30,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-02-04
 outs:
-- md5: 46d876875bee021c3b8c3e21c1348169
-  size: 5263939
-  path: who.csv
+  - md5: abfb1f9c4595948960b5cbc7ddbe30b2
+    size: 5263939
+    path: who.csv
