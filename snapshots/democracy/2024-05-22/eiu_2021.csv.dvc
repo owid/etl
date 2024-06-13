@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Democracy Index 2021: The China challenge"
+    description: |-
+      The Democracy Index, which began in 2006, provides a snapshot of the state of democracy worldwide in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). The Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is then classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime". A full methodology and explanations can be found in the Appendix.
+
+      This edition of the Democracy Index records how global democracy fared in 2021. The results reflect the continuing negative impact of the covid-19 pandemic on democracy and freedom around the world for a second successive year. The pandemic has resulted in an unprecedented withdrawal of civil liberties among developed democracies and authoritarian regimes alike, through the imposition of lockdowns and restrictions on travelling and, increasingly, the introduction of "green passes" requiring proof of vaccination against covid-19 for participation in public life. It has led to the normalisation of emergency powers, which have tended to stay on the statute books, and accustomed citizens to a huge extension of state power over large areas of public and personal life.
+    date_published: "2022-02-10"
+
+    # Citation
+    producer: Economist Intelligence Unit
+    citation_full: |-
+      Economist Intelligence Unit. (2022, February 10). Democracy Index 2021: The China Challenge. Retrieved from Economist Group.
+
+    # Files
+    url_main: https://www.economistgroup.com/group-news/economist-intelligence/democracy-index-2021-less-than-half-the-world-lives-in-a-democracy
+    date_accessed: 2024-05-22
+
+    # License
+    license:
+      name: The Economist Intelligence Unit Limited
+      url: https://www.eiu.com/n/terms/
+outs:
+  - md5: 1f10b7f7ded75333a24fb7131377ef5c
+    size: 7889
+    path: eiu_2021.csv

@@ -124,7 +124,7 @@ def _read_vars_from_env(path: str) -> Dict[str, Any]:
 
 def _build_engine(conf: Dict[str, str]) -> Engine:
     """Build SQL connection object"""
-    return create_engine("mysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**conf))
+    return create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4".format(**conf))
 
 
 def variable_mapping_translate(sql_1: Engine, sql_2: Engine, mapping: Dict[str, str]) -> Dict[str, str]:

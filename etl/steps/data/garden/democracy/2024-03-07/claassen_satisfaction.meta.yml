@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Democracy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  claassen_satisfaction:
+    variables:
+      democracy_satisf_claassen:
+        title: "Citizen satisfaction with democracy"
+        unit: ""
+        description_short: |-
+          Central estimate of the average extent to which citizens are satisfied with democracy in their own country. It combines responses across more than one thousand nationally-representative surveys on how citizens' satisfaction with democracy.
+        description_processing: |-
+          The variable matches Claassen's variable `satis`.
+        description_key: &descruption_key
+          - "An examples of a survey questions is: 'On the whole, how satisfied or dissatisfied are you with the way democracy works in [own country]?'"
+          - Responses above the median were considered as satisfaction with democracy. Dissatisfied respondents may have actively expressed dissatisfaction with democracy, may have given an indifferent answer, may have answered "I don't know", or may not have responded at all.
+          - Higher scores indicate more satisfaction. Positive scores mean that citizen satisfaction with democracy is higher than the average across all countries and years. A score of 1 means that citizen support lies one standard deviation above the average support."
+
+      democracy_satisf_high_claassen:
+        title: "Citizen satisfaction with democracy, upper bound"
+        unit: ""
+        description_short: |-
+          Upper-bound estimate of the average extent to which citizens are satisfied with democracy in their own country. It combines responses across more than one thousand nationally-representative surveys on how citizens' satisfaction with democracy.
+        description_key: *descruption_key
+        description_processing: |-
+          The variable matches Claassen's variable `satis_u95`.
+
+      democracy_satisf_low_claassen:
+        title: "Citizen satisfaction with democracy, lower bound"
+        unit: ""
+        description_short: |-
+          Lower-bound estimate of the average extent to which citizens are satisfied with democracy in their own country. It combines responses across more than one thousand nationally-representative surveys on how citizens' satisfaction with democracy.
+        description_from_producer: |-
+          The variable matches Claassen's variable `satis_l95`.
+        description_key: *descruption_key
+

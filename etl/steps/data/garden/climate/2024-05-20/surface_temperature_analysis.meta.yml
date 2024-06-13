@@ -1,0 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+
+dataset:
+  title: GISS surface temperature analysis
+  update_period_days: 60
+
+tables:
+  surface_temperature_analysis:
+    variables:
+      temperature_anomaly:
+        title: "Global warming: monthly temperature anomaly"
+        description_short: |-
+          Combined land-surface air and sea-surface water temperature anomaly, given as the deviation from the 1951-1980 mean, in degrees Celsius.
+        unit: °C
+        short_unit: °C
+        processing_level: minor

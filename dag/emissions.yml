@@ -34,7 +34,7 @@ steps:
   data://garden/gcp/2023-12-12/global_carbon_budget:
     - data://meadow/gcp/2023-12-12/global_carbon_budget
     # Loaded to calculate emissions per unit energy.
-    - data://garden/energy/2023-12-12/primary_energy_consumption
+    - data://garden/energy/2024-05-08/primary_energy_consumption
     # Loaded to calculate emissions per GDP.
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     # Loaded to create per-capita variables.
@@ -98,7 +98,7 @@ steps:
   # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
   data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
     - data://garden/gcp/2023-12-12/global_carbon_budget
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
   #
   # Jones et al. - National contributions to climate change.
   #
@@ -118,7 +118,7 @@ steps:
   #
   data://garden/emissions/latest/owid_co2:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/energy/2023-12-12/primary_energy_consumption
+    - data://garden/energy/2024-05-08/primary_energy_consumption
     - data://garden/emissions/2024-04-08/national_contributions
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
