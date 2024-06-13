@@ -184,3 +184,9 @@ steps:
     - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
   data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
     - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
+  data://grapher/fasttrack/latest/air_conditioning_rate_iea:
+    - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
+  data://grapher/fasttrack/latest/projections_air_conditioners_iea:
+    - snapshot://fasttrack/latest/projections_air_conditioners_iea.csv
+  data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1993_2018:
+    - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1993_2018.csv

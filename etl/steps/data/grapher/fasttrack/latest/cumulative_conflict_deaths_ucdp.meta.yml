@@ -14,7 +14,7 @@ tables:
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2022.
 
@@ -24,7 +24,7 @@ tables:
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2022.
 
@@ -34,25 +34,27 @@ tables:
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2022.
+
+          An extrasystemic conflict is a conflict between a state and a non-state armed group outside the state's territory that causes at least 25 deaths during a year.
       intrastate_deaths:
         title: Cumulative deaths in intrastate conflicts
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2022.
 
-          An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year.
+          An intrastate conflict is a conflict between a state and a non-state armed group within the state's territory that causes at least 25 deaths during a year.
       interstate_deaths:
         title: Cumulative deaths in interstate conflicts
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2022.
 
@@ -62,8 +64,68 @@ tables:
         unit: deaths
         short_unit: deaths
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: |-
           The best estimate of the number of deaths of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2022.
 
           An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
+      onesided_rate:
+        title: Cumulative death rate from one-sided violence
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2022.
+
+          One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+      nonstate_rate:
+        title: Cumulative death rate in non-state conflicts
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in non-state conflicts that were ongoing between 1989 and 2022.
+
+          A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+      extrastate_rate:
+        title: Cumulative death rate in extrasystemic conflicts
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in extrasystemic conflicts that were ongoing between 1989 and 2022.
+
+          An extrasystemic conflict is a conflict between a state and a non-state armed group outside the state's territory that causes at least 25 deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+      intrastate_rate:
+        title: Cumulative death rate in intrastate conflicts
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in intrastate conflicts that were ongoing between 1989 and 2022.
+
+          An intrastate conflict is a conflict between a state and a non-state armed group within the state's territory that causes at least 25 deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+      interstate_rate:
+        title: Cumulative death rate in interstate conflicts
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in interstate conflicts that were ongoing between 1989 and 2022.
+
+          An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.
+      all_rate:
+        title: Cumulative death rate in armed conflicts
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        description: |-
+          The best estimate of the death rate of combatants and civilians due to fighting in armed conflicts that were ongoing between 1989 and 2022.
+
+          An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
+
+          The rate is the deaths divided by the 1989 population, and expressed per 100,000 people.

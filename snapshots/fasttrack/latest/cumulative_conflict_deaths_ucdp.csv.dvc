@@ -1,16 +1,18 @@
 meta:
   origin:
     producer: Uppsala Conflict Data Program
-    title: Cumulative deaths in armed conflicts (UCDP, 2023)
+    title: Georeferenced Event Dataset (cumulative)
     description: |-
       This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
 
       You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged231.pdf
-    citation_full: Uppsala Conflict Data Program (2023)
+    citation_full: |-
+      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4).
+      Sundberg, Ralph, and Erik Melander, 2013, “Introducing the UCDP Georeferenced Event Dataset”, Journal of Peace Research, vol.50, no.4, 523-532
     url_main: https://ucdp.uu.se/downloads/index.html
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRBIt1ZOTRCPxTRXXeQ4vPrO2SOvfLDO-brn4Vh87uxRzShrdkkflrouX7JIb4D3Grgh7E0BJjdt1Cz/pub?output=csv
-    date_accessed: '2024-05-13'
+    date_accessed: '2024-06-05'
     date_published: '2023'
   name: Cumulative deaths in armed conflicts (UCDP, 2023)
   description: |-
@@ -19,6 +21,6 @@ meta:
     You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged231.pdf
   license: {}
 outs:
-  - md5: 8549e5e0296c5f0a5f025fa8bc4d2c3b
-    size: 407
+  - md5: f6332535a6ed4a175a36331d0c049b37
+    size: 14278
     path: cumulative_conflict_deaths_ucdp.csv

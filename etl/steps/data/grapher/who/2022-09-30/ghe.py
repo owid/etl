@@ -14,10 +14,11 @@ GHE_SUBSET_ONLY = False
 
 def run(dest_dir: str) -> None:
     # Load garden dataset
-    ds_garden: Dataset = paths.load_dependency("ghe")
+    ds_garden: Dataset = paths.load_dataset("ghe")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["ghe"]
+    tb_garden_ratio = ds_garden["ghe_suicides_ratio"]
 
     # Process table
     tb_grapher = process(tb_garden)
@@ -28,8 +29,13 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    tables = [
+        tb_grapher,
+        tb_garden_ratio,
+    ]
+
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_grapher], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=tables, default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

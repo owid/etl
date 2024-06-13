@@ -46,24 +46,39 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = paths.meadow_dataset
-    df = pd.DataFrame(ds_meadow["ghe"])
+    df = pd.DataFrame(ds_meadow["ghe"]).reset_index()
     df = df.drop(columns="flag_level")
     # Load countries regions
-    regions_dataset: Dataset = paths.load_dependency("regions")
+    regions_dataset: Dataset = paths.load_dataset("regions")
     regions = regions_dataset["regions"]
     # Load WHO Standard population
-    snap: Snapshot = paths.load_dependency("standard_age_distribution.csv")
+    snap: Snapshot = paths.load_snapshot("standard_age_distribution.csv")
     who_standard = pd.read_csv(snap.path)
     who_standard = format_who_standard(who_standard)
+    # Read population dataset
+    ds_population = paths.load_dataset("un_wpp")
+
     # convert codes to country names
     code_to_country = cast(Dataset, paths.load_dependency("regions"))["regions"]["name"].to_dict()
     df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
 
-    df = clean_data(df, regions, who_standard)
+    # clean data, process and create final output
+    df = clean_data(df, regions, who_standard, ds_population)
 
-    ds_garden = create_dataset(
-        dest_dir, tables=[Table(df, short_name=paths.short_name)], default_metadata=ds_meadow.metadata
-    )
+    # Make table from dataframe
+    tb = Table(df, short_name=paths.short_name)
+    tb = tb.format(["country", "year", "age_group", "sex", "cause"])
+
+    # Get male-to-female death rate ratio
+    tb_ratio = get_death_rate_sex_ratio(tb)
+    tb_ratio = tb_ratio.format(["country", "year"], short_name="ghe_suicides_ratio")
+
+    # Create tables
+    tables = [
+        tb,
+        tb_ratio,
+    ]
+    ds_garden = create_dataset(dest_dir, tables=tables, default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
     log.info("ghe.end")
@@ -89,7 +104,9 @@ def format_who_standard(who_standard: pd.DataFrame) -> Dict[Any, Any]:
     return who_standard_dict
 
 
-def clean_data(df: pd.DataFrame, regions: Table, who_standard: Dict[str, float]) -> pd.DataFrame:
+def clean_data(
+    df: pd.DataFrame, regions: Table, who_standard: Dict[str, float], ds_population: Dataset
+) -> pd.DataFrame:
     log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
     df = add_population(
@@ -102,6 +119,7 @@ def clean_data(df: pd.DataFrame, regions: Table, who_standard: Dict[str, float])
         sex_group_male="Male",
         age_col="age_group",
         age_group_mapping=AGE_GROUPS_RANGES,
+        ds_un_wpp=ds_population,
     )
     assert df["population"].isna().sum() == 0
 
@@ -128,7 +146,7 @@ def clean_data(df: pd.DataFrame, regions: Table, who_standard: Dict[str, float])
         }
     )
     df = df.drop(columns=["population"])
-    return df.set_index(["country", "year", "age_group", "sex", "cause"], verify_integrity=True)
+    return df
 
 
 def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]) -> pd.DataFrame:
@@ -161,11 +179,16 @@ def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]
 
     who_df = build_custom_age_groups(df, age_groups=age_groups_who_standard)
     df_as = who_df[["country", "year", "cause", "age_group", "sex", "death_rate100k"]]
-    df_as = df_as[df_as["sex"] == "Both sexes"]
+
+    # Check there are three sex groups
+    assert (sex_groups := set(df_as["sex"])) == {
+        "Both sexes",
+        "Female",
+        "Male",
+    }, f"Unexpected sex groups! Review {sex_groups}"
     df_as["multiplier"] = df_as["age_group"].map(who_standard, na_action="ignore")
     assert all(df_as["multiplier"].notna())
     df_as["death_rate100k"] = df_as["death_rate100k"] * df_as["multiplier"]
-
     df_as["age_group"] = "Age-standardized"
     df_as = (
         df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns=["multiplier"]).reset_index()
@@ -337,3 +360,35 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     df = pd.concat([df, df_regions])
 
     return df
+
+
+def get_death_rate_sex_ratio(tb: Table) -> Table:
+    """Add male-to-female self-harm death rate ratio."""
+    # Define copy
+    tb_ = tb.reset_index().copy()
+
+    # Define names
+    causes = [
+        "Self-harm",
+    ]
+    indicator = "death_rate100k"
+    indicator_ratio = f"{indicator}_ratio"
+
+    # Filter and get male and female tables
+    mask = (tb_["age_group"] == "Age-standardized") & (tb_["cause"].isin(causes))
+    columns = ["country", "year", indicator]
+    tb_m = tb_.loc[(tb_["sex"] == "Male") & mask, columns]
+    tb_f = tb_.loc[(tb_["sex"] == "Female") & mask, columns]
+
+    # Merge data by year and country
+    tb_ratio = tb_m.merge(tb_f, on=["country", "year"], suffixes=("_m", "_f"))
+    tb_ratio[indicator_ratio] = tb_ratio[f"{indicator}_m"] / tb_ratio[f"{indicator}_f"]
+
+    # Select relevant columns
+    tb_ratio = tb_ratio[["country", "year", indicator_ratio]]
+
+    # Remove NaNs and infinities
+    tb_ratio = tb_ratio.dropna(subset=[indicator_ratio])
+    tb_ratio = tb_ratio[~tb_ratio[indicator_ratio].isin([np.inf, -np.inf])]
+
+    return tb_ratio

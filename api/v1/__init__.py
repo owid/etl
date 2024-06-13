@@ -10,7 +10,7 @@ from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths

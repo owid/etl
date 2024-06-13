@@ -44,6 +44,9 @@ def run(dest_dir: str) -> None:
     # ds.metadata.update_from_yaml(N.metadata_path)
     tb.update_metadata_from_yaml(N.metadata_path, "ghe")
 
+    # format
+    tb = tb.format(["country", "year", "age_group", "sex", "cause"])
+
     # add table to a dataset
     ds.add(tb)
 
