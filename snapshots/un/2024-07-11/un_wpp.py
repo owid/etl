@@ -1,6 +1,75 @@
 """WARNING: This code was imported from walden. So, when executed, it will not create any snapshot.
 Next time this data needs to be updated, the code below needs to be adapted to create a snapshot.
 
+Command:
+
+    FILE_DIR=''
+    python snapshots/un/2024-07-11/un_wpp.py \
+        --deaths-age-fem $FILE_DIR/deaths_age_female.xlsx \
+        --deaths-age-male $FILE_DIR/deaths_age_male.xlsx \
+        --death-rate $FILE_DIR/death_rate.xlsx \
+        --population $FILE_DIR/population.csv \
+        --growth-rate $FILE_DIR/grrate.xlsx \
+        --nat-change-rate $FILE_DIR/natchange.xlsx \
+        --fertility-tot $FILE_DIR/frtot.xlsx \
+        --fertility-age $FILE_DIR/frage.xlsx \
+        --migration $FILE_DIR/mig.xlsx \
+        --migration-rate $FILE_DIR/migrate.xlsx \
+        --deaths $FILE_DIR/deaths.xlsx \
+        --deaths-age $FILE_DIR/deaths_age.xlsx \
+
+
+Files needed:
+
+    - Population
+        Title (page):   WPP2024_Population_1_July_by_Age1_long.csv.gz
+        Filename:       Population by Age July 1 2024.csv
+        Alias:          population.csv
+    - Natural change
+        Title (page):   WPP2024_Rate_of_natural_change_%28per_thousand%29.xlsx
+        Filename:       WPP2024 Natural Change Rate.xlsx
+        Alias           natchange.xlsx
+    - Growth rate
+        Title (page):   WPP2024_Average_annual_rate_of_population_change-growth_rate_%28%25%29.xlsx
+        Filename:       Population Growth Rate 2024.xlsx
+        Alias           grrate.xlsx
+    - Fertility (total)
+        Title (page):   WPP2024_Total_fertility_rate_%28live_births_per_woman%29.xlsx
+        Filename:       WPP2024 Total Fertility Rate.xlsx
+        Alias:          frtot.xlsx
+    - Fertility (asfr)
+        Title (page):   WPP2024_Age-specific_fertility_rates_%28ASFR%3B_births_per_1%2C000_women%29_Abridged_Ages.xlsx
+        Filename:       ASFR Abridged Ages.xlsx
+        Alias:          frage.xlsx
+    - Migration (number)
+        Title (page):   WPP2024_Net_number_of_migrants_by_sex_%28in_thousands%29.xlsx
+        Filename:       Net migrants by sex 2024.xlsx
+        Alias:          mig.xlsx
+    - Migration rate
+        Title (page):   WPP2024_Crude_net_migration_rate_%28CNMR%29_%28per_1%2C000_population%29.xlsx
+        Filename:       WPP2024 Crude Net Migration Rate.xlsx
+        Alias:          migrate.xlsx
+    - Deaths (total)
+        Title (page):   https://www.dropbox.com/scl/fo/m5ubnjq0j0542px0vowpu/AJbGz8qywO0ZtsrIt4HmVJA/WPP2024_Total_deaths_by_sex_%28in_thousands%29.xlsx?rlkey=jgttagxx80mosd66yi4o61wjh&dl=0
+        Filename:       WPP2024 Total Deaths by Sex.xlsx
+        Alias:          deaths.xlsx
+    - Deaths (age)
+        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Total.xlsx
+        Filename:       WPP2024 Deaths by Age.xlsx
+        Alias:          deaths_age.xlsx
+    - Deaths (age, fem)
+        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Female.xlsx
+        Filename:       WPP2024 Deaths by Age Female.xlsx
+        Alias:          deaths_age_female.xlsx
+    - Deaths (age, mal)
+        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Male.xlsx
+        Filename:       WPP2024 Deaths by Age and Sex Male.xlsx
+        Alias:          deaths_age_male.xlsx
+    - Death rate
+        Title (page):   WPP2024_Crude_death_rate_%28CDR%29_%28deaths_per_1%2C000_population%29.xlsx
+        Filename:       WPP2024 Crude Death Rate.xlsx
+        Alias:          death_rate.xlsx
+
 """
 
 import glob
