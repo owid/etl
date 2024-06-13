@@ -1,0 +1,73 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        # - Neglected Tropical Diseases # Need to add once the tag is upgraded to topic tag and we have a slug for the page
+    processing_level: minor
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+  title: Preventive Chemotherapy (PC) Data Portal
+tables:
+  lymphatic_filariasis:
+    variables:
+      current_status_of_mda:
+        title: Current status of MDA
+        unit: ""
+      number_of_ius_covered:
+        title: Number of implementation units covered
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+      geographical_coverage__pct:
+        title: Geographical coverage (%)
+        description_short: "Geographical coverage of preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis)."
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      total_population_of_ius:
+        title: Total population of implementation units
+        description_short: "Total population of implementation units. Implementation units are defined as geographic areas where health interventions are specifically designed, executed, and monitored to control or eliminate neglected tropical diseases effectively."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+      reported_number_of_people_treated:
+        title: Reported number of people treated
+        description_short: "Reported number of people treated for [lymphatic filariasis](#dod:lymphatic-filariasis)."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+      programme__drug__coverage__pct:
+        title: Programme coverage
+        description_short: "Programme coverage for preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis). The share of people who require preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis) who actually receive it."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 3
+  lymphatic_filariasis_national:
+    variables:
+      national_coverage__pct:
+        title: National coverage
+        description_short: "Drug coverage out of estimated population who require it."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      population_requiring_pc_for_lf:
+        title: Population requiring preventive chemotherapy for lymphatic filariasis
+        description_short: "Population requiring preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis)."
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+      estimated_number_of_people_treated:
+        title: Estimated number of people treated
+        description_short: "Estimated number of people treated for [lymphatic filariasis](#dod:lymphatic-filariasis)."
+        description_processing: To calculate the estimated number of people treated, we multiply the population requiring preventive chemotherapy by the national coverage.
+        unit: "people"
+        display:
+          numDecimalPlaces: 0
+        processing_level: major

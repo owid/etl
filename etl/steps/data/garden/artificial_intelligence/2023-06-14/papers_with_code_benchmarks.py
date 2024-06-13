@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset for Math Code Language.
     ds_meadow_math_code_lang = cast(Dataset, paths.load_dependency("papers_with_code_math_code_language"))
     tb_math_code_lang = ds_meadow_math_code_lang["papers_with_code_math_code_language"]
-    df_math_code_lang = pd.DataFrame(tb_math_code_lang)
+    df_math_code_lang = pd.DataFrame(tb_math_code_lang).reset_index()
 
     # Calculate 'days_since' column.
     df_math_code_lang["days_since"] = (

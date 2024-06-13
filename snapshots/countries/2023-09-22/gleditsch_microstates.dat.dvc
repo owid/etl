@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/countries/2023-09-22
 outs:
-- md5: b9ef1b421b1afbf2004abfe5050774fe
-  size: 1015
-  path: gleditsch_microstates.dat
+  - md5: e011d4bed704f2e0fdada0549e9098b3
+    size: 1015
+    path: gleditsch_microstates.dat

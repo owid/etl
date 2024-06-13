@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 from etl import files
 
 
@@ -69,14 +72,15 @@ def test_checksum_file_regions(tmp_path):
     assert checksum1 == checksum2
 
 
-def test_checksum_file_dvc(tmp_path):
-    f = tmp_path / "test.csv"
-    f.write_text("a,b,c\r\n1,2,3")
+def test_checksum_dict():
+    d = {
+        "a": 1,
+        "b": "x",
+        "c": [1, 2, 3, np.nan],
+    }
+    assert files.checksum_dict(d) == "f5ec37a48fc5bdbe085608c8689b696f"
 
-    # Checksum replaces \r\n with \n
-    assert files.checksum_file(f) == "1a477f6d2f9c9fc827fa46b5ace1a145"
 
-
-def test_checksum_str_dvc():
-    # Checksum replaces \r\n with \n
-    assert files.checksum_str("a,b,c\r\n1,2,3") == files.checksum_str("a,b,c\n1,2,3")
+def test_checksum_df():
+    df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "x", "y"]})
+    assert files.checksum_df(df) == "34c7a3a435e4a0703b37904f09f967f1"

@@ -50,7 +50,6 @@ def run(dest_dir: str) -> None:
     df_pivot_org = organization_categorization_counts.pivot(
         index="year", columns="organization_categorization", values="count"
     ).reset_index()
-
     # Melt dataframe to long format for yearly counts
     melted_df = df_pivot_org.melt(
         id_vars=["year"],
@@ -58,7 +57,6 @@ def run(dest_dir: str) -> None:
             "Academia",
             "Academia and industry collaboration",
             "Industry",
-            "Not specified",
             "Other",
         ],
         var_name="affiliation",
@@ -77,7 +75,6 @@ def run(dest_dir: str) -> None:
             "Academia",
             "Academia and industry collaboration",
             "Industry",
-            "Not specified",
             "Other",
         ],
         var_name="affiliation",

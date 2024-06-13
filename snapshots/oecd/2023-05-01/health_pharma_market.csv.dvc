@@ -20,6 +20,6 @@ meta:
     This dataset is a subset of all the metrics in the database. More details at https://stats.oecd.org/OECDStat_Metadata/ShowMetadata.ashx?Dataset=HEALTH_PHMC&Lang=en
 wdir: ../../../data/snapshots/oecd/2023-05-01
 outs:
-- md5: cf39808319ed8e633f846c39a6cceeea
-  size: 9726240
-  path: health_pharma_market.csv
+  - md5: b5581344c20b17084f278bf4a57e6a4a
+    size: 9726240
+    path: health_pharma_market.csv

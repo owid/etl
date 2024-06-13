@@ -76,7 +76,7 @@ def add_meaning_to_codes(tb: Table) -> Table:
         "min_tra_collab",
     ]
 
-    tb[cols_0_1_3] = tb[cols_0_1_3].astype("category").replace({0: "No", 1: "Yes", 3: "Don't know"})
+    tb[cols_0_1_3] = tb[cols_0_1_3].astype(object).replace({0: "No", 1: "Yes", 3: "Don't know"}).astype("category")
     tb[cols_other] = (
         tb[cols_other]
         .astype("object")

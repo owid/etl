@@ -46,4 +46,10 @@ site/
 .sanity-check
 
 .wizard
+.wizardcfg/*
+.streamlit/secrets.toml
 .ipynb_lock
+.execution_time.json
+
+
+notebooks/

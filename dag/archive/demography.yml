@@ -11,3 +11,30 @@ steps:
     - data://garden/hmd/2023-09-19/hmd
   data://grapher/demography/2023-09-29/gini_le:
     - data://garden/demography/2023-09-29/gini_le
+
+  # Population (new versions, experimental)
+  # Population OMM 2024-01-05: HYDE 3.3 + Gapminder + UN WPP 2022
+  # data://garden/demography/2024-01-05/population:
+  #   - data://garden/hyde/2024-01-02/all_indicators
+  #   - data://garden/gapminder/2023-03-31/population
+  #   - data://garden/un/2022-07-11/un_wpp
+  #   - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+  #   - data://garden/regions/2023-01-01/regions
+  #   - data://garden/wb/2021-07-01/wb_income
+
+  # # Population OMM 2024-01-25: HYDE 3.3 + Maddison + UN WPP 2022
+  # data://garden/demography/2024-01-25/population:
+  #   # HYDE
+  #   - data://garden/hyde/2024-01-02/all_indicators
+  #   # Maddison
+  #   - data://garden/ggdc/2024-01-19/maddison_federico_paper
+  #   # WPP
+  #   - data://garden/un/2022-07-11/un_wpp
+  #   # Auxiliary files
+  #   - data://garden/regions/2023-01-01/regions
+  #   - data://garden/wb/2021-07-01/wb_income
+
+  # # Combine population in grapher
+  # data://grapher/demography/2024-01-25/population:
+  #   - data://garden/demography/2024-01-25/population
+  #   - data://garden/demography/2024-01-05/population

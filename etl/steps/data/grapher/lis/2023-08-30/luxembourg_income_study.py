@@ -1,5 +1,7 @@
 """Load luxembourg_income_Study garden dataset and create the luxembourg_income_study grapher dataset."""
 
+from owid.catalog import warnings
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -23,7 +25,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    with warnings.ignore_warnings([warnings.NoOriginsWarning, warnings.DisplayNameWarning]):
+        ds_garden = create_dataset(
+            dest_dir, tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        )
+
     ds_garden.save()

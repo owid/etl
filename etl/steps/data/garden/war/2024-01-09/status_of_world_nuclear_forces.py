@@ -38,7 +38,8 @@ def run(dest_dir: str) -> None:
 
     # Looking at the original dashboard, it seems that missing values are shown as zeros.
     # https://public.tableau.com/app/profile/kate.kohn/viz/EstimatedGlobalNuclearWarheadInventories2021/Dashboard1
-    tb = tb.fillna(0)
+    cols = [c for c in tb.columns if c not in ["country", "year"]]
+    tb[cols] = tb[cols].fillna(0)
 
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)

@@ -1,0 +1,14 @@
+dataset:
+  title: Global precipitation anomaly (NOAA via EPA, 2024)
+  description: ''
+  licenses:
+    - {}
+tables:
+  global_precipitation_anomaly_noaa:
+    variables:
+      global_precipitation_anomaly:
+        title: Global precipitation anomaly
+        unit: inches
+        short_unit: in
+        description: |-
+          This indicator shows annual anomalies compared with the average precipitation from 1901 to 2000 based on rainfall and snowfall measurements from land-based weather stations worldwide.

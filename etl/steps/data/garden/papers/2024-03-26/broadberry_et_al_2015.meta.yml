@@ -1,0 +1,37 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Crop Yields
+
+dataset:
+  update_period_days: 0
+
+tables:
+  broadberry_et_al_2015:
+    variables:
+      wheat_yield:
+        title: Wheat yields
+        unit: tonnes per hectare
+        short_unit: t/ha
+      rye_yield:
+        title: Rye yields
+        unit: tonnes per hectare
+        short_unit: t/ha
+      barley_yield:
+        title: Barley yields
+        unit: tonnes per hectare
+        short_unit: t/ha
+      oats_yield:
+        title: Oat yields
+        unit: tonnes per hectare
+        short_unit: t/ha
+      pulses_yield:
+        title: Pulse yields
+        unit: tonnes per hectare
+        short_unit: t/ha
+      potatoes_yield:
+        title: Potato yields
+        unit: tonnes per hectare
+        short_unit: t/ha

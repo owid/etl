@@ -2,11 +2,9 @@ meta:
   name: Road accidents (OECD, 2023)
   publication_year: 2023
   source_name: OECD (2023)
-  source_published_by: 'OECD (2023), Road accidents (indicator). doi: 10.1787/2fe1b899-en
-    (Accessed on 11 August 2023)'
+  source_published_by: 'OECD (2023), Road accidents (indicator). doi: 10.1787/2fe1b899-en (Accessed on 11 August 2023)'
   url: https://data.oecd.org/transport/road-accidents.htm
-  source_data_url: 
-    https://stats.oecd.org/sdmx-json/data/DP_LIVE/.ROADACCID.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
+  source_data_url: https://stats.oecd.org/sdmx-json/data/DP_LIVE/.ROADACCID.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
   license_url: https://www.oecd.org/termsandconditions/
   license_name: ''
   date_accessed: 2023-08-11
@@ -15,6 +13,6 @@ meta:
     Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are registered, while deaths are attributed to the countries in which they occur. This indicator is measured in number of accidents, number of persons, per million inhabitants and million vehicles.
 wdir: ../../../data/snapshots/oecd/2023-08-11
 outs:
-- md5: 4f25544c3e16d9fdb83c1a9d1777af22
-  size: 531673
-  path: road_accidents.csv
+  - md5: 00adfc698c64133ed1332520bc1ffc8d
+    size: 531673
+    path: road_accidents.csv

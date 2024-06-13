@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Bayliss-Smith & Wanmali
+    title: Understanding Green Revolutions
+    citation_full: |-
+      Tim P. Bayliss-Smith and Sudhir Wanmali (1984) - Understanding Green Revolutions.
+      The data was manually extracted from Table 1.2 Wheat yields in Europe, 1850 to 1977-79 (100 kg/hectare).
+    url_main: https://www.cambridge.org/core/books/understanding-green-revolutions/761959C5635C85DB4C36E6B44C19A5EF
+    date_accessed: 2024-03-26
+    date_published: 1984-01-01
+    license:
+      name: Copyright Cambridge University Press 1984
+
+wdir: ../../../data/snapshots/papers/2024-03-26
+outs:
+  - md5: b34683141ffb8b9ef407d3a224faff6a
+    size: 526
+    path: bayliss_smith_wanmali_1984.csv

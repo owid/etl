@@ -1,13 +1,10 @@
 meta:
-  namespace: unep
-  short_name: global_trends_in_renewable_energy_investment
   name: Global trends in renewable energy investment
   source_name: UNEP
   publication_year: 2019
   publication_date: 2019-09-11
   url: https://www.unep.org/resources/report/global-trends-renewable-energy-investment-2019
   source_data_url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
-  file_extension: pdf
   license_url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
   license_name: Copyright © Frankfurt School of Finance & Management gGmbH 2019
   date_accessed: 2023-01-03

@@ -4,6 +4,7 @@
 
 import hashlib
 import io
+import json
 import os
 import re
 import subprocess
@@ -13,8 +14,10 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
+import pandas as pd
 import ruamel.yaml
 import yaml
+from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.paths import BASE_DIR
@@ -54,10 +57,6 @@ TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
 DEFAULT_CHUNK_SIZE = 512
 
 
-def dos2unix(data: bytes) -> bytes:
-    return data.replace(b"\r\n", b"\n")
-
-
 def istextblock(block: bytes) -> bool:
     if not block:
         # An empty file is considered a valid text file
@@ -75,7 +74,12 @@ def istextblock(block: bytes) -> bool:
 
 def checksum_str(s: str) -> str:
     "Return the md5 hex digest of the string."
-    return hashlib.md5(dos2unix(s.encode())).hexdigest()
+    return hashlib.md5(s.encode()).hexdigest()
+
+
+def checksum_dict(d: Dict[str, Any]) -> str:
+    "Return the md5 hex digest of the dictionary."
+    return checksum_str(json.dumps(d, default=str))
 
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
@@ -85,9 +89,6 @@ def checksum_file_nocache(filename: Union[str, Path]) -> str:
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
         while chunk:
-            if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
-                chunk = dos2unix(chunk)
-
             _hash.update(chunk)
             chunk = istream.read(chunk_size)
 
@@ -118,6 +119,14 @@ def checksum_file(filename: Union[str, Path]) -> str:
         CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
+
+
+def checksum_df(df: pd.DataFrame, index=True) -> str:
+    """Return the md5 hex digest of dataframe. It is only useful for large dataframes. For smaller
+    ones (<1M rows), it's better to use checksum_dict or checksum_str.
+    """
+    # NOTE: I tried joblib.hash, but it was much slower than pandas hash
+    return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
@@ -201,7 +210,9 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
 
 
 def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
-    return ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader, preserve_quotes=True)
+    yaml = YAML(typ="rt")  # Create a YAML object with round-trip type
+    yaml.preserve_quotes = True
+    return yaml.load(f)  # Load the content using the new API
 
 
 def _strip_lines(s: str) -> str:

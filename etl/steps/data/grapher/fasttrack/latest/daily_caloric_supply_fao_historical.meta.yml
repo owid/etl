@@ -1,0 +1,13 @@
+dataset:
+  title: Daily supply of calories per person (OWID based on UN FAO & historical sources)
+  description: Daily supply of calories, combining recent UN FAO data with historical sources for some countries
+  licenses:
+    - {}
+tables:
+  daily_caloric_supply_fao_historical:
+    variables:
+      daily_caloric_supply:
+        title: Caloric supply
+        unit: kilocalories per day
+        short_unit: kcal
+        description: The average supply of kilocalories from food, measured per person per day.

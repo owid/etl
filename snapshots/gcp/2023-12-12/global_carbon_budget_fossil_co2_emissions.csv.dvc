@@ -68,6 +68,6 @@ meta:
       url: https://zenodo.org/records/10177738
 wdir: ../../../data/snapshots/gcp/2023-12-12
 outs:
-- md5: 33d883a0a14e069eb239cce68b127c62
-  size: 2902409
-  path: global_carbon_budget_fossil_co2_emissions.csv
+  - md5: 5bb46f04063157eff3dcdca66c19c553
+    size: 2902409
+    path: global_carbon_budget_fossil_co2_emissions.csv

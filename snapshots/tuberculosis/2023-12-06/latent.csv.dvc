@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-06
 outs:
-- md5: ec1854d94f1bae8c55550a0e29066564
-  size: 23231
-  path: latent.csv
+  - md5: 17d8d4ed0e40ae3f1817884f5f7ecf87
+    size: 23231
+    path: latent.csv

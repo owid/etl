@@ -248,15 +248,20 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
         suffixes=("_old", "_new"),
     )
 
-    if interactive:
-        for field in fields_to_compare:
-            n_changes = len(compared[compared[f"{field}_old"].fillna("") != compared[f"{field}_new"].fillna("")])
-            tqdm.write(f"\nNumber of changes in {field} to review: {n_changes}")
+    # Ensure no column is of categorical type.
+    compared = compared.astype(object)
 
     # Go one by one on the datasets for which at least one custom item was defined.
     for field in tqdm(fields_to_compare):
-        _compared = compared[compared[f"{field}_old"].fillna("") != compared[f"{field}_new"].fillna("")].reset_index()
-        for i, row in tqdm(_compared.iterrows(), total=len(_compared)):
+        _compared = compared.copy()
+        _compared[f"{field}_old"] = _compared[f"{field}_old"].fillna("")
+        _compared[f"{field}_new"] = _compared[f"{field}_new"].fillna("")
+        _compared = _compared[_compared[f"{field}_old"] != _compared[f"{field}_new"]].reset_index()
+        if interactive:
+            n_changes = len(_compared)
+            tqdm.write(f"\nNumber of changes in {field} to review: {n_changes}")
+
+        for _, row in tqdm(_compared.iterrows(), total=len(_compared)):
             dataset_short_name = row["dataset"]
             item_code = row["item_code"]
             old = row[f"{field}_old"]

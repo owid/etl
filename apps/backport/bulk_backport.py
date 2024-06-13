@@ -9,7 +9,7 @@ from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
 from etl import config
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.snapshot import snapshot_catalog
 from etl.steps import load_dag
 
@@ -21,7 +21,7 @@ config.enable_bugsnag()
 log = structlog.get_logger()
 
 
-@click.command(deprecated=True)
+@click.command(name="bulk", deprecated=True)
 @click.option("--dataset-ids", "-d", type=int, multiple=True)
 @click.option(
     "--dry-run/--no-dry-run",
@@ -88,10 +88,7 @@ def bulk_backport(
     all: bool,
     workers: int,
 ) -> None:
-    """Backport in bulk.
-
-    # Reference
-    """
+    """Backport in bulk."""
     engine = get_engine()
 
     if backport:
@@ -198,7 +195,7 @@ def _active_datasets(
         limit %(limit)s
         """
 
-    df = pd.read_sql(
+    df = read_sql(
         q,
         engine,
         params={

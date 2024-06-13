@@ -1,0 +1,524 @@
+definitions:
+  common:
+    processing_level: major
+    unit: tonnes per hectare
+    short_unit: t/ha
+    presentation:
+      topic_tags:
+        - Crop Yields
+  description_short_attainable_yields: &description_short_attainable_yields |-
+    Attainable yields are estimates of feasible crop yields calculated from high-yielding areas of similar climate.
+  description_key_attainable_yields_1: |-
+    Attainable yields are more conservative than biophysical 'potential yields', but should be achievable using current technologies and management (e.g. fertilizers and irrigation).
+  description_key_attainable_yields_2: |-
+    Attainable yields are based on assessments for the year 2000. Real attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
+  description_key_attainable_yields: &description_key_attainable_yields
+    - "{definitions.description_key_attainable_yields_1}"
+    - "{definitions.description_key_attainable_yields_2}"
+  description_short_yield_gaps: &description_short_yield_gaps |-
+    Yield gaps are the difference between attainable yields and actual yields. Negative values have been replaced by zero, meaning that the attainable yield has been reached.
+  description_key_yield_gaps: &description_key_yield_gaps
+    - "{definitions.description_short_attainable_yields}"
+    - "{definitions.description_key_attainable_yields_1}"
+    - "{definitions.description_key_attainable_yields_2}"
+  description_processing_yield_gaps: &description_processing_yield_gaps |-
+    - Yield gaps have been calculated by Our World in Data as the attainable yields, as reported by Mueller et al. (2012), minus the actual observed yields, as reported by the UN FAO. Negative values have been clipped to zero, meaning that the attainable yield has been reached.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  attainable_yields:
+    title: Attainable yields
+    variables:
+      abaca__manila_hemp__raw_yield:
+        title: Abaca manila hemp raw yield
+      agave_fibres__raw__n_e_c__yield:
+        title: Agave fibres raw n.e.c. yield
+      almond_yield:
+        title: Almond yield
+      apples_yield:
+        title: Apples yield
+      apricots_yield:
+        title: Apricots yield
+      areca_nuts_yield:
+        title: Areca nuts yield
+      artichokes_yield:
+        title: Artichokes yield
+      asparagus_yield:
+        title: Asparagus yield
+      avocados_yield:
+        title: Avocados yield
+      bambara_beans__dry_yield:
+        title: Bambara beans dry yield
+      banana_yield:
+        title: Banana yield
+      barley_yield:
+        title: Barley yield
+      bean_yield:
+        title: Bean yield
+      beans__green_yield:
+        title: Beans green yield
+      blueberries_yield:
+        title: Blueberries yield
+      broad_beans_and_horse_beans__green_yield:
+        title: Broad beans and horse beans green yield
+      broad_beans_yield:
+        title: Broad beans yield
+      buckwheat_yield:
+        title: Buckwheat yield
+      cabbages_yield:
+        title: Cabbages yield
+      canary_seed_yield:
+        title: Canary seed yield
+      carrots_and_turnips_yield:
+        title: Carrots and turnips yield
+      cashew_nuts_yield:
+        title: Cashew nuts yield
+      cashewapple_yield:
+        title: Cashewapple yield
+      cassava_leaves_yield:
+        title: Cassava leaves yield
+      cassava_yield:
+        title: Cassava yield
+      castor_oil_seed_yield:
+        title: Castor oil seed yield
+      cauliflowers_and_broccoli_yield:
+        title: Cauliflowers and broccoli yield
+      cereals_n_e_c__yield:
+        title: Cereals n.e.c. yield
+      cereal_yield:
+        title: Cereal yield
+      cherries_yield:
+        title: Cherries yield
+      chestnut_yield:
+        title: Chestnut yield
+      chickpeas_yield:
+        title: Chickpeas yield
+      chicory_roots_yield:
+        title: Chicory roots yield
+      chillies_and_peppers__green__capsicum_spp__and_pimenta_spp__yield:
+        title: Chillies and peppers green capsicum spp and pimenta spp yield
+      chillies_and_peppers_yield:
+        title: Chillies and peppers yield
+      cinnamon_and_cinnamon_tree_flowers__raw_yield:
+        title: Cinnamon and cinnamon tree flowers raw yield
+      citrus_fruit_yield:
+        title: Citrus fruit yield
+      cloves__whole_stems__raw_yield:
+        title: Cloves whole stems raw yield
+      cocoa_yield:
+        title: Cocoa yield
+      coconuts_yield:
+        title: Coconuts yield
+      coffee_yield:
+        title: Coffee yield
+      cow_peas_yield:
+        title: Cow peas yield
+      cranberries_yield:
+        title: Cranberries yield
+      cucumbers_and_gherkins_yield:
+        title: Cucumbers and gherkins yield
+      currants_yield:
+        title: Currants yield
+      dates_yield:
+        title: Dates yield
+      edible_roots_and_tubers_with_high_starch_or_inulin_content__n_e_c__fresh_yield:
+        title: Edible roots and tubers with high starch or inulin content n.e.c. fresh yield
+      eggplants_yield:
+        title: Eggplants yield
+      fibre_crops__fibre_equivalent_yield:
+        title: Fibre crops fibre equivalent yield
+      fibre_crops_yield:
+        title: Fibre crops yield
+      figs_yield:
+        title: Figs yield
+      flax__raw_or_retted_yield:
+        title: Flax raw or retted yield
+      fonio_yield:
+        title: Fonio yield
+      fruit_yield:
+        title: Fruit yield
+      garlic_yield:
+        title: Garlic yield
+      ginger__raw_yield:
+        title: Ginger raw yield
+      gooseberries_yield:
+        title: Gooseberries yield
+      grapefruit_yield:
+        title: Grapefruit yield
+      grapes_yield:
+        title: Grapes yield
+      green_maize_yield:
+        title: Green maize yield
+      groundnut_yield:
+        title: Groundnut yield
+      hazelnuts_yield:
+        title: Hazelnuts yield
+      hempseed_yield:
+        title: Hempseed yield
+      herbs__e_g__fennel__yield:
+        title: Herbs e g fennel yield
+      hop_cones_yield:
+        title: Hop cones yield
+      jojoba_seeds_yield:
+        title: Jojoba seeds yield
+      jute_yield:
+        title: Jute yield
+      kapok_fruit_yield:
+        title: Kapok fruit yield
+      karite_nuts_yield:
+        title: Karite nuts yield
+      kenaf__and_other_textile_bast_fibres__raw_or_retted_yield:
+        title: Kenaf and other textile bast fibres raw or retted yield
+      kiwi_yield:
+        title: Kiwi yield
+      kola_nuts_yield:
+        title: Kola nuts yield
+      leeks_yield:
+        title: Leeks yield
+      lemons_and_limes_yield:
+        title: Lemons and limes yield
+      lentils_yield:
+        title: Lentils yield
+      lettuce_yield:
+        title: Lettuce yield
+      linseed_yield:
+        title: Linseed yield
+      locust_beans__carobs__yield:
+        title: Locust beans carobs yield
+      lupins_yield:
+        title: Lupins yield
+      maize_yield:
+        title: Maize yield
+      mangoes_yield:
+        title: Mangoes yield
+      mate_leaves_yield:
+        title: Mate leaves yield
+      melon_yield:
+        title: Melon yield
+      melonseed_yield:
+        title: Melonseed yield
+      millet_yield:
+        title: Millet yield
+      mixed_grains_yield:
+        title: Mixed grains yield
+      mustard_seed_yield:
+        title: Mustard seed yield
+      natural_rubber_in_primary_forms_yield:
+        title: Natural rubber in primary forms yield
+      nutmeg__mace__cardamoms__raw_yield:
+        title: Nutmeg mace cardamoms raw yield
+      oats_yield:
+        title: Oats yield
+      oilcrops__cake_equivalent_yield:
+        title: Oilcrops cake equivalent yield
+      oilcrops__oil_equivalent_yield:
+        title: Oilcrops oil equivalent yield
+      okra_yield:
+        title: Okra yield
+      olives_yield:
+        title: Olives yield
+      onions_and_shallots__green_yield:
+        title: Onions and shallots green yield
+      onions_yield:
+        title: Onions yield
+      orange_yield:
+        title: Orange yield
+      other_berries_and_fruits_of_the_genus_vaccinium_n_e_c__yield:
+        title: Other berries and fruits of the genus vaccinium n.e.c. yield
+      other_citrus_fruit__n_e_c__yield:
+        title: Other citrus fruit n.e.c. yield
+      other_fruits__n_e_c__yield:
+        title: Other fruits n.e.c. yield
+      other_nuts__excluding_wild_edible_nuts_and_groundnuts__in_shell__n_e_c__yield:
+        title: Other nuts excluding wild edible nuts and groundnuts in shell n.e.c. yield
+      other_oil_seeds__n_e_c__yield:
+        title: Other oil seeds n.e.c. yield
+      other_pome_fruits_yield:
+        title: Other pome fruits yield
+      other_pulses_n_e_c__yield:
+        title: Other pulses n.e.c. yield
+      other_stimulant__spice_and_aromatic_crops__n_e_c__yield:
+        title: Other stimulant spice and aromatic crops n.e.c. yield
+      other_stone_fruits_yield:
+        title: Other stone fruits yield
+      other_sugar_crops_n_e_c__yield:
+        title: Other sugar crops n.e.c. yield
+      other_tropical_fruits__n_e_c__yield:
+        title: Other tropical fruits n.e.c. yield
+      other_vegetables__fresh_n_e_c__yield:
+        title: Other vegetables fresh n.e.c. yield
+      oilpalm_yield:
+        title: Oil palm yield
+      papayas_yield:
+        title: Papayas yield
+      peaches_and_nectarines_yield:
+        title: Peaches and nectarines yield
+      pears_yield:
+        title: Pears yield
+      pea_yield:
+        title: Pea yield
+      peas__green_yield:
+        title: Peas green yield
+      pepper_yield:
+        title: Pepper yield
+      peppermint__spearmint_yield:
+        title: Peppermint spearmint yield
+      persimmons_yield:
+        title: Persimmons yield
+      pigeon_peas_yield:
+        title: Pigeon peas yield
+      pineapples_yield:
+        title: Pineapples yield
+      pistachios_yield:
+        title: Pistachios yield
+      plantains_yield:
+        title: Plantains yield
+      plums_yield:
+        title: Plums yield
+      poppy_seeds_yield:
+        title: Poppy seeds yield
+      potato_yield:
+        title: Potato yield
+      pulses_yield:
+        title: Pulses yield
+      pumpkins__squash_and_gourds_yield:
+        title: Pumpkins squash and gourds yield
+      pyrethrum__dried_flowers_yield:
+        title: Pyrethrum dried flowers yield
+      quinces_yield:
+        title: Quinces yield
+      quinoa_yield:
+        title: Quinoa yield
+      ramie__raw_or_retted_yield:
+        title: Ramie raw or retted yield
+      rapeseed_yield:
+        title: Rapeseed yield
+      raspberries_yield:
+        title: Raspberries yield
+      rice_yield:
+        title: Rice yield
+      roots_and_tubers_yield:
+        title: Roots and tubers yield
+      rye_yield:
+        title: Rye yield
+      safflower_seed_yield:
+        title: Safflower seed yield
+      cotton_yield:
+        title: Cotton yield
+      sesame_seed_yield:
+        title: Sesame seed yield
+      sisal__raw_yield:
+        title: Sisal raw yield
+      sorghum_yield:
+        title: Sorghum yield
+      sour_cherries_yield:
+        title: Sour cherries yield
+      soybean_yield:
+        title: Soybean yield
+      spinach_yield:
+        title: Spinach yield
+      strawberries_yield:
+        title: Strawberries yield
+      string_beans_yield:
+        title: String beans yield
+      sugarbeet_yield:
+        title: Sugar beet yield
+      sugarcane_yield:
+        title: Sugar cane yield
+      sugar_crops_yield:
+        title: Sugar crops yield
+      sunflower_yield:
+        title: Sunflower seed yield
+      sweet_potatoes_yield:
+        title: Sweet potatoes yield
+      tallowtree_seeds_yield:
+        title: Tallowtree seeds yield
+      tangerines_yield:
+        title: Tangerines yield
+      taro_yield:
+        title: Taro yield
+      tea_yield:
+        title: Tea yield
+      tobacco_yield:
+        title: Tobacco yield
+      tomato_yield:
+        title: Tomato yield
+      treenuts_yield:
+        title: Treenuts yield
+      triticale_yield:
+        title: Triticale yield
+      true_hemp__raw_or_retted_yield:
+        title: True hemp raw or retted yield
+      tung_nuts_yield:
+        title: Tung nuts yield
+      vanilla__raw_yield:
+        title: Vanilla raw yield
+      vegetables_yield:
+        title: Vegetables yield
+      vetches_yield:
+        title: Vetches yield
+      walnuts_yield:
+        title: Walnuts yield
+      watermelons_yield:
+        title: Watermelons yield
+      wheat_yield:
+        title: Wheat yield
+      yams_yield:
+        title: Yams yield
+      yautia_yield:
+        title: Yautia yield
+      barley_attainable_yield:
+        title: Barley attainable yield
+        description_short: "{definitions.description_short_attainable_yields}"
+        description_key: *description_key_attainable_yields
+      cassava_attainable_yield:
+        title: Cassava attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      cotton_attainable_yield:
+        title: Cotton attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      groundnut_attainable_yield:
+        title: Groundnut attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      maize_attainable_yield:
+        title: Maize attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      millet_attainable_yield:
+        title: Millet attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      oilpalm_attainable_yield:
+        title: Oil palm attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      potato_attainable_yield:
+        title: Potato attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      rapeseed_attainable_yield:
+        title: Rapeseed attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      rice_attainable_yield:
+        title: Rice attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      rye_attainable_yield:
+        title: Rye attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      sorghum_attainable_yield:
+        title: Sorghum attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      soybean_attainable_yield:
+        title: Soybean attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      sugarbeet_attainable_yield:
+        title: Sugar beet attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      sugarcane_attainable_yield:
+        title: Sugar cane attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      sunflower_attainable_yield:
+        title: Sunflower seed attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      wheat_attainable_yield:
+        title: Wheat attainable yield
+        description_short: *description_short_attainable_yields
+        description_key: *description_key_attainable_yields
+      barley_yield_gap:
+        title: Barley yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      cassava_yield_gap:
+        title: Cassava yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      cotton_yield_gap:
+        title: Cotton yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      groundnut_yield_gap:
+        title: Groundnut yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      maize_yield_gap:
+        title: Maize yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      millet_yield_gap:
+        title: Millet yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      oilpalm_yield_gap:
+        title: Oil palm yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      potato_yield_gap:
+        title: Potato yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      rapeseed_yield_gap:
+        title: Rapeseed yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      rice_yield_gap:
+        title: Rice yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      rye_yield_gap:
+        title: Rye yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      sorghum_yield_gap:
+        title: Sorghum yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      soybean_yield_gap:
+        title: Soybean yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      sugarbeet_yield_gap:
+        title: Sugar beet yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      sugarcane_yield_gap:
+        title: Sugar cane yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      sunflower_yield_gap:
+        title: Sunflower seed yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps
+      wheat_yield_gap:
+        title: Wheat yield gap
+        description_short: *description_short_yield_gaps
+        description_key: *description_key_yield_gaps
+        description_processing: *description_processing_yield_gaps

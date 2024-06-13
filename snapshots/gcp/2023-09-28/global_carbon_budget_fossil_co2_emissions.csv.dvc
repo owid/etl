@@ -2,12 +2,7 @@ meta:
   origin:
     producer: Global Carbon Project
     title: Global Carbon Budget
-    description: The Global Carbon Budget 2022 has over 105 contributors from 80 organisations
-      and 18 countries. It was founded by the Global Carbon Project international
-      science team to track the trends in global carbon emissions and sinks and is
-      a key measure of progress towards the goals of the Paris Agreement. It's widely
-      recognised as the most comprehensive report of its kind. The 2022 report was
-      published at COP27 in Egypt on Friday 11th November.
+    description: The Global Carbon Budget 2022 has over 105 contributors from 80 organisations and 18 countries. It was founded by the Global Carbon Project international science team to track the trends in global carbon emissions and sinks and is a key measure of progress towards the goals of the Paris Agreement. It's widely recognised as the most comprehensive report of its kind. The 2022 report was published at COP27 in Egypt on Friday 11th November.
     title_snapshot: Global Carbon Budget - Fossil CO2 emissions
     citation_full: >-
       Andrew, R. M., & Peters, G. P. (2022). The Global Carbon Project's fossil CO2
@@ -56,6 +51,6 @@ meta:
     url: https://zenodo.org/record/7215364
 wdir: ../../../data/snapshots/gcp/2023-09-28
 outs:
-- md5: 8a9511bb7d2623ac32d6cf49707c09d0
-  size: 2957261
-  path: global_carbon_budget_fossil_co2_emissions.csv
+  - md5: 251ce1c5f07d5d28128fa84df856b2f9
+    size: 2957261
+    path: global_carbon_budget_fossil_co2_emissions.csv

@@ -6,8 +6,7 @@ meta:
     "Emerging Technology Observatory Advanced Semiconductor Supply Chain Dataset (2022
     release)"
   url: https://chipexplorer.eto.tech/
-  source_data_url: 
-    https://raw.githubusercontent.com/georgetown-cset/eto-supply-chain/main/data/provision.csv
+  source_data_url: https://raw.githubusercontent.com/georgetown-cset/eto-supply-chain/main/data/provision.csv
   license_url: https://eto.tech/tou/
   license_name: Creative Commons BY 4.0
   date_accessed: 2023-07-07
@@ -31,6 +30,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-07-07
 outs:
-- md5: 6f54d4db643ec96a2da82f5b6daeaf14
-  size: 29312
-  path: semiconductors_cset.csv
+  - md5: 27f7eb2f717e21ded94ec346b21b3689
+    size: 29312
+    path: semiconductors_cset.csv

@@ -55,6 +55,6 @@ meta:
       - We also copied any of his notes that numbers were 'estimated' or 'suspect'
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-  - md5: 478d9301b194525a227243df1b5b2a28
+  - md5: 8205dd3c7b31f5c94eea6b3fbf75afdd
     size: 125790
     path: sutton_1971.csv

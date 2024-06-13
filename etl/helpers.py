@@ -8,20 +8,22 @@ import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
+from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table
+from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
+    combine_tables_update_period_days,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
@@ -76,7 +78,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
-def grapher_checks(ds: catalog.Dataset) -> None:
+def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl import grapher_helpers as gh
 
@@ -97,6 +99,9 @@ def grapher_checks(ds: catalog.Dataset) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            _validate_description_key(tab[col].m.description_key, col)
+            _validate_ordinal_variables(tab, col)
+
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab
@@ -108,10 +113,29 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             # would override the indicator title in the Data Page.
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if display_name and not title_public:
-                log.warning(
+            if warn_title_public and display_name and not title_public:
+                warnings.warn(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                    warnings.DisplayNameWarning,
                 )
+
+
+def _validate_description_key(description_key: list[str], col: str) -> None:
+    if description_key:
+        assert not all(
+            len(x) == 1 for x in description_key
+        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+
+
+def _validate_ordinal_variables(tab: Table, col: str) -> None:
+    if tab[col].m.sort:
+        # Exclude NaN values, these will be dropped before inserting to the database.
+        vals = tab[col].dropna()
+
+        extra_values = set(vals) - set(vals.m.sort)
+        assert (
+            not extra_values
+        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
 
 
 def create_dataset(
@@ -124,6 +148,7 @@ def create_dataset(
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    errors: Literal["ignore", "warn", "raise"] = "raise",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -157,7 +182,10 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
+            update_period_days_combined = combine_tables_update_period_days(tables=tables)
+            default_metadata = DatasetMeta(
+                licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
+            )
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)
@@ -204,7 +232,7 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
@@ -353,6 +381,10 @@ class WrongStepName(ExceptionFromDocstring):
     """Wrong step name. If this step was in the dag, it should be corrected."""
 
 
+# loading DAG can take up to 1 second, so cache it
+load_dag_cached = cache(load_dag)
+
+
 class PathFinder:
     """Helper object with naming conventions. It uses your module path (__file__) and
     extracts from it commonly used attributes like channel / namespace / version / short_name or
@@ -366,11 +398,8 @@ class PathFinder:
     def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
-        # Load dag.
-        if "/archive/" in __file__:
-            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
-        else:
-            self.dag = load_dag()
+        # Lazy load dag when needed.
+        self._dag = None
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -387,6 +416,16 @@ class PathFinder:
 
         # Default logger
         self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
+
+    @property
+    def dag(self):
+        """Lazy loading of DAG."""
+        if self._dag is None:
+            if "/archive/" in str(self.f):
+                self._dag = load_dag_cached(paths.DAG_ARCHIVE_FILE)
+            else:
+                self._dag = load_dag_cached()
+        return self._dag
 
     @property
     def channel(self) -> str:
@@ -463,7 +502,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
@@ -627,12 +666,15 @@ class PathFinder:
         return deps[0].replace("etag://", "https://")
 
 
-def print_tables_metadata_template(tables: List[Table]):
+def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.
     # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
     # AI-generated texts when possible.
+
+    if fields is None:
+        fields = ["title", "unit", "short_unit", "description_short"]
 
     # Initialize output dictionary.
     dict_tables = {}
@@ -640,7 +682,7 @@ def print_tables_metadata_template(tables: List[Table]):
         dict_variables = {}
         for column in tb.columns:
             dict_values = {}
-            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
+            for field in fields:
                 value = getattr(tb[column].metadata, field) or ""
 
                 # Add some simple rules to simplify some common cases.
@@ -799,6 +841,8 @@ def write_to_dag_file(
 
     # Initialize a list with the new lines that will be written to the dag file.
     updated_lines = []
+    # Initialize a list of comments preceding the next step after a given step.
+    comments_next_step = []
     # Initialize a flag to skip lines until the next step.
     skip_until_next_step = False
     # Initialize a set to keep track of the steps that were found in the original dag file.
@@ -808,7 +852,10 @@ def write_to_dag_file(
         stripped_line = line.strip()
 
         # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
-        if stripped_line.endswith(":") and not stripped_line.startswith("-"):
+        if stripped_line.endswith(":") and not stripped_line.startswith("-") and not stripped_line.startswith("steps:"):
+            if comments_next_step:
+                updated_lines.extend(comments_next_step)
+                comments_next_step = []
             # Extract the name of the step (without the ":" at the end).
             current_step = ":".join(stripped_line.split(":")[:-1])
             if current_step in dag_part:
@@ -820,6 +867,8 @@ def write_to_dag_file(
                     updated_lines.append(" " * indent_dependency + f"- {dep}\n")
                 # Skip the following lines until the next step is found.
                 skip_until_next_step = True
+                # Start tracking possible comments of the next step.
+                comments_next_step = []
                 # Add the current step to the set of steps found in the dag file.
                 steps_found.add(current_step)
                 continue
@@ -828,8 +877,15 @@ def write_to_dag_file(
                 skip_until_next_step = False
 
         # Skip dependencies and comments among dependencies of the step being updated.
-        if skip_until_next_step and stripped_line.startswith(("-", "#")):
-            continue
+        if skip_until_next_step:
+            if stripped_line.startswith("-"):
+                # Remove comments among dependencies.
+                comments_next_step = []
+                continue
+            elif stripped_line.startswith("#"):
+                # Add comments that may potentially be related to the next step.
+                comments_next_step.append(line)
+                continue
 
         # Add lines that should not be skipped.
         updated_lines.append(line)
@@ -863,3 +919,114 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    _number_of_comment_lines = 0
+    _step_detected = False
+    _continue_until_the_end = False
+    num_spaces_indent = 0
+    for line in lines:
+        if line.startswith("include"):
+            # Nothing should be removed from here onwards, so, skip until the end of the file.
+            _continue_until_the_end = True
+
+            # Ensure there is a space before the include section starts.
+            if new_lines[-1].strip() != "":
+                new_lines.append("\n")
+
+        if line.startswith("steps:"):
+            # Store this special line and move on.
+            new_lines.append(line)
+            # If there were comments above "steps", keep them.
+            _number_of_comment_lines = 0
+            continue
+
+        if _continue_until_the_end:
+            new_lines.append(line)
+            continue
+
+        if not _step_detected:
+            if line.strip().startswith("#") or line.strip() == "":
+                _number_of_comment_lines += 1
+                new_lines.append(line)
+                continue
+            elif line.strip().startswith(step):
+                if _number_of_comment_lines > 0:
+                    # Remove the previous comment lines and ignore the current line.
+                    new_lines = new_lines[:-_number_of_comment_lines]
+                # Find the number of spaces on the left of the step name.
+                # We need this to know if the next comments are indented (as comments within dependencies).
+                num_spaces_indent = len(line) - len(line.lstrip())
+                _step_detected = True
+                continue
+            else:
+                # This line corresponds to any other step or step dependency.
+                new_lines.append(line)
+                _number_of_comment_lines = 0
+                continue
+        else:
+            if line.strip().startswith("- "):
+                # Ignore the dependencies of the step.
+                continue
+            elif (line.strip().startswith("#")) and (len(line) - len(line.lstrip()) > num_spaces_indent):
+                # Ignore comments that are indented (as comments within dependencies).
+                continue
+            elif line.strip() == "":
+                # Ignore empty lines.
+                continue
+            else:
+                # The step dependencies have ended. Append current line and continue until the end of the dag file.
+                new_lines.append(line)
+                _continue_until_the_end = True
+                continue
+
+    # Write the new content to the active dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(new_lines)
+
+
+def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
+    """Remove specific steps from a dag file, including their comments.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    steps_to_remove : List[str]
+        List of steps to be removed from the DAG file.
+        Their dependencies do not need to be specified (they will also be removed).
+
+    """
+    for step in steps_to_remove:
+        _remove_step_from_dag_file(dag_file=dag_file, step=step)
+
+
+def create_dag_archive_file(dag_file_archive: Path) -> None:
+    """Create an empty dag archive file, and add it to the main dag archive file.
+
+    Parameters
+    ----------
+    dag_file_archive : Path
+        Path to a specific dag archive file that does not exist yet.
+
+    """
+    # Create a new archive dag file.
+    dag_file_archive.write_text("steps:\n")
+    # Find the number of spaces in the indentation of the main dag archive file.
+    n_spaces_include_section = 2
+    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
+        lines = file.readlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("include"):
+            n_spaces_include_section = [
+                len(_line) - len(_line.lstrip()) for _line in lines[i + 1 :] if _line.strip().startswith("- ")
+            ][0]
+    # Add this archive dag file to the main dag archive file.
+    dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
+    with open(paths.DAG_ARCHIVE_FILE, "a") as file:
+        file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")

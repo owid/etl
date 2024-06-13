@@ -69,6 +69,8 @@ class Snapshot:
         """Download file from remote to self.path."""
         self.path.parent.mkdir(exist_ok=True, parents=True)
         if self.metadata.is_public:
+            # TODO: temporarily download files from R2 instead of public link to prevent
+            # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
             files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
@@ -80,7 +82,9 @@ class Snapshot:
         if downloaded_md5 != md5:
             # remove the downloaded file
             self.path.unlink()
-            raise ValueError(f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}")
+            raise ValueError(
+                f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}. It is possible that download got interrupted."
+            )
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
@@ -88,9 +92,22 @@ class Snapshot:
             return
 
         assert len(self.metadata.outs) == 1
-        md5 = self.metadata.outs[0]["md5"]
+        expected_md5 = self.metadata.outs[0]["md5"]
 
-        self._download_dvc_file(md5)
+        self._download_dvc_file(expected_md5)
+
+        expected_size = self.metadata.outs[0]["size"]
+        downloaded_size = self.path.stat().st_size
+        if downloaded_size != expected_size:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Size mismatch for {self.path}: expected {expected_size}, got {downloaded_size}")
+
+        downloaded_md5 = checksum_file(self.path)
+        if downloaded_md5 != expected_md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Checksum mismatch for {self.path}: expected {expected_md5}, got {downloaded_md5}")
 
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
@@ -102,9 +119,12 @@ class Snapshot:
 
         assert len(self.metadata.outs) == 1
         file_size = self.path.stat().st_size
-        # Compare file size if it's larger than 10MB, otherwise compare md5
+        # Compare file size if it's larger than 20MB, otherwise compare md5
         # This should be pretty safe and speeds up the process significantly
-        if file_size >= 10 * 2**20:  # 10MB
+        # NOTE: on 2024-06-12 this caused a discrepancy between production and staging
+        # for snapshot://climate/latest/weekly_wildfires.csv.dvc. Data was slightly updated, but
+        # the file size was the same. This should be a very rare case.
+        if file_size >= 20 * 2**20:  # 20MB
             return file_size != self.m.outs[0]["size"]
         else:
             return checksum_file(self.path.as_posix()) != self.m.outs[0]["md5"]
@@ -167,27 +187,19 @@ class Snapshot:
             self.download_from_source()
             self.dvc_add(upload=upload)
 
-    def to_table_metadata(self):
+    def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
 
     def read(self, *args, **kwargs) -> Table:
         """Read file based on its Snapshot extension."""
-        if self.metadata.file_extension == "csv":
-            return self.read_csv(*args, **kwargs)
-        elif self.metadata.file_extension == "feather":
-            return self.read_feather(*args, **kwargs)
-        elif self.metadata.file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-            return self.read_excel(*args, **kwargs)
-        elif self.metadata.file_extension == "json":
-            return self.read_json(*args, **kwargs)
-        elif self.metadata.file_extension == "dta":
-            return self.read_stata(*args, **kwargs)
-        elif self.metadata.file_extension == "rds":
-            return self.read_rds(*args, **kwargs)
-        elif self.metadata.file_extension == "rda":
-            return self.read_rda(*args, **kwargs)
-        else:
-            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+        return read_table_from_snapshot(
+            *args,
+            path=self.path,
+            table_metadata=self.to_table_metadata(),
+            snapshot_origin=self.metadata.origin,
+            file_extension=self.metadata.file_extension,
+            **kwargs,
+        )
 
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
@@ -219,6 +231,10 @@ class Snapshot:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_fwf(self, *args, **kwargs) -> Table:
+        """Read a table of fixed-width formatted lines with metadata."""
+        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -226,10 +242,6 @@ class Snapshot:
     def read_from_dict(self, *args, **kwargs) -> Table:
         """Read data from a dictionary into a Table and populate it with metadata."""
         return pr.read_from_dict(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
-
-    def read_fwf(self, *args, **kwargs) -> Table:
-        """Read a table of fixed-width formatted lines with metadata."""
-        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
         """Return an Excel file object ready for parsing."""
@@ -245,6 +257,26 @@ class Snapshot:
         self.extract(temp_dir.name)
         # Return temporary directory
         return temp_dir
+
+    def read_in_archive(self, filename: str, *args, **kwargs) -> Table:
+        """Read data from file inside a zip/tar archive.
+
+        If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
+
+        To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+        """
+        with self.extract_to_tempdir() as tmpdir:
+            new_extension = filename.split(".")[-1]
+            # Read
+            tb = read_table_from_snapshot(
+                *args,
+                path=Path(tmpdir) / filename,
+                table_metadata=self.to_table_metadata(),
+                snapshot_origin=self.metadata.origin,
+                file_extension=new_extension,
+                **kwargs,
+            )
+            return tb
 
 
 @pruned_json
@@ -446,6 +478,44 @@ class SnapshotMeta:
                 }
             )
         return table_meta
+
+
+def read_table_from_snapshot(
+    path: Union[str, Path],
+    table_metadata: TableMeta,
+    snapshot_origin: Union[Origin, None],
+    file_extension: str,
+    *args,
+    **kwargs,
+) -> Table:
+    """Read snapshot as a table."""
+    # Define kwargs / args
+    args = [
+        path,
+        *args,
+    ]
+    kwargs = {
+        **kwargs,
+        "metadata": table_metadata,
+        "origin": snapshot_origin,
+    }
+    # Read table
+    if file_extension == "csv":
+        return pr.read_csv(*args, **kwargs)
+    elif file_extension == "feather":
+        return pr.read_feather(*args, **kwargs)
+    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
+        return pr.read_excel(*args, **kwargs)
+    elif file_extension == "json":
+        return pr.read_json(*args, **kwargs)
+    elif file_extension == "dta":
+        return pr.read_stata(*args, **kwargs)
+    elif file_extension == "rds":
+        return pr.read_rds(*args, **kwargs)
+    elif file_extension == "rda":
+        return pr.read_rda(*args, **kwargs)
+    else:
+        raise ValueError(f"Unknown extension {file_extension}")
 
 
 def add_snapshot(

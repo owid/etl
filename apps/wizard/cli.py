@@ -13,7 +13,7 @@ import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
 from apps.utils.style import set_rich_click_style
-from apps.wizard.config import WIZARD_PHASES
+from apps.wizard.config import WIZARD_PHASES, WIZARD_PORT
 from apps.wizard.utils import CURRENT_DIR
 
 # Disable streamlit cache data API logging
@@ -46,9 +46,9 @@ set_rich_click_style()
 )
 @click.option(
     "--port",
-    default=8053,
+    default=WIZARD_PORT,
     type=int,
-    help="Application port",
+    help="Application port.",
 )
 def cli(
     phase: Iterable[WIZARD_PHASES],
@@ -60,10 +60,10 @@ def cli(
 
     ```
     ..__    __ _                  _
-    ./ / /\\ \\ (_)______ _ _ __ __| |
-    .\\ \\/  \\/ | |_  / _` | '__/ _` |
-    ..\\  /\\  /| |/ | (_| | | | (_| |
-    ...\\/  \\/ |_/___\\__,_|_|  \\__,_|
+    ./ / /\ \ (_)______ _ _ __ __| |
+    .\ \/  \/ | |_  / _` | '__/ _` |
+    ..\  /\  /| |/ | (_| | | | (_| |
+    ...\/  \/ |_/___\__,_|_|  \__,_|
     ```
 
     Just launch it and start using it! 🪄

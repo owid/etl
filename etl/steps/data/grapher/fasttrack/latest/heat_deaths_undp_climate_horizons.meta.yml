@@ -1,0 +1,12 @@
+dataset:
+  title: Heat-related deaths (UNDP, 2024)
+  description: The estimated increase in heat-related deaths per 100,000 people in a RCP4.5 warming scenario.
+  licenses:
+    - {}
+tables:
+  heat_deaths_undp_climate_horizons:
+    variables:
+      heat_death_rate:
+        title: Heat-related death rate
+        unit: per 100,000
+        description: The estimated increase in heat-related deaths per 100,000 people in a RCP4.5 warming scenario.

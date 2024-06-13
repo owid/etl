@@ -35,7 +35,9 @@ def run(dest_dir: str) -> None:
     # Add a 'year' column filled with 2018
     df_counts["year"] = 2018
 
-    df_counts["countries"] = df_counts["countries"].apply(lambda x: f"{x:,} inhabitants" if isinstance(x, int) else x)
+    df_counts["countries"] = (
+        df_counts["countries"].astype(object).apply(lambda x: f"{x:,} inhabitants" if isinstance(x, int) else x)
+    )
 
     # Replace '<NA>' values in the 'countries' column with 'No minimum population threshold'
     df_counts["countries"] = df_counts["countries"].astype(str).replace("<NA>", "No minimum population threshold")

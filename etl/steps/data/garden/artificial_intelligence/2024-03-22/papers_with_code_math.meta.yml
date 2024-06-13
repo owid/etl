@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+tables:
+  papers_with_code_math:
+    variables:
+      performance_math:
+        title: Performance on math and problem-solving tasks
+        description_key:
+          - This benchmark assesses the accuracy of models on math and problem solving tasks based on the MATH benchmark.
+          - The MATH benchmark consists of 12,500 challenging competition mathematics problems. Each problem in MATH has a full step-by-step solution which can be used to teach models to generate answer derivations and explanations.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true

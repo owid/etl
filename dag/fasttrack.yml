@@ -40,8 +40,6 @@ steps:
     - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv
   data-private://grapher/fasttrack/latest/quantum_processors_over_time:
     - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
-  data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
-    - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
   data-private://grapher/fasttrack/2023-05-03/apms_2014:
     - snapshot-private://fasttrack/2023-05-03/apms_2014.csv
   data-private://grapher/fasttrack/latest/gbd_2019_mental_health_country_coverage:
@@ -124,8 +122,6 @@ steps:
     - snapshot://fasttrack/2023-08-07/animal_lives_per_kilogram.csv
   data://grapher/fasttrack/latest/baxter_2013_gbd_adult_coverage:
     - snapshot://fasttrack/latest/baxter_2013_gbd_adult_coverage.csv
-  data://grapher/fasttrack/latest/joe_test_please_delete:
-    - snapshot://fasttrack/latest/joe_test_please_delete.csv
   data://grapher/fasttrack/latest/public_support_climate_andre:
     - snapshot://fasttrack/latest/public_support_climate_andre.csv
   data://grapher/fasttrack/latest/public_support_climate_vlasceanu:
@@ -134,5 +130,63 @@ steps:
     - snapshot://fasttrack/2023-05-03/qubits.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
-  data-private://grapher/fasttrack/latest/mojmir_test_please_delete:
-    - snapshot-private://fasttrack/latest/mojmir_test_please_delete.csv
+  data-private://grapher/fasttrack/latest/vdem_women_executives:
+    - snapshot://fasttrack/latest/vdem_women_executives.csv
+  data://grapher/fasttrack/latest/heat_deaths_zhao:
+    - snapshot://fasttrack/latest/heat_deaths_zhao.csv
+  data://grapher/fasttrack/latest/aviation_emissions_bergero:
+    - snapshot://fasttrack/latest/aviation_emissions_bergero.csv
+  data://grapher/fasttrack/latest/aviation_emissions_lee_bergero_gcp:
+    - snapshot://fasttrack/latest/aviation_emissions_lee_bergero_gcp.csv
+  data://grapher/fasttrack/latest/agricultural_policies_wuepper:
+    - snapshot://fasttrack/latest/agricultural_policies_wuepper.csv
+  data://grapher/fasttrack/latest/tomitaka_2018:
+    - snapshot://fasttrack/latest/tomitaka_2018.csv
+  data://grapher/fasttrack/latest/draft_joe_idd_oecd:
+    - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
+  data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
+    - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
+  data://grapher/fasttrack/latest/north_atlantic_hurricanes_noaa:
+    - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv
+  data://grapher/fasttrack/latest/usa_hurricane_categories_noaa:
+    - snapshot://fasttrack/latest/usa_hurricane_categories_noaa.csv
+  data://grapher/fasttrack/latest/usa_weather_climate_noaa:
+    - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
+  data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
+    - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
+  data://grapher/fasttrack/latest/gpei:
+    - snapshot://fasttrack/latest/gpei.csv
+  data-private://grapher/fasttrack/latest/conflict_deaths_combined:
+    - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
+  data://grapher/fasttrack/2024-04-17/qubits:
+    - snapshot://fasttrack/2024-04-17/qubits.csv
+  data://grapher/fasttrack/latest/pig_production_bartlett:
+    - snapshot://fasttrack/latest/pig_production_bartlett.csv
+  data://grapher/fasttrack/2024-04-22/supercomputers:
+    - snapshot://fasttrack/2024-04-22/supercomputers.csv
+  data-private://grapher/fasttrack/2024-04-25/joe_phd_short_period:
+    - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds:
+    - snapshot://fasttrack/latest/air_pollution_ceds.csv
+  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
+    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
+    - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv
+  data://grapher/fasttrack/latest/lives_saved_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_vaccination_who.csv
+  data://grapher/fasttrack/latest/heat_deaths_undp_climate_horizons:
+    - snapshot://fasttrack/latest/heat_deaths_undp_climate_horizons.csv
+  data://grapher/fasttrack/latest/infant_mortality_vaccination_shattock:
+    - snapshot://fasttrack/latest/infant_mortality_vaccination_shattock.csv
+  data://grapher/fasttrack/latest/cumulative_lives_saved_vaccination_shattock:
+    - snapshot://fasttrack/latest/cumulative_lives_saved_vaccination_shattock.csv
+  data://grapher/fasttrack/latest/heat_deaths_climate_historical:
+    - snapshot://fasttrack/latest/heat_deaths_climate_historical.csv
+  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
+    - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
+  data://grapher/fasttrack/latest/air_conditioning_rate_iea:
+    - snapshot://fasttrack/latest/air_conditioning_rate_iea.csv
+  data://grapher/fasttrack/latest/projections_air_conditioners_iea:
+    - snapshot://fasttrack/latest/projections_air_conditioners_iea.csv
+  data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1993_2018:
+    - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1993_2018.csv

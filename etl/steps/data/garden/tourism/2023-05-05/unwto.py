@@ -63,14 +63,14 @@ def run(dest_dir: str) -> None:
     merged_df_drop_ = merged_df.loc[~merged_df.country.isin(["Saba", "Sint Eustatius", "Bonaire"])]
     # Concatenate 'merged_df_drop_' and 'sum_bon_sint_saba' into a single DataFrame 'merged_df_concat'.
     # The rows of 'sum_bon_sint_saba' will be appended to 'merged_df_drop_'.
-    merged_df_concat = merged_df_drop_.append(sum_bon_sint_saba, ignore_index=True)
+    merged_df_concat = pd.concat([merged_df_drop_, sum_bon_sint_saba], ignore_index=True)
 
     # Set index, check that it's unique and reset index
-    assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"
+    assert not merged_df_concat[["country", "year"]].duplicated().any(), "Index is not well constructed"  # type: ignore
 
     # Aggregate data by region (decided not to do for now)
     # Africa, Oceania, and income level categories
-    # regions_ = ["North America",
+    ## regions_ = ["North America",
     #     "South America",
     #     "Europe",
     #     "Africa",

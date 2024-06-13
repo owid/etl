@@ -1,0 +1,37 @@
+meta:
+  origin:
+    producer: United States Environmental Protection Agency
+    title: 'Climate Change Indicators: Ice Sheets'
+    description: |-
+      This dataset includes the cumulative change in mass in the ice sheets of Greenland and Antarctica since 1992.
+
+      This indicator is presented in two different ways, based on two different sources:
+      * IMBIE, an average value based on more than 20 different studies.
+        * The uncertainty estimates from the various datasets that feed into the combined average.
+      * NASA JPL: A commonly cited analysis by NASA JPL, which includes seasonal variations.
+
+      All estimates are centered at zero in 2002 to provide a consistent point of reference. Thus, a downward slope indicates a net loss of ice and snow.
+      For reference, 1,000 billion metric tons is equal to about 260 cubic miles of ice—enough to raise sea level by about 3 millimeters.
+    citation_full: |-
+      United States Environmental Protection Agency (EPA) - Climate Change Indicators: Ice Sheets (2021)
+
+      Full citation of the original sources:
+      * IMBIE (Ice sheet Mass Balance Inter-comparison Exercise team). 2018. Mass balance of the Antarctic Ice Sheet from 1992 to 2017. Nature 558:219-222. doi:10.1038/s41586-018-0179-y
+      * IMBIE (Ice sheet Mass Balance Inter-comparison Exercise team). 2020. Mass balance of the Greenland Ice sheet from 1992 to 2018. Nature in press. doi:10.1038/s41586-019-1855-2
+      * NASA (National Aeronautics and Space Administration). 2021. Vital signs: Land ice. Antarctica and Greenland mass variation since 2002. Accessed March 2021. https://climate.nasa.gov/vital-signs/land-ice
+
+      More details can be found on [their technical documentation](https://www.epa.gov/sites/default/files/2021-04/documents/ice-sheets_td.pdf).
+    attribution: EPA based on various sources (2021)
+    attribution_short: EPA
+    url_main: https://www.epa.gov/climate-indicators/climate-change-indicators-ice-sheets
+    url_download: https://www.epa.gov/sites/default/files/2021-04/ice_sheets_fig-1.csv
+    date_accessed: '2024-04-17'
+    date_published: '2021-04-01'
+    license:
+      name: Public domain
+      url: https://edg.epa.gov/epa_data_license.html
+wdir: ../../../data/snapshots/epa/2024-04-17
+outs:
+  - md5: 4855164ffa55ddf71df690fadceac94c
+    size: 25986
+    path: ice_sheet_mass_balance.csv

@@ -11,17 +11,13 @@ definitions:
 
 
 # Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: {{cookiecutter.update_period_days}}
 
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   {{cookiecutter.short_name}}:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       # testing_variable:
       #   title: Testing variable title

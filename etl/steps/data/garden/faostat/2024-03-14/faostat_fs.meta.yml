@@ -1,0 +1,121 @@
+dataset:
+  title: 'Food Security: Suite of Food Security Indicators'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_fs_flat:
+    title: 'Food Security: Suite of Food Security Indicators'
+    variables:
+      minimum_dietary_energy_requirement__kcal_cap_day__00021056__value__006128__kilocalories_per_capita_per_day:
+        title: Minimum dietary energy requirement  (kcal/cap/day) | 00021056 || Value | 006128 || Kilocalories per capita per day
+        unit: kilocalories per capita per day
+        short_unit: kcal/cap/d
+        processing_level: major
+        display:
+          name: Minimum dietary energy requirement
+          shortUnit: kcal/cap/d
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Minimum dietary energy requirement
+      number_of_moderately_or_severely_food_insecure_people__million__3_year_average__00210081__value__006132__million_number:
+        title: Number of moderately or severely food insecure people (million) (3-year average) | 00210081 || Value | 006132 || million Number
+        unit: millions
+        short_unit: millions
+        processing_level: major
+        display:
+          name: Number of moderately or severely food insecure people
+          shortUnit: millions
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of moderately or severely food insecure people
+          title_variant: 3-year average
+      number_of_severely_food_insecure_people__million__3_year_average__00210071__value__006132__million_number:
+        title: Number of severely food insecure people (million) (3-year average) | 00210071 || Value | 006132 || million Number
+        unit: millions
+        short_unit: millions
+        processing_level: major
+        display:
+          name: Number of severely food insecure people
+          shortUnit: million No
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Number of severely food insecure people
+          title_variant: 3-year average
+      number_of_severely_food_insecure_people__million__annual_value__00210070__value__006132__million_number:
+        title: Number of severely food insecure people (million) (annual value) | 00210070 || Value | 006132 || million Number
+        unit: millions
+        short_unit: millions
+        processing_level: major
+        display:
+          name: Number of severely food insecure people
+          shortUnit: million No
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Number of severely food insecure people
+          title_variant: annual value
+      percentage_of_children_under_5_years_of_age_who_are_stunted__modelled_estimates__percent__00021025__value__006121__percent:
+        title: Percentage of children under 5 years of age who are stunted (modelled estimates) (percent) | 00021025 || Value | 006121 || Percent
+        unit: percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Percentage of children under five years of age who are stunted
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Percentage of children under five years of age who are stunted (Percent)
+      prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent:
+        title: Prevalence of moderate or severe food insecurity in the total population (percent) (3-year average) | 00210091 || Value | 006121 || Percent
+        unit: percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Prevalence of moderate or severe food insecurity in the total population
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of moderate or severe food insecurity in the total population
+          title_variant: 3-year average
+      prevalence_of_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210401__value__006121__percent:
+        title: Prevalence of severe food insecurity in the total population (percent) (3-year average) | 00210401 || Value | 006121 || Percent
+        unit: percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Prevalence of severe food insecurity in the total population
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of severe food insecurity in the total population
+          title_variant: 3-year average
+      prevalence_of_undernourishment__percent__annual_value__00210040__value__006121__percent:
+        title: Prevalence of undernourishment (percent) (annual value) | 00210040 || Value | 006121 || Percent
+        unit: percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Prevalence of undernourishment
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of undernourishment
+          title_variant: annual value
+      share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__kcal_cap_day__3_year_average__00021012__value__006121__percent:
+        title: Share of dietary energy supply derived from cereals, roots and tubers (kcal/cap/day) (3-year average) | 00021012 || Value | 006121 || Percent
+        unit: percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Share of dietary energy supply derived from cereals, roots and tubers
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Share of dietary energy supply derived from cereals, roots and tubers

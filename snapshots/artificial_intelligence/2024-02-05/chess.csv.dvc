@@ -34,6 +34,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2024-02-05
 outs:
-- md5: a50b0dfb80d7bdd15ea1fb807d8f7c6f
-  size: 1309
-  path: chess.csv
+  - md5: 2cddb5285d4795b407845cbadca5c049
+    size: 1309
+    path: chess.csv

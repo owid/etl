@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: 1a0a6dbc0d30cd997f3de9e908562f31
-  size: 29072
-  path: plastic_use_projections.csv
+  - md5: 579fda8865cdb240cc224ca56207326f
+    size: 29072
+    path: plastic_use_projections.csv

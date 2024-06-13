@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global Monthly Emissions from Fires
+    title: Global Monthly Emissions from Wildfires
     description: |-
       Monthly biomass burning emissions (in tons) by pollutant for years 2002-2022 for all countries and sub-country administrative units (GADM level 0 and level 1 administrative units). The dataset is derived from the Global Fire Emission Database (GFED) which combines satellite information on fire activity and vegetation productivity to estimate fire emissions.
     date_published: 2022

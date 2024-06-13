@@ -5,32 +5,41 @@ steps:
     - data://explorers/wid/latest/world_inequality_database
     - data://explorers/lis/latest/luxembourg_income_study
 
+  # Poverty and inequality file for Joe's PhD
+  data://explorers/poverty_inequality/latest/poverty_inequality_export:
+    - data://garden/wb/2024-03-27/world_bank_pip
+    - data://garden/wid/2024-05-24/world_inequality_database
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/wb/2024-01-22/thousand_bins_distribution
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+
   # World Bank Poverty and Inequality Platform
-  data://meadow/wb/2024-01-17/world_bank_pip:
-    - snapshot://wb/2024-01-17/world_bank_pip.csv
-    - snapshot://wb/2024-01-17/world_bank_pip_percentiles.csv
-  data://garden/wb/2024-01-17/world_bank_pip:
-    - data://meadow/wb/2024-01-17/world_bank_pip
-  data://grapher/wb/2024-01-17/world_bank_pip_2011ppp:
-    - data://garden/wb/2024-01-17/world_bank_pip
-  data://grapher/wb/2024-01-17/world_bank_pip_2017ppp:
-    - data://garden/wb/2024-01-17/world_bank_pip
+  data://meadow/wb/2024-03-27/world_bank_pip:
+    - snapshot://wb/2024-03-27/world_bank_pip.csv
+    - snapshot://wb/2024-03-27/world_bank_pip_percentiles.csv
+  data://garden/wb/2024-03-27/world_bank_pip:
+    - data://meadow/wb/2024-03-27/world_bank_pip
+  data://grapher/wb/2024-03-27/world_bank_pip_2011ppp:
+    - data://garden/wb/2024-03-27/world_bank_pip
+  data://grapher/wb/2024-03-27/world_bank_pip_2017ppp:
+    - data://garden/wb/2024-03-27/world_bank_pip
   data://explorers/wb/latest/world_bank_pip:
-    - data://garden/wb/2024-01-17/world_bank_pip
+    - data://garden/wb/2024-03-27/world_bank_pip
 
   # World Inequality Database
-  data://meadow/wid/2023-08-24/world_inequality_database:
+  data://meadow/wid/2024-05-24/world_inequality_database:
     - data://garden/regions/2023-01-01/regions
-    - snapshot://wid/2023-08-24/world_inequality_database.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
-  data://garden/wid/2023-08-24/world_inequality_database:
-    - data://meadow/wid/2023-08-24/world_inequality_database
-  data://grapher/wid/2023-08-24/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
+    - snapshot://wid/2024-05-24/world_inequality_database.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_fiscal.csv
+  data://garden/wid/2024-05-24/world_inequality_database:
+    - data://meadow/wid/2024-05-24/world_inequality_database
+  data://grapher/wid/2024-05-24/world_inequality_database:
+    - data://garden/wid/2024-05-24/world_inequality_database
   data://explorers/wid/latest/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
+    - data://garden/wid/2024-05-24/world_inequality_database
 
   # Luxembourg Income Study
   data://meadow/lis/2023-08-30/luxembourg_income_study:
@@ -58,13 +67,13 @@ steps:
   data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
     - data://garden/ophi/2023-07-05/multidimensional_poverty_index
 
-  # OECD Income Distribution Database
-  data://meadow/oecd/2023-06-06/income_distribution_database:
-    - snapshot://oecd/2023-06-06/income_distribution_database.csv
-  data://garden/oecd/2023-06-06/income_distribution_database:
-    - data://meadow/oecd/2023-06-06/income_distribution_database
-  data://grapher/oecd/2023-06-06/income_distribution_database:
-    - data://garden/oecd/2023-06-06/income_distribution_database
+  # # OECD Income Distribution Database
+  data://meadow/oecd/2024-04-10/income_distribution_database:
+    - snapshot://oecd/2024-04-10/income_distribution_database.csv
+  data://garden/oecd/2024-04-10/income_distribution_database:
+    - data://meadow/oecd/2024-04-10/income_distribution_database
+  data://grapher/oecd/2024-04-10/income_distribution_database:
+    - data://garden/oecd/2024-04-10/income_distribution_database
 
   # Historical poverty data - Moatsos (2021)
   data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
@@ -84,3 +93,27 @@ steps:
     - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
+
+  # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
+  data://meadow/cedlas/2024-03-08/sedlac:
+    - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_poverty.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_inequality.xlsx
+  data://garden/cedlas/2024-03-08/sedlac:
+    - data://meadow/cedlas/2024-03-08/sedlac
+  data://grapher/cedlas/2024-03-08/sedlac:
+    - data://garden/cedlas/2024-03-08/sedlac
+
+  # Annual Survey of Hours and Earnings time series of selected estimates - UK's Office for National Statistics
+  data://meadow/ons/2024-03-20/hours_and_earnings_uk:
+    - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
+  data://garden/ons/2024-03-20/hours_and_earnings_uk:
+    - data://meadow/ons/2024-03-20/hours_and_earnings_uk
+
+  # OECD Affordable Housing Database - Homelessness
+  data://meadow/oecd/2024-04-30/affordable_housing_database:
+    - snapshot://oecd/2024-04-30/affordable_housing_database_homelessness.xlsx
+  data://garden/oecd/2024-04-30/affordable_housing_database:
+    - data://meadow/oecd/2024-04-30/affordable_housing_database
+  data://grapher/oecd/2024-04-30/affordable_housing_database:
+    - data://garden/oecd/2024-04-30/affordable_housing_database

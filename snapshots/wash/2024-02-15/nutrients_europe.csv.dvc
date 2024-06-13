@@ -28,6 +28,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-02-15
 outs:
-  - md5: 21bd1b2b8e0c1af1987f1fdbdab68135
+  - md5: 76eb5066d70d165436b3bd060b2ac63c
     size: 125618
     path: nutrients_europe.csv

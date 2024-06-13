@@ -9,11 +9,16 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import get_comments_above_step_in_dag, write_to_dag_file
-from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
+from etl.helpers import (
+    create_dag_archive_file,
+    get_comments_above_step_in_dag,
+    remove_steps_from_dag_file,
+    write_to_dag_file,
+)
+from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
-from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
+from etl.version_tracker import DAG_TEMP_STEP, UpdateState, VersionTracker
 
 log = structlog.get_logger()
 
@@ -36,7 +41,7 @@ class StepUpdater:
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
         # Initialize version tracker.
-        self.tracker = VersionTracker()
+        self.tracker = VersionTracker(ignore_archive=True)
 
         # Update the temporary dag.
         _update_temporary_dag(dag_active=self.tracker.dag_active, dag_all_reverse=self.tracker.dag_all_reverse)
@@ -45,11 +50,6 @@ class StepUpdater:
         self.steps_df = self.tracker.steps_df.copy()
         # Select only active steps.
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
-        # For convenience, add full local path to dag files to steps dataframe.
-        self.steps_df["dag_file_path"] = [
-            (DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
-            for dag_file_name in self.steps_df["dag_file_name"]
-        ]
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
@@ -74,7 +74,7 @@ class StepUpdater:
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         step_header: Optional[str] = None,
-    ) -> None:
+    ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
@@ -82,7 +82,7 @@ class StepUpdater:
         step_dvc_file = SNAPSHOTS_DIR / step_info["namespace"] / step_info["version"] / (step_info["name"] + ".dvc")
         if not step_dvc_file.exists():
             log.error(f"No .dvc file found for step {step}.")
-            sys.exit(1)
+            return 1
 
         # Define folder for new version.
         folder_new = SNAPSHOTS_DIR / step_info["namespace"] / step_version_new
@@ -91,7 +91,7 @@ class StepUpdater:
         step_dvc_file_new = folder_new / (step_info["name"] + ".dvc")
         if step_dvc_file_new.exists():
             log.error(f"New .dvc file already exists: {step_dvc_file_new}")
-            sys.exit(1)
+            return 1
 
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
@@ -138,7 +138,8 @@ class StepUpdater:
             metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
             # Update version and date accessed.
             metadata.version = step_version_new  # type: ignore
-            metadata.origin.date_accessed = step_version_new  # type: ignore
+            if metadata.origin:
+                metadata.origin.date_accessed = step_version_new  # type: ignore
             # Write metadata to new file.
             step_dvc_file_new.write_text(metadata.to_yaml())
 
@@ -165,12 +166,14 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
+        return 0
+
     def _update_data_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         step_header: Optional[str] = None,
-    ) -> None:
+    ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
@@ -189,10 +192,14 @@ class StepUpdater:
             step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
         else:
             log.error(f"No step files found for step {step}.")
-            sys.exit(1)
+            return 1
 
         # Define the new step.
-        step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+        if step_info["version"] == "latest":
+            # If the step has version "latest", the new step will also have version "latest".
+            step_new = step
+        else:
+            step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
 
         # Find the latest version of each of the step's dependencies.
         step_dependencies = set(self.steps_df[self.steps_df["step"] == step].iloc[0]["direct_dependencies"])
@@ -214,21 +221,23 @@ class StepUpdater:
             step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file)
 
         if not self.dry_run:
-            # Copy files to new folder.
-            for step_file in step_files:
-                # Define the path to the new version of this file.
-                step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
+            # If the step has version "latest", the files do not need to be updated, but the dag may need to be updated.
+            if step_info["version"] != "latest":
+                # Copy files to new folder.
+                for step_file in step_files:
+                    # Define the path to the new version of this file.
+                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
 
-                # Check that the new file does not exist.
-                if step_file_new.exists():
-                    log.error(f"New file already exists: {step_file_new}")
-                    sys.exit(1)
+                    # Check that the new file does not exist.
+                    if step_file_new.exists():
+                        log.error(f"New file already exists: {step_file_new}")
+                        return 1
 
-                # If new folder does not exist, create it.
-                step_file_new.parent.mkdir(parents=True, exist_ok=True)
+                    # If new folder does not exist, create it.
+                    step_file_new.parent.mkdir(parents=True, exist_ok=True)
 
-                # Create new file.
-                step_file_new.write_bytes(step_file.read_bytes())
+                    # Create new file.
+                    step_file_new.write_bytes(step_file.read_bytes())
 
             # Add new step and its dependencies to the dag.
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
@@ -236,9 +245,11 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
+        return 0
+
     def _update_step(
         self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
-    ) -> None:
+    ) -> int:
         """Update step to new version."""
 
         # Check that step to be updated exists in the active dag.
@@ -246,15 +257,19 @@ class StepUpdater:
 
         # Extract channel from step.
         step_channel = self.steps_df[self.steps_df["step"] == step].iloc[0]["channel"]
+        step_version = self.steps_df[self.steps_df["step"] == step].iloc[0]["version"]
 
-        log.info(f"Updating {step} to version {step_version_new}.")
+        if step_version == "latest":
+            log.info(f"Updating {step} (by simply updating the DAG).")
+        else:
+            log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
-            self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
+            return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
         elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
-            self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
+            return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
-            sys.exit(1)
+            return 1
 
     def update_steps(
         self,
@@ -287,12 +302,14 @@ class StepUpdater:
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += [usage for usage in usages if usage not in steps]
 
-        # Remove steps that cannot be updated because they are in their latest version,
-        # or because their version is "latest".
+        # Remove steps that cannot be updated because their version is already equal to the new version.
+        # NOTE: One could think that steps with version "latest" should also be skipped. But their dependencies may need
+        # to be updated. So they may need to be updated in the dag, even if their code should not be edited.
         steps = [
             step
             for step in steps
-            if self.steps_df[self.steps_df["step"] == step]["version"].item() not in [step_version_new, "latest"]
+            if (self.steps_df[self.steps_df["step"] == step]["version"].item() != step_version_new)
+            and (self.steps_df[self.steps_df["step"] == step]["update_period_days"].item() != 0)
         ]
 
         # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
@@ -305,7 +322,10 @@ class StepUpdater:
                 )
 
         if len(steps) == 0:
-            log.info("No steps can be updated (they may be in their latest version).")
+            log.info(
+                "No steps to be updated. "
+                "You may have attempted to update steps that are already updated or that have update periods of 0 days."
+            )
         else:
             # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
             # Also, if a data step depends on other steps, the dependencies need to be updated first.
@@ -333,7 +353,102 @@ class StepUpdater:
 
             # Update each step.
             for step in steps:
-                self._update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+                success = self._update_step(
+                    step=step, step_version_new=step_version_new, step_header=step_headers[step]
+                )
+                if success == 1:
+                    log.error(f"Stopped because of a failure on step {step}.")
+                    break
+
+    def _archive_step(self, step: str) -> None:
+        # Move a certain step from its active dag to its corresponding archive dag.
+
+        # Get info for step to be updated.
+        step_info = self.get_step_info(step=step)
+
+        # Skip non-archivable steps.
+        if step_info["update_state"] != UpdateState.ARCHIVABLE.value:
+            log.info(f"Skipping non-archivable step: {step}")
+            return
+
+        # Skip snapshots (since they do not appear as steps in the dag).
+        if step_info["channel"] in ["snapshot", "walden"]:
+            log.info(f"Skipping snapshot: {step}")
+            return
+
+        # Get active dag file for this step.
+        dag_file_active = step_info["dag_file_path"]
+
+        # Get archive dag file for this step.
+        dag_file_archive = Path(
+            dag_file_active.as_posix().replace(
+                DAG_DIR.relative_to(BASE_DIR).as_posix(), DAG_ARCHIVE_FILE.parent.relative_to(BASE_DIR).as_posix()
+            )
+        )
+
+        # If the archive dag file does not exist, create it.
+        if not dag_file_archive.exists():
+            create_dag_archive_file(dag_file_archive=dag_file_archive)
+
+        # Get header from the comment lines right above the current step in the dag.
+        step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file_active)
+
+        # Create the dag_part that needs to be written to the archive file.
+        dag_part = {step: set(step_info["direct_dependencies"])}
+
+        log.info(f"Archiving step: {step}")
+        if not self.dry_run:
+            # Add the new step and its dependencies to the archive dag.
+            write_to_dag_file(dag_file=dag_file_archive, dag_part=dag_part, comments={step: step_header})
+
+            # Delete the step from the active dag.
+            remove_steps_from_dag_file(dag_file=dag_file_active, steps_to_remove=[step])
+
+            # Reload steps dataframe.
+            self._load_version_tracker()
+
+    def archive_steps(self, steps: Union[str, List[str]], include_usages: bool = False) -> None:
+        """Move one or more steps from their active to their archive dag."""
+
+        # If a single step is given, convert it to a list.
+        if isinstance(steps, str):
+            steps = [steps]
+        elif isinstance(steps, tuple):
+            steps = list(steps)
+
+        # Archivable steps should be archived in groups.
+        # For example, the meadow, garden and grapher steps of a step may be archivable, but we shouldn't archive only
+        # the meadow step without archiving the garden and grapher steps as well (otherwise there would be a broken
+        # dependency in the dag).
+        for step in steps:
+            if include_usages:
+                # Add all active usages of current step to the list of steps to update (if not already in the list).
+                usages = self.steps_df[self.steps_df["step"] == step]["all_active_usages"].item()
+
+                steps += [usage for usage in usages if usage not in steps]
+
+        # Sort steps in dependency order (i.e. snapshots first). This avoids an error in the following situation:
+        # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
+        # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
+        # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
+        steps = to_dependency_order(
+            dag=self.tracker.dag_active,
+            includes=steps,  # type: ignore
+            excludes=[],
+            downstream=False,
+            only=True,
+        )
+
+        if self.interactive:
+            message = "The following steps will be archived:"
+            for step in steps:
+                message += f"\n  {step}"
+            log.info(message)
+            if self.interactive:
+                input("Press enter to continue.")
+
+        for step in steps:
+            self._archive_step(step=step)
 
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
@@ -370,7 +485,7 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     return choice
 
 
-@click.command(cls=RichCommand, help=__doc__)
+@click.command(name="update", cls=RichCommand, help=__doc__)
 @click.argument("steps", type=str or List[str], nargs=-1)
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
@@ -396,6 +511,13 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     type=bool,
     help="Do not write to dag or create step files. Default: False.",
 )
+@click.option(
+    "--interactive/--non-interactive",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
+)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -406,54 +528,103 @@ def cli(
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
-    # Description
     This tool lets you update one or more snapshots or data steps to a new version. It will:
 
     * Create new folders and files for each of the steps.
-
     * Add the new steps to the dag, with the same header comments as their current version.
 
-    ## Notes
+    **Notes:**
 
     Keep in mind that:
 
     * If there is ambiguity, the user will be asked for confirmation before updating each step, and on situations where there is some ambiguity.
-
     * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
-
     * All dependencies of new steps will be assumed to use their latest version possible.
+    * Steps whose version is already equal to the new version will be skipped.
 
-    * Steps that are already in their latest version (or whose version is "latest") will be skipped.
+    **Examples:**
 
-    ## Examples
+    **Note:** Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
 
-    Here are some examples of how to use the tool:
+    * To update a single snapshot to the new version:
+        ```
+        $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
+        ```
 
-    NOTE: Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
-
-    * To update a single snapshot to the latest version:
-    ```
-    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
-    ```
-    Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
 
     * To update not only that snapshot, but also the steps that use it:
-    ```
-    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
-    ```
+        ```
+        $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
+        ```
 
     * To update all dependencies of the climate change impacts explorer:
-    ```
-    $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
-    ```
-    Note that the explorers step itself will not be updated, since it is already in its "latest" version.
+        ```
+        $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
+        ```
 
-    # Reference
+        Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
     """
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
+        include_usages=include_usages,
+    )
+
+
+@click.command(name="archive", cls=RichCommand, help=__doc__)
+@click.argument("steps", type=str or List[str], nargs=-1)
+@click.option(
+    "--include-usages",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Archive also steps that are directly using the given steps. Default: False.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Do not write to dag. Default: False.",
+)
+@click.option(
+    "--interactive/--non-interactive",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
+)
+def archive_cli(
+    steps: Union[str, List[str]],
+    include_usages: bool = False,
+    dry_run: bool = False,
+    interactive: bool = True,
+) -> None:
+    """Archive one or more steps.
+
+    This tool lets you move one or more data steps from their active to their archive dag.
+
+    **Examples:**
+
+    **Note:** Remove the --dry-run if you want to actually write to the dag.
+
+    * To archive a single step:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --dry-run
+        ```
+
+        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+
+    * To archive not only that step, but also the steps that use it:
+        ```
+        $ etl archive data://meadow/aviation_safety_network/2022-10-12/aviation_statistics --include-usages --dry-run
+        ```
+    """
+    # Initialize step updater and run update.
+    StepUpdater(dry_run=dry_run, interactive=interactive).archive_steps(
+        steps=steps,
         include_usages=include_usages,
     )

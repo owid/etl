@@ -14,7 +14,7 @@ tables:
         description_key:
           - "The UN Office on Drugs and Crime collates homicide data from two main resources: 1) primarily data from national law enforcement and criminal justice authorities, 2) civil registry data from WHO-MD and national authorities"
         presentation:
-          title_public: Homcide rate
+          title_public: Homicide rate
           attribution_short: UNODC
           grapher_config:
             title: Homicide rate
