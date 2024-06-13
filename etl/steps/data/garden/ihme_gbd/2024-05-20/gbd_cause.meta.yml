@@ -6,7 +6,8 @@ definitions:
         - Global Health
         - Causes of Death
     processing_level: minor
-
+  description_key: |-
+    <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>
@@ -124,6 +125,9 @@ tables:
           {definitions.value_deaths.unit}
         description_short: |-
           {definitions.value_deaths.description_short}
+        description_key:
+          - |-
+            {definitions.description_key}
         presentation:
           grapher_config:
             note: |-
@@ -140,6 +144,9 @@ tables:
           {definitions.value_dalys.unit}
         description_short: |-
           {definitions.value_dalys.description_short}
+        description_key:
+          - |-
+            {definitions.description_key}
         presentation:
           grapher_config:
             note: |-
