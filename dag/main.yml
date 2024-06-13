@@ -742,6 +742,14 @@ steps:
   data://grapher/lgbt_rights/2024-06-03/equaldex:
     - data://garden/lgbt_rights/2024-06-03/equaldex
 
+  # Public Finances in Modern History dataset (IMF)
+  data://meadow/imf/2024-06-12/public_finances_modern_history:
+    - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
+  data://garden/imf/2024-06-12/public_finances_modern_history:
+    - data://meadow/imf/2024-06-12/public_finances_modern_history
+  data://grapher/imf/2024-06-12/public_finances_modern_history:
+    - data://garden/imf/2024-06-12/public_finances_modern_history
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
