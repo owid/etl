@@ -2,6 +2,7 @@
 
 """
 
+import math
 from typing import Any, Dict, List, Union
 
 import numpy as np
@@ -110,6 +111,7 @@ chart_config = create_default_chart_config_for_variable(metadata=metadata)
 #  * Create another slider (from 0 to 10) for tolerance.
 #  * Create dropdown for color schema.
 #  * Add "custom" to the list of radio buttons for bracket type.
+#  * Consider categorical values.
 
 # Maximum number of brackets allowed in a chart.
 MAX_NUM_BRACKETS = 10
@@ -125,23 +127,18 @@ values = df[df["years"] == df["years"].max()]["values"]
 
 
 def round_to_nearest_power_of_ten(number, floor: bool = True):
-    if number <= 0:
-        return 0
     if floor:
-        return 10 ** (np.floor(np.log10(np.abs(number))))
+        return 10 ** (math.floor(math.log10(abs(number if number != 0 else 1))))
     else:
-        return 10 ** (np.ceil(np.log10(np.abs(number))))
+        return 10 ** (math.ceil(math.log10(abs(number if number != 0 else 1))))
 
 
-def round_to_significant_figures(number: Union[int, float], sig_figs: int = 1) -> float:
-    if number == 0:
-        return 0
-    else:
-        return round(number, sig_figs - int(np.floor(np.log10(abs(number)))) - 1)
+def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
+    return round(value, sig_figs - 1 - math.floor(math.log10(abs(value if value != 0 else 1))))
 
 
 # TODO: Move to tests.
-def test_round_to_significant_figures_1_sig_fig():
+def test_round_to_sig_figs_1_sig_fig():
     tests = {
         0.01: 0.01,
         0.059: 0.06,
@@ -160,20 +157,25 @@ def test_round_to_significant_figures_1_sig_fig():
         987: 1000,
     }
     for test in tests.items():
-        assert round_to_significant_figures(test[0], sig_figs=1) == test[1]
+        assert round_to_sig_figs(test[0], sig_figs=1) == float(test[1])
+        # Check also the same numbers but negative.
+        assert round_to_sig_figs(-test[0], sig_figs=1) == -float(test[1])
 
 
-def test_round_to_significant_figures_2_sig_fig():
+def test_round_to_sig_figs_2_sig_fig():
+    # NOTE: Python will always ignore trailing zeros (even when printing in scientific notation).
+    # We could have a function that returns a string that respect significant trailing zeros.
+    # But for now, this is good enough.
     tests = {
-        0.01: 0.01,
+        0.01: 0.010,
         0.059: 0.059,
         0.055: 0.055,
         0.050: 0.050,
         0.0441: 0.044,
-        0: 0,
-        1: 1,
-        5: 5,
-        9: 9,
+        0: 0.0,
+        1: 1.0,
+        5: 5.0,
+        9: 9.0,
         10: 10,
         11: 11,
         15: 15,
@@ -182,7 +184,9 @@ def test_round_to_significant_figures_2_sig_fig():
         987: 990,
     }
     for test in tests.items():
-        assert round_to_significant_figures(test[0], sig_figs=2) == test[1]
+        assert round_to_sig_figs(test[0], sig_figs=2) == test[1]
+        # Check also the same numbers but negative.
+        assert round_to_sig_figs(-test[0], sig_figs=2) == -test[1]
 
 
 def test_round_to_nearest_power_of_ten_floor():
@@ -268,7 +272,7 @@ if bracket_type == LABEL_LINEAR:
     st.number_input("Increments", min_value=0, max_value=100, value=1, step=1)
     brackets = np.arange(values.min(), values.max(), 1).tolist()
 else:
-    brackets = [round_to_significant_figures(bracket, sig_figs=1) for bracket in brackets_all[bracket_type]]  # type: ignore
+    brackets = [round_to_sig_figs(bracket, sig_figs=1) for bracket in brackets_all[bracket_type]]  # type: ignore
 
 # lower_limit, upper_limit = st.slider(label="Select a range of values", min_value=0, max_value=10, value=(0, 10))
 min_selected, max_selected = st.select_slider(  # type: ignore
