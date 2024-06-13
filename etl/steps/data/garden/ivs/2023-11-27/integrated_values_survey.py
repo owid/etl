@@ -2,7 +2,7 @@
 
 from typing import List
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
 
@@ -115,8 +115,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset, regions and population
     ds_meadow = paths.load_dataset("integrated_values_survey")
-    ds_regions = paths.load_dataset("regions")
-    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["integrated_values_survey"].reset_index()
@@ -131,15 +129,6 @@ def run(dest_dir: str) -> None:
 
     # Sanity checks
     tb = sanity_checks(tb)
-
-    # Add aggregations
-    tb = add_population_weighted_aggregations(
-        tb=tb,
-        columns=QUESTIONS_TO_AGGREGATE,
-        ds_regions=ds_regions,
-        ds_population=ds_population,
-        regions=REGIONS,
-    )
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -472,44 +461,5 @@ def check_sum_100(tb: Table, questions: List[str], answers: List[str], margin: f
 
     # Remove sum_check
     tb = tb.drop(columns=["sum_check"])
-
-    return tb
-
-
-def add_population_weighted_aggregations(
-    tb: Table, columns: List[str], ds_regions: Dataset, ds_population: Dataset, regions: List[str]
-) -> Table:
-    """
-    Add population-weighted aggregations for the columns in the list
-    """
-
-    tb = tb.copy()
-
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
-
-    columns_pop = []
-    for col in columns:
-        tb[f"{col}_pop"] = tb[col] * tb["population"]
-        columns_pop.append(f"{col}_pop")
-
-    aggregations = dict.fromkeys(
-        columns_pop + ["population"],
-        "sum",
-    )
-
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        ds_regions=ds_regions,
-        regions=regions,
-        aggregations=aggregations,
-        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
-    )
-
-    # Estimate population-weighted aggregations
-    for col in columns:
-        tb[f"{col}"] = tb[f"{col}_pop"] / tb["population"]
-
-    # Drop columns we don't need anymore
-    tb = tb.drop(columns=columns_pop + ["population"])
 
     return tb

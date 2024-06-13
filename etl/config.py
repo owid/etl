@@ -122,6 +122,7 @@ STAGING = load_STAGING()
 
 # if STAGING is used, override ENV values
 if STAGING is not None:
+    GRAPHER_USER_ID = 1  # use Admin user when working with staging
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
@@ -208,6 +209,9 @@ OWIDBOT_APP_PRIVATE_KEY_PATH = env.get("OWIDBOT_APP_PRIVATE_KEY_PATH", None)
 OWIDBOT_APP_CLIENT_ID = env.get("OWIDBOT_APP_CLIENT_ID", None)
 # get it from https://github.com/settings/installations
 OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
+
+# Load github token (only used for creating PRs from the command line).
+GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
 
 def enable_bugsnag() -> None:

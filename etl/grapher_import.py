@@ -12,7 +12,6 @@ Usage:
 import datetime
 import json
 import os
-import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
@@ -26,16 +25,11 @@ from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from apps.backport.datasync.data_metadata import (
-    add_entity_code_and_name,
-    variable_data,
-    variable_metadata,
-)
+from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from etl import config
 from etl.db import get_engine
 
-from . import files
 from . import grapher_helpers as gh
 from . import grapher_model as gm
 
@@ -298,7 +292,7 @@ def upsert_table(
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
-        df = add_entity_code_and_name(session, df)
+        df = dm.add_entity_code_and_name(session, df)
 
         # update links, we need to do it after we commit deleted relationships above
         db_variable.update_links(
@@ -314,14 +308,15 @@ def upsert_table(
         session.commit()
 
         # process data and metadata
-        var_data = variable_data(df)
-        var_metadata = variable_metadata(session, db_variable_id, df)
+        var_data = dm.variable_data(df)
+        var_metadata = dm.variable_metadata(session, db_variable_id, df)
 
         var_data_str = json.dumps(var_data, default=str)
         var_metadata_str = json.dumps(var_metadata, default=str)
 
-        checksum_data = _checksum_data(var_data_str)
-        checksum_metadata = _checksum_metadata(var_metadata_str)
+        checksum_data = dm.checksum_data_str(var_data_str)
+        # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
+        checksum_metadata = dm.checksum_metadata(var_metadata)
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
@@ -337,11 +332,11 @@ def upsert_table(
 
             # commit new checksums
             if futures:
-                session.add(db_variable)
-                session.commit()
-
                 # Wait for futures to complete in case exceptions are raised
                 [f.result() for f in futures]
+
+                session.add(db_variable)
+                session.commit()
 
         if verbose:
             if futures:
@@ -483,6 +478,8 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
+        con.commit()
+
         log.warning(
             "cleanup_ghost_variables.end",
             size=result.rowcount,
@@ -508,6 +505,7 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: 
                 {"dataset_id": dataset_id},
             )
         if result.rowcount > 0:
+            con.commit()
             log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
@@ -515,14 +513,3 @@ def _get_entity_name(session: Session, entity_id: int) -> str:
     q = select(gm.Entity).where(gm.Entity.id == entity_id)
     entity = session.scalars(q).one_or_none()
     return entity.name if entity else ""
-
-
-def _checksum_data(var_data_str: str) -> str:
-    return files.checksum_str(var_data_str)
-
-
-def _checksum_metadata(var_metadata_str: str) -> str:
-    # ignore updatedAt and checksums
-    return files.checksum_str(
-        re.sub(r'("updatedAt"|"dataChecksum"|"metadataChecksum"): "[^"]*"', r'\1: ""', var_metadata_str)
-    )

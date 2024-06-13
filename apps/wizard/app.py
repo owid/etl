@@ -1,79 +1,76 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page."""
-from pathlib import Path
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page.
 
+NOTE: This only works with >1.35 (nightly) version of Streamlit.
+"""
 import streamlit as st
-from st_pages import Page, Section, show_pages
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils import AppState
+from etl.paths import DOCS_DIR
 
-# Logo
-# st.logo("docs/assets/logo.png")
+###########################################
+# DEFINE PAGES
+###########################################
+pages = {}
 
-# Get current directory
-CURRENT_DIR = Path(__file__).parent
-# Page config
-st.set_page_config(page_title="Wizard", page_icon="🪄")
-st.title("Wizard")
 
 # Initial apps (etl steps)
-toc = []
+pages_ = []
 for step in WIZARD_CONFIG["main"].values():
-    toc.append(
-        Page(
-            path=str(CURRENT_DIR / step["entrypoint"]),
-            name=step["title"],
-            icon=step["emoji"],
+    pages_.append(
+        st.Page(
+            page=str(step["entrypoint"]),
+            title=step["title"],
+            icon=step["icon"],
+            url_path=step["title"].lower(),
+            default=step["title"] == "Home",
         )
     )
+pages["Overview"] = pages_
 
 # ETL steps
-toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
+pages_ = []
 for step in WIZARD_CONFIG["etl"]["steps"].values():
     if step["enable"]:
-        toc.append(
-            Page(
-                path=str(CURRENT_DIR / step["entrypoint"]),
-                name=step["title"],
-                icon=step["emoji"],
+        pages_.append(
+            st.Page(
+                page=str(step["entrypoint"]),
+                title=step["title"],
+                icon=step["icon"],
+                url_path=step["alias"],
             )
         )
+pages[WIZARD_CONFIG["etl"]["title"]] = pages_
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]
     if apps:
-        toc.append(Section(section["title"]))
+        pages_ = []
         for app in apps:
-            toc.append(
-                Page(
-                    path=str(CURRENT_DIR / app["entrypoint"]),
-                    name=app["title"],
-                    icon=app["emoji"],
+            pages_.append(
+                st.Page(
+                    page=str(app["entrypoint"]),
+                    title=app["title"],
+                    icon=app["icon"],
+                    url_path=app["alias"],
                 )
             )
+        pages[section["title"]] = pages_
 
-# Show table of content (apps)
-show_pages(toc)
+###########################################
+# RUN PAGES
+###########################################
+# Create navigation
+page = st.navigation(pages)
 
-# Add indentation
-# add_indentation()
+# Run navigation
+if page is not None:
+    page.run()
+else:
+    st.error("Pages could not be loaded!")
 
-###########################################################################
-# FROM TERMINAL COMMAND
-# Go to specific page if argument is passed
-# TODO: when switching to native MPA v2, this might lead to errors
-###########################################################################
-if AppState.args.phase == "all":  # type: ignore
-    st.switch_page("home.py")  # type: ignore
-## ETL step
-for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-    if AppState.args.phase == step_name:  # type: ignore
-        st.switch_page(step_props["entrypoint"])  # type: ignore
-## Section
-for section in WIZARD_CONFIG["sections"]:
-    for app in section["apps"]:
-        if AppState.args.phase == app["alias"]:  # type: ignore
-            st.switch_page(app["entrypoint"])  # type: ignore
+
+# LOGO
+st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))
