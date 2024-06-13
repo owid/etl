@@ -1,0 +1,122 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &display_common
+      numDecimalPlaces: 0
+      tolerance: 0
+    processing_level: major
+    description_processing: |-
+      From the original table, we constructed a new dataset with data for all countries between 1760 and 2019.
+
+      For countries where the legal status of homosexuality was changing in a range of time in the regional level, we considered the last year of the change as the year of the change for the country. This is the case for Australia (1975-1997), Bosnia and Herzegovina (1998-2001), United Kingdom (1967-1982), and United States (1962-2003).
+
+      We consider the year of the last decriminalization of homosexuality in Germany to be 1969, the year it was decriminalized in West Germany. East Germany did it in 1968.
+
+      We modified the homosexuality status for Russia, Estonia, Latvia, Lithuania and Moldova before 1832 to "Legal" to reflect what it is mentioned on page 8 of the original paper (_[the Russian Empire] have not criminalized these practices since at least the 18th century_).
+    presentation:
+      topic_tags:
+        - LGBT+ Rights
+        - Human Rights
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  criminalization_mignot:
+    variables:
+      status:
+        title: Legal status of homosexuality
+        unit: ""
+        short_unit: ""
+        description_short: Legal status of consensual homosexual acts among adults in public. The categories are "Legal" and "Illegal".
+        presentation:
+          title_public: Legal status of homosexuality
+        display:
+          name: Legal status of homosexuality
+          <<: *display_common
+        type: ordinal
+        sort:
+          - Legal
+          - Illegal
+
+      status_legal_count:
+        title: Number of countries where homosexuality is legal
+        unit: "countries"
+        short_unit: ""
+        description_short: Number of countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        presentation:
+          title_public: Number of countries where homosexuality is legal
+        display:
+          name: Number of countries where homosexuality is legal
+          <<: *display_common
+
+      status_illegal_count:
+        title: Number of countries where homosexuality is illegal
+        unit: "countries"
+        short_unit: ""
+        description_short: Number of countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        presentation:
+          title_public: Number of countries where homosexuality is illegal
+        display:
+          name: Number of countries where homosexuality is illegal
+          <<: *display_common
+
+      status_missing_count:
+        title: Number of countries with missing data
+        unit: "countries"
+        short_unit: ""
+        description_short: Number of countries with missing data about their homosexuality status.
+        presentation:
+          title_public: Number of countries with missing data
+        display:
+          name: Number of countries with missing data
+          <<: *display_common
+
+      status_legal_pop:
+        title: Population in countries where homosexuality is legal
+        unit: "people"
+        short_unit: ""
+        description_short: Population in countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        presentation:
+          title_public: Population in countries where homosexuality is legal
+        display:
+          name: Population in countries where homosexuality is legal
+          <<: *display_common
+
+      status_illegal_pop:
+        title: Population in countries where homosexuality is illegal
+        unit: "people"
+        short_unit: ""
+        description_short: Population in countries where homosexuality is illegal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        presentation:
+          title_public: Population in countries where homosexuality is illegal
+        display:
+          name: Population in countries where homosexuality is illegal
+          <<: *display_common
+
+      status_missing_pop:
+        title: Population in countries with missing data
+        unit: "people"
+        short_unit: ""
+        description_short: Population in countries with missing data about their homosexuality status.
+        presentation:
+          title_public: Population in countries with missing data
+        display:
+          name: Population in countries with missing data
+          <<: *display_common
+
+      last_decriminalization_year:
+        title: Year of last decriminalization of homosexuality
+        unit: ""
+        short_unit: ""
+        description_short: Year of the last decriminalization of homosexuality in each country, for countries where homosexuality is legal. Homosexuality is defined in this case as consensual homosexual acts among adults in public.
+        presentation:
+          title_public: Year of last decriminalization of homosexuality
+        display:
+          name: Year of last decriminalization of homosexuality
+          <<: *display_common
+
