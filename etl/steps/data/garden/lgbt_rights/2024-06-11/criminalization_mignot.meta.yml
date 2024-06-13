@@ -8,11 +8,13 @@ definitions:
     description_processing: |-
       From the original table, we constructed a new dataset with data for all countries between 1760 and 2019.
 
-      For countries where the legal status of homosexuality was changing in a range of time in the regional level, we considered the last year of the change as the year of the change for the country. This is the case for Australia (1975-1997), Bosnia and Herzegovina (1998-2001), United Kingdom (1967-1982), and United States (1962-2003).
+      For countries where criminalization was implemented at different points in time across their regions, we considered the earliest year of the change as the year of criminalization. This is the case for the United States (1610-1948).
+
+      Conversely, for countries where _decriminalization_ was implemented at different points in time across their regions, we considered the latest year of the change as the year of decriminalization. This is the case for Australia (1975-1997), Bosnia and Herzegovina (1998-2001), United Kingdom (1967-1982), and United States (1962-2003).
 
       We consider the year of the last decriminalization of homosexuality in Germany to be 1969, the year it was decriminalized in West Germany. East Germany did it in 1968.
 
-      We modified the homosexuality status for Russia, Estonia, Latvia, Lithuania and Moldova before 1832 to "Legal" to reflect what it is mentioned on page 8 of the original paper (_[the Russian Empire] have not criminalized these practices since at least the 18th century_).
+      We modified the homosexuality status for Russia, Armenia, Azerbaijan, Estonia, Georgia, Kazakhstan, Kyrgyzstan, Latvia, Lithuania, Moldova, Tajikistan, Turkmenistan, and Uzbekistan before 1832 to "Legal" to reflect what it is mentioned on page 8 of the original paper (_[the Russian Empire] have not criminalized these practices since at least the 18th century_).
     presentation:
       topic_tags:
         - LGBT+ Rights

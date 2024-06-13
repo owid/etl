@@ -25,8 +25,6 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read(header=None, names=COLUMN_NAMES)
 
-    print(tb)
-
     #
     # Process data.
     #

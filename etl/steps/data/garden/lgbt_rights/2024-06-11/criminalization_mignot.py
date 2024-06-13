@@ -105,9 +105,9 @@ def assign_unique_year_for_columns(tb: Table) -> Table:
     tb.loc[tb["country"] == "Spain", "former_decriminalizations"] = "1932; 1822"
     tb.loc[tb["country"] == "Spain", "former_criminalizations"] = "1928; 1438"
 
-    for col in ["last_decriminalization", "last_criminalization"]:
-        # Make years int by selecting the text of the first 4 characters
-        tb[col] = tb[col].str[-4:]
+    # Make years int by selecting the text of the first 4 characters for last_criminalization and the last 4 characters for last_decriminalization
+    tb["last_decriminalization"] = tb["last_decriminalization"].str[-4:]
+    tb["last_criminalization"] = tb["last_criminalization"].str[:4]
 
     # When former_decriminalizations is "not illegal before 1873", replace with START_YEAR
     tb.loc[tb["former_decriminalizations"] == "not illegal before 1873", "former_decriminalizations"] = f"{START_YEAR}"
@@ -182,9 +182,29 @@ def make_table_long(tb: Table) -> Table:
     # Fill tb with data from START_YEAR for each country
     tb = fill_countries_to_start_year(tb=tb)
 
-    # Fill empty status of Russia as "Legal" (See P8 of paper)
+    # Fill empty status of the "Russian Empire" as "Legal" (See P8 of paper)
     tb.loc[
-        (tb["country"].isin(["Russia", "Estonia", "Latvia", "Lithuania", "Moldova"])) & (tb["status"].isna()), "status"
+        (
+            tb["country"].isin(
+                [
+                    "Russia",
+                    "Estonia",
+                    "Latvia",
+                    "Lithuania",
+                    "Moldova",
+                    "Armenia",
+                    "Azerbaijan",
+                    "Georgia",
+                    "Kazakhstan",
+                    "Kyrgyzstan",
+                    "Tajikistan",
+                    "Turkmenistan",
+                    "Uzbekistan",
+                ]
+            )
+        )
+        & (tb["status"].isna()),
+        "status",
     ] = "Legal"
 
     # Keep only necesary columns
