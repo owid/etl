@@ -1,13 +1,78 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+      grapher_config:
+        note: |-
+          {definitions.footnote}
+  age: |-
+    <% if age_group == "AllAges" %>
+    all ages
+    <% elif age_group == "age-standardized" %>
+    an age-standardized population
+    <% elif age_group == "YEARS0-14" %>
+    0-14 year olds
+    <% elif age_group == "YEARS0-4" %>
+    0-4 year olds
+    <% elif age_group == "YEARS5-14" %>
+    5-14 year olds
+    <% elif age_group == "YEARS15-19" %>
+    15-19 year olds
+    <% elif age_group == "YEARS15-49" %>
+    15-49 year olds
+    <% elif age_group == "YEARS20-24" %>
+    20-24 year olds
+    <% elif age_group == "YEARS25-34" %>
+    25-34 year olds
+    <% elif age_group == "YEARS35-44" %>
+    35-44 year olds
+    <% elif age_group == "YEARS45-54" %>
+    45-54 year olds
+    <% elif age_group == "YEARS50-69" %>
+    50-69 year olds
+    <% elif age_group == "YEARS55-64" %>
+    55-64 year olds
+    <% elif age_group == "YEARS65-74" %>
+    65-74 year olds
+    <% elif age_group == "YEARS70+" %>
+    70+ year olds
+    <% elif age_group == "YEARS75-84" %>
+    75-84 year olds
+    <% elif age_group == "YEARS85PLUS" %>
+    85+ year olds
+    <%- endif -%>
+  sex: |-
+    <% if sex == "Both sexes" %>
+    both sexes
+    <% elif sex == "Male" %>
+    males
+    <% elif sex == "Female" %>
+    females
+    <%- endif -%>
+  deaths_title: |-
+    <% if age_group == "AllAges" %>
+    Total deaths from << cause.lower() >>, among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized deaths from << cause.lower() >>, among {definitions.sex}
+    <% else %>
+    Deaths from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+
 tables:
   ghe:
     variables:
       death_count:
-        title: Deaths
-        description_short: The total number of deaths
+        title: |-
+          {definitions.deaths_title}
+        description_short: Estimated annual deaths from << cause >>.
         description_from_producer: |
           All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 0
       death_rate100k:
@@ -16,12 +81,12 @@ tables:
         description_from_producer: |
           All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
         unit: deaths per 100,000 people
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 1
       daly_count:
         title: The number of Disability Adjusted Life Yeats (DALYs) lost
-        description_short:  One DALY represents the loss of the equivalent of one year of full health.
+        description_short: One DALY represents the loss of the equivalent of one year of full health.
         description_from_producer: |
           **Rationale:**
           Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
@@ -36,7 +101,7 @@ tables:
           Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
           More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
         unit: DALYs
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 2
       daly_rate100k:
@@ -57,7 +122,7 @@ tables:
             Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
             More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
         unit: DALYs per 100,000 people
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 1
 
