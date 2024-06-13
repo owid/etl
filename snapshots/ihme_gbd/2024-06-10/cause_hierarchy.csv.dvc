@@ -3,6 +3,7 @@
 # Download the file from: https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
 # Select - Cause Hierarchy [XLSX]
 meta:
+  is_public: false
   origin:
     # Data product / Snapshot
     title: Global Burden of Disease, Cause Hierarchy
