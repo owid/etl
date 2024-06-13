@@ -6,10 +6,10 @@ from io import BytesIO
 import pandas as pd
 import rich_click as click
 import structlog
+from owid.catalog.s3_utils import connect_r2
 
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl.db import get_engine
-from etl.publish import connect_s3
 
 log = structlog.get_logger()
 
@@ -124,7 +124,7 @@ def cli(
     """
     assert dry_run, "Only --dry-run is supported at the moment, we don't want to modify files on S3"
 
-    s3 = connect_s3()
+    s3 = connect_r2()
 
     variable_ids = load_variable_ids(limit)
 

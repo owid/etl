@@ -10,7 +10,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from etl import config
 from etl import grapher_model as gm

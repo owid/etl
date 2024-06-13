@@ -17,7 +17,6 @@ dataset:
     This dataset provides information on direct and indirect military and civilian deaths from major armed conflicts, drawn from the report by Kaye et al. (1985).
   licenses:
     - name: Department of National Defence, Canada, Operational Research and Analysis Establishment, 1985
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 

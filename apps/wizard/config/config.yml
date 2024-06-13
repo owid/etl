@@ -15,10 +15,11 @@
 # - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
-# - emoji (str): Emoji to show in the sidebar menu.
-# - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all. Default is True.
+# - icon (str): Emoji or material icon to show in the sidebar menu.
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
-# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`. If it's not `staging` or `production`, the app will be disabled and overwrites the value of `enabled`.
+# - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
+#     bool: Whether the app is disabled in all settings.
+#     dict: Whether the app is disabled in certain settings. The key is the setting and the value is a boolean. Available settings (keys) are 'production', 'staging', 'dev'. 'dev' stands for local environments.
 
 # Main pages
 main:
@@ -27,13 +28,15 @@ main:
     description: "App homepage"
     maintainer: "@lucas"
     entrypoint: home.py
-    emoji: "🏠"
+    icon: ":material/home:"
   expert:
-      title: "Expert"
-      description: "Ask the expert ETL questions!"
-      maintainer: "@lucas"
-      entrypoint: pages/expert/app.py
-      emoji: "🧙"
+    title: "Expert"
+    description: "Ask the expert ETL questions!"
+    maintainer:
+      - "@lucas"
+      - "@daniel"
+    entrypoint: app_pages/expert/app.py
+    icon: ":material/hotel_class:"
 
 # ETL steps
 etl:
@@ -43,115 +46,169 @@ etl:
     snapshot:
       title: "Snapshot"
       entrypoint: etl_steps/snapshot.py
-      emoji: "1️⃣"
-      image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
-      disable_on_remote: True
+      icon: ":material/photo_camera:"
+      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
+      disable:
+        "production": True
+    express:
+      title: "Express"
+      entrypoint: etl_steps/express.py
+      icon: ":material/bolt:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+      disable:
+        "production": True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py
-      emoji: "2️⃣"
+      icon: ":material/nature:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-      disable_on_remote: True
+      disable:
+        "production": True
     garden:
       title: "Garden"
       entrypoint: etl_steps/garden.py
-      emoji: "3️⃣"
+      icon: ":material/deceased:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-      disable_on_remote: True
+      disable:
+        "production": True
     grapher:
       title: "Grapher"
       entrypoint: etl_steps/grapher.py
-      emoji: "4️⃣"
+      icon: ":material/database:"
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-      disable_on_remote: True
+      disable:
+        "production": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
-      entrypoint: pages/fasttrack/app.py
-      emoji: "🏎️"
+      entrypoint: app_pages/fasttrack/app.py
+      icon: ":material/fast_forward:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
-  - title: "Charts"
-    description: |-
-      Create chart revisions, and synchronize aproved revisions between servers.
-    apps:
-      - title: "Chart Upgrader"
-        alias: charts
-        entrypoint: pages/charts/__main__.py
-        description: Prepare chart revisions.
-        maintainer: "@lucas"
-        emoji: "🌟"
-        image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-      - title: "Chart Sync"
-        alias: staging_sync
-        entrypoint: ../staging_sync/app.py
-        description: Sync charts between servers.
-        maintainer: "@mojmir"
-        emoji: "🔄"
-        image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
 
-  - title: "Dashboard"
+  - title: "Data tools"
+    description: |-
+      Updates, data edits, etc.
+    apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: app_pages/indicator_upgrade/app.py
+      description: Migrate indicators in charts
+      maintainer: "@lucas"
+      icon: ":material/upgrade:"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+      disable:
+        production: True
+    - title: "Chart Diff"
+      alias: chart-diff
+      entrypoint: app_pages/chart_diff/app.py
+      description: Compare charts in staging and prod
+      maintainer: "@mojmir"
+      icon: ":material/difference:"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+      disable:
+        production: True
+    - title: "Harmonizer"
+      alias: harmonizer
+      description: "Harmonize a column of a table"
+      maintainer: "@lucas"
+      entrypoint: app_pages/harmonizer.py
+      icon: ":material/music_note:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+
+  - title: "Monitoring"
     description: |-
       Control panel for ETL steps.
     apps:
-      - title: "ETL Dashboard"
+      - title: "Dashboard"
         alias: dashboard
-        entrypoint: pages/dashboard.py
-        description: Control panel for ETL steps.
+        entrypoint: app_pages/dashboard.py
+        description: Control panel for ETL steps
         maintainer: "@pablo"
-        emoji: "📋"
+        icon: ":material/tv_gen:"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
-      - title: "Dataset Explorer"
+      - title: "Datasets"
         alias: dataexp
-        description: "Explore datasets and their metadata."
+        description: "Explore datasets and their metadata"
         maintainer: "@lucas"
-        entrypoint: pages/dataset_explorer.py
-        emoji: "🔍"
+        entrypoint: app_pages/dataset_explorer.py
+        icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
-  - title: "Metadata"
-    description: |-
-      Tools to improve our metadata or learn how to use it.
-    apps:
-      - title: "Meta Upgrader"
-        description: "Migrate old metadata to new format."
-        maintainer: "@veronika / @lucas"
-        entrypoint: pages/metagpt.py
-        emoji: "🌟"
-        alias: metagpt
-        image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-        disable_on_remote: True
-      - title: "Meta Playground"
-        alias: metaplay
-        description: "How is metadata presented in data pages?"
-        maintainer: "@lucas"
-        entrypoint: pages/metaplay.py
-        emoji: "🏐"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-        disable_on_remote: True
 
-  - title: "Others"
+  - title: "Research"
+    description: |-
+      Research tools.
+    apps:
+      - title: "Insighter"
+        alias: insighter
+        description: "Data insights with GPT"
+        maintainer: "@daniel"
+        entrypoint: app_pages/datainsight_robot.py
+        icon: ":material/lightbulb:"
+        image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+
+  - title: "Misc"
     description: |-
       Other helpful tools in the ETL ecosystem.
     apps:
-      - title: "Entity Harmonizer"
-        alias: harmonizer
-        description: "Harmonize a column of a table."
-        maintainer: "@lucas"
-        entrypoint: pages/harmonizer.py
-        emoji: "🎶"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
       - title: "News"
         alias: news
         description: "Latest ETL news"
         maintainer: "@lucas"
-        entrypoint: pages/news.py
-        emoji: "🗞️"
+        entrypoint: app_pages/news.py
+        icon: ":material/newspaper:"
         image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
       - title: "owidle"
         alias: owidle
         description: "Guess the country game!"
         maintainer: "@lucas"
-        entrypoint: pages/owidle.py
-        emoji: "👾"
+        entrypoint: app_pages/owidle.py
+        icon: ":material/videogame_asset:"
         image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
+
+  - title: "Metadata"
+    description: |-
+      Improve our metadata or learn how to use it.
+    apps:
+      - title: "Meta Upgrader"
+        description: "Migrate old metadata to new format."
+        maintainer: "@veronika / @lucas"
+        entrypoint: app_pages/metagpt.py
+        icon: ":material/upgrade:"
+        alias: metagpt
+        image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
+        disable:
+          "production": True
+          "staging": True
+      - title: "Meta Playground"
+        alias: metaplay
+        description: "How is metadata presented in data pages?"
+        maintainer: "@lucas"
+        entrypoint: app_pages/metaplay.py
+        icon: ":material/sports_volleyball:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+        disable:
+          "production": True
+          "staging": True
+
+legacy:
+  description: |-
+    The pages below are legacy now. They are kept in case the new pages are not working properly.
+  apps:
+    - title: "Chart Upgrader"
+      alias: charts
+      entrypoint: app_pages/charts/__main__.py
+      description: Prepare chart revisions
+      maintainer: "@lucas"
+      icon: ":material/upgrade:"
+      image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
+    - title: "Chart Sync"
+      alias: chart-sync
+      entrypoint: ../chart_sync/app.py
+      description: Sync charts between servers
+      maintainer: "@mojmir"
+      icon: ":material/sports_volleyball:"
+      image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
+      disable:
+        "staging": True

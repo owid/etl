@@ -8,25 +8,25 @@ tables:
   gpei:
     variables:
       cvdpv1:
-        title: circulating_vaccine_derived_polio_virus_1
+        title: cVDPV1
         unit: cases
         display:
           numDecimalPlaces: 0
         description: Cases of circulating vaccine derived polio virus, type 1.
       cvdpv2:
-        title: circulating_vaccine_derived_polio_virus_2
+        title: cVDPV2
         unit: cases
         display:
           numDecimalPlaces: 0
         description: Cases of circulating vaccine derived polio virus, type 2.
       cvdpv3:
-        title: circulating_vaccine_derived_polio_virus_3
+        title: CVDPV3
         unit: cases
         display:
           numDecimalPlaces: 0
         description: Cases of circulating vaccine derived polio virus, type 3.
       total_cvdpv:
-        title: circulating_vaccine_derived_polio_virus_total
+        title: cVDPV total
         unit: cases
         display:
           numDecimalPlaces: 0

@@ -17,9 +17,6 @@ dataset:
 
     Negative values for a given year imply that quantities destroyed or quantities exported for the year exceeded the sum of production and imports, implying that the destroyed or exported quantities came from stockpiles.
 
-  licenses:
-    - name: # Example: Testing License Name
-      url: # Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 

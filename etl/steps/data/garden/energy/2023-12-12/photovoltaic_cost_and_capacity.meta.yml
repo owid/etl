@@ -31,6 +31,8 @@ tables:
         title: Solar photovoltaic cumulative capacity
         short_unit: MW
         unit: megawatts
+        presentation:
+          title_public: Solar photovoltaic cumulative capacity
       cumulative_capacity_source:
         title: Source for each value of cumulative capacity data
         unit: ''

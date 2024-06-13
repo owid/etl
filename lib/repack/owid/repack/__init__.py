@@ -33,7 +33,7 @@ def repack_frame(
 
     # repack each column into the best dtype we can give it
     df = pd.concat(
-        [repack_series(df[col]) if col not in dtypes else df[col] for col in df.columns],
+        [repack_series(df.loc[:, col]) if col not in dtypes else df[col] for col in df.columns],
         axis=1,
     )
 

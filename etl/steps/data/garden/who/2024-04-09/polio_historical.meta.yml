@@ -1,0 +1,20 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Eradication of Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  polio_historical:
+    variables:
+      cases:
+        title: Polio cases
+        description_short: Number of new cases of polio reported in a given year.
+        unit: cases

@@ -279,7 +279,7 @@ To use the tool, you upload a CSV file containing a column called `Country`, and
 
 ??? Tip "For staff"
 
-    The interactive harmonization tool for staff is available at [https://owid.cloud/admin/standardize](https://owid.cloud/admin/standardize).
+    The interactive harmonization tool for staff is available at [https://admin.owid.io/admin/standardize](https://admin.owid.io/admin/standardize).
 
 
 ### Metadata

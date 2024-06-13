@@ -4,15 +4,15 @@ from typing import Tuple
 import requests
 from structlog import get_logger
 
-from apps.wizard.pages.expert.prompts import SYSTEM_PROMPT_GENERIC
+from apps.utils.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
+from apps.wizard.app_pages.expert.prompts import SYSTEM_PROMPT_GENERIC
 from apps.wizard.utils.db import WizardDB
-from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
 
 # Logger
 log = get_logger()
 
 # GPT model
-MODEL_NAME = "gpt-4-turbo-preview"
+MODEL_NAME = "gpt-4o"
 
 
 def get_json_url(url: str):
