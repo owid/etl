@@ -262,7 +262,9 @@ def add_uk_by_age(df: pd.DataFrame):
     time_units = df_uk["time_unit"].unique()
     assert len(time_units) == 1, "There are multiple time units for UK Nations"
     # Estimate metrics
-    df_uk = df_uk.groupby(["year", "time", "age"], as_index=False).sum(min_count=3)
+    df_uk = (
+        df_uk.drop(columns=["entity", "time_unit"]).groupby(["year", "time", "age"], as_index=False).sum(min_count=3)
+    )
     # Reassign entity name and time unit
     df_uk["entity"] = "United Kingdom"
     df_uk["time_unit"] = time_units[0]

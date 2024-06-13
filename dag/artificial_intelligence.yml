@@ -1,49 +1,55 @@
 steps:
 
-  # Artificial Intelligence (EPOCH, latest)
-  data://meadow/artificial_intelligence/latest/epoch:
-  - snapshot://artificial_intelligence/latest/epoch.csv
-  data://garden/artificial_intelligence/latest/epoch:
-  - data://meadow/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch:
-  - data://garden/artificial_intelligence/latest/epoch
+  # Main EPOCH dataset
+  data://meadow/artificial_intelligence/2024-06-03/epoch:
+    - snapshot://artificial_intelligence/2024-06-03/epoch.csv
+  data://garden/artificial_intelligence/2024-06-03/epoch:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
 
-  # Aggregates by domain
-  data://garden/artificial_intelligence/latest/epoch_aggregates_domain:
-  - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_domain:
-  - data://garden/artificial_intelligence/latest/epoch_aggregates_domain
+  # EPOCH aggregates by country
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
 
-  # Aggregates by researcher affiliaiton
-  data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation:
-  - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_affiliation:
-  - data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation
+  # EPOCH aggregates by domain
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
 
-  # Aggregates by machine learning approach
-  data://garden/artificial_intelligence/latest/epoch_aggregates_approach:
-  - data://garden/artificial_intelligence/latest/epoch
-  data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
-  - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
+  # EPOCH aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
+
+  # EPOCH aggregates by organization
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
 
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2024-02-15/epoch_llms:
-  - snapshot://artificial_intelligence/2024-02-15/epoch_llms.csv
+    - snapshot://artificial_intelligence/2024-02-15/epoch_llms.csv
   data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
-  - data://garden/artificial_intelligence/2024-02-15/epoch_llms
+    - data://garden/artificial_intelligence/2024-02-15/epoch_llms
 
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
-  - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
+    - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
   data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021:
-  - data://meadow/world_risk_poll/2023-06-26/wrp_2021
+    - data://meadow/world_risk_poll/2023-06-26/wrp_2021
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021:
-  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
+    - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
 
   data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
-  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
+    - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
-  - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
+    - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
 
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
@@ -77,7 +83,7 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
     - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
-    -  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
+    - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
 
   # DeepFakes
   data://garden/artificial_intelligence/2023-06-14/ai_deepfakes:
@@ -168,72 +174,72 @@ steps:
 
   # AI national strategy
   data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy:
-  - snapshot://artificial_intelligence/2023-06-14/ai_national_strategy.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_national_strategy.csv
   data://garden/artificial_intelligence/2023-06-14/ai_national_strategy:
-  - data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy
-  - data://garden/regions/2023-01-01/regions
+    - data://meadow/artificial_intelligence/2023-06-14/ai_national_strategy
+    - data://garden/regions/2023-01-01/regions
   data://grapher/artificial_intelligence/2023-06-14/ai_national_strategy:
-  - data://garden/artificial_intelligence/2023-06-14/ai_national_strategy
+    - data://garden/artificial_intelligence/2023-06-14/ai_national_strategy
 
 
   # AI polls
   # Monmouth University Poll
   data://meadow/artificial_intelligence/2023-06-07/monmouth_poll:
-  - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
+    - snapshot://artificial_intelligence/2023-06-07/monmouth_poll.pdf
   data://garden/artificial_intelligence/2023-06-07/monmouth_poll:
-  - data://meadow/artificial_intelligence/2023-06-07/monmouth_poll
+    - data://meadow/artificial_intelligence/2023-06-07/monmouth_poll
   data://grapher/artificial_intelligence/2023-06-07/monmouth_poll:
-  - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
+    - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
 
   # YouGov AI surveys
   data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
-  - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
+    - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
   data://garden/artificial_intelligence/2024-01-30/yougov_robots:
-  - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
   data://grapher/artificial_intelligence/2024-01-30/yougov_robots:
-  - data://garden/artificial_intelligence/2024-01-30/yougov_robots
+    - data://garden/artificial_intelligence/2024-01-30/yougov_robots
 
   data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation:
-  - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
+    - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
   data://garden/artificial_intelligence/2024-01-30/yougov_job_automation:
-  - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
   data://grapher/artificial_intelligence/2024-01-30/yougov_job_automation:
-  - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation
+    - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation
 
   data://meadow/artificial_intelligence/2023-06-08/yougov_jobs:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
+    - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
   data://garden/artificial_intelligence/2023-06-08/yougov_jobs:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_jobs
+    - data://meadow/artificial_intelligence/2023-06-08/yougov_jobs
   data://grapher/artificial_intelligence/2023-06-08/yougov_jobs:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_jobs
+    - data://garden/artificial_intelligence/2023-06-08/yougov_jobs
 
   data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_end_of_humanity.pdf
+    - snapshot://artificial_intelligence/2023-06-08/yougov_end_of_humanity.pdf
   data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
+    - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
   data://grapher/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
+    - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
 
  # CSET data on semiconductor supply chain
   data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
-  - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
+    - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
   data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:
-  - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
+    - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
-  - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
+    - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
 
 
  # CSET data on articles, patents and investment
   data://meadow/artificial_intelligence/2023-07-25/cset:
-  - snapshot://artificial_intelligence/2023-07-25/cset.csv
+    - snapshot://artificial_intelligence/2023-07-25/cset.csv
   data://garden/artificial_intelligence/2023-07-25/cset:
-  - data://meadow/artificial_intelligence/2023-07-25/cset
-  - data://garden/demography/2023-03-31/population
-  - data://garden/regions/2023-01-01/regions
-  - snapshot://wb/2023-09-19/us_cpi.csv
+    - data://meadow/artificial_intelligence/2023-07-25/cset
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wb/2023-09-19/us_cpi.csv
 
   data://grapher/artificial_intelligence/2023-07-25/cset:
-  - data://garden/artificial_intelligence/2023-07-25/cset
+    - data://garden/artificial_intelligence/2023-07-25/cset
 
   # Chess dataset (ELO ratings)
   data://garden/artificial_intelligence/2024-02-05/chess:
@@ -271,3 +277,9 @@ steps:
     - data://meadow/artificial_intelligence/2024-04-02/dynabench
   data://grapher/artificial_intelligence/2024-04-02/dynabench:
     - data://garden/artificial_intelligence/2024-04-02/dynabench
+  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
+  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
+  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost

@@ -10,6 +10,7 @@ Usage:
 """
 
 import datetime
+import json
 import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -20,17 +21,14 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import utils
+from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
-from sqlmodel import Session, select, update
+from sqlalchemy.orm import Session
 
-from apps.backport.datasync.data_metadata import (
-    add_entity_code_and_name,
-    variable_data,
-    variable_metadata,
-)
-from apps.backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync import data_metadata as dm
+from apps.backport.datasync.datasync import upload_gzip_string
 from etl import config
-from etl.db import open_db
+from etl.db import get_engine
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -213,10 +211,12 @@ def upsert_table(
         "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     )
     table = table.reorder_levels(["year", "entity_id"])
-    assert table.index.dtypes[0] in gh.INT_TYPES, f"year must be of an integer type but was: {table.index.dtypes[0]}"
     assert (
-        table.index.dtypes[1] in gh.INT_TYPES
-    ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+        table.index.dtypes.iloc[0] in gh.INT_TYPES
+    ), f"year must be of an integer type but was: {table.index.dtypes.iloc[0]}"
+    assert (
+        table.index.dtypes.iloc[1] in gh.INT_TYPES
+    ), f"entity_id must be of an integer type but was: {table.index.dtypes.iloc[1]}"
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
@@ -257,6 +257,9 @@ def upsert_table(
                 max_year = max(years)
                 timespan = f"{min_year}-{max_year}"
 
+        # sort table to get deterministic checksum later on
+        table = table.sort_index()
+
         table.reset_index(inplace=True)
 
         source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
@@ -289,7 +292,7 @@ def upsert_table(
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
-        df = add_entity_code_and_name(session, df)
+        df = dm.add_entity_code_and_name(session, df)
 
         # update links, we need to do it after we commit deleted relationships above
         db_variable.update_links(
@@ -305,20 +308,41 @@ def upsert_table(
         session.commit()
 
         # process data and metadata
-        var_data = variable_data(df)
-        var_metadata = variable_metadata(session, db_variable_id, df)
+        var_data = dm.variable_data(df)
+        var_metadata = dm.variable_metadata(session, db_variable_id, df)
+
+        var_data_str = json.dumps(var_data, default=str)
+        var_metadata_str = json.dumps(var_metadata, default=str)
+
+        checksum_data = dm.checksum_data_str(var_data_str)
+        # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
+        checksum_metadata = dm.checksum_metadata(var_metadata)
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            futures = [
-                executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path()),
-                executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path()),
-            ]
-            # Wait for futures to complete in case exceptions are raised
-            [f.result() for f in futures]
+            futures = []
+
+            if db_variable.dataChecksum != checksum_data:
+                db_variable.dataChecksum = checksum_data
+                futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+
+            if db_variable.metadataChecksum != checksum_metadata:
+                db_variable.metadataChecksum = checksum_metadata
+                futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
+
+            # commit new checksums
+            if futures:
+                # Wait for futures to complete in case exceptions are raised
+                [f.result() for f in futures]
+
+                session.add(db_variable)
+                session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            if futures:
+                log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            else:
+                log.info("upsert_table.skipped_upload_to_s3", size=len(table), variable_id=db_variable_id)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
@@ -332,21 +356,21 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.namespace, "Dataset must have a namespace"
 
-    with Session(gm.get_engine()) as session:
+    with Session(get_engine()) as session:
         q = select(gm.Dataset).where(
             gm.Dataset.shortName == dataset.metadata.short_name,
             gm.Dataset.version == dataset.metadata.version,
             gm.Dataset.namespace == dataset.metadata.namespace,
         )
-        ds = session.exec(q).one_or_none()
+        ds = session.scalars(q).one_or_none()
         return ds.sourceChecksum if ds is not None else None
 
 
 def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
-    with Session(gm.get_engine()) as session:
+    with Session(get_engine()) as session:
         q = (
             update(gm.Dataset)
-            .where(gm.Dataset.id == dataset_id)
+            .where(gm.Dataset.id == dataset_id)  # type: ignore
             .values(
                 sourceChecksum=checksum,
                 dataEditedAt=datetime.datetime.utcnow(),
@@ -357,7 +381,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
+def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: List[int]) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -366,15 +390,16 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
     :param upserted_variable_ids: variables upserted in grapher step
     :param workers: delete variables in parallel
     """
-    with open_db() as db:
+    with engine.connect() as con:
         # get all those variables first
-        db.cursor.execute(
-            """
-            SELECT id FROM variables WHERE datasetId=%(dataset_id)s AND id NOT IN %(variable_ids)s
-        """,
+        rows = con.execute(
+            text(
+                """
+            SELECT id FROM variables WHERE datasetId = :dataset_id AND id NOT IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids or [-1]},
-        )
-        rows = db.cursor.fetchall()
+        ).fetchall()
 
         variable_ids_to_delete = [row[0] for row in rows]
 
@@ -385,94 +410,106 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
 
         # raise an exception if they're used in any charts
-        db.cursor.execute(
-            """
-            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN %(variable_ids)s
-        """,
+        rows = con.execute(
+            text(
+                """
+            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
-        )
-        rows = db.cursor.fetchall()
+        ).fetchall()
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
         # then variables themselves with related data in other tables
-        db.cursor.execute(
-            """
-            DELETE FROM country_latest_data WHERE variable_id IN %(variable_ids)s
-        """,
+        con.execute(
+            text(
+                """
+            DELETE FROM country_latest_data WHERE variable_id IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # delete relationships
-        db.cursor.execute(
-            """
-            DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
-        """,
+        con.execute(
+            text(
+                """
+            DELETE FROM origins_variables WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
-        db.cursor.execute(
-            """
-            DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
-        """,
+        con.execute(
+            text(
+                """
+            DELETE FROM tags_variables_topic_tags WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
-        db.cursor.execute(
-            """
-            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
-        """,
+        con.execute(
+            text(
+                """
+            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # delete them from explorers
-        db.cursor.execute(
-            """
-            DELETE FROM explorer_variables WHERE variableId IN %(variable_ids)s
-        """,
+        con.execute(
+            text(
+                """
+            DELETE FROM explorer_variables WHERE variableId IN :variable_ids
+        """
+            ),
             {"variable_ids": variable_ids_to_delete},
         )
 
         # finally delete variables
-        db.cursor.execute(
-            """
-            DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
-        """,
+        result = con.execute(
+            text(
+                """
+            DELETE FROM variables WHERE datasetId = :dataset_id AND id IN :variable_ids
+        """
+            ),
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
+        con.commit()
+
         log.warning(
             "cleanup_ghost_variables.end",
-            size=db.cursor.rowcount,
+            size=result.rowcount,
             variables=variable_ids_to_delete,
         )
 
 
-def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> None:
+def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: List[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
     :param dataset_id: ID of the dataset
     :param upserted_source_ids: sources upserted in grapher step
     """
-    with open_db() as db:
+    with engine.connect() as con:
         if upserted_source_ids:
-            db.cursor.execute(
-                """
-                DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
-            """,
+            result = con.execute(
+                text("""DELETE FROM sources WHERE datasetId = :dataset_id AND id NOT IN :source_ids"""),
                 {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
             )
         else:
-            db.cursor.execute(
-                """
-                DELETE FROM sources WHERE datasetId=%(dataset_id)s
-            """,
+            result = con.execute(
+                text("""DELETE FROM sources WHERE datasetId = :dataset_id"""),
                 {"dataset_id": dataset_id},
             )
-        if db.cursor.rowcount > 0:
-            log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+        if result.rowcount > 0:
+            con.commit()
+            log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
 def _get_entity_name(session: Session, entity_id: int) -> str:
     q = select(gm.Entity).where(gm.Entity.id == entity_id)
-    entity = session.exec(q).one_or_none()
+    entity = session.scalars(q).one_or_none()
     return entity.name if entity else ""

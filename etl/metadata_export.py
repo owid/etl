@@ -133,7 +133,7 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_em
 
             for var_name, var_meta in variables.items():
                 orig_variables[var_name] = _merge_variable_metadata(
-                    orig_variables[var_name],
+                    orig_variables.get(var_name, {}),
                     var_meta,
                     if_origins_exist="replace",
                     # we merge display too

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Polity5 Project, Political Regime Characteristics and Transitions, 1800-2018
+    description: |-
+      The Polity5 project continues the Polity research tradition of coding the authority characteristics of states in the world system for purposes of comparative, quantitative analysis. The original Polity conceptual scheme was formulated and the initial Polity I data collected under the direction of Ted Robert Gurr and informed by foundational, collaborative work with Harry Eckstein, Patterns of Authority: A Structural Basis for Political Inquiry (New York: John Wiley & Sons, 1975). The Polity project has proven its value to researchers over the years, becoming the most widely used resource for monitoring regime change and studying the effects of regime authority. The Polity project evolved through three earlier research phases, all under the direction of Ted Gurr. The Polity III phase updated core Polity data through 1992 and was later updated through 1998 and released as the Polity98 version. Through its evolution, the format of the Polity data has been transformed from its original focus on “persistence and change” in the “polity” as the unit of analysis (i.e., politycase format) to its present country-year case format. The original Polity I format was revisited by a research team under the direction of Nils Petter Gleditsch and information concerning the dates of coded polity changes was updated in 1994 and made available in the original polity-case format as Polity IIId. In the late 1990s, Polity became a core data project in the State Failure Task Force global forecasting project. The special focus on “state failure” problem events within a general context of societal and systemic development processes requires information pertinent to both Polity foci, state continuity and change (country-year format) and regime persistence and change (polity-case format), be combined in a single data resource base. The Polity IV combined format version was instituted with the 2000 data update.
+    date_published: "2020-04-23"
+    version_producer: 5
+
+    # Citation
+    producer: Polity 5
+    citation_full: |-
+      Marshall, Monty G. and Ted Robert Gurr. 2020. Polity 5: Political Regime Characteristics and Transitions, 1800-2018. Center for Systemic Peace.
+
+    # Files
+    url_main: https://www.systemicpeace.org/polityproject.html
+    url_download: http://www.systemicpeace.org/inscr/p5v2018.xls
+    date_accessed: 2024-05-13
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 036d1a3232478536fd763c9f329ee22a
+    size: 4487680
+    path: polity.xlsx

@@ -2,10 +2,11 @@
 #  converters.py
 #
 
+from typing import Any, Dict
+
 from owid.catalog import DatasetMeta, License, Source, VariableMeta
 from owid.walden import Dataset as WaldenDataset
 
-from etl import grapher_model as gm
 from etl.snapshot import SnapshotMeta
 
 
@@ -70,23 +71,23 @@ def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     return ds_meta
 
 
-def convert_grapher_source(s: gm.Source) -> Source:
-    description = s.description.get("additionalInfo") or ""
+def convert_grapher_source(s: Dict[str, Any]) -> Source:
+    description = s["description"].get("additionalInfo") or ""
 
     # append publisher source to description
-    if s.description.get("dataPublisherSource"):
-        description += f"\nPublisher source: {s.description.get('dataPublisherSource')}"
+    if s["description"].get("dataPublisherSource"):
+        description += f"\nPublisher source: {s['description'].get('dataPublisherSource')}"
 
     return Source(
-        name=s.name,
+        name=s["name"],
         description=description,
-        url=s.description.get("link"),
-        date_accessed=s.description.get("retrievedDate"),
-        published_by=s.description.get("dataPublishedBy"),
+        url=s["description"].get("link"),
+        date_accessed=s["description"].get("retrievedDate"),
+        published_by=s["description"].get("dataPublishedBy"),
     )
 
 
-def convert_grapher_dataset(g: gm.Dataset, sources: list[gm.Source], short_name: str) -> DatasetMeta:
+def convert_grapher_dataset(ds: Dict[str, Any], sources: list[Dict[str, Any]], short_name: str) -> DatasetMeta:
     """
     Convert grapher dataset row into DatasetMeta.
 
@@ -109,18 +110,18 @@ def convert_grapher_dataset(g: gm.Dataset, sources: list[gm.Source], short_name:
     """
     return DatasetMeta(
         short_name=short_name,
-        title=g.name,
-        namespace=g.namespace,
-        description=g.description,
-        is_public=not g.isPrivate,
+        title=ds["name"],
+        namespace=ds["namespace"],
+        description=ds["description"],
+        is_public=not ds["isPrivate"],
         sources=[convert_grapher_source(s) for s in sources],
         additional_info={
-            "grapher_meta": g.dict(),
+            "grapher_meta": ds,
         },
     )
 
 
-def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
+def convert_grapher_variable(v: Dict[str, Any], s: Dict[str, Any]) -> VariableMeta:
     """Convert grapher variable row into VariableMeta.
 
     Example:
@@ -144,13 +145,13 @@ def convert_grapher_variable(g: gm.Variable, s: gm.Source) -> VariableMeta:
     }
     """
     return VariableMeta(
-        title=g.name,
-        description=g.description,
-        short_unit=g.shortUnit,
-        unit=g.unit,
-        display=g.display,
+        title=v["name"],
+        description=v["description"],
+        short_unit=v["shortUnit"],
+        unit=v["unit"],
+        display=v["display"],
         additional_info={
-            "grapher_meta": g.dict(),
+            "grapher_meta": v,
         },
         sources=[convert_grapher_source(s)],
         # TODO: where to put `code`?

@@ -1,15 +1,55 @@
 tables:
-  population:
+  population_5_year_age_groups:
     variables:
       age:
-        title: Age-group with the highest population
+        title: Five year age-group with the highest population
         unit: ""
         description_short: |-
           Five-year age group with the highest population.
+        type: ordinal
+        sort:
+          - 0-4
+          - 5-9
+          - 10-14
+          - 15-19
+          - 20-24
+          - 25-29
+          - 30-34
+          - 35-39
+          - 40-44
+          - 45-49
+          - 50-54
+          - 55-59
+          - 60-64
+          - 65-69
+          - 70-74
       value:
-        title: Population of the most populous age group
+        title: Population of the most populous five-year age group
         unit: "people"
         description_short: |-
           Population of the most populous five-year age-group.
+        display:
+          numDecimalPlaces: 0
+  population_10_year_age_groups:
+    variables:
+      age_group:
+        title: Ten year age-group with the highest population
+        unit: ""
+        description_short: |-
+          Ten-year age group with the highest population.
+        type: ordinal
+        sort:
+          - 0-9
+          - 10-19
+          - 20-29
+          - 30-39
+          - 40-49
+          - 50-59
+          - 60-69
+      value:
+        title: Population of the most populous ten year age group
+        unit: "people"
+        description_short: |-
+          Population of the most populous ten-year age-group.
         display:
           numDecimalPlaces: 0

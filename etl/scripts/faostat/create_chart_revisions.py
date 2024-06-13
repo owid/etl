@@ -16,13 +16,13 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from MySQLdb import IntegrityError
 from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
+from pymysql import IntegrityError
 from structlog import get_logger
 
 from etl import db
-from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
+from etl.chart_revision.v2.core import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
 from etl.scripts.faostat.shared import NAMESPACE
 
@@ -257,7 +257,7 @@ def main(
             # Submit revisions to grapher db.
             log.info(f"Creating chart revisions to map {len(grapher_variable_ids_mapping)} old variables to new ones.")
             try:
-                create_and_submit_charts_revisions(mapping=grapher_variable_ids_mapping)
+                create_and_submit_charts_revisions(variable_mapping=grapher_variable_ids_mapping)
             except IntegrityError:
                 log.error(
                     "Execution failed because some of the charts are already awaiting revision. "

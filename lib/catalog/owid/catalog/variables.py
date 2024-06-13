@@ -367,31 +367,35 @@ def _get_metadata_value_from_variables_if_all_identical(
 
 def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
     # Make a list of all sources of all variables.
-    sources = sum([variable.metadata.sources for variable in variables], [])
-
-    return pd.unique(sources).tolist()
+    sources = []
+    for variable in variables:
+        sources += [s for s in variable.metadata.sources if s not in sources]
+    return sources
 
 
 def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
     # Make a list of all origins of all variables.
-    origins = sum([variable.metadata.origins for variable in variables], [])
-
-    # Get unique array of tuples of origin fields (respecting the order).
-    return pd.unique(origins).tolist()
+    origins = []
+    for variable in variables:
+        # Get unique array of tuples of origin fields (respecting the order).
+        origins += [o for o in variable.metadata.origins if o not in origins]
+    return origins
 
 
 def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
     # Make a list of all licenses of all variables.
-    licenses = sum([variable.metadata.licenses for variable in variables], [])
-
-    return pd.unique(licenses).tolist()
+    licenses = []
+    for variable in variables:
+        licenses += [license for license in variable.metadata.licenses if license not in licenses]
+    return licenses
 
 
 def get_unique_description_key_points_from_variables(variables: List[Variable]) -> List[str]:
     # Make a list of all description key points of all variables.
-    description_key_points = sum([variable.metadata.description_key for variable in variables], [])
-
-    return pd.unique(description_key_points).tolist()
+    description_key_points = []
+    for variable in variables:
+        description_key_points += [k for k in variable.metadata.description_key if k not in description_key_points]
+    return description_key_points
 
 
 def combine_variables_processing_logs(variables: List[Variable]) -> ProcessingLog:
@@ -469,6 +473,15 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
     return cast(PROCESSING_LEVELS, combined_processing_level)
 
 
+def combine_variables_sort(variables: List[Variable]) -> List[str]:
+    # Return sort if all variables have the same sort, otherwise return empty list.
+    sorts = [variable.metadata.sort for variable in variables if variable.metadata.sort]
+    if not sorts:
+        return []
+    else:
+        return sorts[0] if all(sort == sorts[0] for sort in sorts) else []
+
+
 def combine_variables_metadata(
     variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
@@ -506,6 +519,14 @@ def combine_variables_metadata(
     metadata.display = combine_variables_display(variables=variables_only, operation=operation)
     metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
+
+    metadata.type = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="type", operation=operation, warn_if_different=True
+    )
+    metadata.sort = combine_variables_sort(variables=variables_only)
+    metadata.license = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="license", operation=operation, warn_if_different=True
+    )
 
     if pl.enabled():
         metadata.processing_log = combine_variables_processing_logs(variables=variables_only)

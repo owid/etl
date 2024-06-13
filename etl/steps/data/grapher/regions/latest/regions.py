@@ -9,8 +9,12 @@ import re
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -250,6 +254,11 @@ NO_COUNTRY_PAGE = [
 
 
 def run(dest_dir: str) -> None:
+    log.warning(
+        "This step exists for backward compatibility and should eventually be removed. "
+        "Consider using external/owid_grapher/latest/regions instead."
+    )
+
     #
     # Load inputs.
     #

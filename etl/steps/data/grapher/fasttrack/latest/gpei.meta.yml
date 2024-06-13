@@ -1,0 +1,33 @@
+dataset:
+  title: Global Polio Eradication Initiative - cVDPV
+  description: ''
+  licenses:
+    - name: CC BY-NC-SA 3.0 IGO
+      url: https://polioeradication.org/terms-of-use/
+tables:
+  gpei:
+    variables:
+      cvdpv1:
+        title: cVDPV1
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+        description: Cases of circulating vaccine derived polio virus, type 1.
+      cvdpv2:
+        title: cVDPV2
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+        description: Cases of circulating vaccine derived polio virus, type 2.
+      cvdpv3:
+        title: CVDPV3
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+        description: Cases of circulating vaccine derived polio virus, type 3.
+      total_cvdpv:
+        title: cVDPV total
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+        description: Cases of circulating vaccine derived polio virus, all types.

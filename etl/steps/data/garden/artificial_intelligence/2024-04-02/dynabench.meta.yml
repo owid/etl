@@ -27,6 +27,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  non_redistributable: true
 
 tables:
   dynabench:

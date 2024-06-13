@@ -30,7 +30,7 @@ def fix_date_column(tb: Table) -> Table:
     tb.loc[(tb.index >= index_second), "date"] = tb["date"].str[0:-2] + "20" + tb["date"].str[-2:]
 
     # Ensure all dates have a reasonable format.
-    tb["date"] = pd.to_datetime(tb["date"]).dt.date.astype(str)
+    tb["date"] = pd.to_datetime(tb["date"], format="mixed").dt.date.astype(str)
 
     return tb
 

@@ -17,7 +17,7 @@ from rich_click.rich_group import RichGroup
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 
 
 @click.group(name="compare", cls=RichGroup)
@@ -293,11 +293,7 @@ def read_dataset_from_db(env_path: str, namespace: str, version: str, dataset: s
     WHERE version = %(version)s and namespace = %(namespace)s and shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
-        q,
-        engine,
-        params={"version": version, "namespace": namespace, "dataset": dataset},
-    )
+    df = read_sql(q, engine, params={"version": version, "namespace": namespace, "dataset": dataset})
 
     # drop uninteresting columns
     df = df.drop(["createdByUserId", "dataEditedAt", "metadataEditedAt", "updatedAt"], axis=1)
@@ -316,7 +312,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
+    df = read_sql(
         q,
         engine,
         params={"version": version, "namespace": namespace, "dataset": dataset},
@@ -341,7 +337,7 @@ def read_sources_from_db(env_path: str, namespace: str, version: str, dataset: s
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
+    df = read_sql(
         q,
         engine,
         params={"version": version, "namespace": namespace, "dataset": dataset},
@@ -365,7 +361,7 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     JOIN datasets as d ON v.datasetId = d.id
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
-    vf = pd.read_sql(
+    vf = read_sql(
         q,
         engine,
         params={"version": version, "namespace": namespace, "dataset": dataset},

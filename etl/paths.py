@@ -62,3 +62,6 @@ BASE_PACKAGE = os.environ.get("BASE_PACKAGE", "etl")
 # Use paths.DAG_ARCHIVE_FILE to load the complete dag, with active and archive steps.
 # Otherwise use paths.DAG_FILE to load only active steps, ignoring archive ones.
 DEFAULT_DAG_FILE = DAG_FILE
+
+# Hidden ETL file that will keep the time it took to execute each step.
+EXECUTION_TIME_FILE = BASE_DIR / ".execution_time.json"

@@ -111,7 +111,7 @@ def add_population(
 
         # Build age groups
         df_pop = []
-        pop["age"] = pop["age"].replace({"100+": 100}).astype("uint")
+        pop["age"] = pop["age"].astype(str).replace({"100+": 100}).astype("uint")
         for age_group_name, age_ranges in age_group_mapping.items():
             if not age_ranges:
                 age_ranges = [None, None]
@@ -138,5 +138,11 @@ def add_population(
     columns_input = list(df.columns)
     df = df.merge(df_pop, how="left", left_on=columns_merge_df, right_on=columns_merge_pop, suffixes=("", "_extra"))
     df = df[columns_input + ["population"]]
+
+    # Optimize memory
+    # NOTE: pd.merge is converting categoricals to objects for some reason
+    df.country = df.country.astype("category")
+    if "age" in df.columns:
+        df.age = df.age.astype("category")
 
     return df

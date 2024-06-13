@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -24,6 +23,12 @@ def run(dest_dir: str) -> None:
     tb["benchmark"] = tb["benchmark"].astype(str)
     # Selecting the best performance for each benchmark per year
     tb = tb.groupby(["benchmark", "year"])["performance"].max().reset_index().copy_metadata(from_table=tb)
+
+    # Set the first year's performance to the baseline of –1 for each benchmark.
+    # This is to preserve a baseline for –1 for all benchmarks,
+    # even when a second, better performance is recorded in a later year.
+    tb = tb.sort_values(by=["benchmark", "year"])
+    tb.loc[tb.groupby("benchmark").head(1).index, "performance"] = -1
 
     mapping = {
         "MNIST": "Handwriting recognition",

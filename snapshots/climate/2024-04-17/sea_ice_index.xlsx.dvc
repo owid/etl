@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: National Snow and Ice Data Center
+    title: Sea Ice Index
+    citation_full: |-
+      Fetterer, F., K. Knowles, W. N. Meier, M. Savoie, and A. K. Windnagel. (2017). Sea Ice Index, Version 3 [Data Set]. Boulder, Colorado USA. National Snow and Ice Data Center. https://doi.org/10.7265/N5K072F8.
+    attribution: National Snow and Ice Data Center - Sea Ice Index (2024)
+    attribution_short: NSIDC
+    version_producer: Version 3
+    url_main: https://nsidc.org/data/g02135/
+    url_download: https://noaadata.apps.nsidc.org/NOAA/G02135/seaice_analysis/Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx
+    date_accessed: '2024-04-17'
+    date_published: '2024-04-16'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 7789e0f09255f745fa15e726569287fc
+    size: 25191
+    path: sea_ice_index.xlsx

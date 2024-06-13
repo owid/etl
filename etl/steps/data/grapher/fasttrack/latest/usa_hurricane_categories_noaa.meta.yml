@@ -1,0 +1,33 @@
+dataset:
+  title: USA Hurricanes by category (HURDAT, NOAA 2024)
+  description: The number of landfalling hurricanes in the United States, by category.
+  licenses:
+    - {}
+tables:
+  usa_hurricane_categories_noaa:
+    variables:
+      category_1_hurricane:
+        title: Category 1
+        unit: hurricanes
+        description: |-
+          The number of hurricanes that make landfall in the US, measured as category one on the Saffir–Simpson hurricane wind scale (SSHWS).
+      category_2_hurricane:
+        title: Category 2
+        unit: hurricanes
+        description: |-
+          The number of hurricanes that make landfall in the US, measured as category two on the Saffir–Simpson hurricane wind scale (SSHWS).
+      category_3_hurricane:
+        title: Category 3
+        unit: hurricanes
+        description: |-
+          The number of hurricanes that make landfall in the US, measured as category three on the Saffir–Simpson hurricane wind scale (SSHWS).
+      category_4_hurricane:
+        title: Category 4
+        unit: hurricanes
+        description: |-
+          The number of hurricanes that make landfall in the US, measured as category four on the Saffir–Simpson hurricane wind scale (SSHWS).
+      category_5_hurricane:
+        title: Category 5
+        unit: hurricanes
+        description: |-
+          The number of hurricanes that make landfall in the US, measured as category five on the Saffir–Simpson hurricane wind scale (SSHWS).

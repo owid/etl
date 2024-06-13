@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # By looking at the original table, it seems clear that empty cells mean zero.
-    tb = tb.fillna(0)
+    tb = tb.astype(object).fillna(0)
 
     # Temporarily convert all columns to string (to avoid issues with categorical variables).
     tb = tb.astype(str)

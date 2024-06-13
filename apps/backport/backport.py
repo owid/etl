@@ -9,7 +9,7 @@ from git.exc import GitCommandError
 from git.repo import Repo
 from owid.catalog import Source
 from sqlalchemy.engine import Engine
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     _variable_metadata,
@@ -20,7 +20,7 @@ from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.files import checksum_str
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -266,7 +266,7 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
 
         # artificial variable with id just to get s3 paths
         db_var = gm.Variable(
-            id=db_variable_row["id"],
+            description="",
             datasetId=1,
             unit="",
             coverage="",
@@ -275,6 +275,7 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
             display={},
             dimensions=None,
         )
+        db_var.id = db_variable_row["id"]
 
         upload_variable_data = variable_data(var_data)
         if not dry_run:
@@ -306,7 +307,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
         source=Source(
             name="Our World in Data catalog backport",
             published_by="Our World in Data catalog backport",
-            url=f"https://owid.cloud/admin/datasets/{ds.id}",
+            url=f"https://admin.owid.io/admin/datasets/{ds.id}",
             publication_date="latest",
             date_accessed=dt.datetime.utcnow(),  # type: ignore
         ),
@@ -346,7 +347,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "entityCode": "entity_code",
         }
     )
-    vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+    vf = read_sql(q, engine, params={"variable_ids": variable_ids})
     df = df.merge(vf, on="variable_id")
 
     # try converting values to float if possible, this can make the data 50% smaller

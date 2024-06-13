@@ -9,7 +9,7 @@ from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
 from etl import config
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.snapshot import snapshot_catalog
 from etl.steps import load_dag
 
@@ -195,7 +195,7 @@ def _active_datasets(
         limit %(limit)s
         """
 
-    df = pd.read_sql(
+    df = read_sql(
         q,
         engine,
         params={

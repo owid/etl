@@ -6,10 +6,11 @@ from typing import Literal
 
 import yaml
 
-from etl.config import ENV_IS_REMOTE
+from etl.config import ENV
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
+WIZARD_PORT = 8053
 
 
 def load_wizard_config():  # -> Any:
@@ -19,19 +20,27 @@ def load_wizard_config():  # -> Any:
         config = yaml.safe_load(file)
     # Some input checks
     _check_wizard_config(config)
-    # Some transformations
 
+    # Add `enable` property to each app
     def _get_enable(props):
-        # Default for `disable_on_remote` is False
-        disable_on_remote = props.get("disable_on_remote", False)
-        # Default for `enable` is True
-        enable = props.get("enable", True)
+        # Default for `disable` is False
+        if "disable" not in props:
+            return True
+        else:
+            disable = props.get("disable", False)
+            # Disable in *all* settings
+            if isinstance(disable, bool):
+                return not disable
+            # Disable in some settings
+            elif isinstance(disable, dict):
+                if ENV == "staging":
+                    return not disable.get("staging", False)
+                if ENV == "production":
+                    return not disable.get("production", False)
+                elif ENV == "dev":
+                    return not disable.get("dev", False)
 
-        # If `disable_on_remote` is set, then disable if we are on remote (i.e. staging or production)
-        if ENV_IS_REMOTE:
-            enable = (not disable_on_remote) and enable
-
-        return enable
+        raise ValueError(f"Invalid disable property: {disable}")
 
     ## ETL steps
     for _, step in config["etl"]["steps"].items():
@@ -40,12 +49,25 @@ def load_wizard_config():  # -> Any:
     for section in config["sections"]:
         for app in section["apps"]:
             app["enable"] = _get_enable(app)
+    ## Section legacy
+    if "legacy" in config:
+        for app in config["legacy"]["apps"]:
+            app["enable"] = _get_enable(app)
+
+    # Add alias if not there by lowering the title
+    for _, step in config["etl"]["steps"].items():
+        if "alias" not in step:
+            step["alias"] = step["title"].lower().replace(" ", "-")
+    for section in config["sections"]:
+        for app in section["apps"]:
+            if "alias" not in app:
+                app["alias"] = app["title"].lower().replace(" ", "-")
     return config
 
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    _app_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
+    _app_properties_expected = ["title", "entrypoint", "icon", "image_url"]
     pages_properties_expected = _app_properties_expected + ["alias", "description"]
     etl_steps_properties_expected = _app_properties_expected
 
@@ -55,7 +77,7 @@ def _check_wizard_config(config: dict):
     assert "description" in config["etl"], "`etl.description` property is required in wizard config!"
     assert "steps" in config["etl"], "`etl.steps` property is required in wizard config!"
     steps = config["etl"]["steps"]
-    steps_expected = ["snapshot", "meadow", "garden", "fasttrack", "grapher"]
+    steps_expected = ["snapshot", "express", "meadow", "garden", "fasttrack", "grapher"]
     for step_expected in steps_expected:
         assert step_expected in steps, f"{step_expected} property is required in etl.steps property in wizard config!"
         for prop in etl_steps_properties_expected:

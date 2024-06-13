@@ -1,0 +1,20 @@
+dataset:
+  title: Heat deaths attributed to climate change (Vicedo-Cabrera et al. 2021)
+  description: |-
+    Estimates of the fraction of "warm season" deaths that are attributed to heat from natural forcings, and human-induced climate change over the period from 1991 to 2018.
+  licenses:
+    - {}
+tables:
+  heat_deaths_climate_historical:
+    variables:
+      heat_deaths_natural_forcing:
+        title: Natural forcings only
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Share of "warm season" deaths attributed to heat, in a scenario with natural forcings only. Human-induced climate change is not included.
+      heat_deaths_with_climate_change:
+        title: Human-induced climate change
+        unit: '%'
+        short_unit: '%'
+        description: Share of "warm season" deaths attributed to heat caused by human-induced climate change.

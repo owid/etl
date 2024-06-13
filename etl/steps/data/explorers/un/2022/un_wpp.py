@@ -35,7 +35,7 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
             & ~(df.metric == "population")
             & (
                 df.age.isin(
-                    [
+                    [  # Dropping from five-year age groups
                         "20-24",
                         "25-29",
                         "30-34",
@@ -52,6 +52,9 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
                         "85-89",
                         "90-94",
                         "95-99",
+                        # Dropping from ten-year age groups
+                        "0-9",
+                        "10-19",
                     ]
                 )
             )
