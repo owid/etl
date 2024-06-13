@@ -9,6 +9,7 @@ definitions:
 
 dataset:
   update_period_days: 365
+  non_redistributable: true
 tables:
   leading_cause_level_1_in_all_ages:
     title: Leading causes of death in all ages, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
