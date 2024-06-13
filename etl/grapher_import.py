@@ -10,6 +10,7 @@ Usage:
 """
 
 import datetime
+import json
 import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -24,12 +25,8 @@ from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
-from apps.backport.datasync.data_metadata import (
-    add_entity_code_and_name,
-    variable_data,
-    variable_metadata,
-)
-from apps.backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync import data_metadata as dm
+from apps.backport.datasync.datasync import upload_gzip_string
 from etl import config
 from etl.db import get_engine
 
@@ -260,6 +257,9 @@ def upsert_table(
                 max_year = max(years)
                 timespan = f"{min_year}-{max_year}"
 
+        # sort table to get deterministic checksum later on
+        table = table.sort_index()
+
         table.reset_index(inplace=True)
 
         source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
@@ -292,7 +292,7 @@ def upsert_table(
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
-        df = add_entity_code_and_name(session, df)
+        df = dm.add_entity_code_and_name(session, df)
 
         # update links, we need to do it after we commit deleted relationships above
         db_variable.update_links(
@@ -308,20 +308,41 @@ def upsert_table(
         session.commit()
 
         # process data and metadata
-        var_data = variable_data(df)
-        var_metadata = variable_metadata(session, db_variable_id, df)
+        var_data = dm.variable_data(df)
+        var_metadata = dm.variable_metadata(session, db_variable_id, df)
+
+        var_data_str = json.dumps(var_data, default=str)
+        var_metadata_str = json.dumps(var_metadata, default=str)
+
+        checksum_data = dm.checksum_data_str(var_data_str)
+        # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
+        checksum_metadata = dm.checksum_metadata(var_metadata)
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            futures = [
-                executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path()),
-                executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path()),
-            ]
-            # Wait for futures to complete in case exceptions are raised
-            [f.result() for f in futures]
+            futures = []
+
+            if db_variable.dataChecksum != checksum_data:
+                db_variable.dataChecksum = checksum_data
+                futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+
+            if db_variable.metadataChecksum != checksum_metadata:
+                db_variable.metadataChecksum = checksum_metadata
+                futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
+
+            # commit new checksums
+            if futures:
+                # Wait for futures to complete in case exceptions are raised
+                [f.result() for f in futures]
+
+                session.add(db_variable)
+                session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            if futures:
+                log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+            else:
+                log.info("upsert_table.skipped_upload_to_s3", size=len(table), variable_id=db_variable_id)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
@@ -457,6 +478,8 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
 
+        con.commit()
+
         log.warning(
             "cleanup_ghost_variables.end",
             size=result.rowcount,
@@ -482,6 +505,7 @@ def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: 
                 {"dataset_id": dataset_id},
             )
         if result.rowcount > 0:
+            con.commit()
             log.warning(f"Deleted {result.rowcount} ghost sources")
 
 

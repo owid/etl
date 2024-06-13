@@ -10,7 +10,9 @@ It is often necessary to add `default=None` or `init=False` to make pyright happ
 """
 
 import json
+import random
 from datetime import date, datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
@@ -43,7 +45,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
@@ -298,6 +300,19 @@ class Chart(Base):
                 raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
+
+    def load_variables_checksums(self, session: Session) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId = %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": self.id}).set_index("variableId")
 
     def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
         """Remap variable ids from source to target session. Variable in source is uniquely identified
@@ -976,6 +991,8 @@ class Variable(Base):
     grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -1016,7 +1033,8 @@ class Variable(Base):
             )
             conflict = session.scalars(q).one_or_none()
             if conflict:
-                conflict.name = f"{conflict.name} (conflict)"
+                # modify the conflicting variable name, it'll be cleaned up later
+                conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
                 session.add(conflict)
                 session.commit()
 
@@ -1351,8 +1369,17 @@ class Origin(Base):
         return origin
 
 
-# TODO: should we also add "rejected" status and exclude such charts from chart-sync?
-CHART_DIFF_STATUS = Literal["approved", "unapproved"]
+class ChartStatus(Enum):
+    APPROVED = "approved"
+    PENDING = "pending"
+    REJECTED = "rejected"
+
+
+CHART_DIFF_STATUS = Literal[
+    ChartStatus.APPROVED,
+    ChartStatus.PENDING,
+    ChartStatus.REJECTED,
+]
 
 
 class ChartDiffApprovals(Base):
@@ -1372,10 +1399,8 @@ class ChartDiffApprovals(Base):
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
-    def latest_chart_status(
-        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
-    ) -> CHART_DIFF_STATUS:
-        """Load the latest approval of the chart. If there's none, return 'unapproved'."""
+    def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
+        """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
         result = session.scalars(
             select(cls)
             .where(
@@ -1387,9 +1412,25 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
-            return result.status
+            if result.status == "unapproved":
+                return ChartStatus.PENDING.value
+            return result.status  # type: ignore
         else:
-            return "unapproved"
+            return ChartStatus.PENDING.value
+
+    @classmethod
+    def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
+        """Get history of values."""
+        result = session.scalars(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                # cls.sourceUpdatedAt == source_updated_at,
+                # cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+        ).fetchall()
+        return list(result)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
