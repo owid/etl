@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
 
         # Join the categories with ", " and " and " before the last one
         if len(categories) > 1:
-            simplified_entry = ", ".join(categories[:-1]) + " and " + categories[-1]
+            simplified_entry = ", ".join(categories[:-1]) + " and " + categories[-1] + " collaboration"
         else:
             simplified_entry = categories[0]
 
@@ -61,15 +61,15 @@ def run(dest_dir: str) -> None:
         "Industry",
         "Academia",
         "Government",
-        "Academia and industry",
-        "Academia and research collective",
-        "Industry and research collective",
-        "Academia, industry and research collective",
-        "Government and industry",
+        "Academia and industry collaboration",
+        "Academia and research collective collaboration",
+        "Industry and research collective collaboration",
+        "Academia, industry and research collective collaboration",
+        "Government and industry collaboration",
         "Research collective",
-        "Academia, government and industry",
-        "Academia and government",
-        "Academia, government, industry and research collective",
+        "Academia, government and industry collaboration",
+        "Academia and government collaboration",
+        "Academia, government, industry and research collective collaboration",
         "Not specified",
     }
     assert unique_values == expected_values, "Unexpected affiliations in organization_categorization column"
