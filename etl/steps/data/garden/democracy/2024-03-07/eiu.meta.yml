@@ -1,0 +1,116 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Democracy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: EIU Democratic Index (2006-2023)
+  description: |-
+    The Economist Intelligence Unit's (EIU) Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime".
+
+    This dataset was constructed using data collected from various EIU yearly reports and a multi-year compilation by Gapminder.
+
+
+tables:
+  eiu:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023)
+
+    variables:
+
+      democracy_eiu:
+        title: Democracy score
+        description_short: |-
+          Extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf. It ranges from 0 to 10 (most democratic).
+        description_processing: |-
+          Values for continents have been obtained by averaging the values of the countries in the continent.
+        unit: ""
+
+      elect_freefair_eiu:
+        title: Free and fair elections
+        description_short: |-
+          Extent to which all citizens can choose their political leaders in free and fair elections. Higher values indicate more pluralism.
+        unit: ""
+
+      funct_gov_eiu:
+        title: Functioning government
+        description_short: |-
+          Extent to which citizens have a functioning government that acts on their behalf. It ranges from 0 to 10 (most effective).
+        unit: ""
+
+      pol_part_eiu:
+        title: Political participation
+        description_short: |-
+          Extent to which citizens can and do participate in politics. It ranges from 0 to 10 (most active).
+        unit: ""
+
+      dem_culture_eiu:
+        title: Democratic culture
+        description_short: |-
+          Extent to which citizens prefer democracy over other political systems. It ranges from 0 to 10 (strongest preference for democracy).
+        unit: ""
+
+      civlib_eiu:
+        title: Civil liberties
+        description_short: |-
+          Extent to which citizens enjoy civil liberties. It ranges from 0 to 10 (most liberties).
+        unit: ""
+
+      regime_eiu:
+        title: Regime
+        unit: ""
+        description_short: |-
+          Political regime of a country. It distinguishes between authoritarian regimes (score 0), hybrid regimes (score 1), flawed democracies (score 2), and full democracies (score 3).
+        description_key:
+          - Full democracies have comprehensive democratic features, with a high extent to which citizens can choose their political leaders in free and fair elections, enjoy civil liberties, prefer democracy over other political systems, can and do participate in politics, and have a functioning government that acts on their behalf.
+          - Flawed democracies have some weaknesses in democratic institutions and culture.
+          - Hybrid regimes have serious weaknesses in democratic institutions and culture.
+          - Authoritarian regimes have few democratic institutions and little democratic culture.
+
+  num_countries:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023)
+
+    variables:
+      num_regime_eiu:
+        title: |-
+          <% if category == '-1' %>
+          Number of countries with unknown regime
+          <% else %>
+          Number of << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
+          <% endif %>
+        unit: "countries"
+
+  num_people:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023); Population based on various sources (2023)
+    variables:
+      pop_regime_eiu:
+        title: |-
+          <% if category == '-1' %>
+          Number of people living in countries with unknown regime
+          <% else %>
+          Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
+          <% endif %>
+        description_short: "Number of countries with available data."
+        unit: "people"
+
+
+  avg_pop:
+    common:
+      presentation:
+        attribution: Economist Intelligence Unit (2006-2023); Population based on various sources (2023)
+    variables:
+      democracy_eiu_weighted:
+        title: "Democracy score (population-weighted)"
+        description_short: Average democratic status, weighted by population.
+        unit: ""

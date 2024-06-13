@@ -2,6 +2,7 @@ import difflib
 import os
 import re
 import traceback
+import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
@@ -17,6 +18,7 @@ from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.files import yaml_dump
 from etl.steps import load_dag
@@ -114,8 +116,8 @@ tb = {_snippet_dataset(ds_b, table_name)}
         else:
             # get both tables in parallel
             with ThreadPoolExecutor() as executor:
-                future_a = executor.submit(ds_a.__getitem__, table_name)
-                future_b = executor.submit(ds_b.__getitem__, table_name)
+                future_a = executor.submit(get_table_with_retry, ds_a, table_name)
+                future_b = executor.submit(get_table_with_retry, ds_b, table_name)
 
                 table_a = future_a.result()
                 table_b = future_b.result()
@@ -493,7 +495,7 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
-def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **kwargs) -> str:
+def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, color: bool = True, **kwargs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
     meta_a = yaml_dump(dict_a, **kwargs)
     meta_b = yaml_dump(dict_b, **kwargs)
@@ -503,7 +505,8 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **
     lines = [line for line in lines if not line.startswith("  ")]
 
     # add color
-    lines = ["[violet]" + line for line in lines]
+    if color:
+        lines = ["[violet]" + line for line in lines]
 
     if not lines:
         return ""
@@ -720,7 +723,11 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
 
 def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
     d = meta.to_dict()
+    # remove noise
     d.pop("processing_log", None)
+    for source in d.get("sources", []):
+        source.pop("date_accessed", None)
+        source.pop("publication_date", None)
     return d
 
 
@@ -819,6 +826,15 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     mapping = {path: result for path, result in zip(ds_paths, results)}
 
     return mapping  # type: ignore
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(urllib.error.HTTPError),
+)
+def get_table_with_retry(ds: Dataset, table_name: str) -> Table:
+    return ds[table_name]
 
 
 def dataset_uri(ds: Dataset) -> str:

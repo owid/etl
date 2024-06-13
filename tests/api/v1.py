@@ -18,8 +18,8 @@ def test_health():
 @patch("etl.grapher_model.Variable.load_from_catalog_path")
 def test_update_indicator(mock_load_from_catalog_path):
     mock_load_from_catalog_path.return_value = gm.Variable(
-        id=1,
         datasetId=1,
+        description="",
         timespan="",
         unit="",
         coverage="",
@@ -29,6 +29,7 @@ def test_update_indicator(mock_load_from_catalog_path):
         dimensions=None,
         sourceId=None,
     )
+    mock_load_from_catalog_path.id = 1
     response = client.put(
         "/api/v1/indicators",
         json={

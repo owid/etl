@@ -48,9 +48,6 @@ steps:
   data://garden/hyde/2017/baseline:
     - data://meadow/hyde/2017/baseline
   # Others
-  data://grapher/who/2021-07-01/ghe:
-    - data://garden/who/2021-07-01/ghe
-    - data://garden/regions/2023-01-01/regions
   data://meadow/living_planet/2020-09-10/lpd:
     - walden://living_planet/2020-09-10/lpd
   data://garden/living_planet/2020-09-10/lpd:
@@ -78,15 +75,6 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
-
-  # World Development Indicators - WDI
-  data://meadow/worldbank_wdi/2023-05-29/wdi:
-    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
-  data://garden/worldbank_wdi/2023-05-29/wdi:
-    - snapshot://worldbank_wdi/2023-05-29/wdi.zip
-    - data://meadow/worldbank_wdi/2023-05-29/wdi
-  data://grapher/worldbank_wdi/2023-05-29/wdi:
-    - data://garden/worldbank_wdi/2023-05-29/wdi
 
   data://meadow/worldbank_wdi/2022-05-26/wdi:
     - walden://worldbank_wdi/2022-05-26/wdi
@@ -150,34 +138,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
-
-  #
-  # Aviation Safety Network - Aviation statistics (2022-10-14).
-  #
-  # Data extracted directly from their website.
-  data://meadow/aviation_safety_network/2022-10-12/aviation_statistics:
-    - snapshot://aviation_safety_network/2022-10-12/aviation_statistics_by_nature.csv
-    - snapshot://aviation_safety_network/2022-10-12/aviation_statistics_by_period.csv
-  # Data extracted from the public spreadsheet.
-  data://meadow/aviation_safety_network/2022-10-14/aviation_statistics:
-    - snapshot://aviation_safety_network/2022-10-14/aviation_statistics.csv
-  data://meadow/aviation_safety_network/2023-04-18/aviation_statistics:
-    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics.csv
-    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_nature.csv
-    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_period.csv
-  # Here, worldbank_wdi is required to get some additional aviation statistics.
-  data://garden/aviation_safety_network/2022-10-14/aviation_statistics:
-    - data://meadow/aviation_safety_network/2022-10-12/aviation_statistics
-    - data://meadow/aviation_safety_network/2022-10-14/aviation_statistics
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-  data://garden/aviation_safety_network/2023-04-18/aviation_statistics:
-    - data://meadow/aviation_safety_network/2023-04-18/aviation_statistics
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-  data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
-    - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
-  data://grapher/aviation_safety_network/2023-04-18/aviation_statistics:
-    - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
-
   # HMD
   data://meadow/hmd/2022-12-07/life_tables:
     - snapshot://hmd/2022-12-07/hmd.zip
@@ -203,7 +163,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    - data://garden/energy/2023-12-12/energy_mix
+    - data://garden/energy/2024-05-08/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Maddison Database 2010
@@ -225,12 +185,12 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
   # Global mobile money dataset (GSMA)
-  data://meadow/technology/2023-03-06/mobile_money:
-    - snapshot://technology/2023-03-06/mobile_money.xlsx
-  data://garden/technology/2023-03-06/mobile_money:
-    - data://meadow/technology/2023-03-06/mobile_money
-  data://grapher/technology/2023-03-06/mobile_money:
-    - data://garden/technology/2023-03-06/mobile_money
+  data://meadow/technology/2024-05-30/mobile_money:
+    - snapshot://technology/2024-05-30/mobile_money.xlsx
+  data://garden/technology/2024-05-30/mobile_money:
+    - data://meadow/technology/2024-05-30/mobile_money
+  data://grapher/technology/2024-05-30/mobile_money:
+    - data://garden/technology/2024-05-30/mobile_money
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -258,12 +218,12 @@ steps:
     - data://garden/wvs/2023-06-25/longitudinal_wvs
 
   # USA consumer prices (US Bureau of Labor Statistics)
-  data://meadow/bls/2023-03-10/us_consumer_prices:
-    - snapshot://bls/2023-03-09/us_consumer_prices.csv
-  data://garden/bls/2023-03-10/us_consumer_prices:
-    - data://meadow/bls/2023-03-10/us_consumer_prices
-  data://grapher/bls/2023-03-10/us_consumer_prices:
-    - data://garden/bls/2023-03-10/us_consumer_prices
+  data://meadow/bls/2024-05-16/us_consumer_prices:
+    - snapshot://bls/2024-05-16/us_consumer_prices.csv
+  data://garden/bls/2024-05-16/us_consumer_prices:
+    - data://meadow/bls/2024-05-16/us_consumer_prices
+  data://grapher/bls/2024-05-16/us_consumer_prices:
+    - data://garden/bls/2024-05-16/us_consumer_prices
 
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
@@ -308,15 +268,6 @@ steps:
     - data://meadow/happiness/2012-03-20/happiness
   data://grapher/happiness/2023-03-20/happiness:
     - data://garden/happiness/2023-03-20/happiness
-
-  # Equaldex dataset
-  data://meadow/lgbt_rights/2023-04-13/equaldex:
-    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
-    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
-  data://garden/lgbt_rights/2023-04-13/equaldex:
-    - data://meadow/lgbt_rights/2023-04-13/equaldex
-  data://grapher/lgbt_rights/2023-04-13/equaldex:
-    - data://garden/lgbt_rights/2023-04-13/equaldex
 
   # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
@@ -392,19 +343,19 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-11-02/world_economic_outlook:
-    - snapshot://imf/2023-11-02/world_economic_outlook.xls
-  data://garden/imf/2023-11-02/world_economic_outlook:
-    - data://meadow/imf/2023-11-02/world_economic_outlook
-  data://grapher/imf/2023-11-02/world_economic_outlook:
-    - data://garden/imf/2023-11-02/world_economic_outlook
+  data://meadow/imf/2024-05-02/world_economic_outlook:
+    - snapshot://imf/2024-05-02/world_economic_outlook.xls
+  data://garden/imf/2024-05-02/world_economic_outlook:
+    - data://meadow/imf/2024-05-02/world_economic_outlook
+  data://grapher/imf/2024-05-02/world_economic_outlook:
+    - data://garden/imf/2024-05-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
-  data://garden/research_development/2023-05-05/patents_articles:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://garden/research_development/2024-05-20/patents_articles:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2023-05-05/patents_articles:
-    - data://garden/research_development/2023-05-05/patents_articles
+  data://grapher/research_development/2024-05-20/patents_articles:
+    - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data
   data://meadow/wb/2023-05-12/women_business_law_additional:
@@ -605,6 +556,14 @@ steps:
   data://grapher/technology/2023-11-28/dna_sequencing:
     - data://garden/technology/2023-11-28/dna_sequencing
 
+  # John C. McCallum, Price and Performance Changes of Computer Technology with Time
+  data://meadow/technology/2024-05-13/computer_memory_storage:
+    - snapshot://technology/2024-05-13/computer_memory_storage.xlsx
+  data://garden/technology/2024-05-13/computer_memory_storage:
+    - data://meadow/technology/2024-05-13/computer_memory_storage
+  data://grapher/technology/2024-05-13/computer_memory_storage:
+    - data://garden/technology/2024-05-13/computer_memory_storage
+
   # European Social Survey - Trust questions
   data://meadow/ess/2023-08-02/ess_trust:
     - snapshot://ess/2023-08-02/ess_trust.csv
@@ -635,16 +594,16 @@ steps:
     - data://garden/survey/2023-08-04/trust_surveys
 
   # World Bank GenderStats
-  data://meadow/wb/2023-12-29/gender_statistics:
-    - snapshot://wb/2023-12-29/gender_statistics.feather
-  data://garden/wb/2023-12-29/gender_statistics:
-    - data://meadow/wb/2023-12-29/gender_statistics
-  data://grapher/wb/2023-12-29/gender_statistics:
-    - data://garden/wb/2023-12-29/gender_statistics
+  data://meadow/wb/2024-06-10/gender_statistics:
+    - snapshot://wb/2024-06-10/gender_statistics.feather
+  data://garden/wb/2024-06-10/gender_statistics:
+    - data://meadow/wb/2024-06-10/gender_statistics
+  data://grapher/wb/2024-06-10/gender_statistics:
+    - data://garden/wb/2024-06-10/gender_statistics
 
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/wb/2023-12-29/gender_statistics
+    - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
@@ -677,12 +636,21 @@ steps:
   data://grapher/ggdc/2024-04-26/maddison_project_database:
     - data://garden/ggdc/2024-04-26/maddison_project_database
 
-  # Global GDP in the long run
+  # Global GDP in the long run (MD + MPD)
   data://grapher/growth/2024-04-29/gdp_historical:
     - data://garden/growth/2024-04-29/gdp_historical
   data://garden/growth/2024-04-29/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
+
+  # Global GDP in the long run (with WDI)
+  data://garden/growth/2024-05-16/gdp_historical:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/ggdc/2022-12-23/maddison_database
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
+
+  data://grapher/growth/2024-05-16/gdp_historical:
+    - data://garden/growth/2024-05-16/gdp_historical
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -714,36 +682,65 @@ steps:
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
 
-  #
-  # EM-DAT Natural disasters.
-  #
-  data://meadow/emdat/2024-04-11/natural_disasters:
-    - snapshot://emdat/2024-04-11/natural_disasters.xlsx
+  # Attention in Media: The Guardian
+  data://meadow/news/2024-05-08/guardian_mentions:
+    - snapshot://news/2024-05-07/guardian_mentions.csv
+    - snapshot://news/2024-05-07/guardian_mentions_raw.csv
+  data://garden/news/2024-05-08/guardian_mentions:
+    - data://meadow/news/2024-05-08/guardian_mentions
+  data://grapher/news/2024-05-08/guardian_mentions:
+    - data://garden/news/2024-05-08/guardian_mentions
 
-  # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2024-04-11/natural_disasters:
-    - data://meadow/emdat/2024-04-11/natural_disasters
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-03-11/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+  # News coverage by GDELT 2
+  data://meadow/news/2024-05-23/gdelt_v2:
+    - snapshot://news/2024-05-23/gdelt_v2.csv
+  data://garden/news/2024-05-23/gdelt_v2:
+    - data://meadow/news/2024-05-23/gdelt_v2
+  data://grapher/news/2024-05-23/gdelt_v2:
+    - data://garden/news/2024-05-23/gdelt_v2
 
-  # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2024-04-11/natural_disasters:
-    - data://garden/emdat/2024-04-11/natural_disasters
-
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2024-04-11/natural_disasters_global_by_type:
-    - data://garden/emdat/2024-04-11/natural_disasters
-
-  # Natural disasters explorer.
-  data://explorers/emdat/latest/natural_disasters:
-    - data://garden/emdat/2024-04-11/natural_disasters
 
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
 
   ######################################################################################################################
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2024-05-20/wdi:
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+
+  data://garden/worldbank_wdi/2024-05-20/wdi:
+    - snapshot://worldbank_wdi/2024-05-20/wdi.zip
+    - data://meadow/worldbank_wdi/2024-05-20/wdi
+
+  data://grapher/worldbank_wdi/2024-05-20/wdi:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  #
+  # Aviation Safety Network - Aviation Statistics.
+  #
+  data://meadow/aviation_safety_network/2024-06-05/aviation_statistics:
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
+    - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
+  data://garden/aviation_safety_network/2024-06-05/aviation_statistics:
+    - data://meadow/aviation_safety_network/2024-06-05/aviation_statistics
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+  data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
+    - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
+  # Equaldex dataset
+  data://meadow/lgbt_rights/2024-06-03/equaldex:
+    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
+
+  data://garden/lgbt_rights/2024-06-03/equaldex:
+    - data://meadow/lgbt_rights/2024-06-03/equaldex
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+
+  data://grapher/lgbt_rights/2024-06-03/equaldex:
+    - data://garden/lgbt_rights/2024-06-03/equaldex
 
 include:
   - dag/open_numbers.yml
@@ -776,3 +773,5 @@ include:
   - dag/democracy.yml
   - dag/temp.yml
   - dag/survey.yml
+  - dag/forests.yml
+  - dag/natural_disasters.yml

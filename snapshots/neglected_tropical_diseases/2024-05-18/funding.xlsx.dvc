@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: G-FINDER
+    description: |-
+      The G-FINDER project tracks annual investment into R&D for new products and technologies to address priority global health challenges. This includes funding for basic research and the development of new drugs, vaccines, diagnostics and other tools for global health priorities that disproportionately affect people in low- and middle-income countries, such as neglected diseases, emerging infectious diseases, and sexual and reproductive health issues.
+
+      The basis of this project is an annual survey of the world’s funders and developers of global health R&D. The G-FINDER survey and report series was founded and created by Policy Cures, and has been funded since its inception by the Bill & Melinda Gates Foundation.
+
+      The data collected in this survey has been used to create a unique repository of investment data, providing an unmatched resource for policy-makers, donors, researchers and industry. The database outlines the long-term landscape of funding for R&D for global health priority areas, including where funding gaps exist and how single investments fit into the global picture. This dataset covers the majority of neglected disease, emerging infectious disease, and sexual & reproductive health R&D funding is captured by G-FINDER, because large funders active in this area and target groups identified by our Advisory Committee are typically responsive and, where they are not, are prioritised during survey follow-up.
+
+      The dataset covers  major funding for: Neglected Diseases: Bacterial pneumonia & meningitis, Buruli ulcer, Chagas disease, Cryptococcal meningitis, Dengue, Diarrhoeal diseases, Helminth infections (worms & flukes), Hepatitis B, Hepatitis C, Histoplasmosis, HIV/AIDS, Kinetoplastid diseases, Leprosy, Leptospirosis, Malaria, Mycetoma, Rheumatic fever, Salmonella infections, Scabies, Snakebite envenoming, Trachoma, Tuberculosis, Yaws. Emerging Infectious Diseases: Arenaviral haemorrhagic fevers (including Lassa fever), Bunyaviral diseases (including CCHF, RVF, SFTS), Chikungunya, Coronaviral diseases (including MERS, SARS, COVID-19), Emergent non-polio enteroviruses (including EV71, D68), Filoviral diseases (including Ebola, Marburg), Henipaviral diseases (including Nipah), Mpox (monkeypox), Zika. Sexual & Reproductive Health: Contraception, HIV/AIDS, HPV and HPV-related cervical cancer, Multi-purpose prevention technologies, Post-partum haemorrhage, Pre-eclampsia and eclampsia, Sexually transmitted infections.
+    date_published: "2023-12-01"
+    title_snapshot: G-FINDER
+    # Citation
+    producer: Policy Cures Research
+    citation_full: |-
+      Neglected Disease G-FINDER report, The Higher Cost of Lower Funding (2023), Policy Cures Research.
+
+    # Files
+    url_main: https://gfinderdata.policycuresresearch.org/pages/data-visualisations/allNeglectedDiseases
+    date_accessed: 2024-05-18
+
+    # License
+    license:
+      name: CC BY 4.0
+
+outs:
+  - md5: 8a0ff3d1c4b17484aa9071b2d8e1cd39
+    size: 7252416
+    path: funding.xlsx
