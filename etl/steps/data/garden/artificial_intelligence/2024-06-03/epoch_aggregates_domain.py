@@ -35,9 +35,9 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints",
         "notability_criteria",
     ]
+
     # Aggregate the data by domain
     tb_agg = sh.calculate_aggregates(tb, "domain", paths.short_name, unused_columns)
-
     # Set the index to year and domain
     tb_agg = tb_agg.format(["year", "domain"])
 

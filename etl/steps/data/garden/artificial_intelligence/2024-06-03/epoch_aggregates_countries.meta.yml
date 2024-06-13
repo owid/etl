@@ -8,7 +8,7 @@ definitions:
         - Artificial Intelligence
     unit: 'AI systems'
     short_unit: ''
-    description_short: Total annual number of notable machine learning models attributed to the location of researchers’ affiliated institutions. {definitions.desc_update}
+    description_short: Refers to the location of the primary organization with which the authors of a notable AI system are affiliated. An AI system can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries. {definitions.desc_update}
     description_processing: The number of notable AI systems by country is determined by tallying the number of machine learning models that are associated with the geographical location of the researchers' affiliated institutions. It's important to note that a single model can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/

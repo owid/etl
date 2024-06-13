@@ -34,7 +34,9 @@ log = get_logger()
 # CONFIG
 ## Title/subtitle
 st.title("**Expert** 🧙")
-st.markdown("Ask the Expert any questions about ETL!")
+st.markdown(
+    "Ask the Expert any questions about ETL! Alternatively, visit [**our documentation ↗**](https://docs.owid.io/projects/etl])."
+)
 
 ## Load variables
 load_env()
