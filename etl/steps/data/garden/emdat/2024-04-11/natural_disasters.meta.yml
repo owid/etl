@@ -8,7 +8,7 @@ definitions:
 
   # General definitions.
   definition_disaster: &definition-disaster |-
-    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering.
+    EM-DAT defines a disaster as a situation or event which overwhelms local capacity, necessitating a request to the national or international level for external assistance; an unforeseen and often sudden event that causes great damage, destruction, and human suffering. Of all EM-DAT disasters, we select geophysical, meteorological, hydrological, and climatological events, which include droughts, earthquakes, extreme temperatures, floods, glacial lake outburst floods, mass movements, extreme weather events, volcanic activity, and wildfires.
   # Definitions of impact variables.
   definition_dead: &definition-dead |-
     EM-DAT counts deaths as deceased and missing people combined, as a result of a natural disaster.
@@ -36,7 +36,7 @@ definitions:
     Drought is defined as an extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect.
   # Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector.
   definition_earthquake: &definition-earthquake |-
-    An earthquake is defined as a sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking.
+    An earthquake is defined as a sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking. The data includes the impacts of earthquake events, aftershocks and tsunamis.
   definition_extreme_temperature: &definition-extreme-temperature |-
     Extreme temperature is used as a general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions.
   definition_flood: &definition-flood |-
@@ -57,14 +57,18 @@ definitions:
     Glacial lake outburst floods are defined as those that occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
   definition_fog: &definition-fog |-
     Fog is defined as water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground. Currently, the only fog disaster recorded in EM-DAT is the Great Smog of London in 1952.
-  # definition_extreme_weather: &definition-extreme-weather |-
   # I couldn't find any precise definition of extreme weather in the EM-DAT documentation: https://doc.emdat.be/docs/
+  # But I can see the subtype of events that are included for the type "Storm" (which we call "Extreme weather").
+  # Do not mention all (there are many and detailed) but a summary of the most important.
+  definition_extreme_weather: &definition-extreme-weather |-
+    Extreme weather events include tornadoes, hailstorms, thunderstorms, sandstorms, blizzards, and extreme wind events.
   # Common description key of all disasters.
   description_key_common: &description-key-common
     - *definition-disaster
     - *definition-drought
     - *definition-earthquake
     - *definition-extreme-temperature
+    - *definition-extreme-weather
     - *definition-flood
     - *definition-volcanic-eruption
     - *definition-wildfire
@@ -72,6 +76,36 @@ definitions:
     - *definition-wet-mass-movement
     - *definition-glacial-lake-outburst-flood
     - *definition-fog
+  # Definitions of event sizes, adapted from Guha-Sapir et al. (2004).
+  definition_small_event: &definition-small-event |-
+    A disaster is considered to have a "small" impact if it results in no more than 5 deaths, affects no more than 1,500 people, and causes economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+  definition_large_event: &definition-large-event |-
+    A disaster is considered to have a "large" impact if it results in more than 50 deaths, affects more than 150,000 people, or causes economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+  definition_medium_event: &definition-medium-event |-
+    A disaster is considered to have a "medium" impact if it does not fall under the categories of "small" or "large".
+  definition_unknown_event: &definition-unknown-event |-
+    A disaster is considered to have an "unknown" impact if there is no data available on the number of deaths, affected people, or economic damages.
+  definition_size_origin: &definition-size-origin |-
+    These definitions on the relative impacts of natural disasters are adapted from Guha-Sapir et al. (2004), and were originally based on definitions by the Centre for Research on the Epidemiology of Disasters (CRED).
+  description_key_sizes: &description-key-sizes
+    - *definition-disaster
+    - *definition-dead
+    - *definition-injured
+    - *definition-affected
+    - *definition-homeless
+    - *definition-total-affected
+    - *definition-total-damage
+    - *definition-small-event
+    - *definition-large-event
+    - *definition-medium-event
+    - *definition-unknown-event
+    - *definition-size-origin
+  definition_unknown_deaths: &definition-unknown-deaths |-
+    A disaster has an unknown number of deaths if there is no data available on the number of total deaths for that reported event.
+  description_key_deaths: &description-key-deaths
+    - *definition-disaster
+    - *definition-dead
+    - *definition-unknown-deaths
 
 dataset:
   title: Natural disasters
@@ -79,12 +113,14 @@ dataset:
 
 tables:
   natural_disasters_decadal:
+    title: Natural disasters, decadal average
+    # NOTE: This table contains AVERAGE decadal values, not total sums.
     variables: &variables-default
       total_dead:
-        title: Total deaths
+        title: Deaths
         unit: 'people'
         description_short: |-
-          Total number of deaths as a result of a natural disaster.
+          Total number of dead and missing people.
         description_key:
           - *definition-dead
           - *description-key-common
@@ -97,7 +133,7 @@ tables:
           - *definition-injured
           - *description-key-common
       affected:
-        title: Affected
+        title: Requiring assistance
         unit: 'people'
         description_short: |-
           People requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
@@ -127,8 +163,6 @@ tables:
         title: Reconstruction costs
         short_unit: '$'
         unit: 'current US$'
-        description_short: |-
-          Reconstruction costs.
         description_key:
           - *definition-reconstruction-costs
           - *description-key-common
@@ -142,7 +176,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages:
-        title: Total economic damage from natural disasters
+        title: Total economic damages
         short_unit: '$'
         unit: 'current US$'
         description_short: |-
@@ -151,46 +185,56 @@ tables:
           - *definition-total-damage
           - *description-key-common
       n_events:
-        title: Number of reported natural disasters
+        title: Disasters
         unit: 'events'
         description_short: |-
-          Number of reported natural disasters.
+          Number of reported natural disasters in any given year. Note that the historical increase largely reflects improvements in data reporting, and should not be used to assess the total number of events.
         description_key:
           - *description-key-common
       population:
         title: Population
         unit: 'people'
       total_dead_per_100k_people:
-        title: Total number of deaths per 100,000 people
+        title: Deaths per 100,000 people
         unit: 'deaths per 100,000 people'
+        description_short: |-
+          Death rate per 100,000 people as a result of a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-dead
           - *description-key-common
       injured_per_100k_people:
-        title: Number of injured persons per 100,000 people
+        title: Injured per 100,000 people
         unit: 'injured per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
           - *description-key-common
       affected_per_100k_people:
-        title: Number of affected persons per 100,000 people
-        unit: 'affected per 100,000 people'
+        title: Requiring assistance per 100,000 people
+        unit: 'requiring assistance per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
         description_processing: *description-processing-100k
         description_key:
           - *definition-affected
           - *description-key-common
       homeless_per_100k_people:
-        title: Number of homeless persons per 100,000 people
+        title: Homeless per 100,000 people
         unit: 'homeless per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 whose houses are destroyed or heavily damaged and therefore need shelter after an event.
         description_processing: *description-processing-100k
         description_key:
           - *definition-homeless
           - *description-key-common
       total_affected_per_100k_people:
-        title: Total number of affected persons per 100,000 people
+        title: Total affected per 100,000 people
         unit: 'affected per 100,000 people'
+        description_short: |-
+          Rate of people per 100,000 affected by a natural disaster.
         description_processing: *description-processing-100k
         description_key:
           - *definition-injured
@@ -199,8 +243,10 @@ tables:
           - *definition-total-affected
           - *description-key-common
       n_events_per_100k_people:
-        title: Number of events per 100,000 people
+        title: Disasters per 100,000 people
         unit: 'events per 100,000 people'
+        description_short: |-
+          Rate of reported natural disasters per 100,000 people in any given year. Note that the historical increase largely reflects improvements in data reporting, and should not be used to assess the true rate of events.
         description_processing: *description-processing-100k
         description_key:
           - *description-key-common
@@ -209,7 +255,7 @@ tables:
         unit: "current US$"
         short_unit: "$"
       reconstruction_costs_per_gdp:
-        title: "Reconstruction costs from natural disasters as a share of GDP"
+        title: "Reconstruction costs as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -219,7 +265,7 @@ tables:
           - *definition-reconstruction-costs
           - *description-key-common
       insured_damages_per_gdp:
-        title: "Insured damages from natural disasters as a share of GDP"
+        title: "Insured damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -229,7 +275,7 @@ tables:
           - *definition-insured-damage
           - *description-key-common
       total_damages_per_gdp:
-        title: "Total economic damages from natural disasters as a share of GDP"
+        title: "Total economic damages as a share of GDP"
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -239,4 +285,199 @@ tables:
           - *definition-total-damage
           - *description-key-common
   natural_disasters_yearly:
+    title: Natural disasters, yearly data
     variables: *variables-default
+  natural_disasters_yearly_impact:
+    title: Natural disasters by yearly impact
+    variables: &variables-impact
+      n_unknown_events:
+        title: Number of reported natural disasters with unknown impacts
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters for which there is no data about the number of deaths, affected people, or economic damages.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Unknown
+        presentation:
+          title_public: Number of reported natural disasters with unknown impacts
+      n_small_events:
+        title: Number of reported natural disasters with a small impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that result in no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Small
+        presentation:
+          title_public: Number of reported natural disasters with a small impact
+      n_medium_events:
+        title: Number of reported natural disasters with a medium impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that do not fall under the categories of "small" or "large".
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Medium
+        presentation:
+          title_public: Number of reported natural disasters with a medium impact
+      n_large_events:
+        title: Number of reported natural disasters with a large impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that result in more than 50 deaths, affect more than 150,000 people, or cause economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Large
+        presentation:
+          title_public: Number of reported natural disasters with a large impact
+      n_events:
+        title: Number of reported natural disasters
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Total number of reported events, even when their impact, i.e. number of deaths, affected people, and economic damages, is unknown.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Total
+        presentation:
+          title_public: Number of reported natural disasters
+      share_unknown_events:
+        title: Share of reported natural disasters with unknown impacts
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Share of reported natural disasters for which there is no data about the number of deaths, affected people, or economic damages.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Unknown
+        presentation:
+          title_public: Share of reported natural disasters with unknown impacts
+      share_small_events:
+        title: Share of reported natural disasters with a small impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Share of reported disasters that result in no more than 5 deaths, affect no more than 1,500 people, and cause economic damages not exceeding 13 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Small
+        presentation:
+          title_public: Share of reported natural disasters with a small impact
+      share_medium_events:
+        title: Share of reported natural disasters with a medium impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Share of reported disasters that do not fall under the categories of "small" or "large".
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Medium
+        presentation:
+          title_public: Share of reported natural disasters with a medium impact
+      share_large_events:
+        title: Share of reported natural disasters with a large impact
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Share of reported disasters that result in more than 50 deaths, affect more than 150,000 people, or cause economic damages exceeding 320 million current US dollars. The economic threshold for previous years is adjusted for inflation accordingly.
+        description_key:
+          - *description-key-sizes
+        display:
+          name: Large
+        presentation:
+          title_public: Share of reported natural disasters with a large impact
+  natural_disasters_decadal_impact:
+    title: Natural disasters by total decadal impact
+    # NOTE: This table contains TOTAL decadal sums, not averages.
+    variables: *variables-impact
+  natural_disasters_yearly_deaths:
+    title: Natural disasters by yearly deaths
+    variables: &variables-deaths
+      n_events_with_over_200_deaths:
+        title: Number of reported natural disasters with over 200 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 200 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 200 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 200 deaths
+      n_events_with_over_500_deaths:
+        title: Number of reported natural disasters with over 500 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 500 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 500 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 500 deaths
+      n_events_with_over_1000_deaths:
+        title: Number of reported natural disasters with over 1000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 1000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 1000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 1000 deaths
+      n_events_with_over_2000_deaths:
+        title: Number of reported natural disasters with over 2000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 2000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 2000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 2000 deaths
+      n_events_with_over_5000_deaths:
+        title: Number of reported natural disasters with over 5000 deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters that cause more than 5000 deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Over 5000 deaths
+        presentation:
+          title_public: Number of reported natural disasters with over 5000 deaths
+      n_events_with_unknown_deaths:
+        title: Number of reported natural disasters with unknown deaths
+        unit: events
+        short_unit: ''
+        description_short: |-
+          Reported disasters for which there is no data available on the number of deaths.
+        description_key:
+          - *description-key-deaths
+        display:
+          name: Unknown number of deaths
+        presentation:
+          title_public: Number of reported natural disasters with unknown deaths
+  natural_disasters_decadal_deaths:
+    title: Natural disasters by total decadal deaths
+    # NOTE: This table contains TOTAL decadal sums, not averages.
+    variables: *variables-deaths

@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: |-
+      Vicedo-Cabrera et al. (2021). The burden of heat-related mortality attributable to recent human-induced climate change. Nature Climate Change.
+    title: heat_deaths_climate_historical
+    citation_full: |-
+      Vicedo-Cabrera et al. (2021). The burden of heat-related mortality attributable to recent human-induced climate change. Nature Climate Change.
+    url_main: https://www.nature.com/articles/s41558-021-01058-x
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSbCg6iOtBidoTXCtjT-iTHBya0IZab8QzMM6snbNXaiOzh9o4Yy8qS3oogcUySTQWPnr9BQMsgoI9d/pub?output=csv
+    date_accessed: '2024-05-07'
+  name: Heat deaths attributed to climate change (Vicedo-Cabrera et al. 2021)
+  description: |-
+    Estimates of the fraction of "warm season" deaths that are attributed to heat from natural forcings, and human-induced climate change over the period from 1991 to 2018.
+  license: {}
+outs:
+  - md5: 3b646d4d59d3e0cd9ba1c061d3499750
+    size: 1103
+    path: heat_deaths_climate_historical.csv

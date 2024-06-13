@@ -21,8 +21,13 @@ TABLEFMT = "pretty"
 # Set margin for checks
 MARGIN = 0.5
 
-# Define question suffixes
+# Define regions to aggregate
+REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
+# Define fraction of allowed NaNs per year
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+
+# Define question suffixes
 
 IMPORTANT_IN_LIFE_QUESTIONS = [
     "important_in_life_family",
@@ -91,12 +96,24 @@ WORRIES_QUESTIONS = ["losing_job", "not_being_able_to_provide_good_education", "
 
 HAPPINESS_QUESTIONS = ["happy"]
 
+# Define questions to aggregate
+QUESTIONS_TO_AGGREGATE = IMPORTANT_IN_LIFE_QUESTIONS + [
+    "very_important_in_life_family",
+    "very_important_in_life_friends",
+    "very_important_in_life_leisure_time",
+    "very_important_in_life_politics",
+    "very_important_in_life_work",
+    "very_important_in_life_religion",
+    "like_me_agg_secure",
+    "like_me_agg_respect_environment",
+]
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset, regions and population
     ds_meadow = paths.load_dataset("integrated_values_survey")
 
     # Read table from meadow dataset.
@@ -264,7 +281,7 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     return tb
 
 
-def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Table:
+def replace_dont_know_by_null(tb: Table, questions: List[str], answers: List[str]) -> Table:
     """
     Replace empty don't know answers when the rest of the answers is null
     """
@@ -286,7 +303,7 @@ def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Tabl
 
 def solve_nulls_values_in_schwartz_questions(
     tb: Table,
-    questions: list,
+    questions: List[str],
     main_answer: str,
     other_answers: List[str],
 ) -> Table:
@@ -419,7 +436,7 @@ def sanity_checks(tb: Table) -> Table:
     return tb
 
 
-def check_sum_100(tb: Table, questions: list, answers: list, margin: float) -> Table:
+def check_sum_100(tb: Table, questions: List[str], answers: List[str], margin: float) -> Table:
     """
     Check if the sum of the answers is 100
     """

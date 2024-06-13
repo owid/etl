@@ -1,0 +1,13 @@
+dataset:
+  title: Air conditioning rates by country (IEA, 2018)
+  description: Share of households that have air conditioning for a select number of countries.
+  licenses:
+    - {}
+tables:
+  air_conditioning_rate_iea:
+    variables:
+      share_households_air_conditioning:
+        title: AC adoption rate
+        unit: '%'
+        short_unit: '%'
+        description: Share of households with air conditioning.

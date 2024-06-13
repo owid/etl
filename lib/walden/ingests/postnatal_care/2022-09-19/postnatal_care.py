@@ -5,7 +5,6 @@ Download the csv of this data from - https://databank.worldbank.org/source/healt
 We then upload it to walden here
 """
 
-
 from pathlib import Path
 
 import click

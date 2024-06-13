@@ -77,7 +77,9 @@ def regroup_sub_technologies(tb: Table) -> Table:
     """
     # It seems that sub-technologies can belong to only one technology.
     # As long as this is true, we can just ignore "technology" and select by "sub_technology".
-    assert set(tb.groupby("sub_technology").agg({"technology": "nunique"}).reset_index()["technology"]) == {1}
+    assert set(
+        tb.groupby("sub_technology", observed=True).agg({"technology": "nunique"}).reset_index()["technology"]
+    ) == {1}
     # This does not happen with sectors.
     # For example, sub-technology Biofuels is included in sectors "Power", "Transport", and "Industry".
 

@@ -85,3 +85,14 @@ tables:
         display:
           name: Disability adjusted life years per 100k
           numDecimalPlaces: 1
+
+  ghe_suicides_ratio:
+    variables:
+      death_rate100k_ratio:
+        title: Male to female suicide death rate ratio (age-standardized)
+        description_short: Age-standardized suicide rate of males divided by the age-standardized suicide rate of females.
+        description_processing: |-
+          After age-standardizing the suicide rates according to the WHO, we've estimate the ratio between male and female suicide rates.
+
+          Age-standardization process is explained here: https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
+        unit: ""

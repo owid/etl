@@ -1,11 +1,11 @@
-from typing import Optional, cast
+import json
+from typing import Any, Dict, Optional, cast
 
 import numpy as np
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
-from pydantic import BaseModel
 
 from etl import grapher_model as gm
 from etl.snapshot import Snapshot
@@ -16,14 +16,17 @@ SPARSE_DATASET_VARIABLES_CHUNKSIZE = 1000
 log = structlog.get_logger()
 
 
-class GrapherConfig(BaseModel):
-    dataset: gm.Dataset
-    variables: list[gm.Variable]
-    # NOTE: sources can belong to dataset or variable
-    sources: list[gm.Source]
+class GrapherConfig(dict):
+    # dataset: gm.Dataset
+    # variables: list[gm.Variable]
+    # sources: list[gm.Source]
 
     def to_json(self) -> str:
-        return self.json(sort_keys=True, indent=0)
+        return json.dumps(self, sort_keys=True, indent=0)
+
+    @classmethod
+    def from_json(cls, str) -> "GrapherConfig":
+        return GrapherConfig(json.loads(str))
 
     @classmethod
     def from_grapher_objects(
@@ -33,9 +36,9 @@ class GrapherConfig(BaseModel):
         sources: list[gm.Source],
     ) -> "GrapherConfig":
         return cls(
-            dataset=ds,
-            variables=vars,
-            sources=sources,
+            dataset=ds.dict(),
+            variables=[v.dict() for v in vars],
+            sources=[s.dict() for s in sources],
         )
 
 
@@ -46,7 +49,8 @@ def load_values(short_name: str) -> pd.DataFrame:
 
 def load_config(short_name: str) -> GrapherConfig:
     snap = Snapshot(f"backport/latest/{short_name}_config.json")
-    return GrapherConfig.parse_file(snap.path)
+    with open(snap.path) as f:
+        return GrapherConfig.from_json(f.read())
 
 
 def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
@@ -95,15 +99,16 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     # add variables metadata
     # NOTE: some datasets such as `dataset_5438_global_health_observatory__world_health_organization__2021_12`
     #   would benefit from compression metadata as it is almost as large as the data itself (uncompressed)
-    variable_dict = {v.name: v for v in config.variables}
-    variable_source_dict = {s.id: s for s in config.sources}
+    variable_dict: Dict[str, Dict[str, Any]] = {v["name"]: v for v in config["variables"]}
+    variable_source_dict = {s["id"]: s for s in config["sources"]}
 
     for col, variable in variable_dict.items():
         if col not in t.columns:
-            log.warning("create_wide_table.no_values", variable_id=variable.id, variable_name=variable.name)
+            log.warning("create_wide_table.no_values", variable_id=variable["id"], variable_name=variable["name"])
             t[col] = np.nan
 
-        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable.sourceId])
+        assert variable["sourceId"]
+        t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable["sourceId"]])
 
     # NOTE: collision happens for dataset 5629 with column names
     # Indicator:On-premise sales restrictions to intoxicated persons (archived) - Beverage Types:Spirits
@@ -120,11 +125,13 @@ def create_dataset(dest_dir: str, short_name: str, new_short_name: Optional[str]
     config = load_config(short_name)
 
     # put sources belonging to a dataset but not to a variable into dataset metadata
-    variable_source_ids = {v.sourceId for v in config.variables}
-    ds_sources = [s for s in config.sources if s.datasetId == config.dataset.id and s.id not in variable_source_ids]
+    variable_source_ids = {v["sourceId"] for v in config["variables"]}
+    ds_sources = [
+        s for s in config["sources"] if s["datasetId"] == config["dataset"]["id"] and s["id"] not in variable_source_ids
+    ]
 
     # create dataset with metadata
-    ds = Dataset.create_empty(dest_dir, convert_grapher_dataset(config.dataset, ds_sources, short_name))
+    ds = Dataset.create_empty(dest_dir, convert_grapher_dataset(config["dataset"], ds_sources, short_name))
 
     tables = []
 

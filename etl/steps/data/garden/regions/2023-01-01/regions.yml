@@ -1233,6 +1233,7 @@
   end_year: 1975
   aliases:
     - "South Vietnam"
+    - "Vietnam, S."
   successors:
     - "VNM"
 
@@ -1243,6 +1244,8 @@
 
 - code: "ROU"
   name: "Romania"
+  aliases:
+    - "ROM"
 
 - code: "RUS"
   name: "Russia"
@@ -1551,6 +1554,7 @@
   aliases:
     - "U.Arab Emirates"
     - "United Arab Em"
+    - "UAE"
 
 - code: "GBR"
   name: "United Kingdom"
@@ -1624,6 +1628,7 @@
   name: "Vatican"
   aliases:
     - "Holy See"
+    - "Papal States"
 
 - code: "VEN"
   name: "Venezuela"
