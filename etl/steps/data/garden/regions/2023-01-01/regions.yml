@@ -1233,6 +1233,7 @@
   end_year: 1975
   aliases:
     - "South Vietnam"
+    - "Vietnam, S."
   successors:
     - "VNM"
 
@@ -1243,6 +1244,8 @@
 
 - code: "ROU"
   name: "Romania"
+  aliases:
+    - "ROM"
 
 - code: "RUS"
   name: "Russia"

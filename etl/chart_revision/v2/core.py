@@ -2,7 +2,7 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
@@ -220,6 +220,7 @@ def create_chart_comparison(config_1: Dict[str, Any], config_2: Dict[str, Any]) 
     return gm.SuggestedChartRevisions(
         chartId=chart_id,
         createdBy=int(GRAPHER_USER_ID),  # type: ignore
+        updatedBy=int(GRAPHER_USER_ID),  # type: ignore
         originalConfig=config_1,
         suggestedConfig=config_2,
         status="pending",

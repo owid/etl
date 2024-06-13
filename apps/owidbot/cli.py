@@ -1,17 +1,17 @@
 import datetime as dt
 import re
 import time
-from typing import Any, Dict, List, Literal, Optional, get_args
+from typing import Any, Dict, List, Literal, get_args
 
 import click
 import structlog
-from github import Auth, Github
 from rich import print
 from rich_click.rich_command import RichCommand
 
 from apps.owidbot import chart_diff, data_diff, grapher
-from apps.staging_sync.cli import _get_container_name
-from etl import config
+from etl.config import get_container_name
+
+from . import github_utils as gh_utils
 
 log = structlog.get_logger()
 
@@ -51,30 +51,39 @@ def cli(
     """
     start_time = time.time()
 
-    repo, branch = repo_branch.split("/", 1)
+    repo_name, branch = repo_branch.split("/", 1)
 
-    if repo not in get_args(REPOS):
+    if repo_name not in get_args(REPOS):
         raise AssertionError("Invalid repo")
 
-    pr = get_pr(repo, branch)
-    comment = get_comment_from_pr(pr)
-
-    # prefill services from existing PR comment
-    if comment:
-        services_body = services_from_comment(comment)
-    else:
-        services_body = {}
+    repo = gh_utils.get_repo(repo_name)
+    pr = gh_utils.get_pr(repo, branch)
 
     # recalculate services
+    services_body = {}
     for service in services:
         if service == "data-diff":
-            services_body["data_diff"] = data_diff.run(include)
+            services_body["data-diff"] = data_diff.run(include)
+
         elif service == "chart-diff":
-            services_body["chart_diff"] = chart_diff.run(branch)
+            charts_df = chart_diff.call_chart_diff(branch)
+            services_body["chart-diff"] = chart_diff.run(branch, charts_df)
+
+            # update github check run
+            chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
+
         elif service == "grapher":
             services_body["grapher"] = grapher.run(branch)
         else:
             raise AssertionError("Invalid service")
+
+    # get existing comment (do this as late as possible to avoid race conditions)
+    comment = gh_utils.get_comment_from_pr(pr)
+
+    # fill in services from existing comment if not run via --services to avoid deleting them
+    if comment:
+        for service, content in services_from_comment(comment).items():
+            services_body.setdefault(service, content)
 
     body = create_comment_body(branch, services_body, start_time)
 
@@ -114,7 +123,7 @@ def services_from_comment(comment: Any) -> Dict[str, str]:
 
 
 def create_comment_body(branch: str, services: Dict[str, str], start_time: float):
-    container_name = _get_container_name(branch) if branch else "dry-run"
+    container_name = get_container_name(branch) if branch else "dry-run"
 
     body = f"""
 <b>Quick links (staging server)</b>:
@@ -127,10 +136,10 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 {services.get('grapher', '')}
 <!--grapher-end-->
 <!--chart-diff-start-->
-{services.get('chart_diff', '')}
+{services.get('chart-diff', '')}
 <!--chart-diff-end-->
 <!--data-diff-start-->
-{services.get('data_diff', '')}
+{services.get('data-diff', '')}
 <!--data-diff-end-->
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
@@ -138,35 +147,3 @@ _Execution time: {time.time() - start_time:.2f} seconds_
     """.strip()
 
     return body
-
-
-def get_pr(repo_name: str, branch_name: str) -> Any:
-    assert config.OWIDBOT_ACCESS_TOKEN
-    auth = Auth.Token(config.OWIDBOT_ACCESS_TOKEN)
-    g = Github(auth=auth)
-
-    repo = g.get_repo(f"owid/{repo_name}")
-
-    # Find pull requests for the branch (assuming you're looking for open PRs)
-    pulls = repo.get_pulls(state="open", sort="created", head=f"{repo.owner.login}:{branch_name}")
-    pulls = list(pulls)
-
-    if len(pulls) == 0:
-        raise AssertionError(f"No open PR found for branch {branch_name}")
-    elif len(pulls) > 1:
-        raise AssertionError(f"More than one open PR found for branch {branch_name}")
-
-    return pulls[0]
-
-
-def get_comment_from_pr(pr: Any) -> Optional[Any]:
-    comments = pr.get_issue_comments()
-
-    owidbot_comments = [comment for comment in comments if comment.user.login == "owidbot"]
-
-    if len(owidbot_comments) == 0:
-        return None
-    elif len(owidbot_comments) == 1:
-        return owidbot_comments[0]
-    else:
-        raise AssertionError("More than one owidbot comment found.")

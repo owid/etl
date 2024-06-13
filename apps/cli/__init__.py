@@ -73,6 +73,7 @@ SUBGROUPS = {
             "run-python-step": "etl.run_python_step.main",
             "map-datasets": "apps.utils.map_datasets.cli",
             "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
+            "draft-pr": "apps.utils.draft_pull_request.cli",
         },
     },
     "b": {
@@ -180,7 +181,7 @@ GROUPS = (
         {
             "name": "Charts",
             "commands": {
-                "chart-sync": "apps.staging_sync.cli.cli",
+                "chart-sync": "apps.chart_sync.cli.cli",
                 "chart-gpt": "etl.chart_revision.v2.chartgpt.cli",
                 "chart-upgrade": "etl.chart_revision.cli.main_cli",
             },

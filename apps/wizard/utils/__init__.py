@@ -15,19 +15,21 @@ import json
 import os
 import re
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, cast
 
 import bugsnag
 import streamlit as st
 import streamlit.components.v1 as components
-from MySQLdb import OperationalError
 from owid.catalog import Dataset
+from pymysql import OperationalError
 from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
+from apps.wizard.utils.env import OWIDEnv
 from apps.wizard.utils.step_form import StepForm
 from etl import config
 from etl.db import get_connection
@@ -556,21 +558,18 @@ def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not
 
 def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
     if border:
         with st.container(border=True):
-            st.page_link(
-                page=PAGES_BY_ALIAS[alias]["entrypoint"],
-                label=PAGES_BY_ALIAS[alias]["title"],
-                icon=PAGES_BY_ALIAS[alias]["emoji"],
-                **kwargs,
-            )
+            st.page_link(**kwargs)
     else:
-        st.page_link(
-            page=PAGES_BY_ALIAS[alias]["entrypoint"],
-            label=PAGES_BY_ALIAS[alias]["title"],
-            icon=PAGES_BY_ALIAS[alias]["emoji"],
-            **kwargs,
-        )
+        st.page_link(**kwargs)
 
 
 st.cache_data
@@ -613,10 +612,12 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], base_url, base_api_url, height=500, **kwargs):
-    chart_config["bakedGrapherURL"] = f"http://{base_url}/grapher"
-    chart_config["adminBaseUrl"] = f"http://{base_url}"
-    chart_config["dataApiUrl"] = base_api_url
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+    chart_config_tmp = deepcopy(chart_config)
+
+    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
+    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
     HTML = f"""
     <!DOCTYPE html>
@@ -639,10 +640,68 @@ def chart_html(chart_config: Dict[str, Any], base_url, base_api_url, height=500,
             </script>
             <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
             <script type="module">
-                var jsonConfig = {json.dumps(chart_config)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
             </script>
         </body>
     </html>
     """
 
     components.html(HTML, height=height, **kwargs)
+
+
+class Pagination:
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+        self.items = items
+        self.items_per_page = items_per_page
+        self.pagination_key = pagination_key
+
+        # Initialize session state for the current page
+        if self.pagination_key not in st.session_state:
+            self.page = 1
+
+    @property
+    def page(self):
+        return st.session_state[self.pagination_key]
+
+    @page.setter
+    def page(self, value):
+        st.session_state[self.pagination_key] = value
+
+    @property
+    def total_pages(self) -> int:
+        return (len(self.items) - 1) // self.items_per_page + 1
+
+    def get_page_items(self) -> list[Any]:
+        page = self.page
+        start_idx = (page - 1) * self.items_per_page
+        end_idx = start_idx + self.items_per_page
+        return self.items[start_idx:end_idx]
+
+    def show_controls(self) -> None:
+        # Pagination controls
+        col1, col2, col3 = st.columns([1, 1, 1])
+
+        # Correct page number if exceeds maximum allowed
+        self.page = min(self.total_pages, self.page)
+
+        with st.container(border=True):
+            with col1:
+                key = f"previous-{self.pagination_key}"
+                if self.page > 1:
+                    if st.button("⏮️ Previous", key=key):
+                        self.page -= 1
+                        st.rerun()
+                else:
+                    st.button("⏮️ Previous", disabled=True, key=key)
+
+            with col3:
+                key = f"next-{self.pagination_key}"
+                if self.page < self.total_pages:
+                    if st.button("Next ⏭️", key=key):
+                        self.page += 1
+                        st.rerun()
+                else:
+                    st.button("Next ⏭️", disabled=True, key=key)
+
+            with col2:
+                st.text(f"Page {self.page} of {self.total_pages}")

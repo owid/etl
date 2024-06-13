@@ -27,8 +27,6 @@ def cli(dry_run: bool) -> None:
 
     log.info("scan-chart-diff.init", active_prs=active_prs)
 
-    # active_prs = [pr for pr in active_prs if "update-electricity-mix-data" in pr]
-
     for pr in active_prs:
         log.info("scan-chart-diff.start", pr=pr)
         args = [f"etl/{pr}", "--services", "chart-diff"]

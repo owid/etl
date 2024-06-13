@@ -10,6 +10,7 @@ from etl.config import ENV
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
+WIZARD_PORT = 8053
 
 
 def load_wizard_config():  # -> Any:
@@ -19,8 +20,8 @@ def load_wizard_config():  # -> Any:
         config = yaml.safe_load(file)
     # Some input checks
     _check_wizard_config(config)
-    # Some transformations
 
+    # Add `enable` property to each app
     def _get_enable(props):
         # Default for `disable` is False
         if "disable" not in props:
@@ -48,12 +49,25 @@ def load_wizard_config():  # -> Any:
     for section in config["sections"]:
         for app in section["apps"]:
             app["enable"] = _get_enable(app)
+    ## Section legacy
+    if "legacy" in config:
+        for app in config["legacy"]["apps"]:
+            app["enable"] = _get_enable(app)
+
+    # Add alias if not there by lowering the title
+    for _, step in config["etl"]["steps"].items():
+        if "alias" not in step:
+            step["alias"] = step["title"].lower().replace(" ", "-")
+    for section in config["sections"]:
+        for app in section["apps"]:
+            if "alias" not in app:
+                app["alias"] = app["title"].lower().replace(" ", "-")
     return config
 
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    _app_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
+    _app_properties_expected = ["title", "entrypoint", "icon", "image_url"]
     pages_properties_expected = _app_properties_expected + ["alias", "description"]
     etl_steps_properties_expected = _app_properties_expected
 

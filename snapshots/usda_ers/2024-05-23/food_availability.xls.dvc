@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "U.S. food supply:  Nutrients and other food components, per capita per day"
+    date_published: "2015-02-01"
+
+    # Citation
+    producer: USDA Economic Research Service (ERS)
+    citation_full: |-
+      Economic Research Service of the United States Department of Agriculture (USDA/ERS) - U.S. food supply:  Nutrients and other food components, per capita per day.
+      The data can be found as one of the archived tables of the Food Availability (Per Capita) Data System.
+    attribution_short: USDA/ERS
+
+    # Files
+    url_main: https://www.ers.usda.gov/data-products/food-availability-per-capita-data-system/food-availability-per-capita-data-system/
+    url_download: https://www.ers.usda.gov/webdocs/DataFiles/50472/nutrients.xls?v=4603.6
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: Public Domain
+      url: https://www.ers.usda.gov/data-products/food-availability-per-capita-data-system/food-availability-per-capita-data-system/
+
+outs:
+  - md5: bfebce79879913cf997ecb2a2e32161b
+    size: 164864
+    path: food_availability.xls

@@ -9,13 +9,19 @@ only important for OWID staff.
 
 import os
 import pwd
+import re
 from os import environ as env
+from typing import Optional
 
 import bugsnag
+import git
 import pandas as pd
+import structlog
 from dotenv import load_dotenv
 
 from etl.paths import BASE_DIR
+
+log = structlog.get_logger()
 
 ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
 
@@ -28,7 +34,23 @@ def load_env():
     if env.get("ENV", "").startswith("."):
         raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
 
-    load_dotenv(ENV_FILE, override=True)
+    load_dotenv(ENV_FILE)
+
+
+def _normalise_branch(branch_name):
+    return re.sub(r"[\/\._]", "-", branch_name)
+
+
+def get_container_name(branch_name):
+    normalized_branch = _normalise_branch(branch_name)
+
+    # Strip staging-site- prefix to add it back later
+    normalized_branch = normalized_branch.replace("staging-site-", "")
+
+    # Ensure the container name is less than 63 characters
+    container_name = f"staging-site-{normalized_branch[:50]}"
+    # Remove trailing hyphens
+    return container_name.rstrip("-")
 
 
 load_env()
@@ -60,6 +82,9 @@ DB_PASS = env.get("DB_PASS", "")
 
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
+# Special ENV file with access to production DB (read-only), used by chart-diff
+ENV_FILE_PROD = os.environ.get("ENV_FILE_PROD")
+
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
 else:
@@ -73,17 +98,37 @@ if DB_IS_PRODUCTION:
     assert DATA_API_ENV == "production", "DATA_API_ENV must be set to production when publishing to live_grapher"
 
 
-# if STAGING is used, override ENV values
-if env.get("STAGING"):
+def load_STAGING() -> Optional[str]:
+    # if STAGING is used, override ENV values
     STAGING = env.get("STAGING")
+
+    # ENV_FILE takes precedence over STAGING
+    if STAGING and ENV_FILE != BASE_DIR / ".env":
+        log.warning("Both ENV_FILE and STAGING is set, STAGING will be ignored.")
+        return None
+    # if STAGING=1, use branch name
+    elif STAGING == "1":
+        branch_name = git.Repo(BASE_DIR).active_branch.name
+        if branch_name == "master":
+            log.warning("You're on master branch, using local env instead of STAGING=master")
+            return None
+        else:
+            return branch_name
+    else:
+        return STAGING
+
+
+STAGING = load_STAGING()
+
+# if STAGING is used, override ENV values
+if STAGING is not None:
+    GRAPHER_USER_ID = 1  # use Admin user when working with staging
     DB_USER = "owid"
     DB_NAME = "owid"
     DB_PASS = ""
     DB_PORT = 3306
-    DB_HOST = f"staging-site-{STAGING}"
-    DATA_API_ENV = f"staging-site-{STAGING}"
-else:
-    STAGING = None
+    DB_HOST = get_container_name(STAGING)
+    DATA_API_ENV = get_container_name(STAGING)
 
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
@@ -157,6 +202,16 @@ BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
+
+# OWIDBOT app
+OWIDBOT_APP_PRIVATE_KEY_PATH = env.get("OWIDBOT_APP_PRIVATE_KEY_PATH", None)
+# get it from https://github.com/settings/apps/owidbot-app
+OWIDBOT_APP_CLIENT_ID = env.get("OWIDBOT_APP_CLIENT_ID", None)
+# get it from https://github.com/settings/installations
+OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
+
+# Load github token (only used for creating PRs from the command line).
+GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
 
 def enable_bugsnag() -> None:

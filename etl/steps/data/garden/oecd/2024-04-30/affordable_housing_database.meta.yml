@@ -158,6 +158,10 @@ definitions:
 
   gender_breakdown: The gender breakdown refers to the headline estimate of homelessness in each country, along the statistical defintion of each country.
 
+  harmonization: Countries use different definitions and data collection methods and are harmonized to the extent possible.
+  methodology_issues: More details about definitions, methodology and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://www.oecd.org/els/family/HC3-1-Population-experiencing-homelessness.pdf).
+  country_notes: For more information on the statistical definitions for each country, please check the [OECD's Country Notes on Homelessness data](https://www.oecd.org/social/homelessness-country-notes.htm).
+
   description_short_ethos_1: Includes people living in the streets or public spaces without a shelter that can be defined as living quarters.
   description_short_ethos_2_3: Includes people living in emergency accomodation, people with no place of usual residence who move frequently between various types of accommodation, and people living in accommodation for the homeless.
   description_short_ethos_1_2_3: Includes people living in the streets or public spaces, in emergency accomodation, and in accommodation for the homeless.
@@ -191,14 +195,17 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_2_3:
@@ -213,14 +220,17 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_1_2_3:
@@ -235,14 +245,17 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       point_in_time_total:
@@ -257,14 +270,17 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - Data for Australia, Canada, France, Germany, South Korea, Norway, and the United States includes people living in unconventional dwellings (e.g. tents).
           - Data for the United Kingdom only considers England and refers to the number of households experiencing homelessness per 100,000 households.
           - Data for France exclude asylum seekers to facilitate cross-country comparison.
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1:
@@ -279,11 +295,14 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_2_3:
@@ -298,11 +317,14 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_1_2_3:
@@ -317,11 +339,14 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       flow_total:
@@ -336,11 +361,14 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Rate of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1_2_3:
@@ -353,13 +381,16 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_2_3:
@@ -372,13 +403,16 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_point_in_time_1:
@@ -391,13 +425,16 @@ tables:
         description_key:
           - "{definitions.ethos_1}"
           - "{definitions.point_in_time_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
           - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_flow_1_2_3:
@@ -410,12 +447,15 @@ tables:
         description_key:
           - "{definitions.ethos_1_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share_of_women_flow_2_3:
@@ -428,12 +468,15 @@ tables:
         description_key:
           - "{definitions.ethos_2_3}"
           - "{definitions.flow_count}"
+          - "{definitions.harmonization}"
           - "{definitions.gender_breakdown}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         presentation:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           <<: *display_common
 
       share:
@@ -441,6 +484,14 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Due to different definitions and data collection methods, the share of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - "{definitions.harmonization}"
+          - Data for the United Kingdom only considers England.
+          - Data for Ireland refers to October of each year.
+          - Data for the United Kingdom refers to households to Q2 (April-June) of each year.
+          - Data refers to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refers to flow data (collected at a given period of time).
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         processing_level: minor
         presentation:
           title_public: Share of people experiencing homelessness
@@ -454,6 +505,10 @@ tables:
         unit: people
         short_unit: ""
         description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
+        description_key:
+          - "{definitions.harmonization}"
+          - "{definitions.methodology_issues}"
+          - "{definitions.country_notes}"
         description_processing: |-
           {definitions.description_processing_years}
 
@@ -471,7 +526,7 @@ tables:
         title: Type of strategy to address homelessness
         unit: ""
         short_unit: ""
-        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at any administrative level, other strategy, or no strategy at all.
+        description_short: Defines whether the country has a Housing First strategy or housing-led strategy to adress homelessness at the national administrative level, other strategy, or no strategy at the national level at all.
         description_key:
           - Housing First models aim to provide tailored, intensive support for homeless people with high and complex needs by providing them with long-term, immediate housing and enabling them to exercise control over their support services.
           - Housing-led solutions are based on access to immediate, long-term housing solutions for people experiencing homelessness.
@@ -490,7 +545,7 @@ tables:
         sort:
           - Housing First/housing-led strategy
           - Other strategy
-          - No strategy
+          - No national strategy
           - Not applicable
 
 
