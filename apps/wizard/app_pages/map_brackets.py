@@ -43,19 +43,7 @@ def load_variable_data(variable: Variable) -> pd.DataFrame:
 @st.cache_data
 def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """Create a default chart for a variable with id `variable_id`."""
-    # TODO: This logic is incomplete. The full logic of how a default chart is constructed for a given variable must be
-    #  somewhere in owid_grapher. Ideally, we should recreate that logic, but for now this is enough.
-    #   * Get all the ingredients needed from the variable metadata to build the map tab that would be displayed for a given variable id in an indicator-based explorer.
-    #   * Also, get the content of the explorer itself, where some of the default map tab parameters may be overridden.
-    chart_title = metadata["presentation"].get("titlePublic") or metadata["name"]
-    attributions = [
-        origin.get("attribution") or f"{origin['producer']} ({origin['datePublished'][0:4]})"
-        for origin in metadata["origins"]
-    ]
-    chart_footer = metadata["presentation"].get("attribution") or "; ".join(attributions)
     chart_config = {
-        "title": chart_title,
-        "sourceDesc": chart_footer,
         "hasMapTab": True,
         "hasChartTab": False,
         "tab": "map",
@@ -124,6 +112,8 @@ LABEL_LOG_X10 = "log x10"
 
 # For now, focus on the latest year.
 values = df[df["years"] == df["years"].max()]["values"]
+min_value = values.min()
+max_value = values.max()
 
 
 def round_to_nearest_power_of_ten(number, floor: bool = True):
@@ -256,10 +246,29 @@ def get_all_possible_log_like_brackets(values) -> Dict[str, List[float]]:
     return brackets_all
 
 
+def are_brackets_open(values):
+    # If the minimum value in the data is negative, assume that the lower bracket is open.
+    # Otherwise, the most common scenario is that the lower bracket is closed.
+    lower_bracket_open = values.min() < 0
+    # The upper bracket is most frequently open.
+    upper_bracket_open = False
+
+    # TODO: Consider creating some heuristics about the openness of the lower and upper brackets,
+    # e.g. if the maximum (minimum) bracket is 100 (-100), close the upper (lower) bracket.
+
+    return lower_bracket_open, upper_bracket_open
+
+
 # Calculate the brackets for all possible log-like bracket types.
 brackets_all = get_all_possible_log_like_brackets(values=values)
 
-# chart_config["map"]["colorScale"]["customNumericMinValue"] = 0
+# Estimate whether the lower and upper brackets should be open.
+lower_bracket_open_default, upper_bracket_open_default = are_brackets_open(values=values)
+
+# Add toggles to control whether lower and upper brackets should be open.
+lower_bracket_open = st.toggle("Lower bracket open", lower_bracket_open_default)
+upper_bracket_open = st.toggle("Upper bracket open", upper_bracket_open_default)
+
 # chart_config["map"]["timeTolerance"] = 0
 bracket_type = st.radio(
     "Select linear or log-like",
@@ -270,7 +279,7 @@ bracket_type = st.radio(
 if bracket_type == LABEL_LINEAR:
     # TODO: Implement linear brackets.
     st.number_input("Increments", min_value=0, max_value=100, value=1, step=1)
-    brackets = np.arange(values.min(), values.max(), 1).tolist()
+    brackets = np.arange(min_value, max_value, 1).tolist()
 else:
     brackets = [round_to_sig_figs(bracket, sig_figs=1) for bracket in brackets_all[bracket_type]]  # type: ignore
 
@@ -287,6 +296,12 @@ if len(brackets_selected) > MAX_NUM_BRACKETS:
     brackets_selected = brackets_selected[:MAX_NUM_BRACKETS]
 # brackets = np.linspace(start=lower_limit, stop=upper_limit, num=10).tolist()
 chart_config["map"]["colorScale"]["customNumericValues"] = brackets_selected
+if lower_bracket_open:
+    # To ensure the lower bracket is open, use a value of "customNumericMinValue" that is larger than the lowest bracket.
+    chart_config["map"]["colorScale"]["customNumericMinValue"] = brackets_selected[0] + 1
+if upper_bracket_open:
+    # To ensure the upper bracket is open, add an upper bracket with a value that is very small.
+    chart_config["map"]["colorScale"]["customNumericValues"].append(min_value)
 
 # Display the chart.
 chart_html(chart_config, owid_env=OWID_ENV)
