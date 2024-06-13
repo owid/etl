@@ -454,3 +454,52 @@ def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwarg
             return pd.read_sql(sql, engine.bind, *args, **kwargs)
         else:
             raise ValueError(f"Unsupported engine type {type(engine)}")
+
+
+def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    query = f"""
+    SELECT
+        d.id AS dataset_id,
+        d.name AS dataset_name,
+        q2.chartIds AS chart_ids
+    FROM
+        (SELECT
+            d.id,
+            d.name
+        FROM
+            datasets d
+        WHERE
+            d.id IN {tuple(dataset_ids)}) d
+    LEFT JOIN
+        (SELECT
+            v.datasetId,
+            GROUP_CONCAT(DISTINCT c.id) AS chartIds
+        FROM
+            variables v
+            JOIN chart_dimensions cd ON cd.variableId = v.id
+            JOIN charts c ON c.id = cd.chartId
+        WHERE
+            v.datasetId IN {tuple(dataset_ids)}
+        GROUP BY
+            v.datasetId) q2
+        ON d.id = q2.datasetId
+    ORDER BY
+        d.id ASC;
+    """
+
+    if len(dataset_ids) == 0:
+        return pd.DataFrame({"dataset_id": [], "dataset_name": [], "chart_ids": []})
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        df = pd.read_sql(query, con=db_conn)
+
+    # Instead of having a string of chart ids, make chart_ids a column with lists of integers.
+    df["chart_ids"] = [
+        [int(chart_id) for chart_id in chart_ids.split(",")] if chart_ids else [] for chart_ids in df["chart_ids"]
+    ]
+
+    return df

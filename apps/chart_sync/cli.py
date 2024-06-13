@@ -179,6 +179,15 @@ def cli(
                     )
                     continue
 
+                # Rejected diffs are skipped
+                if diff.is_rejected:
+                    log.info(
+                        "chart_sync.is_rejected",
+                        slug=chart_slug,
+                        chart_id=chart_id,
+                    )
+                    continue
+
                 # Map variable IDs from source to target
                 diff.source_chart = diff.source_chart.migrate_to_db(source_session, target_session)
 
@@ -205,12 +214,7 @@ def cli(
 
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Pending chart, notify us about it
                         elif diff.is_pending:
@@ -324,12 +328,7 @@ def cli(
                             )
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Not approved, create the chart, but notify us about it
                         elif diff.is_pending:
@@ -539,6 +538,14 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
 
     source_df = source_df.set_index(["chartId", "variableId"])
     target_df = target_df.set_index(["chartId", "variableId"])
+
+    # charts not edited by Admin and with null checksums should be excluded
+    ix = (
+        (source_df.chartLastEditedByUserId != 1)
+        & (source_df.chartPublishedByUserId != 1)
+        & (source_df.dataChecksum.isnull() | source_df.metadataChecksum.isnull())
+    )
+    source_df = source_df[~ix]
 
     # align dataframes with left join (so that source has non-null values)
     # NOTE: new charts will be already in source

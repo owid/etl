@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 from unittest import mock
 
@@ -7,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
+    checksum_metadata,
     variable_data,
     variable_data_df_from_s3,
     variable_metadata,
@@ -97,6 +99,8 @@ def test_variable_metadata():
 
     assert meta == {
         "catalogPath": "grapher/owid/latest/key_indicators/population_density#population_density",
+        "dataChecksum": "123",
+        "metadataChecksum": "456",
         "columnOrder": 0,
         "coverage": "",
         "createdAt": "2022-09-20T12:16:46.000Z",
@@ -235,3 +239,15 @@ def test_convert_strings_to_numeric():
 
     with pytest.raises(AssertionError):
         r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
+
+
+def test_checksum_metadata():
+    meta = _variable_meta()
+    assert checksum_metadata(meta) == "76dc6be6b7509058c7b3d1a8e75704ec"
+
+    # change id, checksums or updatedAt shouldn't change it
+    meta = _variable_meta()
+    meta["id"] = 999
+    meta["dataChecksum"] = 999
+    meta["updatedAt"] = dt.datetime.now()
+    assert checksum_metadata(meta) == "76dc6be6b7509058c7b3d1a8e75704ec"
