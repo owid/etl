@@ -1,0 +1,9 @@
+steps:
+  # Intact Forest Landscapes
+  data://meadow/forests/2024-05-08/ifl:
+    - snapshot://forests/2024-05-08/ifl.xlsx
+  data://garden/forests/2024-05-08/ifl:
+    - data://meadow/forests/2024-05-08/ifl
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/forests/2024-05-08/ifl:
+    - data://garden/forests/2024-05-08/ifl

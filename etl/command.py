@@ -449,11 +449,21 @@ def exec_graph_parallel(
         # Dictionary to keep track of future tasks
         future_to_task: Dict[Future, str] = {}
 
+        ready_tasks = []
+
         while topological_sorter.is_active():
+            # add new tasks
+            ready_tasks += topological_sorter.get_ready()
+
             # Submit tasks that are ready to the executor
-            for task in topological_sorter.get_ready():
+            # NOTE: limit it to `workers`, otherwise it might accept tasks that are not CPU bound
+            # and overload our DB
+            for task in ready_tasks[:workers]:
                 future = executor.submit(func, task, **kwargs)
                 future_to_task[future] = task
+
+            # remove ready tasks
+            ready_tasks = ready_tasks[workers:]
 
             # Wait for at least one future to complete
             done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)

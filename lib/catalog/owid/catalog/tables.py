@@ -38,6 +38,7 @@ from . import processing_log as pl
 from . import variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
+    DatasetMeta,
     License,
     Origin,
     Source,
@@ -1215,6 +1216,26 @@ def concat(
                 **kwargs,
             )
         )
+        ################################################################################################################
+        # In pandas 2.2.1, pd.concat() does not return a copy when one of the input dataframes is empty.
+        # This causes the following unexpected behavior:
+        # df_0 = pd.DataFrame({"a": ["original value"]})
+        # df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+        # df_0.loc[:, "a"] = "new value"
+        # df_1["a"]  # This will return "new value" instead of "original value".
+        # In pandas `1.4.0`, the behavior was as expected (returning "original value").
+        # Note that this happens even if `copy=True` is passed to `pd.concat()`.
+        if any([len(obj) == 0 for obj in objs]):
+            if pd.__version__ != "2.2.1":
+                # Check if patch is no longer needed.
+                df_0 = pd.DataFrame({"a": ["original value"]})
+                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                df_0.loc[:, "a"] = "new value"
+                if df_1["a"].item() != "new value":
+                    log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")
+            # Ensure concat returns a copy.
+            table = table.copy()
+        ################################################################################################################
 
     if (axis == 1) or (axis == "columns"):
         # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
@@ -1677,13 +1698,18 @@ def combine_tables_description(tables: List[Table]) -> Optional[str]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
+def combine_tables_datasetmeta(tables: List[Table]) -> Optional[DatasetMeta]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="dataset")
+
+
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
     title = combine_tables_title(tables=tables)
     description = combine_tables_description(tables=tables)
+    dataset = combine_tables_datasetmeta(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name
-    metadata = TableMeta(title=title, description=description, short_name=short_name)
+    metadata = TableMeta(title=title, description=description, short_name=short_name, dataset=dataset)
 
     return metadata
 

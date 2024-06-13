@@ -61,9 +61,12 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
 
     # Bake documentation for property
     if "type" not in prop:
-        if "oneOf" not in prop:
+        if "oneOf" in prop:
+            type_ = ", ".join([f"`{p['type']}`" for p in prop["oneOf"]])
+        elif "anyOf" in prop:
+            type_ = ", ".join([f"`{p['type']}`" for p in prop["anyOf"]])
+        else:
             raise ValueError(f"Property {prop_name} has no type!")
-        type_ = ", ".join([f"`{p['type']}`" for p in prop["oneOf"]])
     else:
         if isinstance(prop["type"], list):
             type_ = ", ".join([f"`{p}`" for p in prop["type"]])

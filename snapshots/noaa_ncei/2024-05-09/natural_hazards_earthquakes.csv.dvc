@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Significant Earthquake Database
+    description: |-
+      The Significant Earthquake Database is a global listing of over 5,700 earthquakes from 2150 BC to the present. A significant earthquake is classified as one that meets at least one of the following criteria: caused deaths, caused moderate damage (approximately $1 million or more), magnitude 7.5 or greater, Modified Mercalli Intensity (MMI) X or greater, or the earthquake generated a tsunami. The database provides information on the date and time of occurrence, latitude and longitude, focal depth, magnitude, maximum MMI intensity, and socio-economic data such as the total number of casualties, injuries, houses destroyed, and houses damaged, and $ dollar damage estimates. References, political geography, and additional comments are also provided for each earthquake. If the earthquake was associated with a tsunami or volcanic eruption, it is flagged and linked to the related tsunami event or significant volcanic eruption.
+    date_published: "2024-05-09"
+
+    # Citation
+    producer: National Geophysical Data Center / World Data Service
+    citation_full: |-
+      National Geophysical Data Center / World Data Service (NGDC/WDS): NCEI/WDS Global Significant Earthquake Database. NOAA National Centers for Environmental Information. doi:10.7289/V5TD9V7K
+      The data can be accessed via [the NCEI/WDS Global Significant Earthquake Database](https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/search) or via [the Natural Hazards API](https://www.ngdc.noaa.gov/hazel/view/swagger#/Earthquakes).
+    attribution_short: NGDC/WDS
+
+    # Files
+    url_main: http://dx.doi.org/10.7289/V5TD9V7K
+    date_accessed: 2024-05-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.noaa.gov/metaview/page?xml=NOAA/NESDIS/NGDC/MGG/Hazards/iso/xml/G012153.xml&view=getDataView
+outs:
+  - md5: 423fd14ec7088b513415c873e1cebb47
+    size: 959141
+    path: natural_hazards_earthquakes.csv

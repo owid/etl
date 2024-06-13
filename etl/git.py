@@ -9,12 +9,18 @@ Helpers for working with Git in an ETL flow.
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Dict, Optional, Union, cast
 
 import requests
 import sh
+from git import Repo
+from structlog import get_logger
+
+from etl.paths import BASE_DIR
 
 CACHE_DIR = Path("~/.owid/git")
+# Initialize logger.
+log = get_logger()
 
 
 class RepoAlreadyExists(Exception):
@@ -125,3 +131,67 @@ class GithubRepo:
 
 class GitError(Exception):
     pass
+
+
+def get_changed_files(
+    current_branch: Optional[str] = None,
+    base_branch: Optional[str] = None,
+    repo_path: Union[Path, str] = BASE_DIR,
+    only_committed: bool = False,
+) -> Dict[str, Dict[str, str]]:
+    """Return files that are different between the current branch and the specified base branch."""
+    repo = Repo(repo_path)
+
+    if current_branch is None:
+        # If not specified, use the current branch.
+        current_branch = repo.active_branch.name
+    else:
+        # Otherwise, switch to the given branch to compare from.
+        repo.git.checkout(current_branch)
+
+    if base_branch is None:
+        # If not specified, use "master" branch.
+        # However, if there is a "master-1" branch, that means we are on a staging server; if so, use "master-1".
+        base_branch = "master-1" if "master-1" in [branch.name for branch in repo.branches] else "master"
+
+    # Fetch the latest changes from the remote repository
+    repo.remotes.origin.fetch()
+
+    # Find the common ancestor of the remote base branch and the current local branch.
+    # In other words, "merge_base" is the last common commit between those two branches.
+    merge_base = repo.git.merge_base(f"origin/{base_branch}", f"{current_branch}").strip()
+
+    # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
+    # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
+    # * diff_content shows the difference between files.
+    changes = {}
+
+    # Get the diff between the current branch and the base branch.
+    diff_index = repo.git.diff(f"{merge_base}..{current_branch}", name_status=True, no_renames=True)
+    if diff_index:
+        for line in diff_index.splitlines():
+            parts = line.split("\t")
+            if len(parts) == 2:
+                status, file_path = parts
+                # Fetch diff content.
+                diff_content = repo.git.diff(f"{merge_base}...{current_branch}", "--", file_path, p=True)
+                changes[file_path] = {"status": status, "diff": diff_content}
+            else:
+                # Not sure if this could happen.
+                log.error(f"Could not parse diff line: {line}")
+
+    if not only_committed:
+        # Include uncommitted changes
+        uncommitted_diff = repo.git.diff(name_status=True, no_renames=True)
+        if uncommitted_diff:
+            for line in uncommitted_diff.splitlines():
+                parts = line.split("\t")
+                if len(parts) == 2:
+                    status, file_path = parts
+                    diff_content = repo.git.diff("--", file_path, p=True)
+                    changes[file_path] = {"status": status, "diff": diff_content}
+
+        # Add untracked files.
+        changes.update({file_path: {"status": "A", "diff": ""} for file_path in repo.untracked_files})
+
+    return changes

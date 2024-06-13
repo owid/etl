@@ -10,7 +10,7 @@ from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from sqlalchemy.exc import NoResultFound
-from sqlmodel import Session
+from sqlalchemy.orm import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
@@ -142,7 +142,8 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
     origin.fetch()
-    repo.git.rebase("origin/master")
+
+    repo.git.rebase(f"origin/{repo.active_branch.name}")
     push_info_list = origin.push()
 
     # Check each PushInfo result for errors or rejections
@@ -179,8 +180,12 @@ def _indicator_metadata_dict(indicator: Indicator, db_indicator: gm.Variable) ->
     indicator_update_dict = indicator.to_meta_dict()
     update_period_days = indicator_update_dict.pop("update_period_days", None)
 
+    # if indicator has dimensions, use its original name
+    original_short_name = (db_indicator.dimensions or {}).get("originalShortName")
+    short_name = original_short_name or db_indicator.shortName
+
     # create dictionary for metadata
-    meta_dict = {"tables": {db_indicator.table_name: {"variables": {db_indicator.shortName: indicator_update_dict}}}}
+    meta_dict = {"tables": {db_indicator.table_name: {"variables": {short_name: indicator_update_dict}}}}
 
     if update_period_days:
         meta_dict["dataset"] = {"update_period_days": update_period_days}

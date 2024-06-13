@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Aviation Safety Network
+    title: Aviation statistics by nature
+    citation_full: |-
+      The Flight Safety Foundation's Aviation Safety Network (ASN) - Aviation statistics by nature (2024).
+    url_main: https://aviation-safety.net/statistics/nature/stats.php
+    date_accessed: 2024-06-05
+    date_published: 2024-06-05
+    license:
+      name: Copyright Aviation Safety Network
+      url: https://aviation-safety.net/about/usage33.php
+outs:
+  - md5: 105673bcdcb4ff7dd2d1f11350f40e04
+    size: 1599
+    path: aviation_statistics_by_nature.csv

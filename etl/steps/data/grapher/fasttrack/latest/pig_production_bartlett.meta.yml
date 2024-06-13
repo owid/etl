@@ -1,0 +1,35 @@
+dataset:
+  title: Pig production impacts (Bartlett et al. 2024)
+  description: The environmental and animal welfare footprint of different pig production systems in the UK and Brazil.
+  licenses:
+    - {}
+tables:
+  pig_production_bartlett:
+    variables:
+      ghg_cost_incl_sequestration:
+        title: Carbon cost (incl. sequestration)
+        unit: ''
+      ghg_cost:
+        title: Carbon emissions
+        unit: ''
+      land_use_cost:
+        title: Land use
+        unit: ''
+      critical_antimicrobial:
+        title: Critical antibiotic use
+        unit: ''
+      antimicrobial_cost:
+        title: Antibiotic use
+        unit: ''
+      welfare_cost:
+        title: Welfare cost
+        unit: ''
+      highest_label:
+        title: highest_label
+        unit: ''
+      breeding_system:
+        title: breeding_system
+        unit: ''
+      finishing_system:
+        title: finishing_system
+        unit: ''

@@ -3,7 +3,6 @@ meta:
     producer: HURDAT, National Oceanic and Atmospheric Administration
     title: north_atlantic_hurricanes_noaa
     citation_full: HURDAT, National Oceanic and Atmospheric Administration (2024)
-    version_producer: Google Sheet
     url_main: https://www.aoml.noaa.gov/hrd/hurdat/comparison_table.html
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQQQzn4zN3aMA3w6yaxDr1y5EZjgFyy6ak0DRibJJ00WF5JEI0VpzP0N5e8bIjwU0Ay1pvjhQ0OGSqx/pub?output=csv

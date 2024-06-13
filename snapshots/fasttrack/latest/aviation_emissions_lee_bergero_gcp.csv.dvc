@@ -4,7 +4,6 @@ meta:
     title: aviation_emissions_lee_bergero_gcp
     citation_full: |-
       Lee et al. (2021) The contribution of global aviation to anthropogenic climate forcing for 2000 to 2018; Bergero et al. (2023). Pathways to net-zero emissions from aviation; Global Carbon Project (2023).
-    version_producer: Google Sheet
     url_main: |-
       https://www.sciencedirect.com/science/article/pii/S1352231020305689; https://www.nature.com/articles/s41893-022-01046-9; https://globalcarbonbudget.org/
     url_download: |-
