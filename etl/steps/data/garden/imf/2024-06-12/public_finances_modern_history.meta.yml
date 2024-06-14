@@ -29,7 +29,7 @@ tables:
         display:
           name: Government revenue (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       expenditure:
         title: Government expenditure (% of GDP)
@@ -44,7 +44,7 @@ tables:
         display:
           name: Government expenditure (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       interest_exp:
         title: Government interest expense (% of GDP)
@@ -59,7 +59,7 @@ tables:
         display:
           name: Government interest expense (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       prim_expenditure:
         title: Government primary expenditure (% of GDP)
@@ -74,7 +74,7 @@ tables:
         display:
           name: Government primary expenditure (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       prim_balance:
         title: Government primary balance (% of GDP)
@@ -89,7 +89,7 @@ tables:
         display:
           name: Government primary balance (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       debt:
         title: Government gross debt (% of GDP)
@@ -104,7 +104,7 @@ tables:
         display:
           name: Government gross debt (% of GDP)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       rltir:
         title: Real long-term interest rate (%)
@@ -119,7 +119,7 @@ tables:
         display:
           name: Real long-term interest rate (%)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       rgc:
         title: Real GDP growth rate (%)
@@ -134,7 +134,7 @@ tables:
         display:
           name: Real GDP growth rate (%)
           numDecimalPlaces: 1
-          tolerance: 0
+          tolerance: 5
 
       gg_budg:
         title: Sector coverage indicator for revenue, expenditure and interest expense
