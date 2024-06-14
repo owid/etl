@@ -6,9 +6,9 @@ Important - You need and account to access the data.
 
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Cause of death or injury'
-* In Measure select 'Deaths' and 'DALYs'
+* In Measure select 'Prevalence' and 'Incidence'
 * In Metric select 'Number' and 'Rate'
-* In Impairment select 'Select all causes'
+* In Cause select 'Select all causes'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select 'All ages', 'Age-standardized', '<5 years', '5-14 years', '15-49 years', '50-69 years', '70+ years'
 * In Sex select 'Both'
@@ -33,8 +33,8 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/7fe48f68f1956453091ac5de855166b7_files/IHME-GBD_2021_DATA-7fe48f68-"
-NUMBER_OF_FILES = 101
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/c766323eb854e45ca3140ae3797fcbc3_files/IHME-GBD_2021_DATA-c766323e-"
+NUMBER_OF_FILES = 127
 
 
 @click.command()

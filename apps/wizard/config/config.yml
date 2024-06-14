@@ -89,7 +89,7 @@ sections:
 
   - title: "Data tools"
     description: |-
-      Update indicators & charts in staging.
+      Updates, data edits, etc.
     apps:
     - title: "Indicator Upgrader"
       alias: indicator-upgrade
