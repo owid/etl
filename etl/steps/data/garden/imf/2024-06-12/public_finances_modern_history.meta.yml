@@ -20,10 +20,7 @@ tables:
         title: Government revenue (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The sum of all the money received by the government from taxes and other non-tax sources, as a percentage of GDP.
         presentation:
           title_public: Government revenue (% of GDP)
         display:
@@ -35,10 +32,7 @@ tables:
         title: Government expenditure (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It includes the government's interest expense.
         presentation:
           title_public: Government expenditure (% of GDP)
         display:
@@ -50,10 +44,7 @@ tables:
         title: Government interest expense (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The sum of all the money spent by the government on interest payments, as a percentage of GDP.
         presentation:
           title_public: Government interest expense (% of GDP)
         display:
@@ -65,10 +56,7 @@ tables:
         title: Government primary expenditure (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government's interest expense.
         presentation:
           title_public: Government primary expenditure (% of GDP)
         display:
@@ -80,10 +68,7 @@ tables:
         title: Government primary balance (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The difference between government revenue and government expenditure, excluding interest payments, as a percentage of GDP.
         presentation:
           title_public: Government primary balance (% of GDP)
         display:
@@ -95,10 +80,7 @@ tables:
         title: Government gross debt (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: Financial liabilities of the government, as a percentage of GDP.
         presentation:
           title_public: Government gross debt (% of GDP)
         display:
@@ -110,10 +92,7 @@ tables:
         title: Real long-term interest rate (%)
         unit: "%"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The long-term interest rate adjusted for inflation.
         presentation:
           title_public: Real long-term interest rate (%)
         display:
@@ -125,10 +104,7 @@ tables:
         title: Real GDP growth rate (%)
         unit: "%"
         short_unit: "%"
-        description_short: ""
-        description_key:
-          - ""
-        description_from_producer: ""
+        description_short: The rate of change of the GDP, adjusted for inflation.
         presentation:
           title_public: Real GDP growth rate (%)
         display:
@@ -141,9 +117,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Indicates if the data represents the central government (0) or the general government (1).
-        description_key:
-          - ""
-        description_from_producer: ""
         presentation:
           title_public: Sector coverage indicator for revenue, expenditure and interest expense
         display:
@@ -156,9 +129,6 @@ tables:
         unit: ""
         short_unit: ""
         description_short: Indicates if the data represents the central government (0) or the general government (1).
-        description_key:
-          - ""
-        description_from_producer: ""
         presentation:
           title_public: Sector coverage indicator for gross debt
         display:
