@@ -15,7 +15,7 @@ definitions:
       All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
 
   age: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     all ages
     <% elif age_group == "age-standardized" %>
     an age-standardized population
