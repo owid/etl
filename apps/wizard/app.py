@@ -43,7 +43,7 @@ for step in WIZARD_CONFIG["etl"]["steps"].values():
         )
 pages[WIZARD_CONFIG["etl"]["title"]] = pages_
 
-# Other apps specified in the config
+# Sections
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]
     if apps:
@@ -58,6 +58,21 @@ for section in WIZARD_CONFIG["sections"]:
                 )
             )
         pages[section["title"]] = pages_
+
+# Legacy
+if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
+    pages_ = []
+    for app in WIZARD_CONFIG["legacy"]["apps"]:
+        if app["enable"]:
+            pages_.append(
+                st.Page(
+                    page=str(app["entrypoint"]),
+                    title=app["title"],
+                    icon=app["icon"],
+                    url_path=app["alias"],
+                )
+            )
+    pages["Legacy"] = pages_
 
 ###########################################
 # RUN PAGES

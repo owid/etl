@@ -156,39 +156,11 @@ def st_show_home():
                             image_url=app["image_url"],
                             text=text,
                         )
-
-    # section_legacy = None
-    # for section in WIZARD_CONFIG["sections"]:
-    #     apps = [app for app in section["apps"] if app["enable"]]
-
-    #     # Skip legacy (show later)
-    #     if section["title"] == "Legacy":
-    #         section_legacy = section
-    #         continue
-
-    #     # Show section
-    #     if apps:
-    #         st.markdown(f"## {section['title']}")
-    #         st.markdown(section["description"])
-    #         columns = st.columns(len(apps))
-    #         for i, app in enumerate(apps):
-    #             text = [
-    #                 app["description"],
-    #             ]
-    #             # if "maintainer" in app:
-    #             #     text.append(f"maintainer: {app['maintainer']}")
-    #             if app["enable"]:
-    #                 with columns[i]:
-    #                     create_card(
-    #                         entrypoint=app["entrypoint"],
-    #                         title=app["title"],
-    #                         image_url=app["image_url"],
-    #                         text=text,
-    #                     )
-
     st.divider()
 
-    # Show legacy
+    #########################
+    # Legacy
+    #########################
     if "legacy" in WIZARD_CONFIG:
         section_legacy = WIZARD_CONFIG["legacy"]
         apps = [app for app in section_legacy["apps"] if app["enable"]]
@@ -219,6 +191,10 @@ def st_show_home():
                 st.switch_page(step_props["entrypoint"])
         for section in WIZARD_CONFIG["sections"]:
             for app in section["apps"]:
+                if st.query_params["page"] == app["alias"]:
+                    st.switch_page(app["entrypoint"])
+        if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
+            for app in WIZARD_CONFIG["legacy"]["apps"]:
                 if st.query_params["page"] == app["alias"]:
                     st.switch_page(app["entrypoint"])
 
