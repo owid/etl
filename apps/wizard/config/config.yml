@@ -208,7 +208,7 @@ legacy:
       entrypoint: ../chart_sync/app.py
       description: Sync charts between servers
       maintainer: "@mojmir"
-      icon: ":material/sports_volleyball:"
+      icon: ":material/sync:"
       image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
       disable:
         "staging": True
