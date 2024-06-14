@@ -1,4 +1,4 @@
-"""TODO
+"""Helper tool to create map brackets for all indicators in an indicator-based explorer.
 
 """
 
@@ -117,10 +117,7 @@ regions_to_id = load_mappable_regions_and_ids(df=df)
 metadata = load_variable_metadata(variable=variable)
 chart_config = create_default_chart_config_for_variable(metadata=metadata)
 
-# TODO: Review the logic suggested in https://github.com/owid/owid-grapher/issues/3641
-#  * Add a checkbox to have open lower limit, and another to have an open upper limit.
-#    * If lower limit is open, then make "customNumericMinValue" a big number (larger than the minimum bracket).
-#    * If the upper limit is open, then add a bracket after the maximum bracket, with a value that is smaller than that maximum bracket.
+# TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
 #  * Create dropdown for color schema.
 #  * Add "custom" to the list of radio buttons for bracket type.
@@ -208,6 +205,14 @@ brackets_all = get_all_possible_log_like_brackets(values=values)
 # Estimate whether the lower and upper brackets should be open.
 lower_bracket_open_default, upper_bracket_open_default = are_brackets_open(values=values)
 
+# Add a dropdown for color scheme.
+# TODO: Add full list of color schemes.
+color_scheme = st.selectbox(
+    label="Color scheme (not fully implemented!)",
+    options=["BuGn", "BinaryMapPaletteA"],
+    help="Color scheme for the map.",
+)
+
 # Add toggles to control whether lower and upper brackets should be open.
 lower_bracket_open = st.toggle("Lower bracket open", lower_bracket_open_default)
 upper_bracket_open = st.toggle("Upper bracket open", upper_bracket_open_default)
@@ -251,6 +256,7 @@ elif len(brackets_selected) < MIN_NUM_BRACKETS:
     st.warning(f"WARNING: {len(brackets_selected)} is too few brackets. Increase the limits.")
 
 # brackets = np.linspace(start=lower_limit, stop=upper_limit, num=10).tolist()
+chart_config["map"]["colorScale"]["baseColorScheme"] = color_scheme
 chart_config["map"]["colorScale"]["customNumericValues"] = brackets_selected
 if lower_bracket_open:
     # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
@@ -258,6 +264,11 @@ if lower_bracket_open:
 if upper_bracket_open:
     # To ensure the upper bracket is open, add an upper bracket with a value that is very small.
     chart_config["map"]["colorScale"]["customNumericValues"].append(min_value)
+else:
+    # To ensure the upper bracket is closed, ensure the upper bracket value is larger than any data value.
+    if chart_config["map"]["colorScale"]["customNumericValues"][-1] < max_value:
+        # Find the lowest bracket that is above the maximum value in the data, and use that as the upper bracket.
+        chart_config["map"]["colorScale"]["customNumericValues"][-1] = brackets[brackets > max_value].min()
 
 # Display the chart.
 chart_html(chart_config, owid_env=OWID_ENV)
