@@ -52,6 +52,12 @@ def run(dest_dir: str) -> None:
         missing_data_on_columns=False,
     )
 
+    # Redefine legal_status_not_legal_pop as legal_status_not_legal_pop + legal_status_missing_pop
+    tb["legal_status_Not legal_pop"] = tb["legal_status_Not legal_pop"] + tb["legal_status_missing_pop"]
+
+    # Drop legal_status_missing_pop and legal_status_not_legal_count
+    tb = tb.drop(columns=["legal_status_missing_pop", "legal_status_Not legal_count"])
+
     tb = tb.format(["country", "year"])
 
     #

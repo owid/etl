@@ -38,18 +38,6 @@ tables:
           numDecimalPlaces: 0
           tolerance: 0
 
-      legal_status_not_legal_count:
-        title: Number of countries where same-sex marriage is not legal
-        unit: ""
-        short_unit: ""
-        description_short: "{definitions.same_sex_marriage}"
-        presentation:
-          title_public: Number of countries where same-sex marriage is not legal
-        display:
-          name: Not legal
-          numDecimalPlaces: 0
-          tolerance: 0
-
       legal_status_legal_count:
         title: Number of countries where same-sex marriage is legal
         unit: ""
@@ -83,18 +71,6 @@ tables:
           title_public: Population in countries where same-sex marriage is legal
         display:
           name: Legal
-          numDecimalPlaces: 0
-          tolerance: 0
-
-      legal_status_missing_pop:
-        title: Population in countries with missing data on same-sex marriage
-        unit: ""
-        short_unit: ""
-        description_short: "{definitions.same_sex_marriage}"
-        presentation:
-          title_public: Population in countries with missing data on same-sex marriage
-        display:
-          name: Missing data
           numDecimalPlaces: 0
           tolerance: 0
 
