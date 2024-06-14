@@ -2,6 +2,7 @@
 
 """
 
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -290,7 +291,11 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
 
     # Add toggles to control whether lower and upper brackets should be open.
     mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open)
-    mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open)
+    mb.upper_bracket_open = st.toggle(
+        "Upper bracket open",
+        mb.upper_bracket_open,
+        help="Note that, even if set to close, it may still remain open if there is a high data value in a previous year.",
+    )
 
     # Select bracket type.
     mb.bracket_type = st.radio(  # type: ignore
@@ -390,3 +395,26 @@ elif use_type == USE_TYPE_EXPLORERS:
     mb = MapBracketer(variable_id=variable_id)  # type: ignore
 
     map_bracketer_interactive(mb=mb)
+
+    if st.button("Save brackets in explorer file", type="primary"):
+        if "customNumericValues" in mb.chart_config["map"]["colorScale"]:
+            # If map brackets have been defined, update explorer.
+            if "colorScaleNumericBins" not in explorer.df_graphers.columns:
+                # Ensure the column for map brackets exists in the explorer.
+                explorer.df_graphers["colorScaleNumericBins"] = None
+            # Add entry to the map brackets column for this indicator.
+            explorer.df_graphers.loc[
+                explorer.df_graphers["yVariableIds"] == variable_id, "colorScaleNumericBins"
+            ] = json.dumps(mb.chart_config["map"]["colorScale"]["customNumericValues"])
+        if "customNumericMinValue" in mb.chart_config["map"]["colorScale"]:
+            # If a minimum bracket have been defined, update explorer.
+            if "colorScaleNumericMinValue" not in explorer.df_graphers.columns:
+                # Ensure the column for minimum brackets exists in the explorer.
+                explorer.df_graphers["colorScaleNumericMinValue"] = None
+            # Add entry to the minimum bracket column for this indicator.
+            explorer.df_graphers.loc[
+                explorer.df_graphers["yVariableIds"] == variable_id, "colorScaleNumericMinValue"
+            ] = json.dumps(mb.chart_config["map"]["colorScale"]["customNumericMinValue"])
+        # Overwrite explorer file.
+        # TODO: Check if the explorer works after these changes, I think the format that the explorer needs may be different (using semicolons?).
+        explorer.write()
