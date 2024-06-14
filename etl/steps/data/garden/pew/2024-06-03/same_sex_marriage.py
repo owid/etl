@@ -11,8 +11,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define last year (the one with coverage until 31 Dec)
-LATEST_YEAR = 2022
+# Define last year (last update May 2023)
+LATEST_YEAR = 2023
 
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
