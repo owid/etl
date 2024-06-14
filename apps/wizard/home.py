@@ -80,7 +80,6 @@ def st_show_home():
             on_click=lambda: None,
         )
         if go_to_page:
-            print(f"----------- {entrypoint}")
             st.switch_page(entrypoint)
 
     #########################
