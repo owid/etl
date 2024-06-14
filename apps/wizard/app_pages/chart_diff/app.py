@@ -11,7 +11,7 @@ from structlog import get_logger
 
 from apps.chart_sync.cli import modified_charts_by_admin
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
-from apps.wizard.app_pages.chart_diff.show import st_show
+from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
 from apps.wizard.utils.env import OWID_ENV
