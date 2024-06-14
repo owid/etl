@@ -2,6 +2,7 @@
 
 """
 
+from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
@@ -12,10 +13,39 @@ from owid.catalog import find
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.explorer_update.cli import extract_variable_ids_from_explorer_content
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_sig_figs
 from etl.grapher_model import Entity, Variable
+from etl.paths import BASE_DIR
+
+# TODO:
+#  * Create another slider (from 0 to 10) for tolerance.
+#  * Add "custom" to the list of radio buttons for bracket type.
+#  * Consider categorical values.
+
+# Logging
+log = get_logger()
+
+# Default path to the explorers folder.
+EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
+EXPLORER_NAME_DEFAULT = "natural-disasters-temp"
+
+# Maximum number of brackets allowed in a chart.
+MAX_NUM_BRACKETS = 10
+
+# Minimum number of brackets allowed in a chart.
+MIN_NUM_BRACKETS = 4
+
+# Smallest number (in absolute value) to consider.
+SMALLEST_NUMBER_DEFAULT = 0.01
+
+# Labels of the different bracket types.
+LABEL_LINEAR = "linear"
+LABEL_LOG_X2 = "log x2"
+LABEL_LOG_X3 = "log x3"
+LABEL_LOG_X10 = "log x10"
 
 
 @st.cache_data
@@ -89,54 +119,91 @@ def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[s
     return chart_config
 
 
+@st.cache_data
+def load_explorer(explorer_path: Path) -> str:
+    # Load explorer file as a string.
+    with open(explorer_path, "r") as f:
+        explorer = f.read()
+
+    return explorer
+
+
+########################################
+# TITLE and DESCRIPTION
+########################################
+
 st.set_page_config(
     page_title="Wizard: ETL Map bracket generator",
     # layout="wide",
     page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
-########################################
-# GLOBAL VARIABLES and SESSION STATE
-########################################
-
-# Logging
-log = get_logger()
-
-VARIABLE_ID = 901018
-VARIABLE_ID = 900974
-
-########################################
-# TITLE and DESCRIPTION
-########################################
 st.title("ETL Map bracket generator")
 st.markdown("""🔨 WIP.""")
 
-variable = load_variable_from_id(variable_id=VARIABLE_ID)
+# Radio buttons to choose how to use this tool.
+USE_TYPE_EXPLORERS = "by explorer"
+USE_TYPE_CHART = "by chart"
+USE_TYPE_ETL = "by etl path"
+use_type = st.radio(
+    "Select how to use this tool",
+    options=[
+        USE_TYPE_EXPLORERS,
+        USE_TYPE_CHART,
+        USE_TYPE_ETL,
+    ],
+    captions=[
+        "NOT IMPLEMENTED: Select an indicator-based explorer, improve map brackets one by one, and update the explorer file.",
+        "NOT IMPLEMENTED: Search for a chart by id or slug, improve its brackets, and save map configuration in the chart config to (staging) db.",
+        "NOT IMPLEMENTED: Search for an ETL path to a dataset, improve indicator map brackets one by one, and save the configuration to a grapher yaml file.",
+    ],
+    index=0,
+    horizontal=True,
+)
+
+if use_type in [USE_TYPE_CHART, USE_TYPE_ETL]:
+    st.error(f"Use type '{use_type}' not yet implemented.")
+    st.stop()
+elif use_type == USE_TYPE_EXPLORERS:
+    if not EXPLORERS_DIR.is_dir():
+        st.error(f"Explorer directory not found: {EXPLORERS_DIR}")
+        st.stop()
+    # List all explorer names.
+    explorer_names = [
+        explorer_file.stem.replace(".explorer", "") for explorer_file in sorted(EXPLORERS_DIR.glob("*.explorer.tsv"))
+    ]
+    # Select an explorer name from a dropdown menu.
+    explorer_name: str = st.selectbox(  # type: ignore
+        label="Name of explorer file",
+        options=explorer_names,
+        index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
+        help="Name of .explorer.tsv file inside owid-content/explorers.",
+    )
+    # Define path to explorer file.
+    explorer_path = (EXPLORERS_DIR / explorer_name).with_suffix(".explorer.tsv")
+
+    # Load explorer content.
+    explorer = load_explorer(explorer_path=explorer_path)
+    if "yVariableIds" not in explorer:
+        st.error("This tool can handle only indicator-based explorers!")
+        st.stop()
+
+    # Extract variable ids from explorer.
+    variable_ids = extract_variable_ids_from_explorer_content(explorer=explorer)
+    # TODO: Instead of using this function, create one that loads the main table and selects variables with a map tab.
+    #  Also, exclude those that already have map brackets (and optionally show them too).
+    #  We also need to figure out how to write back to the file afterwards with a given map bracket configuration.
+    variable_id: int = st.selectbox(  # type: ignore
+        label="Indicator id",
+        options=variable_ids,
+        index=0,
+    )
+
+variable = load_variable_from_id(variable_id=variable_id)  # type: ignore
 df = load_variable_data(variable=variable)
 regions_to_id = load_mappable_regions_and_ids(df=df)
 metadata = load_variable_metadata(variable=variable)
 chart_config = create_default_chart_config_for_variable(metadata=metadata)
-
-# TODO:
-#  * Create another slider (from 0 to 10) for tolerance.
-#  * Create dropdown for color schema.
-#  * Add "custom" to the list of radio buttons for bracket type.
-#  * Consider categorical values.
-
-# Maximum number of brackets allowed in a chart.
-MAX_NUM_BRACKETS = 10
-
-# Minimum number of brackets allowed in a chart.
-MIN_NUM_BRACKETS = 4
-
-# Smallest number (in absolute value) to consider.
-SMALLEST_NUMBER_DEFAULT = 0.01
-
-# Labels of the different bracket types.
-LABEL_LINEAR = "linear"
-LABEL_LOG_X2 = "log x2"
-LABEL_LOG_X3 = "log x3"
-LABEL_LOG_X10 = "log x10"
 
 # Select only regions that appear in grapher maps.
 # And for now, focus on the latest year.
