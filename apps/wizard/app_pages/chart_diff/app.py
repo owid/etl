@@ -361,7 +361,41 @@ def _show_summary_top(chart_diffs):
         )
 
 
-def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
+def render_app():
+    """Render app.
+
+    This involves: displaying the chart diffs according to filters applied by user.
+    """
+    if len(st.session_state.chart_diffs) == 0:
+        st.warning("No chart modifications found in the staging environment.")
+    else:
+        # Filter based on query params
+        _ = filter_chart_diffs()
+
+        # Show all of the charts
+        _show_options()
+
+        # Show diffs
+        if len(st.session_state.chart_diffs_filtered) == 0:
+            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+        else:
+            # Show changed charts (modified, new, etc.)
+            if st.session_state.chart_diffs_filtered:
+                # Render chart diffs
+                with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
+                    show_chart_diffs(
+                        [chart for chart in st.session_state.chart_diffs_filtered.values()],
+                        "pagination",
+                        source_session,
+                        target_session,
+                    )
+            else:
+                st.warning(
+                    "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                )
+
+
+def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
     """Display chart diffs."""
     # Pagination menu
     with st.container(border=True):
@@ -400,36 +434,10 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
     )
 
     # Get actual charts
-    st.write(1)
     get_chart_diffs()
-    st.write(2)
-    if len(st.session_state.chart_diffs) == 0:
-        st.warning("No chart modifications found in the staging environment.")
-    else:
-        # Filter based on query params
-        _ = filter_chart_diffs()
 
-        # Show all of the charts
-        _show_options()
-
-        # Show diffs
-        if len(st.session_state.chart_diffs_filtered) == 0:
-            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
-        else:
-            # Show changed charts (modified, new, etc.)
-            if st.session_state.chart_diffs_filtered:
-                # Render chart diffs
-                with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-                    render_chart_diffs(
-                        [chart for chart in st.session_state.chart_diffs_filtered.values()],
-                        "pagination",
-                        source_session,
-                        target_session,
-                    )
-            else:
-                st.warning(
-                    "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                )
+    # Render app
+    render_app()
 
 
 main()
