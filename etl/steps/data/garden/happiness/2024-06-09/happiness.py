@@ -38,15 +38,14 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb_this_year[cols_overlap], tb_prev_years], ignore_index=True)
 
     # Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Process data (add population weighted averages for continents & income groups)
 
     # save data of Northern Cyrpus and Somaliland to concat later (they do not have population in population dataset)
-    tb_countries_wo_population = tb[tb["country"].isin(["Northern Cyprus", "Somaliland"])]
-    tb = tb[~tb["country"].isin(["Northern Cyprus", "Somaliland"])]
+    countries_no_pop_msk = tb["country"].isin(["Northern Cyprus", "Somaliland"])
+    tb_countries_wo_population = tb[countries_no_pop_msk]
+    tb = tb[~countries_no_pop_msk]
 
     # add population to table
     tb = geo.add_population_to_table(tb, ds_population)

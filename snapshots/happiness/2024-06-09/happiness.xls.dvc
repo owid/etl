@@ -23,6 +23,7 @@ meta:
     # License
     license:
       name: ""
+      url: https://worldhappiness.report/ed/2024/
 
 outs:
   - md5: 8972c7b28038637edea5b8982350ae8a
