@@ -1,6 +1,8 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_key:
+      - The data has been updated up to May 2023.
     processing_level: major
     description_processing: |-
       We converted the original data with the years of the legalization of same-sex marriage into a expanded dataset with the legal status of same-sex marriage for each country and year.
