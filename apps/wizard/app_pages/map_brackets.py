@@ -2,8 +2,7 @@
 
 """
 
-import math
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -15,6 +14,7 @@ from structlog import get_logger
 
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
+from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_sig_figs
 from etl.grapher_model import Entity, Variable
 
 
@@ -150,103 +150,6 @@ max_value = values.max()
 smallest_number = metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
 
 
-def round_to_nearest_power_of_ten(number, floor: bool = True):
-    if floor:
-        return 10 ** (math.floor(math.log10(abs(number if number != 0 else 1))))
-    else:
-        return 10 ** (math.ceil(math.log10(abs(number if number != 0 else 1))))
-
-
-def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
-    return round(value, sig_figs - 1 - math.floor(math.log10(abs(value if value != 0 else 1))))
-
-
-# TODO: Move to tests.
-def test_round_to_sig_figs_1_sig_fig():
-    tests = {
-        0.01: 0.01,
-        0.059: 0.06,
-        0.055: 0.06,
-        0.050: 0.05,
-        0.0441: 0.04,
-        0: 0,
-        1: 1,
-        5: 5,
-        9: 9,
-        10: 10,
-        11: 10,
-        15: 20,
-        440.0321: 400,
-        450.0321: 500,
-        987: 1000,
-    }
-    for test in tests.items():
-        assert round_to_sig_figs(test[0], sig_figs=1) == float(test[1])
-        # Check also the same numbers but negative.
-        assert round_to_sig_figs(-test[0], sig_figs=1) == -float(test[1])
-
-
-def test_round_to_sig_figs_2_sig_fig():
-    # NOTE: Python will always ignore trailing zeros (even when printing in scientific notation).
-    # We could have a function that returns a string that respect significant trailing zeros.
-    # But for now, this is good enough.
-    tests = {
-        0.01: 0.010,
-        0.059: 0.059,
-        0.055: 0.055,
-        0.050: 0.050,
-        0.0441: 0.044,
-        0: 0.0,
-        1: 1.0,
-        5: 5.0,
-        9: 9.0,
-        10: 10,
-        11: 11,
-        15: 15,
-        440.0321: 440,
-        450.0321: 450,
-        987: 990,
-    }
-    for test in tests.items():
-        assert round_to_sig_figs(test[0], sig_figs=2) == test[1]
-        # Check also the same numbers but negative.
-        assert round_to_sig_figs(-test[0], sig_figs=2) == -test[1]
-
-
-def test_round_to_nearest_power_of_ten_floor():
-    tests = {
-        -0.1: 0,
-        -90: 0,
-        0: 0,
-        1: 1,
-        123: 100,
-        1001: 1000,
-        9000: 1000,
-        0.87: 0.1,
-        0.032: 0.01,
-        0.0005: 0.0001,
-    }
-    for test in tests.items():
-        assert round_to_nearest_power_of_ten(test[0]) == test[1]
-
-
-def test_round_to_nearest_power_of_ten_ceil():
-    tests = {
-        -0.1: 0,
-        -90: 0,
-        0: 0,
-        1: 1,
-        123: 1000,
-        1001: 10000,
-        9000: 10000,
-        0.87: 1,
-        0.032: 0.1,
-        0.0005: 0.001,
-    }
-    for test in tests.items():
-        assert round_to_nearest_power_of_ten(test[0], floor=False) == test[1], test
-
-
 def get_all_possible_log_like_brackets(values) -> Dict[str, List[float]]:
     #  I think that's probably the case for log-like brackets that have both positive and negative values.
     #  Not sure about only positive cases. For now, assume so.
@@ -309,7 +212,6 @@ lower_bracket_open_default, upper_bracket_open_default = are_brackets_open(value
 lower_bracket_open = st.toggle("Lower bracket open", lower_bracket_open_default)
 upper_bracket_open = st.toggle("Upper bracket open", upper_bracket_open_default)
 
-# chart_config["map"]["timeTolerance"] = 0
 bracket_type = st.radio(
     "Select linear or log-like",
     options=[LABEL_LOG_X2, LABEL_LOG_X3, LABEL_LOG_X10, LABEL_LINEAR],

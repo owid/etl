@@ -11,6 +11,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 
 """
 
+import math
 from typing import Any, List, Set, Union
 
 import pandas as pd
@@ -261,3 +262,68 @@ def compare_tables(
         # Plot all listed figures.
         for fig in figures:
             fig.show()
+
+
+def round_to_nearest_power_of_ten(value: Union[int, float], floor: bool = True) -> float:
+    """Round a number to its nearest power of ten.
+
+    If `floor`, values are rounded down, e.g. 123 -> 100. Otherwise, they are rounded up, e.g. 123 -> 1000.
+
+    NOTE: For convenience, negative numbers are rounded down in absolute value.
+    For example, when `floor` is True, -123 -> -100.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    floor : bool, optional
+        Whether to round the value down or up.
+
+    Returns
+    -------
+    float
+        Nearest power of ten.
+    """
+    if value == 0:
+        return 0
+
+    if floor:
+        rounded_value = 10 ** (math.floor(math.log10(abs(value))))
+    else:
+        rounded_value = 10 ** (math.ceil(math.log10(abs(value))))
+
+    if value < 0:
+        rounded_value = -rounded_value
+
+    return rounded_value
+
+
+def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
+    """Round a number to a fixed amount of significant figures.
+
+    For example, if `sig_figs=1`:
+    * 0.123 -> 0.1
+    * 0.992 -> 1
+    * 12.3 -> 10
+    And, if `sig_figs=2`:
+    * 0.123 -> 0.12
+    * 0.992 -> 0.99
+    * 12.3 -> 12
+
+    NOTE: Python will always ignore trailing zeros (even when printing in scientific notation).
+    We could have a function that returns a string that respects significant trailing zeros.
+    But for now, this is good enough.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    sig_figs : int, optional
+        Number of significant figures.
+
+    Returns
+    -------
+    float
+        Rounded value.
+    """
+    return round(value, sig_figs - 1 - math.floor(math.log10(abs(value if value != 0 else 1))))
