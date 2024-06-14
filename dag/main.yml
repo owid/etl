@@ -739,7 +739,7 @@ steps:
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
-    # Equaldex dataset
+  # Equaldex dataset
   data://meadow/lgbt_rights/2024-06-03/equaldex:
     - snapshot://lgbt_rights/2024-06-03/equaldex.csv
     - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
@@ -752,6 +752,16 @@ steps:
 
   data://grapher/lgbt_rights/2024-06-03/equaldex:
     - data://garden/lgbt_rights/2024-06-03/equaldex
+
+  # Same-Sex Marriage Around the World from Pew Research Center
+  data://meadow/pew/2024-06-03/same_sex_marriage:
+    - snapshot://pew/2024-06-03/same_sex_marriage.csv
+  data://garden/pew/2024-06-03/same_sex_marriage:
+    - data://meadow/pew/2024-06-03/same_sex_marriage
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/pew/2024-06-03/same_sex_marriage:
+    - data://garden/pew/2024-06-03/same_sex_marriage
 
 include:
   - dag/open_numbers.yml
