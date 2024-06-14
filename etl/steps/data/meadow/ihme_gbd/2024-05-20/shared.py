@@ -20,7 +20,8 @@ def clean_data(tb: Table) -> Table:
         columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
         errors="ignore",
     )
-    tb = tb = tb.drop(tb[(tb.measure.isin(["Prevalence", "Incidence"])) & (tb.metric == "Percent")].index)
+    msk = (tb["measure"].isin(["Prevalence", "Incidence"])) & (tb["metric"] == "Percent")
+    tb = tb[~msk]
     return tb
 
 

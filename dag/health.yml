@@ -102,16 +102,23 @@ steps:
   data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
     - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
-  # IHME GBD Leading cause of child deaths
+  # IHME GBD Leading cause of deaths - to archive
+  data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
+    - snapshot://ihme_gbd/2023-10-04/cause_hierarchy.csv
   data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths:
     - data://garden/ihme_gbd/2019/gbd_cause
     - data://meadow/ihme_gbd/2023-10-04/cause_hierarchy
   data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
     - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
 
-  # IHME GBD Cause hierarchy
-  data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
-    - snapshot://ihme_gbd/2023-10-04/cause_hierarchy.csv
+  # IHME GBD Leading cause of  deaths - update
+  data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
+    - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
+  data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+    - data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy
+  data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
+    - data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
@@ -602,8 +609,6 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_cause:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
-  data-private://grapher/ihme_gbd/2024-05-20/gbd_cause_dalys:
-    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD 2021 - GBD Prevalence
   data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence:
@@ -611,7 +616,6 @@ steps:
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
     - data://garden/regions/2023-01-01/regions
-    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
   data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
@@ -635,3 +639,20 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/latest/avian_influenza_ah5n1:
     - data://garden/who/latest/avian_influenza_ah5n1
+
+  # International Smoking Statistics cigarette sales data
+  data://meadow/smoking/2024-05-30/cigarette_sales:
+    - snapshot://smoking/2024-05-30/cigarette_sales.zip
+  data://garden/smoking/2024-05-30/cigarette_sales:
+    - data://meadow/smoking/2024-05-30/cigarette_sales
+    - data://garden/demography/2023-03-31/population
+  data://grapher/smoking/2024-05-30/cigarette_sales:
+    - data://garden/smoking/2024-05-30/cigarette_sales
+
+  # ISAPS, Plastic Surgery (2010-2022)
+  data://meadow/health/2024-06-11/isaps_plastic_surgery:
+    - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
+  data://garden/health/2024-06-11/isaps_plastic_surgery:
+    - data://meadow/health/2024-06-11/isaps_plastic_surgery
+  data://grapher/health/2024-06-11/isaps_plastic_surgery:
+    - data://garden/health/2024-06-11/isaps_plastic_surgery

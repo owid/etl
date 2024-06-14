@@ -1,3 +1,5 @@
+import pytest
+
 from apps.wizard.utils.env import Config, OWIDEnv
 
 
@@ -8,8 +10,8 @@ def test_OWIDEnv_staging():
     assert env.name == "staging-site-branch"
     assert env.base_site == "http://staging-site-branch"
     assert env.admin_site == "http://staging-site-branch/admin"
-    assert env.api_site == "https://api-staging.owid.io/staging-site-branch"
-    assert env.indicators_url == "https://api-staging.owid.io/staging-site-branch/v1/indicators/"
+    assert env.data_api_url == "https://api-staging.owid.io/staging-site-branch"
+    assert env.indicators_url == "https://api-staging.owid.io/staging-site-branch/v1/indicators"
 
     env._env_local = "staging"
     assert env.wizard_url == "http://staging-site-branch/etl/wizard"
@@ -30,8 +32,8 @@ def test_OWIDEnv_production():
     assert env.name == "production"
     assert env.base_site == "https://admin.owid.io"
     assert env.admin_site == "https://admin.owid.io/admin"
-    assert env.api_site == "https://api.ourworldindata.org"
-    assert env.indicators_url == "https://api.ourworldindata.org/v1/indicators/"
+    assert env.data_api_url == "https://api.ourworldindata.org"
+    assert env.indicators_url == "https://api.ourworldindata.org/v1/indicators"
 
     env._env_local = "production"
     assert env.wizard_url == "https://etl.owid.io/wizard/"
@@ -52,8 +54,8 @@ def test_OWIDEnv_dev():
     assert env.name == "dev"
     assert env.base_site == "http://localhost:3030"
     assert env.admin_site == "http://localhost:3030/admin"
-    assert env.api_site == "http://localhost:8000"
-    assert env.indicators_url == "http://localhost:8000/v1/indicators/"
+    with pytest.raises(ValueError):
+        env.data_api_url
 
     env._env_local = "dev"
     assert env.wizard_url == "http://localhost:8053/"

@@ -37,11 +37,15 @@ class UnknownOWIDEnv(Exception):
 
 
 class OWIDEnv:
-    """OWID environment."""
+    """OWID environment.
+
+    TODO: maybe worth moving to etl.config
+    """
 
     _env_remote: OWIDEnvType | None
     _env_local: OWIDEnvType | None
     conf: Config
+    _engine: Engine | None
 
     def __init__(
         self: Self,
@@ -52,6 +56,8 @@ class OWIDEnv:
         self._env_remote = None
         # Local environment: environment where the code is running
         self._env_local = None  # "production", "staging", "dev"
+        # Engine (cached)
+        self._engine = None
 
     @property
     def env(self):
@@ -112,8 +118,18 @@ class OWIDEnv:
         return cls.from_staging(staging_or_env_file)
 
     def get_engine(self) -> Engine:
-        """Get engine for env."""
+        """Get engine for env.
+
+        DEPRECATED: Use property `engine` property instead.
+        """
         return get_engine(self.conf.__dict__)
+
+    @property
+    def engine(self) -> Engine:
+        """Get engine for env."""
+        if self._engine is None:
+            self._engine = get_engine(self.conf.__dict__)
+        return self._engine
 
     @property
     def site(self) -> str | None:
@@ -153,16 +169,14 @@ class OWIDEnv:
             return f"{self.base_site}/admin"
 
     @property
-    def api_site(self: Self) -> str:
+    def data_api_url(self: Self) -> str:
         """Get api url."""
         if self.env_remote == "production":
             return "https://api.ourworldindata.org"
         elif self.env_remote == "staging":
             return f"https://api-staging.owid.io/{self.conf.DB_HOST}"
-        elif self.env_remote == "dev":
-            return "http://localhost:8000"
         else:
-            raise UnknownOWIDEnv()
+            raise ValueError(f"Unknown DATA_API for env_remote={self.env_remote}")
 
     @property
     def chart_approval_tool_url(self: Self) -> str:
@@ -172,7 +186,27 @@ class OWIDEnv:
     @property
     def indicators_url(self: Self) -> str:
         """Get indicators url."""
-        return self.api_site + "/v1/indicators/"
+        return self.data_api_url + "/v1/indicators"
+
+    @property
+    def wizard_url(self) -> str:
+        """Get wizard url."""
+        if self.env_local == "dev":
+            return f"http://localhost:{WIZARD_PORT}/"
+        elif self.env_local == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.base_site}/etl/wizard"
+
+    @property
+    def wizard_url_remote(self) -> str:
+        """Get wizard url (in remote server)."""
+        if self.env_remote == "dev":
+            return f"http://localhost:{WIZARD_PORT}/"
+        elif self.env_remote == "production":
+            return "https://etl.owid.io/wizard/"
+        else:
+            return f"{self.base_site}/etl/wizard"
 
     def dataset_admin_site(self: Self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
@@ -197,15 +231,11 @@ class OWIDEnv:
         """
         return f"{self.site}/grapher/thumbnail/{slug}.png"
 
-    @property
-    def wizard_url(self) -> str:
-        """Get wizard url."""
-        if self.env_local == "dev":
-            return f"http://localhost:{WIZARD_PORT}/"
-        elif self.env_local == "production":
-            return "https://etl.owid.io/wizard/"
-        else:
-            return f"{self.base_site}/etl/wizard"
+    def indicator_metadata_url(self, variable_id):
+        return f"{self.indicators_url}/{variable_id}.metadata.json"
+
+    def indicator_data_url(self, variable_id):
+        return f"{self.indicators_url}/{variable_id}.data.json"
 
 
 OWID_ENV = OWIDEnv()

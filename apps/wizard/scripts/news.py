@@ -12,7 +12,7 @@ from apps.wizard.utils.db import WizardDB
 log = get_logger()
 
 # GPT model
-MODEL_NAME = "gpt-4-turbo-preview"
+MODEL_NAME = "gpt-4o"
 
 
 def get_json_url(url: str):

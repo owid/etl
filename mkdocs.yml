@@ -201,10 +201,10 @@ nav:
   - Guides:
       - "guides/index.md"
       - Ingest data:
-          - "guides/ingest-data/index.md"
-          - Adding data: "guides/ingest-data/add-data.md"
-          - Updating data: "guides/ingest-data/update-data.md"
-          - Update charts: "guides/ingest-data/update-charts.md"
+          - "guides/data-work/index.md"
+          - Adding data: "guides/data-work/add-data.md"
+          - Updating data: "guides/data-work/update-data.md"
+          - Update charts: "guides/data-work/update-charts.md"
       - Wizard: "guides/wizard.md"
       - CLI: "guides/etl-cli.md"
       - Using different environments: "guides/environment.md"

@@ -11,8 +11,8 @@ import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states, st_page_link
 from apps.wizard.utils.env import OWID_ENV
-from etl.chart_revision.v3.indicator_update import find_charts_from_variable_ids, update_chart_config
 from etl.db import get_engine
+from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger
 log = get_logger()

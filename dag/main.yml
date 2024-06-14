@@ -269,15 +269,6 @@ steps:
   data://grapher/happiness/2023-03-20/happiness:
     - data://garden/happiness/2023-03-20/happiness
 
-  # Equaldex dataset
-  data://meadow/lgbt_rights/2023-04-13/equaldex:
-    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
-    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
-  data://garden/lgbt_rights/2023-04-13/equaldex:
-    - data://meadow/lgbt_rights/2023-04-13/equaldex
-  data://grapher/lgbt_rights/2023-04-13/equaldex:
-    - data://garden/lgbt_rights/2023-04-13/equaldex
-
   # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
@@ -603,16 +594,16 @@ steps:
     - data://garden/survey/2023-08-04/trust_surveys
 
   # World Bank GenderStats
-  data://meadow/wb/2023-12-29/gender_statistics:
-    - snapshot://wb/2023-12-29/gender_statistics.feather
-  data://garden/wb/2023-12-29/gender_statistics:
-    - data://meadow/wb/2023-12-29/gender_statistics
-  data://grapher/wb/2023-12-29/gender_statistics:
-    - data://garden/wb/2023-12-29/gender_statistics
+  data://meadow/wb/2024-06-10/gender_statistics:
+    - snapshot://wb/2024-06-10/gender_statistics.feather
+  data://garden/wb/2024-06-10/gender_statistics:
+    - data://meadow/wb/2024-06-10/gender_statistics
+  data://grapher/wb/2024-06-10/gender_statistics:
+    - data://garden/wb/2024-06-10/gender_statistics
 
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/wb/2023-12-29/gender_statistics
+    - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
@@ -737,6 +728,19 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
+  # Equaldex dataset
+  data://meadow/lgbt_rights/2024-06-03/equaldex:
+    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
+    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
+
+  data://garden/lgbt_rights/2024-06-03/equaldex:
+    - data://meadow/lgbt_rights/2024-06-03/equaldex
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+
+  data://grapher/lgbt_rights/2024-06-03/equaldex:
+    - data://garden/lgbt_rights/2024-06-03/equaldex
 
 include:
   - dag/open_numbers.yml
