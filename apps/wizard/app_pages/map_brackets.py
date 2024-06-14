@@ -156,6 +156,8 @@ class MapBracketer:
         self.max_value = self.values.max()
         # Get the smallest relevant number in the data.
         self.smallest_number = self.metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
+        # Initialize an attribute of linear increments.
+        self.increments = 1
         # Get the most complete list of map brackets that would contain the data.
         self.brackets_all = self.get_all_brackets()
         # Estimate whether the lower and upper brackets should be open.
@@ -164,6 +166,8 @@ class MapBracketer:
         self.bracket_type = LABEL_LOG_X10
         # Define selected brackets (which will be updated later on).
         self.brackets_selected = []
+        # Initialize a color scheme attribute.
+        self.color_scheme = None
 
     @property
     def brackets(self):
@@ -189,7 +193,9 @@ class MapBracketer:
 
         # Create the minimum number of brackets that would fully contain the values.
         # First, do it in powers of 10.
-        brackets_x10 = 10 ** np.arange(np.log10(min_bracket_possible), np.log10(max_bracket_possible) + 1, 1)
+        brackets_x10 = 10 ** np.arange(
+            np.log10(min_bracket_possible), np.log10(max_bracket_possible) + self.increments, self.increments
+        )
         brackets_all[LABEL_LOG_X10] = brackets_x10
 
         # Now, do it following the sequence 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, etc.
@@ -208,9 +214,16 @@ class MapBracketer:
             brackets_all[bracket_type] = np.array([round_to_sig_figs(bracket) for bracket in brackets])  # .tolist()
 
         # TODO: Implement a better logic.
-        brackets_all[LABEL_LINEAR] = np.arange(self.min_value, self.max_value, 1).tolist()
+        brackets_all[LABEL_LINEAR] = np.arange(
+            self.min_value, self.max_value + self.increments, self.increments
+        ).tolist()
 
         return brackets_all
+
+    def update_linear_brackets(self) -> None:
+        self.brackets_all[LABEL_LINEAR] = np.arange(
+            self.min_value, self.max_value + self.increments, self.increments
+        ).tolist()
 
     def are_brackets_open(self):
         # If the minimum value in the data is negative, assume that the lower bracket is open.
@@ -249,7 +262,7 @@ class MapBracketer:
         self.brackets_selected = brackets_selected
 
     def update_chart_config(self) -> None:
-        self.chart_config["map"]["colorScale"]["baseColorScheme"] = color_scheme
+        self.chart_config["map"]["colorScale"]["baseColorScheme"] = self.color_scheme
         self.chart_config["map"]["colorScale"]["customNumericValues"] = self.brackets_selected
         if self.lower_bracket_open:
             # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
@@ -261,9 +274,52 @@ class MapBracketer:
             # To ensure the upper bracket is closed, ensure the upper bracket value is larger than any data value.
             if self.chart_config["map"]["colorScale"]["customNumericValues"][-1] < self.max_value:
                 # Find the lowest bracket that is above the maximum value in the data, and use that as the upper bracket.
-                self.chart_config["map"]["colorScale"]["customNumericValues"][-1] = self.brackets[
-                    self.brackets > self.max_value
-                ].min()
+                self.chart_config["map"]["colorScale"]["customNumericValues"][-1] = min(
+                    [bracket for bracket in self.brackets if bracket >= self.max_value]
+                )
+
+
+def map_bracketer_interactive(mb: MapBracketer) -> None:
+    # Add a dropdown for color scheme.
+    # TODO: Add full list of color schemes.
+    mb.color_scheme = st.selectbox(  # type: ignore
+        label="Color scheme (not fully implemented!)",
+        options=["BuGn", "BinaryMapPaletteA"],
+        help="Color scheme for the map.",
+    )
+
+    # Add toggles to control whether lower and upper brackets should be open.
+    mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open)
+    mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open)
+
+    # Select bracket type.
+    mb.bracket_type = st.radio(  # type: ignore
+        "Select linear or log-like",
+        options=[LABEL_LOG_X2, LABEL_LOG_X3, LABEL_LOG_X10, LABEL_LINEAR],
+        index=0,
+        horizontal=True,
+    )
+    if mb.bracket_type == LABEL_LINEAR:
+        # In the case of linear brackets, an additional input is the increment.
+        mb.increments = st.number_input("Increments", min_value=0, max_value=100, value=mb.increments, step=1)  # type: ignore
+        mb.update_linear_brackets()
+
+    # Create a slider for positive values.
+    # TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
+    min_selected, max_selected = st.select_slider(  # type: ignore
+        "Select a range of values:",
+        options=mb.brackets_positive,
+        value=(min(mb.brackets_positive), max(mb.brackets_positive)),  # default range
+    )
+
+    # Update map brackets.
+    mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
+
+    # Update chart config given the selections.
+    mb.update_chart_config()
+
+    # Display the chart.
+    chart_html(mb.chart_config, owid_env=OWID_ENV)
 
 
 ########################################
@@ -330,46 +386,7 @@ elif use_type == USE_TYPE_EXPLORERS:
         index=0,
     )
 
-# Initialize map bracketer.
-mb = MapBracketer(variable_id=variable_id)  # type: ignore
+    # Initialize map bracketer.
+    mb = MapBracketer(variable_id=variable_id)  # type: ignore
 
-# Add a dropdown for color scheme.
-# TODO: Add full list of color schemes.
-color_scheme = st.selectbox(
-    label="Color scheme (not fully implemented!)",
-    options=["BuGn", "BinaryMapPaletteA"],
-    help="Color scheme for the map.",
-)
-
-# Add toggles to control whether lower and upper brackets should be open.
-mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open)
-mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open)
-
-# Select bracket type.
-mb.bracket_type = st.radio(  # type: ignore
-    "Select linear or log-like",
-    options=[LABEL_LOG_X2, LABEL_LOG_X3, LABEL_LOG_X10, LABEL_LINEAR],
-    index=0,
-    horizontal=True,
-)
-if mb.bracket_type == LABEL_LINEAR:
-    # In the case of linear brackets, an additional input is the increment.
-    # TODO: This is currently not used.
-    st.number_input("Increments", min_value=0, max_value=100, value=1, step=1)
-
-# Create a slider for positive values.
-# TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
-min_selected, max_selected = st.select_slider(  # type: ignore
-    "Select a range of values:",
-    options=mb.brackets_positive,
-    value=(min(mb.brackets_positive), max(mb.brackets_positive)),  # default range
-)
-
-# Update map brackets.
-mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
-
-# Update chart config given the selections.
-mb.update_chart_config()
-
-# Display the chart.
-chart_html(mb.chart_config, owid_env=OWID_ENV)
+    map_bracketer_interactive(mb=mb)
