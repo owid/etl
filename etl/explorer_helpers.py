@@ -77,14 +77,34 @@ class Explorer:
         self.df_graphers = pd.DataFrame.from_records(
             [line.split("\t") for line in graphers_content[1:]], columns=graphers_content[0].split("\t")
         )
+        # Improve dataframe format.
+        self.df_graphers = self._clean_df(df=self.df_graphers)
 
         if len(columns_content) > 0:
             # Parse the explorer columns table.
             self.df_columns = pd.DataFrame.from_records(
                 [line.split("\t") for line in columns_content[1:]], columns=columns_content[0].split("\t")
             )
+            # Improve dataframe format.
+            self.df_columns = self._clean_df(df=self.df_columns)
         else:
             self.df_columns = pd.DataFrame()
+
+    @staticmethod
+    def _clean_df(df: pd.DataFrame) -> pd.DataFrame:
+        df_clean = df.copy()
+        for column in df_clean.columns:
+            if set(df_clean[column]) == {"false", "true"}:
+                df_clean[column] = df_clean[column].map({"false": False, "true": True}).astype(bool)
+
+        if "yVariableIds" in df_clean.columns:
+            # Convert "yVariableIds" into a list of integers.
+            df_clean["yVariableIds"] = [
+                [int(variable_id) for variable_id in variable_ids.split(" ") if variable_id.isnumeric()]
+                for variable_ids in df_clean["yVariableIds"]
+            ]
+
+        return df_clean
 
     def generate_content(self):
         # Reconstruct the comments section.

@@ -13,10 +13,10 @@ from owid.catalog import find
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.explorer_update.cli import extract_variable_ids_from_explorer_content
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_sig_figs
+from etl.explorer_helpers import Explorer
 from etl.grapher_model import Entity, Variable
 from etl.paths import BASE_DIR
 
@@ -46,6 +46,11 @@ LABEL_LINEAR = "linear"
 LABEL_LOG_X2 = "log x2"
 LABEL_LOG_X3 = "log x3"
 LABEL_LOG_X10 = "log x10"
+
+# Types of uses of this tool.
+USE_TYPE_EXPLORERS = "by explorer"
+USE_TYPE_CHART = "by chart"
+USE_TYPE_ETL = "by etl path"
 
 
 @st.cache_data
@@ -142,9 +147,6 @@ st.title("ETL Map bracket generator")
 st.markdown("""🔨 WIP.""")
 
 # Radio buttons to choose how to use this tool.
-USE_TYPE_EXPLORERS = "by explorer"
-USE_TYPE_CHART = "by chart"
-USE_TYPE_ETL = "by etl path"
 use_type = st.radio(
     "Select how to use this tool",
     options=[
@@ -179,20 +181,16 @@ elif use_type == USE_TYPE_EXPLORERS:
         index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
         help="Name of .explorer.tsv file inside owid-content/explorers.",
     )
-    # Define path to explorer file.
-    explorer_path = (EXPLORERS_DIR / explorer_name).with_suffix(".explorer.tsv")
 
-    # Load explorer content.
-    explorer = load_explorer(explorer_path=explorer_path)
-    if "yVariableIds" not in explorer:
-        st.error("This tool can handle only indicator-based explorers!")
-        st.stop()
+    # Load and parse explorer content.
+    explorer = Explorer(name=explorer_name)
 
-    # Extract variable ids from explorer.
-    variable_ids = extract_variable_ids_from_explorer_content(explorer=explorer)
-    # TODO: Instead of using this function, create one that loads the main table and selects variables with a map tab.
-    #  Also, exclude those that already have map brackets (and optionally show them too).
-    #  We also need to figure out how to write back to the file afterwards with a given map bracket configuration.
+    # Gather all variable ids of indicators with a map tab.
+    variable_ids = list(
+        dict.fromkeys(sum(explorer.df_graphers[explorer.df_graphers["hasMapTab"]]["yVariableIds"].tolist(), []))
+    )
+
+    # Select a variable id from a dropdown menu.
     variable_id: int = st.selectbox(  # type: ignore
         label="Indicator id",
         options=variable_ids,
