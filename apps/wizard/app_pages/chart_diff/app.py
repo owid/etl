@@ -400,8 +400,9 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
     )
 
     # Get actual charts
+    st.write(1)
     get_chart_diffs()
-
+    st.write(2)
     if len(st.session_state.chart_diffs) == 0:
         st.warning("No chart modifications found in the staging environment.")
     else:
