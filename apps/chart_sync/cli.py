@@ -16,13 +16,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
 from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl import grapher_model as gm
 from etl.config import get_container_name
 from etl.datadiff import _dict_diff
-from etl.db import read_sql
 
 log = structlog.get_logger()
 
@@ -486,99 +485,6 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
-
-
-def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
-    """Get charts that have been modified in staging. It includes chart with different
-    config, data or metadata checksums. It assumes that all changes on staging server are
-    done by Admin user with ID = 1."""
-    # TODO: we could aggregate it by charts and get a combined checksum, for now we want
-    #   a view with variable granularity
-    # get modified charts and charts from modified datasets
-    base_q = """
-    select
-        v.id as variableId,
-        cd.chartId,
-        v.dataChecksum,
-        v.metadataChecksum,
-        MD5(c.config) as chartChecksum,
-        c.lastEditedByUserId as chartLastEditedByUserId,
-        c.publishedByUserId as chartPublishedByUserId,
-        d.dataEditedByUserId,
-        d.metadataEditedByUserId
-    from chart_dimensions as cd
-    join charts as c on cd.chartId = c.id
-    join variables as v on cd.variableId = v.id
-    join datasets as d on v.datasetId = d.id
-    where
-    """
-    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
-    #   set automatically if you use STAGING env variable.
-    where = """
-        -- only compare datasets or charts that have been updated on staging server
-        -- by Admin user
-        (
-            (c.lastEditedByUserId = 1 or c.publishedByUserId = 1)
-            or
-            -- include all charts from datasets that have been updated
-            (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
-        )
-    """
-    source_df = read_sql(base_q + where, source_session)
-
-    # no charts, return empty dataframe
-    if source_df.empty:
-        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited", "configEdited"]).set_index("chartId")
-
-    # read those charts from target
-    where = """
-        c.id in %(chart_ids)s
-    """
-    target_df = read_sql(base_q + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())})
-
-    source_df = source_df.set_index(["chartId", "variableId"])
-    target_df = target_df.set_index(["chartId", "variableId"])
-
-    # charts not edited by Admin and with null checksums should be excluded
-    ix = (
-        (source_df.chartLastEditedByUserId != 1)
-        & (source_df.chartPublishedByUserId != 1)
-        & (source_df.dataChecksum.isnull() | source_df.metadataChecksum.isnull())
-    )
-    source_df = source_df[~ix]
-
-    # align dataframes with left join (so that source has non-null values)
-    # NOTE: new charts will be already in source
-    source_df, target_df = source_df.align(target_df, join="left")
-
-    # return differences in data / metadata / config
-    diff = (
-        (source_df != target_df)
-        .groupby("chartId")
-        .max()
-        .rename(
-            columns={
-                "dataChecksum": "dataEdited",
-                "metadataChecksum": "metadataEdited",
-                "chartChecksum": "configEdited",
-            }
-        )
-    )
-    diff = diff[["dataEdited", "metadataEdited", "configEdited"]]
-
-    # If chart hasn't been edited by Admin, then make `configEdited` false
-    # This can happen when you merge master to your branch and staging rebuilds a dataset.
-    # Then dataset will be edited by Admin and will be included, but your charts might be outdated
-    # compared to production. Hence, only consider config updates for charts edited by Admin.
-    chart_ids = source_df[
-        (source_df.chartLastEditedByUserId != 1) & (source_df.chartPublishedByUserId != 1)
-    ].index.get_level_values("chartId")
-    diff.loc[chart_ids, "configEdited"] = False
-
-    # Remove charts with no changes
-    diff = diff[diff.any(axis=1)]
-
-    return diff
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
