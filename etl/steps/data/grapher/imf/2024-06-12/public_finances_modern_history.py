@@ -17,10 +17,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["public_finances_modern_history"]
 
     #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
