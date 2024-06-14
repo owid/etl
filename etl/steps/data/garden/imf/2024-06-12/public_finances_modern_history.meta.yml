@@ -28,7 +28,7 @@ tables:
           title_public: Government revenue (% of GDP)
         display:
           name: Government revenue (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       expenditure:
@@ -43,7 +43,7 @@ tables:
           title_public: Government expenditure (% of GDP)
         display:
           name: Government expenditure (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       interest_exp:
@@ -58,7 +58,7 @@ tables:
           title_public: Government interest expense (% of GDP)
         display:
           name: Government interest expense (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       prim_expenditure:
@@ -73,7 +73,7 @@ tables:
           title_public: Government primary expenditure (% of GDP)
         display:
           name: Government primary expenditure (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       prim_balance:
@@ -88,7 +88,7 @@ tables:
           title_public: Government primary balance (% of GDP)
         display:
           name: Government primary balance (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       debt:
@@ -103,7 +103,7 @@ tables:
           title_public: Government gross debt (% of GDP)
         display:
           name: Government gross debt (% of GDP)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       rltir:
@@ -118,7 +118,7 @@ tables:
           title_public: Real long-term interest rate (%)
         display:
           name: Real long-term interest rate (%)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       rgc:
@@ -133,7 +133,7 @@ tables:
           title_public: Real GDP growth rate (%)
         display:
           name: Real GDP growth rate (%)
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           tolerance: 0
 
       gg_budg:
