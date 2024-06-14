@@ -1,4 +1,8 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+The data is obtained by running the table_extract.py script to extract the data from a PDF file.
+Please follow the instructions in table_extract.py to update the data.
+"""
 
 from pathlib import Path
 

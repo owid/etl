@@ -225,8 +225,7 @@ def expand_table(tb: Table, start_col: str, end_col: str, status: str) -> Table:
     tb_ = tb_.dropna(subset=[start_col, end_col])
 
     # Create a long table that has a year column defined between last_decriminalization and last_criminalization for each country
-    tb_expanded = Table()
-
+    tbs = []
     for country in tb_["country"].unique():
         country_data = tb_[tb_["country"] == country].copy()
 
@@ -238,7 +237,9 @@ def expand_table(tb: Table, start_col: str, end_col: str, status: str) -> Table:
         country_data = country_data.reindex(country_data.index.repeat(len(years)))
         country_data["year"] = years
 
-        tb_expanded = pr.concat([tb_expanded, country_data], ignore_index=True)
+        tbs.append(country_data)
+
+    tb_expanded = pr.concat(tbs, ignore_index=True)
 
     tb_expanded["status"] = status
 
