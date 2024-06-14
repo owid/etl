@@ -10,7 +10,6 @@ definitions:
         selectedEntityNames:
           - World
     processing_level: minor
-
     description_from_producer: |-
       All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
 
@@ -59,7 +58,7 @@ definitions:
     females
     <%- endif -%>
   deaths_title: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Total deaths from << cause.lower() >>, among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
     Age-standardized deaths from << cause.lower() >>, among {definitions.sex}
@@ -67,14 +66,14 @@ definitions:
     Deaths from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   deaths_description: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Estimated number of deaths from << cause.lower() >> in {definitions.sex}.
     <% elif age_group == "Age-standardized" %>
     Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}.
     <% else %>
-    Estimated number of deaths from << cause.lower()>> among {definitions.sex} aged {definitions.age}.
+    Estimated number of deaths from << cause.lower()>> among {definitions.sex}  aged {definitions.age}.
   death_rate_title: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Death rate from << cause.lower() >>, among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
     Age-standardized death rate from << cause.lower() >>, among {definitions.sex}
@@ -82,14 +81,14 @@ definitions:
     Death rate from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   death_rate_description: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Estimated number of deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
     <% elif age_group == "Age-standardized" %>
     Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
     <% else %>
     Estimated number of deaths from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people.
   dalys_title: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     DALYs from << cause.lower() >>, among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
     Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}
@@ -97,14 +96,14 @@ definitions:
     DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   dalys_description: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
     <% elif age_group == "Age-standardized" %>
     Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
     <% else %>
     Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged {definitions.age}.
   dalys_rate_title: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
     <% elif age_group == "Age-standardized" %>
     Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
@@ -112,7 +111,7 @@ definitions:
     DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}, per 100,000 people
     <%- endif -%>
   dalys_rate_description: |-
-    <% if age_group == "AllAges" %>
+    <% if age_group == "ALLAges" %>
     Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
     <% elif age_group == "Age-standardized" %>
     Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
