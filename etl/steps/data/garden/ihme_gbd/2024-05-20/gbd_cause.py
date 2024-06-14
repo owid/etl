@@ -55,6 +55,8 @@ def run(dest_dir: str) -> None:
 
     # Add all forms of violence together - for Deaths only
     tb_deaths = add_all_forms_of_violence(tb_deaths)
+    # Create a category for all infectious diseases - for Deaths only
+    tb_deaths = add_infectious_diseases(tb_deaths)
     # Format the tables
     tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
     tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
@@ -88,4 +90,41 @@ def add_all_forms_of_violence(tb: Table) -> Table:
 
     tb = pr.concat([tb, tb_violence], ignore_index=True)
 
+    return tb
+
+
+def add_infectious_diseases(tb: Table) -> Table:
+    """
+    Separate out communicable diseases from maternal and neonatal diseases, and nutritional deficiencies
+    """
+
+    broad_level_group = ["Communicable, maternal, neonatal, and nutritional diseases"]
+    maternal_neonatal_nutritional = ["Maternal and neonatal disorders", "Nutritional deficiencies"]
+
+    tb_broad = tb[tb["cause"].isin(broad_level_group)]
+    assert len(tb_broad) > 0, "No rows found for 'Communicable, maternal, neonatal, and nutritional diseases'"
+
+    tb_maternal_neonatal_nutritional = tb[tb["cause"].isin(maternal_neonatal_nutritional)]
+    assert len(tb_maternal_neonatal_nutritional["cause"].unique()) == len(
+        maternal_neonatal_nutritional
+    ), "Not all elements of 'maternal_neonatal_nutritional' are present in tb['cause']"
+    tb_maternal_neonatal_nutritional = (
+        tb_maternal_neonatal_nutritional.groupby(["country", "age", "metric", "year"], observed=True)["value"]
+        .sum()
+        .reset_index()
+    )
+
+    tb_combine = pr.merge(
+        tb_broad,
+        tb_maternal_neonatal_nutritional,
+        on=["country", "year", "age", "metric"],
+        suffixes=("", "_maternal_neonatal_nutritional"),
+    )
+    tb_infectious = tb_combine.copy()
+    tb_infectious["cause"] = "Infectious diseases"
+    tb_infectious["value"] = tb_infectious["value"] - tb_infectious["value_maternal_neonatal_nutritional"]
+    tb_infectious = tb_infectious.drop(columns="value_maternal_neonatal_nutritional")
+    assert all(tb_infectious["value"] >= 0), "Negative values found in 'value' column"
+
+    tb = pr.concat([tb, tb_infectious], ignore_index=True)
     return tb
