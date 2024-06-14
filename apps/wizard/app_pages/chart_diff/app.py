@@ -1,5 +1,4 @@
 import re
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import streamlit as st
@@ -9,8 +8,7 @@ from sqlalchemy.orm import Session
 # from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
-from apps.chart_sync.cli import modified_charts_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
+from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
@@ -71,7 +69,7 @@ def get_chart_diffs():
     # Get actual charts
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database..."):
-            st.session_state.chart_diffs = get_chart_diffs_from_grapher()
+            st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
     # Sort charts
     st.session_state.chart_diffs = dict(
@@ -80,43 +78,6 @@ def get_chart_diffs():
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
-
-
-def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
-    """Get chart diffs from Grapher.
-
-    This means, checking for chart changes in the database.
-
-    Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
-    """
-    # Get IDs from modified charts
-    with Session(SOURCE_ENGINE) as source_session:
-        with Session(TARGET_ENGINE) as target_session:
-            # NOTE: this fetches all charts with data & metadata & config changes. This could be wasteful if
-            # user only wants to show config changes.
-            df = modified_charts_by_admin(source_session, target_session)
-            # Get chart its with at least one type of change
-            chart_ids = set(df.index[df.any(axis=1)])
-
-    # Get all chart diffs in parallel
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        chart_diffs_futures = {
-            chart_id: executor.submit(_get_chart_diff_from_grapher, chart_id) for chart_id in chart_ids
-        }
-        chart_diffs = {}
-        for chart_id, future in chart_diffs_futures.items():
-            chart_diffs[chart_id] = future.result()
-
-    return chart_diffs
-
-
-def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiff:
-    with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-        return ChartDiff.from_chart_id(
-            chart_id=chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
 
 
 def filter_chart_diffs():
@@ -313,7 +274,7 @@ def _show_options_misc():
     st.button(
         "🔄 Refresh all charts",
         key="refresh-btn-general",
-        on_click=lambda: set_states({"chart_diffs": get_chart_diffs_from_grapher()}),
+        on_click=lambda: set_states({"chart_diffs": get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)}),
         help="Get the latest chart versions, both from the staging and production servers.",
     )
     st.divider()

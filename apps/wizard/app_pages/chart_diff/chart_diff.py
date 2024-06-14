@@ -1,7 +1,9 @@
 import datetime as dt
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional
 
 import pandas as pd
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
@@ -347,3 +349,43 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     diff = diff[diff.any(axis=1)]
 
     return diff
+
+
+def get_chart_diffs_from_grapher(
+    source_engine: Engine, target_engine: Engine, max_workers: int = 10
+) -> dict[int, ChartDiff]:
+    """Get chart diffs from Grapher.
+
+    This means, checking for chart changes in the database.
+
+    Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
+    """
+    # Get IDs from modified charts
+    with Session(source_engine) as source_session:
+        with Session(target_engine) as target_session:
+            # NOTE: this fetches all charts with data & metadata & config changes. This could be wasteful if
+            # user only wants to show config changes.
+            df = modified_charts_by_admin(source_session, target_session)
+            # Get chart its with at least one type of change
+            chart_ids = set(df.index[df.any(axis=1)])
+
+    # Get all chart diffs in parallel
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        chart_diffs_futures = {
+            chart_id: executor.submit(_get_chart_diff_from_grapher, chart_id, source_engine, target_engine)
+            for chart_id in chart_ids
+        }
+        chart_diffs = {}
+        for chart_id, future in chart_diffs_futures.items():
+            chart_diffs[chart_id] = future.result()
+
+    return chart_diffs
+
+
+def _get_chart_diff_from_grapher(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiff:
+    with Session(source_engine) as source_session, Session(target_engine) as target_session:
+        return ChartDiff.from_chart_id(
+            chart_id=chart_id,
+            source_session=source_session,
+            target_session=target_session,
+        )
