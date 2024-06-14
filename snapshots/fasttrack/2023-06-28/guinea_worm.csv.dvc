@@ -1,47 +1,34 @@
 meta:
-  date_accessed: 2023-06-30
+  source:
+    name: World Health Organization
+    url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQxUg_FPFYvf4Uzc1rH6k_T6JaP2pmlVkBNpPnDiWpMaCTdqT_wkiaQ1rOgUIntSMx5VpILVn5hZ98D/pub?output=csv
+    date_accessed: '2024-06-14'
+    published_by: Dracunculiasis Eradication Portal
   name: Guinea worm cases (WHO, 2023)
-  description: >-
+  description: |-
     Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
 
-
-    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and
-    Yemen data is gathered from:
-
+    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
 
     1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
-
     2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
-
     2019: Table 1a: https://web.archive.org/web/20230629130619/https://apps.who.int/iris/bitstream/handle/10665/332086/WER9520-209-227-eng-fre.pdf?sequence=1&isAllowed=y
-
     2020: Table 1a: https://web.archive.org/web/20230226162934/https://apps.who.int/iris/bitstream/handle/10665/341529/WER9621-173-194-eng-fre.pdf?sequence=1&isAllowed=y
-
     2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
-
     2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
-
 
     For all other countries data is gathered from the following sources:
 
-
     1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
-
     2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
-
     2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+    2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
 
-
-    Global totals are calculated yearly as the sum of the number of reported cases
-    in each country.
-  source_name: Google Sheet
-  url: 
-    https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
-  source_published_by: Google Sheet
-  source_data_url: 
-    https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcPHJ-cSJIozbnDh8I9NNYolbBaYMIaeJ2cdjCRx_keLpPxDuthEK_ZJYZx_grLkYqgF9PxcI6F1i/pub?output=csv
-wdir: ../../../data/snapshots/fasttrack/2023-06-28
+    Global totals are calculated yearly as the sum of the number of reported cases in each country.
+  license: {}
 outs:
-- md5: cbd4368a6db9cb423358d6460c979c12
-  size: 13235
-  path: guinea_worm.csv
+  - md5: ad470e933652da5616882e1e9140665d
+    size: 13383
+    path: guinea_worm.csv
