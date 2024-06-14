@@ -7,6 +7,9 @@ definitions:
       grapher_config:
         note: |-
           {definitions.footnote}
+    description_from_producer: |-
+      All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
+
   age: |-
     <% if age_group == "AllAges" %>
     all ages
@@ -59,34 +62,86 @@ definitions:
     <% else %>
     Deaths from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
     <%- endif -%>
+  deaths_description: |-
+    <% if age_group == "AllAges" %>
+    Estimated number of deaths from << cause.lower() >> in {definitions.sex}.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}.
+    <% else %>
+    Estimated number of deaths from << cause.lower()>> among {definitions.sex} aged {definitions.age}.
+  death_rate_title: |-
+    <% if age_group == "AllAges" %>
+    Death rate from << cause.lower() >>, among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized death rate from << cause.lower() >>, among {definitions.sex}
+    <% else %>
+    Death rate from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  death_rate_description: |-
+    <% if age_group == "AllAges" %>
+    Estimated number of deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% else %>
+    Estimated number of deaths from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people.
+  dalys_title: |-
+    <% if age_group == "AllAges" %>
+    DALYs from << cause.lower() >>, among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}
+    <% else %>
+    DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  dalys_description: |-
+    <% if age_group == "AllAges" %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
+    <% else %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged {definitions.age}.
+  dalys_rate_title: |-
+    <% if age_group == "AllAges" %>
+    DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
+    <% else %>
+    DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}, per 100,000 people
+    <%- endif -%>
+  dalys_rate_description: |-
+    <% if age_group == "AllAges" %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% else %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people.
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
-
 tables:
   ghe:
     variables:
       death_count:
         title: |-
           {definitions.deaths_title}
-        description_short: Estimated annual deaths from << cause >>.
-        description_from_producer: |
-          All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
+        description_short: |-
+          {definitions.deaths_description}
         unit: deaths
         short_unit: ""
         display:
           numDecimalPlaces: 0
       death_rate100k:
-        title: Death rate per 100,000 people
-        description_short: The number of deaths per 100,000 people
-        description_from_producer: |
-          All the different causes can be found in Annex Table A at https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2019_cod_methods.pdf?sfvrsn=37bcfacc_5.
+        title: |-
+          {definitions.death_rate_title}
+        description_short: |-
+          {definitions.death_rate_description}
         unit: deaths per 100,000 people
         short_unit: ""
         display:
           numDecimalPlaces: 1
       daly_count:
-        title: The number of Disability Adjusted Life Yeats (DALYs) lost
-        description_short: One DALY represents the loss of the equivalent of one year of full health.
+        title: |-
+          {definitions.dalys_title}
+        description_short: |-
+          {definitions.dalys_description}
         description_from_producer: |
           **Rationale:**
           Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
@@ -103,10 +158,12 @@ tables:
         unit: DALYs
         short_unit: ""
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
       daly_rate100k:
-        title: Disability adjusted life years per 100,000 people
-        description_short: The number of Disability Adjusted Life Yeats (DALYs) lost per 100,000 people.  One DALY represents the loss of the equivalent of one year of full health.
+        title: |-
+          {definitions.dalys_rate_title}
+        description_short: |-
+          {definitions.dalys_rate_description}
         description_key:
           - |-
             **Rationale:**
