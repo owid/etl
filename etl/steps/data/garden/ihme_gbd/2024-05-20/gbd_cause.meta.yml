@@ -131,6 +131,8 @@ tables:
           {definitions.value_deaths.unit}
         description_short: |-
           {definitions.value_deaths.description_short}
+        description_processing: |-
+          {definitions.value_deaths.description_processing}
         description_key:
           - |-
             {definitions.description_key}
