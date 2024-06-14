@@ -50,11 +50,11 @@ definitions:
     <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<%- endif -%>
   deaths_title: |-
     <% if age_group == "ALLAges" %>
-    Total deaths from << cause.lower() >>, among {definitions.sex}
+    Total deaths from << cause.lower() >> among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
-    Age-standardized deaths from << cause.lower() >>, among {definitions.sex}
+    Age-standardized deaths from << cause.lower() >> among {definitions.sex}
     <% else %>
-    Deaths from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    Deaths from << cause.lower() >> among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   deaths_description: |-
     <% if age_group == "ALLAges" %>
@@ -66,11 +66,11 @@ definitions:
     <%- endif -%>
   death_rate_title: |-
     <% if age_group == "ALLAges" %>
-    Death rate from << cause.lower() >>, among {definitions.sex}
+    Death rate from << cause.lower() >> among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
-    Age-standardized death rate from << cause.lower() >>, among {definitions.sex}
+    Age-standardized death rate from << cause.lower() >> among {definitions.sex}
     <% else %>
-    Death rate from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    Death rate from << cause.lower() >> among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   death_rate_description: |-
     <% if age_group == "ALLAges" %>
@@ -82,11 +82,11 @@ definitions:
     <%- endif -%>
   dalys_title: |-
     <% if age_group == "ALLAges" %>
-    DALYs from << cause.lower() >>, among {definitions.sex}
+    DALYs from << cause.lower() >> among {definitions.sex}
     <% elif age_group == "Age-standardized" %>
-    Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}
+    Age-standardized DALYs from << cause.lower() >> among {definitions.sex}
     <% else %>
-    DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}
+    DALYs from << cause.lower() >> among {definitions.sex} aged {definitions.age}
     <%- endif -%>
   dalys_description: |-
     <% if age_group == "ALLAges" %>
@@ -98,11 +98,11 @@ definitions:
     <%- endif -%>
   dalys_rate_title: |-
     <% if age_group == "ALLAges" %>
-    DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
+    DALYs from << cause.lower() >>, among {definitions.sex} per 100,000 people
     <% elif age_group == "Age-standardized" %>
-    Age-standardized DALYs from << cause.lower() >>, among {definitions.sex}, per 100,000 people
+    Age-standardized DALYs from << cause.lower() >> among {definitions.sex}, per 100,000 people
     <% else %>
-    DALYs from << cause.lower() >>, among {definitions.sex} aged {definitions.age}, per 100,000 people
+    DALYs from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people
     <%- endif -%>
   dalys_rate_description: |-
     <% if age_group == "ALLAges" %>
