@@ -258,10 +258,70 @@ class ChartDiff:
         return config_1 == config_2
 
 
+class ChartDiffsLoader:
+    """Detect charts that differ between staging and production."""
+
+    def __init__(self, source_engine: Engine, target_engine: Engine):
+        self.source_engine = source_engine
+        self.target_engine = target_engine
+        self.df = self.load_df()
+
+    def load_df(self) -> pd.DataFrame:
+        """Load changes in charts between environments from sessions."""
+        with Session(self.source_engine) as source_session:
+            with Session(self.target_engine) as target_session:
+                return modified_charts_by_admin(source_session, target_session)
+
+    @property
+    def chart_ids_all(self):
+        return set(self.df.index[self.df.any(axis=1)])
+
+    def get_chart_ids(self, config: bool = True, data: bool = False, metadata: bool = False):
+        """Get chart ids based on changes in config, data or metadata."""
+        return set(
+            self.df.index[
+                (self.df.configEdited & config) | (self.df.dataEdited & data) | (self.df.metadataEdited & metadata)
+            ]
+        )
+
+    def get_diffs(self, config: bool = True, data: bool = False, metadata: bool = False, max_workers: int = 10):
+        """Get chart diffs from Grapher.
+
+        This means, checking for chart changes in the database.
+
+        Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
+        """
+        # Get ids of charts with relevant changes
+        # chart_ids = self.get_chart_ids(config, data, metadata)
+        chart_ids = self.chart_ids_all
+
+        # Get all chart diffs in parallel
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            chart_diffs_futures = {
+                chart_id: executor.submit(
+                    _get_chart_diff_from_grapher, chart_id, self.source_engine, self.target_engine
+                )
+                for chart_id in chart_ids
+            }
+            chart_diffs = {}
+            for chart_id, future in chart_diffs_futures.items():
+                chart_diffs[chart_id] = future.result()
+
+        return chart_diffs
+
+
 def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
-    """Get charts that have been modified in staging. It includes chart with different
-    config, data or metadata checksums. It assumes that all changes on staging server are
-    done by Admin user with ID = 1."""
+    """Get charts that have been modified in staging.
+
+    - It includes charts with different config, data or metadata checksums.
+    - It assumes that all changes on staging server are done by Admin user with ID = 1. That is, if there are changes by a different user in staging, they are not included.
+
+    The returned object is a dataframe with the following columns:
+        - chartId (index): ID of the chart
+        - dataEdited: True if data checksum has changed
+        - metadataEdited: True if metadata checksum has changed
+        - configEdited: True if config has changed
+    """
     # TODO: we could aggregate it by charts and get a combined checksum, for now we want
     #   a view with variable granularity
     # get modified charts and charts from modified datasets
@@ -360,24 +420,7 @@ def get_chart_diffs_from_grapher(
 
     Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
     """
-    # Get IDs from modified charts
-    with Session(source_engine) as source_session:
-        with Session(target_engine) as target_session:
-            # NOTE: this fetches all charts with data & metadata & config changes. This could be wasteful if
-            # user only wants to show config changes.
-            df = modified_charts_by_admin(source_session, target_session)
-            # Get chart its with at least one type of change
-            chart_ids = set(df.index[df.any(axis=1)])
-
-    # Get all chart diffs in parallel
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        chart_diffs_futures = {
-            chart_id: executor.submit(_get_chart_diff_from_grapher, chart_id, source_engine, target_engine)
-            for chart_id in chart_ids
-        }
-        chart_diffs = {}
-        for chart_id, future in chart_diffs_futures.items():
-            chart_diffs[chart_id] = future.result()
+    chart_diffs = ChartDiffsLoader(source_engine, target_engine).get_diffs(max_workers=max_workers)
 
     return chart_diffs
 
