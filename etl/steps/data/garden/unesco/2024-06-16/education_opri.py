@@ -23,7 +23,12 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    tb = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
+
+    tb = tb.reset_index()
     tb = tb.format(["country", "year"])
+
+    # TO DO: Add metadata columns to the table
 
     #
     # Save outputs.
