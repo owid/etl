@@ -1,6 +1,6 @@
 import datetime as dt
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -142,6 +142,61 @@ class ChartDiff:
         return self._change_types
 
     @classmethod
+    def from_chart_ids(cls, chart_ids, source_session: Session, target_session: Optional[Session] = None):
+        """Get chart diffs from chart ids."""
+        # Get charts from db and save them in memory as dictionaries: chart_id -> chart
+        source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
+        source_charts = {chart.id: chart for chart in source_charts}
+
+        if target_session is not None:
+            try:
+                target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+            except NoResultFound:
+                target_charts = {}
+            else:
+                target_charts = {chart.id: chart for chart in target_charts}
+        else:
+            target_charts = {}
+
+        # Get approval status
+        target_updated_ats = []
+        for chart_id in chart_ids:
+            if target_charts.get(chart_id) is not None:
+                target_updated_ats.append(target_charts[chart_id].updatedAt)
+            else:
+                target_updated_ats.append(None)
+        approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
+            source_session,
+            chart_ids,
+            [source_charts[chart_id].updatedAt for chart_id in chart_ids],
+            target_updated_ats,
+        )
+        approval_statuses = dict(zip(chart_ids, approval_statuses))
+
+        # Get checksums
+        checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
+        checksums_Target = gm.Chart.load_variables_checksums(target_session, chart_ids)
+
+        # Build chart diffs
+        for chart_id, source_chart in source_charts.items():
+            # Get target chart (if exists)
+            target_chart = target_charts.get(chart_id)
+            if target_chart and source_chart.createdAt != target_chart.createdAt:
+                target_chart = None
+            ## Checks
+            if target_chart:
+                assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
+
+            # Approval status
+            assert chart_id in approval_statuses, f"Approval status not found for chart {chart_id}"
+            approval_status = approval_statuses[chart_id]
+
+            # Checksums
+
+            # Build chart diff object
+            chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
+
+    @classmethod
     def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
         """Get chart diff from chart id.
 
@@ -180,8 +235,8 @@ class ChartDiff:
         # Load checksums for underlying indicators
         # TODO: is this fast enough for large datasets? maybe we should avoid dataframes at all
         if target_chart and target_session is not None:
-            source_df = source_chart.load_variables_checksums(source_session)
-            target_df = target_chart.load_variables_checksums(target_session)
+            source_df = source_chart.load_variable_checksums(source_session)
+            target_df = target_chart.load_variable_checksums(target_session)
             source_df, target_df = source_df.align(target_df)
             modified_checksum = source_df != target_df
 
@@ -277,6 +332,9 @@ class ChartDiffsLoader:
         self.target_engine = target_engine
         self.df = self.load_df()
 
+        # Cache
+        self._diffs: Dict[str, Any] | None = None
+
     def load_df(self) -> pd.DataFrame:
         """Load changes in charts between environments from sessions."""
         with Session(self.source_engine) as source_session:
@@ -287,7 +345,12 @@ class ChartDiffsLoader:
     def chart_ids_all(self):
         return set(self.df.index[self.df.any(axis=1)])
 
-    def get_chart_ids(self, config: bool = True, data: bool = False, metadata: bool = False):
+    def get_chart_ids(
+        self,
+        config: bool | None = None,
+        data: bool | None = None,
+        metadata: bool | None = None,
+    ):
         """Get chart ids based on changes in config, data or metadata."""
         return set(
             self.df.index[
@@ -295,22 +358,49 @@ class ChartDiffsLoader:
             ]
         )
 
-    def get_diffs(self, config: bool = True, data: bool = False, metadata: bool = False, max_workers: int = 10):
+    def get_diffs_2(
+        self,
+        config: bool = True,
+        data: bool = False,
+        metadata: bool = False,
+        max_workers: int = 10,
+        sync: bool = False,
+    ):
+        if sync:
+            self.df = self.load_df()
+
+        # Get ids of charts with relevant changes
+        chart_ids = self.get_chart_ids(config, data, metadata)
+
+    def get_diffs(
+        self,
+        config: bool = True,
+        data: bool = False,
+        metadata: bool = False,
+        max_workers: int = 10,
+        sync: bool = False,
+    ):
         """Get chart diffs from Grapher.
 
         This means, checking for chart changes in the database.
 
         Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
         """
+        if sync:
+            self.df = self.load_df()
+
         # Get ids of charts with relevant changes
-        # chart_ids = self.get_chart_ids(config, data, metadata)
-        chart_ids = self.chart_ids_all
+        chart_ids = self.get_chart_ids(config, data, metadata)
+        # chart_ids = self.chart_ids_all
 
         # Get all chart diffs in parallel
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             chart_diffs_futures = {
                 chart_id: executor.submit(
-                    _get_chart_diff_from_grapher, chart_id, self.source_engine, self.target_engine
+                    _get_chart_diff_from_grapher,
+                    chart_id,
+                    self.source_engine,
+                    self.target_engine,
                 )
                 for chart_id in chart_ids
             }
@@ -318,19 +408,25 @@ class ChartDiffsLoader:
             for chart_id, future in chart_diffs_futures.items():
                 chart_diffs[chart_id] = future.result()
 
+        self._diffs = chart_diffs
         return chart_diffs
 
-    def get_diffs_summary_df(self, **kwargs) -> pd.DataFrame:
+    def get_diffs_summary_df(self, cache: bool = False, **kwargs) -> pd.DataFrame:
         """Get dataframe with summary of current chart diffs.
 
-        Details include whether the chart is new, approved, pending or rejected, etc."""
-        summary = []
-        chart_diffs = self.get_diffs(**kwargs)
-        for diff in chart_diffs:
-            summary.append(diff.details)
+        Details include whether the chart is new, approved, pending or rejected, etc.
 
-        df = pd.DataFrame(summary)
-        return df
+        cache: Use cache (latest value retrieved by get_diffs if exists.
+        """
+        if cache and self._diffs is not None:
+            chart_diffs = self._diffs
+        else:
+            chart_diffs = self.get_diffs(**kwargs)
+
+        summary = []
+        for diff in chart_diffs.values():
+            summary.append(diff.details)
+        return pd.DataFrame(summary)
 
 
 def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
@@ -344,7 +440,19 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         - dataEdited: True if data checksum has changed
         - metadataEdited: True if metadata checksum has changed
         - configEdited: True if config has changed
+
+        TODO:
+        - newInSource: True if the chart is new in source environment.
+        - newInTarget: True if the chart is new in target environment.
+        - deletedInSource: True if the chart is deleted in source environment.
+        - deletedInTarget: True if the chart is deleted in target environment.
     """
+    # Get timestamp of creation of databas (i.e. proxy for staging server creation)
+    query_ts = "show table status like 'charts'"
+    df = read_sql(query_ts, source_session)
+    assert len(df) == 1
+    TIMESTAMP_STAGING_CREATION = df["Create_time"].item()
+
     # TODO: we could aggregate it by charts and get a combined checksum, for now we want
     #   a view with variable granularity
     # get modified charts and charts from modified datasets
@@ -357,6 +465,7 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         MD5(c.config) as chartChecksum,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
+        c.lastEditedAt as chartLastEditedAt,
         d.dataEditedByUserId,
         d.metadataEditedByUserId
     from chart_dimensions as cd
@@ -402,6 +511,7 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
 
     # align dataframes with left join (so that source has non-null values)
     # NOTE: new charts will be already in source
+    # NOTE: chart IDs and variable IDs in both environments do not necessarily correspond to the same charts or indicators! While there might be a chart with ID X in both environments that corresponds to different charts, it is rare that there is a chart with ID X using indicator with ID Y, that are different. However, this can't be ruled out. Therefore, aligning source_df and target_df by chartId and variableId can fail sometimes!
     source_df, target_df = source_df.align(target_df, join="left")
 
     # return differences in data / metadata / config
@@ -418,6 +528,12 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         )
     )
     diff = diff[["dataEdited", "metadataEdited", "configEdited"]]
+
+    # Add flag 'edited in staging'
+    edited = source_df.groupby("chartId")[["chartLastEditedAt"]].max()
+    edited["editedInStaging"] = edited >= TIMESTAMP_STAGING_CREATION
+    diff = diff.merge(edited[["editedInStaging"]], left_index=True, right_index=True, how="left")
+    assert diff.editedInStaging.notna().all(), "editedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
 
     # If chart hasn't been edited by Admin, then make `configEdited` false
     # This can happen when you merge master to your branch and staging rebuilds a dataset.
@@ -446,7 +562,12 @@ def get_chart_diffs_from_grapher(
     chart_diffs = ChartDiffsLoader(
         source_engine,
         target_engine,
-    ).get_diffs(max_workers=max_workers)
+    ).get_diffs(
+        config=True,
+        metadata=True,
+        data=True,
+        max_workers=max_workers,
+    )
 
     return chart_diffs
 

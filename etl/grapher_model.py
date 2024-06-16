@@ -32,10 +32,12 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    and_,
     func,
     or_,
     select,
     text,
+    tuple_,
 )
 from sqlalchemy.dialects.mysql import (
     ENUM,
@@ -266,6 +268,17 @@ class Chart(Base):
         return charts[0]
 
     @classmethod
+    def load_charts(cls, session: Session, chart_ids: List[int]) -> List["Chart"]:
+        """Load charts with id in `chart_ids`."""
+        cond = cls.id.in_(chart_ids)
+        charts = session.scalars(select(cls).where(cond)).all()
+
+        if len(charts) == 0:
+            raise NoResultFound()
+
+        return list(charts)
+
+    @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
@@ -301,7 +314,21 @@ class Chart(Base):
 
         return variables
 
-    def load_variables_checksums(self, session: Session) -> pd.DataFrame:
+    @classmethod
+    def load_variables_checksums(cls, session: Session, chart_ids: List[int]) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId in %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index("variableId")
+
+    def load_variable_checksums(self, session: Session) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
         q = """
         select
@@ -1397,6 +1424,51 @@ class ChartDiffApprovals(Base):
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
     targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
+
+    @classmethod
+    def latest_chart_status_batch(
+        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+    ) -> dict:
+        """Load the latest approval of the charts. If there's none, return ChartStatus.PENDING."""
+
+        if not (len(chart_ids) == len(source_updated_ats) == len(target_updated_ats)):
+            raise ValueError("All input lists must have the same length")
+
+        criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
+
+        subquery = (
+            select(cls)
+            .where(tuple_(cls.chartId, cls.sourceUpdatedAt, cls.targetUpdatedAt).in_(criteria))
+            .order_by(cls.updatedAt.desc())
+            .subquery()
+        )
+
+        result = session.scalars(
+            select(subquery).distinct(subquery.c.chartId, subquery.c.sourceUpdatedAt, subquery.c.targetUpdatedAt)
+        ).all()
+
+        # Creating a dictionary to hold the results keyed by the criteria
+        result_dict = {}
+        for chart_id, source_updated_at, target_updated_at in criteria:
+            matched_row = next(
+                (
+                    row
+                    for row in result
+                    if row.chartId == chart_id
+                    and row.sourceUpdatedAt == source_updated_at
+                    and row.targetUpdatedAt == target_updated_at
+                ),
+                None,
+            )
+            if matched_row:
+                if matched_row.status == "unapproved":
+                    result_dict[chart_id] = ChartStatus.PENDING.value
+                else:
+                    result_dict[chart_id] = matched_row.status  # type: ignore
+            else:
+                result_dict[chart_id] = ChartStatus.PENDING.value
+
+        return result_dict
 
     @classmethod
     def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
