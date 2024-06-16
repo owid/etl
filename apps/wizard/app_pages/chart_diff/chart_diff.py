@@ -1,6 +1,6 @@
 import datetime as dt
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -23,6 +23,8 @@ class ChartDiff:
     # DataFrame for all variables with columns dataChecksum and metadataChecksum
     # If True, then the checksum has changed
     modified_checksum: Optional[pd.DataFrame]
+    # Whether the chart has been edited in staging
+    edited_in_staging: Optional[bool]
 
     def __init__(
         self,
@@ -30,6 +32,7 @@ class ChartDiff:
         target_chart: Optional[gm.Chart],
         approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
+        edited_in_staging: Optional[bool] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
@@ -38,6 +41,7 @@ class ChartDiff:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
         self.modified_checksum = modified_checksum
+        self.edited_in_staging = edited_in_staging
 
         # Cached
         self._in_conflict = None
@@ -71,7 +75,18 @@ class ChartDiff:
     @property
     def is_new(self) -> bool:
         """Check if the chart in source is new (compared to target)."""
-        return not self.is_modified
+        if self.edited_in_staging is not None:
+            return (not self.is_modified) and self.edited_in_staging
+        else:
+            return not self.is_modified
+
+    @property
+    def is_deleted_in_target(self) -> bool:
+        """Check if the chart is deleted in target."""
+        if self.edited_in_staging is not None:
+            return (not self.is_modified) and (not self.edited_in_staging)
+        else:
+            raise ValueError("This method is only implemented if self.edited_in_staging is defined.")
 
     @property
     def is_draft(self) -> bool:
@@ -142,8 +157,16 @@ class ChartDiff:
         return self._change_types
 
     @classmethod
-    def from_chart_ids(cls, chart_ids, source_session: Session, target_session: Session) -> List["ChartDiff"]:
-        """Get chart diffs from chart ids."""
+    def from_charts_df(
+        cls, df_charts: pd.DataFrame, source_session: Session, target_session: Session
+    ) -> List["ChartDiff"]:
+        """Get chart diffs from chart ids.
+
+        NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
+        metadata, data, config fields were edited. However, we estimate this again with all the checksums code. Couldn't we just use the info from df_charts?
+        """
+        chart_ids = list(set(df_charts.index))
+
         # Get charts from db and save them in memory as dictionaries: chart_id -> chart
         source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
         source_charts = {chart.id: chart for chart in source_charts}
@@ -200,7 +223,11 @@ class ChartDiff:
             modified_checksum = checksums_diff.loc[chart_id] if target_chart else None
 
             # Build chart diff object
-            chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
+            if chart_id in df_charts.index:
+                edited_in_staging = df_charts.loc[chart_id, "editedInStaging"]
+            else:
+                edited_in_staging = None
+            chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -213,7 +240,7 @@ class ChartDiff:
         - Get its approval state
         - Build diff object
 
-        TODO: replace with call to `from_chart_ids` with chart_ids = [chart_id]
+        TODO: replace with call to `from_charts_df` with chart_ids = [chart_id]
         """
         # Get charts
         source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
@@ -356,6 +383,17 @@ class ChartDiffsLoader:
     def chart_ids_all(self):
         return set(self.df.index[self.df.any(axis=1)])
 
+    def get_charts_df(
+        self,
+        config: bool | None = None,
+        data: bool | None = None,
+        metadata: bool | None = None,
+    ) -> pd.DataFrame:
+        """DataFrame with charts details."""
+        return self.df[
+            (self.df.configEdited & config) | (self.df.dataEdited & data) | (self.df.metadataEdited & metadata)
+        ]
+
     def get_chart_ids(
         self,
         config: bool | None = None,
@@ -381,10 +419,10 @@ class ChartDiffsLoader:
             self.df = self.load_df()
 
         # Get ids of charts with relevant changes
-        chart_ids = self.get_chart_ids(config, data, metadata)
+        df_charts = self.get_charts_df(config, data, metadata)
 
         with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
-            chart_diffs = ChartDiff.from_chart_ids(chart_ids, source_session, target_session)
+            chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
 
         self._diffs = chart_diffs
 
