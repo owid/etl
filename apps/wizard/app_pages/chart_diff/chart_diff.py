@@ -257,6 +257,17 @@ class ChartDiff:
         config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
         return config_1 == config_2
 
+    @property
+    def details(self):
+        return {
+            "chart_id": self.chart_id,
+            "is_approved": self.is_approved,
+            "is_pending": self.is_pending,
+            "is_rejected": self.is_rejected,
+            "is_reviewed": self.is_reviewed,
+            "is_new": self.is_new,
+        }
+
 
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production."""
@@ -308,6 +319,18 @@ class ChartDiffsLoader:
                 chart_diffs[chart_id] = future.result()
 
         return chart_diffs
+
+    def get_diffs_summary_df(self, **kwargs) -> pd.DataFrame:
+        """Get dataframe with summary of current chart diffs.
+
+        Details include whether the chart is new, approved, pending or rejected, etc."""
+        summary = []
+        chart_diffs = self.get_diffs(**kwargs)
+        for diff in chart_diffs:
+            summary.append(diff.details)
+
+        df = pd.DataFrame(summary)
+        return df
 
 
 def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
@@ -420,7 +443,10 @@ def get_chart_diffs_from_grapher(
 
     Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
     """
-    chart_diffs = ChartDiffsLoader(source_engine, target_engine).get_diffs(max_workers=max_workers)
+    chart_diffs = ChartDiffsLoader(
+        source_engine,
+        target_engine,
+    ).get_diffs(max_workers=max_workers)
 
     return chart_diffs
 

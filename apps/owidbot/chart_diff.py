@@ -1,8 +1,7 @@
 import pandas as pd
-from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl.config import get_container_name
 
@@ -74,28 +73,13 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
         target_engine = OWIDEnv.from_staging("master").get_engine()
 
-    df = []
-    with Session(source_engine) as source_session:
-        with Session(target_engine) as target_session:
-            diffs = modified_charts_by_admin(source_session, target_session)
+    df = ChartDiffsLoader(source_engine, target_engine).get_diffs_summary_df(
+        config=True,
+        metadata=False,
+        data=False,
+    )
 
-            # Get only charts with modified chart config
-            modified_chart_ids = set(diffs.index[diffs.configEdited])
-
-            for chart_id in modified_chart_ids:
-                diff = ChartDiff.from_chart_id(chart_id, source_session, target_session)
-                df.append(
-                    {
-                        "chart_id": diff.chart_id,
-                        "is_approved": diff.is_approved,
-                        "is_pending": diff.is_pending,
-                        "is_rejected": diff.is_rejected,
-                        "is_reviewed": diff.is_reviewed,
-                        "is_new": diff.is_new,
-                    }
-                )
-
-    return pd.DataFrame(df)
+    return df
 
 
 def format_chart_diff(df: pd.DataFrame) -> str:
