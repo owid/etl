@@ -1,0 +1,83 @@
+"""Load a snapshot and create a meadow dataset."""
+
+import os
+import zipfile
+
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
+from etl.helpers import PathFinder, create_dataset
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+
+def read_csv_from_zip(zip_path, csv_file):
+    # Get the directory of the zip file
+    extract_dir = os.path.dirname(zip_path)
+
+    # Check if the CSV file exists in the ZIP archive and read it into a DataFrame
+    with zipfile.ZipFile(zip_path, "r") as z:
+        if csv_file in z.namelist():
+            # Extract the file from the ZIP archive
+            z.extract(csv_file, extract_dir)
+            file_path = os.path.join(extract_dir, csv_file)
+            # Read the file
+            df = pr.read_csv(file_path, low_memory=False)
+            return df
+        else:
+            paths.log.info(f"{csv_file} not found in the ZIP archive")
+            return None
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("education_opri.zip")
+
+    # Read the relevantCSV files from the ZIP archive
+    national_df = read_csv_from_zip(snap.path, "OPRI_DATA_NATIONAL.csv")
+    regional_df = read_csv_from_zip(snap.path, "OPRI_DATA_REGIONAL.csv")
+    label_df = read_csv_from_zip(snap.path, "OPRI_LABEL.csv")
+    metadata_df = read_csv_from_zip(snap.path, "OPRI_METADATA.csv")
+
+    #
+    # Process data.
+    #
+    # Rename columns with regions and countries for the purpose of merging the dataframes later on
+    rename_dict = {"region_id": "country", "country_id": "country"}
+    regional_df.rename(columns=rename_dict, inplace=True)
+    national_df.rename(columns=rename_dict, inplace=True)
+    metadata_df.rename(columns=rename_dict, inplace=True)
+
+    # Concatenate and merge dataframes with regional and national data
+    cobimbed_df = pr.concat([regional_df, national_df], axis=0)
+    label_df.columns = label_df.columns.str.lower()
+
+    # Add indicator label columnn that provides a better description of the indicator
+    df_with_labels = pr.merge(cobimbed_df, label_df, on="indicator_id", how="left")
+
+    # Pivot the metadata table by type to get the metadata in separate columns
+    pivoted_metadata_df = metadata_df.pivot(
+        index=["country", "year", "indicator_id"], columns="type", values="metadata"
+    )
+    pivoted_metadata_df = pivoted_metadata_df.reset_index()
+
+    # Merge the dataframe with the metadata
+    df_with_metadata = pr.merge(df_with_labels, pivoted_metadata_df, on=["indicator_id", "country", "year"], how="left")
+
+    # Create a new table and add relevant metadata.
+    tb = Table(df_with_metadata, short_name=paths.short_name)
+    tb = tb.format(["country", "year", "indicator_id"])
+    for column in tb.columns:
+        tb[column].metadata.origins = [snap.metadata.origin]
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
