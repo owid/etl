@@ -18,6 +18,18 @@ tables:
       pip_top1_relative_difference_1993_2018:
         title: pip_top1_relative_difference_1993_2018
         unit: ''
+      wid_top1_1993:
+        title: wid_top1_1993
+        unit: ''
+      wid_top1_2018:
+        title: wid_top1_2018
+        unit: ''
+      pip_top1_1993:
+        title: pip_top1_1993
+        unit: ''
+      pip_top1_2018:
+        title: pip_top1_2018
+        unit: ''
       region:
         title: region
         unit: ''
