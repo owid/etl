@@ -13,21 +13,24 @@ paths = PathFinder(__file__)
 
 
 def read_csv_from_zip(zip_path, csv_file):
-    # Get the directory of the zip file
     extract_dir = os.path.dirname(zip_path)
 
-    # Check if the CSV file exists in the ZIP archive and read it into a DataFrame
+    # Open the ZIP archive
     with zipfile.ZipFile(zip_path, "r") as z:
-        if csv_file in z.namelist():
-            # Extract the file from the ZIP archive
-            z.extract(csv_file, extract_dir)
-            file_path = os.path.join(extract_dir, csv_file)
-            # Read the file
-            df = pr.read_csv(file_path, low_memory=False)
-            return df
-        else:
-            paths.log.info(f"{csv_file} not found in the ZIP archive")
-            return None
+        # Check if the CSV file exists in the ZIP archive
+        if csv_file not in z.namelist():
+            raise ValueError(f"{csv_file} not found in the ZIP archive")
+
+        # Extract the file from the ZIP archive
+        z.extract(csv_file, extract_dir)
+
+    # Create the full file path
+    file_path = os.path.join(extract_dir, csv_file)
+
+    # Read the file
+    df = pr.read_csv(file_path, low_memory=False)
+
+    return df
 
 
 def run(dest_dir: str) -> None:
