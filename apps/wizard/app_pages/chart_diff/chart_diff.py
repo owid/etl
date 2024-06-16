@@ -142,7 +142,7 @@ class ChartDiff:
         return self._change_types
 
     @classmethod
-    def from_chart_ids(cls, chart_ids, source_session: Session, target_session: Optional[Session] = None):
+    def from_chart_ids(cls, chart_ids, source_session: Session, target_session: Session) -> List["ChartDiff"]:
         """Get chart diffs from chart ids."""
         # Get charts from db and save them in memory as dictionaries: chart_id -> chart
         source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
@@ -175,9 +175,14 @@ class ChartDiff:
 
         # Get checksums
         checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
-        checksums_Target = gm.Chart.load_variables_checksums(target_session, chart_ids)
+        checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
+        checksums_source, checksums_target = checksums_source.align(checksums_target)
+        checksums_diff = checksums_source != checksums_target
+        # If checksum has not been filled yet, assume unchanged
+        checksums_diff[checksums_target.isna()] = False
 
         # Build chart diffs
+        chart_diffs = []
         for chart_id, source_chart in source_charts.items():
             # Get target chart (if exists)
             target_chart = target_charts.get(chart_id)
@@ -192,9 +197,13 @@ class ChartDiff:
             approval_status = approval_statuses[chart_id]
 
             # Checksums
+            modified_checksum = checksums_diff.loc[chart_id] if target_chart else None
 
             # Build chart diff object
             chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
+            chart_diffs.append(chart_diff)
+
+        return chart_diffs
 
     @classmethod
     def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
@@ -203,6 +212,8 @@ class ChartDiff:
         - Get charts from source and target
         - Get its approval state
         - Build diff object
+
+        TODO: replace with call to `from_chart_ids` with chart_ids = [chart_id]
         """
         # Get charts
         source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
@@ -333,7 +344,7 @@ class ChartDiffsLoader:
         self.df = self.load_df()
 
         # Cache
-        self._diffs: Dict[str, Any] | None = None
+        self._diffs: List[ChartDiff] | None = None
 
     def load_df(self) -> pd.DataFrame:
         """Load changes in charts between environments from sessions."""
@@ -358,21 +369,28 @@ class ChartDiffsLoader:
             ]
         )
 
-    def get_diffs_2(
+    def get_diffs(
         self,
         config: bool = True,
         data: bool = False,
         metadata: bool = False,
-        max_workers: int = 10,
         sync: bool = False,
-    ):
+    ) -> List[ChartDiff]:
+        """Optimised version of get_diffs."""
         if sync:
             self.df = self.load_df()
 
         # Get ids of charts with relevant changes
         chart_ids = self.get_chart_ids(config, data, metadata)
 
-    def get_diffs(
+        with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
+            chart_diffs = ChartDiff.from_chart_ids(chart_ids, source_session, target_session)
+
+        self._diffs = chart_diffs
+
+        return chart_diffs
+
+    def get_diffs_old(
         self,
         config: bool = True,
         data: bool = False,
@@ -385,7 +403,18 @@ class ChartDiffsLoader:
         This means, checking for chart changes in the database.
 
         Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
+
+        TODO: Remove this code once `get_diffs` proves to be working fine.
         """
+
+        def _get_chart_diff_from_grapher(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiff:
+            with Session(source_engine) as source_session, Session(target_engine) as target_session:
+                return ChartDiff.from_chart_id(
+                    chart_id=chart_id,
+                    source_session=source_session,
+                    target_session=target_session,
+                )
+
         if sync:
             self.df = self.load_df()
 
@@ -408,8 +437,9 @@ class ChartDiffsLoader:
             for chart_id, future in chart_diffs_futures.items():
                 chart_diffs[chart_id] = future.result()
 
-        self._diffs = chart_diffs
-        return chart_diffs
+        self._diffs = list(chart_diffs.values())
+
+        return self._diffs
 
     def get_diffs_summary_df(self, cache: bool = False, **kwargs) -> pd.DataFrame:
         """Get dataframe with summary of current chart diffs.
@@ -424,7 +454,7 @@ class ChartDiffsLoader:
             chart_diffs = self.get_diffs(**kwargs)
 
         summary = []
-        for diff in chart_diffs.values():
+        for diff in chart_diffs:
             summary.append(diff.details)
         return pd.DataFrame(summary)
 
@@ -566,16 +596,8 @@ def get_chart_diffs_from_grapher(
         config=True,
         metadata=True,
         data=True,
-        max_workers=max_workers,
     )
 
+    chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
+
     return chart_diffs
-
-
-def _get_chart_diff_from_grapher(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiff:
-    with Session(source_engine) as source_session, Session(target_engine) as target_session:
-        return ChartDiff.from_chart_id(
-            chart_id=chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
