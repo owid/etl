@@ -1,6 +1,6 @@
 import datetime as dt
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -167,50 +167,26 @@ class ChartDiff:
         """
         chart_ids = list(set(df_charts.index))
 
-        # Get charts from db and save them in memory as dictionaries: chart_id -> chart
+        # Get charts from SOURCE db and save them in memory as dictionaries: chart_id -> chart
         source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
         source_charts = {chart.id: chart for chart in source_charts}
+        assert len(source_charts) == len(chart_ids), "Length of lists should match!"
 
-        if target_session is not None:
-            try:
-                target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
-            except NoResultFound:
-                target_charts = {}
-            else:
-                target_charts = {chart.id: chart for chart in target_charts}
-        else:
-            target_charts = {}
+        # Get charts from TARGET db
+        target_charts = _get_target_charts(target_session, source_charts)
 
         # Get approval status
-        target_updated_ats = []
-        for chart_id in chart_ids:
-            if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)
-            else:
-                target_updated_ats.append(None)
-        approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
-            source_session,
-            chart_ids,
-            [source_charts[chart_id].updatedAt for chart_id in chart_ids],
-            target_updated_ats,
-        )
-        approval_statuses = dict(zip(chart_ids, approval_statuses))
+        approval_statuses = _get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
 
         # Get checksums
-        checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
-        checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
-        checksums_source, checksums_target = checksums_source.align(checksums_target)
-        checksums_diff = checksums_source != checksums_target
-        # If checksum has not been filled yet, assume unchanged
-        checksums_diff[checksums_target.isna()] = False
+        checksums_diff = _get_checksums(source_session, target_session, chart_ids)
 
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
             # Get target chart (if exists)
             target_chart = target_charts.get(chart_id)
-            if target_chart and source_chart.createdAt != target_chart.createdAt:
-                target_chart = None
+
             ## Checks
             if target_chart:
                 assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
@@ -222,11 +198,13 @@ class ChartDiff:
             # Checksums
             modified_checksum = checksums_diff.loc[chart_id] if target_chart else None
 
-            # Build chart diff object
+            # Was the chart edited in Staging?
             if chart_id in df_charts.index:
                 edited_in_staging = df_charts.loc[chart_id, "chartEditedInStaging"]
             else:
                 edited_in_staging = None
+
+            # Build Chart Diff object
             chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
             chart_diffs.append(chart_diff)
 
@@ -360,6 +338,65 @@ class ChartDiff:
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
         }
+
+
+def _get_target_charts(target_session, source_charts):
+    """Get charts from TARGET environment.
+
+    Note that we use source_charts to make sure that we are getting the right charts from TARGET.
+    This is because some charts can be created in different environments independently and be different but
+    share the same ID.
+    """
+
+    def _charts_are_equivalent_envs(s_chart, t_chart):
+        # It can happen that both charts have the same ID, but are completely different (this
+        # happens when two charts are created independently on two servers). If they
+        # have same createdAt then they are the same chart.
+        return not (t_chart and (s_chart.createdAt != t_chart.createdAt))
+
+    chart_ids = source_charts.keys()
+
+    if target_session is not None:
+        try:
+            target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+        except NoResultFound:
+            target_charts = {}
+        else:
+            target_charts = {
+                chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
+                for chart in target_charts
+            }
+    else:
+        target_charts = {}
+    return target_charts
+
+
+def _get_approval_statuses(source_session, chart_ids, source_charts, target_charts) -> Dict[int, str]:
+    target_updated_ats = []
+    for chart_id in chart_ids:
+        if target_charts.get(chart_id) is not None:
+            target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+        else:
+            target_updated_ats.append(None)
+    approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
+        source_session,
+        chart_ids,
+        [source_charts[chart_id].updatedAt for chart_id in chart_ids],
+        target_updated_ats,
+    )
+    approval_statuses = dict(zip(chart_ids, approval_statuses))
+    return approval_statuses
+
+
+def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
+    checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
+    checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
+    checksums_source, checksums_target = checksums_source.align(checksums_target)
+    checksums_diff = checksums_source != checksums_target
+    # If checksum has not been filled yet, assume unchanged
+    checksums_diff[checksums_target.isna()] = False
+
+    return checksums_diff
 
 
 class ChartDiffsLoader:

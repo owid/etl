@@ -1440,7 +1440,8 @@ class ChartDiffApprovals(Base):
         criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
 
         results = session.scalars(
-            select(cls).where(
+            select(cls)
+            .where(
                 or_(
                     *[
                         and_(
@@ -1452,6 +1453,7 @@ class ChartDiffApprovals(Base):
                     ]
                 )
             )
+            .order_by(cls.updatedAt.desc())
         ).all()
         results = {res.chartId: res for res in results}
 
