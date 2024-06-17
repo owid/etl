@@ -112,11 +112,11 @@ tables:
     variables:
       value:
         title: |-
-          <% if measure == 'Deaths')%>{definition.value_deaths.title}<% else %>{definition.value_dalys.title}<%- endif -%>
+          <% if measure == 'Deaths')%>{definitions.value_deaths.title}<% else %>{definitions.value_dalys.title}<%- endif -%>
         unit: |-
-          <% if measure == 'Deaths')%>{definition.value_deaths.unit}<% else %>{definition.value_dalys.unit}<%- endif -%>
+          <% if measure == 'Deaths')%>{definitions.value_deaths.unit}<% else %>{definitions.value_dalys.unit}<%- endif -%>
         description_short: |-
-          <% if measure == 'Deaths')%>{definition.value_deaths.description_short}<% else %>{definition.value_dalys.description_short}<%- endif -%>
+          <% if measure == 'Deaths')%>{definitions.value_deaths.description_short}<% else %>{definitions.value_dalys.description_short}<%- endif -%>
         presentation:
           grapher_config:
             note: |-
