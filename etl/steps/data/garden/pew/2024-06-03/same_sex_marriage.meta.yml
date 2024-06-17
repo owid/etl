@@ -1,8 +1,11 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    display: &display_common
+      numDecimalPlaces: 0
+      tolerance: 0
     description_key:
-      - The data has been updated up to May 2023.
+      - The data is up to date as of May 2023.
     processing_level: major
     description_processing: |-
       We converted the original data with the years of the legalization of same-sex marriage into a expanded dataset with the legal status of same-sex marriage for each country and year.
@@ -35,8 +38,7 @@ tables:
           title_public: Legal status of same-sex marriage
         display:
           name: Legal status of same-sex marriage
-          numDecimalPlaces: 0
-          tolerance: 0
+          <<: *display_common
 
       legal_status_legal_count:
         title: Number of countries where same-sex marriage is legal
@@ -47,8 +49,7 @@ tables:
           title_public: Number of countries where same-sex marriage is legal
         display:
           name: Legal
-          numDecimalPlaces: 0
-          tolerance: 0
+          <<: *display_common
 
       legal_status_not_legal_pop:
         title: Population in countries where same-sex marriage is not legal
@@ -59,8 +60,7 @@ tables:
           title_public: Population in countries where same-sex marriage is not legal
         display:
           name: Not legal
-          numDecimalPlaces: 0
-          tolerance: 0
+          <<: *display_common
 
       legal_status_legal_pop:
         title: Population in countries where same-sex marriage is legal
@@ -71,7 +71,6 @@ tables:
           title_public: Population in countries where same-sex marriage is legal
         display:
           name: Legal
-          numDecimalPlaces: 0
-          tolerance: 0
+          <<: *display_common
 
 

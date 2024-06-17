@@ -114,7 +114,7 @@ def add_country_counts_and_population_by_status(
     missing_data_on_columns: bool = False,
 ) -> Table:
     """
-    Add country counts and population by status for the columns in the list
+    Add country counts and population by status of the columns in the list
     """
 
     tb_regions = tb.copy()
