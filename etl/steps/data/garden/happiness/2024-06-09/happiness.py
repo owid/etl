@@ -82,5 +82,5 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
-    # Save changes in the new garden dataset.
+    # Save changes in the dataset
     ds_garden.save()

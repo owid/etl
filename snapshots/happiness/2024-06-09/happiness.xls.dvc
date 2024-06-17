@@ -1,5 +1,3 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
   origin:
     # Data product / Snapshot
@@ -11,7 +9,7 @@ meta:
     version_producer: 2024
 
     # Citation
-    producer: "University of Oxford: Wellbeing Research Centre"
+    producer: "Wellbeing Research Centre"
     citation_full: |-
       Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2024). World Happiness Report 2024. University of Oxford: Wellbeing Research Centre.
 

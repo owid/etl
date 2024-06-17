@@ -1,4 +1,3 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     processing_level: major
@@ -7,8 +6,6 @@ definitions:
         - Happiness & Life Satisfaction
 
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
@@ -28,8 +25,9 @@ tables:
           - The only exception is the data for the 2012 report, which uses survey data from 2005-2011, we show this data as the final year of the survey data - 2011.
           - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
           - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
+          - The data is the compilation of all previous World Happiness Reports, which can be found at https://worldhappiness.report/archive/.
         presentation:
-          attribution: World Happiness Report (2012-2024)
+          #attribution: World Happiness Report (2012-2024)
           attribution_short: WHR
           title_public: Self-reported life satisfaction
         display:
