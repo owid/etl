@@ -1,0 +1,41 @@
+dataset:
+  title: Guinea worm cases (WHO, 2024)
+  description: |-
+    Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
+
+    For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
+
+    1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
+    2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
+    2019: Table 1a: https://web.archive.org/web/20230629130619/https://apps.who.int/iris/bitstream/handle/10665/332086/WER9520-209-227-eng-fre.pdf?sequence=1&isAllowed=y
+    2020: Table 1a: https://web.archive.org/web/20230226162934/https://apps.who.int/iris/bitstream/handle/10665/341529/WER9621-173-194-eng-fre.pdf?sequence=1&isAllowed=y
+    2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+    2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+
+    For all other countries data is gathered from the following sources:
+
+    1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+    2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
+    2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
+    2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
+
+    Global totals are calculated yearly as the sum of the number of reported cases in each country.
+  licenses:
+    - {}
+tables:
+  guinea_worm:
+    variables:
+      guinea_worm_reported_cases:
+        title: guinea_worm_reported_cases
+        unit: ''
+        description: |-
+          The number of reported cases of guinea worm disease (dracunculiasis) as reported by the WHO.
+
+          The WHO defines a case of guinea worm disease as the following:
+
+          "A case of guinea-worm disease is a person exhibiting a skin lesion with emergence of a Guinea worm,
+          and in which the worm is confirmed in laboratory tests to be Dracunculus medinensis. That person is
+          counted as a case only once during the calendar year, i.e. when the first worm emerges from that person.
+          All worm specimens should be obtained from each case patient for laboratory confirmation and sent to the
+          United States Centers for Disease Control and Prevention (CDC). All cases should be monitored at least twice
+          per month during the remainder of the calendar year for prompt detection of possible emergence of additional guinea worms."

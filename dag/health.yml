@@ -225,6 +225,13 @@ steps:
   data://grapher/who/2023-06-30/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm
 
+  data://garden/neglected_tropical_diseases/2024-06-17/guinea_worm:
+    - data://meadow/who/2023-06-29/guinea_worm
+    - data://garden/who/2023-06-29/guinea_worm
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/neglected_tropical_diseases/2024-06-17/guinea_worm:
+    - data://garden/neglected_tropical_diseases/2024-06-17/guinea_worm
+
   # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
     - snapshot://who/2022-09-01/autopsy.csv
@@ -659,3 +666,4 @@ steps:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
+
