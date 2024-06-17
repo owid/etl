@@ -526,10 +526,11 @@ def st_show(
     show_link: bool = True,
 ) -> None:
     """Show the chart diff in Streamlit."""
-    ChartDiffShow(
+    handle = ChartDiffShow(
         diff=diff,
         source_session=source_session,
         target_session=target_session,
         expander=expander,
         show_link=show_link,
-    ).show()
+    )
+    handle.show()
