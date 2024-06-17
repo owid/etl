@@ -24,15 +24,16 @@ import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
 from pymysql import OperationalError
+from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from apps.wizard.utils.env import OWIDEnv
+from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from apps.wizard.utils.step_form import StepForm
 from etl import config
-from etl.db import get_connection
+from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
@@ -706,3 +707,22 @@ class Pagination:
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
+
+
+def get_staging_creation_time(session: Optional[Session] = None):
+    """Get staging server creation time."""
+    query_ts = "show table status like 'charts'"
+
+    if session:
+        df = read_sql(query_ts, session)
+    else:
+        with Session(OWID_ENV.engine) as source_session:
+            df = read_sql(query_ts, source_session)
+    assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
+
+    return df["Create_time"].item()
+
+
+def set_staging_creation_time(key: str = "server_creation_time") -> None:
+    """Gest staging server creation time estimate."""
+    st.session_state[key] = get_staging_creation_time()

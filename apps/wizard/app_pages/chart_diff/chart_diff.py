@@ -165,6 +165,11 @@ class ChartDiff:
         NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
         metadata, data, config fields were edited. However, we estimate this again with all the checksums code. Couldn't we just use the info from df_charts?
         """
+
+        # Return empty list if no chart difference is found
+        if df_charts.empty:
+            return []
+
         chart_ids = list(set(df_charts.index))
 
         # Get charts from SOURCE db and save them in memory as dictionaries: chart_id -> chart
@@ -400,7 +405,7 @@ def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
 
 
 class ChartDiffsLoader:
-    """Detect charts that differ between staging and production."""
+    """Detect charts that differ between staging and production and load them."""
 
     def __init__(self, source_engine: Engine, target_engine: Engine):
         self.source_engine = source_engine
@@ -431,19 +436,6 @@ class ChartDiffsLoader:
             (self.df.configEdited & config) | (self.df.dataEdited & data) | (self.df.metadataEdited & metadata)
         ]
 
-    def get_chart_ids(
-        self,
-        config: bool | None = None,
-        data: bool | None = None,
-        metadata: bool | None = None,
-    ):
-        """Get chart ids based on changes in config, data or metadata."""
-        return set(
-            self.df.index[
-                (self.df.configEdited & config) | (self.df.dataEdited & data) | (self.df.metadataEdited & metadata)
-            ]
-        )
-
     def get_diffs(
         self,
         config: bool = True,
@@ -454,7 +446,6 @@ class ChartDiffsLoader:
         """Optimised version of get_diffs."""
         if sync:
             self.df = self.load_df()
-
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
 
@@ -464,57 +455,6 @@ class ChartDiffsLoader:
         self._diffs = chart_diffs
 
         return chart_diffs
-
-    def get_diffs_old(
-        self,
-        config: bool = True,
-        data: bool = False,
-        metadata: bool = False,
-        max_workers: int = 10,
-        sync: bool = False,
-    ):
-        """Get chart diffs from Grapher.
-
-        This means, checking for chart changes in the database.
-
-        Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
-
-        TODO: Remove this code once `get_diffs` proves to be working fine.
-        """
-
-        def _get_chart_diff_from_grapher(chart_id: int, source_engine: Engine, target_engine: Engine) -> ChartDiff:
-            with Session(source_engine) as source_session, Session(target_engine) as target_session:
-                return ChartDiff.from_chart_id(
-                    chart_id=chart_id,
-                    source_session=source_session,
-                    target_session=target_session,
-                )
-
-        if sync:
-            self.df = self.load_df()
-
-        # Get ids of charts with relevant changes
-        chart_ids = self.get_chart_ids(config, data, metadata)
-        # chart_ids = self.chart_ids_all
-
-        # Get all chart diffs in parallel
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            chart_diffs_futures = {
-                chart_id: executor.submit(
-                    _get_chart_diff_from_grapher,
-                    chart_id,
-                    self.source_engine,
-                    self.target_engine,
-                )
-                for chart_id in chart_ids
-            }
-            chart_diffs = {}
-            for chart_id, future in chart_diffs_futures.items():
-                chart_diffs[chart_id] = future.result()
-
-        self._diffs = list(chart_diffs.values())
-
-        return self._diffs
 
     def get_diffs_summary_df(self, cache: bool = False, **kwargs) -> pd.DataFrame:
         """Get dataframe with summary of current chart diffs.
@@ -601,8 +541,10 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     source_df = read_sql(base_q + where, source_session)
 
     # no charts, return empty dataframe
-    # if source_df.empty:
-    #     return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited", "configEdited"]).set_index("chartId")
+    if source_df.empty:
+        return pd.DataFrame(
+            columns=["chartId", "dataEdited", "metadataEdited", "configEdited", "chartEditedInStaging"]
+        ).set_index("chartId")
 
     # read those charts from target
     where = """
