@@ -54,7 +54,7 @@ NUMBER_OF_FILES = 91
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_prevalence.feather")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_risk.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
     for file_number in range(1, NUMBER_OF_FILES + 1):

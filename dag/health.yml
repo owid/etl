@@ -631,6 +631,16 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health
 
+  # GBD 2021 - GBD Risk Factors
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_risk:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_risk.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_risk:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_risk:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_risk
+
   # WHO Avian Influenza H5N1
   data://meadow/who/latest/avian_influenza_ah5n1:
     - snapshot://who/latest/avian_influenza_ah5n1.csv
