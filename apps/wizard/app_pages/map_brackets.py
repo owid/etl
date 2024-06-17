@@ -279,9 +279,14 @@ class MapBracketer:
 
     def update_brackets_selected(self, min_selected: float, max_selected: float) -> None:
         # Filter the list to get the selected values.
-        brackets_selected = [
-            bracket for bracket in self.brackets if min_selected <= abs(bracket) <= max_selected or bracket == 0
-        ]
+        if self.bracket_type in (BRACKET_LABELS["log"].values()):
+            brackets_selected = [
+                bracket for bracket in self.brackets if min_selected <= abs(bracket) <= max_selected or bracket == 0
+            ]
+        else:
+            brackets_selected = [
+                bracket for bracket in self.brackets if min_selected <= bracket <= max_selected or bracket == 0
+            ]
         if len(brackets_selected) > MAX_NUM_BRACKETS:
             if mb.min_value < -mb.smallest_number:
                 st.warning(
@@ -359,16 +364,22 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         mb.update_linear_brackets()
 
     # Create a slider for positive values.
-    # TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
-    if len(mb.brackets_positive) <= 1:
-        st.error("No brackets possible.")
-        st.stop()
-    min_selected, max_selected = st.select_slider(  # type: ignore
-        "Select a range of values:",
-        options=mb.brackets_positive,
-        value=(min(mb.brackets_positive), max(mb.brackets_positive)),  # default range
-    )
-
+    if mb.bracket_type in list(BRACKET_LABELS["log"].values()):
+        # TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
+        if len(mb.brackets_positive) <= 1:
+            st.error("No brackets possible.")
+            st.stop()
+        min_selected, max_selected = st.select_slider(  # type: ignore
+            "Select a range of values:",
+            options=mb.brackets_positive,
+            value=(min(mb.brackets_positive), max(mb.brackets_positive)),  # default range
+        )
+    else:
+        min_selected, max_selected = st.select_slider(  # type: ignore
+            "Select a range of values:",
+            options=mb.brackets,
+            value=(min(mb.brackets), max(mb.brackets)),  # default range
+        )
     # Update map brackets.
     mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
 
