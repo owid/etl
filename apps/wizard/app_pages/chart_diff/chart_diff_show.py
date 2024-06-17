@@ -20,7 +20,7 @@ from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils import chart_html
+from apps.wizard.utils import chart_html, get_staging_creation_time
 from apps.wizard.utils.env import OWID_ENV
 
 # How to display the various chart review statuses
@@ -159,7 +159,7 @@ class ChartDiffShow:
         """Get latest chart version from database."""
         diff_new = ChartDiff.from_chart_id(
             chart_id=self.diff.chart_id,
-            server_creation_time=st.session_state.server_creation_time,
+            server_creation_time=st.session_state.get("server_creation_time", get_staging_creation_time()),
             source_session=self.source_session,
             target_session=self.target_session,
         )

@@ -709,7 +709,7 @@ class Pagination:
                 st.text(f"Page {self.page} of {self.total_pages}")
 
 
-def get_staging_creation_time(session: Optional[Session] = None):
+def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
     """Get staging server creation time."""
     query_ts = "show table status like 'charts'"
 
@@ -720,7 +720,12 @@ def get_staging_creation_time(session: Optional[Session] = None):
             df = read_sql(query_ts, source_session)
     assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
 
-    return df["Create_time"].item()
+    create_time = df["Create_time"].item()
+
+    if key not in st.session_state:
+        st.session_state[key] = create_time
+
+    return create_time
 
 
 def set_staging_creation_time(key: str = "server_creation_time") -> None:
