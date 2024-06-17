@@ -224,7 +224,7 @@ class ChartDiff:
 
             # Build chart diff object
             if chart_id in df_charts.index:
-                edited_in_staging = df_charts.loc[chart_id, "editedInStaging"]
+                edited_in_staging = df_charts.loc[chart_id, "chartEditedInStaging"]
             else:
                 edited_in_staging = None
             chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
@@ -509,6 +509,11 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         - metadataEdited: True if metadata checksum has changed
         - configEdited: True if config has changed
 
+        TESTING:
+        - chartEditedInStaging: True if the chart config has been edited in staging.
+        - dataEditedInStaging: True if the chart data has been edited in staging.
+        - metadataEditedInStaging: True if the chart metadata has been edited in staging.
+
         TODO:
         - newInSource: True if the chart is new in source environment.
         - newInTarget: True if the chart is new in target environment.
@@ -535,7 +540,9 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt,
         d.dataEditedByUserId,
-        d.metadataEditedByUserId
+        d.dataEditedAt as dataLastEditedAt,
+        d.metadataEditedByUserId,
+        d.metadataEditedAt as metadataLastEditedAt
     from chart_dimensions as cd
     join charts as c on cd.chartId = c.id
     join variables as v on cd.variableId = v.id
@@ -557,8 +564,8 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     source_df = read_sql(base_q + where, source_session)
 
     # no charts, return empty dataframe
-    if source_df.empty:
-        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited", "configEdited"]).set_index("chartId")
+    # if source_df.empty:
+    #     return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited", "configEdited"]).set_index("chartId")
 
     # read those charts from target
     where = """
@@ -570,6 +577,7 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     target_df = target_df.set_index(["chartId", "variableId"])
 
     # charts not edited by Admin and with null checksums should be excluded
+    # TODO: Review this condition
     ix = (
         (source_df.chartLastEditedByUserId != 1)
         & (source_df.chartPublishedByUserId != 1)
@@ -598,10 +606,23 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     diff = diff[["dataEdited", "metadataEdited", "configEdited"]]
 
     # Add flag 'edited in staging'
-    edited = source_df.groupby("chartId")[["chartLastEditedAt"]].max()
-    edited["editedInStaging"] = edited >= TIMESTAMP_STAGING_CREATION
-    diff = diff.merge(edited[["editedInStaging"]], left_index=True, right_index=True, how="left")
-    assert diff.editedInStaging.notna().all(), "editedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
+    edited = source_df.groupby("chartId")[
+        [
+            "chartLastEditedAt",
+            # "dataLastEditedAt",
+            # "metadataLastEditedAt"
+        ]
+    ].max()
+    edited["chartEditedInStaging"] = edited >= TIMESTAMP_STAGING_CREATION
+    diff = diff.merge(
+        edited[["chartEditedInStaging"]],
+        left_index=True,
+        right_index=True,
+        how="left",
+    )
+    assert (
+        diff["chartEditedInStaging"].notna().all()
+    ), "chartEditedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
 
     # If chart hasn't been edited by Admin, then make `configEdited` false
     # This can happen when you merge master to your branch and staging rebuilds a dataset.
@@ -613,7 +634,8 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
     diff.loc[chart_ids, "configEdited"] = False
 
     # Remove charts with no changes
-    diff = diff[diff.any(axis=1)]
+    cols_exclude = ["chartEditedInStaging"]
+    diff = diff[diff[[col for col in diff.columns if col not in cols_exclude]].any(axis=1)]
 
     return diff
 
