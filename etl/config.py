@@ -318,11 +318,16 @@ class OWIDEnv:
         return self._env_remote
 
     @classmethod
-    def from_this_staging(cls):
-        """Create OWIDEnv for current branch."""
-        if STAGING is None:
-            raise ValueError("`STAGING` is not set")
-        return cls.from_staging(STAGING)
+    def from_local(cls):
+        conf = Config(
+            GRAPHER_USER_ID=1,
+            DB_USER="owid",
+            DB_NAME="owid",
+            DB_PASS="",
+            DB_PORT="3306",
+            DB_HOST=DB_HOST,
+        )
+        return cls(conf)
 
     @classmethod
     def from_staging(cls, branch: str):
@@ -471,4 +476,4 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-OWID_ENV = OWIDEnv.from_this_staging()
+OWID_ENV = OWIDEnv.from_local()
