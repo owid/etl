@@ -37,7 +37,6 @@ from sqlalchemy import (
     or_,
     select,
     text,
-    tuple_,
 )
 from sqlalchemy.dialects.mysql import (
     ENUM,
