@@ -72,7 +72,7 @@ class ChartDiffShow:
         self,
         diff: ChartDiff,
         source_session: Session,
-        target_session: Optional[Session] = None,
+        target_session: Session,
         expander: bool = True,
         show_link: bool = True,
     ):
@@ -159,6 +159,7 @@ class ChartDiffShow:
         """Get latest chart version from database."""
         diff_new = ChartDiff.from_chart_id(
             chart_id=self.diff.chart_id,
+            server_creation_time=st.session_state.server_creation_time,
             source_session=self.source_session,
             target_session=self.target_session,
         )
@@ -521,7 +522,7 @@ def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
 def st_show(
     diff: ChartDiff,
     source_session: Session,
-    target_session: Optional[Session] = None,
+    target_session: Session,
     expander: bool = True,
     show_link: bool = True,
 ) -> None:
