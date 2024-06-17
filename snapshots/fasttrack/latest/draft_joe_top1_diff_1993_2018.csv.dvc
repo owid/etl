@@ -3,13 +3,13 @@ meta:
     producer: Joe draft of PIP and WID
     title: Joe draft of PIP and WID
     url_download: |-
-      gAAAAABma_a_x0GuC6HU-WoJmkZGdxOoQ1DcTO6z0R6-C6h4LHwQIRbaX5xSufhV01wX3A_c1I4MKCD45m-4QSRgQgLkdyFiy_r4zUifdmPdufsKBKSmwbjd0rGJ-0RGolL-d_ynBNuchFByXB88okQJoJ0gRtrdhMRrmmfqaXefxbfwyiUQvYKvn6VpKGZKn9ehOVt3-syDhTjlMglQP7reARbsBFmjtkZgc-UDlLyezclnjizU_bh6LgcJpJ8p94p_lGwQmmX8
-    date_accessed: '2024-06-14'
+      gAAAAABmboktKezi46DRKOigM5uwLsUqEVxwqRTkYS3hQ54xyIkN17HYm7KKkoQAfTe6U1oF83hWhCAHrsQc1knxsZ_0IuNDj4YxaAxok3eiGlr1ity3QpaKK1rzFVa6UPYGiLoA7IeuJdN4IRX-71wsLHIASlsS9dZDAwA1xzs6fuGGDODXppoCFuuuMv_AbqXEBgY31KM77ZYyWph7-JX9Ed081rrTMn-xELQBm9MUxTY5m-WU_Vm1m4ZhYQ5M16lSGfswewJ4
+    date_accessed: '2024-06-16'
   name: 'Draft: Joe – Difference in Top 1 percent share, 1993-2018, PIP vs WID data'
   description: ''
   license: {}
   is_public: false
 outs:
-  - md5: 51c74c9d9e19289104fd35262fd562bc
-    size: 9218
+  - md5: 4be4e363aeff5d9635629e80e6f6b03f
+    size: 13106
     path: draft_joe_top1_diff_1993_2018.csv

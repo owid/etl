@@ -33,7 +33,7 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/b555f8cf48b4063d0034f9eb4b101daf_files/IHME-GBD_2021_DATA-b555f8cf-"
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/040df8a5ca6910c2c884647bcbca3205_files/IHME-GBD_2021_DATA-040df8a5-"
 NUMBER_OF_FILES = 46
 
 

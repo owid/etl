@@ -11,7 +11,7 @@ from structlog import get_logger
 
 from apps.chart_sync.cli import modified_charts_by_admin
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
-from apps.wizard.app_pages.chart_diff.show import st_show
+from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
 from apps.wizard.utils.env import OWID_ENV
@@ -400,8 +400,9 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
     )
 
     # Get actual charts
+    st.write(1)
     get_chart_diffs()
-
+    st.write(2)
     if len(st.session_state.chart_diffs) == 0:
         st.warning("No chart modifications found in the staging environment.")
     else:
