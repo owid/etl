@@ -211,32 +211,32 @@ if option:
                     # no exact match, get nearby matches
                     suggestions = mapper.suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
                     with st.container(border=True):
-                        col1, col2, col3 = st.columns(3)
                         # Original name
-                        with col1:
-                            st.markdown(f"**`{region}`**")
-                            value_ignore = st.toggle(
-                                label="Ignore",
-                                key=f"region_ignore_{i}",
-                            )
+                        st.markdown(f"**{region}**")
+                        col1, col2 = st.columns(2)
+
                         # New name, from selectbox
-                        with col2:
+                        with col1:
                             value_selected = st.selectbox(
                                 label="Select a region",
                                 options=suggestions,
                                 index=0,
-                                label_visibility="collapsed",
+                                # label_visibility="collapsed",
                                 key=f"region_suggestion_{i}",
                             )
                         # New name, custom (useful if no suggestion is good enough)
-                        with col3:
+                        with col2:
                             value_custom = st.text_input(
-                                label="Region name by source",
+                                label="Enter custom name",
                                 key=f"region_custom_{i}",
-                                placeholder="Enter custom name",
-                                label_visibility="collapsed",
+                                # placeholder="Enter custom name",
+                                # label_visibility="collapsed",
                                 help="Use this when no suggestion is good enough",
                             )
+                        value_ignore = st.toggle(
+                            label="Ignore",
+                            key=f"region_ignore_{i}",
+                        )
                         # Add defined mapping (only if not ignored)
                         if not value_ignore:
                             st.session_state.entity_mapping[region] = cast(
