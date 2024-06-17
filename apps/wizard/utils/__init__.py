@@ -127,7 +127,7 @@ def get_namespaces(step_type: str) -> List[str]:
             )
         case _:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
-    namespaces = [folder.name for folder in folders]
+    namespaces = sorted(set(folder.name for folder in folders))
     return namespaces
 
 
