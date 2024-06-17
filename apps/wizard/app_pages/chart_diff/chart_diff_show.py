@@ -21,7 +21,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
 from apps.wizard.utils import chart_html, get_staging_creation_time
-from apps.wizard.utils.env import OWID_ENV
+from etl.config import OWID_ENV
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {

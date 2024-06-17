@@ -4,8 +4,8 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
-from apps.wizard.utils.env import OWID_ENV, OWIDEnv
 from etl import config
+from etl.config import OWID_ENV, OWIDEnv
 
 log = get_logger()
 

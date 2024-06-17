@@ -18,10 +18,9 @@ from sqlalchemy.orm import Session
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
 from apps.wizard.utils import get_staging_creation_time
-from apps.wizard.utils.env import OWIDEnv
 from etl import config
 from etl import grapher_model as gm
-from etl.config import get_container_name
+from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
 
 log = structlog.get_logger()
