@@ -1,16 +1,17 @@
 import datetime as dt
-from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
+from structlog import get_logger
 
 from etl import grapher_model as gm
 from etl.db import read_sql
 
 ADMIN_GRAPHER_USER_ID = 1
+log = get_logger()
 
 
 class ChartDiff:
@@ -78,6 +79,9 @@ class ChartDiff:
         if self.edited_in_staging is not None:
             return (not self.is_modified) and self.edited_in_staging
         else:
+            log.error(
+                "self.edited_in_staging is not set. Therefore, a True value here might reflect a chart that exists in staging and was deleted in production."
+            )
             return not self.is_modified
 
     @property
@@ -178,13 +182,13 @@ class ChartDiff:
         assert len(source_charts) == len(chart_ids), "Length of lists should match!"
 
         # Get charts from TARGET db
-        target_charts = _get_target_charts(target_session, source_charts)
+        target_charts = cls._get_target_charts(target_session, source_charts)
 
         # Get approval status
-        approval_statuses = _get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
+        approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
 
         # Get checksums
-        checksums_diff = _get_checksums(source_session, target_session, chart_ids)
+        checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Build chart diffs
         chart_diffs = []
@@ -216,7 +220,9 @@ class ChartDiff:
         return chart_diffs
 
     @classmethod
-    def from_chart_id(cls, chart_id, source_session: Session, target_session: Optional[Session] = None):
+    def from_chart_id(
+        cls, chart_id, server_creation_time, source_session: Session, target_session: Optional[Session] = None
+    ):
         """Get chart diff from chart id.
 
         - Get charts from source and target
@@ -266,8 +272,11 @@ class ChartDiff:
         else:
             modified_checksum = None
 
+        # Get edited in staging
+        edited_in_staging = source_chart.updatedAt > server_creation_time
+
         # Build object
-        chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum)
+        chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
 
         return chart_diff
 
@@ -279,16 +288,6 @@ class ChartDiff:
             chart_id=self.chart_id,
         )
         return history
-
-    def sync(self, source_session: Session, target_session: Optional[Session] = None):
-        """Sync chart diff."""
-
-        # Synchronize with latest chart from source environment
-        self = self.from_chart_id(
-            chart_id=self.chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
 
     def approve(self, session: Session) -> None:
         """Approve chart diff."""
@@ -344,64 +343,64 @@ class ChartDiff:
             "is_new": self.is_new,
         }
 
+    @staticmethod
+    def _get_target_charts(target_session, source_charts):
+        """Get charts from TARGET environment.
 
-def _get_target_charts(target_session, source_charts):
-    """Get charts from TARGET environment.
+        Note that we use source_charts to make sure that we are getting the right charts from TARGET.
+        This is because some charts can be created in different environments independently and be different but
+        share the same ID.
+        """
 
-    Note that we use source_charts to make sure that we are getting the right charts from TARGET.
-    This is because some charts can be created in different environments independently and be different but
-    share the same ID.
-    """
+        def _charts_are_equivalent_envs(s_chart, t_chart):
+            # It can happen that both charts have the same ID, but are completely different (this
+            # happens when two charts are created independently on two servers). If they
+            # have same createdAt then they are the same chart.
+            return not (t_chart and (s_chart.createdAt != t_chart.createdAt))
 
-    def _charts_are_equivalent_envs(s_chart, t_chart):
-        # It can happen that both charts have the same ID, but are completely different (this
-        # happens when two charts are created independently on two servers). If they
-        # have same createdAt then they are the same chart.
-        return not (t_chart and (s_chart.createdAt != t_chart.createdAt))
+        chart_ids = source_charts.keys()
 
-    chart_ids = source_charts.keys()
-
-    if target_session is not None:
-        try:
-            target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
-        except NoResultFound:
+        if target_session is not None:
+            try:
+                target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+            except NoResultFound:
+                target_charts = {}
+            else:
+                target_charts = {
+                    chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
+                    for chart in target_charts
+                }
+        else:
             target_charts = {}
-        else:
-            target_charts = {
-                chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
-                for chart in target_charts
-            }
-    else:
-        target_charts = {}
-    return target_charts
+        return target_charts
 
+    @staticmethod
+    def _get_approval_statuses(source_session, chart_ids, source_charts, target_charts) -> Dict[int, str]:
+        target_updated_ats = []
+        for chart_id in chart_ids:
+            if target_charts.get(chart_id) is not None:
+                target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+            else:
+                target_updated_ats.append(None)
+        approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
+            source_session,
+            chart_ids,
+            [source_charts[chart_id].updatedAt for chart_id in chart_ids],
+            target_updated_ats,
+        )
+        approval_statuses = dict(zip(chart_ids, approval_statuses))
+        return approval_statuses
 
-def _get_approval_statuses(source_session, chart_ids, source_charts, target_charts) -> Dict[int, str]:
-    target_updated_ats = []
-    for chart_id in chart_ids:
-        if target_charts.get(chart_id) is not None:
-            target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
-        else:
-            target_updated_ats.append(None)
-    approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
-        source_session,
-        chart_ids,
-        [source_charts[chart_id].updatedAt for chart_id in chart_ids],
-        target_updated_ats,
-    )
-    approval_statuses = dict(zip(chart_ids, approval_statuses))
-    return approval_statuses
+    @staticmethod
+    def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
+        checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
+        checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
+        checksums_source, checksums_target = checksums_source.align(checksums_target)
+        checksums_diff = checksums_source != checksums_target
+        # If checksum has not been filled yet, assume unchanged
+        checksums_diff[checksums_target.isna()] = False
 
-
-def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
-    checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
-    checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
-    checksums_source, checksums_target = checksums_source.align(checksums_target)
-    checksums_diff = checksums_source != checksums_target
-    # If checksum has not been filled yet, assume unchanged
-    checksums_diff[checksums_target.isna()] = False
-
-    return checksums_diff
+        return checksums_diff
 
 
 class ChartDiffsLoader:
@@ -474,11 +473,15 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
-def modified_charts_by_admin(source_session: Session, target_session: Session) -> pd.DataFrame:
+def modified_charts_by_admin(
+    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+) -> pd.DataFrame:
     """Get charts that have been modified in staging.
 
     - It includes charts with different config, data or metadata checksums.
     - It assumes that all changes on staging server are done by Admin user with ID = 1. That is, if there are changes by a different user in staging, they are not included.
+
+    Optionally, you can provide a list of chart IDs to filter the results.
 
     The returned object is a dataframe with the following columns:
         - chartId (index): ID of the chart
@@ -538,7 +541,18 @@ def modified_charts_by_admin(source_session: Session, target_session: Session) -
             (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
         )
     """
-    source_df = read_sql(base_q + where, source_session)
+    query_source = base_q + where
+    # Add filter for chart IDs
+    if chart_ids is not None:
+        where_charts = """
+            -- filter and get only charts with given IDs
+            cd.chartId in %(chart_ids)s
+        """
+        query_source += " and " + where_charts
+        params = {"chart_ids": tuple(chart_ids)}
+    else:
+        params = {}
+    source_df = read_sql(query_source, source_session, params=params)
 
     # no charts, return empty dataframe
     if source_df.empty:
