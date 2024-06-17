@@ -12,11 +12,12 @@ def clean_data(tb: Table) -> Table:
             "age_name": "age",
             "cause_name": "cause",
             "metric_name": "metric",
+            "rei_name": "rei",
         },
         errors="ignore",
     )
     tb = tb.drop(
-        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "upper", "lower"],
+        columns=["measure_id", "location_id", "sex_id", "age_id", "cause_id", "metric_id", "rei_id", "upper", "lower"],
         errors="ignore",
     )
     msk = (tb["measure"].isin(["Prevalence", "Incidence"])) & (tb["metric"] == "Percent")

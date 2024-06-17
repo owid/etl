@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
-from owid.catalog import processing as pr
 from shared import add_regional_aggregates
 
 from etl.data_helpers import geo
@@ -43,26 +41,15 @@ def run(dest_dir: str) -> None:
         age_group_mapping=AGE_GROUPS_RANGES,
     )
 
-    # Split into two tables: one for deaths, one for DALYs
-    tb_deaths = tb[tb["measure"] == "Deaths"].copy()
-    tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
-    # Shorten the metric name for DALYs
-    tb_dalys["measure"] = "DALYs"
-
-    # Drop the measure column
-    tb_deaths = tb_deaths.drop(columns="measure")
-    tb_dalys = tb_dalys.drop(columns="measure")
-
     # Format the tables
-    tb_deaths = tb_deaths.format(["country", "year", "metric", "rei", "age", "cause"], short_name="gbd_cause_deaths")
-    tb_dalys = tb_dalys.format(["country", "year", "metric", "rei", "age", "cause"], short_name="gbd_cause_dalys")
+    tb = tb.format(["country", "year", "metric", "rei", "age", "cause"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_deaths, tb_dalys], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
