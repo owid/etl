@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Format the tables
-    tb = tb.format(["country", "year", "metric", "rei", "age", "cause"])
+    tb = tb.format(["country", "year", "metric", "measure" "rei", "age", "cause"])
 
     #
     # Save outputs.
