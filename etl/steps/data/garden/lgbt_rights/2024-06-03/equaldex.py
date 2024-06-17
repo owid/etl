@@ -155,7 +155,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow and regions and population datasets.
-    ds_meadow: Dataset = paths.load_dependency("equaldex")
+    ds_meadow = paths.load_dataset("equaldex")
     ds_regions = paths.load_dataset("regions")
     ds_population = paths.load_dataset("population")
 
@@ -245,7 +245,13 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
 
         # Assign an order to the categories, by modifying the metadata of the column
         tb[issue].m.type = "ordinal"
-        tb[issue].m.sort = list(dict.fromkeys(CATEGORIES_RENAMING[issue].values()))
+        # Create a list of unique categories and remove duplicates
+        categories_from_dict = list(dict.fromkeys(CATEGORIES_RENAMING[issue].values()))
+        categories_from_column = list(tb[issue].dropna().unique().copy())
+
+        # Remove values in categories_from_dict that are not in categories_from_column
+        categories_list = [x for x in categories_from_dict if x in categories_from_column]
+        tb[issue].m.sort = categories_list
 
     # Assert if the issues available are EXPECTED_COLUMNS
     assert set(issue_list + ["country", "year"]) == set(tb.columns), paths.log.error(

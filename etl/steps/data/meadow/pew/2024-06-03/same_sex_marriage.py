@@ -11,23 +11,15 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("lgbti_policy_index.xlsx")
+    snap = paths.load_snapshot("same_sex_marriage.csv")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Sheet1")
+    tb = snap.read()
 
     #
     # Process data.
-
-    # Remove duplicated values for Australia in region = Europe (the author's original dataset has a duplicated value for Australia, one for Oceania and one for Europe).
-    mask = (tb["country"] == "Australia") & (tb["region"] == "Europe")
-
-    if mask.sum() > 0:
-        paths.log.info("There are duplicated values for Australia in the Europe region. They will be removed.")
-        tb = tb[~mask]
-
     #
-    # Verify index and sort
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 
     #
@@ -36,5 +28,5 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
-    # Save changes in the new garden dataset.
+    # Save changes in the new meadow dataset.
     ds_meadow.save()
