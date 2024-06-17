@@ -1,357 +1,400 @@
-descriptions:
-  policy_robustness: |-
-    This policy is not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues (2010, 2017) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators (between parentheses are the scoring schemes):
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      We estimated regional aggregations by using [Our World in Data definitions of regions](https://ourworldindata.org/world-region-map-definitions) and our [consolidated population data](https://ourworldindata.org/population-sources).
+    presentation:
+      topic_tags:
+        - LGBT+ Rights
+        - Human Rights
 
-      1. Proportion of Population Living Under Law: To acknowledge subnational variations (0-1)
-      2. Scope of Genders Subject to Law: As they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both)
-      3. Maximum Level of Punishment: For regressive policies (0: no law, 0.2: less than 3 years, 0.4: over 3 years and less than 15 years, 0.6: over 15 years and less than life in prison, 0.8: life in prison, 1: death penality)
-      4. Ease of Access: To benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers)
-      5. Evidence of Enforcement: Has been least one case the previous year where this was implemented? (0: no evidence, 1: evidence)
+  policy_robustness_1: |-
+    This policy is not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues ([2010](https://www.jstor.org/stable/25782170), [2017](https://www.jstor.org/stable/26166859)) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators.
 
+  policy_robustness_2: |-
+    These indicators are (between parentheses are the scoring schemes): *Proportion of Population Living Under Law*, to acknowledge subnational variations (0-1), *Scope of Genders Subject to Law*, as they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both), *Maximum Level of Punishment*, for regressive policies (0: no law, 0.2: less than 3 years, 0.4: over 3 years and less than 15 years, 0.6: over 15 years and less than life in prison, 0.8: life in prison, 1: death penality), *Ease of Access*, to benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers, and *Evidence of Enforcement* that considers whether at least one case has happenedthe previous year where this was implemented (0: no evidence, 1: evidence).
+
+  policy_robustness_3: |-
     At least three different indicators are used to estimate the policy score, with the result that each policy score ranges from 0 to 1. Therefore, a score of 1 corresponds to that policy's most robust scope and implementation. This also means that changes in any indicator will influence each policy’s overall score.
-  lgbt_index: |-
-    The LGBT+ Policy Index measures a country’s LGBT+ policy landscape by capturing the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
 
-    These policies are subdivided between:
+  lgbt_index_1: |-
+    These policies that define the index are subdivided between progressive policies and regressive policies. Among the progressive policies are: Same-sex sexual acts Legal, Equal Age of Consent, Employment Discrimination, Hate Crime Protections, Incitement to Hatred, Civil Unions, Marriage Equality, *oint Adoptions, Gender Marker Change, LGB Military, Transgender Military, Ban on Conversion Therapies, and Ban on Gender Assignment Surgeries on Children.
 
-      Progressive policies:
-        1. Same-Sex Sexual Acts Legal
-        2. Equal Age of Consent
-        3. Employment Discrimination
-        4. Hate Crime Protections
-        5. Incitement to Hatred
-        6. Civil Unions
-        7. Marriage Equality
-        8. Joint Adoptions
-        9. Gender Marker Change
-        10. LGB Military
-        11. Transgender Military
-        12. Ban on Conversion Therapies
-        13. Ban on Gender Assignment Surgeries on Children
+  lgbt_index_2: |-
+    On the other hand, the regressive policies are: Death Penalty for Same-Sex Sexual Acts, Propaganda Laws, Same-Sex Sexual Acts Illegal, Unequal Age of Consent, and Ban on Marriage Equality.
 
-      Regressive policies
-        1. Death Penalty for Same-Sex Sexual Acts
-        2. Propaganda Laws
-        3. Same-Sex Sexual Acts Illegal
-        4. Unequal Age of Consent
-        5. Ban on Marriage Equality
+  lgbt_index_3: |-
+    To create the index, the scores for each policy are summed together annually, with progressive policies receiving a positive score and regressive policies receiving a negative score. This results in an index ranging from -5 to +13. No country reaches these extremes, demonstrating that countries can get better and worse in their policy environments.
 
-    These policies are not measured in a binary (adopted/not-adopted) scheme; the author follows Frank and colleagues (2010, 2017) in considering that similar policies can meaningfully vary in scope, benefits, punishment, etc. So, he determines the robustness of each policy by reviewing five indicators (between parentheses are the scoring schemes):
-
-      1. Proportion of Population Living Under Law: To acknowledge subnational variations (0-1)
-      2. Scope of Genders Subject to Law: As they can be typically differentiated by gender (0: no law, 0.5: just men or women, 1: both)
-      3. Maximum Level of Punishment: For regressive policies (0: no law, 0.2: less than 3 years, 0.4: over 3 years and less than 15 years, 0.6: over 15 years and less than life in prison, 0.8: life in prison, 1: death penality)
-      4. Ease of Access: To benefits the law outlines (0: no law, 0.25: significant barriers, 0.5: moderate barriers, 0.75: little to few barriers, 1: no barriers)
-      5. Evidence of Enforcement: Has been least one case the previous year where this was implemented? (0: no evidence, 1: evidence)
-
-    While all five indicators may not be relevant to each policy, each policy in question uses at least three different indicators and with them, each policy score ranges from 0 to 1. Therefore, a score of 1 corresponds to that policy's most robust scope and implementation. This also means that changes in any indicators will influence each policy’s overall score. For example, a country having national marriage equality (indicator 1), few (if any) formal restrictions to obtaining a marriage license (indicator 4), and full implementation (indicator 5) will receive a score of 1.
-
-    To create the index, the scores for each policy are summed together annually, with progressive policies receiving a positive score and regressive policies receiving a negative. This results in an index ranging from -5 to +13. No country reaches these extremes, demonstrating that countries can get better and worse in their policy environments.
-
-    The LGBT+ policy index represents a robust and nuanced measure of LGBT+ policy adoption and implementation and is a novel contribution to the literature. By incorporating progressive and regressive LGBT+ policies and variation in implementation beyond a binary coding scheme, this measure captures even fine-grained changes to the LGBT+ policy landscape.
   count_yes: |-
     This is the number of countries per region with full implementation of the policy.
+
   count_no: |-
     This is the number of countries per region with partial or no implementation of the policy.
+
   pop_yes: |-
     This is the population per region with full implementation of the policy.
+
   pop_no: |-
     This is the population per region with partial or no implementation of the policy.
-dataset:
-  title: LGBT+ policies (Velasco, 2020)
-  description: |-
-    This dataset, from the work of Kristopher Velasco (2020), provides a country’s LGBT+ policy landscape by capturing the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
 
-    These policies are subdivided between:
+  equal_age: Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
+  unequal_age: Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
+  constitution: National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.  This variable is not used to calculate the LGBTI index.
+  conversion_therapies: Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
+  death_penalty: Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
+  employment_discrim: Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
+  gender_surgery: Measures if bans on gender assignment surgeries on children are adopted.
+  hate_crimes: Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
+  incite_hate: Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal.
+  joint_adoption: Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
+  lgb_military: Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
+  lgb_military_ban: Measures if lesbian, gay, and bisexual people are banned from the military. This variable is not used to calculate the LGBTI index.
+  marriage_equality: Measures if there is no legal distinction between same-sex and different-sex marriages.
+  marriage_ban: Measures if same-sex marriages are banned.
+  samesex_legal: Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
+  third_gender: Measures if a third gender is recognized in the legislation. This variable is not used to calculate the LGBTI index.
+  trans_military: Measures if transgender people are allowed to serve in the military.
+  samesex_illegal: Measures the presence of a law declaring that same-sex actions are criminalized between consenting adults.
+  civil_unions: Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
+  gendermarker: Measures if the gender marker can be legally changed.
+  propaganda: Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
 
-      Progressive policies:
-        1. Same-Sex Sexual Acts Legal
-        2. Equal Age of Consent
-        3. Employment Discrimination
-        4. Hate Crime Protections
-        5. Incitement to Hatred
-        6. Civil Unions
-        7. Marriage Equality
-        8. Joint Adoptions
-        9. Gender Marker Change
-        10. LGB Military
-        11. Transgender Military
-        12. Ban on Conversion Therapies
-        13. Ban on Gender Assignment Surgeries on Children
-
-      Regressive policies
-        1. Death Penalty for Same-Sex Sexual Acts
-        2. Propaganda Laws
-        3. Same-Sex Sexual Acts Illegal
-        4. Unequal Age of Consent
-        5. Ban on Marriage Equality
-
-    Each of these policies score in a range between 0 and 1, according to their level of implementation. Together, they form the LGBT+ Policy Index.
-
-    Additional policies are included in the dataset, as constitutional protections against discrimination, LGB military ban and third gender recognition.
-
-    Multiple sources were consulted to find the necessary data to construct this index. The primary data source was the State Sponsored Homophobia Reports produced by ILGA. These reports, produced almost annually, outline the adoption of various policies and provide some information on implementation. For information on trans- and intersex-specific policies and military information, other sources were used, including the Trans Legal Mapping Report, also produced by ILGA, reports and documentation provided by Transgender Europe, Movement Advancement Project, The Hague Center for Strategic Studies LGBT+ Military Index, and academic studies such as Reynolds (2013). Furthermore, multiple sources were used to obtain data on the evidence of enforcement – particularly arrests – including an extensive newspaper search across each country using LexisNexis and Factiva and other external reports by Amnesty International, Human Rights Watch, and the U.S. State Department.
-
-  sources:
-  - name: Kristopher Velasco (2020)
-    url: https://osf.io/preprints/socarxiv/3rtje/
-    date_accessed: "2023-06-15"
-    publication_date: '2020-07-24'
-    published_by:
-      'Velasco, K. (2020). Transnational Backlash and the Deinstitutionalization of Liberal Norms: LGBT+ Rights in a Contested World. https://doi.org/10.31235/osf.io/3rtje'
 tables:
   lgbti_policy_index:
     variables:
       equal_age:
         title: Equal age of consent
-        description: |
-          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.equal_age}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Equal age of consent
           numDecimalPlaces: 2
+        presentation:
+          title_public: Age of consent for same-sex and different-sex partners equal
       unequal_age:
         title: Unequal age of consent
-        description: |
-          Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.unequal_age}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ""
         unit: ''
         display:
           name: Unequal age of consent
           numDecimalPlaces: 2
+        presentation:
+          title_public: Age of consent for same-sex and different-sex partners unequal
       constitution:
         title: Constitutional protections against discrimination
-        description: |
-          National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.
-
-          Variable not among the 18 policies of the index.
+        description_short: |
+          {definitions.constitution}
         short_unit: ''
         unit: ''
         display:
           name: Constitutional protections against discrimination
           numDecimalPlaces: 0
+        presentation:
+          title_public: Constitutional protections against discrimination based on sexual orientation or gender identity
       conversion_therapies:
         title: Ban on conversion therapies
-        description: |
-          Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.conversion_therapies}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Ban on conversion therapies
           numDecimalPlaces: 2
+        presentation:
+          title_public: Conversion therapies banned
       death_penalty:
         title: Death penalty for same-sex sexual acts
-        description: |
-          Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.death_penalty}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Death penalty for same-sex sexual acts
           numDecimalPlaces: 2
+        presentation:
+          title_public: Same-sex sexual acts punished by death
       employment_discrim:
         title: Employment discrimination bans
-        description: |
-          Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.employment_discrim}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Employment discrimination laws
           numDecimalPlaces: 2
+        presentation:
+          title_public: Employment discrimination based on sexual orientation or gender identity prohibited
       gender_surgery:
         title: Ban on gender assignment surgeries on children
-        description: |
-          Measures if bans on gender assignment surgeries on children are adopted.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.gender_surgery}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Ban on gender assignment surgeries on children
           numDecimalPlaces: 0
+        presentation:
+          title_public: Gender assignment surgeries on children banned
       hate_crimes:
         title: Hate crime protections
-        description: |
-          Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.hate_crimes}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Hate crime protections
           numDecimalPlaces: 2
+        presentation:
+          title_public: Hate crimes based on sexual orientation or gender identity are an aggravating circumstance
       incite_hate:
         title: Incitement to hatred
-        description: |
-          Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.incite_hate}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Incitement to hatred
           numDecimalPlaces: 2
+        presentation:
+          title_public: Inciting crimes based on sexual orientation or gender identity is illegal
       joint_adoption:
         title: Joint adoptions
-        description: |
-          Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.joint_adoption}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Joint adoptions
           numDecimalPlaces: 2
+        presentation:
+          title_public: Joint adoptions by same-sex partners
       lgb_military:
         title: LGB military
-        description: |
-          Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.lgb_military}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: LGB military
           numDecimalPlaces: 0
+        presentation:
+          title_public: Lesbian, gay, and bisexual people allowed to openly serve in the military
       lgb_military_ban:
         title: LGB military ban
-        description: |
-          Measures if lesbian, gay, and bisexual people are banned from the military.
-
-          Variable not among the 18 policies of the index.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.lgb_military_ban}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: LGB military ban
           numDecimalPlaces: 0
+        presentation:
+          title_public: Lesbian, gay, and bisexual people banned from the military
       marriage_equality:
         title: Marriage equality
-        description: |
-          Measures if there is no legal distinction between same-sex and different-sex marriages.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.marriage_equality}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Marriage equality
           numDecimalPlaces: 2
+        presentation:
+          title_public: Marriage for same-sex partners
       marriage_ban:
         title: Ban on marriage equality
-        description: |
-          Measures if same-sex marriages are banned.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.marriage_ban}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Ban on marriage equality
           numDecimalPlaces: 2
+        presentation:
+          title_public: Marriage for same-sex partners banned
       samesex_legal:
         title: Same-sex sexual acts legal
-        description: |
-          Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.samesex_legal}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Same-sex sexual acts legal
           numDecimalPlaces: 2
+        presentation:
+          title_public: Same-sex sexual acts legal
       third_gender:
         title: Third gender recognition
-        description: |
-          Measures if a third gender is recognized in the legislation.
-
-          Variable not among the 18 policies of the index.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.third_gender}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Third gender recognition
           numDecimalPlaces: 0
+        presentation:
+          title_public: Third gender legally recognized
       trans_military:
         title: Trasgender military
-        description: |
-          Measures if transgender people are allowed to serve in the military.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.trans_military}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Trasgender military
           numDecimalPlaces: 0
+        presentation:
+          title_public: Transgender people are allowed to openly serve in the military
       samesex_illegal:
         title: Same-sex sexual acts illegal
-        description: |
-          Measures the presence of a law declaring that same-sex actions are criminalized between consenting adults.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.samesex_illegal}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Same-sex sexual acts illegal
           numDecimalPlaces: 2
+        presentation:
+          title_public: Same-sex sexual acts illegal
       civil_unions:
         title: Civil unions
-        description: |
-          Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.civil_unions}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Civil unions
           numDecimalPlaces: 2
+        presentation:
+          title_public: Civil union for same-sex partners
       gendermarker:
         title: Gender marker change
-        description: |
-          Measures if the gender marker can be legally changed.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.gendermarker}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Gender marker change
           numDecimalPlaces: 2
+        presentation:
+          title_public: Gender marker can be legally changed
       propaganda:
         title: Anti-propaganda laws
-        description: |
-          Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
-
-          {descriptions.policy_robustness}
+        description_short: |
+          {definitions.propaganda}
+        description_key:
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.policy_robustness_3}"
         short_unit: ''
         unit: ''
         display:
           name: Propaganda laws
           numDecimalPlaces: 2
+        presentation:
+          title_public: Public morality laws on non-traditional sexual relations
       policy_index:
         title: LGBT+ Policy Index
-        description: |
-          {descriptions.lgbt_index}
+        description_short: The LGBT+ Policy Index measures a country’s LGBT+ policy landscape by capturing the implementation of 18 different LGBT+ policies. Policies included in the index are limited to those adopted across at least three countries or are explicitly advocated for by transnational activists.
+        description_key:
+          - "{definitions.lgbt_index_1}"
+          - "{definitions.lgbt_index_2}"
+          - "{definitions.policy_robustness_1}"
+          - "{definitions.policy_robustness_2}"
+          - "{definitions.lgbt_index_3}"
         short_unit: ''
         unit: ''
         display:
           name: LGBT+ Policy Index
           numDecimalPlaces: 2
+        presentation:
+          title_public: LGBT+ rights index
       equal_age_yes:
         title: Equal age of consent ("yes", number of countries)
-        description: |
-          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.equal_age} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -359,10 +402,8 @@ tables:
           numDecimalPlaces: 0
       unequal_age_yes:
         title: Unequal age of consent ("yes"/"partially", number of countries)
-        description: |
-          Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.unequal_age} {definitions.count_yes}
         short_unit: ""
         unit: ''
         display:
@@ -370,10 +411,8 @@ tables:
           numDecimalPlaces: 0
       constitution_yes:
         title: Constitutional protections against discrimination ("yes", number of countries)
-        description: |
-          National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.constitution} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -381,10 +420,8 @@ tables:
           numDecimalPlaces: 0
       conversion_therapies_yes:
         title: Ban on conversion therapies ("yes", number of countries)
-        description: |
-          Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.conversion_therapies} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -392,10 +429,8 @@ tables:
           numDecimalPlaces: 0
       death_penalty_yes:
         title: Death penalty for same-sex sexual acts ("yes"/"partially", number of countries)
-        description: |
-          Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.death_penalty} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -403,10 +438,8 @@ tables:
           numDecimalPlaces: 0
       employment_discrim_yes:
         title: Employment discrimination bans ("yes", number of countries)
-        description: |
-          Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.employment_discrim} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -414,10 +447,8 @@ tables:
           numDecimalPlaces: 0
       gender_surgery_yes:
         title: Ban on gender assignment surgeries on children ("yes", number of countries)
-        description: |
-          Measures if bans on gender assignment surgeries on children are adopted.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.gender_surgery} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -425,10 +456,8 @@ tables:
           numDecimalPlaces: 0
       hate_crimes_yes:
         title: Hate crime protections ("yes", number of countries)
-        description: |
-          Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.hate_crimes} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -436,10 +465,8 @@ tables:
           numDecimalPlaces: 0
       incite_hate_yes:
         title: Incitement to hatred protections ("yes", number of countries)
-        description: |
-          Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.incite_hate} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -447,10 +474,8 @@ tables:
           numDecimalPlaces: 0
       joint_adoption_yes:
         title: Joint adoptions ("yes", number of countries)
-        description: |
-          Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.joint_adoption} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -458,10 +483,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_yes:
         title: LGB military ("yes", number of countries)
-        description: |
-          Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.lgb_military} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -469,10 +492,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_ban_yes:
         title: LGB military ban ("yes", number of countries)
-        description: |
-          Measures if lesbian, gay, and bisexual people are banned from the military.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.lgb_military_ban} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -480,10 +501,8 @@ tables:
           numDecimalPlaces: 0
       marriage_equality_yes:
         title: Marriage equality ("yes", number of countries)
-        description: |
-          Measures if there is no legal distinction between same-sex and different-sex marriages.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.marriage_equality} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -491,10 +510,8 @@ tables:
           numDecimalPlaces: 0
       marriage_ban_yes:
         title: Ban on marriage equality ("yes", number of countries)
-        description: |
-          Measures if same-sex marriages are banned.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.marriage_ban} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -502,10 +519,8 @@ tables:
           numDecimalPlaces: 0
       samesex_legal_yes:
         title: Same-sex sexual acts legal ("yes", number of countries)
-        description: |
-          Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.samesex_legal} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -513,10 +528,8 @@ tables:
           numDecimalPlaces: 0
       third_gender_yes:
         title: Third gender recognition ("yes", number of countries)
-        description: |
-          Measures if a third gender is recognized in the legislation.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.third_gender} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -524,10 +537,8 @@ tables:
           numDecimalPlaces: 0
       trans_military_yes:
         title: Trasgender military ("yes", number of countries)
-        description: |
-          Measures if transgender people are allowed to serve in the military.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.trans_military} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -535,10 +546,8 @@ tables:
           numDecimalPlaces: 0
       civil_unions_yes:
         title: Civil unions ("yes", number of countries)
-        description: |
-          Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.civil_unions} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -546,10 +555,8 @@ tables:
           numDecimalPlaces: 0
       gendermarker_yes:
         title: Gender marker change ("yes", number of countries)
-        description: |
-          Measures if the gender marker can be legally changed.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.gendermarker} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -557,10 +564,8 @@ tables:
           numDecimalPlaces: 0
       propaganda_yes:
         title: Anti-propaganda laws ("yes"/"partially", number of countries)
-        description: |
-          Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
-
-          {descriptions.count_yes}
+        description_short: |
+          {definitions.propaganda} {definitions.count_yes}
         short_unit: ''
         unit: ''
         display:
@@ -568,10 +573,8 @@ tables:
           numDecimalPlaces: 0
       equal_age_no:
         title: Equal age of consent ("no"/"partially", number of countries)
-        description: |
-          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.equal_age} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -579,10 +582,8 @@ tables:
           numDecimalPlaces: 0
       unequal_age_no:
         title: Unequal age of consent ("no", number of countries)
-        description: |
-          Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.unequal_age} {definitions.count_no}
         short_unit: ""
         unit: ''
         display:
@@ -590,10 +591,8 @@ tables:
           numDecimalPlaces: 0
       constitution_no:
         title: Constitutional protections against discrimination ("no"/"partially", number of countries)
-        description: |
-          National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.constitution} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -601,10 +600,8 @@ tables:
           numDecimalPlaces: 0
       conversion_therapies_no:
         title: Ban on conversion therapies ("no"/"partially", number of countries)
-        description: |
-          Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.conversion_therapies} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -612,10 +609,8 @@ tables:
           numDecimalPlaces: 0
       death_penalty_no:
         title: Death penalty for same-sex sexual acts ("no", number of countries)
-        description: |
-          Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.death_penalty} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -623,10 +618,8 @@ tables:
           numDecimalPlaces: 0
       employment_discrim_no:
         title: Employment discrimination bans ("no"/"partially", number of countries)
-        description: |
-          Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.employment_discrim} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -634,10 +627,8 @@ tables:
           numDecimalPlaces: 0
       gender_surgery_no:
         title: Ban on gender assignment surgeries on children ("no"/"partially", number of countries)
-        description: |
-          Measures if bans on gender assignment surgeries on children are adopted.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.gender_surgery} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -645,10 +636,8 @@ tables:
           numDecimalPlaces: 0
       hate_crimes_no:
         title: Hate crime protections ("no"/"partially", number of countries)
-        description: |
-          Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.hate_crimes} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -656,10 +645,8 @@ tables:
           numDecimalPlaces: 0
       incite_hate_no:
         title: Incitement to hatred ("no"/"partially", number of countries)
-        description: |
-          Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.incite_hate} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -667,10 +654,8 @@ tables:
           numDecimalPlaces: 0
       joint_adoption_no:
         title: Joint adoptions ("no"/"partially", number of countries)
-        description: |
-          Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.joint_adoption} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -678,10 +663,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_no:
         title: LGB military ("no"/"partially", number of countries)
-        description: |
-          Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.lgb_military} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -689,10 +672,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_ban_no:
         title: LGB military ban ("no"/"partially", number of countries)
-        description: |
-          Measures if lesbian, gay, and bisexual people are banned from the military.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.lgb_military_ban} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -700,10 +681,8 @@ tables:
           numDecimalPlaces: 0
       marriage_equality_no:
         title: Marriage equality ("no"/"partially", number of countries)
-        description: |
-          Measures if there is no legal distinction between same-sex and different-sex marriages.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.marriage_equality} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -711,10 +690,8 @@ tables:
           numDecimalPlaces: 0
       marriage_ban_no:
         title: Ban on marriage equality ("no"/"partially", number of countries)
-        description: |
-          Measures if same-sex marriages are banned.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.marriage_ban} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -722,10 +699,8 @@ tables:
           numDecimalPlaces: 0
       samesex_legal_no:
         title: Same-sex sexual acts legal ("no"/"partially", number of countries)
-        description: |
-          Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.samesex_legal} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -733,10 +708,8 @@ tables:
           numDecimalPlaces: 0
       third_gender_no:
         title: Third gender recognition ("no"/"partially", number of countries)
-        description: |
-          Measures if a third gender is recognized in the legislation.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.third_gender} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -744,10 +717,8 @@ tables:
           numDecimalPlaces: 0
       trans_military_no:
         title: Trasgender military ("no"/"partially", number of countries)
-        description: |
-          Measures if transgender people are allowed to serve in the military.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.trans_military} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -755,10 +726,8 @@ tables:
           numDecimalPlaces: 0
       civil_unions_no:
         title: Civil unions ("no"/"partially", number of countries)
-        description: |
-          Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.civil_unions} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -766,10 +735,8 @@ tables:
           numDecimalPlaces: 0
       gendermarker_no:
         title: Gender marker change ("no"/"partially", number of countries)
-        description: |
-          Measures if the gender marker can be legally changed.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.gendermarker} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -777,10 +744,8 @@ tables:
           numDecimalPlaces: 0
       propaganda_no:
         title: Anti-propaganda laws ("no", number of countries)
-        description: |
-          Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
-
-          {descriptions.count_no}
+        description_short: |
+          {definitions.propaganda} {definitions.count_no}
         short_unit: ''
         unit: ''
         display:
@@ -788,10 +753,8 @@ tables:
           numDecimalPlaces: 0
       equal_age_yes_pop:
         title: Equal age of consent ("yes", total population)
-        description: |
-          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.equal_age} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -799,10 +762,8 @@ tables:
           numDecimalPlaces: 0
       unequal_age_yes_pop:
         title: Unequal age of consent ("yes"/"partially", total population)
-        description: |
-          Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.unequal_age} {definitions.pop_yes}
         short_unit: ""
         unit: ''
         display:
@@ -810,9 +771,8 @@ tables:
           numDecimalPlaces: 0
       constitution_yes_pop:
         title: Constitutional protections against discrimination ("yes", total population)
-        description: |
-          - National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.constitution} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -820,10 +780,8 @@ tables:
           numDecimalPlaces: 0
       conversion_therapies_yes_pop:
         title: Ban on conversion therapies ("yes", total population)
-        description: |
-          Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.conversion_therapies} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -831,10 +789,8 @@ tables:
           numDecimalPlaces: 0
       death_penalty_yes_pop:
         title: Death penalty for same-sex sexual acts ("yes"/"partially", total population)
-        description: |
-          Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.death_penalty} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -842,10 +798,8 @@ tables:
           numDecimalPlaces: 0
       employment_discrim_yes_pop:
         title: Employment discrimination bans ("yes", total population)
-        description: |
-          Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.employment_discrim} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -853,10 +807,8 @@ tables:
           numDecimalPlaces: 0
       gender_surgery_yes_pop:
         title: Ban on gender assignment surgeries on children ("yes", total population)
-        description: |
-          Measures if bans on gender assignment surgeries on children are adopted.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.gender_surgery} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -864,10 +816,8 @@ tables:
           numDecimalPlaces: 0
       hate_crimes_yes_pop:
         title: Hate crime protections ("yes", total population)
-        description: |
-          Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.hate_crimes} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -875,10 +825,8 @@ tables:
           numDecimalPlaces: 0
       incite_hate_yes_pop:
         title: Incitement to hatred ("yes", total population)
-        description: |
-          Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.incite_hate} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -886,10 +834,8 @@ tables:
           numDecimalPlaces: 0
       joint_adoption_yes_pop:
         title: Joint adoptions ("yes", total population)
-        description: |
-          Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.joint_adoption} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -897,10 +843,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_yes_pop:
         title: LGB military ("yes", total population)
-        description: |
-          Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.lgb_military} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -908,10 +852,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_ban_yes_pop:
         title: LGB military ban ("yes", total population)
-        description: |
-          Measures if lesbian, gay, and bisexual people are banned from the military.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.lgb_military_ban} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -919,10 +861,8 @@ tables:
           numDecimalPlaces: 0
       marriage_equality_yes_pop:
         title: Marriage equality ("yes", total population)
-        description: |
-          Measures if there is no legal distinction between same-sex and different-sex marriages.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.marriage_equality} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -930,10 +870,8 @@ tables:
           numDecimalPlaces: 0
       marriage_ban_yes_pop:
         title: Ban on marriage equality ("yes", total population)
-        description: |
-          Measures if same-sex marriages are banned.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.marriage_ban} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -941,10 +879,8 @@ tables:
           numDecimalPlaces: 0
       samesex_legal_yes_pop:
         title: Same-sex sexual acts legal ("yes", total population)
-        description: |
-          Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.samesex_legal} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -952,10 +888,8 @@ tables:
           numDecimalPlaces: 0
       third_gender_yes_pop:
         title: Third gender recognition ("yes", total population)
-        description: |
-          Measures if a third gender is recognized in the legislation.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.third_gender} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -963,10 +897,8 @@ tables:
           numDecimalPlaces: 0
       trans_military_yes_pop:
         title: Trasgender military ("yes", total population)
-        description: |
-          Measures if transgender people are allowed to serve in the military.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.trans_military} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -974,10 +906,8 @@ tables:
           numDecimalPlaces: 0
       civil_unions_yes_pop:
         title: Civil unions ("yes", total population)
-        description: |
-          Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.civil_unions} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -985,10 +915,8 @@ tables:
           numDecimalPlaces: 0
       gendermarker_yes_pop:
         title: Gender marker change ("yes", total population)
-        description: |
-          Measures if the gender marker can be legally changed.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.gendermarker} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -996,10 +924,8 @@ tables:
           numDecimalPlaces: 0
       propaganda_yes_pop:
         title: Anti-propaganda laws ("yes"/"partially", total population)
-        description: |
-          Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
-
-          {descriptions.pop_yes}
+        description_short: |
+          {definitions.propaganda} {definitions.pop_yes}
         short_unit: ''
         unit: ''
         display:
@@ -1007,10 +933,8 @@ tables:
           numDecimalPlaces: 0
       equal_age_no_pop:
         title: Equal age of consent ("no"/"partially", total population)
-        description: |
-          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.equal_age} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1018,10 +942,8 @@ tables:
           numDecimalPlaces: 0
       unequal_age_no_pop:
         title: Unequal age of consent ("no", total population)
-        description: |
-          Measures the presence of a law outlawing different ages of consent between same-sex and different-sex partners, which serves as a tool to inhibit same-sex acts between consenting adults.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.unequal_age} {definitions.pop_no}
         short_unit: ""
         unit: ''
         display:
@@ -1029,10 +951,8 @@ tables:
           numDecimalPlaces: 0
       constitution_no_pop:
         title: Constitutional protections against discrimination ("no"/"partially", total population)
-        description: |
-          National constitutions are classified as protective against discrimination based on sexual orientation or gender identity if there is explicit language or if judicial cases have set legal precedent for such protections.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.constitution} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1040,10 +960,8 @@ tables:
           numDecimalPlaces: 0
       conversion_therapies_no_pop:
         title: Ban on conversion therapies ("no"/"partially", total population)
-        description: |
-          Measures if bans on conversion therapies are adopted. Conversion therapies are those attempting to change a person’s sexual orientation or gender identity. They can entail counseling, drugging, electric shocks, castrations, or brain surgery.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.conversion_therapies} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1051,10 +969,8 @@ tables:
           numDecimalPlaces: 0
       death_penalty_no_pop:
         title: Death penalty for same-sex sexual acts ("no", total population)
-        description: |
-          Measures the adoption of policies that allow for individuals caught engaging in same-sex acts to be punished by death.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.death_penalty} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1062,10 +978,8 @@ tables:
           numDecimalPlaces: 0
       employment_discrim_no_pop:
         title: Employment discrimination bans ("no"/"partially", total population)
-        description: |
-          Measures the presence of legislation banning employers from discriminating on the basis of sexual orientation or gender identity.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.employment_discrim} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1073,10 +987,8 @@ tables:
           numDecimalPlaces: 0
       gender_surgery_no_pop:
         title: Ban on gender assignment surgeries on children ("no"/"partially", total population)
-        description: |
-          Measures if bans on gender assignment surgeries on children are adopted.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.gender_surgery} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1084,10 +996,8 @@ tables:
           numDecimalPlaces: 0
       hate_crimes_no_pop:
         title: Hate crime protections ("no"/"partially", total population)
-        description: |
-          Measures the adoption of hate crime laws, which designate a crime against someone based based on sexual orientation or gender identity as an aggravating circumstance.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.hate_crimes} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1095,10 +1005,8 @@ tables:
           numDecimalPlaces: 0
       incite_hate_no_pop:
         title: Incitement to hatred ("no"/"partially", total population)
-        description: |
-          Measures the adoption of incitement to hatred protections, which is any act that could provoke a targeted crime illegal
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.incite_hate} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1106,10 +1014,8 @@ tables:
           numDecimalPlaces: 0
       joint_adoption_no_pop:
         title: Joint adoptions ("no"/"partially", total population)
-        description: |
-          Measures if joint adoption policy is adopted. This policy allows for same-sex partners to legally adopt a child, with both parents being recognized as such.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.joint_adoption} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1117,10 +1023,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_no_pop:
         title: LGB military ("no"/"partially", total population)
-        description: |
-          Measures if lesbian, gay, and bisexual people are allowed to serve in the military.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.lgb_military} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1128,10 +1032,8 @@ tables:
           numDecimalPlaces: 0
       lgb_military_ban_no_pop:
         title: LGB military ban ("no"/"partially", total population)
-        description: |
-          Measures if lesbian, gay, and bisexual people are banned from the military.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.lgb_military_ban} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1139,10 +1041,8 @@ tables:
           numDecimalPlaces: 0
       marriage_equality_no_pop:
         title: Marriage equality ("no"/"partially", total population)
-        description: |
-          Measures if there is no legal distinction between same-sex and different-sex marriages.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.marriage_equality} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1150,10 +1050,8 @@ tables:
           numDecimalPlaces: 0
       marriage_ban_no_pop:
         title: Ban on marriage equality ("no"/"partially", total population)
-        description: |
-          Measures if same-sex marriages are banned.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.marriage_ban} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1161,10 +1059,8 @@ tables:
           numDecimalPlaces: 0
       samesex_legal_no_pop:
         title: Same-sex sexual acts legal ("no"/"partially", total population)
-        description: |
-          Measures the presence of a law declaring that same-sex actions are not criminalized between consenting adults.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.samesex_legal} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1172,10 +1068,8 @@ tables:
           numDecimalPlaces: 0
       third_gender_no_pop:
         title: Third gender recognition ("no"/"partially", total population)
-        description: |
-          Measures if a third gender is recognized in the legislation.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.third_gender} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1183,10 +1077,8 @@ tables:
           numDecimalPlaces: 0
       trans_military_no_pop:
         title: Trasgender military ("no"/"partially", total population)
-        description: |
-          Measures if transgender people are allowed to serve in the military.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.trans_military} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1194,10 +1086,8 @@ tables:
           numDecimalPlaces: 0
       civil_unions_no_pop:
         title: Civil unions ("no"/"partially", total population)
-        description: |
-          Measures if civil unions for same-sex partners are adopted. Domestic and registered partnerships are included.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.civil_unions} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1205,10 +1095,8 @@ tables:
           numDecimalPlaces: 0
       gendermarker_no_pop:
         title: Gender marker change ("no"/"partially", total population)
-        description: |
-          Measures if the gender marker can be legally changed.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.gendermarker} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
@@ -1216,12 +1104,380 @@ tables:
           numDecimalPlaces: 0
       propaganda_no_pop:
         title: Anti-propaganda laws ("no", total population)
-        description: |
-          Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
-
-          {descriptions.pop_no}
+        description_short: |
+          {definitions.propaganda} {definitions.pop_no}
         short_unit: ''
         unit: ''
         display:
           name: "No"
           numDecimalPlaces: 0
+
+      age_of_consent:
+        title: Age of consent (combined)
+        description_short: |
+          Combines the equal and unequal age of consent.
+        short_unit: ''
+        unit: ''
+        display:
+          name: Age of consent
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Equal
+          - Partial implementation
+          - No legal provisions
+          - Unequal
+
+      marriage:
+        title: Marriage equality (combined)
+        description_short: |
+          Combines marriage equality, marriage ban and civil unions.
+        short_unit: ''
+        unit: ''
+        display:
+          name: Marriage equality
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Legal
+          - Partial
+          - No legal provisions
+          - Marriage and ban both partial
+          - Partial ban
+          - Banned
+
+      lgb_military_join:
+        title: LGB military (combined)
+        description_short: |
+          Combines LGB military and LGB military ban.
+        short_unit: ''
+        unit: ''
+        display:
+          name: LGB military
+          numDecimalPlaces: 0
+        type: ordinal
+        sort:
+          - Allowed
+          - No policy
+          - Banned
+
+      age_of_consent_no_legal_provisions_count:
+        title: Age of consent (no legal provisions, number of countries)
+        description_short: |
+          This is the number of countries that do not have legal provisions for the age of consent.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "No legal provisions"
+          numDecimalPlaces: 0
+
+      age_of_consent_equal_count:
+        title: Age of consent (equal, number of countries)
+        description_short: |
+          This is the number of countries that have equal age of consent for same-sex and different-sex partners.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Equal"
+          numDecimalPlaces: 0
+
+      age_of_consent_partial_implementation_count:
+        title: Age of consent (partial implementation, number of countries)
+        description_short: |
+          This is the number of countries that have partial implementation of the age of consent legislation.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Partial implementation"
+          numDecimalPlaces: 0
+
+      age_of_consent_unequal_count:
+        title: Age of consent (unequal, number of countries)
+        description_short: |
+          This is the number of countries that have unequal age of consent for same-sex and different-sex partners.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Unequal"
+          numDecimalPlaces: 0
+
+      age_of_consent_missing_count:
+        title: Age of consent (missing, number of countries)
+        description_short: |
+          This is the number of countries that have missing data on the age of consent.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
+      marriage_no_legal_provisions_count:
+        title: Marriage equality (no legal provisions, number of countries)
+        description_short: |
+          This is the number of countries that do not have legal provisions for marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "No legal provisions"
+          numDecimalPlaces: 0
+
+      marriage_partial_count:
+        title: Marriage equality (partial, number of countries)
+        description_short: |
+          This is the number of countries that have partial implementation of marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Partial"
+          numDecimalPlaces: 0
+
+      marriage_legal_count:
+        title: Marriage equality (legal, number of countries)
+        description_short: |
+          This is the number of countries that have legal marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Legal"
+          numDecimalPlaces: 0
+
+      marriage_banned_count:
+        title: Marriage equality (banned, number of countries)
+        description_short: |
+          This is the number of countries that have banned marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Banned"
+          numDecimalPlaces: 0
+
+      marriage_partial_ban_count:
+        title: Marriage equality (partial ban, number of countries)
+        description_short: |
+          This is the number of countries that have partial implementation of a ban on marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Partial ban"
+          numDecimalPlaces: 0
+
+      marriage_marriage_and_ban_both_partial_count:
+        title: Marriage equality (marriage and ban both partial, number of countries)
+        description_short: |
+          This is the number of countries that have partial implementation of both marriage equality and a ban on marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Marriage and ban both partial"
+          numDecimalPlaces: 0
+
+      marriage_missing_count:
+        title: Marriage equality (missing, number of countries)
+        description_short: |
+          This is the number of countries that have missing data on marriage equality.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
+      lgb_military_join_no_policy_count:
+        title: LGB military (no policy, number of countries)
+        description_short: |
+          This is the number of countries that do not have a policy on LGB military service.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "No policy"
+          numDecimalPlaces: 0
+
+      lgb_military_join_allowed_count:
+        title: LGB military (allowed, number of countries)
+        description_short: |
+          This is the number of countries that allow LGB military service.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Allowed"
+          numDecimalPlaces: 0
+
+      lgb_military_join_banned_count:
+        title: LGB military (banned, number of countries)
+        description_short: |
+          This is the number of countries that ban LGB military service.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Banned"
+          numDecimalPlaces: 0
+
+      lgb_military_join_missing_count:
+        title: LGB military (missing, number of countries)
+        description_short: |
+          This is the number of countries that have missing data on LGB military service.
+        short_unit: ''
+        unit: 'countries'
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
+      age_of_consent_no_legal_provisions_pop:
+        title: Age of consent (no legal provisions, total population)
+        description_short: |
+          This is the total population of countries that do not have legal provisions for the age of consent.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "No legal provisions"
+          numDecimalPlaces: 0
+
+      age_of_consent_equal_pop:
+        title: Age of consent (equal, total population)
+        description_short: |
+          This is the total population of countries that have equal age of consent between same-sex and different-sex partners.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Equal"
+          numDecimalPlaces: 0
+
+      age_of_consent_partial_implementation_pop:
+        title: Age of consent (partial implementation, total population)
+        description_short: |
+          This is the total population of countries that have partial implementation of the age of consent legislation.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Partial implementation"
+          numDecimalPlaces: 0
+
+      age_of_consent_unequal_pop:
+        title: Age of consent (unequal, total population)
+        description_short: |
+          This is the total population of countries that have unequal age of consent between same-sex and different-sex partners.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Unequal"
+          numDecimalPlaces: 0
+
+      age_of_consent_missing_pop:
+        title: Age of consent (missing, total population)
+        description_short: |
+          This is the total population of countries that have missing data on the age of consent.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
+      marriage_no_legal_provisions_pop:
+        title: Marriage equality (no legal provisions, total population)
+        description_short: |
+          This is the total population of countries that do not have legal provisions for marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "No legal provisions"
+          numDecimalPlaces: 0
+
+      marriage_partial_pop:
+        title: Marriage equality (partial, total population)
+        description_short: |
+          This is the total population of countries that have partial implementation of marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Partial"
+          numDecimalPlaces: 0
+
+      marriage_legal_pop:
+        title: Marriage equality (legal, total population)
+        description_short: |
+          This is the total population of countries that have legal marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Legal"
+          numDecimalPlaces: 0
+
+      marriage_banned_pop:
+        title: Marriage equality (banned, total population)
+        description_short: |
+          This is the total population of countries that have banned marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Banned"
+          numDecimalPlaces: 0
+
+      marriage_partial_ban_pop:
+        title: Marriage equality (partial ban, total population)
+        description_short: |
+          This is the total population of countries that have partial implementation of a ban on marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Partial ban"
+          numDecimalPlaces: 0
+
+      marriage_marriage_and_ban_both_partial_pop:
+        title: Marriage equality (marriage and ban both partial, total population)
+        description_short: |
+          This is the total population of countries that have partial implementation of both marriage equality and a ban on marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Marriage and ban both partial"
+          numDecimalPlaces: 0
+
+      marriage_missing_pop:
+        title: Marriage equality (missing, total population)
+        description_short: |
+          This is the total population of countries that have missing data on marriage equality.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
+      lgb_military_join_no_policy_pop:
+        title: LGB military (no policy, total population)
+        description_short: |
+          This is the total population of countries that do not have a policy on LGB military service.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "No policy"
+          numDecimalPlaces: 0
+
+      lgb_military_join_allowed_pop:
+        title: LGB military (allowed, total population)
+        description_short: |
+          This is the total population of countries that allow LGB military service.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Allowed"
+          numDecimalPlaces: 0
+
+      lgb_military_join_banned_pop:
+        title: LGB military (banned, total population)
+        description_short: |
+          This is the total population of countries that ban LGB military service.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Banned"
+          numDecimalPlaces: 0
+
+      lgb_military_join_missing_pop:
+        title: LGB military (missing, total population)
+        description_short: |
+          This is the total population of countries that have missing data on LGB military service.
+        short_unit: ''
+        unit: ''
+        display:
+          name: "Missing"
+          numDecimalPlaces: 0
+
