@@ -2,7 +2,7 @@
 
 """
 
-from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_sig_figs
+from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 
 
 def test_round_to_sig_figs_1_sig_fig():
@@ -87,3 +87,45 @@ def test_round_to_nearest_power_of_ten_ceil():
     }
     for test in tests.items():
         assert round_to_nearest_power_of_ten(test[0], floor=False) == test[1], test
+
+
+def test_round_to_shifted_power_of_ten_floor():
+    tests = {
+        -0.1: -0.1,
+        -0.12: -0.1,
+        -0.21: -0.2,
+        -90: -50,
+        0: 0,
+        1: 1,
+        -1: -1,
+        123: 100,
+        1001: 1000,
+        3001: 3000,
+        9000: 5000,
+        0.87: 0.5,
+        0.032: 0.03,
+        0.0005: 0.0005,
+    }
+    for test in tests.items():
+        assert round_to_shifted_power_of_ten(test[0], shifts=[1, 2, 3, 5]) == test[1], test
+
+
+def test_round_to_shifted_power_of_ten_ceil():
+    tests = {
+        -0.1: -0.1,
+        -0.12: -0.2,
+        -0.21: -0.3,
+        -90: -100,
+        0: 0,
+        1: 1,
+        -1: -1,
+        123: 200,
+        1001: 2000,
+        3001: 5000,
+        9000: 10000,
+        0.87: 1,
+        0.032: 0.05,
+        0.0005: 0.0005,
+    }
+    for test in tests.items():
+        assert round_to_shifted_power_of_ten(test[0], shifts=[1, 2, 3, 5], floor=False) == test[1], test

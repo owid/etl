@@ -12,7 +12,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 """
 
 import math
-from typing import Any, List, Set, Union
+from typing import Any, List, Optional, Set, Union
 
 import pandas as pd
 import plotly.express as px
@@ -327,3 +327,82 @@ def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
         Rounded value.
     """
     return round(value, sig_figs - 1 - math.floor(math.log10(abs(value if value != 0 else 1))))
+
+
+def round_to_shifted_power_of_ten(
+    value: Union[int, float], shifts: Optional[List[int]] = None, floor: bool = True
+) -> Union[int, float]:
+    """Round a number to its nearest power of ten, shifted by a certain coefficient.
+
+    By default, the coefficients are 1, 2, 3, and 5.
+
+    If `floor` is True, values are rounded down, e.g. 123 -> 100. Otherwise, they are rounded up, e.g. 123 -> 200.
+
+    For example (if `floor` is True):
+    0 -> 0
+    0.1 -> 0.1
+    0.09 -> 0.05
+    0.11 -> 0.1
+    123 -> 100
+    199 -> 100
+    201 -> 200
+    350 -> 300
+    500 -> 500
+
+    NOTE: For convenience, negative numbers are rounded down in absolute value.
+    For example, when `floor` is True, -123 -> -100.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    shifts : Optional[List[int]]
+        Coefficients that determine the shift from the closest power of ten.
+    floor : bool, optional
+        Whether to round the value down (if True) or up (if False).
+
+    Returns
+    -------
+    closest_shifted_value : Union[int,float]
+        Nearest shifted power of ten.
+    """
+    if value == 0:
+        # Handle special case for zero.
+        return 0
+
+    # Define the absolute value.
+    value_abs = abs(value)
+
+    if shifts is None:
+        shifts = [1, 2, 3, 5]
+
+    # Find the closest power of 10 that is smaller than the value.
+    log_value = math.log10(value_abs)
+    power_of_10 = 10 ** math.floor(log_value)
+
+    # Generate all possible values shifted by the coefficients given in "shifts".
+    _values = [power_of_10 * shift for shift in shifts]
+
+    if floor:
+        # Find the largest shifted value that is still smaller than or equal to the given value.
+        closest_shifted_value = max([_value for _value in _values if _value <= value_abs], default=power_of_10)
+    else:
+        # Generate possible shifted values for the next power of 10.
+        next_power_of_10 = 10 ** math.ceil(log_value)
+        _values += [next_power_of_10 * shift for shift in shifts]
+        # Find the smallest shifted value that is still greater than or equal to the given value.
+        closest_shifted_value = min([_value for _value in _values if _value >= value_abs], default=next_power_of_10)
+
+    # Due to floating precision errors, the returned number differs from the expected one.
+    # Round to 1 significant figure.
+    closest_shifted_value = round_to_sig_figs(closest_shifted_value, sig_figs=1)
+
+    # Respect the type of the input value.
+    if isinstance(value, int):
+        closest_shifted_value = int(closest_shifted_value)
+
+    # Respect the sign of the input value.
+    if value < 0:
+        closest_shifted_value = -closest_shifted_value
+
+    return closest_shifted_value
