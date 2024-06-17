@@ -661,10 +661,14 @@ class Pagination:
 
     @property
     def page(self):
-        return st.session_state[self.pagination_key]
+        # value = min(self.total_pages, st.session_state[self.pagination_key])
+        value = st.session_state[self.pagination_key]
+        return value
 
     @page.setter
     def page(self, value):
+        # Correct page number if exceeds maximum allowed
+
         st.session_state[self.pagination_key] = value
 
     @property
@@ -680,9 +684,6 @@ class Pagination:
     def show_controls(self) -> None:
         # Pagination controls
         col1, col2, col3 = st.columns([1, 1, 1])
-
-        # Correct page number if exceeds maximum allowed
-        self.page = min(self.total_pages, self.page)
 
         with st.container(border=True):
             with col1:
