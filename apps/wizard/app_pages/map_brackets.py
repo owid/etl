@@ -16,7 +16,7 @@ from structlog import get_logger
 
 from apps.wizard.utils import chart_html
 from apps.wizard.utils.env import OWID_ENV
-from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_sig_figs
+from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer_helpers import Explorer
 from etl.grapher_model import Entity, Variable
 from etl.paths import BASE_DIR
@@ -25,6 +25,8 @@ from etl.paths import BASE_DIR
 #  * Create another slider (from 0 to 10) for tolerance.
 #  * Add "custom" to the list of radio buttons for bracket type.
 #  * Consider categorical values.
+#  * For linear brackets, here's a possible strategy: Take positive values. Focus either on the entire range from min to max, or from 5% to 95% percentiles. Find all possible ways to divide that range in steps of 1, 2, and 5 (and powers of 10 of those numbers), so that the result has between 4 and 10 brackets.
+#  * To choose the best configuration (both for linear and log), rank all possibilities by Gini.
 
 # Logging
 log = get_logger()
@@ -43,10 +45,19 @@ MIN_NUM_BRACKETS = 4
 SMALLEST_NUMBER_DEFAULT = 0.01
 
 # Labels of the different bracket types.
-LABEL_LINEAR = "linear"
-LABEL_LOG_X2 = "log x2"
-LABEL_LOG_X3 = "log x3"
-LABEL_LOG_X10 = "log x10"
+BRACKET_LABELS = {
+    "linear": {
+        "1": "linear +1",
+        "2": "linear +2",
+        "5": "linear +5",
+        "custom": "linear custom",
+    },
+    "log": {
+        "x10": "log x10",
+        "x2": "log x2",
+        "x3": "log x3",
+    },
+}
 
 # Types of uses of this tool.
 USE_TYPE_EXPLORERS = "by explorer"
@@ -164,7 +175,7 @@ class MapBracketer:
         # Estimate whether the lower and upper brackets should be open.
         self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
         # Define an attribute that determines the bracket type (by default, pick one).
-        self.bracket_type = LABEL_LOG_X10
+        self.bracket_type = BRACKET_LABELS["log"]["x10"]
         # Define selected brackets (which will be updated later on).
         self.brackets_selected = []
         # Initialize a color scheme attribute.
@@ -194,16 +205,16 @@ class MapBracketer:
 
         # Create the minimum number of brackets that would fully contain the values.
         # First, do it in powers of 10.
-        brackets_x10 = 10 ** np.arange(
-            np.log10(min_bracket_possible), np.log10(max_bracket_possible) + self.increments, self.increments
-        )
-        brackets_all[LABEL_LOG_X10] = brackets_x10
+        brackets_x10 = 10 ** np.arange(np.log10(min_bracket_possible), np.log10(max_bracket_possible) + 1, 1)
+        brackets_all[BRACKET_LABELS["log"]["x10"]] = brackets_x10
 
         # Now, do it following the sequence 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, etc.
-        brackets_all[LABEL_LOG_X2] = np.sort(np.hstack([brackets_x10, brackets_x10[:-1] * 2, brackets_x10[:-1] * 5]))
+        brackets_all[BRACKET_LABELS["log"]["x2"]] = np.sort(
+            np.hstack([brackets_x10, brackets_x10[:-1] * 2, brackets_x10[:-1] * 5])
+        )
 
         # Now, do it following the sequence 0.1, 0.3, 1, 3, 10, 30, etc.
-        brackets_all[LABEL_LOG_X3] = np.sort(np.hstack([brackets_x10, brackets_x10[:-1] * 3]))
+        brackets_all[BRACKET_LABELS["log"]["x3"]] = np.sort(np.hstack([brackets_x10, brackets_x10[:-1] * 3]))
 
         for bracket_type, brackets in brackets_all.items():
             if self.values.min() < -self.smallest_number:
@@ -214,17 +225,49 @@ class MapBracketer:
             # Round numbers.
             brackets_all[bracket_type] = np.array([round_to_sig_figs(bracket) for bracket in brackets])  # .tolist()
 
-        # TODO: Implement a better logic.
-        brackets_all[LABEL_LINEAR] = np.arange(
-            self.min_value, self.max_value + self.increments, self.increments
-        ).tolist()
+        # We want linear brackets to go in increments of 1, 2 or 5 (and powers of 10 of this, e.g. 10, 20, 50, or 0.1, 0.2, 0.5).
+        # In principle, we could also have increments of, say, 4, e.g. [0, 40, 80, 120], but by default it's usually better to round to 1, 2, 5, e.g. [0, 20, 40, 60, 80, 100, 120] or [0, 50, 100, 150]. We'll see if this assumption needs to be relaxed.
+        # If there are negative values, one of the stops should definitely be zero.
+        # E.g. we don't want brackets like [-300, -100, 100, 300], but rather [-400, -200, 0, 200, 400].
+        # TODO: It's not clear if, for purely positive (or purely negative) lists, we need brackets that would pass through zero.
+        #  For example, it would be fine to do [300, 500, 700, 900], instead of imposing [200, 400, 600, 800].
+        #  For now, and for simplicity, assume that 0 is always one of the stops.
+        # TODO: Note that we may also want to have, e.g. [1000, 1020, 1040, 1060].
+
+        # Find the smallest 1,2,5-rounded value that is above the maximum value in the data.
+        # For example, 999 -> 1000, 1001 -> 2000, 199 -> 200, 201 -> 500
+
+        # First find the smallest size of the increment that would ensure all values can be contained in <=10 bins.
+        # TODO: There could be a toggle to "avoid outliers". If activated, use 5th and 95th percentiles instead of min and max.
+        smallest_increment = (self.max_value - self.min_value) / (MAX_NUM_BRACKETS)
+
+        shifts = [1, 2, 5]
+        for shift in shifts:
+            # Round the smallest increment up to the closest shifted power of 10.
+            increment = round_to_shifted_power_of_ten(smallest_increment, shifts=[shift], floor=False)
+            # Find the largest bracket that would fully cover the minimum data value.
+            bracket_min = increment * np.floor(self.min_value / increment).astype(int)
+            # Find the smallest bracket that would fully cover the maximum data value.
+            bracket_max = increment * np.ceil(self.max_value / increment).astype(int)
+            # Create map brackets linearly spaced.
+            brackets_all[BRACKET_LABELS["linear"][str(shift)]] = np.arange(
+                bracket_min, bracket_max + increment, increment
+            ).astype(float)
+
+        # Add an option for linear brackets where the increment is chosen manually.
+        brackets_all[BRACKET_LABELS["linear"]["custom"]] = self.get_custom_linear_brackets(
+            min_value=self.min_value, max_value=self.max_value, increments=self.increments
+        )
 
         return brackets_all
 
+    def get_custom_linear_brackets(self, min_value, max_value, increments) -> List[int]:
+        return np.arange(min_value, max_value + increments, increments).tolist()
+
     def update_linear_brackets(self) -> None:
-        self.brackets_all[LABEL_LINEAR] = np.arange(
-            self.min_value, self.max_value + self.increments, self.increments
-        ).tolist()
+        self.brackets_all[BRACKET_LABELS["linear"]["custom"]] = self.get_custom_linear_brackets(  # type: ignore
+            min_value=self.min_value, max_value=self.max_value, increments=self.increments
+        )
 
     def are_brackets_open(self):
         # If the minimum value in the data is negative, assume that the lower bracket is open.
@@ -300,11 +343,11 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Select bracket type.
     mb.bracket_type = st.radio(  # type: ignore
         "Select linear or log-like",
-        options=[LABEL_LOG_X2, LABEL_LOG_X3, LABEL_LOG_X10, LABEL_LINEAR],
+        options=list(BRACKET_LABELS["log"].values()) + list(BRACKET_LABELS["linear"].values()),
         index=0,
         horizontal=True,
     )
-    if mb.bracket_type == LABEL_LINEAR:
+    if mb.bracket_type == BRACKET_LABELS["linear"]["custom"]:
         # In the case of linear brackets, an additional input is the increment.
         mb.increments = st.number_input("Increments", min_value=0, max_value=100, value=mb.increments, step=1)  # type: ignore
         mb.update_linear_brackets()
