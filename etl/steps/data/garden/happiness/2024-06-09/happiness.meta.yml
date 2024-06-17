@@ -27,7 +27,7 @@ tables:
           - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
           - The data is the compilation of all previous World Happiness Reports, which can be found at https://worldhappiness.report/archive/.
         presentation:
-          #attribution: World Happiness Report (2012-2024)
+          attribution: World Happiness Report (2012-2024)
           attribution_short: WHR
           title_public: Self-reported life satisfaction
         display:
