@@ -68,7 +68,7 @@ def run(dest_dir: str) -> None:
     tb["cantril_ladder_score"] = tb["cantril_times_pop"] / tb["population"]
 
     # drop unneeded columns
-    tb = tb.drop(columns=["cantril_times_pop", "population"])
+    tb = tb.drop(columns=["cantril_times_pop"])
 
     # add back Northern Cyprus and Somaliland
     tb = pr.concat([tb, tb_countries_wo_population], ignore_index=True)

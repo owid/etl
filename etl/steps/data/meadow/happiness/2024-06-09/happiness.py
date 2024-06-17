@@ -18,8 +18,7 @@ def run(dest_dir: str) -> None:
 
     # add year and country columns
     tb["year"] = 2023  # 2024 report -> 2023 data
-    tb["country"] = tb["Country name"]
-    tb = tb.drop(columns=["Country name"])
+    tb = tb.rename(columns={"Country name": "country"}, errors="raise")
 
     #
     # Process data.
