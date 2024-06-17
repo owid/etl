@@ -229,13 +229,9 @@ class MapBracketer:
         # In principle, we could also have increments of, say, 4, e.g. [0, 40, 80, 120], but by default it's usually better to round to 1, 2, 5, e.g. [0, 20, 40, 60, 80, 100, 120] or [0, 50, 100, 150]. We'll see if this assumption needs to be relaxed.
         # If there are negative values, one of the stops should definitely be zero.
         # E.g. we don't want brackets like [-300, -100, 100, 300], but rather [-400, -200, 0, 200, 400].
-        # TODO: It's not clear if, for purely positive (or purely negative) lists, we need brackets that would pass through zero.
+        # NOTE: It's not clear if, for purely positive (or purely negative) lists, we need brackets that would pass through zero.
         #  For example, it would be fine to do [300, 500, 700, 900], instead of imposing [200, 400, 600, 800].
         #  For now, and for simplicity, assume that 0 is always one of the stops.
-        # TODO: Note that we may also want to have, e.g. [1000, 1020, 1040, 1060].
-
-        # Find the smallest 1,2,5-rounded value that is above the maximum value in the data.
-        # For example, 999 -> 1000, 1001 -> 2000, 199 -> 200, 201 -> 500
 
         # First find the smallest size of the increment that would ensure all values can be contained in <=10 bins.
         # TODO: There could be a toggle to "avoid outliers". If activated, use 5th and 95th percentiles instead of min and max.
@@ -364,6 +360,9 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
 
     # Create a slider for positive values.
     # TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
+    if len(mb.brackets_positive) <= 1:
+        st.error("No brackets possible.")
+        st.stop()
     min_selected, max_selected = st.select_slider(  # type: ignore
         "Select a range of values:",
         options=mb.brackets_positive,
@@ -443,6 +442,10 @@ elif use_type == USE_TYPE_EXPLORERS:
         options=variable_ids,
         index=0,
     )
+
+    # For debugging, fix the value of variable id.
+    # Energy variable that has both negative and positive values.
+    # variable_id = 900950
 
     # Initialize map bracketer.
     mb = MapBracketer(variable_id=variable_id)  # type: ignore
