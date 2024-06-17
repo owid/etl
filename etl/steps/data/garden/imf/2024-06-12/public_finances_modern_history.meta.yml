@@ -1,0 +1,138 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Government Spending
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  public_finances_modern_history:
+    variables:
+      revenue:
+        title: Government revenue (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: The sum of all the money received by the government from taxes and other non-tax sources, as a percentage of GDP.
+        presentation:
+          title_public: Government revenue (% of GDP)
+        display:
+          name: Government revenue (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      expenditure:
+        title: Government expenditure (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It includes the government's interest expense.
+        presentation:
+          title_public: Government expenditure (% of GDP)
+        display:
+          name: Government expenditure (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      interest_exp:
+        title: Government interest expense (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: The sum of all the money spent by the government on interest payments, as a percentage of GDP.
+        presentation:
+          title_public: Government interest expense (% of GDP)
+        display:
+          name: Government interest expense (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      prim_expenditure:
+        title: Government primary expenditure (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government's interest expense.
+        presentation:
+          title_public: Government primary expenditure (% of GDP)
+        display:
+          name: Government primary expenditure (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      prim_balance:
+        title: Government primary balance (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: The difference between government revenue and government expenditure, excluding interest payments, as a percentage of GDP.
+        presentation:
+          title_public: Government primary balance (% of GDP)
+        display:
+          name: Government primary balance (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      debt:
+        title: Government gross debt (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Financial liabilities of the government, as a percentage of GDP.
+        presentation:
+          title_public: Government gross debt (% of GDP)
+        display:
+          name: Government gross debt (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      rltir:
+        title: Real long-term interest rate (%)
+        unit: "%"
+        short_unit: "%"
+        description_short: The long-term interest rate adjusted for inflation.
+        presentation:
+          title_public: Real long-term interest rate (%)
+        display:
+          name: Real long-term interest rate (%)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      rgc:
+        title: Real GDP growth rate (%)
+        unit: "%"
+        short_unit: "%"
+        description_short: The rate of change of the GDP, adjusted for inflation.
+        presentation:
+          title_public: Real GDP growth rate (%)
+        display:
+          name: Real GDP growth rate (%)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      gg_budg:
+        title: Sector coverage indicator for revenue, expenditure and interest expense
+        unit: ""
+        short_unit: ""
+        description_short: Indicates if the data represents the central government (0) or the general government (1).
+        presentation:
+          title_public: Sector coverage indicator for revenue, expenditure and interest expense
+        display:
+          name: Sector coverage indicator for revenue, expenditure and interest expense
+          numDecimalPlaces: 0
+          tolerance: 0
+
+      gg_debt:
+        title: Sector coverage indicator for gross debt
+        unit: ""
+        short_unit: ""
+        description_short: Indicates if the data represents the central government (0) or the general government (1).
+        presentation:
+          title_public: Sector coverage indicator for gross debt
+        display:
+          name: Sector coverage indicator for gross debt
+          numDecimalPlaces: 0
+          tolerance: 0
+
