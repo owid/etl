@@ -318,10 +318,11 @@ class OWIDEnv:
         return self._env_remote
 
     @classmethod
-    def from_this_branch(cls):
+    def from_this_staging(cls):
         """Create OWIDEnv for current branch."""
-        branch_name = git.Repo(BASE_DIR).active_branch.name
-        return cls.from_staging(branch_name)
+        if STAGING is None:
+            raise ValueError("`STAGING` is not set")
+        return cls.from_staging(STAGING)
 
     @classmethod
     def from_staging(cls, branch: str):
@@ -470,4 +471,4 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-OWID_ENV = OWIDEnv.from_this_branch()
+OWID_ENV = OWIDEnv.from_this_staging()
