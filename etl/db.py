@@ -460,6 +460,8 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
     if db_conn is None:
         db_conn = get_connection()
 
+    dataset_ids_str = ", ".join(map(str, dataset_ids))
+
     query = f"""
     SELECT
         d.id AS dataset_id,
@@ -472,7 +474,7 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
         FROM
             datasets d
         WHERE
-            d.id IN {tuple(dataset_ids)}) d
+            d.id IN ({dataset_ids_str})) d
     LEFT JOIN
         (SELECT
             v.datasetId,
@@ -482,7 +484,7 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
             JOIN chart_dimensions cd ON cd.variableId = v.id
             JOIN charts c ON c.id = cd.chartId
         WHERE
-            v.datasetId IN {tuple(dataset_ids)}
+            v.datasetId IN ({dataset_ids_str})
         GROUP BY
             v.datasetId) q2
         ON d.id = q2.datasetId
