@@ -322,6 +322,16 @@ class MapBracketer:
                     [bracket for bracket in self.brackets if bracket >= self.max_value]
                 )
 
+        if (
+            self.chart_config["map"]["colorScale"]["customNumericValues"][0]
+            == self.chart_config["map"]["colorScale"].get("customNumericMinValue")
+        ) or (self.chart_config["map"]["colorScale"]["customNumericValues"][0] == 0):
+            # For some reason, when the lowest bracket is 0, the zeroth bracket gets repeated.
+            # No sure what the best solution is. For now, I'll remove the lowest bracket.
+            self.chart_config["map"]["colorScale"]["customNumericValues"] = self.chart_config["map"]["colorScale"][
+                "customNumericValues"
+            ][1:]
+
 
 def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Add a dropdown for color scheme.
