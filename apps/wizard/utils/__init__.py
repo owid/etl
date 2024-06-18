@@ -81,13 +81,25 @@ COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
 COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
 COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
 COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
+COOKIE_STEPS = {
+    "snapshot": COOKIE_SNAPSHOT,
+    "meadow": COOKIE_MEADOW,
+    "garden": COOKIE_GARDEN,
+    "grapher": COOKIE_GRAPHER,
+}
 # Paths to markdown templates
 MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
-
+MD_STEPS = {
+    "snapshot": MD_SNAPSHOT,
+    "meadow": MD_MEADOW,
+    "garden": MD_GARDEN,
+    "grapher": MD_GRAPHER,
+    "express": MD_EXPRESS,
+}
 # Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",

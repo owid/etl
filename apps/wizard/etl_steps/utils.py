@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 
 from etl.steps import load_dag
@@ -144,3 +146,9 @@ TAGS_DEFAULT = [
     "Women's Rights",
     "Working Hours",
 ]
+
+
+def remove_playground_notebook(dataset_dir, notebook_name: str = "playground.ipynb"):
+    notebook_path = dataset_dir / notebook_name
+    if notebook_path.is_file():
+        os.remove(notebook_path)

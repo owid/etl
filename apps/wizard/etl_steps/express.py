@@ -1,7 +1,6 @@
 """Garden phase."""
-import os
 from pathlib import Path
-from typing import List, cast
+from typing import Any, Dict, List, cast
 
 import streamlit as st
 from sqlalchemy.exc import OperationalError
@@ -10,7 +9,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps.utils import TAGS_DEFAULT
+from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DAG_DIR
@@ -78,7 +77,6 @@ class ExpressForm(utils.StepForm):
     add_to_dag: bool
     dag_file: str
     # Others
-    include_metadata_yaml: bool
     is_private: bool
     # Snapshot
     snapshot_version: str
@@ -113,6 +111,41 @@ class ExpressForm(utils.StepForm):
         if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
             self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
 
+    @property
+    def base_step_name(self) -> str:
+        """namespace/version/short_name"""
+        return f"{form.namespace}/{form.version}/{form.short_name}"
+
+    @property
+    def snapshot_step_uri(self) -> str:
+        """Get snapshot step URI."""
+        return f"snapshot{self.private_suffix}://{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
+
+    @property
+    def meadow_step_uri(self) -> str:
+        """Get garden step name."""
+        return f"data{self.private_suffix}://meadow/{self.base_step_name}"
+
+    @property
+    def garden_step_uri(self) -> str:
+        """Get garden step name."""
+        return f"data{self.private_suffix}://garden/{self.base_step_name}"
+
+    @property
+    def grapher_step_uri(self) -> str:
+        """Get garden step name."""
+        return f"data{self.private_suffix}://grapher/{self.base_step_name}"
+
+    @property
+    def dag_path(self) -> Path:
+        """Get DAG path."""
+        return DAG_DIR / self.dag_file
+
+    @property
+    def private_suffix(self) -> str:
+        return "-private" if self.is_private else ""
+
+    @property
     def meadow_dict(self):
         """Get meadow dictionary."""
         return {
@@ -124,10 +157,19 @@ class ExpressForm(utils.StepForm):
             "is_private": self.is_private,
             "snapshot_version": self.snapshot_version,
             "file_extension": self.file_extension,
+            "channel": "meadow",
         }
 
+    @property
     def garden_dict(self):
         """Get meadow dictionary."""
+        ## HOTFIX 1: filter topic_tags if empty
+        if self.topic_tags is None or self.topic_tags == []:
+            topic_tags = ""
+        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
+        ## Hence we need to convert the list to an actual string
+        else:
+            topic_tags = "- " + "\n- ".join(self.topic_tags)
         return {
             "namespace": self.namespace,
             "short_name": self.short_name,
@@ -137,10 +179,11 @@ class ExpressForm(utils.StepForm):
             "dag_file": self.dag_file,
             "is_private": self.is_private,
             "update_period_days": self.update_period_days,
-            "topic_tags": self.topic_tags,
-            "include_metadata_yaml": self.include_metadata_yaml,
+            "topic_tags": topic_tags,
+            "channel": "garden",
         }
 
+    @property
     def grapher_dict(self):
         """Get meadow dictionary."""
         return {
@@ -151,7 +194,65 @@ class ExpressForm(utils.StepForm):
             "add_to_dag": self.add_to_dag,
             "dag_file": self.dag_file,
             "is_private": self.is_private,
+            "channel": "grapher",
         }
+
+    def to_dict(self, channel: str):
+        match channel:
+            case "meadow":
+                return self.meadow_dict
+            case "garden":
+                return self.garden_dict
+            case "grapher":
+                return self.grapher_dict
+            case _:
+                raise ValueError(f"Channel `{channel}` not recognized.")
+
+    def create_files(self, channel: str) -> List[Dict[str, Any]]:
+        # Generate files
+        DATASET_DIR = generate_step_to_channel(
+            cookiecutter_path=utils.COOKIE_STEPS[channel], data=self.to_dict(channel)
+        )
+        # Remove playground (by default it is created, we no longer want it)
+        remove_playground_notebook(DATASET_DIR)
+        # Add to generated files
+        generated_files = [
+            {
+                "path": DATASET_DIR / (self.short_name + ".py"),
+                "language": "python",
+                "channel": "meadow",
+            }
+        ]
+        if channel == "garden":
+            generated_files.append(
+                {
+                    "path": DATASET_DIR / (self.short_name + ".meta.yml"),
+                    "language": "yaml",
+                    "channel": "garden",
+                }
+            )
+        return generated_files
+
+    def add_steps_to_dag(self) -> str:
+        if form.add_to_dag:
+            dag_content = add_to_dag(
+                dag={
+                    self.meadow_step_uri: [
+                        self.snapshot_step_uri,
+                    ],
+                    self.garden_step_uri: [
+                        self.meadow_step_uri,
+                    ],
+                    self.grapher_step_uri: [
+                        self.garden_step_uri,
+                    ],
+                },
+                dag_path=self.dag_path,
+            )
+        else:
+            dag_content = ""
+
+        return dag_content
 
 
 def update_state() -> None:
@@ -173,19 +274,13 @@ def export_metadata() -> None:
         st.success(f"Metadata exported to `{output_path}`.")
 
 
-def remove_notebook(dataset_dir):
-    notebook_path = dataset_dir / "playground.ipynb"
-    if notebook_path.is_file():
-        os.remove(notebook_path)
-
-
 #########################################################
 # MAIN ##################################################
 #########################################################
 # TITLE
 st.title("Create step 🐆 **:gray[Express]**")
 
-st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!.")
+st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!")
 
 # SIDEBAR
 with st.sidebar:
@@ -197,9 +292,6 @@ with st.sidebar:
 # FORM
 form_widget = st.empty()
 with form_widget.form("express"):
-    # Get default version (used in multiple fields)
-    # if (default_version := APP_STATE.default_value("snapshot_version", previous_step="snapshot")) == "":
-    #     default_version = APP_STATE.default_value("version", previous_step="snapshot", default_last=utils.DATE_TODAY)
     if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
         default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
@@ -268,19 +360,12 @@ with form_widget.form("express"):
         default_last=365,
     )
 
-    with st.popover("Other parameters"):
-        APP_STATE.st_widget(
-            st.toggle,
-            label="Include *.meta.yaml file with metadata",
-            key="include_metadata_yaml",
-            default_last=True,
-        )
-        APP_STATE.st_widget(
-            st.toggle,
-            label="Make dataset private",
-            key="is_private",
-            default_last=False,
-        )
+    APP_STATE.st_widget(
+        st.toggle,
+        label="Make dataset private",
+        key="is_private",
+        default_last=False,
+    )
 
     st.markdown("#### Snapshot")
     # Snapshot version
@@ -334,103 +419,20 @@ if submitted:
         # Remove form from UI
         form_widget.empty()
 
-        # Private dataset?
-        private_suffix = "-private" if form.is_private else ""
-
+        # Create files for all steps
         generated_files = []
+        for channel in ["meadow", "garden", "grapher"]:
+            generated_files_ = form.create_files(channel)
+            generated_files.extend(generated_files_)
 
-        #######################
-        # MEADOW ##############
-        #######################
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.meadow_dict(), channel="meadow")
-        )
-        generated_files.append(
-            {
-                "path": DATASET_DIR / (form.short_name + ".py"),
-                "language": "python",
-                "channel": "meadow",
-            }
-        )
-        remove_notebook(DATASET_DIR)
-
-        #######################
-        # GARDEN ##############
-        #######################
-        ## HOTFIX 1: filter topic_tags if empty
-        garden_dict = form.garden_dict()
-        if garden_dict.get("topic_tags") is None or garden_dict.get("topic_tags") == []:
-            garden_dict["topic_tags"] = ""
-        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
-        ## Hence we need to convert the list to an actual string
-        else:
-            garden_dict["topic_tags"] = "- " + "\n- ".join(garden_dict["topic_tags"])
-        ## Create py
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**garden_dict, channel="garden")
-        )
-        generated_files.append(
-            {
-                "path": DATASET_DIR / (form.short_name + ".py"),
-                "language": "python",
-                "channel": "garden",
-            }
-        )
-        ## Create metadata
-        metadata_path = DATASET_DIR / (form.short_name + ".meta.yml")
-        if (not form.include_metadata_yaml) and (metadata_path.is_file()):
-            os.remove(metadata_path)
-        generated_files.append(
-            {
-                "path": metadata_path,
-                "language": "yaml",
-                "channel": "garden",
-            }
-        )
-        remove_notebook(DATASET_DIR)
-
-        #######################
-        # GRAPHER #############
-        #######################
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GRAPHER, data=dict(**form.grapher_dict(), channel="grapher")
-        )
-        generated_files.append(
-            {
-                "path": DATASET_DIR / (form.short_name + ".py"),
-                "language": "python",
-                "channel": "grapher",
-            }
-        )
-        remove_notebook(DATASET_DIR)
-
-        #######################
-        # DAG #################
-        #######################
-        dag_path = DAG_DIR / form.dag_file
-        if form.add_to_dag:
-            dag_content = add_to_dag(
-                dag={
-                    f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
-                        f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.file_extension}",
-                    ],
-                    f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": [
-                        f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}",
-                    ],
-                    f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
-                        f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}",
-                    ],
-                },
-                dag_path=dag_path,
-            )
-        else:
-            dag_content = ""
+        # Add lines to DAG
+        dag_content = form.add_steps_to_dag()
 
         #######################
         # PREVIEW #############
         #######################
         st.subheader("Generated files")
-        utils.preview_dag_additions(dag_content, dag_path, expanded=True)
+        utils.preview_dag_additions(dag_content, form.dag_path, expanded=True)
 
         tab_meadow, tab_garden, tab_grapher = st.tabs(["Meadow", "Garden", "Grapher"])
         for f in generated_files:
@@ -452,7 +454,7 @@ if submitted:
             ## Run step
             st.markdown("##### Run ETL meadow step")
             st.code(
-                f"poetry run etl run data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                f"poetry run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
                 language="shellSession",
             )
 
@@ -462,7 +464,7 @@ if submitted:
             st.markdown("##### Harmonize country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl harmonize data/meadow/{form.namespace}/{form.version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                f"poetry run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
@@ -476,7 +478,7 @@ if submitted:
             st.markdown("##### Run ETL step")
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
-                f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                f"poetry run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
                 "shellSession",
             )
 
