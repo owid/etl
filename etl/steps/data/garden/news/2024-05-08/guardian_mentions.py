@@ -54,6 +54,7 @@ def run(dest_dir: str) -> None:
     tb = geo.add_population_to_table(tb, ds_population)
     for column in ["num_pages_tags", "num_pages_mentions"]:
         tb[f"{column}_per_million"] = tb[column] / tb["population"] * 1_000_000
+    tb = tb.drop(columns="population")
 
     # Estimate 10-year average
     tb_10y_avg = tb[(tb["year"] >= 2014) & (tb["year"] <= 2023)].copy()
