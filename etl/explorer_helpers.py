@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import pandas as pd
 
@@ -92,6 +92,7 @@ class Explorer:
 
     @staticmethod
     def _clean_df(df: pd.DataFrame) -> pd.DataFrame:
+        # TODO: For clarity, refactor and call this function _lines_to_df.
         df_clean = df.copy()
         for column in df_clean.columns:
             if set(df_clean[column]) == {"false", "true"}:
@@ -106,6 +107,25 @@ class Explorer:
 
         return df_clean
 
+    @staticmethod
+    def _df_to_lines(df: pd.DataFrame) -> List[str]:
+        df = df.copy()
+
+        if df.empty:
+            return []
+
+        # Convert lists of variable ids to strings.
+        df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
+
+        # Convert boolean columns to strings of true, false.
+        for column in df.select_dtypes(include="bool").columns:
+            df[column] = df[column].astype(str).str.lower()
+
+        df_tsv = df.to_csv(sep="\t", index=False)
+        lines = [line.rstrip() for line in df_tsv.split("\n")]  # type: ignore
+
+        return lines
+
     def generate_content(self):
         # Reconstruct the comments section.
         # NOTE: We assume comments are at the beginning of the file.
@@ -116,13 +136,11 @@ class Explorer:
         config_part = [f"{key}\t{value}" if value else key for key, value in self.config.items()]
 
         # Reconstruct the graphers section.
-        graphers_tsv: str = self.df_graphers.to_csv(sep="\t", index=False)  # type: ignore
-        graphers_part = ["graphers"] + [line.rstrip() for line in graphers_tsv.split("\n")]
+        graphers_part = ["graphers"] + self._df_to_lines(df=self.df_graphers)
 
         # Reconstruct the columns section if it exists
         if not self.df_columns.empty:
-            columns_tsv: str = self.df_columns.to_csv(sep="\t", index=False)  # type: ignore
-            columns_part = ["columns"] + [line.rstrip() for line in columns_tsv.split("\n")]
+            columns_part = ["columns"] + self._df_to_lines(df=self.df_columns)
         else:
             columns_part = []
 
