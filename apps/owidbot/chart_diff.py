@@ -2,8 +2,7 @@ import pandas as pd
 from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
-from apps.wizard.utils.env import OWID_ENV, OWIDEnv
-from etl.config import get_container_name
+from etl.config import OWID_ENV, OWIDEnv, get_container_name
 
 from . import github_utils as gh_utils
 
