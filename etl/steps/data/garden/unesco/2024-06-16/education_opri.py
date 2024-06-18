@@ -49,18 +49,11 @@ def run(dest_dir: str) -> None:
 
 
 def create_metadata_dictionary(tb):
-    # Define the mapping for the 'qualifier' column
-    qualifier_mapping = {"NAT_EST": "National", "UIS_EST": "UIS"}
-
-    # Replace the entries in the 'qualifier' column
-    tb["qualifier"] = tb["qualifier"].astype(str).replace(qualifier_mapping)
-    tb = tb.drop("magnitude", axis=1)
+    # Drop columns that have metadata that's too detailed and won't work with the current datapage layout
+    tb = tb.drop(["magnitude", "qualifier", "source__data_sources", "change__data_reporting"], axis=1)
 
     # Generate the summary string for metadata columns for each indicator
     metadata_columns = [
-        "qualifier",
-        "change__data_reporting",
-        "source__data_sources",
         "under_coverage__students_or_individuals",
     ]
     summary_dict = {}
@@ -69,11 +62,7 @@ def create_metadata_dictionary(tb):
         tb_indicator = tb[tb["indicator_label_en"] == indicator]
         summary_strings = {}
         for col in metadata_columns:
-            if col == "qualifier":
-                meta = "National or UIS estimate:"
-            elif col == "source__data_sources":
-                meta = "Data sources:"
-            elif col == "change__data_reporting":
+            if col == "change__data_reporting":
                 meta = "Change in data reporting:"
             elif col == "under_coverage__students_or_individuals":
                 meta = "Under coverage:"
@@ -128,9 +117,10 @@ def add_metadata_description(tb, summary_dict):
             update_metadata(meta, display_decimals=1, unit="index", short_unit="")
         elif "(current us$)" in name_lower:
             update_metadata(meta, display_decimals=1, unit="current US$", short_unit="current $")
-        elif "number" in name_lower:
-            update_metadata(meta, display_decimals=0, unit="number", short_unit="")
-
+        elif "male" in name_lower:
+            update_metadata(meta, display_decimals=0, unit="boys", short_unit="")
+        elif "female" in name_lower:
+            update_metadata(meta, display_decimals=0, unit="girls", short_unit="")
         else:
             # Default metadata update when no other conditions are met.
             update_metadata(meta, 0, " ", " ")
