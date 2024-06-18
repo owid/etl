@@ -59,6 +59,12 @@ definitions:
       <% elif metric == "Percent" and age == 'All ages'%>
       The estimated share of deaths from << cause.lower() >>.
       <%- endif -%>
+    description_processing: |-
+      <% if cause == "All forms of violence" %>
+      This was calculated by summing the number of deaths from 'Interpersonal violence', 'Conflict and terrorism', and 'Police conflict and executions'.
+      <% elif cause == "Infectious diseases" %>
+      This was calculated by subtracting 'Maternal and neonatal disorders' and 'Nutritional deficiencies' from 'Communicable, maternal, neonatal and nutritional diseases'.
+      <%- endif -%>
   value_dalys:
     unit: |-
       <% if metric == "Number" %>
@@ -125,6 +131,8 @@ tables:
           {definitions.value_deaths.unit}
         description_short: |-
           {definitions.value_deaths.description_short}
+        description_processing: |-
+          {definitions.value_deaths.description_processing}
         description_key:
           - |-
             {definitions.description_key}

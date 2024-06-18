@@ -20,8 +20,8 @@ from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.conflict_resolver import st_show_conflict_resolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils import chart_html
-from apps.wizard.utils.env import OWID_ENV
+from apps.wizard.utils import chart_html, get_staging_creation_time
+from etl.config import OWID_ENV
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -72,7 +72,7 @@ class ChartDiffShow:
         self,
         diff: ChartDiff,
         source_session: Session,
-        target_session: Optional[Session] = None,
+        target_session: Session,
         expander: bool = True,
         show_link: bool = True,
     ):
@@ -159,6 +159,7 @@ class ChartDiffShow:
         """Get latest chart version from database."""
         diff_new = ChartDiff.from_chart_id(
             chart_id=self.diff.chart_id,
+            server_creation_time=st.session_state.get("server_creation_time", get_staging_creation_time()),
             source_session=self.source_session,
             target_session=self.target_session,
         )
@@ -521,15 +522,16 @@ def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
 def st_show(
     diff: ChartDiff,
     source_session: Session,
-    target_session: Optional[Session] = None,
+    target_session: Session,
     expander: bool = True,
     show_link: bool = True,
 ) -> None:
     """Show the chart diff in Streamlit."""
-    ChartDiffShow(
+    handle = ChartDiffShow(
         diff=diff,
         source_session=source_session,
         target_session=target_session,
         expander=expander,
         show_link=show_link,
-    ).show()
+    )
+    handle.show()

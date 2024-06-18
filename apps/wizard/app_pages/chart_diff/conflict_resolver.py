@@ -35,9 +35,7 @@ class ChartDiffConflictResolver:
 
     def run(self) -> None:
         """Run conflict resolver."""
-        st.warning(
-            "This is under development! For now, please resolve the conflict manually by integrating the changes in production into the chart in staging server."
-        )
+        st.warning("This is under development! Find below a form with the different fields that present conflicts.")
 
         # If things to compare...
         if self.config_compare:
@@ -58,6 +56,10 @@ class ChartDiffConflictResolver:
                 type="primary",
             ):
                 self.resolve_conflicts(rerun=True)
+        else:
+            st.success(
+                "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
+            )
 
     def _show_field_conflict_resolver(self, field):
         with st.container(border=True):
@@ -158,7 +160,7 @@ def compare_chart_configs(c1, c2):
         "bakedGrapherURL",
         "adminBaseUrl",
         "dataApiUrl",
-        "version",
+        # "version",
     }
     for key in keys:
         if key in KEYS_IGNORE:

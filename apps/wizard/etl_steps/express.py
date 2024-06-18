@@ -12,7 +12,6 @@ from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
-from etl.files import ruamel_dump, ruamel_load
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -287,65 +286,6 @@ def update_state() -> None:
     form = ExpressForm.from_state()
     # Update states with values from form
     APP_STATE.update_from_form(form)
-
-
-def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
-    """Fill dummy metadata yaml file with some dummy values.
-
-    Only useful when `--dummy-data` is used. We need this to avoid errors in `etlwiz grapher --dummy-data`.
-    """
-    with open(metadata_path, "r") as f:
-        doc = ruamel_load(f)
-
-    # add all available metadata fields to dummy variable
-    variable_meta = {
-        "title": "Dummy",
-        "description": "This is a dummy indicator with full metadata.",
-        "unit": "Dummy unit",
-        "short_unit": "Du",
-        "display": {
-            "isProjection": True,
-            "conversionFactor": 1000,
-            "numDecimalPlaces": 1,
-            "tolerance": 5,
-            "yearIsDay": False,
-            "zeroDay": "1900-01-01",
-            "entityAnnotationsMap": "Germany: dummy annotation",
-            "includeInTable": True,
-        },
-        "description_processing": "This is some description of the dummy indicator processing.",
-        "description_key": [
-            "Key information 1",
-            "Key information 2",
-        ],
-        "description_short": "Short description of the dummy indicator.",
-        "description_from_producer": "The description of the dummy indicator by the producer, shown separately on a data page.",
-        "processing_level": "major",
-        "license": {"name": "CC-BY 4.0", "url": ""},
-        "presentation": {
-            "grapher_config": {
-                "title": "The dummy indicator - chart title",
-                "subtitle": "You'll never guess where the line will go",
-                "hasMapTab": True,
-                "selectedEntityNames": ["Germany", "Italy", "France"],
-            },
-            "title_public": "The dummy indicator - data page title",
-            "title_variant": "historical data",
-            "attribution_short": "ACME",
-            "attribution": "ACME project",
-            "topic_tags": ["Internet"],
-            "key_info_text": [
-                "First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)",
-                "Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)",
-            ],
-            "faqs": [{"fragment_id": "cherries", "gdoc_id": "16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"}],
-        },
-    }
-
-    doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
-
-    with open(metadata_path, "w") as f:
-        f.write(ruamel_dump(doc))
 
 
 def export_metadata() -> None:

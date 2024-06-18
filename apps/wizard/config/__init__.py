@@ -10,7 +10,6 @@ from etl.config import ENV
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
-WIZARD_PORT = 8053
 
 
 def load_wizard_config():  # -> Any:
