@@ -44,7 +44,7 @@ tables:
         unit: "pages per 100,000 pages"
         description_short: Share of pages in The Guardian that are tagged with a country-related label. Excludes US, UK and Australia.
         description_processing: |-
-          {{ tables.guardian_mentions.variables.num_pages_tags.description_processing }}
+          {tables.guardian_mentions.variables.num_pages_tags.description_processing}
 
           This estimates exclude the UK, US, and Australia from the total number of pages. The reason for this is because the Guardian is a UK-based newspaper, and it is expected to have a higher number of articles about the UK, US, and Australia.
 
@@ -76,7 +76,7 @@ tables:
         unit: "pages per 100,000 pages"
         description_short: Share of pages in The Guardian that are tagged with a country-related label. Excludes US, UK and Australia.
         description_processing: |-
-          {{ tables.guardian_mentions.variables.num_pages_mentions.description_processing }}
+          {tables.guardian_mentions.variables.num_pages_mentions.description_processing}
 
           This estimates exclude the UK, US, and Australia from the total number of pages. The reason for this is because the Guardian is a UK-based newspaper, and it is expected to have a higher number of articles about the UK, US, and Australia.
 
@@ -84,51 +84,51 @@ tables:
     variables:
       num_pages_tags_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.num_pages_tags.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.num_pages_tags.title} (10-year average)
         unit: pages
         description_short: |-
-          {{ tables.guardian_mentions.variables.num_pages_tags.description_short }}. It reflects a 10-year average (2014 - 2023).
+          {tables.guardian_mentions.variables.num_pages_tags.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_1
 
       relative_pages_tags_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.relative_pages_tags.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.relative_pages_tags.title} (10-year average)
         unit: "pages per 100,000 pages"
         description_short: |-
-          {{ tables.guardian_mentions.variables.relative_pages_tags.description_short }}. It reflects a 10-year average (2014 - 2023).
+          {tables.guardian_mentions.variables.relative_pages_tags.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_1
 
       relative_pages_tags_excluded_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.relative_pages_tags_excluded.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.relative_pages_tags_excluded.title} (10-year average)
         unit: "pages per 100,000 pages"
         description_short: |-
-          {{ tables.guardian_mentions.variables.relative_pages_tags_excluded.description_short }}. It reflects a 10-year average (2014 - 2023).
+          {tables.guardian_mentions.variables.relative_pages_tags_excluded.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: |-
-          {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }}
+          {tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing}
 
       num_pages_mentions_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.num_pages_mentions.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.num_pages_mentions.title} (10-year average)
         unit: pages
         description_short: |-
-          {{ tables.guardian_mentions.variables.num_pages_mentions.description_short }}. It reflects a 10-year average (2014 - 2023).
+          {tables.guardian_mentions.variables.num_pages_mentions.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_2
 
       relative_pages_mentions_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.relative_pages_mentions.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.relative_pages_mentions.title} (10-year average)
         unit: "pages per 100,000 pages"
         description_short: Share of pages in The Guardian that that mention a particular country.
         description_processing: *desc_proc_2
 
       relative_pages_mentions_excluded_10y_avg:
         title: |-
-          {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }} (10-year average)
+          {tables.guardian_mentions.variables.relative_pages_mentions_excluded.title} (10-year average)
         unit: "pages per 100,000 pages"
         description_short: |-
-          {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_short }}. It reflects a 10-year average (2014 - 2023).
+          {tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: |-
-          {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }}
+          {tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing}
 
   # 10y_avg_log:
