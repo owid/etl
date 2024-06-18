@@ -165,6 +165,9 @@ class ChartDiff:
         NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
         metadata, data, config fields were edited. However, we estimate this again with all the checksums code. Couldn't we just use the info from df_charts?
         """
+        if df_charts.empty:
+            return []
+
         chart_ids = list(set(df_charts.index))
 
         # Get charts from SOURCE db and save them in memory as dictionaries: chart_id -> chart
