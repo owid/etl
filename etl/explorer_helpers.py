@@ -74,38 +74,31 @@ class Explorer:
         }
 
         # Parse the explorer graphers table.
-        self.df_graphers = pd.DataFrame.from_records(
-            [line.split("\t") for line in graphers_content[1:]], columns=graphers_content[0].split("\t")
-        )
-        # Improve dataframe format.
-        self.df_graphers = self._clean_df(df=self.df_graphers)
+        self.df_graphers = self._lines_to_df(lines=graphers_content)
 
-        if len(columns_content) > 0:
-            # Parse the explorer columns table.
-            self.df_columns = pd.DataFrame.from_records(
-                [line.split("\t") for line in columns_content[1:]], columns=columns_content[0].split("\t")
-            )
-            # Improve dataframe format.
-            self.df_columns = self._clean_df(df=self.df_columns)
-        else:
-            self.df_columns = pd.DataFrame()
+        # Parse the explorer columns table.
+        self.df_columns = self._lines_to_df(lines=columns_content)
 
     @staticmethod
-    def _clean_df(df: pd.DataFrame) -> pd.DataFrame:
-        # TODO: For clarity, refactor and call this function _lines_to_df.
-        df_clean = df.copy()
-        for column in df_clean.columns:
-            if set(df_clean[column]) == {"false", "true"}:
-                df_clean[column] = df_clean[column].map({"false": False, "true": True}).astype(bool)
+    def _lines_to_df(lines: List[str]) -> pd.DataFrame:
+        if len(lines) == 0:
+            return pd.DataFrame()
 
-        if "yVariableIds" in df_clean.columns:
+        # Parse the explorer graphers table.
+        df = pd.DataFrame.from_records([line.split("\t") for line in lines[1:]], columns=lines[0].split("\t"))
+        # Improve dataframe format.
+        for column in df.columns:
+            if set(df[column]) == {"false", "true"}:
+                df[column] = df[column].map({"false": False, "true": True}).astype(bool)
+
+        if "yVariableIds" in df.columns:
             # Convert "yVariableIds" into a list of integers.
-            df_clean["yVariableIds"] = [
+            df["yVariableIds"] = [
                 [int(variable_id) for variable_id in variable_ids.split(" ") if variable_id.isnumeric()]
-                for variable_ids in df_clean["yVariableIds"]
+                for variable_ids in df["yVariableIds"]
             ]
 
-        return df_clean
+        return df
 
     @staticmethod
     def _df_to_lines(df: pd.DataFrame) -> List[str]:
@@ -146,7 +139,8 @@ class Explorer:
 
         # Combine all sections
         full_content = (
-            "\n".join(comments_part + config_part + graphers_part + (columns_part if columns_part else [])) + "\n"
+            "\n".join(comments_part + [""] + config_part + graphers_part + (columns_part if columns_part else []))
+            + "\n"
         )
 
         return full_content
