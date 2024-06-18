@@ -9,6 +9,7 @@ import streamlit as st
 from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
+from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_DATASETTE,
     SYSTEM_PROMPT_FULL,
@@ -19,7 +20,6 @@ from apps.wizard.app_pages.expert.prompts import (
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
-from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
 st.set_page_config(
@@ -34,7 +34,9 @@ log = get_logger()
 # CONFIG
 ## Title/subtitle
 st.title("**Expert** 🧙")
-st.markdown("Ask the Expert any questions about ETL!")
+st.markdown(
+    "Ask the Expert any questions about ETL! Alternatively, visit [**our documentation ↗**](https://docs.owid.io/projects/etl])."
+)
 
 ## Load variables
 load_env()
@@ -64,7 +66,7 @@ class Options:
     DATASETTE = "Datasette"
     METADATA = "Metadata"
     START = "Setting up your environment"
-    GUIDES = "How to use, tools, APIs, and guides"
+    GUIDES = "Tools, APIs, and guides"
     PRINCIPLES = "Design principles"
     FULL = "Complete documentation"
     DEBUG = "Debug"
@@ -129,20 +131,29 @@ def reset_messages() -> None:
 
 
 # Category for the chat
-st.selectbox(
+options = [
+    Options.FULL,
+    Options.DATASETTE,
+    Options.METADATA,
+    Options.START,
+    Options.GUIDES,
+    Options.PRINCIPLES,
+]
+# captions = [
+#     "The most complete chat. Use all our documentation.",
+#     "Specific queries about the metadata, yaml files, etc.",
+#     "Create SQL queries on our Datasette instance.",
+#     "Specific queries about setting up your environment.",
+# ]
+st.radio(
     label="Choose a category for the question",
-    options=[
-        Options.FULL,
-        Options.METADATA,
-        Options.DATASETTE,
-        Options.START,
-        Options.GUIDES,
-        Options.PRINCIPLES,
-    ],
-    index=1,
+    options=options,
+    index=0,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
     key="category_gpt",
     on_change=reset_messages,
+    horizontal=True,
+    # captions=captions,
 )
 
 ## EXAMPLE QUERIES

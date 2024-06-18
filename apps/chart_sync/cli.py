@@ -2,7 +2,7 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 import click
 import pandas as pd
@@ -16,13 +16,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
-from apps.wizard.utils.env import OWIDEnv
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
+from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl import grapher_model as gm
-from etl.config import get_container_name
+from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
-from etl.db import read_sql
 
 log = structlog.get_logger()
 
@@ -150,17 +149,26 @@ def cli(
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
+            # Get staging server creation time
+            SERVER_CREATION_TIME = get_staging_creation_time(source_session)
+
             if chart_id:
                 chart_ids = {chart_id}
             else:
-                chart_ids = _modified_chart_ids_by_admin(source_session)
+                diffs = modified_charts_by_admin(source_session, target_session)
+                chart_ids = set(diffs.index[diffs.configEdited])
 
             log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
 
             charts_synced = 0
 
             for chart_id in chart_ids:
-                diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
+                diff = ChartDiff.from_chart_id(
+                    chart_id=chart_id,
+                    server_creation_time=SERVER_CREATION_TIME,
+                    source_session=source_session,
+                    target_session=target_session,
+                )
 
                 chart_slug = diff.source_chart.config["slug"]
 
@@ -174,6 +182,15 @@ def cli(
                         "chart_sync.skip",
                         slug=chart_slug,
                         reason="filtered by --include/--exclude",
+                        chart_id=chart_id,
+                    )
+                    continue
+
+                # Rejected diffs are skipped
+                if diff.is_rejected:
+                    log.info(
+                        "chart_sync.is_rejected",
+                        slug=chart_slug,
                         chart_id=chart_id,
                     )
                     continue
@@ -204,12 +221,7 @@ def cli(
 
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Pending chart, notify us about it
                         elif diff.is_pending:
@@ -323,12 +335,7 @@ def cli(
                             )
                         # Rejected chart diff
                         elif diff.is_rejected:
-                            log.info(
-                                "chart_sync.is_rejected",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            continue
+                            raise ValueError("Rejected chart diff should have been skipped")
 
                         # Not approved, create the chart, but notify us about it
                         elif diff.is_pending:
@@ -385,9 +392,7 @@ def _get_git_branch_from_commit_sha(commit_sha: str) -> str:
         raise ValueError(f"No closed pull requests found for commit {commit_sha}")
 
 
-def _load_revisions(
-    source_session: Session, chart_id: int, diff: ChartDiffModified
-) -> List[gm.SuggestedChartRevisions]:
+def _load_revisions(source_session: Session, chart_id: int, diff: ChartDiff) -> List[gm.SuggestedChartRevisions]:
     assert diff.target_chart
 
     revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
@@ -405,7 +410,7 @@ def _load_revisions(
     return revs
 
 
-def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiffModified, dry_run: bool) -> None:
+def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
     assert diff.target_chart
 
     message = f"""
@@ -488,32 +493,6 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
-
-
-def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
-    """Get charts created by Admin user with ID = 1 on a staging server. These charts have been
-    modified on the staging server and are candidates for syncing back to production."""
-    q = """
-    -- modified charts
-    select
-        id as chartId
-    from charts
-    where (publishedByUserId = 1 or lastEditedByUserId = 1)
-
-    union
-
-    -- charts revisions that were approved on staging, such charts would have publishedByUserId
-    -- of the user that ran etlwiz locally, but would be updated by Admin
-    -- the chart must be published
-    select
-        chartId
-    from suggested_chart_revisions
-    where updatedBy = 1 and status = 'approved' and chartId in (
-        select id from charts
-    )
-    """
-
-    return set(read_sql(q, session.bind).chartId.tolist())  # type: ignore
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:

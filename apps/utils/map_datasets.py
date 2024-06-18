@@ -10,15 +10,15 @@ NOTE:
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List
 
 import click
 import numpy as np
 import pandas as pd
-from git import Repo
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+from etl.git import get_changed_files
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.version_tracker import VersionTracker
 
@@ -26,46 +26,7 @@ from etl.version_tracker import VersionTracker
 log = get_logger()
 
 
-def get_changed_files(
-    current_branch: Optional[str] = None, base_branch: str = "master", repo_path: Union[Path, str] = BASE_DIR
-) -> Dict[str, Dict[str, str]]:
-    """Return files that are different between the current branch and the specified base branch."""
-    # Initialize a git repository object.
-    repo = Repo(repo_path)
-
-    if current_branch is None:
-        # If not specified, use the current branch.
-        current_branch = repo.active_branch.name
-    else:
-        # Otherwise, switch to the given branch to compare from.
-        repo.git.checkout(current_branch)
-
-    # Fetch latest changes from the remote to ensure diffs are accurate
-    repo.remotes.origin.fetch()
-
-    # Get the diff between the current branch and the base branch, corrected command
-    diff_index = repo.git.diff(f"{base_branch}..{current_branch}", name_status=True, no_renames=True)
-
-    # Create a dictionary {file_path: {"status": status, "diff": diff_content}}, where
-    # * status is the change status, namely: 'M' if the file was modified, 'A' if appended, 'D' if deleted.
-    # * diff_content shows the difference between files.
-    changes = {}
-    if diff_index:
-        for line in diff_index.splitlines():
-            parts = line.split("\t")
-            if len(parts) == 2:
-                status, file_path = parts
-                # Fetching diff content.
-                diff_content = repo.git.diff(f"{base_branch}...{current_branch}", "--", file_path, p=True)
-                changes[file_path] = {"status": status, "diff": diff_content}
-            else:
-                # Not sure if this could happen.
-                log.error(f"Could not parse diff line: {line}")
-
-    return changes
-
-
-def get_grapher_changes(files_changed, steps_df):
+def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.DataFrame) -> List[Dict[str, Any]]:
     steps_affected = []
     files_unidentified = []
     grapher_changes = []

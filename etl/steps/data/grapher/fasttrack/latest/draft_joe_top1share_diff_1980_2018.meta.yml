@@ -1,0 +1,26 @@
+dataset:
+  title: 'Draft: Joe – Difference in top 1 percent share, 1980-2018, PIP vs WID data (take2)'
+  description: ''
+  licenses:
+    - {}
+tables:
+  draft_joe_top1share_diff_1980_2018:
+    variables:
+      wid_top1share_difference_1980_2018:
+        title: wid_top1share_difference_1980_2018
+        unit: ''
+      pip_top1share_difference_1980_2018:
+        title: pip_top1share_difference_1980_2018
+        unit: ''
+      wid_top1share_relative_difference_1980_2018:
+        title: wid_top1share_relative_difference_1980_2018
+        unit: ''
+      pip_top1share_relative_difference_1980_2018:
+        title: pip_top1share_relative_difference_1980_2018
+        unit: ''
+      region:
+        title: region
+        unit: ''
+      population_in_2018:
+        title: population_in_2018
+        unit: ''

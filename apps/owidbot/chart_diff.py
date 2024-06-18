@@ -1,11 +1,8 @@
 import pandas as pd
-from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.chart_sync.cli import _modified_chart_ids_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffModified
-from apps.wizard.utils.env import OWID_ENV, OWIDEnv
-from etl.config import get_container_name
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
+from etl.config import OWID_ENV, OWIDEnv, get_container_name
 
 from . import github_utils as gh_utils
 
@@ -75,25 +72,13 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
         target_engine = OWIDEnv.from_staging("master").get_engine()
 
-    df = []
-    with Session(source_engine) as source_session:
-        with Session(target_engine) as target_session:
-            modified_chart_ids = _modified_chart_ids_by_admin(source_session)
+    df = ChartDiffsLoader(source_engine, target_engine).get_diffs_summary_df(
+        config=True,
+        metadata=False,
+        data=False,
+    )
 
-            for chart_id in modified_chart_ids:
-                diff = ChartDiffModified.from_chart_id(chart_id, source_session, target_session)
-                df.append(
-                    {
-                        "chart_id": diff.chart_id,
-                        "is_approved": diff.is_approved,
-                        "is_pending": diff.is_pending,
-                        "is_rejected": diff.is_rejected,
-                        "is_reviewed": diff.is_reviewed,
-                        "is_new": diff.is_new,
-                    }
-                )
-
-    return pd.DataFrame(df)
+    return df
 
 
 def format_chart_diff(df: pd.DataFrame) -> str:
@@ -103,9 +88,24 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     new = df[df.is_new]
     modified = df[~df.is_new]
 
+    # Total charts
+    num_charts = len(df)
+    num_charts_reviewed = df.is_reviewed.sum()
+
+    # Modified charts
+    num_charts_modified = len(modified)
+    num_charts_modified_reviewed = modified.is_reviewed.sum()
+
+    # New charts
+    num_charts_new = len(new)
+    num_charts_new_reviewed = new.is_reviewed.sum()
+
     return f"""
 <ul>
-    <li>{len(new)} new charts ({new.is_reviewed.sum()} reviewed)</li>
-    <li>{len(modified)} modified charts ({modified.is_reviewed.sum()} reviewed)</li>
+    <li>{num_charts_reviewed}/{num_charts} reviewed charts</li>
+    <ul>
+        <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
+        <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+    </ul>
 </ul>
     """.strip()

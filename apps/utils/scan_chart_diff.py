@@ -47,6 +47,9 @@ def cli(dry_run: bool) -> None:
             if "Unknown MySQL server host" in str(e):
                 log.warning("scan-chart-diff.unknown-host", pr=pr)
                 continue
+            if "Can't connect to MySQL server" in str(e):
+                log.warning("scan-chart-diff.cant-connect", pr=pr)
+                continue
             else:
                 raise e
 

@@ -33,7 +33,6 @@ from apps.wizard.app_pages.charts.search_config import build_dataset_form
 from apps.wizard.app_pages.charts.submission import create_submission, push_submission
 from apps.wizard.app_pages.charts.utils import get_datasets, get_schema
 from apps.wizard.app_pages.charts.variable_config import ask_and_get_variable_mapping
-from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
@@ -46,8 +45,6 @@ init_app()
 DATASETS = get_datasets()
 # Get schema
 SCHEMA_CHART_CONFIG = get_schema()
-# OWID Env
-owid_env = OWIDEnv()
 # Session states
 set_session_states()
 

@@ -13,6 +13,9 @@ CURRENT_DIR = Path(__file__).resolve().parent
 
 
 def main():
+    st.error("This page is no longer maintained. We plan to run chart-sync automatically once a PR is merged.")
+    st.divider()
+
     st.title("Chart 🔄 **:gray[Sync]**")
     st.markdown(
         """

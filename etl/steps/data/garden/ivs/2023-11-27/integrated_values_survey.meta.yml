@@ -432,7 +432,7 @@ tables:
           title_public: "Not at all important in life: Family"
       dont_know_important_in_life_family:
         title: "Don't know: Important in life: Family"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
         display:
           name: "Don't know: Important in life: Family"
           <<: *common-display
@@ -497,7 +497,7 @@ tables:
           title_public: "Not at all important in life: Friends"
       dont_know_important_in_life_friends:
         title: "Don't know: Important in life: Friends"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
         display:
           name: "Don't know: Important in life: Friends"
           <<: *common-display
@@ -562,7 +562,7 @@ tables:
           title_public: "Not at all important in life: Leisure time"
       dont_know_important_in_life_leisure_time:
         title: "Don't know: Important in life: Leisure time"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
         display:
           name: "Don't know: Important in life: Leisure time"
           <<: *common-display
@@ -627,7 +627,7 @@ tables:
           title_public: "Not at all important in life: Politics"
       dont_know_important_in_life_politics:
         title: "Don't know: Important in life: Politics"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
         display:
           name: "Don't know: Important in life: Politics"
           <<: *common-display
@@ -692,7 +692,7 @@ tables:
           title_public: "Not at all important in life: Work"
       dont_know_important_in_life_work:
         title: "Don't know: Important in life: Work"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
         display:
           name: "Don't know: Important in life: Work"
           <<: *common-display
@@ -757,7 +757,7 @@ tables:
           title_public: "Not at all important in life: Religion"
       dont_know_important_in_life_religion:
         title: "Don't know: Important in life: Religion"
-        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        description_short: '% of respondents replying "don''t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
         display:
           name: "Don't know: Important in life: Religion"
           <<: *common-display
@@ -822,7 +822,7 @@ tables:
           title_public: "Not at all interested in politics"
       dont_know_interested_politics:
         title: "Don't know: Interest in politics"
-        description_short: '% of respondents replying "don‘t know" when asked "How interested would you say you are in politics?"'
+        description_short: '% of respondents replying "don''t know" when asked "How interested would you say you are in politics?"'
         display:
           name: "Don't know: Interest in politics"
           <<: *common-display
@@ -863,7 +863,7 @@ tables:
           title_public: "Would never sign a petition"
       dont_know_political_action_signing_a_petition:
         title: "Political action: Signing a petition (Don't know)"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
           name: "Signing a petition (Don't know)"
           <<: *common-display
@@ -904,7 +904,7 @@ tables:
           title_public: "Would never join in boycotts"
       dont_know_political_action_joining_in_boycotts:
         title: "Political action: Joining in boycotts (Don't know)"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
           name: "Joining in boycotts (Don't know)"
           <<: *common-display
@@ -945,7 +945,7 @@ tables:
           title_public: "Would never attend peaceful demonstrations"
       dont_know_political_action_attending_peaceful_demonstrations:
         title: "Political action: Attending peaceful demonstrations (Don't know)"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
           name: "Attending peaceful demonstrations (Don't know)"
           <<: *common-display
@@ -986,7 +986,7 @@ tables:
           title_public: "Would never join unofficial strikes"
       dont_know_political_action_joining_unofficial_strikes:
         title: "Political action: Joining unofficial strikes (Don't know)"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
           name: "Joining unofficial strikes (Don't know)"
           <<: *common-display
@@ -1027,7 +1027,7 @@ tables:
           title_public: "Environment vs economic growth: Other answer"
       dont_know_env_ec:
         title: "Environment vs economic growth: Don't know"
-        description_short: '% of respondents choosing "Don‘t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing "don''t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
         display:
           name: "Environment vs economic growth: Don't know"
           <<: *common-display
@@ -1068,7 +1068,7 @@ tables:
           title_public: "Income equality: There should be greater incentives for individual effort"
       dont_know_eq_ineq:
         title: "Income equality: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
           name: "Don't know"
           <<: *common-display
@@ -1159,7 +1159,7 @@ tables:
           title_public: "Not at all like me: Important to think up new ideas"
       dont_know_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Don't know: Important to think up new ideas"
           <<: *common-display
@@ -1240,7 +1240,7 @@ tables:
           title_public: "Not at all like me: Important to be rich"
       dont_know_rich:
         title: "It is important to this person to be rich: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Don't know: Important to be rich"
           <<: *common-display
@@ -1321,7 +1321,7 @@ tables:
           title_public: "Not at all like me: Important living in secure surroundings"
       dont_know_secure:
         title: "It is important to this person living in secure surroundings: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Don't know: Important living in secure surroundings"
           <<: *common-display
@@ -1402,7 +1402,7 @@ tables:
           title_public: "Not at all like me: Important to have a good time"
       dont_know_good_time:
         title: "It is important to this person to have a good time: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Don't know: Important to have a good time"
           <<: *common-display
@@ -1483,7 +1483,7 @@ tables:
           title_public: "Not at all like me: Important to help the people nearby"
       dont_know_help_others:
         title: "It is important to this person to help the people nearby: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Don't know: Important to help the people nearby"
           <<: *common-display
@@ -1564,7 +1564,7 @@ tables:
           title_public: "Not at all like me: Important being very successful"
       dont_know_success:
         title: "It is important to this person being very successful: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Don't know: Important being very successful"
           <<: *common-display
@@ -1645,7 +1645,7 @@ tables:
           title_public: "Not at all like me: Important taking risks"
       dont_know_risks:
         title: "It is important to this person adventure and taking risks: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Don't know: Important taking risks"
           <<: *common-display
@@ -1726,7 +1726,7 @@ tables:
           title_public: "Not at all like me: Important to always behave properly"
       dont_know_behave:
         title: "It is important to this person to always behave properly: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Don't know: Important to always behave properly"
           <<: *common-display
@@ -1807,7 +1807,7 @@ tables:
           title_public: "Not at all like me: Important looking after the environment"
       dont_know_respect_environment:
         title: "It is important to this person looking after the environment: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Don't know: Important looking after the environment"
           <<: *common-display
@@ -1888,7 +1888,7 @@ tables:
           title_public: "Not at all like me: Important tradition"
       dont_know_tradition:
         title: "It is important to this person tradition: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "don''t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Don't know: Important tradition"
           <<: *common-display
@@ -1961,7 +1961,7 @@ tables:
           title_public: "Leisure vs work: Work"
       dont_know_lei_vs_wk:
         title: "Leisure vs work: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
+        description_short: '% of respondents replying "don''t know" when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
           name: "Leisure vs work: Don't know"
           <<: *common-display
@@ -2044,7 +2044,7 @@ tables:
           title_public: "Work is a duty towards society: Strongly disagree"
       dont_know_work_is_a_duty:
         title: "Work is a duty towards society: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements? Work is a duty towards society".'
         display:
           name: "Work is a duty towards society: Don't know"
           <<: *common-display
@@ -2117,7 +2117,7 @@ tables:
           title_public: "Work should come first: Strongly disagree"
       dont_know_work_should_come_first:
         title: "Work should come first: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
         display:
           name: "Work should come first: Don't know"
           <<: *common-display
@@ -2174,7 +2174,7 @@ tables:
           title_public: "Most serious problem: Environmental pollution"
       dont_know_most_serious:
         title: "Most serious problem: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "don''t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
         display:
           name: "Most serious problem: Don't know"
           <<: *common-display
@@ -2231,7 +2231,7 @@ tables:
           title_public: "Claiming benefits: Neutral"
       dont_know_claiming_benefits:
         title: "Claiming government benefits to which you are not entitled: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Claiming benefits: Don't know"
           <<: *common-display
@@ -2298,7 +2298,7 @@ tables:
           title_public: "Stealing property: Neutral"
       dont_know_stealing_property:
         title: "Stealing property: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Stealing property: Don't know"
           <<: *common-display
@@ -2365,7 +2365,7 @@ tables:
           title_public: "Parents beating children: Neutral"
       dont_know_parents_beating_children:
         title: "Parents beating children: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Parents beating children: Don't know"
           <<: *common-display
@@ -2432,7 +2432,7 @@ tables:
           title_public: "Violence against other people: Neutral"
       dont_know_violence_against_other_people:
         title: "Violence against other people: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Violence against other people: Don't know"
           <<: *common-display
@@ -2499,7 +2499,7 @@ tables:
           title_public: "Avoiding a fare on public transport: Neutral"
       dont_know_avoiding_fare_on_public_transport:
         title: "Avoiding a fare on public transport: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Avoiding a fare on public transport: Don't know"
           <<: *common-display
@@ -2566,7 +2566,7 @@ tables:
           title_public: "Cheating on taxes: Neutral"
       dont_know_cheating_on_taxes:
         title: "Cheating on taxes: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Cheating on taxes: Don't know"
           <<: *common-display
@@ -2633,7 +2633,7 @@ tables:
           title_public: "Accepting a bribe: Neutral"
       dont_know_accepting_a_bribe:
         title: "Accepting a bribe in the course of their duties: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Accepting a bribe: Don't know"
           <<: *common-display
@@ -2700,7 +2700,7 @@ tables:
           title_public: "Homosexuality: Neutral"
       dont_know_homosexuality:
         title: "Homosexuality: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Homosexuality: Don't know"
           <<: *common-display
@@ -2767,7 +2767,7 @@ tables:
           title_public: "Prostitution: Neutral"
       dont_know_prostitution:
         title: "Prostitution: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Prostitution: Don't know"
           <<: *common-display
@@ -2834,7 +2834,7 @@ tables:
           title_public: "Abortion: Neutral"
       dont_know_abortion:
         title: "Abortion: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Abortion: Don't know"
           <<: *common-display
@@ -2901,7 +2901,7 @@ tables:
           title_public: "Divorce: Neutral"
       dont_know_divorce:
         title: "Divorce: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Divorce: Don't know"
           <<: *common-display
@@ -2968,7 +2968,7 @@ tables:
           title_public: "Euthanasia: Neutral"
       dont_know_euthanasia:
         title: "Euthanasia: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Euthanasia: Don't know"
           <<: *common-display
@@ -3035,7 +3035,7 @@ tables:
           title_public: "Suicide: Neutral"
       dont_know_suicide:
         title: "Suicide: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Suicide: Don't know"
           <<: *common-display
@@ -3102,7 +3102,7 @@ tables:
           title_public: "Having casual sex: Neutral"
       dont_know_having_casual_sex:
         title: "Having casual sex: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Having casual sex: Don't know"
           <<: *common-display
@@ -3169,7 +3169,7 @@ tables:
           title_public: "Sex before marriage: Neutral"
       dont_know_sex_before_marriage:
         title: "Sex before marriage: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Sex before marriage: Don't know"
           <<: *common-display
@@ -3236,7 +3236,7 @@ tables:
           title_public: "Invitro fertilization: Neutral"
       dont_know_invitro_fertilization:
         title: "Invitro fertilization: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Invitro fertilization: Don't know"
           <<: *common-display
@@ -3303,7 +3303,7 @@ tables:
           title_public: "Death penalty: Neutral"
       dont_know_death_penalty:
         title: "Death penalty: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Death penalty: Don't know"
           <<: *common-display
@@ -3370,7 +3370,7 @@ tables:
           title_public: "Man beating wife: Neutral"
       dont_know_man_beating_wife:
         title: "Man beating wife: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Man beating wife: Don't know"
           <<: *common-display
@@ -3437,7 +3437,7 @@ tables:
           title_public: "Political violence: Neutral"
       dont_know_political_violence:
         title: "Political violence: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+        description_short: '% of respondents replying "don''t know" when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Political violence: Don't know"
           <<: *common-display
@@ -3512,7 +3512,7 @@ tables:
           title_public: "Losing my job or not finding a job: Not at all worried"
       dont_know_losing_job:
         title: "Losing my job or not finding a job: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job".'
+        description_short: '% of respondents replying "don''t know" when asked "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job".'
         display:
           name: "Losing my job or not finding a job: Don't know"
           <<: *common-display
@@ -3587,7 +3587,7 @@ tables:
           title_public: "Not being able to give one's children a good education: Not at all worried"
       dont_know_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "To what degree are you worried about the following situations?", when the situation was "Not being able to give one''s children a good education".'
+        description_short: '% of respondents replying "don''t know" when asked "To what degree are you worried about the following situations?", when the situation was "Not being able to give one''s children a good education".'
         display:
           name: "Not being able to give one's children a good education: Don't know"
           <<: *common-display
@@ -3662,7 +3662,7 @@ tables:
           title_public: "A war involving my country: Not at all worried"
       dont_know_war:
         title: "A war involving my country: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "To what degree are you worried about the following situations?", when the situation was "A war involving my country".'
+        description_short: '% of respondents replying "don''t know" when asked "To what degree are you worried about the following situations?", when the situation was "A war involving my country".'
         display:
           name: "A war involving my country: Don't know"
           <<: *common-display
@@ -3737,7 +3737,7 @@ tables:
           title_public: "A terrorist attack: Not at all worried"
       dont_know_terrorist_attack:
         title: "A terrorist attack: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "To what degree are you worried about the following situations?", when the situation was "A terrorist attack".'
+        description_short: '% of respondents replying "don''t know" when asked "To what degree are you worried about the following situations?", when the situation was "A terrorist attack".'
         display:
           name: "A terrorist attack: Don't know"
           <<: *common-display
@@ -3812,7 +3812,7 @@ tables:
           title_public: "A civil war: Not at all worried"
       dont_know_civil_war:
         title: "A civil war: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "To what degree are you worried about the following situations?", when the situation was "A civil war".'
+        description_short: '% of respondents replying "don''t know" when asked "To what degree are you worried about the following situations?", when the situation was "A civil war".'
         display:
           name: "A civil war: Don't know"
           <<: *common-display
@@ -3887,7 +3887,7 @@ tables:
           title_public: "Happiness: Not at all happy"
       dont_know_happy:
         title: "Happiness: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        description_short: '% of respondents replying "don''t know" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
         display:
           name: "Happiness: Don't know"
           <<: *common-display
@@ -3902,5 +3902,405 @@ tables:
         presentation:
           title_public: "Happiness: No answer"
 
+      notmentioned_neighbors_different_race:
+        title: "Neighbors of a different race: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different race".'
+        display:
+          name: "Neighbors of a different race: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different race: Not mentioned"
+      mentioned_neighbors_different_race:
+        title: "Neighbors of a different race: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different race".'
+        display:
+          name: "Neighbors of a different race: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different race: Mentioned"
+      dont_know_neighbors_different_race:
+        title: "Neighbors of a different race: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different race".'
+        display:
+          name: "Neighbors of a different race: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different race: Don't know"
+      no_answer_neighbors_different_race:
+        title: "Neighbors of a different race: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different race".'
+        display:
+          name: "Neighbors of a different race: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different race: No answer"
 
+      notmentioned_neighbors_heavy_drinkers:
+        title: "Neighbors being heavy drinkers: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Heavy drinkers".'
+        display:
+          name: "Neighbors being heavy drinkers: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being heavy drinkers: Not mentioned"
+      mentioned_neighbors_heavy_drinkers:
+        title: "Neighbors being heavy drinkers: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Heavy drinkers".'
+        display:
+          name: "Neighbors being heavy drinkers: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being heavy drinkers: Mentioned"
+      dont_know_neighbors_heavy_drinkers:
+        title: "Neighbors being heavy drinkers: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Heavy drinkers".'
+        display:
+          name: "Neighbors being heavy drinkers: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being heavy drinkers: Don't know"
+      no_answer_neighbors_heavy_drinkers:
+        title: "Neighbors being heavy drinkers: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Heavy drinkers".'
+        display:
+          name: "Neighbors being heavy drinkers: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being heavy drinkers: No answer"
 
+      notmentioned_neighbors_inmigrant_foreign_workers:
+        title: "Neighbors being inmigrant/foreign workers: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+        display:
+          name: "Neighbors being inmigrant/foreign workers: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being inmigrant/foreign workers: Not mentioned"
+      mentioned_neighbors_inmigrant_foreign_workers:
+        title: "Neighbors being inmigrant/foreign workers: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+        display:
+          name: "Neighbors being inmigrant/foreign workers: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being inmigrant/foreign workers: Mentioned"
+      dont_know_neighbors_inmigrant_foreign_workers:
+        title: "Neighbors being inmigrant/foreign workers: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+        display:
+          name: "Neighbors being inmigrant/foreign workers: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being inmigrant/foreign workers: Don't know"
+      no_answer_neighbors_inmigrant_foreign_workers:
+        title: "Neighbors being inmigrant/foreign workers: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Inmigrant/foreign workers".'
+        display:
+          name: "Neighbors being inmigrant/foreign workers: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being inmigrant/foreign workers: No answer"
+
+      notmentioned_neighbors_aids:
+        title: "Neighbors being people with AIDS: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "People with AIDS".'
+        display:
+          name: "Neighbors being people with AIDS: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being people with AIDS: Not mentioned"
+      mentioned_neighbors_aids:
+        title: "Neighbors being people with AIDS: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "People with AIDS".'
+        display:
+          name: "Neighbors being people with AIDS: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being people with AIDS: Mentioned"
+      dont_know_neighbors_aids:
+        title: "Neighbors being people with AIDS: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "People with AIDS".'
+        display:
+          name: "Neighbors being people with AIDS: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being people with AIDS: Don't know"
+      no_answer_neighbors_aids:
+        title: "Neighbors being people with AIDS: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "People with AIDS".'
+        display:
+          name: "Neighbors being people with AIDS: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being people with AIDS: No answer"
+
+      notmentioned_neighbors_drug_addicts:
+        title: "Neighbors being drug addicts: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Drug addicts".'
+        display:
+          name: "Neighbors being drug addicts: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being drug addicts: Not mentioned"
+      mentioned_neighbors_drug_addicts:
+        title: "Neighbors being drug addicts: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Drug addicts".'
+        display:
+          name: "Neighbors being drug addicts: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being drug addicts: Mentioned"
+      dont_know_neighbors_drug_addicts:
+        title: "Neighbors being drug addicts: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Drug addicts".'
+        display:
+          name: "Neighbors being drug addicts: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being drug addicts: Don't know"
+      no_answer_neighbors_drug_addicts:
+        title: "Neighbors being drug addicts: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Drug addicts".'
+        display:
+          name: "Neighbors being drug addicts: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being drug addicts: No answer"
+
+      notmentioned_neighbors_homosexuals:
+        title: "Neighbors being homosexuals: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
+        display:
+          name: "Neighbors being homosexuals: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being homosexuals: Not mentioned"
+      mentioned_neighbors_homosexuals:
+        title: "Neighbors being homosexuals: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
+        display:
+          name: "Neighbors being homosexuals: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being homosexuals: Mentioned"
+      dont_know_neighbors_homosexuals:
+        title: "Neighbors being homosexuals: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
+        display:
+          name: "Neighbors being homosexuals: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being homosexuals: Don't know"
+      no_answer_neighbors_homosexuals:
+        title: "Neighbors being homosexuals: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
+        display:
+          name: "Neighbors being homosexuals: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being homosexuals: No answer"
+
+      notmentioned_neighbors_different_religion:
+        title: "Neighbors of a different religion: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different religion".'
+        display:
+          name: "Neighbors of a different religion: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different religion: Not mentioned"
+      mentioned_neighbors_different_religion:
+        title: "Neighbors of a different religion: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different religion".'
+        display:
+          name: "Neighbors of a different religion: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different religion: Mentioned"
+      dont_know_neighbors_different_religion:
+        title: "Neighbors of a different religion: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different religion".'
+        display:
+          name: "Neighbors of a different religion: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different religion: Don't know"
+      no_answer_neighbors_different_religion:
+        title: "Neighbors of a different religion: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors of a different religion".'
+        display:
+          name: "Neighbors of a different religion: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors of a different religion: No answer"
+
+      notmentioned_neighbors_gypsies:
+        title: "Neighbors being gypsies: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Gypsies".'
+        display:
+          name: "Neighbors being gypsies: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being gypsies: Not mentioned"
+      mentioned_neighbors_gypsies:
+        title: "Neighbors being gypsies: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Gypsies".'
+        display:
+          name: "Neighbors being gypsies: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being gypsies: Mentioned"
+      dont_know_neighbors_gypsies:
+        title: "Neighbors being gypsies: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Gypsies".'
+        display:
+          name: "Neighbors being gypsies: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being gypsies: Don't know"
+      no_answer_neighbors_gypsies:
+        title: "Neighbors being gypsies: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Gypsies".'
+        display:
+          name: "Neighbors being gypsies: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being gypsies: No answer"
+
+      notmentioned_neighbors_unmarried_couples:
+        title: "Neighbors being unmarried couples: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Unmarried couples".'
+        display:
+          name: "Neighbors being unmarried couples: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being unmarried couples: Not mentioned"
+      mentioned_neighbors_unmarried_couples:
+        title: "Neighbors being unmarried couples: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Unmarried couples".'
+        display:
+          name: "Neighbors being unmarried couples: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being unmarried couples: Mentioned"
+      dont_know_neighbors_unmarried_couples:
+        title: "Neighbors being unmarried couples: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Unmarried couples".'
+        display:
+          name: "Neighbors being unmarried couples: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being unmarried couples: Don't know"
+      no_answer_neighbors_unmarried_couples:
+        title: "Neighbors being unmarried couples: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Unmarried couples".'
+        display:
+          name: "Neighbors being unmarried couples: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors being unmarried couples: No answer"
+
+      notmentioned_neighbors_different_language:
+        title: "Neighbors speaking a different language: Not mentioned"
+        description_short: '% of respondents not specifying the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors speaking a different language".'
+        display:
+          name: "Neighbors speaking a different language: Not mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors speaking a different language: Not mentioned"
+      mentioned_neighbors_different_language:
+        title: "Neighbors speaking a different language: Mentioned"
+        description_short: '% of respondents mentioning the group when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors speaking a different language".'
+        display:
+          name: "Neighbors speaking a different language: Mentioned"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors speaking a different language: Mentioned"
+      dont_know_neighbors_different_language:
+        title: "Neighbors speaking a different language: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors speaking a different language".'
+        display:
+          name: "Neighbors speaking a different language: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors speaking a different language: Don't know"
+      no_answer_neighbors_different_language:
+        title: "Neighbors speaking a different language: No answer"
+        description_short: '% of answers classified as "No answer" for the question "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Neighbors speaking a different language".'
+        display:
+          name: "Neighbors speaking a different language: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Neighbors speaking a different language: No answer"
+
+      agree_agg_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Agree (aggregate)"
+        description_short: '% of respondents replying "strongly agree" or "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Agree (aggregate)"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Agree (aggregate)"
+      disagree_agg_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Disagree (aggregate)"
+        description_short: '% of respondents replying "strongly disagree" or "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Disagree (aggregate)"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Disagree (aggregate)"
+      strongly_agree_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Strongly agree"
+        description_short: '% of respondents replying "strongly agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Strongly agree"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Strongly agree"
+      agree_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Agree"
+        description_short: '% of respondents replying "agree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Agree"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Agree"
+      neither_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Neither agree nor disagree"
+        description_short: '% of respondents replying "neither agree nor disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Neither agree nor disagree"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Neither agree nor disagree"
+      disagree_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Disagree"
+        description_short: '% of respondents replying "disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Disagree"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Disagree"
+      strongly_disagree_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Strongly disagree"
+        description_short: '% of respondents replying "strongly disagree" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Strongly disagree"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Strongly disagree"
+      dont_know_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: Don't know"
+        description_short: '% of respondents replying "don''t know" when asked "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: Don't know"
+      no_answer_homosx_prnts:
+        title: "Homosexual couples are as good parents as other couples: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Do you agree, disagree or neither agree nor disagree with the following statements?" When the statement is "Homosexual couples are as good parents as other couples".'
+        display:
+          name: "Homosexual couples are as good parents as other couples: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Homosexual couples are as good parents as other couples: No answer"

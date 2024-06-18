@@ -155,6 +155,56 @@ steps:
   data://grapher/worldbank_wdi/2023-05-29/wdi:
     - data://garden/worldbank_wdi/2023-05-29/wdi
 
+  data://grapher/aviation_safety_network/2022-10-14/aviation_statistics:
+    - data://garden/aviation_safety_network/2022-10-14/aviation_statistics
+
+  data://meadow/aviation_safety_network/2023-04-18/aviation_statistics:
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_nature.csv
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics_by_period.csv
+    - snapshot://aviation_safety_network/2023-04-18/aviation_statistics.csv
+
+  #
+  # Aviation Safety Network - Aviation statistics (2022-10-14).
+  #
+  # Data extracted directly from their website.
+  data://meadow/aviation_safety_network/2022-10-12/aviation_statistics:
+    - snapshot://aviation_safety_network/2022-10-12/aviation_statistics_by_period.csv
+    - snapshot://aviation_safety_network/2022-10-12/aviation_statistics_by_nature.csv
+
+  # Data extracted from the public spreadsheet.
+  data://meadow/aviation_safety_network/2022-10-14/aviation_statistics:
+    - snapshot://aviation_safety_network/2022-10-14/aviation_statistics.csv
+
+  data://garden/aviation_safety_network/2023-04-18/aviation_statistics:
+    - data://meadow/aviation_safety_network/2023-04-18/aviation_statistics
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
+  # Here, worldbank_wdi is required to get some additional aviation statistics.
+  data://garden/aviation_safety_network/2022-10-14/aviation_statistics:
+    - data://meadow/aviation_safety_network/2022-10-14/aviation_statistics
+    - data://meadow/aviation_safety_network/2022-10-12/aviation_statistics
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
+  data://grapher/aviation_safety_network/2023-04-18/aviation_statistics:
+    - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
+
+  # World Bank GenderStats
+  data://meadow/wb/2023-12-29/gender_statistics:
+    - snapshot://wb/2024-12-29/gender_statistics.feather
+  data://garden/wb/2023-12-29/gender_statistics:
+    - data://meadow/wb/2023-12-29/gender_statistics
+  data://grapher/wb/2023-12-29/gender_statistics:
+    - data://garden/wb/2023-12-29/gender_statistics
+
+  # Equaldex dataset
+  data://meadow/lgbt_rights/2023-04-13/equaldex:
+    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+  data://garden/lgbt_rights/2023-04-13/equaldex:
+    - data://meadow/lgbt_rights/2023-04-13/equaldex
+  data://grapher/lgbt_rights/2023-04-13/equaldex:
+    - data://garden/lgbt_rights/2023-04-13/equaldex
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
