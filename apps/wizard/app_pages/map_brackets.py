@@ -448,6 +448,50 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     chart_html(mb.chart_config, owid_env=OWID_ENV)
 
 
+def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
+    if "variableId" not in explorer.df_columns.columns:
+        explorer.df_columns["variableId"] = None
+
+    if mb.variable_id in set(explorer.df_columns["variableId"]):
+        # If variable configuration is already specified in the columns table, overwrite its config.
+        index = explorer.df_columns[explorer.df_columns["variableId"] == mb.variable_id].index
+    else:
+        # Otherwise, add new variable to columns table.
+        index = len(explorer.df_columns)
+
+    # If custom brackets have been defined, update explorer.
+    if "customNumericValues" in mb.chart_config["map"]["colorScale"]:
+        if "colorScaleNumericBins" not in explorer.df_columns.columns:
+            # Ensure the column for map brackets exists in the columns table of the explorer.
+            explorer.df_columns["colorScaleNumericBins"] = None
+        # Add entry to the map brackets column for this indicator.
+        explorer.df_columns.loc[index, "variableId"] = mb.variable_id
+        # Note that, to assign a list to a cell in a dataframe, the "at" method needs to be used, instead of loc.
+        explorer.df_columns.at[index, "colorScaleNumericBins"] = mb.chart_config["map"]["colorScale"][
+            "customNumericValues"
+        ]
+
+    # If a minimum bracket have been defined, update explorer.
+    if "customNumericMinValue" in mb.chart_config["map"]["colorScale"]:
+        if "colorScaleNumericMinValue" not in explorer.df_columns.columns:
+            # Ensure the column for minimum brackets exists in the columns table of the explorer.
+            explorer.df_columns["colorScaleNumericMinValue"] = None
+        # Add entry to the minimum bracket column for this indicator.
+        explorer.df_columns.loc[index, ["variableId", "colorScaleNumericMinValue"]] = (
+            mb.variable_id,
+            mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
+        )
+
+    # Overwrite explorer file.
+    # TODO: Check if the explorer works after these changes, I think the format that the explorer needs may be different (using semicolons?).
+    if not explorer.has_changed():
+        st.error("Explorer has not changed")
+        return
+    else:
+        explorer.write()
+        st.info(f"Successfully updated {explorer.name} explorer file.")
+
+
 ########################################
 # TITLE and DESCRIPTION
 ########################################
@@ -522,24 +566,4 @@ elif use_type == USE_TYPE_EXPLORERS:
     map_bracketer_interactive(mb=mb)
 
     if st.button("Save brackets in explorer file", type="primary"):
-        if "customNumericValues" in mb.chart_config["map"]["colorScale"]:
-            # If map brackets have been defined, update explorer.
-            if "colorScaleNumericBins" not in explorer.df_graphers.columns:
-                # Ensure the column for map brackets exists in the explorer.
-                explorer.df_graphers["colorScaleNumericBins"] = None
-            # Add entry to the map brackets column for this indicator.
-            explorer.df_graphers.loc[
-                explorer.df_graphers["yVariableIds"] == variable_id, "colorScaleNumericBins"
-            ] = json.dumps(mb.chart_config["map"]["colorScale"]["customNumericValues"])
-        if "customNumericMinValue" in mb.chart_config["map"]["colorScale"]:
-            # If a minimum bracket have been defined, update explorer.
-            if "colorScaleNumericMinValue" not in explorer.df_graphers.columns:
-                # Ensure the column for minimum brackets exists in the explorer.
-                explorer.df_graphers["colorScaleNumericMinValue"] = None
-            # Add entry to the minimum bracket column for this indicator.
-            explorer.df_graphers.loc[
-                explorer.df_graphers["yVariableIds"] == variable_id, "colorScaleNumericMinValue"
-            ] = json.dumps(mb.chart_config["map"]["colorScale"]["customNumericMinValue"])
-        # Overwrite explorer file.
-        # TODO: Check if the explorer works after these changes, I think the format that the explorer needs may be different (using semicolons?).
-        explorer.write()
+        update_explorer_file(mb=mb, explorer=explorer)

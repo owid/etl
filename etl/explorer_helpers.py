@@ -16,6 +16,7 @@ class Explorer:
     """
 
     def __init__(self, name: str):
+        self.name = name
         self.path = (EXPLORERS_DIR / name).with_suffix(".explorer.tsv")
         self._load_content()
         self._parse_content()
@@ -91,6 +92,10 @@ class Explorer:
             if set(df[column]) == {"false", "true"}:
                 df[column] = df[column].map({"false": False, "true": True}).astype(bool)
 
+        if "variableId" in df.columns:
+            # Convert string variable ids to integers.
+            df["variableId"] = df["variableId"].astype(int)
+
         if "yVariableIds" in df.columns:
             # Convert "yVariableIds" into a list of integers.
             df["yVariableIds"] = [
@@ -107,8 +112,15 @@ class Explorer:
         if df.empty:
             return []
 
-        # Convert lists of variable ids to strings.
-        df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
+        if "yVariableIds" in df.columns:
+            # Convert lists of variable ids to strings.
+            df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
+
+        if "colorScaleNumericBins" in df.columns:
+            # Convert list of brackets into strings separated by ";".
+            df["colorScaleNumericBins"] = [
+                ";".join(map(str, row)) if row else "" for row in df["colorScaleNumericBins"]
+            ]
 
         # Convert boolean columns to strings of true, false.
         for column in df.select_dtypes(include="bool").columns:
@@ -144,6 +156,21 @@ class Explorer:
         )
 
         return full_content
+
+    @staticmethod
+    def _ignore_commented_and_empty_lines(content: str) -> str:
+        _content = "\n".join([line for line in content.split("\n") if (len(line) > 0) and (not line.startswith("#"))])
+        return _content
+
+    def has_changed(self) -> bool:
+        # Return True if content of explorer has changed, and False otherwise.
+        # NOTE: The original content and the generated one may differ either because of commented lines or empty lines.
+        # Ignore those lines, and check if the original and the new content coincide.
+        original = self._ignore_commented_and_empty_lines(content=self.content)
+        current = self._ignore_commented_and_empty_lines(content=self.generate_content())
+        content_has_changed = original != current
+
+        return content_has_changed
 
     def write(self, path: Optional[Union[str, Path]] = None) -> None:
         if path is None:
