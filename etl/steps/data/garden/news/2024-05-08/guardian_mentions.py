@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("guardian_mentions")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["guardian_mentions"].reset_index()
@@ -46,9 +47,13 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
-    ## Create indicators w
     ## Get relative values
     tb = add_relative_indicators(tb, ["num_pages_tags", "num_pages_mentions"])
+
+    ## Add per-capita indicators
+    tb = geo.add_population_to_table(tb, ds_population)
+    for column in ["num_pages_tags", "num_pages_mentions"]:
+        tb[f"{column}_per_million"] = tb[column] / tb["population"] * 1_000_000
 
     # Estimate 10-year average
     tb_10y_avg = tb[(tb["year"] >= 2014) & (tb["year"] <= 2023)].copy()

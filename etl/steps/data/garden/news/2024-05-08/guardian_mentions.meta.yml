@@ -33,6 +33,12 @@ tables:
 
           For mor details, please refer to the snapshot script.
 
+      num_pages_tags_per_million:
+        title: Number of pages in the Guardian with a country tag (per million people)
+        unit: "pages per million people"
+        description_short: Number of pages in the Guardian that are tagged with a country-related label, normalised by the population of the country.
+        description_processing: *desc_proc_1
+
       relative_pages_tags:
         title: Share of pages in the Guardian with a country tag
         unit: "pages per 100,000 pages"
@@ -65,6 +71,12 @@ tables:
 
           For mor details, please refer to the snapshot script.
 
+      num_pages_mentions_per_million:
+        title: Number of pages in the Guardian that mention a country (per million people)
+        unit: "pages per million people"
+        description_short: Number of pages in the Guardian that mention a particular country, normalised by the population of the country.
+        description_processing: *desc_proc_2
+
       relative_pages_mentions:
         title: Share of pages in The Guardian that mention a country
         unit: "pages per 100,000 pages"
@@ -90,6 +102,15 @@ tables:
           {tables.guardian_mentions.variables.num_pages_tags.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_1
 
+      num_pages_tags_per_million_10y_avg:
+        title: |-
+          {tables.guardian_mentions.variables.num_pages_tags_per_million.title} (10-year average)
+        unit: "pages per million people"
+        description_short: |-
+          {tables.guardian_mentions.variables.num_pages_tags_per_million.description_short}. It reflects a 10-year average (2014 - 2023).
+        description_processing: |-
+          {tables.guardian_mentions.variables.num_pages_tags.description_processing}
+
       relative_pages_tags_10y_avg:
         title: |-
           {tables.guardian_mentions.variables.relative_pages_tags.title} (10-year average)
@@ -114,6 +135,15 @@ tables:
         description_short: |-
           {tables.guardian_mentions.variables.num_pages_mentions.description_short}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_2
+
+      num_pages_mentions_per_million_10y_avg:
+        title: |-
+          {tables.guardian_mentions.variables.num_pages_mentions_per_million.title} (10-year average)
+        unit: "pages per million people"
+        description_short: |-
+          {tables.guardian_mentions.variables.num_pages_mentions_per_million.description_short}. It reflects a 10-year average (2014 - 2023).
+        description_processing: |-
+          {tables.guardian_mentions.variables.num_pages_mentions.description_processing}
 
       relative_pages_mentions_10y_avg:
         title: |-

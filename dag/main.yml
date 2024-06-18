@@ -698,6 +698,7 @@ steps:
     - snapshot://news/2024-05-07/guardian_mentions_raw.csv
   data://garden/news/2024-05-08/guardian_mentions:
     - data://meadow/news/2024-05-08/guardian_mentions
+    - data://garden/demography/2023-03-31/population
   data://grapher/news/2024-05-08/guardian_mentions:
     - data://garden/news/2024-05-08/guardian_mentions
 
