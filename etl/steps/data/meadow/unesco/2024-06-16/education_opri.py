@@ -44,7 +44,6 @@ def run(dest_dir: str) -> None:
     national_df = read_csv_from_zip(snap.path, "OPRI_DATA_NATIONAL.csv")
     regional_df = read_csv_from_zip(snap.path, "OPRI_DATA_REGIONAL.csv")
     label_df = read_csv_from_zip(snap.path, "OPRI_LABEL.csv")
-    metadata_df = read_csv_from_zip(snap.path, "OPRI_METADATA.csv")
 
     #
     # Process data.
@@ -53,7 +52,6 @@ def run(dest_dir: str) -> None:
     rename_dict = {"region_id": "country", "country_id": "country"}
     regional_df.rename(columns=rename_dict, inplace=True)
     national_df.rename(columns=rename_dict, inplace=True)
-    metadata_df.rename(columns=rename_dict, inplace=True)
 
     # Concatenate and merge dataframes with regional and national data
     cobimbed_df = pr.concat([regional_df, national_df], axis=0)
@@ -62,17 +60,8 @@ def run(dest_dir: str) -> None:
     # Add indicator label columnn that provides a better description of the indicator
     df_with_labels = pr.merge(cobimbed_df, label_df, on="indicator_id", how="left")
 
-    # Pivot the metadata table by type to get the metadata in separate columns
-    pivoted_metadata_df = metadata_df.pivot(
-        index=["country", "year", "indicator_id"], columns="type", values="metadata"
-    )
-    pivoted_metadata_df = pivoted_metadata_df.reset_index()
-
-    # Merge the dataframe with the metadata
-    df_with_metadata = pr.merge(df_with_labels, pivoted_metadata_df, on=["indicator_id", "country", "year"], how="left")
-
     # Create a new table and add relevant metadata.
-    tb = Table(df_with_metadata, short_name=paths.short_name)
+    tb = Table(df_with_labels, short_name=paths.short_name)
     tb = tb.format(["country", "year", "indicator_id"])
     for column in tb.columns:
         tb[column].metadata.origins = [snap.metadata.origin]

@@ -31,10 +31,10 @@ def run(dest_dir: str) -> None:
     )
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
 
-    # TO DO: Add metadata columns to the table
+    # Add metadata columns to the table
     long_definition = add_metadata_wb_edstats(tb, tb_wb)
     tb_pivoted = add_metadata_description(tb_pivoted, long_definition)
-    # Add metadata columns to the table
+
     tb_pivoted = tb_pivoted.reset_index()
     tb_pivoted = tb_pivoted.format(["country", "year"])
 
