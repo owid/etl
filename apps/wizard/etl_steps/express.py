@@ -1,6 +1,6 @@
 """Garden phase."""
 from pathlib import Path
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List
 
 import streamlit as st
 from sqlalchemy.exc import OperationalError
@@ -413,7 +413,7 @@ utils.render_responsive_field_in_form(
 #########################################################
 if submitted:
     # Create form
-    form = cast(ExpressForm, ExpressForm.from_state())
+    form = ExpressForm.from_state()
 
     if not form.errors:
         # Remove form from UI
