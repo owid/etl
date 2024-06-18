@@ -29,7 +29,7 @@ tables:
         display:
           numDecimalPlaces: 0
       time_frame_certified:
-        title: Year country was certified free of guinea worm disease
+        title: Year country was certified free of guinea worm disease or status of certification
         unit: ''
         description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
         description_from_producer:
