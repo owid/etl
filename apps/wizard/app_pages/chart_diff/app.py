@@ -12,8 +12,8 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
-from apps.wizard.utils.env import OWID_ENV
 from etl import config
+from etl.config import OWID_ENV
 
 log = get_logger()
 
@@ -211,7 +211,7 @@ def _show_options_filters():
         st.multiselect(
             label="Chart changes type",
             options=["new", "data", "metadata", "config"],
-            format_func=lambda x: x if x == "new" else f"modified {x}",
+            format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
             help="Show new charts or modified ones with changes in data, metadata, or config.",
@@ -258,6 +258,7 @@ def _show_options_display():
         "Number of charts per page",
         options=[
             # 1,
+            5,
             10,
             20,
             50,
@@ -265,7 +266,7 @@ def _show_options_display():
         ],
         key="charts-per-page",
         help="Select the number of charts to display per page.",
-        index=0,
+        index=1,
     )
 
 

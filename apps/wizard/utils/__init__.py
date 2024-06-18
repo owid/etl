@@ -24,15 +24,15 @@ import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
 from pymysql import OperationalError
+from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from apps.wizard.utils.env import OWIDEnv
 from apps.wizard.utils.step_form import StepForm
-from etl import config
-from etl.db import get_connection
+from etl.config import OWID_ENV, OWIDEnv, enable_bugsnag
+from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
@@ -126,7 +126,7 @@ def get_namespaces(step_type: str) -> List[str]:
             )
         case _:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
-    namespaces = [folder.name for folder in folders]
+    namespaces = sorted(set(folder.name for folder in folders))
     return namespaces
 
 
@@ -405,7 +405,7 @@ def _check_env() -> bool:
     """Check if environment variables are set correctly."""
     ok = True
     for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
+        if getattr(OWID_ENV.conf, env_name) is None:
             ok = False
             st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
 
@@ -437,10 +437,10 @@ def _show_environment():
     **Environment variables**:
 
     ```
-    GRAPHER_USER_ID: {config.GRAPHER_USER_ID}
-    DB_USER: {config.DB_USER}
-    DB_NAME: {config.DB_NAME}
-    DB_HOST: {config.DB_HOST}
+    GRAPHER_USER_ID: {OWID_ENV.conf.GRAPHER_USER_ID}
+    DB_USER: {OWID_ENV.conf.DB_USER}
+    DB_NAME: {OWID_ENV.conf.DB_NAME}
+    DB_HOST: {OWID_ENV.conf.DB_HOST}
     ```
     """
     )
@@ -599,7 +599,7 @@ def enable_bugsnag_for_streamlit():
     """Enable bugsnag for streamlit. Uses this workaround
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
-    config.enable_bugsnag()
+    enable_bugsnag()
     # error_util = sys.modules["streamlit.error_util"]
     error_util = sys.modules["streamlit.runtime.scriptrunner.script_runner"]
     original_handler = error_util.handle_uncaught_app_exception
@@ -706,3 +706,27 @@ class Pagination:
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
+
+
+def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
+    """Get staging server creation time."""
+    query_ts = "show table status like 'charts'"
+
+    if session:
+        df = read_sql(query_ts, session)
+    else:
+        with Session(OWID_ENV.engine) as source_session:
+            df = read_sql(query_ts, source_session)
+    assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
+
+    create_time = df["Create_time"].item()
+
+    if key not in st.session_state:
+        st.session_state[key] = create_time
+
+    return create_time
+
+
+def set_staging_creation_time(key: str = "server_creation_time") -> None:
+    """Gest staging server creation time estimate."""
+    st.session_state[key] = get_staging_creation_time()

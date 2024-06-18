@@ -11,9 +11,6 @@ import etl.grapher_model as gm
 from apps.utils.gpt import GPTResponse
 from apps.wizard.app_pages.charts.variable_config import VariableConfig
 from apps.wizard.utils import set_states
-
-# from etl.chart_revision.v2.base import ChartUpdater
-from apps.wizard.utils.env import OWID_ENV
 from etl.chart_revision.v2.chartgpt import SYSTEM_PROMPT_TEXT, suggest_new_config_fields
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
@@ -21,6 +18,7 @@ from etl.chart_revision.v2.core import (
     submit_chart_comparisons,
     update_chart_config,
 )
+from etl.config import OWID_ENV
 
 # Logger
 log = get_logger()
