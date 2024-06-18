@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import streamlit as st
+from rapidfuzz import fuzz
 from sqlalchemy.exc import OperationalError
 from typing_extensions import Self
 
@@ -291,20 +292,29 @@ with st.sidebar:
 
 # FORM
 form_widget = st.empty()
-with form_widget.form("express"):
+# with form_widget.form("express"):
+with form_widget.container(border=True):
     if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
         default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
     # Namespace
-    namespace_field = [st.empty(), st.container()]
+    APP_STATE.st_widget_responsive(
+        st_widget=st.selectbox,
+        custom_label="Custom namespace...",
+        key="namespace",
+        label="Namespace",
+        help="Institution or topic name",
+        options=OPTIONS_NAMESPACES,
+        default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+    )
 
     # Short name (meadow, garden, grapher)
     APP_STATE.st_widget(
         st_widget=st.text_input,
+        key="short_name",
         label="short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
-        key="short_name",
         value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
     )
 
@@ -322,6 +332,12 @@ with form_widget.form("express"):
     label = "Indicators tag"
     if USING_TAGS_DEFAULT:
         label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
+    namespace = APP_STATE.vars["namespace"].replace("_", " ")
+    default_last = None
+    for tag in tag_list:
+        if namespace.lower() == tag.lower():
+            default_last = tag
+            break
     APP_STATE.st_widget(
         st_widget=st.multiselect,
         label=label,
@@ -337,16 +353,30 @@ with form_widget.form("express"):
         key="topic_tags",
         options=tag_list,
         placeholder="Choose a tag (or multiple)",
-        default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else None,
+        default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
     )
 
     # Add to DAG
+    sorted_dag = sorted(
+        utils.dag_files,
+        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars["namespace"]),
+        reverse=True,
+    )
+    sorted_dag = [
+        utils.dag_not_add_option,
+        *sorted_dag,
+    ]
+    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars["namespace"]:
+        default_last = sorted_dag[1]
+    else:
+        default_last = ""
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=sorted_dag,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
+        default_last=default_last,
     )
 
     # Update frequency
@@ -388,25 +418,13 @@ with form_widget.form("express"):
     )
 
     # Submit
-    submitted = st.form_submit_button(
+    submitted = st.button(
         "Submit",
         type="primary",
         use_container_width=True,
         on_click=update_state,
     )
 
-# Render responsive namespace field
-utils.render_responsive_field_in_form(
-    key="namespace",
-    display_name="Namespace",
-    field_1=namespace_field[0],
-    field_2=namespace_field[1],
-    options=OPTIONS_NAMESPACES,
-    custom_label="Custom namespace...",
-    help_text="Institution or topic name",
-    app_state=APP_STATE,
-    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-)
 
 #########################################################
 # SUBMISSION ############################################
