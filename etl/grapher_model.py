@@ -32,6 +32,7 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    and_,
     func,
     or_,
     select,
@@ -285,6 +286,17 @@ class Chart(Base):
         return charts[0]
 
     @classmethod
+    def load_charts(cls, session: Session, chart_ids: List[int]) -> List["Chart"]:
+        """Load charts with id in `chart_ids`."""
+        cond = cls.id.in_(chart_ids)
+        charts = session.scalars(select(cls).where(cond)).all()
+
+        if len(charts) == 0:
+            raise NoResultFound()
+
+        return list(charts)
+
+    @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
@@ -320,7 +332,22 @@ class Chart(Base):
 
         return variables
 
-    def load_variables_checksums(self, session: Session) -> pd.DataFrame:
+    @classmethod
+    def load_variables_checksums(cls, session: Session, chart_ids: List[int]) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            cd.chartId,
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId in %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "variableId"])
+
+    def load_variable_checksums(self, session: Session) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
         q = """
         select
@@ -1416,6 +1443,55 @@ class ChartDiffApprovals(Base):
     status: Mapped[CHART_DIFF_STATUS] = mapped_column(VARCHAR(255))
     targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
+
+    @classmethod
+    def latest_chart_status_batch(
+        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+    ) -> List[str]:
+        """Load the latest approval of the charts. If there's none, return ChartStatus.PENDING.
+
+        Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
+        """
+        if not (len(chart_ids) == len(source_updated_ats) == len(target_updated_ats)):
+            raise ValueError("All input lists must have the same length")
+
+        # Get matches from DB
+        criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
+
+        results = session.scalars(
+            select(cls)
+            .where(
+                or_(
+                    *[
+                        and_(
+                            cls.chartId == chart_id,
+                            cls.sourceUpdatedAt == source_updated_at,
+                            cls.targetUpdatedAt == target_updated_at,
+                        )
+                        for chart_id, source_updated_at, target_updated_at in criteria
+                    ]
+                )
+            )
+            .order_by(cls.updatedAt.desc())
+        ).all()
+        results = {res.chartId: res for res in results}
+
+        # List with statuses corresponding to charts specified by IDs in chart_ids
+        statuses = []
+        for chart_id in chart_ids:
+            if chart_id in results:
+                status = results[chart_id].status
+                # Legacy
+                if status == "unapproved":
+                    statuses.append(ChartStatus.PENDING.value)
+                else:
+                    statuses.append(results[chart_id].status)
+            else:
+                statuses.append(ChartStatus.PENDING.value)
+
+        assert len(chart_ids) == len(statuses), "Length of chart_ids and statuses must be the same."
+
+        return statuses
 
     @classmethod
     def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:

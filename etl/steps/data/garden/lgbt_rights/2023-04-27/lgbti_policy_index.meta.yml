@@ -1115,7 +1115,11 @@ tables:
       age_of_consent:
         title: Age of consent (combined)
         description_short: |
-          Combines the equal and unequal age of consent.
+          Measures the presence of a law defining the same age of consent between same-sex and different-sex partners or outlawing different ages of consent between them. Outlawing serves as a tool to inhibit same-sex acts between consenting adults.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          From the original dataset, we combined data from two different indicators: age of consent equal and age of consent unequal, to consolidate in one indicator laws that define or outlaw age of consent equality between same-sex and different-sex partners.
         short_unit: ''
         unit: ''
         display:
@@ -1131,7 +1135,11 @@ tables:
       marriage:
         title: Marriage equality (combined)
         description_short: |
-          Combines marriage equality, marriage ban and civil unions.
+          Measures if there is no legal distinction between same-sex and different-sex marriages, if civil unions are considered instead or if same-sex marriages are banned.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          From the original dataset, we combined data from three different indicators: marriage equality, ban on marriage equality and civil unions.
         short_unit: ''
         unit: ''
         display:
@@ -1149,7 +1157,11 @@ tables:
       lgb_military_join:
         title: LGB military (combined)
         description_short: |
-          Combines LGB military and LGB military ban.
+          Measures if lesbian, gay, and bisexual people are allowed or banned to serve in the military.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          From the original dataset, we combined data from two different indicators: LGB allowed in military and LGB military ban.
         short_unit: ''
         unit: ''
         display:

@@ -1,5 +1,4 @@
 import re
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import streamlit as st
@@ -9,13 +8,12 @@ from sqlalchemy.orm import Session
 # from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
-from apps.chart_sync.cli import modified_charts_by_admin
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
+from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.utils import Pagination, set_states
-from apps.wizard.utils.env import OWID_ENV
 from etl import config
+from etl.config import OWID_ENV
 
 log = get_logger()
 
@@ -71,7 +69,7 @@ def get_chart_diffs():
     # Get actual charts
     if st.session_state.chart_diffs == {}:
         with st.spinner("Getting charts from database..."):
-            st.session_state.chart_diffs = get_chart_diffs_from_grapher()
+            st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
     # Sort charts
     st.session_state.chart_diffs = dict(
@@ -80,43 +78,6 @@ def get_chart_diffs():
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
-
-
-def get_chart_diffs_from_grapher(max_workers: int = 10) -> dict[int, ChartDiff]:
-    """Get chart diffs from Grapher.
-
-    This means, checking for chart changes in the database.
-
-    Changes in charts can be due to: chart config changes, changes in indicator timeseries, in indicator metadata, etc.
-    """
-    # Get IDs from modified charts
-    with Session(SOURCE_ENGINE) as source_session:
-        with Session(TARGET_ENGINE) as target_session:
-            # NOTE: this fetches all charts with data & metadata & config changes. This could be wasteful if
-            # user only wants to show config changes.
-            df = modified_charts_by_admin(source_session, target_session)
-            # Get chart its with at least one type of change
-            chart_ids = set(df.index[df.any(axis=1)])
-
-    # Get all chart diffs in parallel
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        chart_diffs_futures = {
-            chart_id: executor.submit(_get_chart_diff_from_grapher, chart_id) for chart_id in chart_ids
-        }
-        chart_diffs = {}
-        for chart_id, future in chart_diffs_futures.items():
-            chart_diffs[chart_id] = future.result()
-
-    return chart_diffs
-
-
-def _get_chart_diff_from_grapher(chart_id: int) -> ChartDiff:
-    with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-        return ChartDiff.from_chart_id(
-            chart_id=chart_id,
-            source_session=source_session,
-            target_session=target_session,
-        )
 
 
 def filter_chart_diffs():
@@ -250,7 +211,7 @@ def _show_options_filters():
         st.multiselect(
             label="Chart changes type",
             options=["new", "data", "metadata", "config"],
-            format_func=lambda x: x if x == "new" else f"modified {x}",
+            format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
             help="Show new charts or modified ones with changes in data, metadata, or config.",
@@ -297,6 +258,7 @@ def _show_options_display():
         "Number of charts per page",
         options=[
             # 1,
+            5,
             10,
             20,
             50,
@@ -304,7 +266,7 @@ def _show_options_display():
         ],
         key="charts-per-page",
         help="Select the number of charts to display per page.",
-        index=0,
+        index=1,
     )
 
 
@@ -313,7 +275,7 @@ def _show_options_misc():
     st.button(
         "🔄 Refresh all charts",
         key="refresh-btn-general",
-        on_click=lambda: set_states({"chart_diffs": get_chart_diffs_from_grapher()}),
+        on_click=lambda: set_states({"chart_diffs": get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)}),
         help="Get the latest chart versions, both from the staging and production servers.",
     )
     st.divider()
@@ -361,7 +323,41 @@ def _show_summary_top(chart_diffs):
         )
 
 
-def render_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
+def render_app():
+    """Render app.
+
+    This involves: displaying the chart diffs according to filters applied by user.
+    """
+    if len(st.session_state.chart_diffs) == 0:
+        st.warning("No chart modifications found in the staging environment.")
+    else:
+        # Filter based on query params
+        _ = filter_chart_diffs()
+
+        # Show all of the charts
+        _show_options()
+
+        # Show diffs
+        if len(st.session_state.chart_diffs_filtered) == 0:
+            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+        else:
+            # Show changed charts (modified, new, etc.)
+            if st.session_state.chart_diffs_filtered:
+                # Render chart diffs
+                with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
+                    show_chart_diffs(
+                        [chart for chart in st.session_state.chart_diffs_filtered.values()],
+                        "pagination",
+                        source_session,
+                        target_session,
+                    )
+            else:
+                st.warning(
+                    "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+                )
+
+
+def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
     """Display chart diffs."""
     # Pagination menu
     with st.container(border=True):
@@ -400,36 +396,10 @@ If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `p
     )
 
     # Get actual charts
-    st.write(1)
     get_chart_diffs()
-    st.write(2)
-    if len(st.session_state.chart_diffs) == 0:
-        st.warning("No chart modifications found in the staging environment.")
-    else:
-        # Filter based on query params
-        _ = filter_chart_diffs()
 
-        # Show all of the charts
-        _show_options()
-
-        # Show diffs
-        if len(st.session_state.chart_diffs_filtered) == 0:
-            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
-        else:
-            # Show changed charts (modified, new, etc.)
-            if st.session_state.chart_diffs_filtered:
-                # Render chart diffs
-                with Session(SOURCE_ENGINE) as source_session, Session(TARGET_ENGINE) as target_session:
-                    render_chart_diffs(
-                        [chart for chart in st.session_state.chart_diffs_filtered.values()],
-                        "pagination",
-                        source_session,
-                        target_session,
-                    )
-            else:
-                st.warning(
-                    "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                )
+    # Render app
+    render_app()
 
 
 main()

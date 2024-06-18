@@ -17,10 +17,10 @@ from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
-from apps.wizard.utils.env import OWIDEnv
+from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl import grapher_model as gm
-from etl.config import get_container_name
+from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
 
 log = structlog.get_logger()
@@ -149,6 +149,9 @@ def cli(
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
+            # Get staging server creation time
+            SERVER_CREATION_TIME = get_staging_creation_time(source_session)
+
             if chart_id:
                 chart_ids = {chart_id}
             else:
@@ -160,7 +163,12 @@ def cli(
             charts_synced = 0
 
             for chart_id in chart_ids:
-                diff = ChartDiff.from_chart_id(chart_id, source_session, target_session)
+                diff = ChartDiff.from_chart_id(
+                    chart_id=chart_id,
+                    server_creation_time=SERVER_CREATION_TIME,
+                    source_session=source_session,
+                    target_session=target_session,
+                )
 
                 chart_slug = diff.source_chart.config["slug"]
 

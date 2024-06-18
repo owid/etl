@@ -6,7 +6,7 @@ import streamlit as st
 from streamlit_card import card
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils import st_page_link
+from apps.wizard.utils import set_staging_creation_time, st_page_link
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -199,4 +199,8 @@ def st_show_home():
                     st.switch_page(app["entrypoint"])
 
 
+# Load some config parameters
+set_staging_creation_time()
+
+# Show the home page
 st_show_home()

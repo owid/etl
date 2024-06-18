@@ -17,25 +17,19 @@ from etl.version_tracker import VersionTracker
 log = get_logger()
 
 
-# @st.cache_data(show_spinner=False)
-def get_datasets(new_mode=False) -> pd.DataFrame:
-    """Load datasets.
-
-    new_mode: Use VersionTracker
-    """
-    with st.spinner("Retrieving datasets..."):
-        if new_mode:
-            return get_datasets_new()
-        else:
-            return get_datasets_from_db()
-
-
-def get_datasets_new() -> pd.DataFrame:
+@st.spinner("Retrieving datasets...")
+def get_datasets() -> pd.DataFrame:
     steps_df_grapher, grapher_changes = get_datasets_from_version_tracker()
 
     # Combine with datasets from database that are not present in ETL
     # Get datasets from Database
-    datasets_db = get_datasets_from_db()
+    try:
+        datasets_db = get_all_datasets(archived=False)
+    except OperationalError as e:
+        raise OperationalError(
+            f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
+        )
+
     steps_df_grapher = pd.concat([steps_df_grapher, datasets_db], ignore_index=True)
     steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
 
