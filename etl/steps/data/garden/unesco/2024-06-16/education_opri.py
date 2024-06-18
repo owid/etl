@@ -21,6 +21,11 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["education_opri"].reset_index()
 
+    # Retrieve snapshot with the metadata provided via World Bank.
+
+    snap_wb = paths.load_snapshot("edstats_metadata.xls")
+    tb_wb = snap_wb.read()
+
     #
     # Process data.
     #
@@ -30,8 +35,8 @@ def run(dest_dir: str) -> None:
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
 
     # TO DO: Add metadata columns to the table
-    summary_dict = create_metadata_dictionary(tb)
-    tb_pivoted = add_metadata_description(tb_pivoted, summary_dict)
+    long_definition = add_metadata_wb_edstats(tb, tb_wb)
+    tb_pivoted = add_metadata_description(tb_pivoted, long_definition)
     # Add metadata columns to the table
     tb_pivoted = tb_pivoted.reset_index()
     tb_pivoted = tb_pivoted.format(["country", "year"])
@@ -48,54 +53,19 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_metadata_dictionary(tb):
-    # Drop columns that have metadata that's too detailed and won't work with the current datapage layout
-    tb = tb.drop(["magnitude", "qualifier", "source__data_sources", "change__data_reporting"], axis=1)
-
-    # Generate the summary string for metadata columns for each indicator
-    metadata_columns = [
-        "under_coverage__students_or_individuals",
-    ]
-    summary_dict = {}
-
-    for indicator in tqdm(tb["indicator_label_en"].unique(), desc="Processing indicators"):
-        tb_indicator = tb[tb["indicator_label_en"] == indicator]
-        summary_strings = {}
-        for col in metadata_columns:
-            if col == "change__data_reporting":
-                meta = "Change in data reporting:"
-            elif col == "under_coverage__students_or_individuals":
-                meta = "Under coverage:"
-            unique_values = tb_indicator[col].astype(str).dropna().unique()
-            if not all(value == "nan" for value in unique_values):
-                summary_per_unique_value = {}
-                for value in unique_values:
-                    if value != "nan":
-                        countries_years = (
-                            tb_indicator[tb_indicator[col] == value].groupby(["country", "year"], observed=False).size()
-                        )
-                        unique_countries = (
-                            countries_years[countries_years.values == 1].index.get_level_values(0).unique().tolist()
-                        )
-                        summary_per_unique_country = {}
-                        for country in unique_countries:
-                            years = countries_years.loc[country]
-                            years_list = years[years.values == 1].index.get_level_values(0).tolist()
-                            summary_per_unique_country[country] = years_list
-                        summary_per_unique_value[value] = summary_per_unique_country
-                if summary_per_unique_value:
-                    summary_strings[meta] = summary_per_unique_value
-        summary_dict[indicator] = summary_strings
-    return summary_dict
+def add_metadata_wb_edstats(tb, tb_wb):
+    long_definition = {}
+    for indicator in tb["indicator_label_en"].unique():
+        long_definition[indicator] = tb_wb[tb_wb["Indicator Name"] == indicator]["Long definition"].values
+    return long_definition
 
 
-def add_metadata_description(tb, summary_dict):
+def add_metadata_description(tb, long_definition):
     for column in tb.columns:
         meta = tb[column].metadata
 
         # Use the function
-        md_table = dict_to_string(summary_dict[column])
-        meta.description_from_producer = md_table
+        meta.description_from_producer = long_definition[column]
         meta.title = column
         meta.processing = "minor"
         meta.display = {}
@@ -143,21 +113,3 @@ def update_metadata(meta, display_decimals, unit, short_unit):
     meta.display["numDecimalPlaces"] = display_decimals
     meta.unit = unit
     meta.short_unit = short_unit
-
-
-def dict_to_string(d):
-    if not d:
-        return "No metadata."
-    else:
-        paragraphs = []
-        for key, nested_dict in d.items():
-            paragraph = f"**{key}**\n"
-            paragraph += "\n".join(
-                f"**{nested_key}** - {nested_value}+\n" for nested_key, nested_value in nested_dict.items()
-            )
-            paragraph = paragraph.replace("(", "").replace(")", "") + "\n\n"
-            paragraph = re.sub(r"[\[\]']+", "", paragraph)
-            paragraph = paragraph.replace("{", "").replace("}", "")
-
-            paragraphs.append(paragraph)
-        return "\n\n".join(paragraphs)
