@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.utils import chart_html
-from apps.wizard.utils.env import OWID_ENV
+from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer_helpers import Explorer
 from etl.grapher_model import Entity, Variable
