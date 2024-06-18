@@ -52,6 +52,9 @@ def run(dest_dir: str) -> None:
 
     # Estimate 10-year average
     tb_10y_avg = tb[(tb["year"] >= 2014) & (tb["year"] <= 2023)].copy()
+    tb_10y_avg = tb_10y_avg.rename(
+        columns={col: f"{col}_10y_avg" for col in tb_10y_avg.columns if col not in COLUMN_INDEX}
+    )
     columns_indicators = [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]
     tb_10y_avg = tb_10y_avg.groupby("country")[columns_indicators].mean().reset_index()
     tb_10y_avg["year"] = 2023
@@ -59,6 +62,7 @@ def run(dest_dir: str) -> None:
     # Estimate log(10-year average)
     tb_10y_avg_log = tb_10y_avg.copy()
     tb_10y_avg_log[columns_indicators] = np.log(tb_10y_avg[columns_indicators] + 1)
+    tb_10y_avg_log = tb_10y_avg_log.rename(columns={col: f"{col}_10y_avg_log" for col in columns_indicators})
     tb_10y_avg_log["year"] = 2023
 
     ## Format

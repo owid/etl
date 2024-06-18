@@ -82,7 +82,7 @@ tables:
 
   avg_10y:
     variables:
-      num_pages_tags:
+      num_pages_tags_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.num_pages_tags.description_processing }} (10-year average)
         unit: pages
@@ -90,7 +90,7 @@ tables:
           {{ tables.guardian_mentions.variables.num_pages_tags.description_short }}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_1
 
-      relative_pages_tags:
+      relative_pages_tags_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.relative_pages_tags.description_processing }} (10-year average)
         unit: "pages per 100,000 pages"
@@ -98,7 +98,7 @@ tables:
           {{ tables.guardian_mentions.variables.relative_pages_tags.description_short }}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_1
 
-      relative_pages_tags_excluded:
+      relative_pages_tags_excluded_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.relative_pages_tags_excluded.description_processing }} (10-year average)
         unit: "pages per 100,000 pages"
@@ -107,7 +107,7 @@ tables:
         description_processing: |-
           {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }}
 
-      num_pages_mentions:
+      num_pages_mentions_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.num_pages_mentions.description_processing }} (10-year average)
         unit: pages
@@ -115,14 +115,14 @@ tables:
           {{ tables.guardian_mentions.variables.num_pages_mentions.description_short }}. It reflects a 10-year average (2014 - 2023).
         description_processing: *desc_proc_2
 
-      relative_pages_mentions:
+      relative_pages_mentions_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.relative_pages_mentions.description_processing }} (10-year average)
         unit: "pages per 100,000 pages"
         description_short: Share of pages in The Guardian that that mention a particular country.
         description_processing: *desc_proc_2
 
-      relative_pages_mentions_excluded:
+      relative_pages_mentions_excluded_10y_avg:
         title: |-
           {{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }} (10-year average)
         unit: "pages per 100,000 pages"
