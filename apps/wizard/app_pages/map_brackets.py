@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -23,9 +23,7 @@ from etl.paths import BASE_DIR
 
 # TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
-#  * Add "custom" to the list of radio buttons for bracket type.
 #  * Consider categorical values.
-#  * For linear brackets, here's a possible strategy: Take positive values. Focus either on the entire range from min to max, or from 5% to 95% percentiles. Find all possible ways to divide that range in steps of 1, 2, and 5 (and powers of 10 of those numbers), so that the result has between 4 and 10 brackets.
 #  * To choose the best configuration (both for linear and log), rank all possibilities by Gini.
 
 # Logging
@@ -50,13 +48,13 @@ BRACKET_LABELS = {
         "1": "linear +1",
         "2": "linear +2",
         "5": "linear +5",
-        "custom": "linear custom",
     },
     "log": {
         "x10": "log x10",
         "x2": "log x2",
         "x3": "log x3",
     },
+    "custom": {"custom": "custom"},
 }
 
 # Types of uses of this tool.
@@ -145,6 +143,26 @@ def load_explorer(explorer_path: Path) -> str:
     return explorer
 
 
+def dispersion(hist: Union[List[float], np.ndarray]) -> float:
+    """Estimate the dispersion of a histogram.
+
+    It's based on the Gini coefficient. It's zero if a histogram contains the same number of non-zero elements, and
+    it's 1 if the content of the histogram is very heterogeneous.
+
+    However, if the content is made of zeros, this function returns 1.
+
+    """
+
+    hist_len = len(hist)
+    hist_sum = sum(hist)
+    if (hist_len == 0) or (hist_sum == 0):
+        return 1
+    sum_absolute_differences = sum(abs(x_i - x_j) for x_i in hist for x_j in hist)
+    gini = sum_absolute_differences / (2 * hist_len * hist_sum)
+
+    return gini
+
+
 class MapBracketer:
     def __init__(self, variable_id: int):
         self.variable_id = variable_id
@@ -168,18 +186,16 @@ class MapBracketer:
         self.max_value = self.values.max()
         # Get the smallest relevant number in the data.
         self.smallest_number = self.metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
-        # Initialize an attribute of linear increments.
-        self.increments = 1
+        # Define the bracket type (by default, pick an arbitrary one).
+        self.bracket_type = BRACKET_LABELS["log"]["x10"]
         # Get the most complete list of map brackets that would contain the data.
         self.brackets_all = self.get_all_brackets()
         # Estimate whether the lower and upper brackets should be open.
         self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
-        # Define an attribute that determines the bracket type (by default, pick one).
-        self.bracket_type = BRACKET_LABELS["log"]["x10"]
-        # Define selected brackets (which will be updated later on).
-        self.brackets_selected = []
         # Initialize a color scheme attribute.
         self.color_scheme = None
+        # Define default selected brackets (which will be updated later on).
+        self.brackets_selected = self.brackets_all[self.bracket_type].tolist()  # type: ignore
 
     @property
     def brackets(self):
@@ -250,20 +266,49 @@ class MapBracketer:
                 bracket_min, bracket_max + increment, increment
             ).astype(float)
 
-        # Add an option for linear brackets where the increment is chosen manually.
-        brackets_all[BRACKET_LABELS["linear"]["custom"]] = self.get_custom_linear_brackets(
-            min_value=self.min_value, max_value=self.max_value, increments=self.increments
-        )
+        # Add an option for custom brackets, manually input by the user.
+        brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_all[self.bracket_type]
 
         return brackets_all
 
-    def get_custom_linear_brackets(self, min_value, max_value, increments) -> List[int]:
-        return np.arange(min_value, max_value + increments, increments).tolist()
+    def rank_brackets(self):
+        brackets = self.brackets_selected.copy()
+        if brackets[-1] < brackets[-2]:
+            # To keep the upper bracket open, a value smaller than the upper bracket was added.
+            # But now this causes an issue when calculating the histogram.
+            # So, instead of a small bracket, add a very big bracket, to include all high values in the histogram.
+            brackets[-1] = np.inf
+        if brackets[0] > self.min_value:
+            # Ensure the lowest bin is added to the left.
+            brackets = [self.min_value] + brackets
 
-    def update_linear_brackets(self) -> None:
-        self.brackets_all[BRACKET_LABELS["linear"]["custom"]] = self.get_custom_linear_brackets(  # type: ignore
-            min_value=self.min_value, max_value=self.max_value, increments=self.increments
-        )
+        # TODO: Then ensure the histogram always adds up to the total number of countries.
+        # TODO: I think the slider should show the absolute minimum and maximum, and the default selection should be the
+        #  smart one.
+        # TODO: Also, when switching to custom, it would be good to keep the previous selection.
+
+        # Find the number of countries in each bracket.
+        histogram = np.histogram(self.values, bins=brackets, density=False)[0]
+        if sum(histogram) != len(self.values):
+            st.error("Unexpected error (histogram does not add up to the number of entities).")
+        len(self.values)
+        st.write(f"Selected: {brackets}")
+        st.write(f"Histogram: {histogram}")
+        if (histogram == 0).all():
+            # This should not happen.
+            dispersion_value = 1
+        else:
+            # Find indices of non-zero elements.
+            non_zero_indices = np.nonzero(histogram)[0]
+            # Slice the histogram from the first to the last non-zero element.
+            histogram = histogram[non_zero_indices[0] : non_zero_indices[-1] + 1]
+            dispersion_value = dispersion(histogram)
+        # TODO: Use this value to pick the best configuration.
+        st.write(dispersion_value)
+
+    def update_custom_brackets(self, brackets_manual) -> None:
+        self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_manual
+        self.brackets_selected = brackets_manual
 
     def are_brackets_open(self):
         # If the minimum value in the data is negative, assume that the lower bracket is open.
@@ -354,17 +399,26 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Select bracket type.
     mb.bracket_type = st.radio(  # type: ignore
         "Select linear or log-like",
-        options=list(BRACKET_LABELS["log"].values()) + list(BRACKET_LABELS["linear"].values()),
+        options=list(BRACKET_LABELS["log"].values())
+        + list(BRACKET_LABELS["linear"].values())
+        + list(BRACKET_LABELS["custom"].values()),
         index=0,
         horizontal=True,
     )
-    if mb.bracket_type == BRACKET_LABELS["linear"]["custom"]:
-        # In the case of linear brackets, an additional input is the increment.
-        mb.increments = st.number_input("Increments", min_value=0, max_value=100, value=mb.increments, step=1)  # type: ignore
-        mb.update_linear_brackets()
-
-    # Create a slider for positive values.
-    if mb.bracket_type in list(BRACKET_LABELS["log"].values()):
+    if mb.bracket_type == BRACKET_LABELS["custom"]["custom"]:
+        # Create an input text box for custom brackets.
+        try:
+            brackets_manual = st.text_input(
+                label="Enter custom brackets, e.g. [0, 10, 20, 30, 40]", value=json.dumps(mb.brackets_selected)
+            )
+            brackets_manual = json.loads(brackets_manual)
+            brackets_manual = [float(bracket) for bracket in brackets_manual]
+        except json.JSONDecodeError:
+            st.error("Invalid format for input brackets.")
+            st.stop()
+        mb.update_custom_brackets(brackets_manual)
+    elif mb.bracket_type in list(BRACKET_LABELS["log"].values()):
+        # Create a slider for positive values.
         # TODO: Maybe have a toggle to be able to manually select negative and positive values separately.
         if len(mb.brackets_positive) <= 1:
             st.error("No brackets possible.")
@@ -374,18 +428,22 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
             options=mb.brackets_positive,
             value=(min(mb.brackets_positive), max(mb.brackets_positive)),  # default range
         )
-    else:
+        # Update log map brackets.
+        mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
+    elif mb.bracket_type in list(BRACKET_LABELS["linear"].values()):
+        # Create a slider for all values.
         min_selected, max_selected = st.select_slider(  # type: ignore
             "Select a range of values:",
             options=mb.brackets,
             value=(min(mb.brackets), max(mb.brackets)),  # default range
         )
-    # Update map brackets.
-    mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
+        # Update linear map brackets.
+        mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
 
     # Update chart config given the selections.
     mb.update_chart_config()
 
+    mb.rank_brackets()
     # Display the chart.
     chart_html(mb.chart_config, owid_env=OWID_ENV)
 
