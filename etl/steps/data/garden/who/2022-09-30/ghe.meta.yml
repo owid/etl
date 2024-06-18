@@ -47,7 +47,7 @@ definitions:
     85+ year olds
     <%- endif -%>
   sex: |-
-    <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<%- endif -%>
+    <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<% endif %>
   deaths_title: |-
     <% if age_group == "ALLAges" %>
     Total deaths from << cause.lower() >> among {definitions.sex}
