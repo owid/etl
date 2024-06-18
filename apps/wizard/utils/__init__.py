@@ -357,6 +357,38 @@ class AppState:
         self.display_error(key)
         return widget
 
+    def st_widget_responsive(
+        self: "AppState",
+        custom_label: str,
+        **kwargs,
+    ) -> None:
+        """Render the namespace field within the form.
+
+        We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+        This is a workaround to have repsonsive behaviour within a form.
+
+        Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+        """
+        # Handle kwargs
+        kwargs["options"] = [custom_label] + kwargs["options"]
+        key = cast(str, kwargs["key"])
+
+        # Render and get element depending on selection in selectbox
+        with st.container():
+            field = self.st_widget(**kwargs)
+        with st.empty():
+            if field == custom_label:
+                default_value = self.default_value(key)
+                field = self.st_widget(
+                    st.text_input,
+                    label="↳ *Use custom value*",
+                    placeholder="",
+                    help="Enter custom value.",
+                    key=f"{key}_custom",
+                    default_last=default_value,
+                )
+
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
         """Get arguments passed from command line."""
@@ -497,7 +529,7 @@ def render_responsive_field_in_form(
     Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
     """
     # Main decription
-    help_text = "## Description\n\nInstitution or topic name"
+    help_text = "## Institution or topic name"
 
     # Render and get element depending on selection in selectbox
     with field_1:
