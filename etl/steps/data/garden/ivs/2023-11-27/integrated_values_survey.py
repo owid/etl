@@ -21,12 +21,6 @@ TABLEFMT = "pretty"
 # Set margin for checks
 MARGIN = 0.5
 
-# Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
-
-# Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = 0.2
-
 # Define question suffixes
 
 IMPORTANT_IN_LIFE_QUESTIONS = [
@@ -96,17 +90,20 @@ WORRIES_QUESTIONS = ["losing_job", "not_being_able_to_provide_good_education", "
 
 HAPPINESS_QUESTIONS = ["happy"]
 
-# Define questions to aggregate
-QUESTIONS_TO_AGGREGATE = IMPORTANT_IN_LIFE_QUESTIONS + [
-    "very_important_in_life_family",
-    "very_important_in_life_friends",
-    "very_important_in_life_leisure_time",
-    "very_important_in_life_politics",
-    "very_important_in_life_work",
-    "very_important_in_life_religion",
-    "like_me_agg_secure",
-    "like_me_agg_respect_environment",
+NEIGHBORS_QUESTIONS = [
+    "neighbors_different_race",
+    "neighbors_heavy_drinkers",
+    "neighbors_inmigrant_foreign_workers",
+    "neighbors_aids",
+    "neighbors_drug_addicts",
+    "neighbors_homosexuals",
+    "neighbors_different_religion",
+    "neighbors_gypsies",
+    "neighbors_unmarried_couples",
+    "neighbors_different_language",
 ]
+
+HOMOSEXUAL_PARENTS_QUESTIONS = ["homosx_prnts"]
 
 
 def run(dest_dir: str) -> None:
@@ -275,6 +272,20 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
         tb=tb, questions=HAPPINESS_QUESTIONS, answers=["very", "quite", "not_very", "not_at_all"]
     )
 
+    # For neighbors questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=NEIGHBORS_QUESTIONS,
+        answers=["mentioned", "notmentioned"],
+    )
+
+    # For homosexual parents questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=HOMOSEXUAL_PARENTS_QUESTIONS,
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
+    )
+
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
 
@@ -430,6 +441,30 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=HAPPINESS_QUESTIONS,
         answers=["very", "quite", "not_very", "not_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For neighbors questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=NEIGHBORS_QUESTIONS,
+        answers=["mentioned", "notmentioned", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For homosexual parents questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=HOMOSEXUAL_PARENTS_QUESTIONS,
+        answers=[
+            "strongly_agree",
+            "agree",
+            "neither",
+            "disagree",
+            "strongly_disagree",
+            "dont_know",
+            "no_answer",
+        ],
         margin=MARGIN,
     )
 
