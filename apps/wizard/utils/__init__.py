@@ -729,4 +729,7 @@ def get_staging_creation_time(session: Optional[Session] = None, key: str = "ser
 
 def set_staging_creation_time(key: str = "server_creation_time") -> None:
     """Gest staging server creation time estimate."""
-    st.session_state[key] = get_staging_creation_time()
+    if OWID_ENV.env_local == "staging":
+        st.session_state[key] = get_staging_creation_time()
+    else:
+        st.session_state[key] = None
