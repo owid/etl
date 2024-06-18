@@ -29,8 +29,6 @@ def run(dest_dir: str) -> None:
         if tb_name == "attribution_of_road_traffic_deaths_to_alcohol__pct":
             col = "attribution_of_road_traffic_deaths_to_alcohol__pct"
             tb[col] = pd.to_numeric(tb[col], errors="coerce").copy_metadata(tb[col])
-        else:
-            continue
 
         # Drop noisy dimensions dhs_mics_subnational_regions__health_equity_monitor
         if "dhs_mics_subnational_regions__health_equity_monitor" in tb.index.names:
