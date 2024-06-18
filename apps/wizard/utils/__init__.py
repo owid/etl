@@ -63,7 +63,7 @@ DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
 # DAG dropdown options
-dag_files = sorted(os.listdir(DAG_DIR))
+dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
 dag_not_add_option = "(do not add to DAG)"
 ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
@@ -315,6 +315,14 @@ class AppState:
             elif self.step == "express":
                 self._previous_step = "snapshot"
         return self._previous_step
+
+    @property
+    def vars(self):
+        return {
+            str(k).replace(f"{self.step}.", ""): v
+            for k, v in dict(st.session_state).items()
+            if str(k).startswith(f"{self.step}.")
+        }
 
     def st_widget(
         self: "AppState",
