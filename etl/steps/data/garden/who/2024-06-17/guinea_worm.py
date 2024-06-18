@@ -15,16 +15,16 @@ YEAR_TO_CAT_MAP = {
     1997: "1997-1999",
     1998: "1997-1999",
     1999: "1997-1999",
-    2000: "2000-2004",
-    2001: "2000-2004",
-    2002: "2000-2004",
-    2003: "2000-2004",
-    2004: "2000-2004",
-    2005: "2005-2009",
-    2006: "2005-2009",
-    2007: "2005-2009",
-    2008: "2005-2009",
-    2009: "2005-2009",
+    2000: "2000s",
+    2001: "2000s",
+    2002: "2000s",
+    2003: "2000s",
+    2004: "2000s",
+    2005: "2000s",
+    2006: "2000s",
+    2007: "2000s",
+    2008: "2000s",
+    2009: "2000s",
     2010: "2010s",
     2011: "2010s",
     2012: "2010s",
@@ -43,6 +43,15 @@ YEAR_TO_CAT_MAP = {
     "Pre-certification": "Pre-certification",
     "Endemic": "Endemic",
 }
+
+YEAR_CATEGORIES = [
+    "1997-1999",
+    "2000s",
+    "2010s",
+    "2020s",
+    "Pre-certification",
+    "Endemic",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -69,7 +78,7 @@ def run(dest_dir: str) -> None:
     # - time_frame_certified: time frame in which country was certified as disease free (with status messages, Category type)
 
     tb_cert["time_frame_certified"] = pd.Categorical(
-        tb_cert["year_certified"].map(YEAR_TO_CAT_MAP), categories=YEAR_TO_CAT_MAP.values(), ordered=True
+        tb_cert["year_certified"].map(YEAR_TO_CAT_MAP), categories=YEAR_CATEGORIES, ordered=True
     )
     tb_cert["year_certified"] = pd.to_numeric(tb_cert["year_certified"], errors="coerce").astype("Int64")
 
@@ -77,7 +86,11 @@ def run(dest_dir: str) -> None:
     tb_cert = add_year_certified(tb_cert)
 
     # add rows for current year
+    tb_cert = tb_cert[~(tb_cert["year"] == 2023)]  # data has some empty rows for 2023
     tb = add_current_year(tb_cert, tb_cases, year=2023)
+
+    # fix dtypes
+    tb["year_certified"] = tb["year_certified"].astype("Int64")
 
     # format index
     tb = tb.format(["country", "year"])
