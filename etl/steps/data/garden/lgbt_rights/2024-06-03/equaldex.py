@@ -158,11 +158,13 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("equaldex")
     ds_regions = paths.load_dataset("regions")
     ds_population = paths.load_dataset("population")
+    ds_sovereign_countries = paths.load_dataset("isd")
 
     # Read tables from meadow dataset.
     tb = ds_meadow["equaldex"].reset_index()
     tb_current = ds_meadow["equaldex_current"].reset_index()
     tb_indices = ds_meadow["equaldex_indices"].reset_index()
+    tb_sovereign_countries = ds_sovereign_countries["isd_countries"].reset_index()
 
     #
     # Process data.
@@ -177,6 +179,9 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_indices, on=["country", "year"], how="left")
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Select only sovereign countries
+    tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)
 
     # Add population-weighted aggregations for the columns in the list
     tb = add_population_weighted_aggregations(
@@ -428,3 +433,27 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
     return meta  # type: ignore
+
+
+def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) -> Table:
+    """
+    Use the latest sovereign countries data to select only those countries in the table
+    """
+
+    # Format tb_sovereign_countries
+    # Rename regions to country
+    tb_sovereign_countries = tb_sovereign_countries.rename({"statename": "country"})
+    tb_sovereign_countries = tb_sovereign_countries[["country", "year"]]
+
+    # Filter data: max year
+    tb_sovereign_countries = tb_sovereign_countries[
+        (tb_sovereign_countries["year"] == tb_sovereign_countries["year"].max())
+    ]
+
+    # Drop year column
+    tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
+
+    # Merge the two tables
+    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+
+    return tb
