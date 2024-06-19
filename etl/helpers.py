@@ -27,7 +27,7 @@ from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.datautils.common import ExceptionFromDocstring
+from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
@@ -365,11 +365,11 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
     """Current step must be listed in the dag."""
 
 
-class NoMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """No steps found among dependencies of current ETL step, that match the given specifications."""
 
 
-class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """Multiple steps found among dependencies of current ETL step, that match the given specifications."""
 
 
@@ -599,9 +599,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies
+            raise NoMatchingStepsAmongDependencies(step_name=pattern)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies
+            raise MultipleMatchingStepsAmongDependencies(step_name=pattern)
 
         dependency = matches[0]
 

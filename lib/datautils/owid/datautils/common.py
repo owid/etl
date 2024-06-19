@@ -11,6 +11,17 @@ class ExceptionFromDocstring(Exception):
         super().__init__(exception_message or self.__doc__, *args)
 
 
+class ExceptionFromDocstringWithKwargs(Exception):
+    """Exception that returns its own docstring, if no message is explicitly given."""
+
+    def __init__(self, exception_message: Union[str, None] = None, *args: Any, **kwargs: Any):
+        text = exception_message or self.__doc__
+        if kwargs:
+            additional_text = ", ".join([f"{key}: {value}" for key, value in kwargs.items()])
+            text += additional_text
+        super().__init__(text, *args)
+
+
 def warn_on_list_of_entities(
     list_of_entities: Union[List[Any], Set[Any]], warning_message: str, show_list: bool
 ) -> None:
