@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,7 +16,12 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("guinea_worm")
 
     # Read table from garden dataset.
-    tb = ds_garden["guinea_worm"]
+    tb = ds_garden["guinea_worm"].reset_index()
+
+    # remove certified year for all years except the current year
+    tb = remove_certified_year(tb, 2023)
+
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
@@ -26,3 +33,10 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
+
+
+def remove_certified_year(tb, current_year):
+    """Remove the year in which a country was certified as disease free
+    except for the row of the current year."""
+    tb.loc[tb["year"] != current_year, "year_certified"] = pd.NA
+    return tb
