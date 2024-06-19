@@ -481,6 +481,14 @@ class OWIDEnv:
 
 
 if ENV_FILE.exists():
-    OWID_ENV = OWIDEnv.from_env_file(str(ENV_FILE))
+    conf = Config(
+        GRAPHER_USER_ID=GRAPHER_USER_ID,
+        DB_USER=DB_USER,
+        DB_NAME=DB_NAME,
+        DB_PASS=DB_PASS,
+        DB_PORT=str(DB_PORT),
+        DB_HOST=DB_HOST,
+    )
+    OWID_ENV = OWIDEnv(conf)
 else:
     OWID_ENV = OWIDEnv.from_local()
