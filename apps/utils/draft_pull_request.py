@@ -39,7 +39,8 @@ GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
 @click.option(
     "--base-branch", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
 )
-def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> None:
+@click.option("--title", type=str, default=None, help="Title of the PR and the first commit.")
+def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, title: Optional[str] = None) -> None:
     if not GITHUB_TOKEN:
         log.error(
             """A github token is needed. To create one:
@@ -112,7 +113,7 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
         return
 
     log.info("Creating an empty commit.")
-    repo.git.commit("--allow-empty", "-m", f"Start a new staging server for branch '{new_branch}'")
+    repo.git.commit("--allow-empty", "-m", title or f"Start a new staging server for branch '{new_branch}'")
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", new_branch)
@@ -120,7 +121,7 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
     log.info("Creating a draft pull request.")
     headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
     data = {
-        "title": f":construction: Draft PR for branch {new_branch}",
+        "title": title or f":construction: Draft PR for branch {new_branch}",
         "head": new_branch,
         "base": base_branch,
         "body": "",
@@ -128,6 +129,7 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None) -> 
     }
     response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
-        log.info("Draft pull request created successfully.")
+        js = response.json()
+        log.info(f"Draft pull request created successfully at {js['html_url']}.")
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
