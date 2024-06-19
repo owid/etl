@@ -24,7 +24,6 @@ from etl.paths import BASE_DIR
 # TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
 #  * Consider categorical values.
-#  * To choose the best configuration (both for linear and log), rank all possibilities by Gini.
 
 # Logging
 log = get_logger()
@@ -195,7 +194,7 @@ class MapBracketer:
         # Initialize a color scheme attribute.
         self.color_scheme = None
         # Define default selected brackets (which will be updated later on).
-        self.brackets_selected = self.brackets_all[self.bracket_type].tolist()  # type: ignore
+        self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the "grapher version" of the selected brackets, which needs a minimum value and a list of brackets.
         self.brackets_selected_grapher_min_value = None
         self.brackets_selected_grapher_values = self.brackets_selected.copy()
@@ -209,9 +208,22 @@ class MapBracketer:
     def brackets_positive(self):
         return [bracket for bracket in self.brackets if bracket > 0]
 
-    def get_all_brackets(self) -> Dict[str, List[float]]:
+    def get_all_brackets(self) -> Dict[str, np.ndarray]:
         # Find the minimum and maximum absolute nonzero values.
         values_nonzero = abs(self.values[abs(self.values) > self.smallest_number])
+        if values_nonzero.empty:
+            # This happens if the only values are zeros (or smaller than self.smallest_number).
+            # For example, 899976.
+            # In such cases, to avoid further errors, assign arbitrary brackets.
+            st.warning(f"WARNING: Variable {self.variable_id} has no values larger than {self.smallest_number}.")
+            brackets_all = {
+                label: np.array([0.0, 1.0])
+                for label in list(BRACKET_LABELS["linear"].values())
+                + list(BRACKET_LABELS["log"].values())
+                + list(BRACKET_LABELS["custom"].values())
+            }
+            return brackets_all
+
         # Find the closest power of 10 that is right below the minimum nonzero value.
         # That would be the minimum bracket possible.
         min_bracket_possible = round_to_nearest_power_of_ten(values_nonzero.min())
@@ -611,7 +623,3 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     if st.button("Save brackets in explorer file", type="primary"):
         update_explorer_file(mb=mb, explorer=explorer)
-        # TODO: Fix "InvalidIndexError: You can only assign a scalar value not a <class 'list'>".
-        #  It happens if the save button is pressed for a variable that already exists.
-        #  It may be the case that the "at" method cannot replace a list of values.
-        #  A possible solution would be to first empty the cell, and then write to it.
