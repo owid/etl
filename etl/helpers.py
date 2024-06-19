@@ -639,9 +639,9 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+    def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
-        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name, **kwargs)
         assert isinstance(snap, Snapshot)
         return snap
 
