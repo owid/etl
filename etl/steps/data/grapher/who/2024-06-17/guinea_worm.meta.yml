@@ -39,6 +39,14 @@ tables:
           could be reduced to a strict minimum.
         display:
           numDecimalPlaces: 0
+        origins:
+          - title: "Certification status of dracunculiasis eradication"
+            date_published: "2017"
+            producer: World Health Organization
+            attribution_short: WHO
+            citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
+            url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+            date_accessed: "2024-06-17"
       time_frame_certified:
         title: Time country was certified free of guinea worm disease or status of certification
         unit: ""
@@ -55,6 +63,14 @@ tables:
           - "2020s"
           - "Pre-certification"
           - "Endemic"
+        origins:
+          - title: "Certification status of dracunculiasis eradication"
+            date_published: "2017"
+            producer: World Health Organization
+            attribution_short: WHO
+            citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
+            url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+            date_accessed: "2024-06-17"
       certification_status:
         title: Certification status over time
         unit: ""

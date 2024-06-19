@@ -14,7 +14,7 @@ definitions:
         date_published: "2024-05-17"
         producer: World Health Organization
         attribution_short: WHO
-        citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, WHO
+        citation_full: "World Health Organization. Weekly Epidemic Report No 20, 2024-05-17, 99, 249–26 Dracunculiasis eradication: global surveillance summary"
         url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
         url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
         date_accessed: "2024-06-17"
@@ -39,6 +39,14 @@ tables:
           could be reduced to a strict minimum.
         display:
           numDecimalPlaces: 0
+        origins:
+          - title: "Certification status of dracunculiasis eradication"
+            date_published: "2017"
+            producer: World Health Organization
+            attribution_short: WHO
+            citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
+            url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+            date_accessed: "2024-06-17"
       certification_status:
         title: Certification status over time
         unit: ""
