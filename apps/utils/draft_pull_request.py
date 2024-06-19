@@ -27,6 +27,62 @@ log = get_logger()
 
 # URL of the Github API, to be used to create a draft pull request in the ETL repos.
 GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
+# Add EMOJIs for each PR type
+PR_CATEGORIES = {
+    "data": {
+        "emoji": "📊",
+        "emoji_raw": ":bar_chart:",
+        "description": "data update or addition",
+    },
+    "bug": {
+        "emoji": "🐛",
+        "emoji_raw": ":bug:",
+        "description": "bug fix for the user",
+    },
+    "refactor": {
+        "emoji": "🔨",
+        "emoji_raw": ":hammer:",
+        "description": "a code change that neither fixes a bug nor adds a feature for the user",
+    },
+    "enhance": {
+        "emoji": "✨",
+        "emoji_raw": ":sparkles:",
+        "description": "visible improvement over a current implementation without adding a new feature or fixing a bug",
+    },
+    "feature": {
+        "emoji": "🎉",
+        "emoji_raw": ":tada:",
+        "description": "new feature for the user",
+    },
+    "docs": {
+        "emoji": "📜",
+        "emoji_raw": ":scroll:",
+        "description": "documentation only changes",
+    },
+    "chore": {
+        "emoji": "🧹",
+        "emoji_raw": ":honeybee:",
+        "description": "upgrading dependencies, tooling, etc. No production code change",
+    },
+    "style": {
+        "emoji": "💄",
+        "emoji_raw": ":lipstick:",
+        "description": "formatting, missing semi colons, etc. No production code change",
+    },
+    "wip": {
+        "emoji": "🚧",
+        "emoji_raw": ":construction:",
+        "description": "work in progress - intermediate commits that will be explained later on",
+    },
+    "tests": {
+        "emoji": "✅",
+        "emoji_raw": ":white_check_mark:",
+        "description": "adding missing tests, refactoring tests, etc. No production code change",
+    },
+}
+description = "- " + "\n- ".join(
+    f"**{choice}: {choice_params['description']}" for choice, choice_params in PR_CATEGORIES.items()
+)
 
 
 @click.command(name="draft-pr", cls=RichCommand, help=__doc__)
@@ -37,10 +93,21 @@ GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
     required=False,
 )
 @click.option(
-    "--base-branch", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
+    "--base-branch", "-b", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
 )
-@click.option("--title", type=str, default=None, help="Title of the PR and the first commit.")
-def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, title: Optional[str] = None) -> None:
+@click.option("--title", "-t", type=str, default=None, help="Title of the PR and the first commit.")
+@click.option(
+    "--category",
+    "-c",
+    type=click.Choice(list(PR_CATEGORIES.keys()), case_sensitive=False),
+    help=f"Category of the PR. A corresponding emoji will be pre-fixed to the PR title.\n {description}",
+)
+def cli(
+    new_branch: Optional[str] = None,
+    base_branch: Optional[str] = None,
+    title: Optional[str] = None,
+    category: Optional[str] = None,
+) -> None:
     if not GITHUB_TOKEN:
         log.error(
             """A github token is needed. To create one:
@@ -59,6 +126,16 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, tit
 
     # List all local branches.
     local_branches = [branch.name for branch in repo.branches]
+
+    # Create title
+    # Add emoji for PR mode chosen if applicable
+    if (title is not None) and (category is not None):
+        if type in PR_CATEGORIES:
+            emoji = PR_CATEGORIES[category]["emoji"]
+            title = f"{emoji} {title}"
+        else:
+            log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
+            return
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
