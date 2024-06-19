@@ -6,6 +6,8 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
+      grapher_config:
+        note: Confirmed large-scale AI models are those where the training compute exceeds 10²³ floating-point operations (FLOP).
     description_short: Describes the specific area, application, or field in which a large-scale AI model is designed to operate. An AI system can operate in more than one domain, thus contributing to the count for multiple domains. {definitions.desc_update}
     description_key:
         - Game systems are specifically designed for games and excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.

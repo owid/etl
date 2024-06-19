@@ -5,7 +5,11 @@ meta:
     # Data product / Snapshot
     title: Tracking Compute-Intensive AI Models
     description: |-
-      A dataset that tracks compute-intensive AI models, with training compute over 1023 floating point operations (FLOP). This corresponds to training costs of hundreds of thousands of dollars or more.  
+      A dataset that tracks compute-intensive AI models, with training compute over 1023 floating point operations (FLOP). This corresponds to training costs of hundreds of thousands of dollars or more. 
+
+      To identify compute-intensive AI models, the team at Epoch AI used various resources, estimating compute when not directly reported. They included benchmarks and repositories, such as Papers With Code and Hugging Face, to find models exceeding 10²³ FLOP. They also explored non-English media and specific leaderboards, particularly focusing on Chinese sources.
+
+      Additionally, they examined blog posts, press releases from major labs, and scholarly literature to track new models. A separate table was created for models with unconfirmed but plausible compute levels. Despite thorough methods, proprietary and secretive models may have been missed.
     date_published: "2024-04-05"
 
     # Citation

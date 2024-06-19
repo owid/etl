@@ -1,5 +1,6 @@
 from typing import List
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -65,6 +66,12 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
 
     # Calculate the cumulative count (consider all categories which will assume 0 for missing values)
     tb_agg["cumulative_count"] = tb_agg.groupby(agg_column, observed=False)["yearly_count"].cumsum()
+
+    total_counts = tb_agg.groupby("year")["yearly_count"].sum().reset_index()
+    total_counts[agg_column] = "Total"
+    total_counts["cumulative_count"] = total_counts["yearly_count"].cumsum()
+
+    tb_agg = pr.concat([tb_agg, total_counts], ignore_index=True)
 
     # Add the origins metadata to the columns
     for col in ["yearly_count", "cumulative_count"]:
