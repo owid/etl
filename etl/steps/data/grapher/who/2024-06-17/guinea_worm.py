@@ -7,12 +7,56 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+YEAR_TO_CAT_MAP = {
+    "1997": "1997-1999",
+    "1998": "1997-1999",
+    "1999": "1997-1999",
+    "2000": "2000s",
+    "2001": "2000s",
+    "2002": "2000s",
+    "2003": "2000s",
+    "2004": "2000s",
+    "2005": "2000s",
+    "2006": "2000s",
+    "2007": "2000s",
+    "2008": "2000s",
+    "2009": "2000s",
+    "2010": "2010s",
+    "2011": "2010s",
+    "2012": "2010s",
+    "2013": "2010s",
+    "2014": "2010s",
+    "2015": "2010s",
+    "2016": "2010s",
+    "2017": "2010s",
+    "2018": "2010s",
+    "2019": "2010s",
+    "2020": "2020s",
+    "2021": "2020s",
+    "2022": "2020s",
+    "2023": "2020s",
+    "2024": "2020s",
+    "Pre-certification": "Pre-certification",
+    "Endemic": "Endemic",
+}
+
+YEAR_CATEGORIES = [
+    "1997-1999",
+    "2000s",
+    "2010s",
+    "2020s",
+    "Pre-certification",
+    "Endemic",
+]
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
     # Load garden dataset
+
+    print(dest_dir)
     ds_garden = paths.load_dataset("guinea_worm")
 
     # Read table from garden dataset.
@@ -21,7 +65,10 @@ def run(dest_dir: str) -> None:
     # remove certified year for all years except the current year
     tb = remove_certified_year(tb, 2023)
 
-    tb["year_certified"] = tb["year_certified"].replace({"Pre-certification": 3000, "Endemic": 4000})
+    tb["time_frame_certified"] = pd.Categorical(
+        tb["year_certified"].map(YEAR_TO_CAT_MAP), categories=YEAR_CATEGORIES, ordered=True
+    )
+
     # change to numeric dtype
     tb["year_certified"] = (
         pd.to_numeric(tb["year_certified"], errors="coerce").astype("Int64").copy_metadata(tb["year_certified"])
