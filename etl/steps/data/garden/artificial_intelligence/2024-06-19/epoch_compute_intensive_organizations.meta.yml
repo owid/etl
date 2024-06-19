@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    unit: 'AI systems'
+    short_unit: ''
+    description_short: Refers to the primary organization affiliated with the authors of a large-scale AI model. {definitions.desc_update}
+    description_processing: |-
+      The count of large-scale AI models per organization is derived by tallying the instances of machine learning models associated with each organization. It's important to note that a single machine learning model can be associated with multiple organizations. The classification into organizations is determined by the specific entities that primarily contributed to the development of the AI system.
+    description_from_producer: Multiple-select multiple-choice of organization(s) who created the system. In the spreadsheet, this field is formatted as a string, with multiple organizations separated by commas.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+
+dataset:
+  update_period_days: 180
+  title:  Large-scale AI models by organization
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_compute_intensive_organizations:
+    variables:
+      yearly_count:
+        title: Annual number of large-scale AI models by organization
+
+      cumulative_count:
+        title: Cumulative number of large-scale AI models by organization
