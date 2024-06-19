@@ -12,34 +12,34 @@ from etl.snapshot import Snapshot
 paths = PathFinder(__file__)
 
 YEAR_TO_CAT_MAP = {
-    1997: "1997-1999",
-    1998: "1997-1999",
-    1999: "1997-1999",
-    2000: "2000s",
-    2001: "2000s",
-    2002: "2000s",
-    2003: "2000s",
-    2004: "2000s",
-    2005: "2000s",
-    2006: "2000s",
-    2007: "2000s",
-    2008: "2000s",
-    2009: "2000s",
-    2010: "2010s",
-    2011: "2010s",
-    2012: "2010s",
-    2013: "2010s",
-    2014: "2010s",
-    2015: "2010s",
-    2016: "2010s",
-    2017: "2010s",
-    2018: "2010s",
-    2019: "2010s",
-    2020: "2020s",
-    2021: "2020s",
-    2022: "2020s",
-    2023: "2020s",
-    2024: "2020s",
+    "1997": "1997-1999",
+    "1998": "1997-1999",
+    "1999": "1997-1999",
+    "2000": "2000s",
+    "2001": "2000s",
+    "2002": "2000s",
+    "2003": "2000s",
+    "2004": "2000s",
+    "2005": "2000s",
+    "2006": "2000s",
+    "2007": "2000s",
+    "2008": "2000s",
+    "2009": "2000s",
+    "2010": "2010s",
+    "2011": "2010s",
+    "2012": "2010s",
+    "2013": "2010s",
+    "2014": "2010s",
+    "2015": "2010s",
+    "2016": "2010s",
+    "2017": "2010s",
+    "2018": "2010s",
+    "2019": "2010s",
+    "2020": "2020s",
+    "2021": "2020s",
+    "2022": "2020s",
+    "2023": "2020s",
+    "2024": "2020s",
     "Pre-certification": "Pre-certification",
     "Endemic": "Endemic",
 }
@@ -76,6 +76,9 @@ def run(dest_dir: str) -> None:
     # split "year_certified" in two columns:
     # - year_certified: year in which country was certified as disease free (without status messages, Int64 type)
     # - time_frame_certified: time frame in which country was certified as disease free (with status messages, Category type)
+
+    # remove leading spaces from "year_certified" column and cast as string
+    tb_cert["year_certified"] = tb_cert["year_certified"].str.strip()
 
     tb_cert["time_frame_certified"] = pd.Categorical(
         tb_cert["year_certified"].map(YEAR_TO_CAT_MAP), categories=YEAR_CATEGORIES, ordered=True

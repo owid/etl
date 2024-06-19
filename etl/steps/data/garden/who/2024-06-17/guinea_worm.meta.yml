@@ -8,6 +8,16 @@ definitions:
         - Neglected Tropical Diseases
       attribution: World Health Organization (2024)
       attribution_short: WHO
+    origins:
+      - title: "Dracunculiasis eradication: global surveillance summary"
+        date_published: "2024-05-17"
+        producer: World Health Organization
+        attribution_short: WHO
+        citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, WHO
+        url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
+        url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
+        date_accessed: "2024-06-17"
+        version_producer: 2023
 
 
 # Learn more about the available fields:
