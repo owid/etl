@@ -100,13 +100,19 @@ description = "- " + "\n- ".join(
     "--category",
     "-c",
     type=click.Choice(list(PR_CATEGORIES.keys()), case_sensitive=False),
-    help=f"Category of the PR. A corresponding emoji will be pre-fixed to the PR title.\n {description}",
+    help=f"Category of the PR. Only works if --title is used (it will be added to the PR title). A corresponding emoji will be pre-fixed to the PR title.\n {description}",
+)
+@click.option(
+    "--scope",
+    "-s",
+    help="Scope of the PR. Only works if --title is used (it will be added to the PR title).\n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
 )
 def cli(
     new_branch: Optional[str] = None,
     base_branch: Optional[str] = None,
     title: Optional[str] = None,
     category: Optional[str] = None,
+    scope: Optional[str] = None,
 ) -> None:
     if not GITHUB_TOKEN:
         log.error(
@@ -128,14 +134,23 @@ def cli(
     local_branches = [branch.name for branch in repo.branches]
 
     # Create title
-    # Add emoji for PR mode chosen if applicable
-    if (title is not None) and (category is not None):
-        if type in PR_CATEGORIES:
-            emoji = PR_CATEGORIES[category]["emoji"]
-            title = f"{emoji} {title}"
-        else:
-            log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
-            return
+    if title is not None:
+        prefix = ""
+        # Add emoji for PR mode chosen if applicable
+        if category is not None:
+            if category in PR_CATEGORIES:
+                prefix = PR_CATEGORIES[category]["emoji"]
+            else:
+                log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
+                return
+        # Add scope
+        if scope is not None:
+            if prefix != "":
+                prefix += " "
+            prefix += f"{scope}:"
+
+        # Add prefix
+        title = f"{prefix} {title}"
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
