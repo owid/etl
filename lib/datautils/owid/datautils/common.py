@@ -1,7 +1,7 @@
 """Common objects shared by other modules."""
 
 import warnings
-from typing import Any, List, Set, Union
+from typing import Any, List, Set, Union, cast
 
 
 class ExceptionFromDocstring(Exception):
@@ -15,10 +15,11 @@ class ExceptionFromDocstringWithKwargs(Exception):
     """Exception that returns its own docstring, if no message is explicitly given."""
 
     def __init__(self, exception_message: Union[str, None] = None, *args: Any, **kwargs: Any):
-        text = exception_message or self.__doc__
+        text = cast(str, exception_message or self.__doc__)
         if kwargs:
             additional_text = ", ".join([f"{key}: {value}" for key, value in kwargs.items()])
-            text += additional_text
+            if additional_text is not None:
+                text += additional_text
         super().__init__(text, *args)
 
 
