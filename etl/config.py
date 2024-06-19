@@ -19,8 +19,8 @@ import git
 import pandas as pd
 import structlog
 from dotenv import dotenv_values, load_dotenv
+from sqlalchemy.engine import Engine
 
-from etl.db import Engine, get_engine
 from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
@@ -360,11 +360,15 @@ class OWIDEnv:
 
         DEPRECATED: Use property `engine` property instead.
         """
+        from etl.db import get_engine
+
         return get_engine(self.conf.__dict__)
 
     @property
     def engine(self) -> Engine:
         """Get engine for env."""
+        from etl.db import get_engine
+
         if self._engine is None:
             self._engine = get_engine(self.conf.__dict__)
         return self._engine
