@@ -251,7 +251,10 @@ class AppState:
         return st.session_state["steps"][self.step]
 
     def default_value(
-        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[str | bool | int] = ""
+        self: "AppState",
+        key: str,
+        previous_step: Optional[str] = None,
+        default_last: Optional[str | bool | int | date] = "",
     ) -> str | bool | int:
         """Get the default value of a variable.
 
