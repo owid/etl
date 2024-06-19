@@ -25,7 +25,7 @@ from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
 
-ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
+ENV_FILE = Path(env.get("ENV_FILE", BASE_DIR / ".env"))
 
 
 def get_username():
@@ -480,4 +480,7 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-OWID_ENV = OWIDEnv.from_local()
+if ENV_FILE.exists():
+    OWID_ENV = OWIDEnv.from_env_file(str(ENV_FILE))
+else:
+    OWID_ENV = OWIDEnv.from_local()
