@@ -46,19 +46,19 @@ steps:
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive:
     - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive
 
-  # EPOCH aggregates by country
+  # EPOCH dataset on Compute Intensive AI, aggregates by country
   data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
     - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
     - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries
 
-  # EPOCH aggregates by domain
+  # EPOCH dataset on Compute Intensive AI, aggregates by domain
   data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
     - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain
 
-  # EPOCH aggregates by organization
+  # EPOCH dataset on Compute Intensive AI, aggregates by organization
   data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
     - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
