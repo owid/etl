@@ -36,8 +36,9 @@ def cli(dry_run: bool) -> None:
         try:
             owidbot_cli(args, standalone_mode=False)
         except ProgrammingError as e:
-            # old staging servers without the table
-            if "Table 'owid.chart_diff_approvals' doesn't exist" in str(e):
+            # MySQL is being refreshed and tables are not ready
+            # We're getting `Table ... doesn't exist`
+            if "doesn't exist" in str(e):
                 log.warning("scan-chart-diff.missing-table", pr=pr)
                 continue
             else:

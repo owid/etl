@@ -480,9 +480,14 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-# Load a default environment.
-# If ENV_FILE exists, load from there, otherwise load from local (pre-defined variables).
-if ENV_FILE.exists():
-    OWID_ENV = OWIDEnv.from_env_file(str(ENV_FILE))
-else:
-    OWID_ENV = OWIDEnv.from_local()
+# Wrap envs in OWID_ENV
+OWID_ENV = OWIDEnv(
+    Config(
+        GRAPHER_USER_ID=GRAPHER_USER_ID,
+        DB_USER=DB_USER,
+        DB_NAME=DB_NAME,
+        DB_PASS=DB_PASS,
+        DB_PORT=str(DB_PORT),
+        DB_HOST=DB_HOST,
+    )
+)

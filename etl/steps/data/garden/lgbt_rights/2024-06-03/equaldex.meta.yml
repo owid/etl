@@ -7,8 +7,9 @@ definitions:
     description_processing: |-
       - We have extracted the data from the official [Equaldex JSON API](https://equaldex.stoplight.io/docs/equaldex/d033e28a5cf0c-equaldex-json-api).
       - We combine the historical and current data extracted from the API to create a time series.
-      - Whenever policy implementation dates for a status are not provided in the data, and this status is the only available for the country, we assign the earliest year in the series (1950) to construct the most complete data as possible.
+      - Whenever policy implementation dates for a status are not provided in the data, and this status is the only available for the country, we consider that this status has not changed during the entire period of the dataset.
       - We group some of the categories the source has defined for each issue, for further clarity in our visualizations.
+      - We present this data only for sovereign states, defined by [Butcher and Griffiths (2020)](https://ourworldindata.org/grapher/sovereign-state-butcher-griffiths). We use the definitions of the latest year available.
     presentation:
       topic_tags:
         - LGBT+ Rights
