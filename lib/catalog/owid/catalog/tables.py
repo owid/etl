@@ -570,15 +570,15 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, *, inplace: Literal[True]) -> None:
+    def reset_index(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
 
     @overload
-    def reset_index(self, *, inplace: Literal[False]) -> "Table":
+    def reset_index(self, *, inplace: Literal[False], **kwargs) -> "Table":
         ...
 
     @overload
-    def reset_index(self) -> "Table":
+    def reset_index(self, **kwargs) -> "Table":
         ...
 
     def reset_index(self, *args, **kwargs) -> Optional["Table"]:  # type: ignore
@@ -590,6 +590,9 @@ class Table(pd.DataFrame):
             # preserve metadata in _fields, calling reset_index() on a table drops it
             t._fields = self._fields
             return t  # type: ignore
+
+    def astype(self, *args, **kwargs) -> "Table":
+        return super().astype(*args, **kwargs)  # type: ignore
 
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
         """Fix type signature of join."""

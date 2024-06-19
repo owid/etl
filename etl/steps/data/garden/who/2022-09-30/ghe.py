@@ -1,8 +1,9 @@
 """Generate GHE garden dataset"""
 
-from typing import Any, Dict, cast
+from typing import Any, Dict
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
@@ -11,7 +12,6 @@ from structlog import get_logger
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 log = get_logger()
 
@@ -42,31 +42,27 @@ AGE_GROUPS_RANGES = {
 
 
 def run(dest_dir: str) -> None:
-    log.info("ghe.start")
-
     # read dataset from meadow
-    ds_meadow = paths.meadow_dataset
-    df = pd.DataFrame(ds_meadow["ghe"]).reset_index()
-    df = df.drop(columns="flag_level")
+    ds_meadow = paths.load_dataset()
+    tb = ds_meadow["ghe"].reset_index()
+    tb = tb.drop(columns="flag_level")
     # Load countries regions
-    regions_dataset: Dataset = paths.load_dataset("regions")
-    regions = regions_dataset["regions"]
+    regions = paths.load_dataset("regions")["regions"]
     # Load WHO Standard population
-    snap: Snapshot = paths.load_snapshot("standard_age_distribution.csv")
-    who_standard = pd.read_csv(snap.path)
+    snap = paths.load_snapshot("standard_age_distribution.csv")
+    who_standard = snap.read()
     who_standard = format_who_standard(who_standard)
     # Read population dataset
     ds_population = paths.load_dataset("un_wpp")
 
     # convert codes to country names
-    code_to_country = cast(Dataset, paths.load_dependency("regions"))["regions"]["name"].to_dict()
-    df["country"] = dataframes.map_series(df["country"], code_to_country, warn_on_missing_mappings=True)
+    code_to_country = regions["name"].to_dict()
+    tb["country"] = dataframes.map_series(tb["country"], code_to_country, warn_on_missing_mappings=True)
 
     # clean data, process and create final output
-    df = clean_data(df, regions, who_standard, ds_population)
+    tb = clean_data(tb, regions, who_standard, ds_population)
 
-    # Make table from dataframe
-    tb = Table(df, short_name=paths.short_name)
+    # format
     tb = tb.format(["country", "year", "age_group", "sex", "cause"])
 
     # Get male-to-female death rate ratio
@@ -81,15 +77,13 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(dest_dir, tables=tables, default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
-    log.info("ghe.end")
 
-
-def format_who_standard(who_standard: pd.DataFrame) -> Dict[Any, Any]:
+def format_who_standard(who_standard: Table) -> Dict[Any, Any]:
     """
     Convert who standard age distribution into a dict and combine the over 85 age-groups
     """
-    under_85 = who_standard[who_standard["age_min"] < 85]
-    over_85 = who_standard[who_standard["age_min"] >= 85]
+    under_85 = who_standard.loc[who_standard["age_min"] < 85]
+    over_85 = who_standard.loc[who_standard["age_min"] >= 85]
     over_85["age_group"] = "YEARS85PLUS"
     over_85["age_weight"] = over_85["age_weight"].sum()
     over_85 = over_85[["age_group", "age_weight"]].drop_duplicates().reset_index(drop=True)
@@ -99,28 +93,28 @@ def format_who_standard(who_standard: pd.DataFrame) -> Dict[Any, Any]:
     )
     under_85 = under_85[["age_group", "age_weight"]].reset_index(drop=True)
 
-    who_standard = pd.concat([under_85, over_85])
+    who_standard = pr.concat([under_85, over_85])
     who_standard_dict = who_standard.set_index("age_group")["age_weight"].to_dict()
     return who_standard_dict
 
 
-def clean_data(
-    df: pd.DataFrame, regions: Table, who_standard: Dict[str, float], ds_population: Dataset
-) -> pd.DataFrame:
+def clean_data(df: Table, regions: Table, who_standard: Dict[str, float], ds_population: Dataset) -> Table:
     log.info("ghe.basic cleaning")
     df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
-    df = add_population(
-        df=df,
-        country_col="country",
-        year_col="year",
-        sex_col="sex",
-        sex_group_all="Both sexes",
-        sex_group_female="Female",
-        sex_group_male="Male",
-        age_col="age_group",
-        age_group_mapping=AGE_GROUPS_RANGES,
-        ds_un_wpp=ds_population,
-    )
+    df = Table(
+        add_population(
+            df=df,
+            country_col="country",
+            year_col="year",
+            sex_col="sex",
+            sex_group_all="Both sexes",
+            sex_group_female="Female",
+            sex_group_male="Male",
+            age_col="age_group",
+            age_group_mapping=AGE_GROUPS_RANGES,
+            ds_un_wpp=ds_population,
+        )
+    ).copy_metadata(df)
     assert df["population"].isna().sum() == 0
 
     # Combine substance and alcohol abuse
@@ -149,7 +143,7 @@ def clean_data(
     return df
 
 
-def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]) -> pd.DataFrame:
+def add_age_standardized_metric(df: Table, who_standard: Dict[str, float]) -> Table:
     """
     Using the WHO's standard population we can calculate the age-standardized metric
     Values from : https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
@@ -193,11 +187,11 @@ def add_age_standardized_metric(df: pd.DataFrame, who_standard: Dict[str, float]
     df_as = (
         df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns=["multiplier"]).reset_index()
     )
-    df = pd.concat([df, df_as])
+    df = pr.concat([df, df_as])
     return df
 
 
-def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+def add_age_groups(df: Table) -> Table:
     """
     Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
     For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
@@ -250,12 +244,12 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
     df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
     df_age_group_self_harm = build_custom_age_groups(df, age_groups=age_groups_self_harm, select_causes=["Self-harm"])
     df = remove_granular_age_groups(df, age_groups_to_keep=["ALLAges", "Age-standardized"])
-    df_combined = pd.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True)
+    df_combined = pr.concat([df, df_age_group_ihme, df_age_group_self_harm], ignore_index=True)
 
     return df_combined
 
 
-def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
+def combine_drug_and_alcohol(df: Table) -> Table:
     substance_use_disorders = ["Drug use disorders", "Alcohol use disorders"]
     substance_df = df[df["cause"].isin(substance_use_disorders)]
     substance_agg = (
@@ -268,11 +262,11 @@ def combine_drug_and_alcohol(df: pd.DataFrame) -> pd.DataFrame:
     substance_agg = calculate_rates(substance_agg)
     substance_agg["cause"] = "Substance use disorders"
     substance_agg = substance_agg.reset_index(drop=True)
-    df = pd.concat([df, substance_agg], ignore_index=True).drop(columns=["index"])
+    df = pr.concat([df, substance_agg], ignore_index=True).drop(columns=["index"])
     return df
 
 
-def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
+def calculate_rates(df: Table) -> Table:
     df["daly_rate100k"] = 100000 * (df["daly_count"] / df["population"])
     df["death_rate100k"] = 100000 * (df["death_count"] / df["population"])
     df["daly_rate100k"] = np.where(df["daly_count"] == 0, 0, df["daly_rate100k"])
@@ -281,7 +275,7 @@ def calculate_rates(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: Any = None) -> pd.DataFrame:
+def build_custom_age_groups(df: Table, age_groups: dict, select_causes: Any = None) -> Table:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
@@ -289,7 +283,7 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
     df_age = df.copy()
     age_groups_to_drop = set(df_age["age_group"]) - set(age_groups)
     log.info(f"Not including... {age_groups_to_drop} in custom age groups")
-    df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
+    df_age = df_age.loc[df_age["age_group"].isin(age_groups.keys())]
     if select_causes is not None:
         log.info("Dropping unused causes...")
         msk = df_age["cause"].isin(select_causes)
@@ -310,40 +304,39 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict, select_causes: A
 
     # Checking we have the same number of deaths after aggregating age-groups
     total_deaths_check = df_age.groupby(["country", "year"], observed=True, as_index=False)["death_count"].sum()
-    comparison = total_deaths == total_deaths_check
+    assert all(total_deaths == total_deaths_check)
 
-    assert all(comparison)
     return df_age
 
 
-def remove_granular_age_groups(df: pd.DataFrame, age_groups_to_keep: list[str]) -> pd.DataFrame:
+def remove_granular_age_groups(df: Table, age_groups_to_keep: list[str]) -> Table:
     """
     Remove the small five-year age-groups that are in the original dataset
     """
-    df = df[df["age_group"].isin(age_groups_to_keep)]
+    df = df.loc[df["age_group"].isin(age_groups_to_keep)]
     assert len(df["age_group"].drop_duplicates()) == len(age_groups_to_keep)
     return df
 
 
-def add_global_total(df: pd.DataFrame) -> pd.DataFrame:
+def add_global_total(df: Table) -> Table:
     df_glob = (
         df.groupby(["year", "age_group", "sex", "cause"], observed=True)
         .agg({"daly_count": "sum", "death_count": "sum", "population": "sum"})
         .reset_index()
     )
     df_glob["country"] = "World"
-    df = pd.concat([df, df_glob])
+    df = pr.concat([df, df_glob])
 
     return df
 
 
-def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
+def add_regional_and_global_aggregates(df: Table, regions: Table) -> Table:
     continents = regions[regions["region_type"] == "continent"]["name"].to_list()
-    cont_out = pd.DataFrame()
+    cont_out = Table()
     for continent in continents:
-        cont_df = pd.DataFrame({"continent": continent, "country": pd.Series(geo.list_countries_in_region(continent))})
-        cont_out = pd.concat([cont_out, cont_df])
-    df_cont = pd.merge(df, cont_out, on="country")
+        cont_df = Table({"continent": continent, "country": pd.Series(geo.list_countries_in_region(continent))})
+        cont_out = pr.concat([cont_out, cont_df])
+    df_cont = pr.merge(df, cont_out, on="country")
 
     assert df_cont["continent"].isna().sum() == 0
 
@@ -357,7 +350,7 @@ def add_regional_and_global_aggregates(df: pd.DataFrame, regions: Table) -> pd.D
     df_regions = add_global_total(df_cont)
     df_regions = calculate_rates(df_regions)
 
-    df = pd.concat([df, df_regions])
+    df = pr.concat([df, df_regions])
 
     return df
 

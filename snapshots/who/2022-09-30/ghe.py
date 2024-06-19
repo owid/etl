@@ -1,6 +1,6 @@
+"""Script to create a snapshot of dataset."""
+
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import List
 
@@ -10,30 +10,28 @@ import requests
 from owid.repack import repack_frame
 from structlog import get_logger
 
-from owid.walden import Dataset, add_to_catalog
+from etl.snapshot import Snapshot
+
+# Version for current snapshot dataset.
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
 log = get_logger()
 
 
 @click.command()
-@click.option(
-    "--upload/--skip-upload",
-    default=True,
-    type=bool,
-    help="Upload dataset to Walden",
-)
-def main(upload: bool):
-    with tempfile.TemporaryDirectory() as temp_dir:
-        log.info("Creating metadata...")
-        metadata = Dataset.from_yaml(Path(__file__).parent / "who_ghe.meta.yml")
-        # Get the list of causes of disease/injury. The data is too big to request all at once.
-        causes = get_causes_list()
-        # Download the data
-        dataset = download_cause_data(causes)
-        data_file = os.path.join(temp_dir, f"data.{metadata.file_extension}")
-        # Save it locally as a temp feather file.
-        dataset.to_feather(data_file)
-        add_to_catalog(metadata, data_file, upload=upload)
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+def main(upload: bool) -> None:
+    # Create a new snapshot.
+    snap = Snapshot(f"who/{SNAPSHOT_VERSION}/ghe.feather")
+
+    # Get the list of causes of disease/injury. The data is too big to request all at once.
+    causes = get_causes_list()
+
+    # Download the data
+    df = download_cause_data(causes)
+
+    # Download data from source, add file to DVC and upload to S3.
+    snap.create_snapshot(data=df, upload=upload)
 
 
 def get_causes_list() -> List[str]:
@@ -68,7 +66,7 @@ def download_cause_data(causes) -> pd.DataFrame:
     all_df = pd.concat(all_data)
     all_df = all_df.reset_index()
 
-    return all_df
+    return repack_frame(all_df)
 
 
 if __name__ == "__main__":
