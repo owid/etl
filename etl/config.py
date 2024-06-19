@@ -480,4 +480,4 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-OWID_ENV = OWIDEnv.from_local()
+OWID_ENV = OWIDEnv.from_env_file(str(ENV_FILE))
