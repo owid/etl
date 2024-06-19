@@ -70,12 +70,6 @@ def run(dest_dir: str) -> None:
     # Add metadata by code (distributions)
     tb_percentiles = add_metadata_vars_distribution(tb_percentiles)
 
-    # NOTE: I am temporarily removing data for Sierra Leone and Cuba, because numbers do not seem right
-    countries_to_remove = ["Sierra Leone", "Cuba"]
-    tb = tb[~tb["country"].isin(countries_to_remove)].reset_index(drop=True)
-    tb_percentiles = tb_percentiles[~tb_percentiles["country"].isin(countries_to_remove)].reset_index(drop=True)
-    tb_fiscal = tb_fiscal[~tb_fiscal["country"].isin(countries_to_remove)].reset_index(drop=True)
-
     # Set index and sort
     tb = tb.format()
     tb_percentiles = tb_percentiles.format(["country", "year", "welfare", "p", "percentile"])
