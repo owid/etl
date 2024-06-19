@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
+    # Load garden dataset
     ds_garden = paths.load_dataset("guinea_worm")
 
     # Read table from garden dataset.
@@ -20,6 +20,12 @@ def run(dest_dir: str) -> None:
 
     # remove certified year for all years except the current year
     tb = remove_certified_year(tb, 2023)
+
+    tb["year_certified"] = tb["year_certified"].replace({"Pre-certification": 3000, "Endemic": 4000})
+    # change to numeric dtype
+    tb["year_certified"] = (
+        pd.to_numeric(tb["year_certified"], errors="coerce").astype("Int64").copy_metadata(tb["year_certified"])
+    )
 
     tb = tb.format(["country", "year"])
 

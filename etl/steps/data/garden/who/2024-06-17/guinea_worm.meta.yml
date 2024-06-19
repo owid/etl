@@ -31,7 +31,7 @@ tables:
     variables:
       year_certified:
         title: Year country was certified free of guinea worm disease
-        unit: ''
+        unit: ""
         description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
         description_from_producer:
           Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
@@ -39,17 +39,9 @@ tables:
           could be reduced to a strict minimum.
         display:
           numDecimalPlaces: 0
-      time_frame_certified:
-        title: Year country was certified free of guinea worm disease or status of certification
-        unit: ''
-        description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-        description_from_producer:
-          Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
-          in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
-          could be reduced to a strict minimum.
       certification_status:
         title: Certification status over time
-        unit: ''
+        unit: ""
         description_short:
           The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO.
           To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
@@ -59,7 +51,7 @@ tables:
           could be reduced to a strict minimum.
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
-        unit: ''
+        unit: cases
         description_short: Reported cases of guinea worm disease (Dracunculiasis) as recorded by the WHO.
         description_from_producer:
           A case of guinea-worm disease is a person exhibiting a skin lesion with emergence of a Guinea worm,
