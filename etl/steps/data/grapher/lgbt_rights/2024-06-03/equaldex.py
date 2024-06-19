@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("equaldex")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["equaldex"].reset_index()
+    tb_garden = ds_garden["equaldex"]
 
     #
     # Save outputs.
