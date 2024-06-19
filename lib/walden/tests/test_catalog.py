@@ -59,7 +59,7 @@ def test_catalog_find_one_too_many():
         catalog.find_one()
 
     with pytest.raises(Exception):
-        catalog.find_one("who")
+        catalog.find_one("ihme_gbd")
 
 
 def test_catalog_find_one_too_few():
