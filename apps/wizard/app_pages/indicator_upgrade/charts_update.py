@@ -32,7 +32,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     # If user submitted variable mapping (i.e. clicked on "Next (2/3)"), then get charts and update them accordingly.
     with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
         try:
-            log.info("chart_revision: building updaters and getting charts!")
+            log.info("building updaters and getting charts!")
             st.session_state.indicator_mapping = indicator_mapping
             # Get charts
             charts = find_charts_from_variable_ids(set(indicator_mapping.keys()))
@@ -97,7 +97,7 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
     bar = st.progress(0, progress_text)
     try:
         for i, chart in enumerate(charts):
-            log.info(f"chart_revision: creating comparison for chart {chart.id}")
+            log.info(f"creating comparison for chart {chart.id}")
             # Update chart config
             config_new = update_chart_config(
                 chart.config,

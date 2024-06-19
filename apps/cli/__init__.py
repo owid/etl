@@ -182,8 +182,6 @@ GROUPS = (
             "name": "Charts",
             "commands": {
                 "chart-sync": "apps.chart_sync.cli.cli",
-                "chart-gpt": "etl.chart_revision.v2.chartgpt.cli",
-                "chart-upgrade": "etl.chart_revision.cli.main_cli",
             },
         },
         {
