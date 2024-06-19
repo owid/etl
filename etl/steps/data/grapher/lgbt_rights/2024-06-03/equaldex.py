@@ -1,7 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from owid.catalog import Dataset
-
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
 # Get paths and naming conventions for current step.
@@ -13,11 +12,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("equaldex")
+    ds_garden = paths.load_dataset("equaldex")
+    ds_regions = paths.load_dataset("regions")
+    ds_population = paths.load_dataset("population")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["equaldex"]
+    tb_garden = ds_garden["equaldex"].reset_index()
 
+    countries_europe = geo.list_members_of_region("Europe", ds_regions)
+
+    tb_garden["country"] = tb_garden["country"].astype("string")
+    tb_garden = geo.add_population_to_table(tb_garden, ds_population)
+
+    tb_garden = tb_garden.loc[tb_garden.year == 2024, ["country", "year", "ei_legal", "population"]]
+    tb_garden = tb_garden[tb_garden.country.isin(countries_europe)]
     #
     # Save outputs.
     #
