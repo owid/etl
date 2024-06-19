@@ -196,6 +196,9 @@ class MapBracketer:
         self.color_scheme = None
         # Define default selected brackets (which will be updated later on).
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()  # type: ignore
+        # Define the "grapher version" of the selected brackets, which needs a minimum value and a list of brackets.
+        self.brackets_selected_grapher_min_value = None
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()
 
     @property
     def brackets(self):
@@ -271,8 +274,12 @@ class MapBracketer:
 
         return brackets_all
 
-    def rank_brackets(self):
-        brackets = self.brackets_selected.copy()
+    def _get_dispersion_for_all_windows_for_given_brackets(self, brackets):
+        brackets = brackets.copy()
+        # Roll a given list of brackets until finding the window with a most homogeneous distribution of countries.
+        # TODO: Here, we need to ensure that the brackets we are analyzing are aligned with the choices of lower and upper bracket openness, and the bracket values.
+        #  I think the slider should show the absolute minimum and maximum, and the default selection should be the
+        #  smart one.
         if brackets[-1] < brackets[-2]:
             # To keep the upper bracket open, a value smaller than the upper bracket was added.
             # But now this causes an issue when calculating the histogram.
@@ -282,33 +289,54 @@ class MapBracketer:
             # Ensure the lowest bin is added to the left.
             brackets = [self.min_value] + brackets
 
-        # TODO: Then ensure the histogram always adds up to the total number of countries.
-        # TODO: I think the slider should show the absolute minimum and maximum, and the default selection should be the
-        #  smart one.
-        # TODO: Also, when switching to custom, it would be good to keep the previous selection.
+        if (brackets[0] > self.min_value) or (brackets[-1] < self.max_value):
+            st.error("Bracket do not fully cover the data.")
 
         # Find the number of countries in each bracket.
         histogram = np.histogram(self.values, bins=brackets, density=False)[0]
-        if sum(histogram) != len(self.values):
-            st.error("Unexpected error (histogram does not add up to the number of entities).")
-        len(self.values)
-        st.write(f"Selected: {brackets}")
-        st.write(f"Histogram: {histogram}")
-        if (histogram == 0).all():
-            # This should not happen.
-            dispersion_value = 1
-        else:
-            # Find indices of non-zero elements.
-            non_zero_indices = np.nonzero(histogram)[0]
-            # Slice the histogram from the first to the last non-zero element.
-            histogram = histogram[non_zero_indices[0] : non_zero_indices[-1] + 1]
-            dispersion_value = dispersion(histogram)
-        # TODO: Use this value to pick the best configuration.
-        st.write(dispersion_value)
+        # Consider if taking a subset of the brackets would improve the histogram.
+        # This would happen, for example, if the lowest been has only 1 country.
+        # In such a case, it's better to collapse the first and second bin together.
+        results = {"brackets": [], "histogram": [], "dispersion": []}
+        for bracket_low in range(len(brackets)):
+            for bracket_upp in range(
+                bracket_low + MIN_NUM_BRACKETS, min(len(histogram) + 1, bracket_low + MAX_NUM_BRACKETS)
+            ):
+                _brackets = np.hstack([brackets[0], brackets[bracket_low + 1 : bracket_upp], brackets[-1]])
+                _histogram = np.hstack(
+                    [
+                        [sum(histogram[: bracket_low + 1])],
+                        histogram[bracket_low + 1 : bracket_upp - 1],
+                        [sum(histogram[bracket_upp - 1 :])],
+                    ]
+                )
+                # Sanity check (remove if it always works, to improve performance).
+                assert (_histogram == np.histogram(self.values, bins=_brackets)[0]).all()
+                if sum(_histogram) != len(self.values):
+                    st.error("Unexpected error (histogram does not add up to the number of entities).")
+                # Calculate dispersion.
+                dispersion_value = dispersion(_histogram)
+
+                # Store results.
+                results["brackets"].append(_brackets)
+                results["histogram"].append(_histogram)
+                results["dispersion"].append(dispersion_value)
+        ranking = pd.DataFrame(results).sort_values("dispersion").reset_index(drop=True)
+
+        return ranking
+
+    def find_optimal_window_for_brackets(self, brackets):
+        brackets_optimal = self._get_dispersion_for_all_windows_for_given_brackets(brackets=brackets).iloc[0][
+            "brackets"
+        ]
+
+        return brackets_optimal
 
     def update_custom_brackets(self, brackets_manual) -> None:
         self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_manual
         self.brackets_selected = brackets_manual
+        # TODO: Raise warnings if the input manual brackets do not fulfil certain conditions (e.g. monotonically increasing).
+        self._update_grapher_brackets()
 
     def are_brackets_open(self):
         # If the minimum value in the data is negative, assume that the lower bracket is open.
@@ -351,32 +379,44 @@ class MapBracketer:
 
         self.brackets_selected = brackets_selected
 
-    def update_chart_config(self) -> None:
-        self.chart_config["map"]["colorScale"]["baseColorScheme"] = self.color_scheme
-        self.chart_config["map"]["colorScale"]["customNumericValues"] = self.brackets_selected
+        # Update grapher version of the selected brackets.
+        self._update_grapher_brackets()
+
+    def _update_grapher_brackets(self):
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()
         if self.lower_bracket_open:
             # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
-            self.chart_config["map"]["colorScale"]["customNumericMinValue"] = self.max_value
+            self.brackets_selected_grapher_min_value = self.max_value
+        else:
+            # Otherwise, I'm not sure what the default is, but simply leave it undefined.
+            self.brackets_selected_grapher_min_value = None
+
         if self.upper_bracket_open:
-            # To ensure the upper bracket is open, add an upper bracket with a value that is very small.
-            self.chart_config["map"]["colorScale"]["customNumericValues"].append(self.min_value)
+            self.brackets_selected_grapher_values.append(self.min_value)
         else:
             # To ensure the upper bracket is closed, ensure the upper bracket value is larger than any data value.
-            if self.chart_config["map"]["colorScale"]["customNumericValues"][-1] < self.max_value:
+            if self.brackets_selected_grapher_values[-1] < self.max_value:
                 # Find the lowest bracket that is above the maximum value in the data, and use that as the upper bracket.
-                self.chart_config["map"]["colorScale"]["customNumericValues"][-1] = min(
+                # NOTE: The result may still show an open bracket.
+                # The reason is that some country in a year different to the one currently selected has a larger value.
+                # This is a limitation of considering only the values of the current year, but I think it's fine.
+                # (We shouldn't use closed brackets anyway if the data is not restricted to a closed interval).
+                self.brackets_selected_grapher_values[-1] = min(
                     [bracket for bracket in self.brackets if bracket >= self.max_value]
                 )
 
-        if (
-            self.chart_config["map"]["colorScale"]["customNumericValues"][0]
-            == self.chart_config["map"]["colorScale"].get("customNumericMinValue")
-        ) or (self.chart_config["map"]["colorScale"]["customNumericValues"][0] == 0):
+        if (self.brackets_selected_grapher_values[0] == self.brackets_selected_grapher_min_value) or (
+            self.brackets_selected_grapher_values[0] == 0
+        ):
             # For some reason, when the lowest bracket is 0, the zeroth bracket gets repeated.
             # No sure what the best solution is. For now, I'll remove the lowest bracket.
-            self.chart_config["map"]["colorScale"]["customNumericValues"] = self.chart_config["map"]["colorScale"][
-                "customNumericValues"
-            ][1:]
+            self.brackets_selected_grapher_values = self.brackets_selected_grapher_values[1:]
+
+    def update_chart_config(self) -> None:
+        self.chart_config["map"]["colorScale"]["baseColorScheme"] = self.color_scheme
+        self.chart_config["map"]["colorScale"]["customNumericValues"] = self.brackets_selected_grapher_values
+        if self.brackets_selected_grapher_min_value:
+            self.chart_config["map"]["colorScale"]["customNumericMinValue"] = self.brackets_selected_grapher_min_value
 
 
 def map_bracketer_interactive(mb: MapBracketer) -> None:
@@ -443,7 +483,9 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Update chart config given the selections.
     mb.update_chart_config()
 
-    mb.rank_brackets()
+    # final_brackets = np.hstack([mb.chart_config["map"]["colorScale"].get("customNumericMinValue", 0), mb.chart_config["map"]["colorScale"]["customNumericValues"]])
+    # optimal_brackets = mb.find_optimal_window_for_brackets(brackets=final_brackets)
+    # st.write(optimal_brackets)
     # Display the chart.
     chart_html(mb.chart_config, owid_env=OWID_ENV)
 
@@ -559,6 +601,8 @@ elif use_type == USE_TYPE_EXPLORERS:
     # For debugging, fix the value of variable id.
     # Energy variable that has both negative and positive values.
     # variable_id = 900950
+    # The following may have nans that cause issues.
+    # variable_id = 899976
 
     # Initialize map bracketer.
     mb = MapBracketer(variable_id=variable_id)  # type: ignore
@@ -567,3 +611,8 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     if st.button("Save brackets in explorer file", type="primary"):
         update_explorer_file(mb=mb, explorer=explorer)
+        # TODO: Fix "InvalidIndexError: You can only assign a scalar value not a <class 'list'>".
+        #  It happens if the save button is pressed for a variable that already exists.
+        #  It may be the case that the "at" method cannot replace a list of values.
+        #  A possible solution would be to first empty the cell, and then write to it.
+        # TODO: Also, 1. restart app, 2. press save button for default variable 899767, 3. restart the app, 4. select 899770, 5. press save button, 6. go to owid-content and do git diff, 7. see that the current save affected the format of 899767! (also, variableId becomes float).
