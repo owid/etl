@@ -479,6 +479,16 @@ class PathFinder:
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
+    @property
+    def step_name(self) -> str:
+        """Return step name."""
+        return self.create_step_name(
+            short_name=self.short_name,
+            channel=self.channel,  # type: ignore
+            namespace=self.namespace,
+            version=self.version,
+        )
+
     @staticmethod
     def create_step_name(
         short_name: str,
@@ -599,9 +609,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies(directory=self.directory)
+            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies(directory=self.directory)
+            raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
         dependency = matches[0]
 
