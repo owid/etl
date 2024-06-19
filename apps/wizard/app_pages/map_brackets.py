@@ -496,7 +496,7 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
 
     if mb.variable_id in set(explorer.df_columns["variableId"]):
         # If variable configuration is already specified in the columns table, overwrite its config.
-        index = explorer.df_columns[explorer.df_columns["variableId"] == mb.variable_id].index
+        index = explorer.df_columns.loc[explorer.df_columns["variableId"] == mb.variable_id].index.item()
     else:
         # Otherwise, add new variable to columns table.
         index = len(explorer.df_columns)
@@ -615,4 +615,3 @@ elif use_type == USE_TYPE_EXPLORERS:
         #  It happens if the save button is pressed for a variable that already exists.
         #  It may be the case that the "at" method cannot replace a list of values.
         #  A possible solution would be to first empty the cell, and then write to it.
-        # TODO: Also, 1. restart app, 2. press save button for default variable 899767, 3. restart the app, 4. select 899770, 5. press save button, 6. go to owid-content and do git diff, 7. see that the current save affected the format of 899767! (also, variableId becomes float).

@@ -103,6 +103,13 @@ class Explorer:
                 for variable_ids in df["yVariableIds"]
             ]
 
+        if "colorScaleNumericBins" in df.columns:
+            # Convert strings of brackets separated by ";" to list of brackets.
+            df["colorScaleNumericBins"] = [
+                [int(bracket) if bracket.isdigit() else float(bracket) for bracket in row.split(";")]
+                for row in df["colorScaleNumericBins"]
+            ]
+
         return df
 
     @staticmethod
@@ -121,6 +128,9 @@ class Explorer:
             df["colorScaleNumericBins"] = [
                 ";".join(map(str, row)) if row else "" for row in df["colorScaleNumericBins"]
             ]
+
+        if "variableId" in df.columns:
+            df["variableId"] = df["variableId"].astype(int)
 
         # Convert boolean columns to strings of true, false.
         for column in df.select_dtypes(include="bool").columns:
