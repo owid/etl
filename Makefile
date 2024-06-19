@@ -154,10 +154,6 @@ fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
 	poetry run fasttrack --skip-auto-open --port 8082
 
-chart-sync: .venv
-	@echo '==> Starting Chart-sync on http://localhost:8083/'
-	poetry run streamlit run apps/chart_sync/app.py --server.port 8083
-
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	poetry run etlwiz
