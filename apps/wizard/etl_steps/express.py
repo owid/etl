@@ -1,4 +1,5 @@
 """Garden phase."""
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -83,15 +84,23 @@ class ExpressForm(utils.StepForm):
     snapshot_version: str
     file_extension: str
 
-    def __init__(self: Self, **data: str | bool) -> None:
+    def __init__(self: Self, **data: str | date | bool | int) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
-        if "namespace_custom" in data:
+        if ("namespace_custom" in data) and data["namespace_custom"] is not None:
             data["namespace"] = str(data["namespace_custom"])
 
-        super().__init__(**data)
+        # Handle update_period_days. Obtain from date.
+        if "update_period_date" in data:
+            assert isinstance(data["update_period_date"], date)
+            update_period_days = (data["update_period_date"] - date.today()).days
+
+            data["update_period_days"] = update_period_days
+            data.pop("update_period_date", None)
+
+        super().__init__(**data)  # type: ignore
 
     def validate(self: Self) -> None:
         """Check that fields in form are valid.
@@ -307,6 +316,10 @@ with form_widget.container(border=True):
         options=OPTIONS_NAMESPACES,
         default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
     )
+    # if APP_STATE.vars.get("namespace_custom"):
+    #     namespace_key = "namespace_custom"
+    # else:
+    #     namespace_key = "namespace"
 
     # Short name (meadow, garden, grapher)
     APP_STATE.st_widget(
@@ -332,12 +345,15 @@ with form_widget.container(border=True):
     label = "Indicators tag"
     if USING_TAGS_DEFAULT:
         label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
-    namespace = APP_STATE.vars["namespace"].replace("_", " ")
+
+    namespace_key = "namespace"
+    namespace = APP_STATE.vars[namespace_key].replace("_", " ")
     default_last = None
     for tag in tag_list:
         if namespace.lower() == tag.lower():
             default_last = tag
             break
+    # default_last = None
     APP_STATE.st_widget(
         st_widget=st.multiselect,
         label=label,
@@ -357,11 +373,13 @@ with form_widget.container(border=True):
     )
 
     # Add to DAG
+    namespace_key = "namespace"
     sorted_dag = sorted(
         utils.dag_files,
-        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars["namespace"]),
+        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
         reverse=True,
     )
+    # sorted_dag = utils.dag_files
     sorted_dag = [
         utils.dag_not_add_option,
         *sorted_dag,
@@ -380,14 +398,14 @@ with form_widget.container(border=True):
     )
 
     # Update frequency
+    today = datetime.today()
     APP_STATE.st_widget(
-        st_widget=st.number_input,
-        label="Dataset update frequency (days)",
-        help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
-        key="update_period_days",
-        step=1,
-        min_value=0,
-        default_last=365,
+        st_widget=st.date_input,
+        label="When is the next update expected?",
+        help="Expected date of the next update of this dataset by OWID (typically in a year).",
+        key="update_period_date",
+        min_value=today + timedelta(days=1),
+        default_last=today.replace(year=today.year + 1),
     )
 
     APP_STATE.st_widget(
@@ -430,6 +448,7 @@ with form_widget.container(border=True):
 # SUBMISSION ############################################
 #########################################################
 if submitted:
+    st.write(st.session_state)
     # Create form
     form = ExpressForm.from_state()
 

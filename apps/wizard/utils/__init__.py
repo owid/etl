@@ -16,6 +16,7 @@ import os
 import re
 import sys
 from copy import deepcopy
+from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -327,9 +328,9 @@ class AppState:
     def st_widget(
         self: "AppState",
         st_widget: Callable,
-        default_last: Optional[str | bool | int] = "",
+        default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
-        **kwargs: Optional[str | int | List[str]],
+        **kwargs: Optional[str | int | List[str] | date],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
@@ -396,6 +397,8 @@ class AppState:
                     key=f"{key}_custom",
                     default_last=default_value,
                 )
+            else:
+                st.session_state[f"{self.step}.{key}_custom"] = None
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
