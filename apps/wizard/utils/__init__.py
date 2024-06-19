@@ -242,7 +242,7 @@ class AppState:
 
     def update_from_form(self, form: "StepForm") -> None:
         self._check_step()
-        st.session_state["steps"][self.step] = form.dict()
+        st.session_state["steps"][self.step] = form.model_dump()
 
     @property
     def state_step(self: "AppState") -> Dict[str, Any]:
@@ -330,18 +330,20 @@ class AppState:
         st_widget: Callable,
         default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
-        **kwargs: Optional[str | int | List[str] | date],
+        default_value: Optional[str | bool | int | date] = None,
+        **kwargs: Optional[str | int | List[str] | date | Callable],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        if self.dataset_edit[self.step] is not None:
-            if dataset_field_name:
-                default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+        if default_value is None:
+            if self.dataset_edit[self.step] is not None:
+                if dataset_field_name:
+                    default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+                else:
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
             else:
-                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
-        else:
-            default_value = self.default_value(key, default_last=default_last)
+                default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Special behaviour for multiselect
@@ -366,7 +368,7 @@ class AppState:
         self.display_error(key)
         return widget
 
-    def st_widget_responsive(
+    def st_selectbox_responsive(
         self: "AppState",
         custom_label: str,
         **kwargs,
@@ -387,7 +389,8 @@ class AppState:
         with st.container():
             field = self.st_widget(**kwargs)
         with st.empty():
-            if field == custom_label:
+            if (field == custom_label) | (str(field) not in kwargs["options"]):
+                st.toast("showing custom input")
                 default_value = self.default_value(key)
                 field = self.st_widget(
                     st.text_input,
@@ -397,8 +400,8 @@ class AppState:
                     key=f"{key}_custom",
                     default_last=default_value,
                 )
-            else:
-                st.session_state[f"{self.step}.{key}_custom"] = None
+            # else:
+            #     st.session_state[f"{self.step}.{key}_custom"] = "nana"
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:

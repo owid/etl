@@ -23,6 +23,8 @@ st.set_page_config(
     page_title="Wizard: Express",
     page_icon="🪄",
 )
+st.session_state.submit_form = st.session_state.get("submit_form", False)
+
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("all")
 
@@ -84,6 +86,10 @@ class ExpressForm(utils.StepForm):
     snapshot_version: str
     file_extension: str
 
+    # Others
+    namespace_custom: str | None = None
+    update_period_date: date
+
     def __init__(self: Self, **data: str | date | bool | int) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
@@ -98,7 +104,6 @@ class ExpressForm(utils.StepForm):
             update_period_days = (data["update_period_date"] - date.today()).days
 
             data["update_period_days"] = update_period_days
-            data.pop("update_period_date", None)
 
         super().__init__(**data)  # type: ignore
 
@@ -265,12 +270,20 @@ class ExpressForm(utils.StepForm):
         return dag_content
 
 
-def update_state() -> None:
+def submit_form() -> None:
     """Submit form."""
     # Create form
     form = ExpressForm.from_state()
     # Update states with values from form
     APP_STATE.update_from_form(form)
+
+    # Submit
+    utils.set_states({"submit_form": True})
+
+
+def edit_field() -> None:
+    """Submit form."""
+    utils.set_states({"submit_form": False})
 
 
 def export_metadata() -> None:
@@ -307,19 +320,21 @@ with form_widget.container(border=True):
         default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
     # Namespace
-    APP_STATE.st_widget_responsive(
+    custom_label = "Custom namespace..."
+    APP_STATE.st_selectbox_responsive(
         st_widget=st.selectbox,
-        custom_label="Custom namespace...",
+        custom_label=custom_label,
         key="namespace",
         label="Namespace",
         help="Institution or topic name",
         options=OPTIONS_NAMESPACES,
         default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+        on_change=edit_field,
     )
-    # if APP_STATE.vars.get("namespace_custom"):
-    #     namespace_key = "namespace_custom"
-    # else:
-    #     namespace_key = "namespace"
+    if APP_STATE.vars.get("namespace") == custom_label:
+        namespace_key = "namespace_custom"
+    else:
+        namespace_key = "namespace"
 
     # Short name (meadow, garden, grapher)
     APP_STATE.st_widget(
@@ -329,6 +344,7 @@ with form_widget.container(border=True):
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
         value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
+        on_change=edit_field,
     )
 
     # Version (meadow, garden, grapher)
@@ -339,6 +355,7 @@ with form_widget.container(border=True):
         key="version",
         default_last=default_version,
         value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
+        on_change=edit_field,
     )
 
     # Indicator tags
@@ -346,14 +363,12 @@ with form_widget.container(border=True):
     if USING_TAGS_DEFAULT:
         label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
 
-    namespace_key = "namespace"
     namespace = APP_STATE.vars[namespace_key].replace("_", " ")
     default_last = None
     for tag in tag_list:
         if namespace.lower() == tag.lower():
             default_last = tag
             break
-    # default_last = None
     APP_STATE.st_widget(
         st_widget=st.multiselect,
         label=label,
@@ -370,31 +385,31 @@ with form_widget.container(border=True):
         options=tag_list,
         placeholder="Choose a tag (or multiple)",
         default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
+        on_change=edit_field,
     )
 
     # Add to DAG
-    namespace_key = "namespace"
     sorted_dag = sorted(
         utils.dag_files,
         key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
         reverse=True,
     )
-    # sorted_dag = utils.dag_files
     sorted_dag = [
         utils.dag_not_add_option,
         *sorted_dag,
     ]
-    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars["namespace"]:
-        default_last = sorted_dag[1]
+    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
+        default_value = sorted_dag[1]
     else:
-        default_last = ""
+        default_value = ""
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
         options=sorted_dag,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
-        default_last=default_last,
+        default_value=default_value,
+        on_change=edit_field,
     )
 
     # Update frequency
@@ -406,6 +421,7 @@ with form_widget.container(border=True):
         key="update_period_date",
         min_value=today + timedelta(days=1),
         default_last=today.replace(year=today.year + 1),
+        on_change=edit_field,
     )
 
     APP_STATE.st_widget(
@@ -413,6 +429,7 @@ with form_widget.container(border=True):
         label="Make dataset private",
         key="is_private",
         default_last=False,
+        on_change=edit_field,
     )
 
     st.markdown("#### Snapshot")
@@ -424,6 +441,7 @@ with form_widget.container(border=True):
         # placeholder=f"Example: {DATE_TODAY}",
         key="snapshot_version",
         value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
+        on_change=edit_field,
     )
     # File extension
     APP_STATE.st_widget(
@@ -433,6 +451,7 @@ with form_widget.container(border=True):
         placeholder="Example: 'csv', 'xls', 'zip'",
         key="file_extension",
         value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
+        on_change=edit_field,
     )
 
     # Submit
@@ -440,15 +459,14 @@ with form_widget.container(border=True):
         "Submit",
         type="primary",
         use_container_width=True,
-        on_click=update_state,
+        on_click=submit_form,
     )
 
 
 #########################################################
 # SUBMISSION ############################################
 #########################################################
-if submitted:
-    st.write(st.session_state)
+if st.session_state.submit_form:
     # Create form
     form = ExpressForm.from_state()
 
