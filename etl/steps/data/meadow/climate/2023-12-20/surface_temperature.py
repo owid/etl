@@ -1,4 +1,3 @@
-"""Load a snapshot and create a meadow dataset. """
 import gzip
 import zipfile
 
@@ -26,7 +25,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
     # Load data from snapshot.
     with gzip.open(snap.path, "r") as _file:
-        ds = xr.open_dataset(_file)
+        ds = xr.open_dataset(_file, chunks={"time": 10})  # Use chunking to handle large datasets
 
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
@@ -54,7 +53,7 @@ def run(dest_dir: str) -> None:
     # Read surface temperature data from snapshot and convert temperature from Kelvin to Celsius.
     da = _load_data_array(snap) - 273.15
 
-    # Read the shapefile to extract country informaiton
+    # Read the shapefile to extract country information
     snap_geo = paths.load_snapshot("world_bank.zip")
     shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
 
@@ -146,6 +145,7 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["time", "country"], verify_integrity=True)
 
     tb["temperature_2m"].metadata.origins = [snap.metadata.origin]
+
     #
     # Save outputs.
     #
