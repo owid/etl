@@ -599,9 +599,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies(step_name=pattern)
+            raise NoMatchingStepsAmongDependencies(directory=self.directory)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies(step_name=pattern)
+            raise MultipleMatchingStepsAmongDependencies(directory=self.directory)
 
         dependency = matches[0]
 

@@ -19,7 +19,7 @@ class ExceptionFromDocstringWithKwargs(Exception):
         if kwargs:
             additional_text = ", ".join([f"{key}: {value}" for key, value in kwargs.items()])
             if additional_text is not None:
-                text += additional_text
+                text += " " + additional_text
         super().__init__(text, *args)
 
 
