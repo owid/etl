@@ -801,25 +801,6 @@ class Table(pd.DataFrame):
 
         return t
 
-    @overload
-    def dropna(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
-
-    @overload
-    def dropna(self, **kwargs) -> "Table":
-        ...
-
-    @overload
-    def reindex(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
-
-    @overload
-    def reindex(self, *args, **kwargs) -> "Table":
-        ...
-
-    def reindex(self, *args, **kwargs) -> "Table":
-        return cast("Table", super().reindex(*args, **kwargs))
-
     def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
