@@ -11,6 +11,7 @@ We have estimated various indicators.
 """
 
 import numpy as np
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -25,6 +26,9 @@ COUNTRIES_EXCLUDED = [
 ]
 # Index columns
 COLUMN_INDEX = ["country", "year"]
+# Years: Minimum and maximum of the 10-year average period.
+YEAR_DEC_MIN = 2014
+YEAR_DEC_MAX = 2023
 
 
 def run(dest_dir: str) -> None:
@@ -57,19 +61,19 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns="population")
 
     # Estimate 10-year average
-    tb_10y_avg = tb[(tb["year"] >= 2014) & (tb["year"] <= 2023)].copy()
+    tb_10y_avg = tb[(tb["year"] >= YEAR_DEC_MIN) & (tb["year"] <= YEAR_DEC_MAX)].copy()
     tb_10y_avg = tb_10y_avg.rename(
         columns={col: f"{col}_10y_avg" for col in tb_10y_avg.columns if col not in COLUMN_INDEX}
     )
     columns_indicators = [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]
     tb_10y_avg = tb_10y_avg.groupby("country")[columns_indicators].mean().reset_index()
-    tb_10y_avg["year"] = 2023
+    tb_10y_avg["year"] = YEAR_DEC_MAX
 
     # Estimate log(10-year average)
     tb_10y_avg_log = tb_10y_avg.copy()
     tb_10y_avg_log[columns_indicators] = np.log(tb_10y_avg[columns_indicators] + 1)
     tb_10y_avg_log = tb_10y_avg_log.rename(columns={col: f"{col}_10y_avg_log" for col in columns_indicators})
-    tb_10y_avg_log["year"] = 2023
+    tb_10y_avg_log["year"] = YEAR_DEC_MAX
 
     ## Format
     tb = tb.format(COLUMN_INDEX)
@@ -92,7 +96,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_relative_indicators(tb, colnames):
+def add_relative_indicators(tb: Table, colnames):
     """Add relative indicators (including excluding versions)"""
     for colname in colnames:
         tb = add_relative_indicator(tb, colname)

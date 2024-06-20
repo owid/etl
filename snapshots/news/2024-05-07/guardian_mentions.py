@@ -1,6 +1,6 @@
 """Getting the snapshot data requires interaction with The Guardian's Open Platform API (https://open-platform.theguardian.com/access/).
 
-NOTE: The data has been cosolidated into a Google Spreadhseet here https://docs.google.com/spreadsheets/d/18xjcsEjT7zTGTSNffju_zoD95RFxYl0vYKXc8jErKGk/edit#gid=0
+NOTE: The data has been cosolidated into a Google Spreadsheet here https://docs.google.com/spreadsheets/d/18xjcsEjT7zTGTSNffju_zoD95RFxYl0vYKXc8jErKGk/edit#gid=0
 
 MAIN STRATEGY
 =============
