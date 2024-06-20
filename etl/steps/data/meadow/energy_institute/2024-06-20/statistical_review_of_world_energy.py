@@ -30,7 +30,7 @@ paths = PathFinder(__file__)
 def parse_coal_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Coal - Reserves"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1)
+    tb = data.parse(sheet_name, skiprows=3)
 
     # The year of the data is written in the header of the sheet.
     # Extract it using a regular expression.
@@ -43,10 +43,10 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
         "Coal reserves - " + " ".join(tb[column].iloc[0:2].fillna("").astype(str).tolist()).strip()
         for column in tb.columns[1:]
     ]
-    tb = tb.rename(columns={column: new_columns[i] for i, column in enumerate(tb.columns)})
+    tb = tb.rename(columns={column: new_columns[i] for i, column in enumerate(tb.columns)}, errors="raise")
 
     # The units should be written in the header of the first column.
-    assert tb.iloc[1][0] == "Million tonnes", f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    assert tb.iloc[1, 0] == "Million tonnes", f"Units (or sheet format) may have changed in sheet {sheet_name}"
     # Zeroth column should correspond to countries.
     assert "Total World" in tb["country"].tolist()
 
@@ -81,10 +81,7 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
     tb = tb.assign(**{"year": year})
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
-
-    # Make column names snake case.
-    tb = tb.underscore()
+    tb = tb.format()
 
     return tb
 
@@ -92,7 +89,7 @@ def parse_coal_reserves(data: pr.ExcelFile) -> Table:
 def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Oil - Proved reserves history"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=2)
+    tb = data.parse(sheet_name, skiprows=4)
 
     # Check that units are the expected ones.
     assert (
@@ -141,10 +138,7 @@ def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     tb = tb.astype({"oil_reserves_bbl": float})
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
-
-    # Ensure column names are snake case.
-    tb = tb.underscore()
+    tb = tb.format()
 
     return tb
 
@@ -152,7 +146,7 @@ def parse_oil_reserves(data: pr.ExcelFile) -> Table:
 def parse_gas_reserves(data: pr.ExcelFile) -> Table:
     sheet_name = "Gas - Proved reserves history "
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=2)
+    tb = data.parse(sheet_name, skiprows=4)
 
     # Check that units are the expected ones.
     assert tb.columns[0] == "Trillion cubic metres", f"Units (or sheet format) may have changed in sheet {sheet_name}"
@@ -197,16 +191,13 @@ def parse_gas_reserves(data: pr.ExcelFile) -> Table:
     tb = tb.astype({"gas_reserves_tcm": float})
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
-
-    # Ensure column names are snake case.
-    tb = tb.underscore()
+    tb = tb.format()
 
     return tb
 
 
 def parse_oil_spot_crude_prices(data: pr.ExcelFile):
-    sheet_name = "Oil - Spot crude prices"
+    sheet_name = "Spot crude prices"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
     tb = data.parse(sheet_name, skiprows=0, na_values=["-"])
 
@@ -217,7 +208,7 @@ def parse_oil_spot_crude_prices(data: pr.ExcelFile):
     ]
 
     # The units should be written in the header of the first column.
-    assert tb.iloc[2][0] == "US dollars per barrel", f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    assert tb.iloc[2, 0] == "US dollars per barrel", f"Units (or sheet format) may have changed in sheet {sheet_name}"
 
     # Drop header rows.
     tb = tb.drop([0, 1, 2, 3]).reset_index(drop=True)
@@ -231,10 +222,7 @@ def parse_oil_spot_crude_prices(data: pr.ExcelFile):
     tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
-
-    # Make column names snake case.
-    tb = tb.underscore()
+    tb = tb.format(keys=["year"])
 
     return tb
 
@@ -255,11 +243,8 @@ def parse_oil_crude_prices(data: pr.ExcelFile):
     # Remove all those rows, for which all columns are nan except the country column.
     tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
 
-    # Make column names snake case.
-    tb = tb.underscore()
-
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
+    tb = tb.format(keys=["year"])
 
     return tb
 
@@ -267,19 +252,24 @@ def parse_oil_crude_prices(data: pr.ExcelFile):
 def parse_gas_prices(data: pr.ExcelFile) -> Table:
     sheet_name = "Gas Prices "
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, na_values="-")
+    tb = data.parse(sheet_name, skiprows=0, na_values="-")
 
     # Re-create the original column names, assuming the zeroth column is for countries.
     tb.iloc[0] = tb.iloc[0].ffill()
+    units = tb.iloc[1].ffill()
+    error = f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    assert set(units.dropna()) == {"$/kg", "$/mt", "US dollars per million Btu"}, error
+    tb = tb.drop(1)
     tb.columns = ["year"] + [
         "  - ".join(tb[column].iloc[0:3].fillna("").astype(str).tolist()).strip() for column in tb.columns[1:]
     ]
-
     # Remove numbers from column names (they are references to footnotes).
-    tb.columns = [re.sub(r"\d", "", column).strip() for column in tb.columns]
+    tb.columns = [re.sub(r"\d", "", column).strip().strip(" -").replace("\n", " ") for column in tb.columns]
+    # Remove spurious spaces.
+    tb.columns = [re.sub(r"\s{2,3}", " ", column) for column in tb.columns]
 
     # Drop header rows.
-    tb = tb.drop([0, 1, 2]).reset_index(drop=True)
+    tb = tb.drop([0, 2, 3]).reset_index(drop=True)
 
     # Drop empty columns and rows.
     tb = tb.dropna(axis=1, how="all")
@@ -290,63 +280,41 @@ def parse_gas_prices(data: pr.ExcelFile) -> Table:
     tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
-
-    # Make column names snake case.
-    tb = tb.underscore()
+    tb = tb.format(keys=["year"])
 
     return tb
 
 
 def parse_coal_prices(data: pr.ExcelFile) -> Table:
-    sheet_name = "Coal Prices"
+    sheet_name = "Coal & Uranium - Prices"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
-    tb = data.parse(sheet_name, skiprows=1, na_values=["-"])
+    tb = data.parse(sheet_name, skiprows=0, na_values=["-"])
 
-    # Remove spurious columns.
-    tb = tb.drop(columns=[column for column in tb.columns if column.startswith("Unnamed:") or len(column.strip()) == 0])
+    # Re-create the original column names, assuming the zeroth column is for countries.
+    tb.iloc[0] = tb.iloc[0].ffill()
+    units = tb.iloc[1].ffill()
+    error = f"Units (or sheet format) may have changed in sheet {sheet_name}"
+    assert set(units.dropna()) == {"$/lb", "US dollars per tonne"}, error
+    tb = tb.drop(1)
+    tb.columns = ["year"] + [
+        "  - ".join(tb[column].iloc[0:2].fillna("").astype(str).tolist()).strip() for column in tb.columns[1:]
+    ]
+    # Remove numbers from column names (they are references to footnotes).
+    tb.columns = [re.sub(r"\d", "", column).strip().strip(" -").replace("\n", " ") for column in tb.columns]
+    # Remove spurious spaces.
+    tb.columns = [re.sub(r"\s{2,3}", " ", column) for column in tb.columns]
 
-    assert tb.columns[0] == "US dollars per tonne", f"Units (or sheet format) may have changed in sheet {sheet_name}"
-
-    # Rename year column and remove spurious symbols used to signal footnotes.
-    tb.columns = ["year"] + tb.columns[1:].tolist()
-    tb.columns = [re.sub(r"\†|\‡|\^|\*|\#", "", column).strip() for column in tb.columns]
-
-    # Drop empty columns and rows.
-    tb = tb.dropna(axis=1, how="all")
-    tb = tb.dropna(how="all").reset_index(drop=True)
+    # Drop unnecessary rows.
+    tb = tb.drop([0, 2])
 
     # There are many rows of footers at the end, occupying values of the zeroth column.
     # Remove all those rows, for which all columns are nan except the country column.
-    tb = tb.dropna(subset=tb.drop(columns=tb.columns[0]).columns, how="all")
+    tb = tb.dropna(subset=tb.columns[1:], how="all").reset_index(drop=True)
 
     # Ensure index columns are not repeated, and sort rows and columns conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().reset_index()
-
-    # Make column names snake case.
-    tb = tb.underscore()
+    tb = tb.format(keys=["year"])
 
     return tb
-
-
-def create_table_of_fossil_fuel_prices(
-    tb_oil_spot_crude_prices: Table,
-    tb_oil_crude_prices: Table,
-    tb_gas_prices: Table,
-    tb_coal_prices: Table,
-) -> Table:
-    # Combine additional tables of fossil fuel prices.
-    tb_prices = tb_oil_spot_crude_prices.copy()
-    for tb_additional in [tb_oil_crude_prices, tb_gas_prices, tb_coal_prices]:
-        # Add current table to combined table.
-        tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"])
-    # Rename table appropriately.
-    tb_prices.metadata.short_name += "_fossil_fuel_prices"
-
-    # Set an appropriate index and sort conveniently.
-    tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    return tb_prices
 
 
 def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, license: License) -> Table:
@@ -386,7 +354,7 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     efficiency["efficiency_factor"] = tb[["Efficiency Factor"]].melt()["value"]
 
     # Concatenate older and curren values of efficiency.
-    efficiency = pr.concat([older_efficiency, efficiency], ignore_index=True)
+    efficiency = pr.concat([older_efficiency, efficiency], ignore_index=True).dropna().reset_index(drop=True)
 
     # Sanity checks.
     assert efficiency["year"].diff().dropna().unique().tolist() == [
@@ -400,10 +368,9 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, lice
     ).all(), "Efficiency out of expected range."
 
     # Set an appropriate index and sort conveniently.
-    efficiency = efficiency.set_index(["year"], verify_integrity=True).sort_index()
+    efficiency = efficiency.format(keys=["year"], short_name="statistical_review_of_world_energy_efficiency_factors")
 
     # Prepare table and variable metadata.
-    efficiency.metadata.short_name = "statistical_review_of_world_energy_efficiency_factors"
     efficiency["efficiency_factor"].metadata = VariableMeta(
         title="Thermal equivalent efficiency factors",
         description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
@@ -456,30 +423,47 @@ def run(dest_dir: str) -> None:
     )
 
     # Combine main table and coal, gas, and oil reserves.
-    for tb_reserves in [tb_coal_reserves, tb_gas_reserves, tb_oil_reserves]:
-        tb = tb.merge(tb_reserves, how="outer", on=["country", "year"])
+    tb = pr.multi_merge(
+        [tb, tb_coal_reserves.reset_index(), tb_gas_reserves.reset_index(), tb_oil_reserves.reset_index()],
+        how="outer",
+        on=["country", "year"],
+    )
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(sort_columns=True)
 
     # Create combined table of fossil fuel prices.
-    tb_prices = create_table_of_fossil_fuel_prices(
-        tb_oil_spot_crude_prices=tb_oil_spot_crude_prices,
-        tb_oil_crude_prices=tb_oil_crude_prices,
-        tb_gas_prices=tb_gas_prices,
-        tb_coal_prices=tb_coal_prices,
+    tb_prices = pr.multi_merge(
+        [
+            tb_oil_spot_crude_prices.reset_index(),
+            tb_oil_crude_prices.reset_index(),
+            tb_gas_prices.reset_index(),
+            tb_coal_prices.reset_index(),
+        ],
+        how="outer",
+        on=["year"],
+    )
+
+    # Set an appropriate index and sort conveniently.
+    tb_prices = tb_prices.format(
+        keys=["year"], sort_columns=True, short_name="statistical_review_of_world_energy_fossil_fuel_prices"
     )
 
     # Prices variables need to cite S&P Global Platts, and include their license.
+    year_published = tb_prices[tb_prices.columns[0]].metadata.origins[0].date_published[0:4]
     for column in tb_prices.columns:
         assert len(tb_prices[column].metadata.origins) == 1, f"Unexpected origins in column {column}"
         tb_prices[column].metadata.origins[
             0
-        ].attribution = "Energy Institute based on S&P Global Platts - Statistical Review of World Energy (2023)"
+        ].attribution = (
+            f"Energy Institute based on S&P Global Platts - Statistical Review of World Energy ({year_published})"
+        )
         tb_prices[column].metadata.origins[
             0
-        ].citation_full = "Energy Institute based on S&P Global Platts - Statistical Review of World Energy (2023)"
-        tb_prices[column].metadata.licenses.append(License(name="© S&P Global Inc. 2023"))
+        ].citation_full = (
+            f"Energy Institute based on S&P Global Platts - Statistical Review of World Energy ({year_published})"
+        )
+        tb_prices[column].metadata.licenses.append(License(name=f"© S&P Global Inc. {year_published}"))
 
     #
     # Save outputs.
