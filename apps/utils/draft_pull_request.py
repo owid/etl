@@ -134,23 +134,7 @@ def cli(
     local_branches = [branch.name for branch in repo.branches]
 
     # Create title
-    if title is not None:
-        prefix = ""
-        # Add emoji for PR mode chosen if applicable
-        if category is not None:
-            if category in PR_CATEGORIES:
-                prefix = PR_CATEGORIES[category]["emoji"]
-            else:
-                log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
-                return
-        # Add scope
-        if scope is not None:
-            if prefix != "":
-                prefix += " "
-            prefix += f"{scope}:"
-
-        # Add prefix
-        title = f"{prefix} {title}"
+    title = generate_pr_title(title, category, scope)
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
@@ -225,3 +209,30 @@ def cli(
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
+
+
+def generate_pr_title(title: str | None, category: str | None, scope: str | None) -> None | str:
+    """Generate the PR title.
+
+    title + category + scope -> 'category scope: title'
+    title + category -> 'category title'
+    scope + title -> 'scope: title'
+    """
+    if title is not None:
+        prefix = ""
+        # Add emoji for PR mode chosen if applicable
+        if category is not None:
+            if category in PR_CATEGORIES:
+                prefix = PR_CATEGORIES[category]["emoji"]
+            else:
+                log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
+                return
+        # Add scope
+        if scope is not None:
+            if prefix != "":
+                prefix += " "
+            prefix += f"{scope}:"
+
+        # Add prefix
+        title = f"{prefix} {title}"
+    return title
