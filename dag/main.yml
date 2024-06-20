@@ -152,20 +152,6 @@ steps:
   data://grapher/un/2024-04-09/undp_hdr:
     - data://garden/un/2024-04-09/undp_hdr
 
-  # Country profiles - overview
-  data://garden/country_profile/2022/overview:
-    - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
-    - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
-    - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
-    - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
-    - data://garden/demography/2023-10-09/life_expectancy
-    - data://garden/owid/latest/key_indicators
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-12-12/global_carbon_budget
-    - data://garden/democracy/2023-03-02/vdem
-    - data://garden/energy/2024-05-08/energy_mix
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-
   # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
     - snapshot://ggdc/2022-12-23/maddison_database.xlsx
