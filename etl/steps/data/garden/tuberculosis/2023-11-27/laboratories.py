@@ -33,8 +33,8 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("laboratories")
     snap = paths.load_snapshot("data_dictionary.csv")
     ds_un_wpp = paths.load_dataset("un_wpp")
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     ds_pop = ds_un_wpp["population"].reset_index()
     # Load data dictionary from snapshot.
@@ -77,14 +77,14 @@ def add_population_and_rates(tb: Table, ds_pop: Table) -> Table:
     Adding the total population of each country-year to the table and then calculating the rates per million people.
 
     """
-    ds_pop = ds_pop[
+    ds_pop = ds_pop.loc[
         (ds_pop["variant"] == "estimates")
         & (ds_pop["age"] == "all")
         & (ds_pop["sex"] == "all")
         & (ds_pop["metric"] == "population")
     ]
     ds_pop = ds_pop.rename(columns={"location": "country", "value": "population"})
-    ds_pop = ds_pop[["country", "year", "population"]]
+    ds_pop = ds_pop.loc[:, ["country", "year", "population"]]
 
     tb_pop = pr.merge(tb, ds_pop, on=["country", "year"], how="left")
     tb_pop["culture_rate"] = (tb_pop["culture"] / tb_pop["population"]) * 1000000
