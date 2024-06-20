@@ -27,6 +27,62 @@ log = get_logger()
 
 # URL of the Github API, to be used to create a draft pull request in the ETL repos.
 GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
+# Add EMOJIs for each PR type
+PR_CATEGORIES = {
+    "data": {
+        "emoji": "📊",
+        "emoji_raw": ":bar_chart:",
+        "description": "data update or addition",
+    },
+    "bug": {
+        "emoji": "🐛",
+        "emoji_raw": ":bug:",
+        "description": "bug fix for the user",
+    },
+    "refactor": {
+        "emoji": "🔨",
+        "emoji_raw": ":hammer:",
+        "description": "a code change that neither fixes a bug nor adds a feature for the user",
+    },
+    "enhance": {
+        "emoji": "✨",
+        "emoji_raw": ":sparkles:",
+        "description": "visible improvement over a current implementation without adding a new feature or fixing a bug",
+    },
+    "feature": {
+        "emoji": "🎉",
+        "emoji_raw": ":tada:",
+        "description": "new feature for the user",
+    },
+    "docs": {
+        "emoji": "📜",
+        "emoji_raw": ":scroll:",
+        "description": "documentation only changes",
+    },
+    "chore": {
+        "emoji": "🧹",
+        "emoji_raw": ":honeybee:",
+        "description": "upgrading dependencies, tooling, etc. No production code change",
+    },
+    "style": {
+        "emoji": "💄",
+        "emoji_raw": ":lipstick:",
+        "description": "formatting, missing semi colons, etc. No production code change",
+    },
+    "wip": {
+        "emoji": "🚧",
+        "emoji_raw": ":construction:",
+        "description": "work in progress - intermediate commits that will be explained later on",
+    },
+    "tests": {
+        "emoji": "✅",
+        "emoji_raw": ":white_check_mark:",
+        "description": "adding missing tests, refactoring tests, etc. No production code change",
+    },
+}
+description = "- " + "\n- ".join(
+    f"**{choice}**: {choice_params['description']}" for choice, choice_params in PR_CATEGORIES.items()
+)
 
 
 @click.command(name="draft-pr", cls=RichCommand, help=__doc__)
@@ -37,10 +93,27 @@ GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
     required=False,
 )
 @click.option(
-    "--base-branch", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
+    "--base-branch", "-b", type=str, default=None, help="Name of base branch (if not given, 'master' will be used)."
 )
-@click.option("--title", type=str, default=None, help="Title of the PR and the first commit.")
-def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, title: Optional[str] = None) -> None:
+@click.option("--title", "-t", type=str, default=None, help="Title of the PR and the first commit.")
+@click.option(
+    "--category",
+    "-c",
+    type=click.Choice(list(PR_CATEGORIES.keys()), case_sensitive=False),
+    help=f"Category of the PR (only relevant if --title is given). A corresponding emoji will be prepended to the title.\n {description}",
+)
+@click.option(
+    "--scope",
+    "-s",
+    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
+)
+def cli(
+    new_branch: Optional[str] = None,
+    base_branch: Optional[str] = None,
+    title: Optional[str] = None,
+    category: Optional[str] = None,
+    scope: Optional[str] = None,
+) -> None:
     if not GITHUB_TOKEN:
         log.error(
             """A github token is needed. To create one:
@@ -59,6 +132,9 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, tit
 
     # List all local branches.
     local_branches = [branch.name for branch in repo.branches]
+
+    # Create title
+    title = generate_pr_title(title, category, scope)
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
@@ -83,7 +159,9 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, tit
         # If not explicitly given, the new branch will be the current branch.
         new_branch = repo.active_branch.name
         if new_branch == "master":
-            log.error("You're currently on 'master' branch. Use '--new-branch ...' to create a new branch.")
+            log.error(
+                "You're currently on 'master' branch. Pass the name of a branch as an argument to create a new branch."
+            )
             return
     else:
         # Ensure the new branch does not already exist locally.
@@ -133,3 +211,30 @@ def cli(new_branch: Optional[str] = None, base_branch: Optional[str] = None, tit
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
+
+
+def generate_pr_title(title: str | None, category: str | None, scope: str | None) -> None | str:
+    """Generate the PR title.
+
+    title + category + scope -> 'category scope: title'
+    title + category -> 'category title'
+    scope + title -> 'scope: title'
+    """
+    if title is not None:
+        prefix = ""
+        # Add emoji for PR mode chosen if applicable
+        if category is not None:
+            if category in PR_CATEGORIES:
+                prefix = PR_CATEGORIES[category]["emoji"]
+            else:
+                log.error(f"Invalid PR type '{category}'. Choose one of {list(PR_CATEGORIES.keys())}.")
+                return
+        # Add scope
+        if scope is not None:
+            if prefix != "":
+                prefix += " "
+            prefix += f"{scope}:"
+
+        # Add prefix
+        title = f"{prefix} {title}"
+    return title
