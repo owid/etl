@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     # Drop 'FY'from the year column
     tb["Year"] = tb["Year"].str.replace("FY ", "").astype(int)
     # Set index as disease and year, there are plenty of duplicates but we will aggregate in garden.
-    tb = tb.format(["disease", "year"])
+    tb = tb.format(["disease", "year"], verify_integrity=False)
 
     #
     # Save outputs.
