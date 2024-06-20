@@ -1,12 +1,9 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
 import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -42,8 +39,8 @@ def run(dest_dir: str) -> None:
 
     #
     # Retrieve snapshots for terrorism data up intil 2020 and terrorism data between 2020-2021.
-    snap_2020 = cast(Snapshot, paths.load_dependency("global_terrorism_database.csv"))
-    snap_2021 = cast(Snapshot, paths.load_dependency("global_terrorism_database_2021.csv"))
+    snap_2020 = paths.load_snapshot("global_terrorism_database.csv")
+    snap_2021 = paths.load_snapshot("global_terrorism_database_2021.csv")
     # Select columns of interest
     COLUMNS_OF_INTEREST = [
         "iyear",

@@ -15,11 +15,9 @@ On regions:
         - Sub-Saharan Africa: 402-420 (Cape Verde-Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-517 (Congo-Rwanda), 540-591 (Angola-Seychelles)
 """
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -58,7 +56,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("mars"))
+    ds_meadow = paths.load_dataset("mars")
 
     # Read table from meadow dataset.
     tb = ds_meadow["mars"].reset_index()

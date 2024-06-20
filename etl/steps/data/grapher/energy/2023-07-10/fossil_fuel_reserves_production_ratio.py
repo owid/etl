@@ -2,8 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -15,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("fossil_fuel_reserves_production_ratio")
+    ds_garden = paths.load_dataset("fossil_fuel_reserves_production_ratio")
     tb_garden = ds_garden["fossil_fuel_reserves_production_ratio"]
 
     # Create new grapher dataset.

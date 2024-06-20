@@ -21,11 +21,9 @@ ON REGIONS:
         5 = Americas (GWNo: 2-199).
     - Data for incompatibilities in Oceania are included in region Asia (source decision). Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
 """
-from typing import cast
-
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -55,7 +53,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("prio_v31"))
+    ds_meadow = paths.load_dataset("prio_v31")
 
     # Read table from meadow dataset.
     tb = ds_meadow["prio_v31"].reset_index()

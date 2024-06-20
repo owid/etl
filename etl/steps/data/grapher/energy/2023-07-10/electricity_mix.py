@@ -2,8 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
-
 from etl.grapher_helpers import add_columns_for_multiindicator_chart
 from etl.helpers import PathFinder, create_dataset
 
@@ -16,7 +14,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("electricity_mix")
+    ds_garden = paths.load_dataset("electricity_mix")
     tb_garden = ds_garden["electricity_mix"]
 
     #

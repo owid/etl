@@ -1,12 +1,9 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
-
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,9 +14,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("autopsy"))
+    ds_garden = paths.load_dataset("autopsy")
     # Load Paratz paper dataset
-    snap = cast(Snapshot, paths.load_dependency("paratz.csv"))
+    snap = paths.load_snapshot("paratz.csv")
     paratz_df = pd.read_csv(snap.path)
     tb_paratz = Table(paratz_df, short_name="paratz")
 

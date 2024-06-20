@@ -1,7 +1,5 @@
 """Grapher step for the primary energy consumption dataset.
 """
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -13,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("primary_energy_consumption")
+    ds_garden = paths.load_dataset("primary_energy_consumption")
     tb_garden = ds_garden["primary_energy_consumption"].reset_index()
 
     #

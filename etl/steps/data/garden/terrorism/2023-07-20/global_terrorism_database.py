@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -47,14 +47,14 @@ def add_deaths_and_population(tb_terrorism: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Step 1: Load population data and merge with terrorism data
-    ds_population = cast(Dataset, paths.load_dependency("population"))
+    ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index(drop=False)
     df_pop_add = pd.merge(
         tb_terrorism, tb_population[["country", "year", "population"]], how="left", on=["country", "year"]
     )
 
     # Step 2: Load deaths data and merge with terrorism data
-    ds_meadow_un = cast(Dataset, paths.load_dependency("un_wpp"))
+    ds_meadow_un = paths.load_dataset("un_wpp")
     tb_un = ds_meadow_un["un_wpp"]
 
     # Step 3: Extract 'deaths' data with specific criteria
@@ -94,7 +94,7 @@ def run(dest_dir: str) -> None:
     """
 
     # Load inputs from the meadow dataset.
-    ds_meadow_terrorism = cast(Dataset, paths.load_dependency("global_terrorism_database"))
+    ds_meadow_terrorism = paths.load_dataset("global_terrorism_database")
     tb_terrorism = ds_meadow_terrorism["global_terrorism_database"]
     tb_terrorism = tb_terrorism.astype(
         {
