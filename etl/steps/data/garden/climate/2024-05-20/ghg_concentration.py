@@ -37,7 +37,7 @@ def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
     unique_locations = tb_with_average["location"].unique()
 
     # Set date as index and sort.
-    tb_with_average = tb_with_average.set_index(["location", "date"]).sort_index()
+    tb_with_average = tb_with_average.format(["location", "date"])
 
     # Create a MultiIndex with all possible combinations of date and location.
     multi_index = pd.MultiIndex.from_product([unique_locations, date_range], names=["location", "date"])
@@ -133,8 +133,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index()
-
+    tb = tb.format(["location", "date"])
     #
     # Save outputs.
     #

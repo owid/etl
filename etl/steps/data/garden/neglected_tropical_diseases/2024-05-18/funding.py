@@ -107,8 +107,7 @@ def aggregate_malaria(tb: Table, groupby_cols: List[str], index_cols: List[str])
     tb_malaria["disease"] = "Malaria - all types"
     # Adding the combined malaria types back to the original table
     tb = pr.concat([tb, tb_malaria], ignore_index=True)
-    tb = tb.set_index(["country", "year"] + index_cols, verify_integrity=True)
-
+    tb = tb.format(["country", "year"] + index_cols)
     return tb
 
 

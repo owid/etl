@@ -87,7 +87,7 @@ def run(dest_dir: str) -> None:
     tb = add_rolling_average(tb=tb, original_column_name="snow_cover_extent")
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "date"])
 
     #
     # Save outputs.
