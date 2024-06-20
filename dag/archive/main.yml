@@ -205,7 +205,39 @@ steps:
   data://grapher/lgbt_rights/2023-04-13/equaldex:
     - data://garden/lgbt_rights/2023-04-13/equaldex
 
-  # World Happiness report
+  # Happiness report
+  data://meadow/happiness/2023-03-20/happiness:
+    - snapshot://happiness/2023-03-20/happiness.xls
+  data://meadow/happiness/2022-03-20/happiness:
+    - snapshot://happiness/2022-03-20/happiness.xls
+  data://meadow/happiness/2021-03-20/happiness:
+    - snapshot://happiness/2021-03-20/happiness.xls
+  data://meadow/happiness/2020-03-20/happiness:
+    - snapshot://happiness/2020-03-20/happiness.xls
+  data://meadow/happiness/2019-03-20/happiness:
+    - snapshot://happiness/2019-03-20/happiness.xls
+  data://meadow/happiness/2018-03-20/happiness:
+    - snapshot://happiness/2018-03-20/happiness.xls
+  data://meadow/happiness/2017-03-20/happiness:
+    - snapshot://happiness/2017-03-20/happiness.xlsx
+  data://meadow/happiness/2016-03-20/happiness:
+    - snapshot://happiness/2016-03-20/happiness.xlsx
+  data://meadow/happiness/2015-03-20/happiness:
+    - snapshot://happiness/2015-03-20/happiness.xlsx
+  data://meadow/happiness/2012-03-20/happiness:
+    - snapshot://happiness/2012-03-20/happiness.xlsx
+
+  data://garden/happiness/2023-03-20/happiness:
+    - data://meadow/happiness/2023-03-20/happiness
+    - data://meadow/happiness/2022-03-20/happiness
+    - data://meadow/happiness/2021-03-20/happiness
+    - data://meadow/happiness/2020-03-20/happiness
+    - data://meadow/happiness/2019-03-20/happiness
+    - data://meadow/happiness/2018-03-20/happiness
+    - data://meadow/happiness/2017-03-20/happiness
+    - data://meadow/happiness/2016-03-20/happiness
+    - data://meadow/happiness/2015-03-20/happiness
+    - data://meadow/happiness/2012-03-20/happiness
   data://grapher/happiness/2023-03-20/happiness:
     - data://garden/happiness/2023-03-20/happiness
 
