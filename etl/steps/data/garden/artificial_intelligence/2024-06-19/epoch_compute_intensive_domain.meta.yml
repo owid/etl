@@ -24,7 +24,7 @@ definitions:
 
         - Image generation systems create visual content from text descriptions or other inputs, used in graphic design and content creation.
 
-    description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI system is primarily designed to operate within. System domains with less than 10 systems are grouped under "Other."
+    description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI system is primarily designed to operate within.
     description_from_producer: A foreign key field categorizing the system’s domain of machine learning. This field links to the [ML Domains table](https://airtable.com/appDFXXgaG1xLtXGL/shrhzolGiQCVnwOY5/tbleYEsZORsiYRVTM), and domains are selected from the options in that table.
     unit: 'AI systems'
     short_unit: ''
