@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Happiness Report
+    description: |-
+      The World Happiness Report is a partnership of Gallup, the Oxford Wellbeing Research Centre, the UN Sustainable Development Solutions Network, and the WHR’s Editorial Board.
+      It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+    date_published: "2024-03-08"
+    version_producer: 2024
+    title_snapshot: World Happiness Report - Happiness by age group
+    description_snapshot: |-
+      Happiness measured for different age groups for each country; Age groups are under 30 years old, 30-44 years old, 45-60 years old and over 60 years old. 
+
+    # Citation
+    producer: Wellbeing Research Centre
+    citation_full: |-
+      Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2024). World Happiness Report 2024. University of Oxford: Wellbeing Research Centre.
+    attribution_short: WHR
+
+    # Files
+    url_main: https://worldhappiness.report/ed/2024/
+    date_accessed: 2024-06-20
+
+    # License
+    license:
+      name: ""
+      url: https://worldhappiness.report/ed/2024/
+
+outs:
+  - md5: 512ec7ed6d2c698c1474c35adedc402e
+    size: 705536
+    path: happiness_ages.xls
