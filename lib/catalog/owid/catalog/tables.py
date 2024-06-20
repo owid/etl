@@ -595,7 +595,18 @@ class Table(pd.DataFrame):
         return super().astype(*args, **kwargs)  # type: ignore
 
     @overload
-    def __getitem__(self, item: Union["Table", pd.DataFrame, variables.Variable, pd.Series, List[str]]) -> "Table":
+    def __getitem__(
+        self,
+        item: Union[
+            "Table",
+            pd.DataFrame,
+            variables.Variable,
+            pd.Series,
+            List[str | Literal[Any]],
+            Tuple[str | Literal[Any]],
+            ...,
+        ],
+    ) -> "Table":
         ...
 
     @overload
