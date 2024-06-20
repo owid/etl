@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     #
     for file_name, tb in tables.items():
         # Set an appropriate index and sort conveniently.
-        tables[file_name] = tb.set_index(["year", "month"], verify_integrity=True).sort_index()
+        tables[file_name] = tb.format(["year", "month"])
 
     #
     # Save outputs.

@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     first_full_year = tally[tally == 6].index.min()
     tb = tb[tb.year >= first_full_year]
 
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
     tb = tb.format(["country", "year"])
 
     #

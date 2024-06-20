@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["date"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["date"], sort_columns=True)
 
     #
     # Save outputs.
