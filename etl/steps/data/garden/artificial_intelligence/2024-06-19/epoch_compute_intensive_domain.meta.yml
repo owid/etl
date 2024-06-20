@@ -20,31 +20,10 @@ definitions:
 
         - Speech systems are dedicated to handling spoken language, serving as the backbone of voice assistants and similar applications. They recognize, interpret, and generate spoken language to interact with users.
 
-        - Recommendation systems offer suggestions based on user preferences, prominently seen in online shopping and media streaming. For instance, Netflix's movie suggestions or Amazon's product recommendations are powered by algorithms that analyze users' preferences and past behaviors.
-
-        - 3D Modeling systems specialize in creating and manipulating 3D representations of objects, used in fields like architecture, engineering, and entertainment.
-
-        - Audio systems process and generate sound, with applications in music composition, signal processing, and sound recognition.
-
         - Biology systems analyze biological data and simulate biological processes, aiding in drug discovery and genetic research.
-
-        - Driving systems focus on autonomous vehicle technology, enabling cars to navigate and operate without human intervention.
-
-        - Earth science systems utilize AI to study and model natural phenomena, assisting in weather forecasting and climate change studies.
 
         - Image generation systems create visual content from text descriptions or other inputs, used in graphic design and content creation.
 
-        - Materials science systems apply AI to discover and design new materials with specific properties, speeding up material discovery.
-
-        - Mathematics systems solve complex mathematical problems and perform symbolic calculations, aiding in theorem proving and optimization.
-
-        - Medicine systems enhance healthcare by improving diagnostics and treatment planning.
-
-        - Robotics systems combine AI with mechanical engineering to create autonomous robots for various industries.
-
-        - Search systems enhance search accuracy and relevance on the internet or within databases.
-
-        - Video systems analyze and generate video content, aiding in editing, surveillance, and content creation.
     description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI system is primarily designed to operate within. System domains with less than 10 systems are grouped under "Other."
     description_from_producer: A foreign key field categorizing the system’s domain of machine learning. This field links to the [ML Domains table](https://airtable.com/appDFXXgaG1xLtXGL/shrhzolGiQCVnwOY5/tbleYEsZORsiYRVTM), and domains are selected from the options in that table.
     unit: 'AI systems'
