@@ -163,7 +163,7 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 
 class MapBracketer:
-    def __init__(self, variable_id: int):
+    def __init__(self, variable_id: int, latest_year: bool = True):
         self.variable_id = variable_id
         # Load variable from db.
         self.variable = load_variable_from_id(variable_id)
@@ -175,11 +175,17 @@ class MapBracketer:
         self.regions_to_id = load_mappable_regions_and_ids(df=self.df)
         # Create a chart config.
         self.chart_config = create_default_chart_config_for_variable(metadata=self.metadata)
+        # Define a flag that, if True, the brackets will be decided based on the latest year only.
+        # Otherwise, the data for all years will be considered.
+        # TODO: We could add a radio button for this. But, on change, all values would need to be recalculated.
+        self.latest_year = latest_year
         # Select only regions that appear in grapher maps.
-        # And for now, focus on the latest year.
-        self.values = self.df[
-            (self.df["entities"].isin(self.regions_to_id.values())) & (self.df["years"] == self.df["years"].max())
-        ]["values"]
+        data_mask = self.df["entities"].isin(self.regions_to_id.values())
+        if self.latest_year:
+            # Focus on the values of the latest year.
+            data_mask &= self.df["years"] == self.df["years"].max()
+        # Define an array of values in the data.
+        self.values = self.df[data_mask]["values"]
         # Get minimum and maximum values in the data.
         self.min_value = self.values.min()
         self.max_value = self.values.max()
@@ -187,10 +193,17 @@ class MapBracketer:
         self.smallest_number = self.metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
         # Define the bracket type (by default, pick an arbitrary one).
         self.bracket_type = BRACKET_LABELS["log"]["x10"]
-        # Get the most complete list of map brackets that would contain the data.
-        self.brackets_all = self.get_all_brackets()
         # Estimate whether the lower and upper brackets should be open.
         self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
+        # Get the most complete list of map brackets that would fully contain the data.
+        self.brackets_all = self.get_all_brackets()
+        # Create a dictionary with the optimal brackets of all types.
+        self.brackets_optimal = self.get_optimal_brackets()
+        # Find the optimal bracket type.
+        self.brackets_optimal_type = self.brackets_optimal["optimal"]["bracket_type"]
+        self.brackets_optimal_brackets = self.brackets_optimal["optimal"]["brackets"]
+        # For convenience, use the optimal configuration by default in the "custom" brackets.
+        self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = np.array(self.brackets_optimal_brackets)
         # Initialize a color scheme attribute.
         self.color_scheme = None
         # Define default selected brackets (which will be updated later on).
@@ -207,6 +220,25 @@ class MapBracketer:
     @property
     def brackets_positive(self):
         return [bracket for bracket in self.brackets if bracket > 0]
+
+    def are_brackets_open(self):
+        if self.min_value < -self.smallest_number:
+            # If the minimum value in the data is negative, assume that the lower bracket is open.
+            lower_bracket_open = self.min_value < -self.smallest_number
+        else:
+            # Otherwise, the most common scenario is that the lower bracket is closed.
+            lower_bracket_open = False
+
+        # The upper bracket is most frequently open.
+        upper_bracket_open = True
+
+        if ((-101 < self.min_value < 99) or (-1 < self.min_value < 1)) and (99 < self.max_value < 101):
+            # If the data is between -100 and 100, or between 0 and 100 (plus minus 1), assume it's percentages.
+            # If so, then both brackets should be assumed closed to begin with.
+            lower_bracket_open = False
+            upper_bracket_open = False
+
+        return lower_bracket_open, upper_bracket_open
 
     def get_all_brackets(self) -> Dict[str, np.ndarray]:
         # Find the minimum and maximum absolute nonzero values.
@@ -225,8 +257,8 @@ class MapBracketer:
             return brackets_all
 
         # Find the closest power of 10 that is right below the minimum nonzero value.
-        # That would be the minimum bracket possible.
-        min_bracket_possible = round_to_nearest_power_of_ten(values_nonzero.min())
+        # That would be the minimum nonzero bracket (the lower bin will be added afterwards).
+        min_nonzero_bracket = round_to_nearest_power_of_ten(values_nonzero.min())
         # Find the closest power of 10 that is right above the maximum nonzero value.
         # That would be the maximum bracket possible.
         max_bracket_possible = round_to_nearest_power_of_ten(values_nonzero.max(), floor=False)
@@ -236,22 +268,25 @@ class MapBracketer:
 
         # Create the minimum number of brackets that would fully contain the values.
         # First, do it in powers of 10.
-        brackets_x10 = 10 ** np.arange(np.log10(min_bracket_possible), np.log10(max_bracket_possible) + 1, 1)
+        # NOTE: The lower bin is always added to the left. If the brackets are open, it will not be shown.
+        brackets_x10 = np.hstack(
+            [[0], 10 ** np.arange(np.log10(min_nonzero_bracket), np.log10(max_bracket_possible) + 1, 1)]
+        )
         brackets_all[BRACKET_LABELS["log"]["x10"]] = brackets_x10
 
         # Now, do it following the sequence 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, etc.
         brackets_all[BRACKET_LABELS["log"]["x2"]] = np.sort(
-            np.hstack([brackets_x10, brackets_x10[:-1] * 2, brackets_x10[:-1] * 5])
+            np.hstack([brackets_x10, brackets_x10[1:-1] * 2, brackets_x10[1:-1] * 5])
         )
 
         # Now, do it following the sequence 0.1, 0.3, 1, 3, 10, 30, etc.
-        brackets_all[BRACKET_LABELS["log"]["x3"]] = np.sort(np.hstack([brackets_x10, brackets_x10[:-1] * 3]))
+        brackets_all[BRACKET_LABELS["log"]["x3"]] = np.sort(np.hstack([brackets_x10, brackets_x10[1:-1] * 3]))
 
         for bracket_type, brackets in brackets_all.items():
             if self.values.min() < -self.smallest_number:
                 # If there is any negative value in the data, replicate the bracket to the left (to negative values).
                 # NOTE: Instead of 0, we assume -0.001, in case there is some numeric noise.
-                brackets = np.hstack([-brackets[::-1], [0], brackets])
+                brackets = np.hstack([-brackets[::-1], brackets[1:]])
 
             # Round numbers.
             brackets_all[bracket_type] = np.array([round_to_sig_figs(bracket) for bracket in brackets])  # .tolist()
@@ -282,7 +317,7 @@ class MapBracketer:
             ).astype(float)
 
         # Add an option for custom brackets, manually input by the user.
-        brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_all[self.bracket_type]
+        # brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_all[self.bracket_type]
 
         return brackets_all
 
@@ -298,10 +333,12 @@ class MapBracketer:
             # So, instead of a small bracket, add a very big bracket, to include all high values in the histogram.
             brackets[-1] = np.inf
         if brackets[0] > self.min_value:
+            # TODO: Instead of this, shouldn't we take the bracket min value?
             # Ensure the lowest bin is added to the left.
             brackets = [self.min_value] + brackets
 
         if (brackets[0] > self.min_value) or (brackets[-1] < self.max_value):
+            # TODO: This should never happen. Consider deleting.
             st.error("Bracket do not fully cover the data.")
 
         # Find the number of countries in each bracket.
@@ -330,37 +367,47 @@ class MapBracketer:
                 dispersion_value = dispersion(_histogram)
 
                 # Store results.
-                results["brackets"].append(_brackets)
+                results["brackets"].append(_brackets.tolist())
                 results["histogram"].append(_histogram)
                 results["dispersion"].append(dispersion_value)
         ranking = pd.DataFrame(results).sort_values("dispersion").reset_index(drop=True)
 
         return ranking
 
-    def find_optimal_window_for_brackets(self, brackets):
-        brackets_optimal = self._get_dispersion_for_all_windows_for_given_brackets(brackets=brackets).iloc[0][
-            "brackets"
-        ]
+    def rank_all_brackets(self):
+        # TODO: When starting the page, the best would be chosen by default.
+        #  We can also have a button "Choose optimal" (or two, one in general, and another for this bracket type).
+        df = pd.DataFrame()
+        for bracket_type, brackets in self.brackets_all.items():
+            _df = self._get_dispersion_for_all_windows_for_given_brackets(brackets=brackets)
+            _df["bracket_type"] = bracket_type
+            df = pd.concat([df, _df], ignore_index=True)
+        rank = df.sort_values("dispersion").reset_index(drop=True)
 
-        return brackets_optimal
+        return rank
+
+    def get_optimal_brackets(self):
+        # Get optimal brackets for all bracket types.
+        rank = self.rank_all_brackets()
+
+        # Create a dictionary.
+        brackets_all_optimal = (
+            rank.drop_duplicates(subset="bracket_type", keep="first")
+            .reset_index(drop=True)
+            .set_index("bracket_type")
+            .to_dict()["brackets"]
+        )
+
+        # Create an additional dictionary with the configuration of the optimal brackets.
+        brackets_all_optimal["optimal"] = rank.iloc[0].to_dict()
+
+        return brackets_all_optimal
 
     def update_custom_brackets(self, brackets_manual) -> None:
         self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_manual
         self.brackets_selected = brackets_manual
         # TODO: Raise warnings if the input manual brackets do not fulfil certain conditions (e.g. monotonically increasing).
         self._update_grapher_brackets()
-
-    def are_brackets_open(self):
-        # If the minimum value in the data is negative, assume that the lower bracket is open.
-        # Otherwise, the most common scenario is that the lower bracket is closed.
-        lower_bracket_open = self.values.min() < -self.smallest_number
-        # The upper bracket is most frequently open.
-        upper_bracket_open = True
-
-        # TODO: Consider creating some additional heuristics about the openness of the lower and upper brackets,
-        # e.g. if the maximum (minimum) bracket is 100 (-100), close the upper (lower) bracket.
-
-        return lower_bracket_open, upper_bracket_open
 
     def update_brackets_selected(self, min_selected: float, max_selected: float) -> None:
         # Filter the list to get the selected values.
@@ -441,19 +488,19 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     )
 
     # Add toggles to control whether lower and upper brackets should be open.
-    mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open)
-    mb.upper_bracket_open = st.toggle(
-        "Upper bracket open",
-        mb.upper_bracket_open,
-        help="Note that, even if set to close, it may still remain open if there is a high data value in a previous year.",
-    )
+    _message = "Note that, even if set to close, it may still remain open if a value in a previous year exceeds the current bracket."
+    mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open, help=_message)
+    mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open, help=_message)
 
     # Select bracket type.
+    bracket_type_options = (
+        list(BRACKET_LABELS["log"].values())
+        + list(BRACKET_LABELS["linear"].values())
+        + list(BRACKET_LABELS["custom"].values())
+    )
     mb.bracket_type = st.radio(  # type: ignore
         "Select linear or log-like",
-        options=list(BRACKET_LABELS["log"].values())
-        + list(BRACKET_LABELS["linear"].values())
-        + list(BRACKET_LABELS["custom"].values()),
+        options=bracket_type_options,
         index=0,
         horizontal=True,
     )
@@ -495,9 +542,6 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Update chart config given the selections.
     mb.update_chart_config()
 
-    # final_brackets = np.hstack([mb.chart_config["map"]["colorScale"].get("customNumericMinValue", 0), mb.chart_config["map"]["colorScale"]["customNumericValues"]])
-    # optimal_brackets = mb.find_optimal_window_for_brackets(brackets=final_brackets)
-    # st.write(optimal_brackets)
     # Display the chart.
     chart_html(mb.chart_config, owid_env=OWID_ENV)
 
@@ -612,7 +656,7 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     # For debugging, fix the value of variable id.
     # Energy variable that has both negative and positive values.
-    # variable_id = 900950
+    variable_id = 900950
     # The following may have nans that cause issues.
     # variable_id = 899976
 
