@@ -16,6 +16,7 @@ import os
 import re
 import sys
 from copy import deepcopy
+from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -63,7 +64,7 @@ DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
 # DAG dropdown options
-dag_files = sorted(os.listdir(DAG_DIR))
+dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
 dag_not_add_option = "(do not add to DAG)"
 ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
@@ -81,13 +82,25 @@ COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
 COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
 COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
 COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
+COOKIE_STEPS = {
+    "snapshot": COOKIE_SNAPSHOT,
+    "meadow": COOKIE_MEADOW,
+    "garden": COOKIE_GARDEN,
+    "grapher": COOKIE_GRAPHER,
+}
 # Paths to markdown templates
 MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
-
+MD_STEPS = {
+    "snapshot": MD_SNAPSHOT,
+    "meadow": MD_MEADOW,
+    "garden": MD_GARDEN,
+    "grapher": MD_GRAPHER,
+    "express": MD_EXPRESS,
+}
 # Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",
@@ -229,7 +242,7 @@ class AppState:
 
     def update_from_form(self, form: "StepForm") -> None:
         self._check_step()
-        st.session_state["steps"][self.step] = form.dict()
+        st.session_state["steps"][self.step] = form.model_dump()
 
     @property
     def state_step(self: "AppState") -> Dict[str, Any]:
@@ -238,7 +251,10 @@ class AppState:
         return st.session_state["steps"][self.step]
 
     def default_value(
-        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[str | bool | int] = ""
+        self: "AppState",
+        key: str,
+        previous_step: Optional[str] = None,
+        default_last: Optional[str | bool | int | date] = "",
     ) -> str | bool | int:
         """Get the default value of a variable.
 
@@ -304,23 +320,33 @@ class AppState:
                 self._previous_step = "snapshot"
         return self._previous_step
 
+    @property
+    def vars(self):
+        return {
+            str(k).replace(f"{self.step}.", ""): v
+            for k, v in dict(st.session_state).items()
+            if str(k).startswith(f"{self.step}.")
+        }
+
     def st_widget(
         self: "AppState",
         st_widget: Callable,
-        default_last: Optional[str | bool | int] = "",
+        default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
-        **kwargs: Optional[str | int | List[str]],
+        default_value: Optional[str | bool | int | date] = None,
+        **kwargs: Optional[str | int | List[str] | date | Callable],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        if self.dataset_edit[self.step] is not None:
-            if dataset_field_name:
-                default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+        if default_value is None:
+            if self.dataset_edit[self.step] is not None:
+                if dataset_field_name:
+                    default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+                else:
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
             else:
-                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
-        else:
-            default_value = self.default_value(key, default_last=default_last)
+                default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Special behaviour for multiselect
@@ -344,6 +370,41 @@ class AppState:
         # Show error message
         self.display_error(key)
         return widget
+
+    def st_selectbox_responsive(
+        self: "AppState",
+        custom_label: str,
+        **kwargs,
+    ) -> None:
+        """Render the namespace field within the form.
+
+        We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+        This is a workaround to have repsonsive behaviour within a form.
+
+        Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+        """
+        # Handle kwargs
+        kwargs["options"] = [custom_label] + kwargs["options"]
+        key = cast(str, kwargs["key"])
+
+        # Render and get element depending on selection in selectbox
+        with st.container():
+            field = self.st_widget(**kwargs)
+        with st.empty():
+            if (field == custom_label) | (str(field) not in kwargs["options"]):
+                st.toast("showing custom input")
+                default_value = self.default_value(key)
+                field = self.st_widget(
+                    st.text_input,
+                    label="↳ *Use custom value*",
+                    placeholder="",
+                    help="Enter custom value.",
+                    key=f"{key}_custom",
+                    default_last=default_value,
+                )
+            # else:
+            #     st.session_state[f"{self.step}.{key}_custom"] = "nana"
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
@@ -485,7 +546,7 @@ def render_responsive_field_in_form(
     Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
     """
     # Main decription
-    help_text = "## Description\n\nInstitution or topic name"
+    help_text = "## Institution or topic name"
 
     # Render and get element depending on selection in selectbox
     with field_1:
@@ -729,4 +790,7 @@ def get_staging_creation_time(session: Optional[Session] = None, key: str = "ser
 
 def set_staging_creation_time(key: str = "server_creation_time") -> None:
     """Gest staging server creation time estimate."""
-    st.session_state[key] = get_staging_creation_time()
+    if OWID_ENV.env_local == "staging":
+        st.session_state[key] = get_staging_creation_time()
+    else:
+        st.session_state[key] = None

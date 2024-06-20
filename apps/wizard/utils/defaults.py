@@ -53,7 +53,7 @@ def update_wizard_defaults_from_form(form: StepForm) -> None:
 
     # Update config
     if form.step_name in ["meadow", "garden"]:
-        form_dix = form.dict()
+        form_dix = form.model_dump()
         config["template"][form.step_name]["generate_notebook"] = form_dix.get("generate_notebook", False)
 
     # Export config

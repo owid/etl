@@ -28,7 +28,7 @@ log = structlog.get_logger()
 
 
 # Main CLI command setup with Click
-@click.command(name="chart-upgrade", cls=RichCommand)
+@click.command(name="metadata-upgrade", cls=RichCommand)
 @click.option(
     "--path-to-file",
     prompt=True,

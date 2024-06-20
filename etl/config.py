@@ -480,8 +480,9 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-if ENV_FILE.exists():
-    conf = Config(
+# Wrap envs in OWID_ENV
+OWID_ENV = OWIDEnv(
+    Config(
         GRAPHER_USER_ID=GRAPHER_USER_ID,
         DB_USER=DB_USER,
         DB_NAME=DB_NAME,
@@ -489,6 +490,4 @@ if ENV_FILE.exists():
         DB_PORT=str(DB_PORT),
         DB_HOST=DB_HOST,
     )
-    OWID_ENV = OWIDEnv(conf)
-else:
-    OWID_ENV = OWIDEnv.from_local()
+)

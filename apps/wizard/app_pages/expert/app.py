@@ -145,16 +145,16 @@ options = [
 #     "Create SQL queries on our Datasette instance.",
 #     "Specific queries about setting up your environment.",
 # ]
-st.radio(
-    label="Choose a category for the question",
-    options=options,
-    index=0,
-    help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
-    key="category_gpt",
-    on_change=reset_messages,
-    horizontal=True,
-    # captions=captions,
-)
+with st.container(border=True):
+    st.radio(
+        label="Choose a category for the question",
+        options=options,
+        index=0,
+        help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
+        key="category_gpt",
+        on_change=reset_messages,
+        horizontal=True,
+    )
 
 ## EXAMPLE QUERIES
 if st.session_state["category_gpt"] == Options.DATASETTE:

@@ -38,6 +38,33 @@ steps:
   data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
     - data://garden/artificial_intelligence/2024-02-15/epoch_llms
 
+  # EPOCH dataset on Compute Intensive AI
+  data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - snapshot://artificial_intelligence/2024-06-19/epoch_compute_intensive.csv
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by country
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by domain
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by organization
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations
+
+
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
     - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip

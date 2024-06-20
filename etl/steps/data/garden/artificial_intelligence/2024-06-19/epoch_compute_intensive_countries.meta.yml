@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      grapher_config:
+        note: Confirmed large-scale AI models are those where the training compute exceeds 10²³ floating-point operations (FLOP).
+
+    unit: 'AI systems'
+    short_unit: ''
+    description_short: Refers to the location of the primary organization with which the authors of a large-scale AI systems are affiliated. An AI system can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries. {definitions.desc_update}
+    description_processing: The number of large-scale AI systems by country is determined by tallying the number of machine learning models that are associated with the geographical location of the researchers' affiliated institutions. It's important to note that a single model can have multiple authors, each potentially affiliated with different institutions, thus contributing to the count for multiple countries.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+
+dataset:
+  update_period_days: 180
+  title: Large-scale AI systems by country
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_compute_intensive_countries:
+    variables:
+      yearly_count:
+        title: Annual number of large-scale AI systems by country
+
+      cumulative_count:
+        title: Cumulative number of large-scale AI systems by country
