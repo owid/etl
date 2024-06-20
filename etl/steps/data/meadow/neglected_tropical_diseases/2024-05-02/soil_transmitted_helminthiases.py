@@ -43,9 +43,7 @@ def run(dest_dir: str) -> None:
     tb[columns_to_check] = tb[columns_to_check].replace(values_to_replace, np.nan)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    cols = ["country", "year", "Drug combination, Pre-SAC", "Drug combination, SAC"]
-    # For some reason format doesn't work here
-    # tb = tb.format(cols)
+    cols = ["country", "year", "drug_combination__pre_sac", "drug_combination__sac"]
     tb = tb.format(cols)
 
     #
