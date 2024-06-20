@@ -1,4 +1,5 @@
 # NOTE: To learn more about the fields, hover over their names.
+# common origins & descriptions for certification status, specific one for reported cases
 definitions:
   common:
     processing_level: major
@@ -9,16 +10,28 @@ definitions:
         - Eradication of Diseases
       attribution: World Health Organization (2024)
       attribution_short: WHO
+    description_from_producer:
+      Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
+      in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
+      could be reduced to a strict minimum.
+    description_processing:
+        "The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+
+        Data regarding certification status is taken from: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
+
+        This is supplemented with more recent changes to Guinea worm disease certification:
+        - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
+        - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
+        - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who"
     origins:
-      - title: "Dracunculiasis eradication: global surveillance summary"
-        date_published: "2024-05-17"
+      - title: "Certification status of dracunculiasis eradication"
+        date_published: "2017"
         producer: World Health Organization
         attribution_short: WHO
-        citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, WHO
-        url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
-        url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
+        citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
+        url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
         date_accessed: "2024-06-17"
-        version_producer: 2023
+
 
 
 # Learn more about the available fields:
@@ -39,40 +52,10 @@ tables:
           could be reduced to a strict minimum.
         display:
           numDecimalPlaces: 0
-        origins:
-          - title: "Certification status of dracunculiasis eradication"
-            date_published: "2017"
-            producer: World Health Organization
-            attribution_short: WHO
-            citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
-            url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-            date_accessed: "2024-06-17"
-        description_processing:
-          "The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-
-          Data regarding certification status is taken from: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-
-          This is supplemented with more recent changes to Guinea worm disease certification:
-          - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
-          - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
-          - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who"
       time_frame_certified:
         title: Time country was certified free of guinea worm disease or status of certification
         unit: ""
         description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-        description_from_producer:
-          Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
-          in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
-          could be reduced to a strict minimum.
-        description_processing:
-              "The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-
-              Data regarding certification status is taken from: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-
-              This is supplemented with more recent changes to Guinea worm disease certification:
-              - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
-              - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
-              - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who"
         type: ordinal
         sort:
           - "1997-1999"
@@ -81,33 +64,12 @@ tables:
           - "2020s"
           - "Pre-certification"
           - "Endemic"
-        origins:
-          - title: "Certification status of dracunculiasis eradication"
-            date_published: "2017"
-            producer: World Health Organization
-            attribution_short: WHO
-            citation_full: "World Health Organization. Certification status of dracunculiasis eradication, 2017"
-            url_main: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-            date_accessed: "2024-06-17"
       certification_status:
         title: Certification status over time
         unit: ""
         description_short:
           The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO.
           To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-        description_from_producer:
-          Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
-          in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
-          could be reduced to a strict minimum.
-        description_processing:
-          "The current and historical values for the status of Guinea worm disease (Dracunculiasis) as certified by the WHO. To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-
-          Data regarding certification status is taken from: https://web.archive.org/web/20211024081702/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_t0.html
-
-          This is supplemented with more recent changes to Guinea worm disease certification:
-          - Angola has had endemic status since 2020:  https://www.who.int/news/item/23-09-2020-eradicating-dracunculiasis-human-cases-and-animal-infections-decline-as-angola-becomes-endemic
-          - Kenya was certified guinea worm free in 2018: https://www.who.int/news/item/21-03-2018-dracunculiasis-eradication-south-sudan-claims-interruption-of-transmission-in-humans
-          - DRC was certified guinea worm free in 2022: https://www.who.int/news/item/15-12-2022-the-democratic-republic-of-the-congo-certified-free-of-dracunculiasis-transmission-by-who"
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
         unit: cases

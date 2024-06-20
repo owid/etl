@@ -31,10 +31,6 @@ def run(dest_dir: str) -> None:
     tb_cert = geo.harmonize_countries(df=tb_cert, countries_file=paths.country_mapping_path)
     tb_cases = geo.harmonize_countries(df=tb_cases, countries_file=paths.country_mapping_path)
 
-    # split "year_certified" in two columns:
-    # - year_certified: year in which country was certified as disease free (without status messages, Int64 type)
-    # - time_frame_certified: time frame in which country was certified as disease free (with status messages, Category type)
-
     # remove leading spaces from "year_certified" column and cast as string
     tb_cert["year_certified"] = tb_cert["year_certified"].str.strip()
 
@@ -64,7 +60,9 @@ def run(dest_dir: str) -> None:
 
 
 def add_year_certified(tb):
-    "add year in which country was certified as disease free"
+    """add year in which country was certified as disease free
+    by looping over all rows and setting the year_certified column
+    to the maximum year_certified value for the country"""
     for idx, row in tb.iterrows():
         if row["certification_status"] == "Certified disease free":
             tb_filter_country = tb[tb["country"] == row["country"]]

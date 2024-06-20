@@ -51,10 +51,13 @@ def run(dest_dir: str) -> None:
     # remove certified year for all years except the current year
     tb = remove_certified_year(tb, 2023)
 
+    # split "year_certified" in two columns:
+    # - time_frame_certified: time frame in which country was certified as disease free (with status messages, Category type)
+    # - year_certified: year in which country was certified as disease free (without status messages, Int64 type)
+
     tb["time_frame_certified"] = pd.Categorical(
         tb["year_certified"].map(YEAR_TO_CAT_MAP), categories=YEAR_CATEGORIES, ordered=True
     )
-
     # change to numeric dtype
     tb["year_certified"] = (
         pd.to_numeric(tb["year_certified"], errors="coerce").astype("Int64").copy_metadata(tb["year_certified"])
