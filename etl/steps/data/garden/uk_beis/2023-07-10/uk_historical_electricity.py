@@ -1,5 +1,5 @@
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and read its tables.
-    ds_meadow: Dataset = paths.load_dependency("uk_historical_electricity")
+    ds_meadow = paths.load_dataset("uk_historical_electricity")
     tb_fuel_input = ds_meadow["fuel_input"].reset_index()
     tb_supply = ds_meadow["supply"].reset_index()
     tb_efficiency = ds_meadow["efficiency"].reset_index()

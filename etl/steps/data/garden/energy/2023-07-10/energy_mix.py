@@ -429,11 +429,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load the population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.

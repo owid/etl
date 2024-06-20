@@ -136,13 +136,13 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read all required datasets.
-    ds_energy_mix: Dataset = paths.load_dependency("energy_mix")
-    ds_fossil_fuels: Dataset = paths.load_dependency("fossil_fuel_production")
-    ds_primary_energy: Dataset = paths.load_dependency("primary_energy_consumption")
-    ds_electricity_mix: Dataset = paths.load_dependency("electricity_mix")
-    ds_population: Dataset = paths.load_dependency("population")
-    ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_energy_mix = paths.load_dataset("energy_mix")
+    ds_fossil_fuels = paths.load_dataset("fossil_fuel_production")
+    ds_primary_energy = paths.load_dataset("primary_energy_consumption")
+    ds_electricity_mix = paths.load_dataset("electricity_mix")
+    ds_population = paths.load_dataset("population")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_regions = paths.load_dataset("regions")
 
     # Gather all required tables from all datasets.
     tb_energy_mix = ds_energy_mix["energy_mix"].reset_index()

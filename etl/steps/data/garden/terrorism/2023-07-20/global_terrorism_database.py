@@ -183,7 +183,7 @@ def run(dest_dir: str) -> None:
     merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
     # Add deaths and population data, and region aggregates.
     df_pop_deaths = add_deaths_and_population(merge_all)
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
     # Calculate statistics per capita
     df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (

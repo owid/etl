@@ -4,7 +4,7 @@ electricity mix in the UK.
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
@@ -171,11 +171,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load BEIS dataset and read its main table.
-    ds_beis: Dataset = paths.load_dependency("uk_historical_electricity")
+    ds_beis = paths.load_dataset("uk_historical_electricity")
     tb_beis = ds_beis["uk_historical_electricity"].reset_index()
 
     # Load electricity mix dataset and read its main table.
-    ds_elec: Dataset = paths.load_dependency("electricity_mix")
+    ds_elec = paths.load_dataset("electricity_mix")
     tb_elec = ds_elec["electricity_mix"].reset_index()
 
     #

@@ -2,7 +2,7 @@
 
 """
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -76,7 +76,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"].reset_index()
 
     #

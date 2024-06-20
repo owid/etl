@@ -6,7 +6,6 @@ from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.

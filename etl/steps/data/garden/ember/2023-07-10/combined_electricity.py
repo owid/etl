@@ -285,8 +285,8 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read yearly electricity data and european electricity review datasets from garden.
-    ds_global: Dataset = paths.load_dependency("yearly_electricity")
-    ds_european: Dataset = paths.load_dependency("european_electricity_review")
+    ds_global = paths.load_dataset("yearly_electricity")
+    ds_european = paths.load_dataset("european_electricity_review")
 
     #
     # Process data.

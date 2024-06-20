@@ -253,15 +253,15 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load BP's statistical review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Ember's combined electricity dataset and read its main table.
-    ds_ember: Dataset = paths.load_dependency("combined_electricity")
+    ds_ember = paths.load_dataset("combined_electricity")
     tb_ember = ds_ember["combined_electricity"]
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.

@@ -442,14 +442,14 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("energy_production_from_fossil_fuels")
+    ds_meadow = paths.load_dataset("energy_production_from_fossil_fuels")
     tb_meadow = ds_meadow["energy_production_from_fossil_fuels"].reset_index()
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups: Dataset = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.

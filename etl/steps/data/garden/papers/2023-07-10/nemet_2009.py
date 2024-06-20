@@ -2,7 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -15,7 +14,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load dataset from meadow and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("nemet_2009")
+    ds_meadow = paths.load_dataset("nemet_2009")
     tb_meadow = ds_meadow["nemet_2009"]
 
     #

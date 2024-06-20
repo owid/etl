@@ -17,7 +17,7 @@ For cost data, we use Nemet (2009) between 1975 and 2003, Farmer & Lafond (2016)
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
@@ -121,19 +121,19 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Nemet (2009) dataset from garden and read its main table.
-    ds_nemet: Dataset = paths.load_dependency("nemet_2009")
+    ds_nemet = paths.load_dataset("nemet_2009")
     tb_nemet = ds_nemet["nemet_2009"].reset_index()
 
     # Load Farmer & Lafond (2016) dataset from garden and read its main table.
-    ds_farmer_lafond: Dataset = paths.load_dependency("farmer_lafond_2016")
+    ds_farmer_lafond = paths.load_dataset("farmer_lafond_2016")
     tb_farmer_lafond = ds_farmer_lafond["farmer_lafond_2016"].reset_index()
 
     # Load IRENA dataset on capacity from garden and read its main table.
-    ds_irena_capacity: Dataset = paths.load_dependency("renewable_electricity_capacity")
+    ds_irena_capacity = paths.load_dataset("renewable_electricity_capacity")
     tb_irena_capacity = ds_irena_capacity["renewable_electricity_capacity"].reset_index()
 
     # Load IRENA dataset on cost from garden and read its main table.
-    ds_irena_cost: Dataset = paths.load_dependency("renewable_power_generation_costs")
+    ds_irena_cost = paths.load_dataset("renewable_power_generation_costs")
     tb_irena_cost = ds_irena_cost["solar_photovoltaic_module_prices"].reset_index()
 
     #

@@ -244,18 +244,18 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load EIA dataset on energy consumption and read its main table.
-    ds_eia: Dataset = paths.load_dependency("energy_consumption")
+    ds_eia = paths.load_dataset("energy_consumption")
     tb_eia = ds_eia["energy_consumption"]
 
     # Load GDP dataset.
-    ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.

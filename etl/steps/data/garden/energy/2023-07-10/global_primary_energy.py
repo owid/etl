@@ -4,7 +4,7 @@ World Energy.
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
@@ -199,11 +199,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Smil dataset and read its main table.
-    ds_smil: Dataset = paths.load_dependency("smil_2017")
+    ds_smil = paths.load_dataset("smil_2017")
     tb_smil = ds_smil["smil_2017"]
 
     #
