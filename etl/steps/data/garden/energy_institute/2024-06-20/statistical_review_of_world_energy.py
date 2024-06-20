@@ -193,30 +193,61 @@ COLUMNS = {
 
 # Columns to use from the additional data file related to prices, and how to rename them.
 COLUMNS_PRICES = {
+    # Ammonia prices.
+    "ammonia__far_east_asia": "ammonia_price_far_east_asia",
+    "ammonia__middle_east": "ammonia_price_middle_east",
+    "ammonia__northwest_europe": "ammonia_price_northwest_europe",
+    "ammonia__us_gulf_coast": "ammonia_price_us_gulf_coast",
     # Coal prices.
-    "asian_marker_price": "coal_price_asian_marker_current_dollars_per_tonne",
-    "china_qinhuangdao_spot_price": "coal_price_china_qinhuangdao_spot_current_dollars_per_tonne",
-    "japan_coking_coal_import_cif_price": "coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne",
-    "japan_steam_coal_import_cif_price": "coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne",
-    "japan_steam_spot_cif_price": "coal_price_japan_steam_spot_cif_current_dollars_per_tonne",
-    "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne",
-    "newcastle_thermal_coal_fob": "coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne",
-    "northwest_europe": "coal_price_northwest_europe_current_dollars_per_tonne",
-    # Gas prices.
-    "lng__japan__cif": "gas_price_lng_japan_cif_current_dollars_per_million_btu",
-    "lng__japan_korea_marker__jkm": "gas_price_lng_japan_korea_marker_current_dollars_per_million_btu",
-    "natural_gas__average_german__import_price": "gas_price_average_german_import_current_dollars_per_million_btu",
-    "natural_gas__canada__alberta": "gas_price_canada_alberta_current_dollars_per_million_btu",
-    "natural_gas__netherlands_ttf__da_icis__heren_ttf_index": "gas_price_netherlands_ttf_index_current_dollars_per_million_btu",
-    "natural_gas__uk_nbp__icis_nbp_index": "gas_price_uk_nbp_index_current_dollars_per_million_btu",
-    "natural_gas__us__henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
+    "coal__australia": "coal_price_australia",
+    "coal__colombia": "coal_price_colombia",
+    "coal__indonesia": "coal_price_indonesia",
+    "coal__japan": "coal_price_japan",
+    "coal__northwest_europe": "coal_price_northwest_europe",
+    "coal__south_africa": "coal_price_south_africa",
+    "coal__south_china": "coal_price_south_china",
+    "coal__united_states": "coal_price_united_states",
+    # Hydrogen prices.
+    "hydrogen__far_east_asia": "hydrogen_price_far_east_asia",
+    "hydrogen__middle_east": "hydrogen_price_middle_east",
+    "hydrogen__northwest_europe": "hydrogen_price_northwest_europe",
+    "hydrogen__us_gulf_coast": "hydrogen_price_us_gulf_coast",
+    # LNG prices.
+    "lng__china__mainland": "lng_price_china__mainland",
+    "lng__japan": "lng_price_japan",
+    "lng__south_korea": "lng_price_south_korea",
+    # Natural gas prices.
+    "natural_gas__netherlands_ttf": "natural_gas_price_netherlands_ttf",
+    "natural_gas__uk_nbp": "natural_gas_price_uk_nbp",
+    "natural_gas__us__henry_hub": "natural_gas_price_us_henry_hub",
+    "natural_gas__zeebrugge": "natural_gas_price_zeebrugge",
     # Oil prices.
-    "oil_crude_prices__dollar_2022": "oil_price_crude_2022_dollars_per_barrel",
+    "oil_crude_prices__dollar_2023": "oil_price_crude_2023_dollars_per_barrel",
     "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_current_dollars_per_barrel",
     "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent_current_dollars_per_barrel",
     "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai_current_dollars_per_barrel",
     "oil_spot_crude_prices__nigerian_forcados": "oil_spot_crude_price_nigerian_forcados_current_dollars_per_barrel",
     "oil_spot_crude_prices__west_texas_intermediate": "oil_spot_crude_price_west_texas_intermediate_current_dollars_per_barrel",
+    # Uranium prices.
+    "uranium__canada": "uranium__canada",
+    # Old columns (not anymore existing in the current version of the Statistical Review).
+    # Coal prices.
+    # "asian_marker_price": "coal_price_asian_marker_current_dollars_per_tonne",
+    # "china_qinhuangdao_spot_price": "coal_price_china_qinhuangdao_spot_current_dollars_per_tonne",
+    # "japan_coking_coal_import_cif_price": "coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne",
+    # "japan_steam_coal_import_cif_price": "coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne",
+    # "japan_steam_spot_cif_price": "coal_price_japan_steam_spot_cif_current_dollars_per_tonne",
+    # "us_central_appalachian_coal_spot_price_index": "coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne",
+    # "newcastle_thermal_coal_fob": "coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne",
+    # "northwest_europe": "coal_price_northwest_europe_current_dollars_per_tonne",
+    # Gas prices.
+    # "lng__japan__cif": "gas_price_lng_japan_cif_current_dollars_per_million_btu",
+    # "lng__japan_korea_marker__jkm": "gas_price_lng_japan_korea_marker_current_dollars_per_million_btu",
+    # "natural_gas__average_german__import_price": "gas_price_average_german_import_current_dollars_per_million_btu",
+    # "natural_gas__canada__alberta": "gas_price_canada_alberta_current_dollars_per_million_btu",
+    # "natural_gas__netherlands_ttf__da_icis__heren_ttf_index": "gas_price_netherlands_ttf_index_current_dollars_per_million_btu",
+    # "natural_gas__uk_nbp__icis_nbp_index": "gas_price_uk_nbp_index_current_dollars_per_million_btu",
+    # "natural_gas__us__henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
 }
 
 # Regions to use to create aggregates.
@@ -398,6 +429,7 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         # https://en.wikipedia.org/wiki/Nuclear_power_in_Estonia
         "Estonia",
         "Gabon",
+        "Guyana",
         # Hong Kong imports electricity from mainland China.
         # NOTE: Despite importing nuclear power from China, in the data, nuclear_consumption_ej is zero (or nan).
         # https://en.wikipedia.org/wiki/Nuclear_energy_in_Hong_Kong
@@ -594,16 +626,17 @@ def run(dest_dir: str) -> None:
     tb = tb[~tb["country"].str.startswith("Other ")].reset_index(drop=True)
 
     # Set an appropriate index to main table and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(sort_columns=True)
 
     # Rename columns from the additional data file related to prices.
     tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
 
     # Convert units of price variables.
+    # TODO: Continue here.
     tb_prices = convert_price_units(tb_prices=tb_prices)
 
     # Set an appropriate index to prices table and sort conveniently.
-    tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_prices = tb_prices.format(keys=["year"], sort_columns=True)
 
     # Create table of index prices (similar to tb_prices, but normalized so that prices are 100 in a reference year).
     tb_prices_index = prepare_prices_index_table(tb_prices=tb_prices)
