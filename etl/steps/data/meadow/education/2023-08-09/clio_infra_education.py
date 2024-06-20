@@ -1,12 +1,9 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
 import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,11 +14,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_years_education = cast(Snapshot, paths.load_dependency("years_of_education.xlsx"))
-    snap_years_education_gini = cast(Snapshot, paths.load_dependency("years_of_education_gini.xlsx"))
-    snap_years_education_gender = cast(Snapshot, paths.load_dependency("years_of_education_gender.xlsx"))
-    snap_numeracy = cast(Snapshot, paths.load_dependency("numeracy.xlsx"))
-    snap_numeracy_gender = cast(Snapshot, paths.load_dependency("numeracy_gender.xlsx"))
+    snap_years_education = paths.load_snapshot("years_of_education.xlsx")
+    snap_years_education_gini = paths.load_snapshot("years_of_education_gini.xlsx")
+    snap_years_education_gender = paths.load_snapshot("years_of_education_gender.xlsx")
+    snap_numeracy = paths.load_snapshot("numeracy.xlsx")
+    snap_numeracy_gender = paths.load_snapshot("numeracy_gender.xlsx")
     #
     # Process data.
     #

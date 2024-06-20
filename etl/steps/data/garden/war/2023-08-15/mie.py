@@ -22,12 +22,10 @@ the country code (ccode) to assign a region to each participant. Same as in COW 
 - We encode the region using the codes from COW (based on GW).
 """
 
-from typing import cast
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -51,7 +49,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("mie"))
+    ds_meadow = paths.load_dataset("mie")
 
     # Read table from meadow dataset.
     tb = ds_meadow["mie"].reset_index()

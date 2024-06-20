@@ -6,10 +6,8 @@ The migrated dataset has a collection of data from different sources, primarilty
 Here we add the most recent years data from the OECD. If there are overlapping country-years, we use the new data.
 """
 
-from typing import cast
-
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -23,8 +21,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("road_accidents"))
-    ds_migrate = cast(Dataset, paths.load_dependency("road_deaths_and_injuries"))
+    ds_meadow = paths.load_dataset("road_accidents")
+    ds_migrate = paths.load_dataset("road_deaths_and_injuries")
     # Read table from meadow dataset.
     tb = ds_meadow["road_accidents"].reset_index()
     tb_migrate = ds_migrate["road_deaths_and_injuries"].reset_index()

@@ -1,8 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
-
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -15,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = cast(Dataset, paths.load_dependency("avian_influenza_ah5n1"))
+    ds_garden = paths.load_dataset("avian_influenza_ah5n1")
 
     # Read table from garden dataset.
     tb = ds_garden["avian_influenza_ah5n1"].reset_index()

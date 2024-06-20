@@ -3,15 +3,12 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_snapshot_metadata
 
 # Initialize logger.
@@ -49,10 +46,10 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     # Load reference file with country names in OWID standard
-    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"][["name", "iso_alpha2"]]
+    df_countries_regions = paths.load_dataset("regions")["regions"][["name", "iso_alpha2"]]
 
     # Create a new meadow dataset with the same metadata as the snapshot.
-    snap = paths.load_dependency("lis_keyvars.csv")
+    snap = paths.load_snapshot("lis_keyvars.csv")
     ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 
     # Ensure the version of the new dataset corresponds to the version of current step.
@@ -62,7 +59,7 @@ def run(dest_dir: str) -> None:
     for age, age_suffix in age_dict.items():
         for ds_name, ds_ids in snapshots_dict.items():
             # Retrieve snapshot.
-            snap: Snapshot = paths.load_dependency(f"{ds_name}{age_suffix}.csv")
+            snap = paths.load_snapshot(f"{ds_name}{age_suffix}.csv")
 
             # Load data from snapshot.
             df = pd.read_csv(snap.path)

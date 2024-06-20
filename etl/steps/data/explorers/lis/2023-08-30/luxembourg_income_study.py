@@ -2,9 +2,6 @@
 
 Loads the latest LIS data from garden and stores a table (as a csv file).
 """
-
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -13,7 +10,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("luxembourg_income_study")
+    ds_garden = paths.load_dataset("luxembourg_income_study")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["luxembourg_income_study"]

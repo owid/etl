@@ -3,9 +3,6 @@
 Loads the latest WID data from garden and stores a table (as a csv file).
 
 """
-
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,7 +11,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("world_inequality_database")
+    ds_garden = paths.load_dataset("world_inequality_database")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["world_inequality_database"]

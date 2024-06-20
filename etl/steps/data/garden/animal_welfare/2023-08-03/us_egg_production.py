@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -96,7 +96,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its tables.
-    ds_meadow: Dataset = paths.load_dependency("us_egg_production")
+    ds_meadow = paths.load_dataset("us_egg_production")
     tb = ds_meadow["us_egg_production"].reset_index()
     tb_share = ds_meadow["us_egg_production_share_cage_free"].reset_index()
 

@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -42,10 +40,10 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
@@ -247,7 +245,7 @@ def load_aux_table(short_name: str) -> Table:
     An auxiliary table is a table coming from a dataset that was not sourced from the official API.
     """
     # Load dataset
-    ds = cast(Dataset, paths.load_dependency(short_name))
+    ds = paths.load_dataset(short_name)
     # Etract table
     tb = ds[short_name].reset_index()
 

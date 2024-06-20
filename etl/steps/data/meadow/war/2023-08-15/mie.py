@@ -2,14 +2,12 @@
 
 import os
 import tempfile
-from typing import cast
 
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.io import decompress_file
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("mie.zip"))
+    snap = paths.load_snapshot("mie.zip")
 
     # Extract data
     with tempfile.TemporaryDirectory() as tmpdir:

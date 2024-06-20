@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,8 +14,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_igme = paths.load_dataset("igme")
-    ds_gapminder_v11: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-21")
-    ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
+    ds_gapminder_v11 = paths.load_dataset("under_five_mortality", version="2023-09-21")
+    ds_gapminder_v7 = paths.load_dataset("under_five_mortality", version="2023-09-18")
 
     # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
     tb_igme = ds_igme["igme"].reset_index()

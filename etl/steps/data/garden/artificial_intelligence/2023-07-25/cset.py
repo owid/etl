@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -9,7 +7,6 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -76,7 +73,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("cset"))
+    ds_meadow = paths.load_dataset("cset")
 
     # Read table from meadow dataset.
     tb = ds_meadow["cset"]
@@ -88,7 +85,7 @@ def run(dest_dir: str) -> None:
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Add world
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     tb = add_world(tb=tb, ds_regions=ds_regions)
 
     # List of columns to include for conversion to millions (investment values)
@@ -97,7 +94,7 @@ def run(dest_dir: str) -> None:
     tb.loc[:, _investment_cols] *= 1e6
 
     # Import US CPI data from the API (to adjust investment indicators for inflation)
-    snap = cast(Snapshot, paths.load_dependency("us_cpi.csv"))
+    snap = paths.load_snapshot("us_cpi.csv")
 
     # Now read the file with pandas
     df_wdi_cpi_us = pd.read_csv(snap.path)
@@ -121,7 +118,7 @@ def run(dest_dir: str) -> None:
     df_cpi_inv.drop("cpi_adj_2021", axis=1, inplace=True)
 
     # Load population and merge with CSET dataset
-    ds_population = cast(Dataset, paths.load_dependency("population"))
+    ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index(drop=False)
     df_pop_add = pd.merge(
         df_cpi_inv, tb_population[["country", "year", "population"]], how="left", on=["country", "year"]

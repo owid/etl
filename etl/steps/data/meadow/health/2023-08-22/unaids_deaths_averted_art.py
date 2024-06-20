@@ -1,14 +1,11 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +32,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("unaids_deaths_averted_art.xlsx"))
+    snap = paths.load_snapshot("unaids_deaths_averted_art.xlsx")
 
     # Load data from snapshot.
     df = pd.read_excel(snap.path, sheet_name="ResultGrid", header=1)

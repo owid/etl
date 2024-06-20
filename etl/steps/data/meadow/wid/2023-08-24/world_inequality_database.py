@@ -1,7 +1,5 @@
 """Load a snapshot and create the World Inequality Dataset meadow dataset."""
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -110,7 +108,7 @@ snapshots_dict = {
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list
 def harmonize_countries(df: pd.DataFrame, iso2_missing: dict) -> pd.DataFrame:
     # Load reference file with country names in OWID standard
-    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
+    df_countries_regions = paths.load_dataset("regions")["regions"]
 
     # Merge dataset and country dictionary to get the name of the country
     df = pd.merge(
@@ -150,7 +148,7 @@ def run(dest_dir: str) -> None:
     log.info("world_inequality_database.start")
 
     # Create a new meadow dataset with the same metadata as the snapshot.
-    snap = paths.load_dependency("world_inequality_database.csv")
+    snap = paths.load_snapshot("world_inequality_database.csv")
     ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 
     # Ensure the version of the new dataset corresponds to the version of current step.
@@ -184,7 +182,7 @@ def run(dest_dir: str) -> None:
         ]
 
         # Retrieve snapshot.
-        snap: Snapshot = paths.load_dependency(f"{ds_name}.csv")
+        snap = paths.load_snapshot(f"{ds_name}.csv")
         df = pd.read_csv(
             snap.path,
             keep_default_na=False,
@@ -192,7 +190,7 @@ def run(dest_dir: str) -> None:
         )
 
         # Retrieve snapshot with extrapolations
-        snap: Snapshot = paths.load_dependency(f"{ds_name}_with_extrapolations.csv")
+        snap = paths.load_snapshot(f"{ds_name}_with_extrapolations.csv")
         # Load data from snapshot.
         # `keep_default_na` and `na_values` are included because there is a country labeled NA, Namibia, which becomes null without the parameters
         df_extrapolations = pd.read_csv(

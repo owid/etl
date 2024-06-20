@@ -30,12 +30,10 @@ On regions:
 - We encode the region using the codes from COW (based on GW).
 """
 
-from typing import cast
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -70,7 +68,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("cow_mid"))
+    ds_meadow = paths.load_dataset("cow_mid")
 
     # Read table from meadow dataset.
     tb_a = ds_meadow["mida"].reset_index()

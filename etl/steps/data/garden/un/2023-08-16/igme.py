@@ -4,7 +4,7 @@ from math import trunc
 from typing import List
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -18,9 +18,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("igme", version="2023-08-16")
+    ds_meadow = paths.load_dataset("igme", version="2023-08-16")
     # Load vintage dataset which has older data.
-    ds_vintage: Dataset = paths.load_dependency("igme", version="2018")
+    ds_vintage = paths.load_dataset("igme", version="2018")
     # Read table from meadow dataset.
     tb = ds_meadow["igme"].reset_index()
     tb_vintage = ds_vintage["igme"].reset_index()

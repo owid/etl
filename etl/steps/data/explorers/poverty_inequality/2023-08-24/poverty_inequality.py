@@ -7,7 +7,7 @@ This data will be replaced in 2023-2 by a PIP step inside the ETL
 """
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -103,11 +103,11 @@ def create_pip_inequality_table(tb_pip: pd.DataFrame) -> pd.DataFrame:
 
 def run(dest_dir: str) -> None:
     # Load WID explorer step
-    ds_wid: Dataset = paths.load_dependency("world_inequality_database")
+    ds_wid = paths.load_dataset("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()
 
     # Load LIS explorer step
-    ds_lis: Dataset = paths.load_dependency("luxembourg_income_study")
+    ds_lis = paths.load_dataset("luxembourg_income_study")
     tb_lis = ds_lis["luxembourg_income_study"].reset_index()
 
     # Load PIP data

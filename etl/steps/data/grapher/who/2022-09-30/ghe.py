@@ -3,7 +3,7 @@
 # columns, but 12500 dimension combinations). It takes ~1.5h to upload it to grapher with
 # 40 workers.
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,7 +14,7 @@ GHE_SUBSET_ONLY = False
 
 def run(dest_dir: str) -> None:
     # Load garden dataset
-    ds_garden: Dataset = paths.load_dataset("ghe")
+    ds_garden = paths.load_dataset("ghe")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["ghe"]

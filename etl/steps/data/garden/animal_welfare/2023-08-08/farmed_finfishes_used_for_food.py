@@ -35,11 +35,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("farmed_finfishes_used_for_food")
+    ds_meadow = paths.load_dataset("farmed_finfishes_used_for_food")
     tb = ds_meadow["farmed_finfishes_used_for_food"].reset_index()
 
     # Load population dataset.
-    ds_population = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.

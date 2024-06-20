@@ -30,10 +30,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("avian_influenza_h5n1_kucharski"))
+    ds_meadow = paths.load_dataset("avian_influenza_h5n1_kucharski")
 
     # Load regions dataset.
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["avian_influenza_h5n1_kucharski"].reset_index()

@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_dependency("oecd_education.csv")
+    snap = paths.load_snapshot("oecd_education.csv")
 
     # Load data from snapshot.
     tb = snap.read_csv()
