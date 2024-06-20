@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(how="all").dropna(axis=1, how="all").reset_index(drop=True)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "year"])
 
     #
     # Save outputs.

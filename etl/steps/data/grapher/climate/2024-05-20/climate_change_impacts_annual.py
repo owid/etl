@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     tb_annual = tb_annual.rename(columns={"location": "country"}, errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb_annual = tb_annual.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_annual = tb_annual.format(["country", "year"])
 
     #
     # Save outputs.
