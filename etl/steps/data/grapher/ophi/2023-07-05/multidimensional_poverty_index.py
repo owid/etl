@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden  = paths.load_dataset("multidimensional_poverty_index")
+    ds_garden = paths.load_dataset("multidimensional_poverty_index")
 
     # Read table from garden dataset.
     tb = ds_garden["multidimensional_poverty_index"]
