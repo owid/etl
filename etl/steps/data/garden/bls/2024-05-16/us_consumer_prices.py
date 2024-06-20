@@ -21,7 +21,7 @@ VARIABLE_NAMES = {
     "CUUR0000SEEE02": "software",
     "CUUR0000SERE01": "toys",
     "CUUR0000SERA01": "televisions",
-"CUUR0000SA0": "all_items",
+    "CUUR0000SA0": "all_items",
 }
 
 
