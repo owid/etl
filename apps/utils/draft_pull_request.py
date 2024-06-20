@@ -100,12 +100,12 @@ description = "- " + "\n- ".join(
     "--category",
     "-c",
     type=click.Choice(list(PR_CATEGORIES.keys()), case_sensitive=False),
-    help=f"Category of the PR. Only works if --title is used (it will be added to the PR title). A corresponding emoji will be pre-fixed to the PR title.\n {description}",
+    help=f"Category of the PR (only relevant if --title is given). A corresponding emoji will be prepended to the title.\n {description}",
 )
 @click.option(
     "--scope",
     "-s",
-    help="Scope of the PR. Only works if --title is used (it will be added to the PR title).\n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
+    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
 )
 def cli(
     new_branch: Optional[str] = None,
