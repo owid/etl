@@ -8,12 +8,6 @@ steps:
   data://grapher/artificial_intelligence/2024-06-03/epoch:
     - data://garden/artificial_intelligence/2024-06-03/epoch
 
-  # EPOCH aggregates by country
-  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
-    - data://meadow/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
-    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
-
   # EPOCH aggregates by domain
   data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
     - data://meadow/artificial_intelligence/2024-06-03/epoch
@@ -25,12 +19,6 @@ steps:
     - data://garden/artificial_intelligence/2024-06-03/epoch
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
-
-  # EPOCH aggregates by organization
-  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
-    - data://meadow/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
-    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
 
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2024-02-15/epoch_llms:
@@ -57,12 +45,6 @@ steps:
     - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain
-
-  # EPOCH dataset on Compute Intensive AI, aggregates by organization
-  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
-    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
-  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
-    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations
 
 
   # World Risk Poll
