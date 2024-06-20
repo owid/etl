@@ -81,7 +81,7 @@ PR_CATEGORIES = {
     },
 }
 description = "- " + "\n- ".join(
-    f"**{choice}: {choice_params['description']}" for choice, choice_params in PR_CATEGORIES.items()
+    f"**{choice}**: {choice_params['description']}" for choice, choice_params in PR_CATEGORIES.items()
 )
 
 
