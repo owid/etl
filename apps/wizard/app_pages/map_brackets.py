@@ -163,7 +163,7 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 
 class MapBracketer:
-    def __init__(self, variable_id: int, latest_year: bool = True):
+    def __init__(self, variable_id: int):
         self.variable_id = variable_id
         # Load variable from db.
         self.variable = load_variable_from_id(variable_id)
@@ -177,8 +177,12 @@ class MapBracketer:
         self.chart_config = create_default_chart_config_for_variable(metadata=self.metadata)
         # Define a flag that, if True, the brackets will be decided based on the latest year only.
         # Otherwise, the data for all years will be considered.
-        # TODO: We could add a radio button for this. But, on change, all values would need to be recalculated.
-        self.latest_year = latest_year
+        # To begin with, assume True.
+        self.latest_year = True
+        # Run all calculations to define the relevant brackets.
+        self.run_calculations()
+
+    def run_calculations(self):
         # Select only regions that appear in grapher maps.
         data_mask = self.df["entities"].isin(self.regions_to_id.values())
         if self.latest_year:
@@ -487,8 +491,15 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         help="Color scheme for the map.",
     )
 
+    # Add toggle to control whether the brackets are based only on the data for the latest year, or all years.
+    latest_year = st.toggle("Consider only latest year", mb.latest_year)
+    if latest_year != mb.latest_year:
+        mb.latest_year = latest_year
+        mb.run_calculations()
     # Add toggles to control whether lower and upper brackets should be open.
-    _message = "Note that, even if set to close, it may still remain open if a value in a previous year exceeds the current bracket."
+    _message = ""
+    if latest_year:
+        _message = "Note that, even if set to close, it may still remain open if a value in a previous year exceeds the current bracket."
     mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open, help=_message)
     mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open, help=_message)
 
@@ -656,7 +667,7 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     # For debugging, fix the value of variable id.
     # Energy variable that has both negative and positive values.
-    variable_id = 900950
+    # variable_id = 900950
     # The following may have nans that cause issues.
     # variable_id = 899976
 
