@@ -41,6 +41,10 @@ MIN_NUM_BRACKETS = 4
 # Smallest number (in absolute value) to consider.
 SMALLEST_NUMBER_DEFAULT = 0.01
 
+# Default minimum and maximum percentiles to consider when defining brackets.
+MIN_PERCENTILE = 5
+MAX_PERCENTILE = 95
+
 # Labels of the different bracket types.
 BRACKET_LABELS = {
     "linear": {
@@ -179,41 +183,51 @@ class MapBracketer:
         # Otherwise, the data for all years will be considered.
         # To begin with, assume True.
         self.latest_year = True
-        # Run all calculations to define the relevant brackets.
-        self.run_calculations()
-
-    def run_calculations(self):
-        # Select only regions that appear in grapher maps.
-        data_mask = self.df["entities"].isin(self.regions_to_id.values())
-        if self.latest_year:
-            # Focus on the values of the latest year.
-            data_mask &= self.df["years"] == self.df["years"].max()
-        # Define an array of values in the data.
-        self.values = self.df[data_mask]["values"]
-        # Get minimum and maximum values in the data.
-        self.min_value = self.values.min()
-        self.max_value = self.values.max()
-        # Get the smallest relevant number in the data.
-        self.smallest_number = self.metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
-        # Define the bracket type (by default, pick an arbitrary one).
-        self.bracket_type = BRACKET_LABELS["log"]["x10"]
-        # Estimate whether the lower and upper brackets should be open.
-        self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
-        # Get the most complete list of map brackets that would fully contain the data.
-        self.brackets_all = self.get_all_brackets()
-        # Get optimal brackets for all bracket types.
-        # TODO: Rename.
-        self.rank = self.rank_all_brackets()
-        # Create a dictionary with the optimal brackets of all types.
-        self.brackets_optimal = self.get_optimal_brackets()
-        # # Find the optimal bracket type.
-        # self.brackets_optimal_type = self.brackets_optimal["optimal"]["bracket_type"]
-        # self.brackets_optimal_brackets = self.brackets_optimal["optimal"]["brackets"][1:-1]
-        # self.brackes_optimal_abs_min = min(self.brackets_optimal["optimal"]["brackets"][1:-1])
-        # # For convenience, use the optimal configuration by default in the "custom" brackets.
-        # self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = np.array(self.brackets_optimal_brackets)
         # Initialize a color scheme attribute.
         self.color_scheme = None
+        # Get the smallest relevant number in the data.
+        self.smallest_number = self.metadata["display"].get("numDecimalPlaces", SMALLEST_NUMBER_DEFAULT)
+        # Define the minimum and maximum percentiles (if 0 and 100, they will be identical to the min and max values).
+        # The selected brackets will ensure to cover these values.
+        self.percentile_min = MIN_PERCENTILE
+        self.percentile_max = MAX_PERCENTILE
+        # Define the bracket type (by default, pick an arbitrary one).
+        self.bracket_type = BRACKET_LABELS["log"]["x10"]
+        # Run calculations that will select the relevant values in the data.
+        self.run()
+
+    def run(
+        self,
+        reload_data_values=True,
+        reload_openness=True,
+        reload_all_brackets=True,
+        reload_rank=True,
+        reload_optimal_brackets=True,
+    ):
+        if reload_data_values:
+            # Select only regions that appear in grapher maps.
+            data_mask = self.df["entities"].isin(self.regions_to_id.values())
+            if self.latest_year:
+                # Focus on the values of the latest year.
+                data_mask &= self.df["years"] == self.df["years"].max()
+            # Define an array of values in the data.
+            self.values = self.df[data_mask]["values"]
+            # Get minimum and maximum values in the data.
+            self.min_value = self.values.min()
+            self.max_value = self.values.max()
+        if reload_openness:
+            # Estimate whether the lower and upper brackets should be open.
+            self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
+        if reload_all_brackets:
+            # Get the most complete list of map brackets that would fully contain the data.
+            self.brackets_all = self.get_all_brackets()
+        if reload_rank:
+            # Get optimal brackets for all bracket types.
+            # TODO: Rename.
+            self.rank = self.rank_all_brackets()
+        if reload_optimal_brackets:
+            # Create a dictionary with the optimal brackets of all types.
+            self.brackets_optimal = self.get_optimal_brackets()
         # Define default selected brackets (which will be updated later on).
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the "grapher version" of the selected brackets, which needs a minimum value and a list of brackets.
@@ -274,6 +288,8 @@ class MapBracketer:
         # Initialize a dictionary of brackets.
         brackets_all = {}
 
+        # Calculate log-like brackets.
+
         # Create the minimum number of brackets that would fully contain the values.
         # First, do it in powers of 10.
         # NOTE: The lower bin is always added to the left. If the brackets are open, it will not be shown.
@@ -299,6 +315,8 @@ class MapBracketer:
             # Round numbers.
             brackets_all[bracket_type] = np.array([round_to_sig_figs(bracket) for bracket in brackets])  # .tolist()
 
+        # Calculate linear brackets.
+
         # We want linear brackets to go in increments of 1, 2 or 5 (and powers of 10 of this, e.g. 10, 20, 50, or 0.1, 0.2, 0.5).
         # In principle, we could also have increments of, say, 4, e.g. [0, 40, 80, 120], but by default it's usually better to round to 1, 2, 5, e.g. [0, 20, 40, 60, 80, 100, 120] or [0, 50, 100, 150]. We'll see if this assumption needs to be relaxed.
         # If there are negative values, one of the stops should definitely be zero.
@@ -308,13 +326,15 @@ class MapBracketer:
         #  For now, and for simplicity, assume that 0 is always one of the stops.
 
         # First find the smallest size of the increment that would ensure all values can be contained in <=10 bins.
-        # TODO: There could be a toggle to "avoid outliers". If activated, use 5th and 95th percentiles instead of min and max.
-        smallest_increment = (self.max_value - self.min_value) / (MAX_NUM_BRACKETS)
+        # smallest_increment = (self.max_value - self.min_value) / (MAX_NUM_BRACKETS)
+        _min_value = np.percentile(self.values, self.percentile_min)
+        _max_value = np.percentile(self.values, self.percentile_max)
+        smallest_increment = (_max_value - _min_value) / (MAX_NUM_BRACKETS)
 
         shifts = [1, 2, 5]
         for shift in shifts:
             # Round the smallest increment up to the closest shifted power of 10.
-            increment = round_to_shifted_power_of_ten(smallest_increment, shifts=[shift], floor=False)
+            increment = round_to_shifted_power_of_ten(smallest_increment, shifts=[shift], floor=False)  # type: ignore
             # Find the largest bracket that would fully cover the minimum data value.
             bracket_min = increment * np.floor(self.min_value / increment).astype(int)
             # Find the smallest bracket that would fully cover the maximum data value.
@@ -417,9 +437,6 @@ class MapBracketer:
         brackets_all_optimal["optimal"] = rank.iloc[0].to_dict()["bracket_type"]
 
         return brackets_all_optimal
-
-    def update_optimal_brackets(self) -> None:
-        self.brackets_optimal = self.get_optimal_brackets()
 
     def update_custom_brackets(self, brackets_manual) -> None:
         self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_manual
@@ -541,14 +558,39 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     if latest_year != mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
         mb.latest_year = latest_year
-        mb.run_calculations()
+        mb.run(
+            reload_data_values=True,
+            reload_openness=True,
+            reload_all_brackets=True,
+            reload_rank=True,
+            reload_optimal_brackets=True,
+        )
     # Add toggles to control whether lower and upper brackets should be open.
     _message = ""
     if latest_year:
         _message = "Note that, even if set to close, it may still remain open if a value in a previous year exceeds the current bracket."
     mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open, help=_message)
     mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open, help=_message)
-    mb.update_optimal_brackets()
+    mb.run(
+        reload_data_values=False,
+        reload_openness=True,
+        reload_all_brackets=True,
+        reload_rank=True,
+        reload_optimal_brackets=True,
+    )
+    mb.percentile_min, mb.percentile_max = st.slider(
+        label="Percentile range to be covered by brackets (so far only for linear brackets)",
+        min_value=0,
+        max_value=100,
+        value=(MIN_PERCENTILE, MAX_PERCENTILE),
+    )
+    mb.run(
+        reload_data_values=False,
+        reload_openness=False,
+        reload_all_brackets=True,
+        reload_rank=True,
+        reload_optimal_brackets=True,
+    )
 
     # Select bracket type.
     bracket_type_options = (
