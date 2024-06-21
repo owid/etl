@@ -19,13 +19,13 @@ import git
 import pandas as pd
 import structlog
 from dotenv import dotenv_values, load_dotenv
+from sqlalchemy.engine import Engine
 
-from etl.db import Engine, get_engine
 from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
 
-ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
+ENV_FILE = Path(env.get("ENV_FILE", BASE_DIR / ".env"))
 
 
 def get_username():
@@ -360,11 +360,15 @@ class OWIDEnv:
 
         DEPRECATED: Use property `engine` property instead.
         """
+        from etl.db import get_engine
+
         return get_engine(self.conf.__dict__)
 
     @property
     def engine(self) -> Engine:
         """Get engine for env."""
+        from etl.db import get_engine
+
         if self._engine is None:
             self._engine = get_engine(self.conf.__dict__)
         return self._engine
@@ -476,4 +480,14 @@ class OWIDEnv:
         return f"{self.indicators_url}/{variable_id}.data.json"
 
 
-OWID_ENV = OWIDEnv.from_local()
+# Wrap envs in OWID_ENV
+OWID_ENV = OWIDEnv(
+    Config(
+        GRAPHER_USER_ID=GRAPHER_USER_ID,
+        DB_USER=DB_USER,
+        DB_NAME=DB_NAME,
+        DB_PASS=DB_PASS,
+        DB_PORT=str(DB_PORT),
+        DB_HOST=DB_HOST,
+    )
+)

@@ -205,6 +205,10 @@ steps:
   data://grapher/lgbt_rights/2023-04-13/equaldex:
     - data://garden/lgbt_rights/2023-04-13/equaldex
 
+  # World Happiness report
+  data://grapher/happiness/2023-03-20/happiness:
+    - data://garden/happiness/2023-03-20/happiness
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

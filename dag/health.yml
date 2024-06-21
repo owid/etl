@@ -22,7 +22,7 @@ steps:
 
   # WHO Global Health Estimates
   data://meadow/who/2022-09-30/ghe:
-    - walden://who/2022-09-30/ghe
+    - snapshot://who/2022-09-30/ghe.feather
   data://garden/who/2022-09-30/ghe:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
