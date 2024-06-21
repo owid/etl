@@ -182,13 +182,17 @@ class IndicatorUpgradeShow:
 
     def _st_show_extra_options(self):
         ## Explore mode checkbox
-        self.show_explore = st.button(
+        explore = st.button(
             label="🔎",
             key=f"{self.iu.key_explore}",
         )
 
         # Similarity score
         self._st_show_text_score()
+
+        if explore:
+            st.toast("EXPLORE 1")
+        return explore
 
     @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
     def _st_explore_indicator_dialog(self, indicator_old, indicator_new, df=None) -> None:
@@ -222,23 +226,26 @@ class IndicatorUpgradeShow:
 
         # Extra options
         with cols[2]:
-            self._st_show_extra_options()
+            explore = self._st_show_extra_options()
 
-        return indicator_chosen
+        return indicator_chosen, explore
 
     def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
             # Fragment execution
-            indicator_chosen = self._render(indicator_id_to_display)
+            indicator_chosen, explore = self._render(indicator_id_to_display)
 
             # Act if clicked on explore mode
-            if self.show_explore:
+            if explore:
+                st.toast("EXPLORE")
                 self._st_explore_indicator_dialog(
                     self.iu.id_old,
                     indicator_chosen,
                     df_data,
                     # enable_bulk_explore,
                 )  # type: ignore
+
+            return indicator_chosen
 
 
 @st.cache_data(show_spinner=False)
