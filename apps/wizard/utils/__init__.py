@@ -18,7 +18,7 @@ import sys
 from copy import deepcopy
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
 import streamlit as st
@@ -741,7 +741,15 @@ class Pagination:
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self) -> None:
+    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
+        if mode == "bar":
+            self.show_controls_bar()
+        elif mode == "buttons":
+            self.show_controls_buttons()
+        else:
+            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+
+    def show_controls_buttons(self):
         # Pagination controls
         col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
@@ -770,6 +778,25 @@ class Pagination:
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
+
+    def show_controls_bar(self) -> None:
+        def _change_page():
+            # Internal action
+
+            # External action
+            if self.on_click is not None:
+                self.on_click()
+
+        col, _ = st.columns([1, 3])
+        with col:
+            st.number_input(
+                label=f"**Go to page** (total: {self.total_pages})",
+                min_value=1,
+                max_value=self.total_pages,
+                # value=self.page,
+                on_change=_change_page,
+                key=self.pagination_key,
+            )
 
 
 def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
