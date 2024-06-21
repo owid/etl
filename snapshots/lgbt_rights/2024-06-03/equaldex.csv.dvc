@@ -23,6 +23,6 @@ meta:
       name: Equaldex Terms and Conditions of Use
       url: https://www.equaldex.com/terms
 outs:
-  - md5: 1445a7557d5daf2247fa2a7b459b618c
-    size: 34860142
+  - md5: dac1eeee8930c7b10f53f43882c4cd3a
+    size: 12755016
     path: equaldex.csv
