@@ -207,7 +207,7 @@ def st_show_indicator_upgrades(
     )
     ## Show controls only if needed
     if len(indicator_ups) > st.session_state["mappings-per-page"]:
-        pagination.show_controls()
+        pagination.show_controls("bar")
 
     # Show indicator mapping
     indicator_upgrades_shown = pagination.get_page_items()
