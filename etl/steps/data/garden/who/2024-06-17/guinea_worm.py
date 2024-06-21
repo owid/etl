@@ -55,8 +55,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
+    # Do not check variables metadata, as this is added in grapher step
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb], check_variables_metadata=False, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new garden dataset

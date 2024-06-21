@@ -11,7 +11,7 @@ definitions:
       attribution: World Health Organization (2024)
       attribution_short: WHO
     description_from_producer:
-      Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
+      Elimination of [dracunculiasis[(#dod:guinea-worm)] is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
       in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
       could be reduced to a strict minimum.
     description_processing:
@@ -45,7 +45,9 @@ tables:
       year_certified:
         title: Year country was certified free of guinea worm disease
         unit: ""
-        description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+        description_short:
+          To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
         description_from_producer:
           Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
           in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
@@ -55,7 +57,9 @@ tables:
       time_frame_certified:
         title: Time country was certified free of guinea worm disease or status of certification
         unit: ""
-        description_short: To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+        description_short:
+          To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
         type: ordinal
         sort:
           - "1997-1999"
@@ -70,6 +74,7 @@ tables:
         description_short:
           The current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
           To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
+          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
         unit: cases
@@ -85,13 +90,13 @@ tables:
           date_published: "2024-05-17"
           producer: World Health Organization
           attribution_short: WHO
-          citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, WHO
+          citation_full: Weekly Epidemic Report No 20, 2024, 99, 249–269, World Health Organization
           url_download: https://web.archive.org/web/20240617154248/https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
           url_main: https://www.who.int/publications/i/item/who-wer-9920-249-269
           date_accessed: "2024-06-17"
           version_producer: 2023
         description_processing:
-          "For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen data is gathered from:
+          "For Cameroon, Central African Republic, Cote d'Ivoire, Mauritania, Senegal and Yemen the data is from:
 
           1986-2017: https://web.archive.org/web/20220208133814/https://apps.who.int/dracunculiasis/dradata/html/report_Countries_i2.html
           2018: Table 1a: https://web.archive.org/web/20230629130727/https://apps.who.int/iris/bitstream/handle/10665/324786/WER9420-233-251.pdf?sequence=1&isAllowed=y
@@ -100,13 +105,13 @@ tables:
           2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
           2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
 
-          For all other countries data is gathered from the following sources:
+          For all other countries we gathered data from the following sources:
 
           1980-2020: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
           2021: Table 1a: https://web.archive.org/web/20230226163027/https://apps.who.int/iris/bitstream/handle/10665/354576/WER9721-22-225-247-eng-fre.pdf?sequence=1&isAllowed=y
           2022: Table 1a: https://web.archive.org/web/20230629124651/https://apps.who.int/iris/bitstream/handle/10665/367924/WER9820-205-224.pdf?sequence=1&isAllowed=y
           2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
 
-          Global totals are calculated yearly as the sum of the number of reported cases in each country."
+          We calculate global totals as the sum of the number of reported cases in each country."
 
 
