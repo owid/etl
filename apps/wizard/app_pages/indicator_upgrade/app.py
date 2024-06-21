@@ -77,8 +77,7 @@ ignore_selectbox = []
 charts = []
 updaters = []
 num_charts = 0
-indicator_mapping = {}
-indicator_config = None
+indicator_mapping = None
 submission_config = None
 
 
@@ -122,7 +121,7 @@ with st.container(border=True):
 ##########################################################################################
 if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
-    indicator_config = ask_and_get_indicator_mapping(search_form)
+    indicator_mapping = ask_and_get_indicator_mapping(search_form)
     # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
 
 
@@ -137,22 +136,20 @@ if st.session_state.submitted_datasets:
 if st.session_state.submitted_datasets and st.session_state.submitted_indicators:
     # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
     # st.write(reset_indicator_form)
-    if indicator_config is not None:
-        if not indicator_config.indicator_mapping:
+    if indicator_mapping is not None:
+        if indicator_mapping == {}:
             msg_error = "No indicators selected! Please select at least one indicator."
             st.error(msg_error)
-        elif indicator_config.is_valid:
-            charts = get_affected_charts_and_preview(
-                indicator_config.indicator_mapping,
-            )
         else:
-            "Something went wrong when trying to update the charts and pushing them to the database. Please try again or report the error #003001"
-
+            charts = get_affected_charts_and_preview(
+                indicator_mapping,
+            )
 ##########################################################################################
 # 4 UPDATE CHARTS
 #
 # TODO: add description
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_indicators and st.session_state.submitted_charts:
+if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
     if isinstance(charts, list) and len(charts) > 0:
-        push_new_charts(charts, SCHEMA_CHART_CONFIG)
+        st.toast("Updating charts...")
+        # push_new_charts(charts, SCHEMA_CHART_CONFIG)
