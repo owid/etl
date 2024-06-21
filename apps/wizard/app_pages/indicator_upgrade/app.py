@@ -26,7 +26,7 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard import utils
-from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview
+from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets, get_schema
@@ -149,4 +149,4 @@ if st.session_state.submitted_datasets and st.session_state.submitted_indicators
 if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
     if isinstance(charts, list) and len(charts) > 0:
         st.toast("Updating charts...")
-        # push_new_charts(charts, SCHEMA_CHART_CONFIG)
+        push_new_charts(charts, SCHEMA_CHART_CONFIG)
