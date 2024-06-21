@@ -797,3 +797,13 @@ def set_staging_creation_time(key: str = "server_creation_time") -> None:
         st.session_state[key] = get_staging_creation_time()
     else:
         st.session_state[key] = None
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")
