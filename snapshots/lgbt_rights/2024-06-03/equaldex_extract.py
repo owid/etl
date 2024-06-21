@@ -191,9 +191,11 @@ def create_long_dataset(df_current, df_historical):
     # HISTORICAL DATA
 
     # Remove empty start_data_formatted and end_date_formatted
-    df_historical = df_historical[
-        ~(df_historical["start_date_formatted"].isnull()) & ~(df_historical["end_date_formatted"].isnull())
-    ].reset_index(drop=True)
+    df_historical = df_historical[~(df_historical["end_date_formatted"].isnull())].reset_index(drop=True)
+
+    # Fill start_date_formatted with START_YEAR if it is null
+    df_historical.loc[df_historical["start_date_formatted"].isnull(), "date_modified"] = True
+    df_historical.loc[df_historical["start_date_formatted"].isnull(), "start_date_formatted"] = f"Jan 1, {START_YEAR}"
 
     # Get year after comma in the column name start_date_formatted and end_date_formatted
     df_historical["year_start"] = (
@@ -217,6 +219,7 @@ def create_long_dataset(df_current, df_historical):
                 "value": df_historical.iloc[i]["value"],
                 "value_formatted": df_historical.iloc[i]["value_formatted"],
                 "description": df_historical.iloc[i]["description"],
+                "date_modified": df_historical.iloc[i]["date_modified"],
             }
         )
         df_historical_long = pd.concat([df_historical_long, df_country_issue], ignore_index=True)
@@ -280,13 +283,13 @@ def create_long_dataset(df_current, df_historical):
             "date_modified",
             "dataset",
         ],
-        ascending=True,
+        ascending=[True, True, True, True, False],
     )
 
     # Show rows with duplicated index
-    df_duplicated = df_long[df_long.duplicated(subset=["country", "year", "issue", "date_modified"], keep=False)].copy()  # type: ignore
+    df_duplicated = df_long[df_long.duplicated(subset=["country", "year", "issue"], keep=False)].copy()  # type: ignore
 
-    df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=True)
+    df_duplicated.to_csv(PARENT_DIR / "duplicated.csv", index=False)
 
     df_long.to_csv(PARENT_DIR / "long.csv", index=False)
 
