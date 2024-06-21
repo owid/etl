@@ -11,7 +11,7 @@ meta:
     version_producer: 2024
     title_snapshot: World Happiness Report - Happiness by age group
     description_snapshot: |-
-      Happiness measured for different age groups for each country; Age groups are under 30 years old, 30-44 years old, 45-60 years old and over 60 years old. 
+      Happiness measured for different age groups for each country; Age groups are under 30 years old, 30-44 years old, 45-59 years old and 60 years old and above.
 
     # Citation
     producer: Wellbeing Research Centre
