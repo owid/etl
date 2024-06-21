@@ -26,9 +26,9 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard import utils
-from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
+from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
-from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
+from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets, get_schema
 from etl.match_variables import SIMILARITY_NAMES
 
@@ -119,7 +119,7 @@ with st.container(border=True):
 ##########################################################################################
 if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
-    indicator_mapping = ask_and_get_indicator_mapping(search_form)
+    indicator_mapping = render_indicator_mapping(search_form)
     # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
 
 ##########################################################################################
