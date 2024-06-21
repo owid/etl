@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset 'Equaldex dataset - Current'."""
+"""
+Script to create a snapshot of dataset 'Equaldex dataset - Current'.
+Check the equaldex_extract.py script for the data extraction and update process.
+"""
 
 from pathlib import Path
 
