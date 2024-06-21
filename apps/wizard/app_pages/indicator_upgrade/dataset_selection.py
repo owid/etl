@@ -195,6 +195,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             logging=True,
         )
         reset_indicator_form()
+        st.session_state["not-ignore-all"] = True
 
     # Get IDs of the chosen old and new datasets.
     dataset_old_id = display_name_to_id_mapping.get(dataset_old) or display_step_to_id_mapping.get(dataset_old)

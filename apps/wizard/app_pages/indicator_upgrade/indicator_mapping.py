@@ -51,6 +51,7 @@ class IndicatorUpgrade:
 
     @classmethod
     def from_auto(cls, id_old: int, id_new: int):
+        """Create automatic mapping."""
         return cls(
             id_old=id_old,
             ids_new=[id_new],
@@ -59,6 +60,10 @@ class IndicatorUpgrade:
 
     @classmethod
     def from_manual(cls, id_old: int, suggestions: pd.DataFrame):
+        """Create instance from manual mapping.
+
+        Different than from_auto because it has to handle multiple suggestions.
+        """
         ids_new = list(suggestions["id_new"])
         scores = suggestions.set_index("id_new")["similarity"].to_dict()
         scores = cast(Dict[int, float], scores)
@@ -71,31 +76,32 @@ class IndicatorUpgrade:
 
     @property
     def skip(self) -> bool:
-        if st.session_state.get("ignore-all"):
-            self._set_skip_state(True)
-            return True
-        if st.session_state.get("not-ignore-all"):
-            self._set_skip_state(False)
-            return False
-        return self._get_skip_state()
-
-    def _get_skip_state(self) -> bool:
-        if "indicator_upgrades_ignore" in st.session_state:
-            if self.key in st.session_state["indicator_upgrades_ignore"]:
-                return st.session_state["indicator_upgrades_ignore"][self.key]
+        def _get_skip_state() -> bool:
+            if "indicator_upgrades_ignore" in st.session_state:
+                if self.key in st.session_state["indicator_upgrades_ignore"]:
+                    return st.session_state["indicator_upgrades_ignore"][self.key]
+                else:
+                    raise ValueError(
+                        f"No key {self.key} in st.session_state['indicator_upgrades_ignore']! It should be created when creating the indicator upgrades."
+                    )
             else:
                 raise ValueError(
-                    f"No key {self.key} in st.session_state['indicator_upgrades_ignore']! It should be created when creating the indicator upgrades."
+                    "No indicator_upgrades_ignore in session state! It should be created when creating the indicator upgrades."
                 )
-        else:
-            raise ValueError(
-                "No indicator_upgrades_ignore in session state! It should be created when creating the indicator upgrades."
-            )
 
-    def _set_skip_state(self, value: bool):
-        if "indicator_upgrades_ignore" in st.session_state:
-            if self.key in st.session_state["indicator_upgrades_ignore"]:
-                st.session_state["indicator_upgrades_ignore"][self.key] = value
+        def _set_skip_state(value: bool) -> None:
+            if "indicator_upgrades_ignore" in st.session_state:
+                if self.key in st.session_state["indicator_upgrades_ignore"]:
+                    st.session_state["indicator_upgrades_ignore"][self.key] = value
+
+        """If this upgrade should be skipped."""
+        if st.session_state.get("ignore-all"):
+            _set_skip_state(True)
+            return True
+        if st.session_state.get("not-ignore-all"):
+            _set_skip_state(False)
+            return False
+        return _get_skip_state()
 
     @property
     def id_new_selected(self):
@@ -112,11 +118,15 @@ class IndicatorUpgrade:
 
 
 class IndicatorUpgradeShow:
+    """Wrapper around IndicatorUpgrade to help visualise it in Streamlit."""
+
     def __init__(self, indicator_upgrade: "IndicatorUpgrade"):
         self.iu = indicator_upgrade
         self.colun_layout = [10, 100, 7, 4.5]
+        self.show_explore = None
 
-    def _st_show_score(self):
+    def _st_show_text_score(self):
+        """Show score of selected new indicator."""
         score = self.iu.scores[self.iu.id_new_selected] if not self.iu.auto else 100
         if self.iu.auto:
             color = "violet"
@@ -132,66 +142,102 @@ class IndicatorUpgradeShow:
         score = int(round(self.iu.text_similarity_score, 0))
         st.markdown(f":{color}[**{score}%**]")
 
-    # @st.experimental_fragment
-    def render(self, indicator_id_to_display, df_data=None, enable_bulk_explore: bool = False):
+    def _st_show_checkbox_ignore(self):
+        def _set_states_checkbox():
+            set_states(
+                {
+                    "submitted_indicators": False,
+                    "ignore-all": False,
+                    "not-ignore-all": False,
+                }
+            )
+            k = "indicator_upgrades_ignore"
+            st.session_state[k][self.iu.key] = not st.session_state[k][self.iu.key]
+
+        st.checkbox(
+            label="Ignore",
+            key=self.iu.key_ignore,
+            label_visibility="collapsed",
+            value=self.iu.skip,
+            on_change=_set_states_checkbox,
+        )
+
+    def _st_show_indicators(self, indicator_id_to_display):
+        # Old indicator selectbox
+        text = f"{indicator_id_to_display.get(self.iu.id_old)}"
+        st.markdown(text)
+
+        # New indicator selectbox
+        indicator_chosen = st.selectbox(
+            label="New indicator",
+            key=self.iu.key_id_new_selected,
+            options=self.iu.ids_new,  # indicator_up.ids_new,
+            disabled=self.iu.auto,
+            label_visibility="collapsed",
+            format_func=indicator_id_to_display.get,
+            on_change=lambda: set_states({"submitted_indicators": False}),
+        )
+
+        return indicator_chosen
+
+    def _st_show_extra_options(self):
+        ## Explore mode checkbox
+        self.show_explore = st.button(
+            label="🔎",
+            key=f"{self.iu.key_explore}",
+        )
+
+        # Similarity score
+        self._st_show_text_score()
+
+    @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
+    def _st_explore_indicator_dialog(self, indicator_old, indicator_new, df=None) -> None:
+        """Same as st_explore_indicator but framed in a dialog.
+
+        More on dialogs: https://docs.streamlit.io/develop/api-reference/execution-flow/st.dialog
+        """
+        # Get data if necessary
+        if df is None:
+            st.write("df is None")
+            # df = get_indicator_data_cached([indicator_old, indicator_new])
+
+        if indicator_old == indicator_new:
+            st.write("Both indicators are the same")
+            # st.error("Comparison failed, because old and new inidcators are the same.")
+        else:
+            st.write(f"WORKING ON IT! Compare {indicator_old} and {indicator_new}.")
+
+    @st.experimental_fragment
+    def _render(self, indicator_id_to_display):
+        cols = [10, 100, 5]
+        cols = st.columns(cols, vertical_alignment="center")
+
+        # Ignore checkbox
+        with cols[0]:
+            self._st_show_checkbox_ignore()
+
+        # Indicators
+        with cols[1]:
+            indicator_chosen = self._st_show_indicators(indicator_id_to_display)
+
+        # Extra options
+        with cols[2]:
+            self._st_show_extra_options()
+
+        return indicator_chosen
+
+    def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
-            cols = [10, 100, 7, 4.5]
-            cols = st.columns(cols, vertical_alignment="center")
-
-            # Ignore checkbox
-            def _set_states_checkbox():
-                set_states(
-                    {
-                        "submitted_indicators": False,
-                        "ignore-all": False,
-                        "not-ignore-all": False,
-                    }
-                )
-                k = "indicator_upgrades_ignore"
-                st.session_state[k][self.iu.key] = not st.session_state[k][self.iu.key]
-
-            with cols[0]:
-                st.checkbox(
-                    label="Ignore",
-                    key=self.iu.key_ignore,
-                    label_visibility="collapsed",
-                    value=self.iu.skip,
-                    on_change=_set_states_checkbox,
-                )
-
-            with cols[1]:
-                # Old indicator selectbox
-                text = f"{indicator_id_to_display.get(self.iu.id_old)}"
-                st.markdown(text)
-
-                # New indicator selectbox
-                indicator_new_manual = st.selectbox(
-                    label="New indicator",
-                    key=self.iu.key_id_new_selected,
-                    options=self.iu.ids_new,  # indicator_up.ids_new,
-                    disabled=self.iu.auto,
-                    label_visibility="collapsed",
-                    format_func=indicator_id_to_display.get,
-                    on_change=lambda: set_states({"submitted_indicators": False}),
-                )
-
-            with cols[3]:
-                ## Explore mode checkbox
-                show_explore = st.button(
-                    label="🔎",
-                    key=f"{self.iu.key_explore}",
-                )
-                # Similarity score
-                self._st_show_score()
+            # Fragment execution
+            indicator_chosen = self._render(indicator_id_to_display)
 
             # Act if clicked on explore mode
-            if show_explore:
-                st_explore_indicator_dialog(
+            if self.show_explore:
+                self._st_explore_indicator_dialog(
                     self.iu.id_old,
-                    indicator_new_manual,
-                    indicator_id_to_display,
-                    enable_bulk_explore,
-                    df=df_data,
+                    indicator_chosen,
+                    df_data,
+                    # enable_bulk_explore,
                 )  # type: ignore
 
 
@@ -288,47 +334,35 @@ def st_show_header():
         )
 
 
-@st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
-def st_explore_indicator_dialog(indicator_old, indicator_new, var_id_to_display, enable_bulk_explore, df=None) -> None:
-    """Same as st_explore_indicator but framed in a dialog.
-
-    More on dialogs: https://docs.streamlit.io/develop/api-reference/execution-flow/st.dialog
-    """
-    if df is None:
-        df = get_indicator_data_cached([indicator_old, indicator_new])
-    if indicator_old == indicator_new:
-        st.error("Comparison failed, because old and new inidcators are the same.")
-    else:
-        st.write(f"To be implemented; compare {indicator_old} and {indicator_new}.")
-
-
-def st_show_indicator_upgrades(indicator_ups, pagination_key, indicator_id_to_display, df_data) -> None:
+def st_show_indicator_upgrades(
+    indicator_ups, pagination_key, indicator_id_to_display, df_data
+) -> List[IndicatorUpgrade]:
     """Display chart diffs."""
-    # Pagination menu
-    with st.container(border=False):
-        # Pagination
-        pagination = Pagination(
-            indicator_ups,
-            items_per_page=st.session_state["mappings-per-page"],
-            pagination_key=pagination_key,
-            on_click=lambda: set_states({"submitted_indicators": False}),
-        )
-        ## Show controls only if needed
-        if len(indicator_ups) > st.session_state["mappings-per-page"]:
-            pagination.show_controls()
+    # Pagination
+    pagination = Pagination(
+        indicator_ups,
+        items_per_page=st.session_state["mappings-per-page"],
+        pagination_key=pagination_key,
+        on_click=lambda: set_states({"submitted_indicators": False}),
+    )
+    ## Show controls only if needed
+    if len(indicator_ups) > st.session_state["mappings-per-page"]:
+        pagination.show_controls()
 
     # Show indicator mapping
     td = []
-    for indicator_up in pagination.get_page_items():
+    indicator_upgrades_shown = pagination.get_page_items()
+    for indicator_up in indicator_upgrades_shown:
         ta = time()
-        show = IndicatorUpgradeShow(indicator_up)
-        show.render(
+        IndicatorUpgradeShow(indicator_up).render(
             indicator_id_to_display=indicator_id_to_display,
             df_data=df_data,
         )
         tb = time()
         td.append(tb - ta)
     log.info(f"AVG: {sum(td) / len(td)}")
+
+    return indicator_upgrades_shown
 
 
 def get_params(search_form):
@@ -405,6 +439,7 @@ def ask_and_get_indicator_mapping(search_form) -> Dict[int, int]:
     indicator_upgrades, indicator_id_to_display, df_data = get_params(search_form)
     if "indicator_upgrades_ignore" not in st.session_state:
         st.session_state.indicator_upgrades_ignore = {iu.key: False for iu in indicator_upgrades}
+
     ###########################################################################
     # 2/ DISPLAY: Show the indicator mapping form
     ###########################################################################
@@ -420,7 +455,7 @@ def ask_and_get_indicator_mapping(search_form) -> Dict[int, int]:
             # 2/ Map indicators
             # Show columns with indicators that were automatically (and manually) mapped
             t0 = time()
-            st_show_indicator_upgrades(
+            indicator_upgrades_shown = st_show_indicator_upgrades(
                 indicator_ups=indicator_upgrades,
                 pagination_key="pagination_indicator_mapping",
                 indicator_id_to_display=indicator_id_to_display,
@@ -437,7 +472,7 @@ def ask_and_get_indicator_mapping(search_form) -> Dict[int, int]:
             )
             x = {
                 iu.id_old: iu.id_new_selected
-                for iu in indicator_upgrades
+                for iu in indicator_upgrades_shown
                 if not iu.skip and iu.id_new_selected is not None
             }
             st.write(x)
@@ -445,7 +480,7 @@ def ask_and_get_indicator_mapping(search_form) -> Dict[int, int]:
                 # Define mapping of indicators
                 indicator_mapping = {
                     iu.id_old: iu.id_new_selected
-                    for iu in indicator_upgrades
+                    for iu in indicator_upgrades_shown
                     if not iu.skip and iu.id_new_selected is not None
                 }
     return indicator_mapping
@@ -479,7 +514,7 @@ def reset_indicator_form() -> None:
         {
             "ignore-all": False,
             **checks,
-        }
+        },
     )
 
 

@@ -53,7 +53,6 @@ st.set_page_config(
     },
 )
 st.title("Indicator 🧬 **:gray[Upgrader]**")
-st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
 
 # Get all datasets
@@ -68,7 +67,7 @@ utils.set_states(
         "submitted_charts": False,
         "indicator_mapping": {},
     },
-    only_if_not_exists=True,
+    also_if_not_exists=True,
 )
 # Avoid "unbound" errors
 old_var_selectbox = []
@@ -111,7 +110,6 @@ st.session_state.show_step_name = st.session_state.get("show_step_name", False)
 with st.container(border=True):
     search_form = build_dataset_form(DATASETS, SIMILARITY_NAMES)
 
-
 ##########################################################################################
 # 2 INDICATORS MAPPING
 #
@@ -123,7 +121,6 @@ if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
     indicator_mapping = ask_and_get_indicator_mapping(search_form)
     # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
-
 
 ##########################################################################################
 # 3 GET CHARTS
