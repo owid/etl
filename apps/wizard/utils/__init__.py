@@ -711,25 +711,24 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kw
 
 
 class Pagination:
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-
+        # Action to perform when interacting with any of the buttons.
+        ## Example: Change the value of certain state in session_state
+        self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
             self.page = 1
 
     @property
     def page(self):
-        # value = min(self.total_pages, st.session_state[self.pagination_key])
         value = st.session_state[self.pagination_key]
         return value
 
     @page.setter
     def page(self, value):
-        # Correct page number if exceeds maximum allowed
-
         st.session_state[self.pagination_key] = value
 
     @property
@@ -744,7 +743,7 @@ class Pagination:
 
     def show_controls(self) -> None:
         # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
             with col1:
@@ -752,6 +751,8 @@ class Pagination:
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
                         self.page -= 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
@@ -761,6 +762,8 @@ class Pagination:
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
                         self.page += 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
