@@ -28,8 +28,12 @@ def run(dest_dir: str) -> None:
     #
 
     # harmonize countries
-    tb_cert = geo.harmonize_countries(df=tb_cert, countries_file=paths.country_mapping_path)
-    tb_cases = geo.harmonize_countries(df=tb_cases, countries_file=paths.country_mapping_path)
+    tb_cert = geo.harmonize_countries(
+        df=tb_cert, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
+    tb_cases = geo.harmonize_countries(
+        df=tb_cases, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
 
     # remove leading spaces from "year_certified" column and cast as string
     tb_cert["year_certified"] = tb_cert["year_certified"].str.strip()
@@ -59,7 +63,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_year_certified(tb):
+def add_year_certified(tb: Table):
     """add year in which country was certified as disease free
     by looping over all rows and setting the year_certified column
     to the maximum year_certified value for the country"""
@@ -72,14 +76,15 @@ def add_year_certified(tb):
     return tb
 
 
-def add_current_year(tb, tb_cases, year, changes_dict={}):
+def add_current_year(tb: Table, tb_cases: Table, year: int, changes_dict={}):
     """
     Add rows with current certification status & case numbers for each country
     tb (Table): table with certification status & case numbers until last year
     tb_cases (Table): table with case numbers for all (incl. current) years
     year (int): current year
     changes_dict (dict): changes to certification status since last year with key: country, value: certification status
-    (changes_dict is empty for 2023, including it to make code reusable)
+    (changes_dict is empty for 2023, including it to make code reusable for future years,
+    e.g. if Angola is certified in a future year, pass {"Angola": "Certified disease free"} as changes_dict for that year)
     """
     country_list = tb["country"].unique()
     last_year = year - 1
