@@ -282,8 +282,14 @@ steps:
     - snapshot://happiness/2024-06-20/happiness_ages.xls
   data://garden/happiness/2024-06-20/happiness_ages:
     - data://meadow/happiness/2024-06-20/happiness_ages
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
   data://grapher/happiness/2024-06-20/happiness_ages:
     - data://garden/happiness/2024-06-20/happiness_ages
+
+
+  # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
   data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
