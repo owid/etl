@@ -14,27 +14,18 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("education_opri")
 
     # Read table from garden dataset.
-    tb = ds_garden["education_opri"].reset_index()
+    tb = ds_garden["education_opri"]
 
     #
     # Process data.
     #
-    # Pivot the table to have the indicators as columns to add descriptions from producer
 
-    tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
-    for column in tb_pivoted.columns:
-        long_definition = tb["long_description"].loc[tb["indicator_label_en"] == column].iloc[0]
-        tb_pivoted[column].metadata.description_from_producer = long_definition
-        tb_pivoted[column].metadata.title = column
-
-    tb_pivoted = tb_pivoted.reset_index()
-    tb_pivoted = tb_pivoted.format(["country", "year"])
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_pivoted], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.
