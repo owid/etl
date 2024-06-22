@@ -5,15 +5,15 @@ definitions:
       topic_tags:
         - Global Education
   unit: |-
-      <% if "_pct_" in indicator_label_en %>
+      <% if _pct_ in indicator_label_en %>
         %
-      <% elif "days" in indicator_label_en %>
+      <% elif days in indicator_label_en %>
         days
-      <% elif "index" in indicator_label_en %>
+      <% elif index in indicator_label_en %>
         index
-      <% elif "female" in indicator_label_en %>
+      <% elif female in indicator_label_en %>
         girls
-      <% elif "male" in indicator_label_en %>
+      <% elif male in indicator_label_en %>
         boys
       <% endif %>
 
