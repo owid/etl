@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import Dict, Optional
+
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -50,14 +53,14 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_metadata_wb_edstats(tb, tb_wb):
+def add_metadata_wb_edstats(tb: Table, tb_wb: Table) -> Dict:
     long_definition = {}
     for indicator in tb["indicator_label_en"].unique():
         long_definition[indicator] = tb_wb[tb_wb["Indicator Name"] == indicator]["Long definition"].values
     return long_definition
 
 
-def add_metadata_description(tb, long_definition):
+def add_metadata_description(tb: Table, long_definition: Dict) -> Table:
     for column in tb.columns:
         meta = tb[column].metadata
 
@@ -94,7 +97,7 @@ def add_metadata_description(tb, long_definition):
     return tb
 
 
-def update_metadata(meta, display_decimals, unit, short_unit):
+def update_metadata(meta: Dict, display_decimals: int, unit: str, short_unit: Optional[str]) -> None:
     """
     Update metadata attributes of a specified column in the given table.
 

@@ -3,7 +3,7 @@ Script to create a snapshot of the metadata related to Education indicators data
 
 To create a csv with education related indicators and download it:
     - go to this wesbite http://databank.worldbank.org/Data/Views/VariableSelection/SelectVariables.aspx?source=Education%20Statistics
-    - on the left click on Country -> select World, series -> select All and Time -> select All
+    - on the left click on Country -> select World, series -> select All and Time -> select All  -->  'Click Download Options' -> Metadata"
 """
 
 
