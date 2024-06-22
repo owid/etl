@@ -12,7 +12,7 @@ from typing import DefaultDict, Dict, List, Optional, Set, Tuple, cast
 import click
 import pandas as pd
 import questionary
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from rapidfuzz import process
 from rich_click.rich_command import RichCommand
 
@@ -97,6 +97,40 @@ def read_table(input_file: str) -> pd.DataFrame:
         raise ValueError(f"Unsupported file type: {input_file}")
 
     return cast(pd.DataFrame, df)
+
+
+def harmonize_table(
+    tb: Table,
+    column: str = "country",
+    output_file: str | None = None,
+    num_suggestions: int = 10,
+    institution: Optional[str] = None,
+):
+    # Focus on the column of interest
+    geo_column = tb[column].dropna().astype("str")
+
+    # Prepare output file
+    if output_file is None:
+        output_file = ""
+
+    # Reload previous work
+    if Path(output_file).exists():
+        print("Resuming from existing mapping...\n")
+        with open(output_file, "r") as istream:
+            mapping = json.load(istream)
+    else:
+        mapping = {}
+
+    mapping = interactive_harmonize(
+        geo_column,
+        mapping,
+        institution=institution,
+        num_suggestions=num_suggestions,
+    )
+
+    # Export
+    with open(output_file, "w") as ostream:
+        json.dump(mapping, ostream, indent=2)
 
 
 def interactive_harmonize(
