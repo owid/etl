@@ -30,6 +30,6 @@ tables:
           {definitions.unit}
         display:
           numDecimalPlaces: |-
-            <% if 'number' in indicator_label_en %>0<% else %>1<%- endif -%>
+            <% if number in indicator_label_en %>0<% else %>1<%- endif -%>
 
 
