@@ -107,7 +107,7 @@ def harmonize_table(
     institution: Optional[str] = None,
 ):
     # Focus on the column of interest
-    geo_column = tb[column].dropna().astype("str")
+    geo_column = tb[column].dropna().astype("string")
 
     # Prepare output file
     if output_file is None:
@@ -142,7 +142,7 @@ def interactive_harmonize(
     mapping = mapping or {}
 
     # prepare data
-    to_map = sorted(set(geo))
+    to_map = sorted(set(geo.unique()))
     questionary.print(f"{len(to_map)} countries/regions to harmonize")
     mapper = CountryRegionMapper()
 
