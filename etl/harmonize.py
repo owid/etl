@@ -7,12 +7,12 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Optional, Set, Tuple, cast
+from typing import DefaultDict, Dict, List, Literal, Optional, Set, cast
 
 import click
 import pandas as pd
 import questionary
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, Variable
 from rapidfuzz import process
 from rich_click.rich_command import RichCommand
 
@@ -70,20 +70,44 @@ def harmonize(
 
     If a mapping file already exists, it will resume where the mapping file left off.
     """
-
+    # Load
     df = read_table(data_file)
-    geo_column = cast(pd.Series, df[column].dropna().astype("str"))
 
-    if Path(output_file).exists():
-        print("Resuming from existing mapping...\n")
-        with open(output_file, "r") as istream:
-            mapping = json.load(istream)
-    else:
-        mapping = {}
+    # Create Harmonizer
+    harmonizer = Harmonizer(
+        tb=df,
+        colname=column,
+        output_file=output_file,
+    )
 
-    mapping = interactive_harmonize(geo_column, mapping, institution=institution, num_suggestions=num_suggestions)
-    with open(output_file, "w") as ostream:
-        json.dump(mapping, ostream, indent=2)
+    # Run automatic harmonization
+    ambiguous = harmonizer.run_automatic(logging="shell")
+
+    # Need user input
+    harmonizer.run_interactive_terminal(ambiguous, institution, num_suggestions)
+
+    # Export
+    harmonizer.export_mapping()
+
+
+def run_harmonizer_ipython(
+    tb: Table, column: str, output_file: str, num_suggestions: int = 100, institution: Optional[str] = None
+):
+    # Create Harmonizer
+    harmonizer = Harmonizer(
+        tb=tb,
+        colname=column,
+        output_file=output_file,
+    )
+
+    # Run automatic harmonization
+    ambiguous = harmonizer.run_automatic(logging="ipython")
+
+    # Need user input
+    harmonizer.run_interactive_ipython(ambiguous, institution, num_suggestions)
+
+    # Export
+    # harmonizer.export_mapping()
 
 
 def read_table(input_file: str) -> pd.DataFrame:
@@ -97,150 +121,6 @@ def read_table(input_file: str) -> pd.DataFrame:
         raise ValueError(f"Unsupported file type: {input_file}")
 
     return cast(pd.DataFrame, df)
-
-
-def harmonize_table(
-    tb: Table,
-    column: str = "country",
-    output_file: str | None = None,
-    num_suggestions: int = 10,
-    institution: Optional[str] = None,
-):
-    # Focus on the column of interest
-    geo_column = tb[column].dropna().astype("string")
-
-    # Prepare output file
-    if output_file is None:
-        output_file = ""
-
-    # Reload previous work
-    if Path(output_file).exists():
-        print("Resuming from existing mapping...\n")
-        with open(output_file, "r") as istream:
-            mapping = json.load(istream)
-    else:
-        mapping = {}
-
-    mapping = interactive_harmonize(
-        geo_column,
-        mapping,
-        institution=institution,
-        num_suggestions=num_suggestions,
-    )
-
-    # Export
-    with open(output_file, "w") as ostream:
-        json.dump(mapping, ostream, indent=2)
-
-
-def interactive_harmonize(
-    geo: pd.Series,
-    mapping: Optional[Dict[str, str]] = None,
-    institution: Optional[str] = None,
-    num_suggestions: int = 5,
-) -> Dict[str, str]:
-    mapping = mapping or {}
-
-    # prepare data
-    to_map = sorted(set(geo.unique()))
-    questionary.print(f"{len(to_map)} countries/regions to harmonize")
-    mapper = CountryRegionMapper()
-
-    # do the easy cases first
-    ambiguous, mapping = harmonize_simple(to_map, mapping, mapper)
-
-    # first summary
-    questionary.print(f"  └ {len(to_map) - len(ambiguous)} automatically matched")
-    questionary.print(f"  └ {len(ambiguous)} ambiguous countries/regions")
-    questionary.print("")
-
-    # actually ask user
-    prompt_user(ambiguous, mapping, mapper, institution, num_suggestions)
-
-    return mapping
-
-
-def harmonize_simple(
-    to_map: List[str], mapping: Dict[str, str], mapper: "CountryRegionMapper"
-) -> Tuple[List[str], Dict[str, str]]:
-    """Apply basic harmonization (map entities with identical names).
-
-    Uses `mapper` to map entities in `to_map` to standard OWID naming conventions.
-
-    It returns two objects:
-        - `mapping`: Dictionary with the entity mapping.
-        - `ambiguous`: List of entities from `to_map` that could not be mapped.
-    """
-    ambiguous = []
-    for region in to_map:
-        if region in mapping:
-            # we did this one in a previous run
-            continue
-
-        if region in mapper:
-            # it's an exact match for a country/region or its known aliases
-            name = mapper[region]
-            mapping[region] = name
-            continue
-
-        ambiguous.append(region)
-    return ambiguous, mapping
-
-
-def prompt_user(
-    ambiguous: List[str],
-    mapping: Dict[str, str],
-    mapper: "CountryRegionMapper",
-    institution: Optional[str],
-    num_suggestions: int,
-) -> Dict[str, str]:
-    """Ask user to map countries."""
-    questionary.print("Beginning interactive harmonization...")
-    questionary.print("  Select [skip] to skip a country/region mapping")
-    questionary.print("  Select [custom] to enter a custom name\n")
-
-    instruction = "(Use shortcuts or arrow keys)"
-    # start interactive session
-    n_skipped = 0
-    try:
-        for i, region in enumerate(ambiguous, 1):
-            # no exact match, get nearby matches
-            suggestions = mapper.suggestions(region, institution=institution, num_suggestions=num_suggestions)
-
-            # show suggestions
-            name = questionary.select(
-                f"[{i}/{len(ambiguous)}] {region}:",
-                choices=suggestions + ["[custom]", "[skip]"],
-                use_shortcuts=True,
-                style=custom_style_fancy,
-                instruction=instruction,
-            ).unsafe_ask()
-
-            # use custom mapping
-            if name == "[custom]":
-                name = questionary.text("Enter custom name:", style=custom_style_fancy).unsafe_ask()
-                name = name.strip()
-                if name in mapper.valid_names:
-                    confirm = questionary.confirm(
-                        "Save this alias", default=True, style=custom_style_fancy
-                    ).unsafe_ask()
-                    if confirm:
-                        save_alias_to_regions_yaml(name, region)
-                else:
-                    # it's a manual entry that does not correspond to any known country
-                    questionary.print(
-                        f"Using custom entry '{name}' that does not match a country/region from the regions set"
-                    )
-            elif name == "[skip]":
-                n_skipped += 1
-                continue
-
-            mapping[region] = name
-    except KeyboardInterrupt:
-        questionary.print("Saving session...\n")
-    questionary.print(f"\nDone! ({len(mapping)} mapped, {n_skipped} skipped)")
-
-    return mapping
 
 
 class CountryRegionMapper:
@@ -343,6 +223,184 @@ def _add_alias_to_regions(yaml_content, target_name, new_alias):
         raise ValueError(f"Could not find region {target_name} in {LATEST_REGIONS_YML}")
 
     return yaml_content
+
+
+class Harmonizer:
+    def __init__(
+        self,
+        tb: Optional[Table | pd.DataFrame] = None,
+        colname: str = "country",
+        indicator: Optional[Variable | pd.Series] = None,
+        output_file: Optional[str] = None,
+    ):
+        """Constructor
+
+        Parameters:
+            * tb: Table that contains country column.
+            * colname: Name of the column that contains country names.
+            * indicator: Optional. Variable that contains country names. This is an alternative way of providing country names. That is, either give `tb` and `colname` or `indicator`.
+            * output_file: Optional. File to save the mapping. If the file exists, it will resume from the existing mapping.
+        """
+        self.geo = self._get_geo(tb, colname, indicator)
+        self.mapper = CountryRegionMapper()
+        self.output_file = output_file
+
+        # Mapping
+        self._mapping = None
+        self.countries_mapped_automatic = None
+
+    def _get_geo(self, tb, colname, indicator):
+        """Get set of country names to map."""
+        if (tb is None) and (indicator is None):
+            raise ValueError("Either `tb` or `indicator` must be provided")
+        elif indicator is not None:
+            return indicator
+        else:
+            if colname not in tb.columns:
+                raise ValueError(f"Column '{colname}' not found in table")
+            indicator = tb[colname]
+
+        return sorted(set(indicator.dropna().astype("string").unique()))
+
+    @property
+    def mapping(self):
+        if self._mapping is None:
+            # Reload previous work
+            if (self.output_file is not None) and Path(self.output_file).exists():
+                print("Resuming from existing mapping...\n")
+                with open(self.output_file, "r") as istream:
+                    self._mapping = json.load(istream)
+            else:
+                self._mapping = {}
+        return self._mapping
+
+    def run_automatic(
+        self,
+        logging: Optional[Literal["shell", "ipython"]] = None,
+    ):
+        """Build country mappings that can be done automatically.
+
+        Automation comes from the fact that some country-mapping are already tracked by our regions dataset.
+
+        Parameters:
+            `logging`: If `shell`, print messages to the shell. If `ipython`, print messages to the IPython console.
+        Returns:
+            `ambiguous`: List of countries that could not be mapped automatically.
+
+        NOTE: It also updates class attribute `mapping`, to reflect the mapping done so far.
+        """
+
+        # do the easy cases first
+        ambiguous = []
+        for region in self.geo:
+            if region in self.mapping:
+                # we did this one in a previous run
+                continue
+
+            if region in self.mapper:
+                # it's an exact match for a country/region or its known aliases
+                name = self.mapper[region]
+                self.mapping[region] = name
+                continue
+
+            ambiguous.append(region)
+
+        # logging
+        if logging == "ipython":
+            questionary.print(f"{len(self.geo)} countries/regions to harmonize")
+            questionary.print(f"  └ {len(self.geo) - len(ambiguous)} automatically matched")
+            questionary.print(f"  └ {len(ambiguous)} ambiguous countries/regions")
+            questionary.print("")
+        elif logging == "shell":
+            print(f"{len(self.geo)} countries/regions to harmonize")
+            print(f"  └ {len(self.geo) - len(ambiguous)} automatically matched")
+            print(f"  └ {len(ambiguous)} ambiguous countries/regions")
+            print("")
+
+        return ambiguous
+
+    def get_suggestions(self, region: str, institution: Optional[str], num_suggestions: int):
+        """Get suggestions for region."""
+        return self.mapper.suggestions(region, institution=institution, num_suggestions=num_suggestions)
+
+    def run_interactive_terminal(
+        self,
+        ambiguous: List[str],
+        institution: Optional[str],
+        num_suggestions: int,
+    ) -> None:
+        """Ask user to map countries."""
+        questionary.print("Beginning interactive harmonization...")
+        questionary.print("  Select [skip] to skip a country/region mapping")
+        questionary.print("  Select [custom] to enter a custom name\n")
+
+        instruction = "(Use shortcuts or arrow keys)"
+        # start interactive session
+        n_skipped = 0
+        try:
+            for i, region in enumerate(ambiguous, 1):
+                # no exact match, get nearby matches
+                suggestions = self.get_suggestions(region, institution=institution, num_suggestions=num_suggestions)
+
+                # show suggestions
+                name = questionary.select(
+                    f"[{i}/{len(ambiguous)}] {region}:",
+                    choices=suggestions + ["[custom]", "[skip]"],
+                    use_shortcuts=True,
+                    style=custom_style_fancy,
+                    instruction=instruction,
+                ).unsafe_ask()
+
+                # use custom mapping
+                if name == "[custom]":
+                    name = questionary.text("Enter custom name:", style=custom_style_fancy).unsafe_ask()
+                    name = name.strip()
+                    if name in self.mapper.valid_names:
+                        confirm = questionary.confirm(
+                            "Save this alias", default=True, style=custom_style_fancy
+                        ).unsafe_ask()
+                        if confirm:
+                            save_alias_to_regions_yaml(name, region)
+                    else:
+                        # it's a manual entry that does not correspond to any known country
+                        questionary.print(
+                            f"Using custom entry '{name}' that does not match a country/region from the regions set"
+                        )
+                elif name == "[skip]":
+                    n_skipped += 1
+                    continue
+
+                self.mapping[region] = name
+        except KeyboardInterrupt:
+            questionary.print("Saving session...\n")
+        questionary.print(f"\nDone! ({len(self.mapping)} mapped, {n_skipped} skipped)")
+
+    def run_interactive_ipython(
+        self,
+        ambiguous: List[str],
+        institution: Optional[str],
+        num_suggestions: int,
+    ):
+        pass
+
+    # Build mapping
+    def generate_country_mapping(self, mappings_raw):
+        mapping = {}
+        for m in mappings_raw:
+            if m["widgets"]["mapping_type"].value == "DEFAULT":
+                country_name_new = m["widgets"]["selection"].value
+            elif m["widgets"]["mapping_type"].value == "CUSTOM":
+                country_name_new = m["widgets"]["text"].value
+            else:
+                continue
+            mapping[m["country"]] = country_name_new
+        return mapping
+
+    def export_mapping(self):
+        if self.output_file is None:
+            raise ValueError("Output file not provided")
+        with open(self.output_file, "w") as ostream:
+            json.dump(self.mapping, ostream, indent=2)
 
 
 if __name__ == "__main__":

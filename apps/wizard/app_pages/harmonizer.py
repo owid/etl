@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.config import ENV_IS_REMOTE
-from etl.harmonize import CountryRegionMapper, harmonize_simple
+from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
@@ -183,12 +183,12 @@ if option:
                 )
                 st.stop()
 
-            mapping = {}
-            to_map = sorted(set(tb[column_name]))
-            mapper = CountryRegionMapper()
-
-            # do the easy cases first
-            ambiguous, mapping = harmonize_simple(to_map, mapping, mapper)
+            harmonizer = Harmonizer(
+                tb=tb,
+                colname=column_name,
+            )
+            ambiguous = harmonizer.run_automatic()
+            mapping = harmonizer.mapping
 
             st.divider()
 
@@ -209,7 +209,7 @@ if option:
                 # - a toggle to ignore the region (no mapping)
                 for i, region in enumerate(ambiguous, 1):
                     # no exact match, get nearby matches
-                    suggestions = mapper.suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
+                    suggestions = harmonizer.get_suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
                     with st.container(border=True):
                         # Original name
                         st.markdown(f"**{region}**")
