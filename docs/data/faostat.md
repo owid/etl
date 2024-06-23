@@ -478,6 +478,7 @@ folder, which contains the following columns:
   the letters `pc` prepended (e.g. the per-capita variable of the original element with code `001234` will be `pc1234`).
 
 !!! note
+
 _ If a unit factor is applied, consider changing the unit names appropriately. For example, when multiplying by 1000,
 change the unit name from `thousand tonnes` to `tonnes`.
 _ When making `was_per_capita` 1, the unit name should be changed accordingly from, e.g. `grams per capita` to `grams`.

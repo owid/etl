@@ -17,6 +17,7 @@ The main function is set up as a command-line interface (CLI). It takes three ar
 - `overwrite`: A flag that, if set to True, overwrites the original file with the updated metadata.
 
 !!! example
+
     To use this tool, run it from the command line with the required arguments. For example:
 
     ```bash
