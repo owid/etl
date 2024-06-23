@@ -768,8 +768,7 @@ class Table(pd.DataFrame):
 
         return t
 
-    def dropna(self, *args, **kwargs) -> "Table":
-        tb = super().dropna(*args, **kwargs)
+    def dropna(self, *args, **kwargs) -> Optional["Table"]:        tb = super().dropna(*args, **kwargs)
         # inplace returns None
         if tb is None:
             return None
