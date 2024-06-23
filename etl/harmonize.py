@@ -10,8 +10,10 @@ from pathlib import Path
 from typing import DefaultDict, Dict, List, Literal, Optional, Set, cast
 
 import click
+import ipywidgets as widgets
 import pandas as pd
 import questionary
+from IPython.display import display
 from owid.catalog import Dataset, Table, Variable
 from rapidfuzz import process
 from rich_click.rich_command import RichCommand
@@ -19,7 +21,8 @@ from rich_click.rich_command import RichCommand
 from etl.exceptions import RegionDatasetNotFound
 from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
-custom_style_fancy = questionary.Style(
+# Style for questionary
+SHELL_FORM_STYLE = questionary.Style(
     [
         ("qmark", "fg:#fac800 bold"),  # token in front of the question
         ("question", "bold"),  # question text
@@ -33,6 +36,8 @@ custom_style_fancy = questionary.Style(
         # ('disabled', 'fg:#858585 italic')   # disabled choices for select and checkbox prompts
     ]
 )
+# Default number of suggestions
+DEFAULT_NUM_SUGGESTIONS = 5
 
 
 @click.command(name="harmonize", cls=RichCommand)
@@ -50,8 +55,8 @@ custom_style_fancy = questionary.Style(
     "--num-suggestions",
     "-n",
     required=False,
-    default=5,
-    help="Number of suggestions to show per entity",
+    default=DEFAULT_NUM_SUGGESTIONS,
+    help=f"Number of suggestions to show per entity. Default is {DEFAULT_NUM_SUGGESTIONS}",
 )
 def harmonize(
     data_file: str, column: str, output_file: str, num_suggestions: int, institution: Optional[str] = None
@@ -90,7 +95,7 @@ def harmonize(
     harmonizer.export_mapping()
 
 
-def run_harmonizer_ipython(
+def harmonize_ipython(
     tb: Table, column: str, output_file: str, num_suggestions: int = 100, institution: Optional[str] = None
 ):
     # Create Harmonizer
@@ -104,10 +109,11 @@ def run_harmonizer_ipython(
     ambiguous = harmonizer.run_automatic(logging="ipython")
 
     # Need user input
-    harmonizer.run_interactive_ipython(ambiguous, institution, num_suggestions)
-
-    # Export
-    # harmonizer.export_mapping()
+    harmonizer.run_interactive_ipython(
+        ambiguous=ambiguous,
+        institution=institution,
+        num_suggestions=num_suggestions,
+    )
 
 
 def read_table(input_file: str) -> pd.DataFrame:
@@ -326,8 +332,8 @@ class Harmonizer:
     def run_interactive_terminal(
         self,
         ambiguous: List[str],
-        institution: Optional[str],
-        num_suggestions: int,
+        institution: Optional[str] = None,
+        num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ) -> None:
         """Ask user to map countries."""
         questionary.print("Beginning interactive harmonization...")
@@ -347,17 +353,17 @@ class Harmonizer:
                     f"[{i}/{len(ambiguous)}] {region}:",
                     choices=suggestions + ["[custom]", "[skip]"],
                     use_shortcuts=True,
-                    style=custom_style_fancy,
+                    style=SHELL_FORM_STYLE,
                     instruction=instruction,
                 ).unsafe_ask()
 
                 # use custom mapping
                 if name == "[custom]":
-                    name = questionary.text("Enter custom name:", style=custom_style_fancy).unsafe_ask()
+                    name = questionary.text("Enter custom name:", style=SHELL_FORM_STYLE).unsafe_ask()
                     name = name.strip()
                     if name in self.mapper.valid_names:
                         confirm = questionary.confirm(
-                            "Save this alias", default=True, style=custom_style_fancy
+                            "Save this alias", default=True, style=SHELL_FORM_STYLE
                         ).unsafe_ask()
                         if confirm:
                             save_alias_to_regions_yaml(name, region)
@@ -378,10 +384,132 @@ class Harmonizer:
     def run_interactive_ipython(
         self,
         ambiguous: List[str],
-        institution: Optional[str],
-        num_suggestions: int,
+        institution: Optional[str] = None,
+        num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ):
-        pass
+        # Render widgets
+        mappings_raw = []
+        for i, country in enumerate(ambiguous, start=1):
+            ## Get suggestions for country
+            options = self.get_suggestions(
+                country,
+                institution=institution,
+                num_suggestions=num_suggestions,
+            )
+
+            ## Render widgets
+            params = self._widgets_ipython_country(
+                label=f"({i}/{len(ambiguous)}) {country}",
+                country=country,
+                options=options,
+            )
+
+            ## Add to mapping
+            mappings_raw.append(params)
+
+        if mappings_raw != []:
+            # Show button
+            btn = widgets.Button(
+                description="Export mapping",
+                button_style="info",
+                icon="check",
+            )
+
+            # Action if clicked on button
+            def _on_submit(_):
+                widgets.Widget.close_all()
+                # Generate mapping from input by user
+                mapping_manual = self.generate_country_mapping(mappings_raw)
+                # Combine manual mapping with auto mapping
+                self._mapping = {**self.mapping, **mapping_manual}
+                self.export_mapping()
+
+                def _export_new_name(country_name, alias):
+                    def _on_export(country_name, alias, vbox):
+                        save_alias_to_regions_yaml(country_name, alias)
+                        vbox.close()
+
+                    label = widgets.Label(value=f"Save new name '{country_name}' for alias '{alias}'")
+                    btn = widgets.Button(description="Export", icon="save")
+                    vbox = widgets.VBox(
+                        [label, btn],
+                        layout=widgets.Layout(margin="0px 0px 0px 0px", padding="0px", align_items="flex-start"),
+                    )
+                    btn.on_click(lambda _: _on_export(country_name, alias, vbox))
+
+                    display(vbox)
+
+                # Save new aliases
+                for alias, country_name in mapping_manual.items():
+                    if country_name in self.mapper.valid_names:
+                        _export_new_name(country_name, alias)
+
+            btn.on_click(_on_submit)
+
+            display(btn)
+
+    def _widgets_ipython_country(self, label, country, options):
+        """Render ipython widgets for a single country."""
+        # Label
+        label_w = widgets.HTML(value=f"<b>{label}</b>:")
+
+        # Mapping type: default, custom, ignore
+        mapping_type = widgets.RadioButtons(
+            options=[
+                ("From default list", "DEFAULT"),
+                ("Custom name", "CUSTOM"),
+                ("Ignore", "IGNORE"),
+            ],
+            layout=widgets.Layout(width="max-content", padding="0px 10px 0px 0px"),
+        )
+
+        # Dropdown (default list)
+        selection = widgets.Select(
+            options=options,
+            # value=options[0],
+            layout=widgets.Layout(margin="0px 0px 0px 0px", padding="0px"),  # Adjust the width as needed
+            style={"description_width": "initial"},
+            disabled=False,
+        )
+        # Text (custom)
+        text = widgets.Text(value="", placeholder="Enter custom name", description="", disabled=False)
+
+        # HBox to hold the Select and Text widgets, initially showing Select
+        selection_container = widgets.HBox([selection])
+
+        # Update visibility based on RadioButtons selection
+        def _update_visibility(change):
+            if change["new"] == "DEFAULT":
+                selection_container.children = [selection]
+            elif change["new"] == "CUSTOM":
+                selection_container.children = [text]
+            else:
+                selection_container.children = []
+
+        # Observe changes in the RadioButtons
+        mapping_type.observe(_update_visibility, names="value")
+
+        hbox = widgets.HBox([mapping_type, selection_container])
+
+        # VBox layout to stack the label and dropdown vertically
+        vbox = widgets.VBox(
+            [label_w, hbox], layout=widgets.Layout(margin="0px 0px 0px 0px", padding="0px", align_items="flex-start")
+        )
+
+        # Align
+        hbox = widgets.HBox([vbox])
+
+        display(hbox)
+
+        return {
+            "country": country,
+            "suggestions": options,
+            "widgets": {
+                "mapping_type": mapping_type,
+                "selection": selection,
+                "text": text,
+            },
+        }
 
     # Build mapping
     def generate_country_mapping(self, mappings_raw):
@@ -398,7 +526,7 @@ class Harmonizer:
 
     def export_mapping(self):
         if self.output_file is None:
-            raise ValueError("Output file not provided")
+            raise ValueError("`output_file` not provided")
         with open(self.output_file, "w") as ostream:
             json.dump(self.mapping, ostream, indent=2)
 
