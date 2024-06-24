@@ -783,6 +783,14 @@ steps:
   data://grapher/pew/2024-06-03/same_sex_marriage:
     - data://garden/pew/2024-06-03/same_sex_marriage
 
+# UN Regions
+  data://meadow/un/2024-06-24/sdg_regions:
+    - snapshot://un/2024-06-24/sdg_regions.csv
+  data://garden/un/2024-06-24/sdg_regions:
+    - data://meadow/un/2024-06-24/sdg_regions
+  data://grapher/un/2024-06-24/sdg_regions:
+    - data://garden/un/2024-06-24/sdg_regions
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

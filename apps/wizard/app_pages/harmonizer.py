@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.config import ENV_IS_REMOTE
-from etl.harmonize import CountryRegionMapper, harmonize_simple
+from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
@@ -183,12 +183,14 @@ if option:
                 )
                 st.stop()
 
-            mapping = {}
-            to_map = sorted(set(tb[column_name]))
-            mapper = CountryRegionMapper()
+            harmonizer = Harmonizer(
+                tb=tb,
+                colname=column_name,
+            )
+            harmonizer.run_automatic()
 
-            # do the easy cases first
-            ambiguous, mapping = harmonize_simple(to_map, mapping, mapper)
+            ambiguous = cast(List, harmonizer.ambiguous)
+            mapping = harmonizer.mapping
 
             st.divider()
 
@@ -199,7 +201,8 @@ if option:
                     st.dataframe(mapping)
 
             ## 2/ MANUAL (user input needed)
-            with st.form("form"):
+            with st.container(border=True):
+                # with st.form("form"):
                 # Title
                 st.markdown("#### Manual entity mapping needed")
                 st.markdown(f"{len(ambiguous)} ambiguous regions")
@@ -209,21 +212,12 @@ if option:
                 # - a toggle to ignore the region (no mapping)
                 for i, region in enumerate(ambiguous, 1):
                     # no exact match, get nearby matches
-                    suggestions = mapper.suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
+                    suggestions = harmonizer.get_suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
                     with st.container(border=True):
                         # Original name
                         st.markdown(f"**{region}**")
                         col1, col2 = st.columns(2)
 
-                        # New name, from selectbox
-                        with col1:
-                            value_selected = st.selectbox(
-                                label="Select a region",
-                                options=suggestions,
-                                index=0,
-                                # label_visibility="collapsed",
-                                key=f"region_suggestion_{i}",
-                            )
                         # New name, custom (useful if no suggestion is good enough)
                         with col2:
                             value_custom = st.text_input(
@@ -232,6 +226,16 @@ if option:
                                 # placeholder="Enter custom name",
                                 # label_visibility="collapsed",
                                 help="Use this when no suggestion is good enough",
+                            )
+                        # New name, from selectbox
+                        with col1:
+                            value_selected = st.selectbox(
+                                label="Select a region",
+                                options=suggestions,
+                                index=0,
+                                # label_visibility="collapsed",
+                                key=f"region_suggestion_{i}",
+                                disabled=value_custom != "",
                             )
                         value_ignore = st.toggle(
                             label="Ignore",
@@ -258,7 +262,7 @@ if option:
                         value=path_export,
                     )
                     # Submit button
-                    export_btn = st.form_submit_button(
+                    export_btn = st.button(
                         label="Export mapping",
                         type="primary",
                     )

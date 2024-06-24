@@ -19,7 +19,7 @@ MAX_COLS_PER_ROW = 3
 
 def st_show_home():
     # Page config
-    cols = st.columns([10, 3])
+    cols = st.columns([10, 3], vertical_alignment="center")
     with cols[0]:
         st.title("Wizard 🪄")
     with cols[1]:
