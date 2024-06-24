@@ -8,7 +8,7 @@ A crucial step in the ETL process is harmonizing country names. This is because 
 
     All our standardised country names are defined in our regions dataset (see [this YAML file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.yml)).
 
-Typically, harmonizing country names is done after the Meadow step and before the Garden step, and is is consolidated into a JSON dictionary, mapping the source's country names to our standard names:
+Typically, harmonizing country names is done after the Meadow step and before (or during) the Garden step, and is is consolidated into a JSON dictionary, which maps the source's country names to our standard names:
 
 ```json
 // some_step.countries.json
