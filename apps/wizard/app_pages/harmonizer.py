@@ -187,7 +187,9 @@ if option:
                 tb=tb,
                 colname=column_name,
             )
-            ambiguous = harmonizer.run_automatic()
+            harmonizer.run_automatic()
+
+            ambiguous = cast(List, harmonizer.ambiguous)
             mapping = harmonizer.mapping
 
             st.divider()

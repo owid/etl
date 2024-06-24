@@ -86,10 +86,10 @@ def harmonize(
     )
 
     # Run automatic harmonization
-    ambiguous = harmonizer.run_automatic(logging="shell")
+    harmonizer.run_automatic(logging="shell")
 
     # Need user input
-    harmonizer.run_interactive_terminal(ambiguous, institution, num_suggestions)
+    harmonizer.run_interactive_terminal(institution, num_suggestions)
 
     # Export
     harmonizer.export_mapping()
@@ -106,11 +106,10 @@ def harmonize_ipython(
     )
 
     # Run automatic harmonization
-    ambiguous = harmonizer.run_automatic(logging="ipython")
+    harmonizer.run_automatic(logging="ipython")
 
     # Need user input
     harmonizer.run_interactive_ipython(
-        ambiguous=ambiguous,
         institution=institution,
         num_suggestions=num_suggestions,
     )
@@ -250,6 +249,7 @@ class Harmonizer:
         self.geo = self._get_geo(tb, colname, indicator)
         self.mapper = CountryRegionMapper()
         self.output_file = output_file
+        self.ambiguous = None
 
         # Mapping
         self._mapping = None
@@ -323,7 +323,7 @@ class Harmonizer:
             print(f"  └ {len(ambiguous)} ambiguous countries/regions")
             print("")
 
-        return ambiguous
+        self.ambiguous = ambiguous
 
     def get_suggestions(self, region: str, institution: Optional[str], num_suggestions: int):
         """Get suggestions for region."""
@@ -331,11 +331,13 @@ class Harmonizer:
 
     def run_interactive_terminal(
         self,
-        ambiguous: List[str],
         institution: Optional[str] = None,
         num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ) -> None:
         """Ask user to map countries."""
+        if self.ambiguous is None:
+            raise ValueError("Run `run_automatic` first!")
+
         questionary.print("Beginning interactive harmonization...")
         questionary.print("  Select [skip] to skip a country/region mapping")
         questionary.print("  Select [custom] to enter a custom name\n")
@@ -344,13 +346,13 @@ class Harmonizer:
         # start interactive session
         n_skipped = 0
         try:
-            for i, region in enumerate(ambiguous, 1):
+            for i, region in enumerate(self.ambiguous, 1):
                 # no exact match, get nearby matches
                 suggestions = self.get_suggestions(region, institution=institution, num_suggestions=num_suggestions)
 
                 # show suggestions
                 name = questionary.select(
-                    f"[{i}/{len(ambiguous)}] {region}:",
+                    f"[{i}/{len(self.ambiguous)}] {region}:",
                     choices=suggestions + ["[custom]", "[skip]"],
                     use_shortcuts=True,
                     style=SHELL_FORM_STYLE,
@@ -383,13 +385,15 @@ class Harmonizer:
 
     def run_interactive_ipython(
         self,
-        ambiguous: List[str],
         institution: Optional[str] = None,
         num_suggestions: int = DEFAULT_NUM_SUGGESTIONS,
     ):
+        if self.ambiguous is None:
+            raise ValueError("Run `run_automatic` first!")
+
         # Render widgets
         mappings_raw = []
-        for i, country in enumerate(ambiguous, start=1):
+        for i, country in enumerate(self.ambiguous, start=1):
             ## Get suggestions for country
             options = self.get_suggestions(
                 country,
@@ -399,7 +403,7 @@ class Harmonizer:
 
             ## Render widgets
             params = self._widgets_ipython_country(
-                label=f"({i}/{len(ambiguous)}) {country}",
+                label=f"({i}/{len(self.ambiguous)}) {country}",
                 country=country,
                 options=options,
             )
