@@ -27,7 +27,7 @@ from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.datautils.common import ExceptionFromDocstring
+from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
@@ -365,11 +365,11 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
     """Current step must be listed in the dag."""
 
 
-class NoMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """No steps found among dependencies of current ETL step, that match the given specifications."""
 
 
-class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """Multiple steps found among dependencies of current ETL step, that match the given specifications."""
 
 
@@ -478,6 +478,16 @@ class PathFinder:
     @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
+
+    @property
+    def step_name(self) -> str:
+        """Return step name."""
+        return self.create_step_name(
+            short_name=self.short_name,
+            channel=self.channel,  # type: ignore
+            namespace=self.namespace,
+            version=self.version,
+        )
 
     @staticmethod
     def create_step_name(
@@ -599,9 +609,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies
+            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies
+            raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
         dependency = matches[0]
 
@@ -639,9 +649,9 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+    def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
-        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name, **kwargs)
         assert isinstance(snap, Snapshot)
         return snap
 
