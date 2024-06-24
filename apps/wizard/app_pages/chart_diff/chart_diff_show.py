@@ -213,7 +213,11 @@ class ChartDiffShow:
 
         # Status of chart diff: approve, pending, reject
         with col1:
-            if self.diff.is_modified & (("data" in self.diff.change_types) | ("metadata" in self.diff.change_types)):
+            if (
+                self.diff.is_modified
+                & ("config" not in self.diff.change_types)
+                & (("data" in self.diff.change_types) | ("metadata" in self.diff.change_types))
+            ):
                 st.radio(
                     label="Did you review the chart?",
                     key=f"radio-{self.diff.chart_id}",
