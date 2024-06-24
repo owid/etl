@@ -9,17 +9,20 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.utils import set_states, st_page_link
+from apps.wizard.utils import set_states, st_page_link, st_toast_error
 from etl.config import OWID_ENV
 from etl.db import get_engine
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger
 log = get_logger()
-# Session state variable to track gpt tweaks
-st.session_state["gpt_tweaks"] = st.session_state.get("gpt_tweaks", {})
-# Limit the charts to preview
-NUM_CHARTS_LIMIT = 100
+
+
+def trigger_chart_submission():
+    if st.session_state.submitted_indicators:
+        set_states({"submitted_charts": True})
+    else:
+        st_toast_error("You've changed the indicator mapping. Please submit the form before to update the charts.")
 
 
 def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[gm.Chart]:
@@ -77,7 +80,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
                 label="🚀 Update charts (3/3)",
                 use_container_width=True,
                 type="primary",
-                on_click=lambda: set_states({"submitted_charts": True}),
+                on_click=trigger_chart_submission,
             )
     else:
         st.warning("No charts found to update with the given variable mapping.")

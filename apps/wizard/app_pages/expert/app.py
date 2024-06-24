@@ -145,6 +145,7 @@ options = [
 #     "Create SQL queries on our Datasette instance.",
 #     "Specific queries about setting up your environment.",
 # ]
+# NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
 with st.container(border=True):
     st.radio(
         label="Choose a category for the question",
