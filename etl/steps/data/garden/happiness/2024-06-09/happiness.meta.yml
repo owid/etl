@@ -13,7 +13,7 @@ dataset:
 tables:
   happiness:
     variables:
-      cantril_ladder_score:
+      happiness_score:
         title: Cantril ladder score
         unit: ""
         short_unit: ""

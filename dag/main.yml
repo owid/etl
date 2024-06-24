@@ -271,6 +271,7 @@ steps:
 
   data://garden/happiness/2024-06-09/happiness:
     - data://meadow/happiness/2024-06-09/happiness
+    - data://meadow/happiness/2024-06-20/happiness_ages
     - data://garden/happiness/2023-03-20/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
@@ -280,13 +281,6 @@ steps:
 
   data://meadow/happiness/2024-06-20/happiness_ages:
     - snapshot://happiness/2024-06-20/happiness_ages.xls
-  data://garden/happiness/2024-06-20/happiness_ages:
-    - data://meadow/happiness/2024-06-20/happiness_ages
-    - data://garden/demography/2023-03-31/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
-  data://grapher/happiness/2024-06-20/happiness_ages:
-    - data://garden/happiness/2024-06-20/happiness_ages
 
 
   # LGBTI Policy Index (Velasco, 2020)
