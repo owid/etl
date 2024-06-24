@@ -6,7 +6,8 @@ tags:
 # Update data
 
 !!! warning "This guide is a work in progress"
-This guide is currently being written. If you have any questions, please reach out to the Data Team.
+
+  This guide is currently being written. If you have any questions, please reach out to the Data Team.
 
 To update a dataset you have two main options:
 
