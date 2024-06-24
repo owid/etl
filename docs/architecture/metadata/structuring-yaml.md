@@ -198,7 +198,7 @@ Even more complex metadata can be generated with [Jinja templates](https://jinja
 
 !!! note
 
-    We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var `.
+    We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var }}`.
 
 
 Find below a more complex example with dimension `conflict_type`. In this example, we use Jinja combined with dynamic YAML. Note that the dimension values are available through variables with the same name.

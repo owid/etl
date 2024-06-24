@@ -16,13 +16,13 @@ meta:
 
     # Files
     url_main: https://www.equaldex.com/
-    date_accessed: 2024-06-17
+    date_accessed: 2024-06-24
 
     # License
     license:
       name: Equaldex Terms and Conditions of Use
       url: https://www.equaldex.com/terms
 outs:
-  - md5: a0963bdfd4b8d808e8e0c5efa4eb754c
-    size: 7853
+  - md5: 98ed56e9500fab9ba15b62fd841e4210
+    size: 7856
     path: equaldex_indices.csv
