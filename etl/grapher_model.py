@@ -1439,7 +1439,7 @@ class ChartDiffApprovals(Base):
         # Get matches from DB
         criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
 
-        results = session.scalars(
+        raw_results = session.scalars(
             select(cls)
             .where(
                 or_(
@@ -1455,7 +1455,13 @@ class ChartDiffApprovals(Base):
             )
             .order_by(cls.updatedAt.desc())
         ).all()
-        results = {res.chartId: res for res in results}
+
+        # Take the latest approval for each chart - note that it's sorted by updatedAt, so we take just the
+        # first element
+        results = {}
+        for r in raw_results:
+            if r.chartId not in results:
+                results[r.chartId] = r
 
         # List with statuses corresponding to charts specified by IDs in chart_ids
         statuses = []
