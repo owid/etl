@@ -19,6 +19,7 @@ from rapidfuzz import process
 from rich_click.rich_command import RichCommand
 
 from etl.exceptions import RegionDatasetNotFound
+from etl.helpers import PathFinder
 from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
 # Style for questionary
@@ -38,6 +39,8 @@ SHELL_FORM_STYLE = questionary.Style(
 )
 # Default number of suggestions
 DEFAULT_NUM_SUGGESTIONS = 5
+# Default column-to-harmonize name
+COLUMN_HARMONIZE = "country"
 
 
 @click.command(name="harmonize", cls=RichCommand)
@@ -96,13 +99,19 @@ def harmonize(
 
 
 def harmonize_ipython(
-    tb: Table, column: str, output_file: str, num_suggestions: int = 100, institution: Optional[str] = None
+    tb: Table,
+    column: Optional[str] = None,
+    output_file: Optional[str] = None,
+    paths: Optional[PathFinder] = None,
+    num_suggestions: int = 100,
+    institution: Optional[str] = None,
 ):
     # Create Harmonizer
     harmonizer = Harmonizer(
         tb=tb,
         colname=column,
         output_file=output_file,
+        paths=paths,
     )
 
     # Run automatic harmonization
@@ -234,9 +243,10 @@ class Harmonizer:
     def __init__(
         self,
         tb: Optional[Table | pd.DataFrame] = None,
-        colname: str = "country",
+        colname: Optional[str] = None,
         indicator: Optional[Variable | pd.Series] = None,
         output_file: Optional[str] = None,
+        paths: Optional[PathFinder] = None,
     ):
         """Constructor
 
@@ -248,7 +258,7 @@ class Harmonizer:
         """
         self.geo = self._get_geo(tb, colname, indicator)
         self.mapper = CountryRegionMapper()
-        self.output_file = output_file
+        self.output_file = self._get_output_file(output_file, paths)
         self.ambiguous = None
 
         # Mapping
@@ -259,14 +269,23 @@ class Harmonizer:
         """Get set of country names to map."""
         if (tb is None) and (indicator is None):
             raise ValueError("Either `tb` or `indicator` must be provided")
-        elif indicator is not None:
-            return indicator
-        else:
+        elif indicator is None:
+            if colname is None:
+                colname = COLUMN_HARMONIZE
             if colname not in tb.columns:
                 raise ValueError(f"Column '{colname}' not found in table")
             indicator = tb[colname]
 
         return sorted(set(indicator.dropna().astype("string").unique()))
+
+    def _get_output_file(self, output_file: Optional[str], paths: Optional[PathFinder]):
+        """Get set of country names to map."""
+        if (output_file is None) and (paths is None):
+            raise ValueError("Either `output_file` or `paths` must be provided")
+        elif paths is not None:
+            return paths.country_mapping_path
+        else:
+            return output_file
 
     @property
     def mapping(self):
