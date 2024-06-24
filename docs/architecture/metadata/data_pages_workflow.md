@@ -34,4 +34,5 @@ ENV_FILE=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher
 After initiating the above command, changes made to the YAML file can be reviewed by refreshing the [staging Data page](http://staging-site-mojmir/admin/datapage-preview/738081). The updates should be reflected promptly.
 
 !!! info
+
     If editing the YAML file in the **garden channel** and the step execution time is long, refresh latency will be dependent on the step's runtime. In such cases, consider developing the YAML file in the **grapher channel** before moving it into the garden channel (if the table and indicator names are identical).

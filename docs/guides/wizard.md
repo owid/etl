@@ -3,7 +3,8 @@ status: new
 ---
 
 !!! warning
-Wizard is a living project, and is constantly being improved and new features are being added. Consequently, this documentation might be slightly out of sync.
+
+    Wizard is a living project, and is constantly being improved and new features are being added. Consequently, this documentation might be slightly out of sync.
 
 _The Wizard_ is OWID's ETL admin tool. It is an interactive [streamlit](https://streamlit.io/)-based web app that provides a user-friendly interface to manage our ETL catalog.
 
@@ -73,31 +74,34 @@ Additionally, Expert can also help out create Datasette queries!
   <figcaption>Asking the Expert to generate a Datasette query to get the charts with most views.</figcaption>
 </figure>
 
-### Charts
+### Data tools
 
 Pages to help us improve our charts (e.g. keeping them up to date). The current pages are:
 
 - **Indicator Upgrader**: Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
 - **Chart diff**: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
+- **Harmonizer**: Harmonize the entity names of a table. Read more about the tool [here](harmonize-countries).
 
-!!! info "Learn more about this flow in [Update charts](data-work/update-charts.md) section"
+!!! info "Learn more about [updating charts](data-work/update-charts.md) section"
 
-### Data tools
+### Monitoring
 
-- **Dashboard**: Bla
+- **Dashboard**: Monitor all our datasets and update them quickly!
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it.
-- **Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [our CLI](../etl-cli/#etl-harmonize).
+
+### Research
+
 - **Insighter**: Generate insights from a chart using LLMs.
+
+### Misc
+
+- **News**: Brief summary of the latest activity in the ETL repository. This is only available in production.
+- **owidle**: Daily challenge where you have to guess the country based on the data provided.
 
 ### Metadata
 
 - **Meta Upgrader**: Upgrade v1 metadata YAML files to v2. This tool uses chatGPT to suggest the new YAML structure.
 - **Meta Playground**: A playground to test the metadata of a step. It is useful to check if the metadata is valid and to see how it will look like in a data page of an indicator.
-
-### Others
-
-- **News**: Brief summary of the latest activity in the ETL repository. This is only available in production.
-- **owidle**: Daily challenge where you have to guess the country based on the data provided.
 
 ## Adding new functionalities to Wizard
 

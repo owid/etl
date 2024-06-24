@@ -37,6 +37,7 @@ where
 
 
 !!! example
+
     ```
     snapshot://ember/2023-02-20/yearly_electricity.csv
     ```
@@ -56,6 +57,7 @@ where
 | `dataset-name`    | Short name of the curated dataset (e.g. `un_wpp`). |
 
 !!! example "Examples"
+
     - **Meadow**: `data://meadow/nasa/2023-03-06/ozone_hole_area`
     - **Garden**: `data://garden/nasa/2023-03-06/ozone_hole_area`
     - **Grapher**: `data://grapher/nasa/2023-03-06/ozone_hole_area`
@@ -79,6 +81,7 @@ where
 | `dataset-name`    | Short name of the curated dataset (e.g. `un_wpp`). |
 
 !!! example
+
     ```
     walden://irena/2022-10-07/renewable_electricity_capacity_and_generation
     ```
@@ -96,6 +99,7 @@ where
 | `dataset-name`    | Name of the dataset. It follows the format `dataset_<dataset-id>_<dataset-name>`, where `dataset-id` corresponds to the dataset Grapher id and `dataset-name` is the name of the dataset in Grapher (with lower case, and all symbols replaced by underscores). |
 
 !!! example
+
     ```
     backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
     ```

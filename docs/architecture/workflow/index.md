@@ -21,6 +21,7 @@ The design of the ETL involves steps that mirror the stages above, which help us
 A data manager must implement all these steps to make something chartable on the Our World in Data site.
 
 !!! info
+
     When all steps (1 to 4) are implemented, the data is available for publication on our site. The publication step can involve creating new charts or updating existing ones with the new data.
 
 Note that there are [other steps](other-steps), which are used only in specific cases.
