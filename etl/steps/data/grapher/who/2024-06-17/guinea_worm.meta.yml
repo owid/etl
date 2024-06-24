@@ -47,7 +47,6 @@ tables:
         unit: ""
         description_short:
           To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
         description_from_producer:
           Elimination of dracunculiasis is the confirmed absence of the emergence of adult female worms (the interruption of transmission of Dracunculus medinensis)
           in humans and animals for three consecutive years or longer from a country with such a low risk of reintroduction of the parasite that preventive measures
@@ -59,7 +58,6 @@ tables:
         unit: ""
         description_short:
           To be certified as free of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm), a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
         type: ordinal
         sort:
           - "1997-1999"
@@ -74,7 +72,6 @@ tables:
         description_short:
           The current and historical values for the status of [Guinea worm disease (Dracunculiasis)](#dod:guinea-worm) as certified by the WHO.
           To be certified as free of guinea worm disease, a country must have reported zero indigenous cases through active surveillance for at least three consecutive years.
-          Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year.
       guinea_worm_reported_cases:
         title: Reported cases of guinea worm disease in humans
         unit: cases
