@@ -431,6 +431,21 @@ class Harmonizer:
             mappings_raw.append(params)
 
         if mappings_raw != []:
+            style = """
+            <style>
+            .jupyter-widgets-output-area .output_scroll {
+                    height: unset !important;
+                    border-radius: unset !important;
+                    -webkit-box-shadow: unset !important;
+                    box-shadow: unset !important;
+                }
+                .jupyter-widgets-output-area  {
+                    height: auto !important;
+                }
+            </style>
+            """
+            display(widgets.HTML(style))
+
             # Show button
             btn = widgets.Button(
                 description="Export mapping",
@@ -468,6 +483,7 @@ class Harmonizer:
                         _export_new_name(country_name, alias)
 
             btn.on_click(_on_submit)
+
 
             display(btn)
 
