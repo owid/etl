@@ -47,6 +47,7 @@ my_var_1:
 
 
 !!! note "Note"
+
     This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (or ++option+z++ in VS Code on Mac).
 
 ### Folded style `>`
@@ -65,6 +66,7 @@ my_var_1:
 ```
 
 !!! note "Note"
+
     This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
 
 
@@ -195,7 +197,8 @@ There are also special variables like `{ TODAY }` that can be used for automatic
 Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
 
 !!! note
-    We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var }}`.
+
+    We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var `.
 
 
 Find below a more complex example with dimension `conflict_type`. In this example, we use Jinja combined with dynamic YAML. Note that the dimension values are available through variables with the same name.

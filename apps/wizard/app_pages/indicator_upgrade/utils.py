@@ -1,5 +1,5 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 
 import pandas as pd
 import streamlit as st
@@ -11,6 +11,7 @@ from apps.utils.map_datasets import get_grapher_changes
 from etl.db import config, get_all_datasets, get_connection, get_dataset_charts, get_variables_in_dataset
 from etl.git import get_changed_files
 from etl.indicator_upgrade.schema import get_schema_chart_config
+from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 from etl.version_tracker import VersionTracker
 
 # Logger
@@ -205,3 +206,47 @@ def _check_env_and_environment() -> None:
             st.success(msg)
             st.subheader("Environment")
             _show_environment()
+
+
+@st.cache_data(show_spinner=False)
+def preliminary_mapping_cached(
+    old_indicators, new_indicators, match_identical
+) -> Tuple[Dict[int, int], pd.DataFrame, pd.DataFrame]:
+    """Get preliminary indicator mapping.
+
+    This maps indicators based on names that are identical.
+    """
+    mapping, missing_old, missing_new = preliminary_mapping(
+        old_indicators=old_indicators,
+        new_indicators=new_indicators,
+        match_identical=match_identical,
+    )
+
+    if not mapping.empty:
+        indicator_mapping_auto = (
+            mapping.astype({"id_old": "int", "id_new": "int"}).set_index("id_old")["id_new"].to_dict()
+        )
+    else:
+        indicator_mapping_auto = {}
+
+    # Cast
+    indicator_mapping_auto = cast(Dict[int, int], indicator_mapping_auto)
+
+    return indicator_mapping_auto, missing_old, missing_new
+
+
+@st.cache_data(show_spinner=False)
+def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
+    """Get mappings for manual mapping.
+
+    Most indicators can't be mapped automatically. This method finds suggestions for each indicator. The user will have to review these and manually choose the best option.
+    """
+    with st.spinner():
+        suggestions = find_mapping_suggestions(
+            missing_old=missing_old,
+            missing_new=missing_new,
+            similarity_name=similarity_name,
+        )  # type: ignore
+    # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
+    suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
+    return suggestions

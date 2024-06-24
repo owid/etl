@@ -4,24 +4,24 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Mental Health Prevalence
+    title: Global Burden of Disease - Risk Factors
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence of mental health conditions for a range of age-groups across males and females.
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the risk factors that contribute to deaths and DALYs from all causes, cardiovascular diseases, lower respiratory infections, diarrheal diseases and cancers.
     date_published: "2024-05-17"
     # Citation
     producer: IHME, Global Burden of Disease
     citation_full: |-
       "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2024. Available from https://vizhub.healthdata.org/gbd-results/."
-    attribution_short: "IHME-GBD"
+        attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    date_accessed: 2024-05-20
+    date_accessed: 2024-06-14
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: ce528ff38366761c840a72f6f009c000
-    size: 343358786
-    path: gbd_mental_health.feather
+  - md5: 27e28b2d1f792ed04012683fb772f00a
+    size: 725420586
+    path: gbd_risk.feather

@@ -10,6 +10,7 @@ Our documentation is built using `mkdocs`, which renders markdown files into HTM
 The markdown files powering the documentation are in the same repository, under the [`docs/`](https://github.com/owid/etl/tree/master/docs) directory. Along with this file, there is the [`mkdocs.yml`](https://github.com/owid/etl/tree/master/mkdocs.yml) configuration file, which organizes the markdown files hierarchically, sets the site theme, and much more.
 
 !!! info "Whenever you do substantial changes to the ETL project, make sure that this is reflected in the documentation"
+
     That is, whenever you are working on a project and you create a pull request, make sure that the documentation still makes sense with your changes. If necessary, adapt it in the same PR.
 
 
