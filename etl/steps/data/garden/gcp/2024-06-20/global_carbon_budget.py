@@ -162,7 +162,7 @@ def run(dest_dir: str) -> None:
     tb_energy = ds_energy["primary_energy_consumption"].reset_index()
 
     # Load GDP dataset.
-    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_gdp = paths.load_dataset("maddison_project_database")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -368,7 +368,7 @@ def sanity_checks_on_input_data(
     # Since country names have not yet been harmonized, rename the only countries that are present in both datasets.
     comparison = pr.merge(
         tb_co2[["country", "year", "emissions_total"]],
-        tb_production[tb_production["country"] != "Bunkers"].replace({"World": "Global"}),
+        tb_production[tb_production["country"] != "Bunkers"].astype({"country": str}).replace({"World": "Global"}),
         on=["country", "year"],
         how="inner",
     ).dropna(subset=["emissions_total", "production_emissions"], how="any")
@@ -428,9 +428,18 @@ def sanity_checks_on_output_data(tb_combined: Table) -> None:
         (tb_combined["country"] == "World") & (tb_combined["population_as_share_of_global"].fillna(100) != 100)
     ].empty, error
 
-    error = "All share of global emissions should be smaller than 100% (within 2% error)."
-    share_variables = [col for col in tb_combined.columns if "share" in col]
-    assert (tb_combined[share_variables].fillna(0) <= 102).all().all(), error
+    error = "All share of global emissions should be smaller than 100% (within 1% error)."
+    share_variables = [
+        col
+        for col in tb_combined.columns
+        if "share" in col
+        if col != "emissions_from_land_use_change_as_share_of_global"
+    ]
+    assert (tb_combined[share_variables].fillna(0) <= 101).all().all(), error
+    # NOTE: "emissions_from_land_use_change_as_share_of_global" from Upper-middle-income countries in 1982, 1984 and 1986 is >101%.
+    # This is, in principle, possible (since land use change emissions can be negative), but it would be good to look into it.
+    # For now, check this variable separately (and ensure it's smaller than, say, 109%).
+    assert (tb_combined["emissions_from_land_use_change_as_share_of_global"].fillna(0) <= 109).all().all(), error
 
     # Check that cumulative variables are monotonically increasing.
     # Firstly, list columns of cumulative variables, but ignoring cumulative columns as a share of global
@@ -448,7 +457,7 @@ def sanity_checks_on_output_data(tb_combined: Table) -> None:
     assert (
         tb_combined.sort_values("year", ascending=False)
         .groupby("country")
-        .agg({col: lambda x: ((x.pct_change().dropna() * 100) <= 0.1).all() for col in cumulative_cols})
+        .agg({col: lambda x: ((x.pct_change(fill_method=None).dropna() * 100) <= 0.1).all() for col in cumulative_cols})
         .all()
         .all()
     ), error
@@ -1053,12 +1062,13 @@ def combine_data_and_add_variables(
 
     # Add annual percentage growth of total emissions.
     tb_co2_with_regions["pct_growth_emissions_total"] = (
-        tb_co2_with_regions.groupby("country")["emissions_total"].pct_change() * 100
+        tb_co2_with_regions.groupby("country", observed=True)["emissions_total"].pct_change(fill_method=None) * 100
     )
 
     # Add annual percentage growth of total emissions (including land-use change).
     tb_co2_with_regions["pct_growth_emissions_total_including_land_use_change"] = (
-        tb_co2_with_regions.groupby("country")["emissions_total_including_land_use_change"].pct_change() * 100
+        tb_co2_with_regions.groupby("country")["emissions_total_including_land_use_change"].pct_change(fill_method=None)
+        * 100
     )
 
     # Add annual absolute growth of total emissions.

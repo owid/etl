@@ -6,7 +6,7 @@ Datasets combined:
 * Greenhouse gas emissions by sector - Climate Watch.
 * Primary energy consumption - EI & EIA.
 
-Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2020) on
+Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2023) on
 GDP are included.
 
 """
@@ -291,7 +291,7 @@ def run(dest_dir: str) -> None:
     ds_climate_watch = paths.load_dataset("emissions_by_sector")
 
     # Load the GDP dataset by GGDC Maddison.
-    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_gdp = paths.load_dataset("maddison_project_database")
 
     # Load primary energy consumption dataset (by different sources in our 'energy' namespace).
     ds_energy = paths.load_dataset("primary_energy_consumption")
@@ -309,7 +309,7 @@ def run(dest_dir: str) -> None:
     tb_climate_watch_ch4 = ds_climate_watch["methane_emissions_by_sector"]
     tb_climate_watch_n2o = ds_climate_watch["nitrous_oxide_emissions_by_sector"]
     tb_energy = ds_energy["primary_energy_consumption"]
-    tb_gdp = ds_gdp["maddison_gdp"]
+    tb_gdp = ds_gdp["maddison_project_database"]
     tb_population = ds_population["population"]
     tb_regions = ds_regions["regions"]
 
