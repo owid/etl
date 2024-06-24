@@ -1,3 +1,4 @@
+import ast
 import json
 from copy import deepcopy
 from typing import cast
@@ -119,9 +120,13 @@ class ChartDiffConflictResolver:
                 if self.value_resolved[field_key] is None:
                     config.pop(field_key, None)
                 else:
-                    config[field_key] = as_valid_json(field_resolution)
+                    # st.write(field_key)
+                    config_field = as_valid_json(field_resolution)
+                    config_field = as_list(config_field)
+                    config[field_key] = config_field
+                    # st.write(f"{field_key}: {type(config[field_key]).__name__}")
 
-            # Get rid of special fields
+            # # Get rid of special fields
             fields_remove = [
                 "bakedGrapherURL",
                 "adminBaseUrl",
@@ -131,7 +136,7 @@ class ChartDiffConflictResolver:
                 config.pop(field, None)
 
             # Verify config
-            config_new = validate_chart_config_and_set_defaults(config, schema=get_schema())
+            config_new = validate_chart_config_and_set_defaults(config, schema=get_schema("004"))
 
             # Push to staging
             api = AdminAPI(SOURCE.engine, grapher_user_id=1)
@@ -139,17 +144,32 @@ class ChartDiffConflictResolver:
                 chart_id=self.diff.chart_id,
                 chart_config=config_new,
             )
-            print(config)
-        if rerun:
-            st.rerun()
+            st.success(
+                "Conflicts have been resolved. The chart in staging has been updated. You can close this window."
+            )
+        # if rerun:
+        #     st.rerun()
 
 
 def as_valid_json(s):  # -> Any:
     """Return `s` as a dictionary if applicable."""
+    # Preprocess the string to replace single quotes with double quotes
+    s = s.replace("'", '"')
+
     try:
         return json.loads(s)
     except json.JSONDecodeError:
         return s
+
+
+def as_list(s):
+    """Return `s` as a list if applicable."""
+    if isinstance(s, str):
+        try:
+            return ast.literal_eval(s)
+        except (ValueError, SyntaxError):
+            return s
+    return s
 
 
 def compare_chart_configs(c1, c2):
