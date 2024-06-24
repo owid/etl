@@ -807,6 +807,10 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
+        # We sometimes get a warning, but it's unclear where it is coming from
+        # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
             verbose = True

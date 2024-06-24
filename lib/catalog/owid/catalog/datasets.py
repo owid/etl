@@ -180,11 +180,17 @@ class Dataset:
 
         # Update the copy of this datasets metadata in every table in the set.
         # TODO: this entire part should go away and we should make t.metadata.dataset read only
+        #   also dataset metadata should be only saved in `index.json` and not in every table
         for table_name in self.table_names:
-            with disable_processing_log():
-                table = self[table_name]
-            table.metadata.dataset = self.metadata
-            table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
+            # NOTE: don't load the table here, that could be slow. Just update the metadata file.
+            table_meta_path = Path(self.path) / f"{table_name}.meta.json"
+
+            with open(table_meta_path, "r") as f:
+                table_meta = json.load(f)
+                table_meta["dataset"] = self.metadata.to_dict()
+
+            with open(table_meta_path, "w") as f:
+                json.dump(table_meta, f, indent=2, default=str)
 
     def update_metadata(
         self,
