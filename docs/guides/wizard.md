@@ -48,7 +48,9 @@ In the following sections we try to give a brief overview of each of the section
 
 This section is dedicated to the creation of new ETL steps, including **Snapshot**, **Meadow**, **Garden** and **Grapher** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
 
-There is also **Express**, which creates a meadow, garden and grapher step in one go.
+!!! Tip "Using Express"
+
+    Express mode is helpful when working with very canonical datasets. It is a one-click solution to create a meadow, garden and grapher step in one go.
 
 In each step creation, a form is presented to the user so that they can fill in the necessary metadata fields. Based on the input, new files (e.g. python scripts, metadata YAML files, etc.) are created and modifications to existing ones (e.g. the DAG) are done.
 
@@ -70,31 +72,34 @@ Additionally, Expert can also help out create Datasette queries!
   <figcaption>Asking the Expert to generate a Datasette query to get the charts with most views.</figcaption>
 </figure>
 
-### Charts
+### Data tools
 
 Pages to help us improve our charts (e.g. keeping them up to date). The current pages are:
 
-- **Indicator Upgrader**: Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
-- **Chart diff**: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
+- [**Indicator Upgrader**](update-charts/#indicator-upgrader): Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
+- [**Chart diff**](update-charts/#chart-diff): Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
+- [**Harmonizer**](harmonize-countries): Harmonize the entity names of a table.
 
-!!! info "Learn more about this flow in [Update charts](data-work/update-charts.md) section"
+!!! info "Learn more about [updating charts](data-work/update-charts.md) section"
 
-### Data tools
+### Monitoring
 
-- **Dashboard**: Bla
+- **Dashboard**: Monitor all our datasets and update them quickly!
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it.
-- **Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [our CLI](../etl-cli/#etl-harmonize).
+
+### Research
+
 - **Insighter**: Generate insights from a chart using LLMs.
+
+### Misc
+
+- **News**: Brief summary of the latest activity in the ETL repository. This is only available in production.
+- **owidle**: Daily challenge where you have to guess the country based on the data provided.
 
 ### Metadata
 
 - **Meta Upgrader**: Upgrade v1 metadata YAML files to v2. This tool uses chatGPT to suggest the new YAML structure.
 - **Meta Playground**: A playground to test the metadata of a step. It is useful to check if the metadata is valid and to see how it will look like in a data page of an indicator.
-
-### Others
-
-- **News**: Brief summary of the latest activity in the ETL repository. This is only available in production.
-- **owidle**: Daily challenge where you have to guess the country based on the data provided.
 
 ## Adding new functionalities to Wizard
 
