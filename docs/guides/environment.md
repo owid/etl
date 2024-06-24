@@ -1,5 +1,4 @@
 ---
-status: new
 tags:
   - 👷 Staff
 ---
@@ -14,7 +13,8 @@ In ETL, we often have to interact with a external services (including some of ou
 To this end, we work with `.env` files, where we define all the required environment variables. An example template is available in the root directory of the repository (see [.env.example](https://github.com/owid/etl/blob/master/.env.example)). Based on this file, staff members create their own `.env` file.
 
 !!! note "Which environment is used?"
-By default, your commands will load all the environment variables defined in `.env`. In case you want to use another file, you can use the prefix `ENV_FILE=.env.name` before the command. E.g. `ENV_FILE=.env.name etl run ...` or `ENV_FILE=.env.name etlwiz charts`.
+
+    By default, your commands will load all the environment variables defined in `.env`. In case you want to use another file, you can use the prefix `ENV_FILE=.env.name` before the command. E.g. `ENV_FILE=.env.name etl run ...` or `ENV_FILE=.env.name etlwiz charts`.
 
     **The use of `ENV_FILE` is not recommended** unless you are aware of what it comprises.
 
