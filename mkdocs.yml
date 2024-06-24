@@ -200,18 +200,18 @@ nav:
       - Contributing: "contributing.md"
   - Guides:
       - "guides/index.md"
-      - Ingest data:
+      - Data work:
           - "guides/data-work/index.md"
           - Adding data: "guides/data-work/add-data.md"
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
       - Wizard: "guides/wizard.md"
       - CLI: "guides/etl-cli.md"
+      - Harmonize country names: "guides/harmonize-countries.md"
       - Using different environments: "guides/environment.md"
       - Staging servers: "guides/staging-servers.md"
-      - Backport a dataset to ETL: "guides/backport.md"
       - Private dataset import to ETL: "guides/private-import.md"
-      - Harmonize country names: "guides/harmonize-countries.md"
+      - Backport a dataset to ETL: "guides/backport.md"
       - Metadata in data pages: "guides/metadata-play.md"
       - Edit the documentation: "dev/docs.md"
       - OpenAI setup: "guides/openai.md"
