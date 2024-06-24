@@ -76,11 +76,11 @@ There is also an "explore" mode which you can use to quickly compare two indicat
   <figcaption>Using Wizard to upgrade the indicators from dataset 5963 with those in dataset 6349.</figcaption>
 </figure>
 
-Once you have finished mapping indicators, you will see a preview of the affected charts. Finally approve and run all chart updates.
+Once you have finished mapping indicators, you will see a preview of the affected charts. Now, you just need to approve all new charts, and these will become live on your staging server.
 
 <figure markdown="span">
-  ![Chart Upgrader](../../../assets/chart-upgrader-2.png)
-  <figcaption>Once you submit the chart revisions, a link to the chart approval tool will be displayed.</figcaption>
+  ![Chart Upgrader](../../../assets/indicator-upgrader-2.png)
+  <figcaption>.</figcaption>
 </figure>
 
 ## Chart diff
