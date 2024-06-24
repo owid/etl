@@ -18,7 +18,7 @@ import sys
 from copy import deepcopy
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
 import streamlit as st
@@ -603,7 +603,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -611,7 +611,7 @@ def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        if only_if_not_exists:
+        if also_if_not_exists:
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
@@ -711,25 +711,24 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kw
 
 
 class Pagination:
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-
+        # Action to perform when interacting with any of the buttons.
+        ## Example: Change the value of certain state in session_state
+        self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
             self.page = 1
 
     @property
     def page(self):
-        # value = min(self.total_pages, st.session_state[self.pagination_key])
         value = st.session_state[self.pagination_key]
         return value
 
     @page.setter
     def page(self, value):
-        # Correct page number if exceeds maximum allowed
-
         st.session_state[self.pagination_key] = value
 
     @property
@@ -742,9 +741,17 @@ class Pagination:
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self) -> None:
+    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
+        if mode == "bar":
+            self.show_controls_bar()
+        elif mode == "buttons":
+            self.show_controls_buttons()
+        else:
+            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+
+    def show_controls_buttons(self):
         # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
             with col1:
@@ -752,6 +759,8 @@ class Pagination:
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
                         self.page -= 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
@@ -761,12 +770,33 @@ class Pagination:
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
                         self.page += 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
+
+    def show_controls_bar(self) -> None:
+        def _change_page():
+            # Internal action
+
+            # External action
+            if self.on_click is not None:
+                self.on_click()
+
+        col, _ = st.columns([1, 3])
+        with col:
+            st.number_input(
+                label=f"**Go to page** (total: {self.total_pages})",
+                min_value=1,
+                max_value=self.total_pages,
+                # value=self.page,
+                on_change=_change_page,
+                key=self.pagination_key,
+            )
 
 
 def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
@@ -794,3 +824,13 @@ def set_staging_creation_time(key: str = "server_creation_time") -> None:
         st.session_state[key] = get_staging_creation_time()
     else:
         st.session_state[key] = None
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")

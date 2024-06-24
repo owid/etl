@@ -218,6 +218,9 @@ steps:
     - data://garden/democracy/2023-03-02/vdem
     - data://garden/energy/2024-05-08/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
+  # World Happiness report
+  data://grapher/happiness/2023-03-20/happiness:
+    - data://garden/happiness/2023-03-20/happiness
 
 include:
   # Include all active steps plus all archive steps.

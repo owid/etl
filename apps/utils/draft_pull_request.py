@@ -159,7 +159,9 @@ def cli(
         # If not explicitly given, the new branch will be the current branch.
         new_branch = repo.active_branch.name
         if new_branch == "master":
-            log.error("You're currently on 'master' branch. Use '--new-branch ...' to create a new branch.")
+            log.error(
+                "You're currently on 'master' branch. Pass the name of a branch as an argument to create a new branch."
+            )
             return
     else:
         # Ensure the new branch does not already exist locally.
