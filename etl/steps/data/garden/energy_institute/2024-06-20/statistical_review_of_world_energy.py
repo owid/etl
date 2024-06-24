@@ -21,13 +21,18 @@ MTOE_TO_TWH = MTOE_TO_PJ * PJ_TO_TWH
 BARRELS_TO_CUBIC_METERS = 1 / 6.2898
 # Thousand barrels per day to cubic meters per day
 KBD_TO_CUBIC_METERS_PER_DAY = 1000 * BARRELS_TO_CUBIC_METERS
-# Million British thermal units to megawatt-hours.
-MILLION_BTU_TO_MWH = 1e3 / 3412
+# Million British thermal units (of natural gas and liquefied natural gas) to megawatt-hours.
+MILLION_BTU_TO_MWH = 0.2931
 # Billion barrels to tonnes.
 BBL_TO_TONNES = 0.1364 * 1e9
+# Pounds (lb) to kg.
+LB_TO_KG = 0.453593
 
 # Reference year to use for table of price indexes.
-PRICE_INDEX_REFERENCE_YEAR = 2018
+PRICE_INDEX_REFERENCE_YEAR = 2019
+
+# Reference year to use for table of prices.
+PRICE_REFERENCE_YEAR = 2023
 
 # There is overlapping data for gas_reserves_tcm from USSR and Russia between 1991 and 1996.
 # By looking at the original file, this overlap seems to be intentional, so we keep the overlapping data when creating
@@ -194,42 +199,42 @@ COLUMNS = {
 # Columns to use from the additional data file related to prices, and how to rename them.
 COLUMNS_PRICES = {
     # Ammonia prices.
-    "ammonia__far_east_asia": "ammonia_price_far_east_asia",
-    "ammonia__middle_east": "ammonia_price_middle_east",
-    "ammonia__northwest_europe": "ammonia_price_northwest_europe",
-    "ammonia__us_gulf_coast": "ammonia_price_us_gulf_coast",
+    "ammonia__far_east_asia": "ammonia_price_far_east_asia_current_dollars_per_tonne",
+    "ammonia__middle_east": "ammonia_price_middle_east_current_dollars_per_tonne",
+    "ammonia__northwest_europe": "ammonia_price_northwest_europe_current_dollars_per_tonne",
+    "ammonia__us_gulf_coast": "ammonia_price_us_gulf_coast_current_dollars_per_tonne",
     # Coal prices.
-    "coal__australia": "coal_price_australia",
-    "coal__colombia": "coal_price_colombia",
-    "coal__indonesia": "coal_price_indonesia",
-    "coal__japan": "coal_price_japan",
-    "coal__northwest_europe": "coal_price_northwest_europe",
-    "coal__south_africa": "coal_price_south_africa",
-    "coal__south_china": "coal_price_south_china",
-    "coal__united_states": "coal_price_united_states",
+    "coal__australia": "coal_price_australia_current_dollars_per_tonne",
+    "coal__colombia": "coal_price_colombia_current_dollars_per_tonne",
+    "coal__indonesia": "coal_price_indonesia_current_dollars_per_tonne",
+    "coal__japan": "coal_price_japan_current_dollars_per_tonne",
+    "coal__northwest_europe": "coal_price_northwest_europe_current_dollars_per_tonne",
+    "coal__south_africa": "coal_price_south_africa_current_dollars_per_tonne",
+    "coal__south_china": "coal_price_south_china_current_dollars_per_tonne",
+    "coal__united_states": "coal_price_united_states_current_dollars_per_tonne",
     # Hydrogen prices.
-    "hydrogen__far_east_asia": "hydrogen_price_far_east_asia",
-    "hydrogen__middle_east": "hydrogen_price_middle_east",
-    "hydrogen__northwest_europe": "hydrogen_price_northwest_europe",
-    "hydrogen__us_gulf_coast": "hydrogen_price_us_gulf_coast",
+    "hydrogen__far_east_asia": "hydrogen_price_far_east_asia_current_dollars_per_kg",
+    "hydrogen__middle_east": "hydrogen_price_middle_east_current_dollars_per_kg",
+    "hydrogen__northwest_europe": "hydrogen_price_northwest_europe_current_dollars_per_kg",
+    "hydrogen__us_gulf_coast": "hydrogen_price_us_gulf_coast_current_dollars_per_kg",
     # LNG prices.
-    "lng__china__mainland": "lng_price_china__mainland",
-    "lng__japan": "lng_price_japan",
-    "lng__south_korea": "lng_price_south_korea",
+    "lng__china__mainland": "lng_price_china_mainland_current_dollars_per_million_btu",
+    "lng__japan": "lng_price_japan_current_dollars_per_million_btu",
+    "lng__south_korea": "lng_price_south_korea_current_dollars_per_million_btu",
     # Natural gas prices.
-    "natural_gas__netherlands_ttf": "natural_gas_price_netherlands_ttf",
-    "natural_gas__uk_nbp": "natural_gas_price_uk_nbp",
-    "natural_gas__us__henry_hub": "natural_gas_price_us_henry_hub",
-    "natural_gas__zeebrugge": "natural_gas_price_zeebrugge",
+    "natural_gas__netherlands_ttf": "gas_price_netherlands_ttf_current_dollars_per_million_btu",
+    "natural_gas__uk_nbp": "gas_price_uk_nbp_current_dollars_per_million_btu",
+    "natural_gas__us__henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
+    "natural_gas__zeebrugge": "gas_price_zeebrugge_current_dollars_per_million_btu",
     # Oil prices.
-    "oil_crude_prices__dollar_2023": "oil_price_crude_2023_dollars_per_barrel",
+    f"oil_crude_prices__dollar_{PRICE_REFERENCE_YEAR}": f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_barrel",
     "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_current_dollars_per_barrel",
     "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent_current_dollars_per_barrel",
     "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai_current_dollars_per_barrel",
     "oil_spot_crude_prices__nigerian_forcados": "oil_spot_crude_price_nigerian_forcados_current_dollars_per_barrel",
     "oil_spot_crude_prices__west_texas_intermediate": "oil_spot_crude_price_west_texas_intermediate_current_dollars_per_barrel",
     # Uranium prices.
-    "uranium__canada": "uranium__canada",
+    "uranium__canada": "uranium_price_canada_current_dollars_per_lb",
     # Old columns (not anymore existing in the current version of the Statistical Review).
     # Coal prices.
     # "asian_marker_price": "coal_price_asian_marker_current_dollars_per_tonne",
@@ -333,10 +338,13 @@ def convert_price_units(tb_prices: Table) -> Table:
             # Convert variables given in dollars per barrel to dollars per cubic meter.
             tb_prices[column.replace("_per_barrel", "_per_m3")] = tb_prices[column] / BARRELS_TO_CUBIC_METERS
             tb_prices = tb_prices.drop(columns=[column])
-        if column.endswith("_per_million_btu"):
+        elif column.endswith("_per_million_btu"):
             # Convert variables given in dollars per million BTU to dollars per kilocalorie.
             tb_prices[column.replace("_per_million_btu", "_per_mwh")] = tb_prices[column] / MILLION_BTU_TO_MWH
             tb_prices = tb_prices.drop(columns=[column])
+        elif column.endswith("_per_lb"):
+            # Convert price of uranium from dollars per pound (lb) to dollars per kg.
+            tb_prices[column.replace("_per_lb", "_per_kg")] = tb_prices[column] / LB_TO_KG
 
     return tb_prices
 
@@ -369,7 +377,7 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
         # Update metadata.
         tb_prices_index[
             new_column
-        ].metadata.description = (
+        ].metadata.description_short = (
             f"Average price measured as an energy index where prices in {PRICE_INDEX_REFERENCE_YEAR} = 100."
         )
 
@@ -387,7 +395,7 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
     ], "Price index is not well constructed."
 
     # Update table metadata.
-    tb_prices_index.metadata.short_name = "statistical_review_of_world_energy_fossil_fuel_price_index"
+    tb_prices_index.metadata.short_name = "statistical_review_of_world_energy_price_index"
 
     return tb_prices_index
 
@@ -425,7 +433,7 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         # https://en.wikipedia.org/wiki/El_Dabaa_Nuclear_Power_Plant
         "Egypt",
         "Equatorial Guinea",
-        # Estonia has plans to built a nuclear power plant in 2023.
+        # Estonia has plans to built a nuclear power plant in 2024.
         # https://en.wikipedia.org/wiki/Nuclear_power_in_Estonia
         "Estonia",
         "Gabon",
@@ -491,8 +499,8 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
         "Thailand",
         "Trinidad and Tobago",
         "Tunisia",
-        # Turkey is planned to start nuclear energy in 2023.
-        # https://en.wikipedia.org/wiki/Nuclear_power_in_Turkey
+        # Turkey's first nuclear power reactor is now expected to be connected to the grid in 2025.
+        # https://world-nuclear.org/information-library/country-profiles/countries-t-z/turkey#:~:text=Turkey%20has%20had%20plans%20for,financed%20and%20built%20by%20Russia.
         "Turkey",
         "Turkmenistan",
         "Uzbekistan",
@@ -581,7 +589,7 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("statistical_review_of_world_energy")
     tb_meadow = ds_meadow["statistical_review_of_world_energy"].reset_index()
-    tb_meadow_prices = ds_meadow["statistical_review_of_world_energy_fossil_fuel_prices"].reset_index()
+    tb_meadow_prices = ds_meadow["statistical_review_of_world_energy_prices"].reset_index()
     tb_efficiency = ds_meadow["statistical_review_of_world_energy_efficiency_factors"].reset_index()
 
     # Load regions dataset.
@@ -632,7 +640,6 @@ def run(dest_dir: str) -> None:
     tb_prices = tb_meadow_prices.rename(columns=COLUMNS_PRICES, errors="raise").copy()
 
     # Convert units of price variables.
-    # TODO: Continue here.
     tb_prices = convert_price_units(tb_prices=tb_prices)
 
     # Set an appropriate index to prices table and sort conveniently.

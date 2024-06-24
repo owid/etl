@@ -446,7 +446,7 @@ def run(dest_dir: str) -> None:
 
     # Set an appropriate index and sort conveniently.
     tb_prices = tb_prices.format(
-        keys=["year"], sort_columns=True, short_name="statistical_review_of_world_energy_fossil_fuel_prices"
+        keys=["year"], sort_columns=True, short_name="statistical_review_of_world_energy_prices"
     )
 
     # Prices variables need to cite S&P Global Platts, and include their license.

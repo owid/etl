@@ -7,11 +7,17 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Reference year to use for table of prices.
+# NOTE: This must be identical to the one defined in the garden step.
+PRICE_REFERENCE_YEAR = 2023
+
 
 def prepare_item_prices_table(tb_prices: Table, item_name: str) -> Table:
     if item_name == "oil_price":
         tb_item_prices = (
-            tb_prices[["oil_price_crude_current_dollars_per_m3", "oil_price_crude_2022_dollars_per_m3"]]
+            tb_prices[
+                ["oil_price_crude_current_dollars_per_m3", f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_m3"]
+            ]
             .reset_index()
             .assign(**{"country": "World"})
         )
@@ -46,8 +52,8 @@ def run(dest_dir: str) -> None:
     # Load garden dataset and read its main table and the fossil fuel prices table.
     ds_garden = paths.load_dataset("statistical_review_of_world_energy")
     tb = ds_garden["statistical_review_of_world_energy"]
-    tb_prices = ds_garden["statistical_review_of_world_energy_fossil_fuel_prices"]
-    tb_price_index = ds_garden["statistical_review_of_world_energy_fossil_fuel_price_index"]
+    tb_prices = ds_garden["statistical_review_of_world_energy_prices"]
+    tb_price_index = ds_garden["statistical_review_of_world_energy_price_index"]
 
     #
     # Process data.

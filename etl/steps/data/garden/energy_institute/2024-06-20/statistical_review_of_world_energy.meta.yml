@@ -634,41 +634,41 @@ tables:
         presentation:
           title_public: 'Thermal equivalent efficiency factors'
 
-  statistical_review_of_world_energy_fossil_fuel_prices:
+  statistical_review_of_world_energy_prices:
     variables:
       # Coal prices.
-      coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne:
-        title: Coal price - US Central Appalachian coal spot price index
-        unit: 'current US$ per tonne'
-        short_unit: '$'
-      coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne:
-        title: Coal price - Newcastle Thermal Coal FOB
-        unit: 'current US$ per tonne'
-        short_unit: '$'
-      coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne:
-        title: Coal price - Japan coking coal import CIF price
-        unit: 'current US$ per tonne'
-        short_unit: '$'
-      coal_price_china_qinhuangdao_spot_current_dollars_per_tonne:
-        title: Coal price - China Qinhuangdao spot price
-        unit: 'current US$ per tonne'
-        short_unit: '$'
-      coal_price_japan_steam_spot_cif_current_dollars_per_tonne:
-        title: Coal price - Japan steam spot CIF price
-        unit: 'current US$ per tonne'
-        short_unit: '$'
+      # coal_price_us_central_appalachian_spot_price_index_current_dollars_per_tonne:
+      #   title: Coal price - US Central Appalachian coal spot price index
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
+      # coal_price_newcastle_thermal_coal_fob_current_dollars_per_tonne:
+      #   title: Coal price - Newcastle Thermal Coal FOB
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
+      # coal_price_japan_coking_coal_import_cif_current_dollars_per_tonne:
+      #   title: Coal price - Japan coking coal import CIF price
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
+      # coal_price_china_qinhuangdao_spot_current_dollars_per_tonne:
+      #   title: Coal price - China Qinhuangdao spot price
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
+      # coal_price_japan_steam_spot_cif_current_dollars_per_tonne:
+      #   title: Coal price - Japan steam spot CIF price
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
       coal_price_northwest_europe_current_dollars_per_tonne:
         title: Coal price - Northwest Europe
         unit: 'current US$ per tonne'
         short_unit: '$'
-      coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne:
-        title: Coal price - Japan steam coal import CIF price
-        unit: 'current US$ per tonne'
-        short_unit: '$'
-      coal_price_asian_marker_current_dollars_per_tonne:
-        title: Coal price - Asian marker price
-        unit: 'current US$ per tonne'
-        short_unit: '$'
+      # coal_price_japan_steam_coal_import_cif_current_dollars_per_tonne:
+      #   title: Coal price - Japan steam coal import CIF price
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
+      # coal_price_asian_marker_current_dollars_per_tonne:
+      #   title: Coal price - Asian marker price
+      #   unit: 'current US$ per tonne'
+      #   short_unit: '$'
 
       # Gas prices.
       # gas_price_us_henry_hub_current_dollars_per_million_btu:
@@ -703,30 +703,30 @@ tables:
         title: Gas price - US Henry Hub
         unit: 'current US$ per megawatt-hour'
         short_unit: '$'
-      gas_price_netherlands_ttf_index_current_dollars_per_mwh:
-        title: Gas price - Netherlands TTF index (DA ICIS Heren TTF index)
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
-      gas_price_canada_alberta_current_dollars_per_mwh:
-        title: Gas price - Canada (Alberta)
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
-      gas_price_average_german_import_current_dollars_per_mwh:
-        title: Gas price - Average German import price
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
-      gas_price_lng_japan_cif_current_dollars_per_mwh:
-        title: Gas price - LNG Japan CIF
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
-      gas_price_uk_nbp_index_current_dollars_per_mwh:
-        title: Gas price - UK NBP (ICIS NBP Index)
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
-      gas_price_lng_japan_korea_marker_current_dollars_per_mwh:
-        title: Gas price - LNG Japan Korea Marker (JKM)
-        unit: 'current US$ per megawatt-hour'
-        short_unit: '$'
+      # gas_price_netherlands_ttf_index_current_dollars_per_mwh:
+      #   title: Gas price - Netherlands TTF index (DA ICIS Heren TTF index)
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
+      # gas_price_canada_alberta_current_dollars_per_mwh:
+      #   title: Gas price - Canada (Alberta)
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
+      # gas_price_average_german_import_current_dollars_per_mwh:
+      #   title: Gas price - Average German import price
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
+      # gas_price_lng_japan_cif_current_dollars_per_mwh:
+      #   title: Gas price - LNG Japan CIF
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
+      # gas_price_uk_nbp_index_current_dollars_per_mwh:
+      #   title: Gas price - UK NBP (ICIS NBP Index)
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
+      # gas_price_lng_japan_korea_marker_current_dollars_per_mwh:
+      #   title: Gas price - LNG Japan Korea Marker (JKM)
+      #   unit: 'current US$ per megawatt-hour'
+      #   short_unit: '$'
 
       # Oil prices.
       # oil_price_crude_current_dollars_per_barrel:
@@ -743,9 +743,9 @@ tables:
         short_unit: '$'
         presentation:
           title_public: 'Oil price - Crude prices since 1861'
-      oil_price_crude_2022_dollars_per_m3:
-        title: 'Oil price - Crude prices since 1861 (constant 2022 US$)'
-        unit: 'constant 2022 US$ per cubic meter'
+      oil_price_crude_2023_dollars_per_m3:
+        title: 'Oil price - Crude prices since 1861 (constant 2023 US$)'
+        unit: 'constant 2023 US$ per cubic meter'
         short_unit: '$'
         presentation:
           title_public: 'Oil price - Crude prices since 1861'
@@ -782,65 +782,65 @@ tables:
         unit: 'current US$ per cubic meter'
         short_unit: '$'
 
-  statistical_review_of_world_energy_fossil_fuel_price_index:
+  statistical_review_of_world_energy_price_index:
     variables:
       # Fossil fuel prices as an index.
-      coal_price_index_asian_marker_current_dollars_per_tonne:
-        title: Coal price index - Asian marker price
-        unit: ''
-        short_unit: ''
-      coal_price_index_china_qinhuangdao_spot_current_dollars_per_tonne:
-        title: Coal price index - China Qinhuangdao spot price
-        unit: ''
-        short_unit: ''
-      coal_price_index_japan_coking_coal_import_cif_current_dollars_per_tonne:
-        title: Coal price index - Japan coking coal import CIF price
-        unit: ''
-        short_unit: ''
-      coal_price_index_japan_steam_coal_import_cif_current_dollars_per_tonne:
-        title: Coal price index - Japan steam coal import CIF price
-        unit: ''
-        short_unit: ''
-      coal_price_index_japan_steam_spot_cif_current_dollars_per_tonne:
-        title: Coal price index - Japan steam spot CIF price
-        unit: ''
-        short_unit: ''
-      coal_price_index_newcastle_thermal_coal_fob_current_dollars_per_tonne:
-        title: Coal price index - Newcastle Thermal Coal FOB
-        unit: ''
-        short_unit: ''
+      # coal_price_index_asian_marker_current_dollars_per_tonne:
+      #   title: Coal price index - Asian marker price
+      #   unit: ''
+      #   short_unit: ''
+      # coal_price_index_china_qinhuangdao_spot_current_dollars_per_tonne:
+      #   title: Coal price index - China Qinhuangdao spot price
+      #   unit: ''
+      #   short_unit: ''
+      # coal_price_index_japan_coking_coal_import_cif_current_dollars_per_tonne:
+      #   title: Coal price index - Japan coking coal import CIF price
+      #   unit: ''
+      #   short_unit: ''
+      # coal_price_index_japan_steam_coal_import_cif_current_dollars_per_tonne:
+      #   title: Coal price index - Japan steam coal import CIF price
+      #   unit: ''
+      #   short_unit: ''
+      # coal_price_index_japan_steam_spot_cif_current_dollars_per_tonne:
+      #   title: Coal price index - Japan steam spot CIF price
+      #   unit: ''
+      #   short_unit: ''
+      # coal_price_index_newcastle_thermal_coal_fob_current_dollars_per_tonne:
+      #   title: Coal price index - Newcastle Thermal Coal FOB
+      #   unit: ''
+      #   short_unit: ''
       coal_price_index_northwest_europe_current_dollars_per_tonne:
         title: Coal price index - Northwest Europe
         unit: ''
         short_unit: ''
-      coal_price_index_us_central_appalachian_spot_price_index_current_dollars_per_tonne:
-        title: Coal price index - US Central Appalachian coal spot price index
-        unit: ''
-        short_unit: ''
-      gas_price_index_average_german_import_current_dollars_per_mwh:
-        title: Gas price index - Average German import price
-        unit: ''
-        short_unit: ''
-      gas_price_index_canada_alberta_current_dollars_per_mwh:
-        title: Gas price index - Canada (Alberta)
-        unit: ''
-        short_unit: ''
-      gas_price_index_lng_japan_cif_current_dollars_per_mwh:
-        title: Gas price index - LNG Japan CIF
-        unit: ''
-        short_unit: ''
-      gas_price_index_lng_japan_korea_marker_current_dollars_per_mwh:
-        title: Gas price index - LNG Japan Korea Marker (JKM)
-        unit: ''
-        short_unit: ''
-      gas_price_index_netherlands_ttf_index_current_dollars_per_mwh:
-        title: Gas price index - Netherlands TTF index (DA ICIS Heren TTF index)
-        unit: ''
-        short_unit: ''
-      gas_price_index_uk_nbp_index_current_dollars_per_mwh:
-        title: Gas price index - UK NBP (ICIS NBP Index)
-        unit: ''
-        short_unit: ''
+      # coal_price_index_us_central_appalachian_spot_price_index_current_dollars_per_tonne:
+      #   title: Coal price index - US Central Appalachian coal spot price index
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_average_german_import_current_dollars_per_mwh:
+      #   title: Gas price index - Average German import price
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_canada_alberta_current_dollars_per_mwh:
+      #   title: Gas price index - Canada (Alberta)
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_lng_japan_cif_current_dollars_per_mwh:
+      #   title: Gas price index - LNG Japan CIF
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_lng_japan_korea_marker_current_dollars_per_mwh:
+      #   title: Gas price index - LNG Japan Korea Marker (JKM)
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_netherlands_ttf_index_current_dollars_per_mwh:
+      #   title: Gas price index - Netherlands TTF index (DA ICIS Heren TTF index)
+      #   unit: ''
+      #   short_unit: ''
+      # gas_price_index_uk_nbp_index_current_dollars_per_mwh:
+      #   title: Gas price index - UK NBP (ICIS NBP Index)
+      #   unit: ''
+      #   short_unit: ''
       gas_price_index_us_henry_hub_current_dollars_per_mwh:
         title: Gas price index - US Henry Hub
         unit: ''
