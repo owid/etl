@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  sdg_regions:
+    variables:
+      sdg_region:
+        title: Sustainable Development Goals (SDG) Regions
+        description_short: "The regions used in the Sustainable Development Goals (SDG) framework."
+        unit: ""
+

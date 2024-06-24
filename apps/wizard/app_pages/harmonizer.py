@@ -201,7 +201,8 @@ if option:
                     st.dataframe(mapping)
 
             ## 2/ MANUAL (user input needed)
-            with st.form("form"):
+            with st.container(border=True):
+                # with st.form("form"):
                 # Title
                 st.markdown("#### Manual entity mapping needed")
                 st.markdown(f"{len(ambiguous)} ambiguous regions")
@@ -217,15 +218,6 @@ if option:
                         st.markdown(f"**{region}**")
                         col1, col2 = st.columns(2)
 
-                        # New name, from selectbox
-                        with col1:
-                            value_selected = st.selectbox(
-                                label="Select a region",
-                                options=suggestions,
-                                index=0,
-                                # label_visibility="collapsed",
-                                key=f"region_suggestion_{i}",
-                            )
                         # New name, custom (useful if no suggestion is good enough)
                         with col2:
                             value_custom = st.text_input(
@@ -234,6 +226,16 @@ if option:
                                 # placeholder="Enter custom name",
                                 # label_visibility="collapsed",
                                 help="Use this when no suggestion is good enough",
+                            )
+                        # New name, from selectbox
+                        with col1:
+                            value_selected = st.selectbox(
+                                label="Select a region",
+                                options=suggestions,
+                                index=0,
+                                # label_visibility="collapsed",
+                                key=f"region_suggestion_{i}",
+                                disabled=value_custom != "",
                             )
                         value_ignore = st.toggle(
                             label="Ignore",
@@ -260,7 +262,7 @@ if option:
                         value=path_export,
                     )
                     # Submit button
-                    export_btn = st.form_submit_button(
+                    export_btn = st.button(
                         label="Export mapping",
                         type="primary",
                     )
