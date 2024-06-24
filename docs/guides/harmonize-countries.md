@@ -109,12 +109,32 @@ You can simply invoke it with the following code:
 from etl.harmonize import harmonize_ipython
 harmonize_ipython(
    tb,
-   "country",
-   output_file=paths.country_mapping_path,
+   paths=paths,
 )
 ```
 
-This assumes that you have a `PathFinder` instance defined as `paths`.
+This assumes that you have a `PathFinder` instance defined as `paths` and that `tb` has a column `"country"` to harmonize. If you want to use a different column, you can pass it as the `column` argument.
+
+```python
+from etl.harmonize import harmonize_ipython
+harmonize_ipython(
+   tb,
+   column="region",
+   paths=paths,
+)
+```
+
+If you want to export the mapping to a different file, you can pass the `output_file` argument.
+
+```python
+from etl.harmonize import harmonize_ipython
+harmonize_ipython(
+   tb,
+   output_file="output/file/path.json",
+)
+```
+
+Furthermore,
 
 <figure markdown="span">
   ![Chart Upgrader](../assets/harmonize-ipython.gif)
