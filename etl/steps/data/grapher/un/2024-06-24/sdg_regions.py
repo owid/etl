@@ -14,11 +14,9 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("sdg_regions")
     # Read table from garden dataset.
     tb = ds_garden["sdg_regions"]
-
-    #
-    # Process data.
-    #
-
+    tb = tb.reset_index()
+    tb["year"] = 2024  # Not sure this matters as we don't show it in the grapher - but it's needed to be uploaded
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #

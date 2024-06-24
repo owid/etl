@@ -13,9 +13,9 @@ dataset:
 
 
 tables:
-  regions:
+  sdg_regions:
     variables:
-      sdg_regions:
+      sdg_region:
         title: Sustainable Development Goals (SDG) Regions
         description_short: "The regions used in the Sustainable Development Goals (SDG) framework."
         unit: ""

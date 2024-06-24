@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("regions.csv")
+    snap = paths.load_snapshot("sdg_regions.csv")
 
     # Load data from snapshot.
     tb = snap.read(delimiter=";")

@@ -14,10 +14,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("regions")
+    ds_meadow = paths.load_dataset("sdg_regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["regions"].reset_index()
+    tb = ds_meadow["sdg_regions"].reset_index()
     tb = tb.rename(columns={"country_or_area": "country"})
     #
     # Process data.
@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = create_sdg_regions(tb)
     tb = tb[["country", "sdg_region"]]
-    tb = tb.format(["country"], short_name="sdg_regions")
+    tb = tb.format(["country"])
 
     #
     # Save outputs.
