@@ -484,7 +484,6 @@ class Harmonizer:
 
             btn.on_click(_on_submit)
 
-
             display(btn)
 
     def _widgets_ipython_country(self, label, country, options):
