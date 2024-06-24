@@ -62,9 +62,15 @@ global worries_questions H006_01 H006_02 H006_03 H006_04 H006_05
 * Happiness
 global happiness_questions A008
 
+* Neighbors
+global neighbors_questions A124_02 A124_03 A124_06 A124_07 A124_08 A124_09 A124_12 A124_17 A124_42 A124_43
+
+* Homosexuals as parents
+global homosexuals_parents_questions D081
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions $neighbors_questions $homosexuals_parents_questions
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -837,6 +843,100 @@ save "`happiness_file'"
 restore
 preserve
 
+* Processing neighbors questions
+/*
+           0 Not mentioned
+           1 Mentioned
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+
+*/
+
+
+foreach var in $neighbors_questions {
+	keep if `var' >= 0
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
+
+	gen notmentioned_neighbors_`var' = 0
+	replace notmentioned_neighbors_`var' = 1 if `var' == 0
+	
+	gen mentioned_neighbors_`var' = 0
+	replace mentioned_neighbors_`var' = 1 if `var' == 1
+	
+	gen dont_know_neighbors_`var' = 0
+	replace dont_know_neighbors_`var' = 1 if `var' == .a
+	
+	gen no_answer_neighbors_`var' = 0
+	replace no_answer_neighbors_`var' = 1 if `var' == .b
+
+	collapse (mean) notmentioned_neighbors_`var' mentioned_neighbors_`var' dont_know_neighbors_`var' no_answer_neighbors_`var' [w=S017], by (year country)
+	tempfile neighbors_`var'_file
+	save "`neighbors_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing homosexuals as parents question
+/*
+           1 Agree strongly
+           2 Agree
+           3 Neither agree nor disagree
+           4 Disagree
+           5 Disagree strongly
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+keep if D081 >= 1
+keep if D081 != .c
+keep if D081 != .d
+keep if D081 != .e
+
+gen agree_agg_homosx_prnts = 0
+replace agree_agg_homosx_prnts = 1 if D081 == 1 | D081 == 2
+
+gen disagree_agg_homosx_prnts = 0
+replace disagree_agg_homosx_prnts = 1 if D081 == 4 | D081 == 5
+
+gen strongly_agree_homosx_prnts = 0
+replace strongly_agree_homosx_prnts = 1 if D081 == 1
+
+gen agree_homosx_prnts = 0
+replace agree_homosx_prnts = 1 if D081 == 2
+
+gen neither_homosx_prnts = 0
+replace neither_homosx_prnts = 1 if D081 == 3
+
+gen disagree_homosx_prnts = 0
+replace disagree_homosx_prnts = 1 if D081 == 4
+
+gen strongly_disagree_homosx_prnts = 0
+replace strongly_disagree_homosx_prnts = 1 if D081 == 5
+
+gen dont_know_homosx_prnts = 0
+replace dont_know_homosx_prnts = 1 if D081 == .a
+
+gen no_answer_homosx_prnts = 0
+replace no_answer_homosx_prnts = 1 if D081 == .b
+
+collapse (mean) agree_agg_homosx_prnts disagree_agg_homosx_prnts strongly_agree_homosx_prnts agree_homosx_prnts neither_homosx_prnts disagree_homosx_prnts strongly_disagree_homosx_prnts dont_know_homosx_prnts no_answer_homosx_prnts [w=S017], by (year country)
+tempfile homosexual_parents_file
+save "`homosexual_parents_file'"
+
+restore
+preserve
+
 
 
 * Combine all the saved datasets
@@ -884,7 +984,13 @@ foreach var in $worries_questions {
 	merge 1:1 year country using "`worries_`var'_file'", nogenerate // keep(master match)
 }
 
+foreach var in $neighbors_questions {
+	merge 1:1 year country using "`neighbors_`var'_file'", nogenerate // keep(master match)
+}
+
 merge 1:1 year country using "`happiness_file'", nogenerate // keep(master match)
+merge 1:1 year country using "`homosexual_parents_file'", nogenerate // keep(master match)
+
 
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)

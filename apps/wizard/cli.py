@@ -15,6 +15,7 @@ from rich_click.rich_command import RichCommand
 from apps.utils.style import set_rich_click_style
 from apps.wizard.config import WIZARD_PHASES
 from apps.wizard.utils import CURRENT_DIR
+from etl.config import WIZARD_PORT
 
 # Disable streamlit cache data API logging
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
@@ -46,9 +47,9 @@ set_rich_click_style()
 )
 @click.option(
     "--port",
-    default=8053,
+    default=WIZARD_PORT,
     type=int,
-    help="Application port",
+    help="Application port.",
 )
 def cli(
     phase: Iterable[WIZARD_PHASES],

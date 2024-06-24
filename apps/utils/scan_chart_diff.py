@@ -27,8 +27,6 @@ def cli(dry_run: bool) -> None:
 
     log.info("scan-chart-diff.init", active_prs=active_prs)
 
-    # active_prs = [pr for pr in active_prs if "update-electricity-mix-data" in pr]
-
     for pr in active_prs:
         log.info("scan-chart-diff.start", pr=pr)
         args = [f"etl/{pr}", "--services", "chart-diff"]
@@ -38,8 +36,9 @@ def cli(dry_run: bool) -> None:
         try:
             owidbot_cli(args, standalone_mode=False)
         except ProgrammingError as e:
-            # old staging servers without the table
-            if "Table 'owid.chart_diff_approvals' doesn't exist" in str(e):
+            # MySQL is being refreshed and tables are not ready
+            # We're getting `Table ... doesn't exist`
+            if "doesn't exist" in str(e):
                 log.warning("scan-chart-diff.missing-table", pr=pr)
                 continue
             else:
@@ -48,6 +47,9 @@ def cli(dry_run: bool) -> None:
             # PRs without a staging server
             if "Unknown MySQL server host" in str(e):
                 log.warning("scan-chart-diff.unknown-host", pr=pr)
+                continue
+            if "Can't connect to MySQL server" in str(e):
+                log.warning("scan-chart-diff.cant-connect", pr=pr)
                 continue
             else:
                 raise e

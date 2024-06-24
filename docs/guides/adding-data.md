@@ -38,7 +38,7 @@ There are different ways you can add data to the catalog, depending on your tech
 ## Using Wizard (recommended)
 
 !!! info
-    Learn more about Wizard in [this dedicated guideline](guides/wizard.md)
+    Learn more about Wizard in [this dedicated guideline](wizard.md)
 
 The Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
 

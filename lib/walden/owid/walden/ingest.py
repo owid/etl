@@ -46,7 +46,7 @@ def add_to_catalog(
         log("ADDED TO CATALOG", f"{dataset.relative_base}.json")
     elif (dataframe is not None) and (filename is None):
         # Get output file extension from metadata.
-        if type(metadata) == dict:
+        if isinstance(metadata, dict):
             file_extension = metadata["file_extension"]  # type: ignore
         else:
             file_extension = metadata.file_extension  # type: ignore

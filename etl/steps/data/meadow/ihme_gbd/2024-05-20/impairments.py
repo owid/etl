@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("impairments.csv")
+    snap = paths.load_snapshot("impairments.feather")
 
     # Load data from snapshot.
     tb = snap.read()

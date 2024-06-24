@@ -1,0 +1,142 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+      grapher_config:
+        originUrl: https://ourworldindata.org/economic-inequality
+        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  world_inequality_database:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      p99p100_share_pretax:
+        presentation:
+          title_public: Income share of the richest 1%
+          title_variant: Before tax
+          grapher_config:
+            title: Income share of the richest 1% (before tax)
+            subtitle: >-
+              The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
+            note: >-
+              Income is measured before payment of taxes and non-pension benefits, but after
+              the payment of public and private pensions.
+            hasMapTab: true
+            tab: map
+            variantName: WID
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+            selectedEntityNames:
+              - Chile
+              - Brazil
+              - United States
+              - South Africa
+              - China
+              - France
+      p90p100_share_pretax:
+        presentation:
+          title_public: Income share of the richest 10%
+          title_variant: Before tax
+          grapher_config:
+            title: Income share of the richest 10% (before tax)
+            subtitle: >-
+              The share of income received by the richest 10% of the population. Income here is measured before taxes and benefits.
+            note: >-
+              Income is measured before payment of taxes and non-pension benefits, but after
+              the payment of public and private pensions.
+            hasMapTab: true
+            tab: map
+            variantName: WID
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericMinValue: 100
+                customNumericValues:
+                  - 30
+                  - 35
+                  - 40
+                  - 45
+                  - 50
+                  - 55
+                  - 60
+                  - 65
+            selectedEntityNames:
+              - Chile
+              - Brazil
+              - United States
+              - South Africa
+              - China
+              - France
+
+  world_inequality_database_fiscal:
+    common:
+      description_key:
+        - Income is ‘fiscal’ — it represents the total income that is or should be reported on tax declarations (before any specific deduction allowed by fiscal legislation).
+        - The data is estimated from a combination of household surveys and tax records. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+        - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
+      description_processing: We extract estimations via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool).
+    variables:
+      p99p100_share_fiscal992i:
+        title: Top 1% - Share (Fiscal, individuals)
+        description_short: The share of income received by the richest 1%.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Top 1% - Share (Fiscal, individuals)
+          numDecimalPlaces: 1
+          tolerance: 5
+        presentation:
+          title_public: Top 1% - Share (Fiscal, individuals)
+
+      p99p100_share_fiscal992j:
+        title: Top 1% - Share (Fiscal, equal-split adults)
+        description_short: The share of income received by the richest 1%.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Top 1% - Share (Fiscal, equal-split adults)
+          numDecimalPlaces: 1
+          tolerance: 5
+        presentation:
+          title_public: Top 1% - Share (Fiscal, equal-split adults)
+
+      p99p100_share_fiscal992t:
+        title: Top 1% - Share (Fiscal, tax units)
+        description_short: The share of income received by the richest 1%.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Top 1% - Share (Fiscal, tax units)
+          numDecimalPlaces: 1
+          tolerance: 5
+        presentation:
+          title_public: Top 1% - Share (Fiscal, tax units)
+
+

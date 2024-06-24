@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  is_public: false
+  origin:
+    # Data product / Snapshot
+    title: Global Burden of Disease - Prevalence and Incidence
+    description: |-
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence and incidence counts and rates for 371 diseases and injuries.
+    date_published: "2024-05-17"
+    # Citation
+    producer: IHME, Global Burden of Disease
+    citation_full: |-
+      "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2024. Available from https://vizhub.healthdata.org/gbd-results/."
+    attribution_short: "IHME-GBD"
+    # Files
+    url_main: https://vizhub.healthdata.org/gbd-results/
+    date_accessed: 2024-05-20
+
+    # License
+    license:
+      name: Free-of-Charge Non-commercial User Agreement
+      url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 9ca94232c82826279f30f89970c565ca
+    size: 922705122
+    path: gbd_prevalence.feather

@@ -16,6 +16,7 @@ from owid.catalog import Dataset
 from rapidfuzz import process
 from rich_click.rich_command import RichCommand
 
+from etl.exceptions import RegionDatasetNotFound
 from etl.paths import LATEST_REGIONS_DATASET_PATH, LATEST_REGIONS_YML
 
 custom_style_fancy = questionary.Style(
@@ -214,7 +215,12 @@ class CountryRegionMapper:
     valid_names: Set[str]
 
     def __init__(self) -> None:
-        tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
+        try:
+            tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
+        except FileNotFoundError:
+            raise RegionDatasetNotFound(
+                "Region dataset not found. Please run `etl run regions` to generate it locally. It should live in `data/`."
+            )
         rc_df = tb_regions[["name", "short_name", "region_type", "is_historical", "defined_by"]]
         # Convert strings of lists of aliases into lists of aliases.
         tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]

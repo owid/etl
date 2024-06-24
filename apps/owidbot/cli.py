@@ -9,7 +9,7 @@ from rich import print
 from rich_click.rich_command import RichCommand
 
 from apps.owidbot import chart_diff, data_diff, grapher
-from apps.wizard.utils.env import get_container_name
+from etl.config import get_container_name
 
 from . import github_utils as gh_utils
 

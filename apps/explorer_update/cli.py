@@ -20,6 +20,66 @@ EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 CATALOG_URL = "https://catalog.ourworldindata.org/"
 
 
+@click.command(name="explorer-update", cls=RichCommand, help=__doc__)
+@click.argument("explorer-names", type=str or List[str], nargs=-1)
+@click.option(
+    "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Do not write to explorer files, simply print potential changes. Default: False.",
+)
+def cli(
+    explorer_names: Optional[Union[List[str], str]] = None,
+    explorers_dir: Union[Path, str] = EXPLORERS_DIR,
+    dry_run: bool = False,
+) -> None:
+    """Update one or more explorer (tsv) files.
+
+    This command will update the content of one or more explorer (tsv) files, with the following logic:
+
+    - If it is a file-based explorer, ensure URLs to data catalog point to the latest version of the data.
+    - If it is an indicator-based explorer, ensure variable ids correspond to the latest versions of the variables.
+
+    By default, this tool reads the database of your local (or staging) grapher.
+    But normally, you want to update explorers with the information (e.g. variable ids) from the production database.
+
+    Hence, after merging code to create a new dataset in production, wait for ETL to create the dataset, and then run:
+    ```
+    ENV_FILE=.env.production etl explorer-update
+    ```
+    (or, instead of `.env.production`, use whatever you call your production environment file).
+
+    Then you can check that your `owid-content` explorer files may have been updated.
+    If so, create a pull request in `owid-content` with those changes.
+
+    """
+
+    if isinstance(explorers_dir, str):
+        # Ensure explorer folder is a Path object.
+        explorers_dir = Path(explorers_dir)
+
+    if not explorers_dir.is_dir():
+        raise NotADirectoryError(f"Explorer directory not found: {explorers_dir}")
+
+    if explorer_names is None or len(explorer_names) == 0:
+        # If no explorer name is provided, update all explorers in the folder.
+        explorer_names = [explorer_file.stem for explorer_file in sorted(explorers_dir.glob("*.tsv"))]
+    if isinstance(explorer_names, str):
+        # If only one explorer name is provided, convert it into a list.
+        explorer_names = [explorer_names]
+
+    for explorer_name in tqdm(explorer_names):
+        # Define path to explorer file.
+        explorer_file = (explorers_dir / explorer_name).with_suffix(".explorer.tsv")
+
+        # Update variable ids in the explorer file.
+        update_explorer(explorer_file=explorer_file, dry_run=dry_run)
+
+
 def extract_variable_ids_from_explorer_content(explorer: str) -> List[int]:
     variable_ids_all = []
     for line in explorer.split("\n"):
@@ -171,6 +231,10 @@ def update_indicator_based_explorer(explorer: str) -> Optional[str]:
     # Fetch variable data for the latest steps from the database.
     variable_data_new = get_variables_data(filter={"catalogPath": updateable["catalogPath_new"].tolist()})
 
+    if len(variable_data_new) == 0:
+        log.error("Unexpected error. Manually inspect this explorer.")
+        return None
+
     # Select and rename columns.
     variable_data_new = variable_data_new.rename(
         columns={"id": "id_new", "catalogPath": "catalogPath_new", "name": "name_new"}, errors="raise"
@@ -263,50 +327,3 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
         # Write to explorer file, to update its content.
         with open(explorer_file, "w") as f:
             f.write(explorer_new)
-
-
-@click.command(name="explorer-update", cls=RichCommand, help=__doc__)
-@click.argument("explorer-names", type=str or List[str], nargs=-1)
-@click.option(
-    "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
-)
-@click.option(
-    "--dry-run",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Do not write to explorer files, simply print potential changes. Default: False.",
-)
-def cli(
-    explorer_names: Optional[Union[List[str], str]] = None,
-    explorers_dir: Union[Path, str] = EXPLORERS_DIR,
-    dry_run: bool = False,
-) -> None:
-    """Update one or more explorer (tsv) files.
-
-    This command will update the content of one or more explorer (tsv) files, with the following logic:
-    - If it is a file-based explorer, ensure URLs to data catalog point to the latest version of the data.
-    - If it is an indicator-based explorer, ensure variable ids correspond to the latest versions of the variables.
-
-    """
-
-    if isinstance(explorers_dir, str):
-        # Ensure explorer folder is a Path object.
-        explorers_dir = Path(explorers_dir)
-
-    if not explorers_dir.is_dir():
-        raise NotADirectoryError(f"Explorer directory not found: {explorers_dir}")
-
-    if explorer_names is None or len(explorer_names) == 0:
-        # If no explorer name is provided, update all explorers in the folder.
-        explorer_names = [explorer_file.stem for explorer_file in sorted(explorers_dir.glob("*.tsv"))]
-    if isinstance(explorer_names, str):
-        # If only one explorer name is provided, convert it into a list.
-        explorer_names = [explorer_names]
-
-    for explorer_name in tqdm(explorer_names):
-        # Define path to explorer file.
-        explorer_file = (explorers_dir / explorer_name).with_suffix(".explorer.tsv")
-
-        # Update variable ids in the explorer file.
-        update_explorer(explorer_file=explorer_file, dry_run=dry_run)

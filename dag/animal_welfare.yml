@@ -93,15 +93,6 @@ steps:
   data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
     - data://garden/animal_welfare/2023-09-01/chick_culling_laws
   #
-  # Bullfighting laws (Various sources, 2023).
-  #
-  data://meadow/animal_welfare/2023-09-05/bullfighting_laws:
-    - snapshot://animal_welfare/2023-09-05/bullfighting_laws.csv
-  data://garden/animal_welfare/2023-09-05/bullfighting_laws:
-    - data://meadow/animal_welfare/2023-09-05/bullfighting_laws
-  data://grapher/animal_welfare/2023-09-05/bullfighting_laws:
-    - data://garden/animal_welfare/2023-09-05/bullfighting_laws
-  #
   # Fur laws (Fur Free Alliance, 2023).
   #
   data://meadow/animal_welfare/2023-10-24/fur_laws:
@@ -122,3 +113,12 @@ steps:
   # To be archived:
 
   ######################################################################################################################
+  #
+  # Various sources - Bullfighting laws.
+  #
+  data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
+    - snapshot://animal_welfare/2024-06-04/bullfighting_laws.csv
+  data://garden/animal_welfare/2024-06-04/bullfighting_laws:
+    - data://meadow/animal_welfare/2024-06-04/bullfighting_laws
+  data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
+    - data://garden/animal_welfare/2024-06-04/bullfighting_laws

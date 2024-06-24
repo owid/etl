@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries
+    title_snapshot: How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries - Daily calories in England and Wales
+    description: |-
+      This dataset contains the table in the appendix of Harris et al. (2015) paper: "How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries".
+      That table contains a compilation of daily calorie (supply or consumption) in England and Wales, according to various different studies.
+    date_published: "2015-04-22"
+
+    # Citation
+    producer: Harris et al.
+    citation_full: |-
+      Harris, B., Floud, R. and Hong, S.C. (2015), "How Many Calories? Food Availability in England and Wales in the Eighteenth and Nineteenth Centuries", Research in Economic History (Research in Economic History, Vol. 31), Emerald Group Publishing Limited, Leeds, pp. 111-191. https://doi.org/10.1108/S0363-326820150000031003
+      Data extracted from the Appendix.
+    attribution_short: Harris et al. (2015)
+
+    # Files
+    url_main: https://www.emerald.com/insight/content/doi/10.1108/S0363-326820150000031003/full/html
+    date_accessed: 2024-05-23
+
+    # License
+    license:
+      name: © Emerald Group Publishing Limited 2015
+      url: https://www.emerald.com/insight/content/doi/10.1108/S0363-326820150000031003/full/html
+outs:
+  - md5: 79d314aa6815574e11146337336ee10b
+    size: 2050
+    path: harris_et_al_2015.csv

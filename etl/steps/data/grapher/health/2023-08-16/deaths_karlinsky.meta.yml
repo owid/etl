@@ -11,13 +11,12 @@ definitions:
           The International Completeness of Death Registration 2015–2019 database (ICDR), produced by Ariel Karlinsky, represents the most comprehensive and up-to-date database on the completeness of death reporting globally.
 
           The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
-
-          You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
-        citation_full: A. Karlinsky (2021). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+        citation_full: |-
+          Karlinsky, A. (2024). International completeness of death registration. Demographic Research, 50, 1151–1170. https://doi.org/10.4054/DemRes.2024.50.38
         url_main: https://github.com/akarlinsky/death_registration
         url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
         date_accessed: "2023-08-16"
-        date_published: "2021-08-14"
+        date_published: "2024-05-28"
         license:
           name: CC BY 4.0
           url: https://creativecommons.org/licenses/by/4.0/
@@ -33,7 +32,7 @@ tables:
         description_from_producer: |-
           Death registration completeness, the share of deaths captured by countries’ vital registration systems, vary substantially across countries. Estimates of completeness, even recent ones, are outdated or contradictory for many countries. In this short paper, I utilize the annual amount of deaths registered in 139 vital registration systems around the world to provide the most up-to-date estimates of death-registration completeness from 2015 to 2019.
 
-          \[Text from [Karlinsky (2021)](https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1)\]
+          \[Text from [Karlinsky (2024)](https://doi.org/10.4054/DemRes.2024.50.38)\]
         description_key:
           - The most common way of knowing how many deaths occur in a country is to rely on death certificates registered in national Vital Registry systems. In many countries, however, a large share of deaths are not registered. This is due to factors such as a lack of doctors and nurses to fill in death certificates, or a poorly functioning Vital Registry system.
           - This indicator estimates the extent of under-registering, given as the share of deaths that were registered, out of the total deaths expected for that year.
@@ -41,7 +40,7 @@ tables:
         display:
           numDecimalPlaces: 1
         presentation:
-          attribution_short: Ariel Karlinsky (2021)
+          attribution_short: Ariel Karlinsky (2024)
           topic_tags:
             - Population Growth
             - Causes of Death
@@ -56,7 +55,7 @@ tables:
               system](#dod:cvrs) as a share of total expected deaths. Expected deaths are
               estimated by three international sources: UN, WHO, and IHME, using data from
               household surveys and censuses.
-            sourceDesc: Karlinsky, A. (2021)
+            sourceDesc: Karlinsky, A. (2024)
             minTime: latest
             hasMapTab: true
             tab: map

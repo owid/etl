@@ -1,4 +1,4 @@
-This step is for _express_ ETL step generation. It should only be used when your data pipeline is simple and linear: meadow -> garden -> grapher, with one dataset.
+This step is for _express_ ETL step generation. It should only be used when your data pipeline is simple and linear: meadow → garden → grapher, with one dataset.
 
 This step will:
 

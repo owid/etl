@@ -1,0 +1,48 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Homosexuality criminalization data from Mignot
+    description: >-
+      Most of the world’s countries have at some point prohibited homosexual acts among
+      consenting adults in private. Where, when and how were homosexual relations
+      decriminalized in the world since the Age of Enlightenment? Historical data on the
+      legality of homosexual acts and on population numbers in 203 present-day countries
+      allows us to compute the annual share of the world population who live in a country
+      where homosexual acts are legal (vs. a criminal offence), since 1760. Although France
+      became the first country to decriminalize homosexual acts (1791) and inspired the first
+      wave of decriminalization in Western Europe, Latin America and the Ottoman Empire,
+      in the 19th century fewer than 25% of humans lived in a country which did not
+      criminalize homosexual relations. The second wave of decriminalization, which was
+      based on increasingly liberal public opinions regarding acts among consenting adults,
+      started in Western Europe and North America in the 1960s and then spread to Oceania,
+      Eastern Europe and finally Asia. In 2020, more than 75% of humans live in a country
+      which no longer criminalizes homosexual relations. Liberalization has been uneven,
+      though: homosexual acts are still a crime for most of the inhabitants in Africa and in
+      Muslim-majority countries, and they are especially harshly punished in a few Islamic law states and sub-state entities. As the countries which criminalize homosexual acts
+      today will grow demographically relatively fast in the coming decades, the share of
+      humans who are legally free to engage in homosexual acts will likely decrease, except if
+      a sufficiently large number of sufficiently populated criminalizing countries
+      decriminalize soon.
+    date_published: "2022-09-15"
+    version_producer: Version 1
+
+    # Citation
+    producer: Mignot
+    citation_full: |-
+      Jean-François Mignot. Decriminalizing Homosexuality: A Global Overview Since the 18th Century. Annales de démographie historique, In press, 1. Appendix: Table 1.
+
+    # Files
+    url_main: https://hal.science/hal-03778162
+    date_accessed: 2024-06-11
+
+    # License
+    license:
+      name: © HAL
+      url: https://about.hal.science/interoperability-dissemination/
+
+outs:
+  - md5: 9277248c28bc5607c3a84a92cca40973
+    size: 5673
+    path: criminalization_mignot.csv

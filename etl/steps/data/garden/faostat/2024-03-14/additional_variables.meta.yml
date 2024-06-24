@@ -107,83 +107,83 @@ tables:
         - Protein of animal origin includes protein supplied in the form of all meat commodities, eggs and dairy products, and fish & seafood.
     variables:
       energy_from_animal_products:
-        title: "Daily caloric intake per person from animal products"
+        title: "Daily calorie supply per person from animal products"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       energy_from_animal_protein:
-        title: "Daily caloric intake per person that comes from animal protein"
+        title: "Daily calorie supply per person that comes from animal protein"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       energy_from_vegetal_products:
-        title: "Daily caloric intake per person from vegetal products"
+        title: "Daily calorie supply per person from vegetal products"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       energy_from_vegetal_protein:
-        title: "Daily caloric intake per person that comes from vegetal protein"
+        title: "Daily calorie supply per person that comes from vegetal protein"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       fat_from_animal_products:
-        title: "Daily fat intake per person from animal products"
+        title: "Daily fat supply per person from animal products"
         unit: "grams per day per capita"
         short_unit: "g"
       fat_from_vegetal_products:
-        title: "Daily fat intake per person from vegetal products"
+        title: "Daily fat supply per person from vegetal products"
         unit: "grams per day per capita"
         short_unit: "g"
       protein_from_animal_products:
-        title: "Daily protein intake from animal products"
+        title: "Daily protein supply from animal products"
         unit: "grams per day per capita"
         short_unit: "g"
       protein_from_vegetal_products:
-        title: "Daily protein intake per person from vegetal products"
+        title: "Daily protein supply per person from vegetal products"
         unit: "grams per day per capita"
         short_unit: "g"
       share_of_energy_from_animal_protein:
-        title: "Share of the daily caloric intake that comes from animal protein"
+        title: "Share of the daily calorie supply that comes from animal protein"
         unit: "%"
         short_unit: "%"
       share_of_energy_from_carbohydrates:
-        title: "Share of the daily caloric intake that comes from carbohydrates"
+        title: "Share of the daily calorie supply that comes from carbohydrates"
         unit: "%"
         short_unit: "%"
       share_of_energy_from_fat:
-        title: "Share of the daily caloric intake that comes from fat"
+        title: "Share of the daily calorie supply that comes from fat"
         unit: "%"
         short_unit: "%"
       share_of_energy_from_protein:
-        title: "Share of the daily caloric intake that comes from protein"
+        title: "Share of the daily calorie supply that comes from protein"
         unit: "%"
         short_unit: "%"
       share_of_energy_from_vegetal_protein:
-        title: "Share of the daily caloric intake that comes from vegetal protein"
+        title: "Share of the daily calorie supply that comes from vegetal protein"
         unit: "%"
         short_unit: "%"
       total_carbohydrates:
-        title: "Daily carbohydrates intake per person"
+        title: "Daily carbohydrates supply per person"
         unit: "grams per day per capita"
         short_unit: "g"
       total_energy:
-        title: "Daily caloric intake per person"
+        title: "Daily calorie supply per person"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       total_energy_from_carbohydrates:
-        title: "Daily caloric intake per person from carbohydrates"
+        title: "Daily calorie supply per person from carbohydrates"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       total_energy_from_fat:
-        title: "Daily caloric intake per person from fat"
+        title: "Daily calorie supply per person from fat"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       total_energy_from_protein:
-        title: "Daily caloric intake per person from protein"
+        title: "Daily calorie supply per person from protein"
         unit: "kilocalories per day per capita"
         short_unit: "kcal"
       total_fat:
-        title: "Daily fat intake per person"
+        title: "Daily fat supply per person"
         unit: "grams per day per capita"
         short_unit: "g"
       total_protein:
-        title: "Daily protein intake per person"
+        title: "Daily protein supply per person"
         unit: "grams per day per capita"
         short_unit: "g"
   fertilizers:

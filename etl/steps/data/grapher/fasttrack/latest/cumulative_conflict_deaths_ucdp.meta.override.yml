@@ -5,7 +5,7 @@ definitions:
       # the snapshot). As a workaround, origins are added here to *.override.yml file.
       # Origins were copied from snapshot and from snapshots/geography/2023-11-28/nat_earth_110.zip.dvc
       - producer: Uppsala Conflict Data Program
-        title: Cumulative deaths in armed conflicts (UCDP, 2023)
+        title: Georeferenced Event Dataset (cumulative)
         description: |-
           This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
 
@@ -14,7 +14,7 @@ definitions:
         url_main: https://ucdp.uu.se/downloads/index.html
         url_download: |-
           https://docs.google.com/spreadsheets/d/e/2PACX-1vRBIt1ZOTRCPxTRXXeQ4vPrO2SOvfLDO-brn4Vh87uxRzShrdkkflrouX7JIb4D3Grgh7E0BJjdt1Cz/pub?output=csv
-        date_accessed: '2024-05-22'
+        date_accessed: '2023-09-21'
         date_published: '2023'
 
       - title: Large scale data (1:10m Cultural Vectors), Admin 0 Countries

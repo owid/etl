@@ -31,7 +31,7 @@ steps:
   data://garden/education/2023-07-17/education_lee_lee:
     - data://meadow/education/2023-07-17/education_lee_lee
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2023-05-29/wdi
+    - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/owid/latest/key_indicators
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee

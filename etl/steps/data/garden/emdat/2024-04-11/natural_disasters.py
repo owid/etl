@@ -1,6 +1,4 @@
-"""Process and harmonize EM-DAT natural disasters dataset.
-
-"""
+"""Process and harmonize EM-DAT natural disasters dataset."""
 
 import datetime
 from typing import Any, Dict, List, Tuple
@@ -913,13 +911,6 @@ def run(dest_dir: str) -> None:
     # Load WDI dataset, read its main table and select variable corresponding to GDP (in current US$).
     ds_wdi = paths.load_dataset("wdi")
     tb_gdp = ds_wdi["wdi"][["ny_gdp_mktp_cd"]].reset_index()
-
-    ####################################################################################################################
-    # TODO: Remote this temporary solution once WDI has origins.
-    from etl.data_helpers.misc import add_origins_to_wdi
-
-    tb_gdp = add_origins_to_wdi(tb_wdi=tb_gdp)
-    ####################################################################################################################
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

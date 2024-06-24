@@ -1,0 +1,37 @@
+dataset:
+  title: Emissions and energy demand from cooling and heating (IEA, 2023)
+  description: Carbon emissions from heating and cooling, and estimated energy demand of air conditioning.
+  licenses:
+    - {}
+tables:
+  emissions_energy_heating_cooling_iea:
+    variables:
+      cooling_co2_emissions:
+        title: Space cooling
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000.0
+        description: |-
+          Greenhouse gas emissions from space cooling, measured in tonnes of carbon dioxide-equivalents. Most of these emissions come from electricity generation. Emissions from refrigerants are not included.
+      cooling_energy_ej:
+        title: cooling_energy_ej
+        unit: exajoules
+        short_unit: EJ
+        display:
+          name: Space cooling
+        description: Energy use of space cooling technologies — mostly air conditioning units.
+      cooling_energy_twh:
+        title: cooling_energy_twh
+        unit: terawatt-hours
+        short_unit: TWh
+        display:
+          name: Space cooling
+        description: Energy use of space cooling technologies — mostly air conditioning units.
+      heating_co2:
+        title: Heating
+        unit: tonnes
+        short_unit: t
+        display:
+          conversionFactor: 1000000.0
+        description: Greenhouse gas emissions from heating, which includes space and water heating.

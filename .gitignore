@@ -47,7 +47,7 @@ site/
 
 .wizard
 .wizardcfg/*
-.streamlit/*
+.streamlit/secrets.toml
 .ipynb_lock
 .execution_time.json
 

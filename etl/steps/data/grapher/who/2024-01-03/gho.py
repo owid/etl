@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
 import structlog
 
 from etl.helpers import PathFinder, create_dataset
@@ -23,6 +24,11 @@ def run(dest_dir: str) -> None:
     tables = []
     for tb_name in ds_garden.table_names:
         tb = ds_garden[tb_name]
+
+        # Invalid data from GHO, drop them for now.
+        if tb_name == "attribution_of_road_traffic_deaths_to_alcohol__pct":
+            col = "attribution_of_road_traffic_deaths_to_alcohol__pct"
+            tb[col] = pd.to_numeric(tb[col], errors="coerce").copy_metadata(tb[col])
 
         # Drop noisy dimensions dhs_mics_subnational_regions__health_equity_monitor
         if "dhs_mics_subnational_regions__health_equity_monitor" in tb.index.names:

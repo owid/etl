@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Escape from Hunger and Premature Death
+    title_snapshot: The Escape from hunger and Premature Death - Daily calories in France and Great Britain
+    description: |-
+      This dataset contains daily calorie supply from Table 1.2 of Fogel (2004) book: "The Escape from hunger and Premature Death".
+    date_published: "2004-05-24"
+
+    # Citation
+    producer: Fogel
+    citation_full: |-
+      Fogel, R.W. (2004), "The Escape from hunger and Premature Death". Cambridge Studies in Population, Economy and Society in Past Time, Series Number 38.
+      Data extracted from Table 1.2.
+    attribution_short: Fogel (2004)
+
+    # Files
+    url_main: https://www.cambridge.org/core/books/escape-from-hunger-and-premature-death-17002100/384C6032DE4E73C90EF6C9D1E55009CA
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: © Cambridge University Press 2004
+      url: https://www.cambridge.org/core/books/escape-from-hunger-and-premature-death-17002100/384C6032DE4E73C90EF6C9D1E55009CA
+outs:
+  - md5: 11d98a77f8589394b38ba286dc56d27f
+    size: 241
+    path: fogel_2004.csv

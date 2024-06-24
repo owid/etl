@@ -107,42 +107,6 @@ def test_version_tracker_raise_error_if_active_step_depends_on_missing_step(mock
     assert "Missing" in mock_log.error.call_args[0][0]
 
 
-@patch("etl.version_tracker.log")
-def test_version_tracker_raise_warning_if_active_steps_can_safely_be_archived(mock_log):
-    mock_dag = {
-        "steps": {
-            # The following step is an old version of a that depends on old versions of b and c.
-            "data://garden/institution_1/2024-01-01/dataset_a": set(
-                ["data://garden/institution_1/2024-01-01/dataset_b", "data://garden/institution_1/2024-01-01/dataset_c"]
-            ),
-            # The following step is the latest version of a that depends on the latest version of b but an old version of c.
-            "data://garden/institution_1/2024-01-02/dataset_a": set(
-                ["data://garden/institution_1/2024-01-02/dataset_b", "data://garden/institution_1/2024-01-01/dataset_c"]
-            ),
-            # Old version of b.
-            "data://garden/institution_1/2024-01-01/dataset_b": set(),
-            # Latest version of b.
-            "data://garden/institution_1/2024-01-02/dataset_b": set(),
-            # Old version of c.
-            "data://garden/institution_1/2024-01-01/dataset_c": set(),
-            # Latest version of c.
-            "data://garden/institution_1/2024-01-02/dataset_c": set(),
-        },
-        "archive": {},
-    }
-    versions = create_mock_version_tracker(dag=mock_dag, step_prefix="")
-    versions.check_that_all_active_steps_are_necessary()
-    mock_log.warning.assert_called()
-    # Check that archivable steps appear in the warning.
-    assert "data://garden/institution_1/2024-01-01/dataset_a" in mock_log.warning.call_args[0][0]
-    assert "data://garden/institution_1/2024-01-01/dataset_b" in mock_log.warning.call_args[0][0]
-    # Check that non-archivable steps do not appear in the warning.
-    assert "data://garden/institution_1/2024-01-02/dataset_a" not in mock_log.warning.call_args[0][0]
-    assert "data://garden/institution_1/2024-01-02/dataset_b" not in mock_log.warning.call_args[0][0]
-    assert "data://garden/institution_1/2024-01-01/dataset_c" not in mock_log.warning.call_args[0][0]
-    assert "data://garden/institution_1/2024-01-02/dataset_c" not in mock_log.warning.call_args[0][0]
-
-
 def test_version_tracker_get_all_step_versions():
     mock_dag = {
         "steps": {

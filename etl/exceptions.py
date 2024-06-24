@@ -1,0 +1,2 @@
+class RegionDatasetNotFound(Exception):
+    pass

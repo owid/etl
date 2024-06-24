@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Aviation Safety Network
+    title: Accidents and fatalities per year
+    citation_full: |-
+      The Flight Safety Foundation's Aviation Safety Network (ASN) - Accidents and fatalities per year (2024).
+    url_main: https://aviation-safety.net/statistics/
+    url_download: https://docs.google.com/spreadsheets/d/1SDp7p1y6m7N5xD5_fpOkYOrJvd68V7iy6etXy2cetb8/gviz/tq?tqx=out:csv&sheet=Accidents+and+fatalities+per+year
+    date_accessed: 2024-06-05
+    date_published: 2024-06-05
+    license:
+      name: Copyright Aviation Safety Network
+      url: https://aviation-safety.net/about/usage33.php
+outs:
+  - md5: aae2d0f3be835d999fecc33fe6c3dbf4
+    size: 12124
+    path: aviation_statistics.csv

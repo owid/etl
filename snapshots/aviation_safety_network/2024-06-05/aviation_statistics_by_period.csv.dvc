@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Aviation Safety Network
+    title: Aviation statistics by period
+    citation_full: |-
+      The Flight Safety Foundation's Aviation Safety Network (ASN) - Aviation statistics by period (2024).
+    url_main: https://aviation-safety.net/statistics/period/stats.php
+    date_accessed: 2024-06-05
+    date_published: 2024-06-05
+    license:
+      name: Copyright Aviation Safety Network
+      url: https://aviation-safety.net/about/usage33.php
+outs:
+  - md5: e1db95af99b03e0c5c536aaa8fbed932
+    size: 1884
+    path: aviation_statistics_by_period.csv

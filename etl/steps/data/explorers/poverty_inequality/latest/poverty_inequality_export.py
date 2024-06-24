@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from garden datasets.
-    tb_pip = ds_pip["income_consumption_2017"].reset_index()
+    tb_pip = ds_pip["income_consumption_2017_unsmoothed"].reset_index()
     tb_lis = ds_lis["luxembourg_income_study"].reset_index()
     tb_wid = ds_wid["world_inequality_database"].reset_index()
     tb_lis_adults = ds_lis["luxembourg_income_study_adults"].reset_index()
@@ -432,7 +432,7 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     tb["prices"] = ""
     tb["prices"] = tb["prices"].where(
         (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
-        "2011ppp2022",
+        "2011ppp2023",
     )
     tb["prices"] = tb["prices"].astype(str)
     tb["resource_sharing"] = "perAdult"
@@ -459,7 +459,7 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     else:
         tb["source"] = tb["source"].replace({"wid": "WID"})
 
-    tb["prices"] = tb["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
+    tb["prices"] = tb["prices"].replace({"2011ppp2023": "2011 PPPs, at 2023 prices"})
     tb["welfare"] = tb["welfare"].replace(
         {"pretaxNational": "Pretax national income", "posttaxNational": "Post-tax national income"}
     )
@@ -776,7 +776,7 @@ def create_percentiles_file_wid(tb) -> Table:
     # Define id columns
     tb["resource_sharing"] = "perAdult"
     tb["prices"] = ""
-    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2011ppp2022")
+    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2011ppp2023")
     tb["prices"] = tb["prices"].astype(str)
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
@@ -797,7 +797,7 @@ def create_percentiles_file_wid(tb) -> Table:
 
     # Replace names for descriptive columns
 
-    tb["prices"] = tb["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
+    tb["prices"] = tb["prices"].replace({"2011ppp2023": "2011 PPPs, at 2023 prices"})
     tb["welfare"] = tb["welfare"].replace(
         {"pretaxNational": "Pretax national income", "posttax_nat": "Post-tax national income"}
     )

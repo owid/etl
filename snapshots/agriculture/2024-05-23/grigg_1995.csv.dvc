@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The nutritional transition in Western Europe
+    title_snapshot: The nutritional transition in Western Europe - Daily calories in Western Europe
+    description: |-
+      This dataset contains daily calories available per capita from Table 1 of Grigg (1995) paper: "The nutritional transition in Western Europe".
+    date_published: "1995-07-01"
+
+    # Citation
+    producer: Grigg
+    citation_full: |-
+      Grigg, D. (1995), "The nutritional transition in Western Europe". Journal of Historical Geography, Volume 21, Issue 3, 1995, Pages 247-261. https://doi.org/10.1006/jhge.1995.0018
+      Data extracted from Table 1.
+    attribution_short: Grigg (1995)
+
+    # Files
+    url_main: https://www.sciencedirect.com/science/article/abs/pii/S0305748885700187?via%3Dihub
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: © Elsevier 1995
+      url: https://www.sciencedirect.com/science/article/abs/pii/S0305748885700187?via%3Dihub
+outs:
+  - md5: 79e132cf8120eb4ad8a1dd9d349d892a
+    size: 520
+    path: grigg_1995.csv

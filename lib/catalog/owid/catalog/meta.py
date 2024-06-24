@@ -8,13 +8,14 @@ import dataclasses
 import datetime as dt
 import json
 import re
-from dataclasses import dataclass, field, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Type, TypeVar, Union
 
 import mistune
 import pandas as pd
 from dataclasses_json import dataclass_json
+from typing_extensions import Self
 
 from .processing_log import ProcessingLog
 from .utils import pruned_json
@@ -26,23 +27,56 @@ VARIABLE_TYPE = Literal["float", "int", "mixed", "string", "ordinal", "categoric
 YearDateLatest = NewType("YearDateLatest", str)
 
 
-@pruned_json
-@dataclass_json
-@dataclass
-class License:
-    name: Optional[str] = None
-    url: Optional[str] = None
+T = TypeVar("T")
 
+
+class MetaBase:
     def __hash__(self):
-        """Hash that uniquely identifies a License."""
-        return _hash_dataclass(self)
+        """Hash that uniquely identifies an object (without needing frozen dataclass)."""
+        return _hash_any(self)
+
+    def __eq__(self, other: Self) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__hash__() == other.__hash__()
 
     def to_dict(self) -> Dict[str, Any]:
         ...
 
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "License":
+    @classmethod
+    def from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
         ...
+
+    def update(self, **kwargs: Dict[str, Any]) -> None:
+        """Update object with new values."""
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(self, key, value)
+
+    def copy(self, deep=True) -> Self:
+        """Return a copy of the object."""
+        if not deep:
+            return dataclasses.replace(self)  # type: ignore
+        else:
+            return _deepcopy_dataclass(self)
+
+    def save(self, filename: Union[str, Path]) -> None:
+        filename = Path(filename).as_posix()
+        with open(filename, "w") as ostream:
+            json.dump(self.to_dict(), ostream, indent=2, default=str)
+
+    @classmethod
+    def load(cls, filename: str) -> Self:
+        with open(filename) as istream:
+            return cls.from_dict(json.load(istream))
+
+
+@pruned_json
+@dataclass_json
+@dataclass(eq=False)
+class License(MetaBase):
+    name: Optional[str] = None
+    url: Optional[str] = None
 
     def __bool__(self):
         return bool(self.name or self.url)
@@ -51,8 +85,8 @@ class License:
 # DEPRECATED: use Origin instead
 @pruned_json
 @dataclass_json
-@dataclass
-class Source:
+@dataclass(eq=False)
+class Source(MetaBase):
     """Notes on importing sources to grapher:
     - Field `source.description` gets mapped to `Internal notes`, but we rather use it for `additional_info`
     - The most important fields are `published_by` and `additional_info`
@@ -73,27 +107,11 @@ class Source:
     # we're keeping both for the time being. We might consolidate them in the future
     published_by: Optional[str] = None
 
-    def __hash__(self):
-        """Hash that uniquely identifies a source."""
-        return _hash_dataclass(self)
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "Source":
-        ...
-
-    def update(self, **kwargs: Dict[str, Any]) -> None:
-        for key, value in kwargs.items():
-            if value is not None:
-                setattr(self, key, value)
-
 
 @pruned_json
 @dataclass_json
-@dataclass
-class Origin:
+@dataclass(eq=False)
+class Origin(MetaBase):
     # Producer name
     # Name of the institution or the author(s) that produced the data product.
     producer: str
@@ -127,10 +145,6 @@ class Origin:
     # License of the dataset
     license: Optional[License] = None
 
-    def __hash__(self):
-        """Hash that uniquely identifies an origin."""
-        return _hash_dataclass(self)
-
     def __post_init__(self):
         if self.date_published:
             # convert date or int to string
@@ -139,18 +153,6 @@ class Origin:
 
             if self.date_published != "latest" and not is_year_or_date(self.date_published):
                 raise ValueError("date_published should be either a year or a date or latest")
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "Origin":
-        ...
-
-    def update(self, **kwargs: Dict[str, Any]) -> None:
-        for key, value in kwargs.items():
-            if value is not None:
-                setattr(self, key, value)
 
 
 # Minor is for cases where we only harmonized the countries or similar
@@ -166,8 +168,8 @@ PROCESSING_LEVELS_ORDER = {
 
 @pruned_json
 @dataclass_json
-@dataclass
-class FaqLink:
+@dataclass(eq=False)
+class FaqLink(MetaBase):
     gdoc_id: str
     fragment_id: str
 
@@ -177,8 +179,8 @@ GrapherConfig = Dict[str, Any]
 
 @pruned_json
 @dataclass_json
-@dataclass
-class VariablePresentationMeta:
+@dataclass(eq=False)
+class VariablePresentationMeta(MetaBase):
     # Any fields of grapher config can be set here - title and subtitle *should* be set whenever possible
     grapher_config: Optional[GrapherConfig] = None
     # The text for the header of the data page
@@ -197,19 +199,11 @@ class VariablePresentationMeta:
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
 
-    def __hash__(self):
-        """Hash that uniquely identifies VariablePresentationMeta."""
-        return _hash_dataclass(self)
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "VariablePresentationMeta":
-        ...
-
 
 @pruned_json
 @dataclass_json
-@dataclass
-class VariableMeta:
+@dataclass(eq=False)
+class VariableMeta(MetaBase):
     """Allowed fields for `display` attribute used for grapher:
         name
         zeroDay
@@ -267,17 +261,6 @@ class VariableMeta:
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
 
-    def __hash__(self):
-        """Hash that uniquely identifies VariableMeta."""
-        return _hash_dataclass(self)
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "VariableMeta":
-        ...
-
     @property
     def schema_version(self) -> int:
         """Schema version is used to easily understand everywhere what metadata standard was used
@@ -298,18 +281,11 @@ class VariableMeta:
              {}
         """.format(getattr(self, "_name", None), to_html(record))
 
-    def copy(self, deep=True) -> "VariableMeta":
-        """Return a copy of the VariableMeta object."""
-        if not deep:
-            return dataclasses.replace(self)
-        else:
-            return _deepcopy_dataclass(self)
-
 
 @pruned_json
 @dataclass_json
-@dataclass
-class DatasetMeta:
+@dataclass(eq=False)
+class DatasetMeta(MetaBase):
     """
     The metadata for this entire dataset kept in JSON (e.g. mydataset/index.json).
 
@@ -339,10 +315,6 @@ class DatasetMeta:
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
 
-    def __hash__(self):
-        """Hash that uniquely identifies DatasetMeta."""
-        return _hash_dataclass(self)
-
     def __post_init__(self) -> None:
         """Imply version from publication_date or publication_year if not given
         in __init__."""
@@ -355,23 +327,6 @@ class DatasetMeta:
                     self.version = str(source.publication_year)
                 else:
                     self.version = None
-
-    def save(self, filename: Union[str, Path]) -> None:
-        filename = Path(filename).as_posix()
-        with open(filename, "w") as ostream:
-            json.dump(self.to_dict(), ostream, indent=2, default=str)
-
-    @classmethod
-    def load(cls, filename: str) -> "DatasetMeta":
-        with open(filename) as istream:
-            return cls.from_dict(json.load(istream))
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "DatasetMeta":
-        ...
 
     def _params_yaml(self) -> dict:
         """Parameters passed to YAML for dynamic interpolation."""
@@ -431,8 +386,8 @@ class DatasetMeta:
 
 @pruned_json
 @dataclass_json
-@dataclass
-class TableMeta:
+@dataclass(eq=False)
+class TableMeta(MetaBase):
     # data about this table
     short_name: Optional[str] = None
     title: Optional[str] = None
@@ -442,23 +397,12 @@ class TableMeta:
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
 
-    def __hash__(self):
-        """Hash that uniquely identifies TableMeta."""
-        return _hash_dataclass(self)
-
     @property
     def checked_name(self) -> str:
         if not self.short_name:
             raise Exception("table has no short_name")
 
         return self.short_name
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(dict: Dict[str, Any]) -> "TableMeta":
-        ...
 
     def _repr_html_(self):
         # Render a nice display of the table metadata
@@ -469,13 +413,6 @@ class TableMeta:
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">table meta</p>
              {}
         """.format(short_name, to_html(record))
-
-    def copy(self, deep=True) -> "TableMeta":
-        """Return a copy of the TableMeta object."""
-        if not deep:
-            return dataclasses.replace(self)
-        else:
-            return _deepcopy_dataclass(self)
 
 
 def to_html(record: Any) -> Optional[str]:
@@ -517,22 +454,17 @@ def is_year_or_date(s: str) -> bool:
         return False
 
 
-def _hash_dataclass(dataclass: Any) -> int:
-    """Return unique hash for a dataclass. This is useful if you can't make your dataclasses
+def _hash_any(x: Any) -> int:
+    """Return unique hash for an arbitrary object. This is useful if you can't make your dataclasses
     frozen but still want to use operations such as `set` or `unique`."""
-    fields = []
-    for k, v in dataclass.__dict__.items():
-        if is_dataclass(v):
-            fields.append((k, hash(v)))
-        elif isinstance(v, list):
-            hashes = [_hash_dataclass(x) if is_dataclass(x) else hash(x) for x in v]
-            fields.append((k, hash(tuple(hashes))))
-        elif isinstance(v, dict):
-            hashes = [(x, _hash_dataclass(y) if is_dataclass(y) else hash(y)) for x, y in v.items()]
-            fields.append((k, hash(tuple(hashes))))
-        else:
-            fields.append((k, v))
-    return hash(tuple(fields))
+    if is_dataclass(x):
+        return hash(tuple([(f.name, _hash_any(getattr(x, f.name))) for f in fields(x)]))
+    elif isinstance(x, list):
+        return hash(tuple([_hash_any(y) for y in x]))
+    elif isinstance(x, dict):
+        return hash(tuple([(k, _hash_any(v)) for k, v in x.items()]))
+    else:
+        return hash(x)
 
 
 def _deepcopy_dataclass(dc) -> Any:

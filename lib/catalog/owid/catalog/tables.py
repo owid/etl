@@ -38,6 +38,7 @@ from . import processing_log as pl
 from . import variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
+    DatasetMeta,
     License,
     Origin,
     Source,
@@ -569,15 +570,15 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, *, inplace: Literal[True]) -> None:
+    def reset_index(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
 
     @overload
-    def reset_index(self, *, inplace: Literal[False]) -> "Table":
+    def reset_index(self, *, inplace: Literal[False], **kwargs) -> "Table":
         ...
 
     @overload
-    def reset_index(self) -> "Table":
+    def reset_index(self, **kwargs) -> "Table":
         ...
 
     def reset_index(self, *args, **kwargs) -> Optional["Table"]:  # type: ignore
@@ -589,6 +590,9 @@ class Table(pd.DataFrame):
             # preserve metadata in _fields, calling reset_index() on a table drops it
             t._fields = self._fields
             return t  # type: ignore
+
+    def astype(self, *args, **kwargs) -> "Table":
+        return super().astype(*args, **kwargs)  # type: ignore
 
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
         """Fix type signature of join."""
@@ -1697,13 +1701,18 @@ def combine_tables_description(tables: List[Table]) -> Optional[str]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
+def combine_tables_datasetmeta(tables: List[Table]) -> Optional[DatasetMeta]:
+    return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="dataset")
+
+
 def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = None) -> TableMeta:
     title = combine_tables_title(tables=tables)
     description = combine_tables_description(tables=tables)
+    dataset = combine_tables_datasetmeta(tables=tables)
     if short_name is None:
         # If a short name is not specified, take it from the first table.
         short_name = tables[0].metadata.short_name
-    metadata = TableMeta(title=title, description=description, short_name=short_name)
+    metadata = TableMeta(title=title, description=description, short_name=short_name, dataset=dataset)
 
     return metadata
 

@@ -2,6 +2,7 @@ import difflib
 import os
 import re
 import traceback
+import urllib.error
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
@@ -17,6 +18,7 @@ from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.files import yaml_dump
 from etl.steps import load_dag
@@ -114,8 +116,8 @@ tb = {_snippet_dataset(ds_b, table_name)}
         else:
             # get both tables in parallel
             with ThreadPoolExecutor() as executor:
-                future_a = executor.submit(ds_a.__getitem__, table_name)
-                future_b = executor.submit(ds_b.__getitem__, table_name)
+                future_a = executor.submit(get_table_with_retry, ds_a, table_name)
+                future_b = executor.submit(get_table_with_retry, ds_b, table_name)
 
                 table_a = future_a.result()
                 table_b = future_b.result()
@@ -824,6 +826,15 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     mapping = {path: result for path, result in zip(ds_paths, results)}
 
     return mapping  # type: ignore
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(urllib.error.HTTPError),
+)
+def get_table_with_retry(ds: Dataset, table_name: str) -> Table:
+    return ds[table_name]
 
 
 def dataset_uri(ds: Dataset) -> str:

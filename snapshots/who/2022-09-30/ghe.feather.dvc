@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Health Estimates
+    date_published: 2020-12-01
+    description: |-
+      WHO's Global Health Estimates (GHE) provide the latest available data on death and disability globally, by region and country, and by age, sex and cause. The latest updates include global, regional and country trends from 2000 to 2019 inclusive. By providing key insights on mortality and morbidity trends, these estimates are a powerful tool to support informed decision-making on health policy and resource allocation.
+
+      **Methods:**
+      WHO's Global Health Estimates present comprehensive and comparable time-series data from 2000 onwards for health-related indicators, including life expectancy, healthy life expectancy, mortality and morbidity, as well as burden of diseases at global, regional and country levels, disaggregated by age, sex and cause.
+
+      They are produced using data from multiple consolidated sources, including national vital registration data, latest estimates from WHO technical programmes, United Nations partners and inter-agency groups, as well as the Global Burden of Disease and other scientific studies. A broad spectrum of robust and  well-established scientific methods were applied for the processing, synthesis and analysis of data. 
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Global Health Estimates 2020: Deaths by Cause, Age, Sex, by Country and by Region, 2000-2019. Geneva, World Health Organization; 2020.
+
+    # Files
+    url_main: https://www.who.int/data/global-health-estimates
+    date_accessed: 2022-09-30
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 1064c15209e1fb79bb31a436e22e0537
+    size: 540803082
+    path: ghe.feather
+
+# description
+# WHO’s Global Health Estimates (GHE) provide the latest available data on death and disability globally, by region and country, and by age, sex and cause. The latest updates include global, regional and country trends from 2000 to 2019 inclusive. By providing key insights on mortality and morbidity trends, these estimates are a powerful tool to support informed decision-making on health policy and resource allocation.

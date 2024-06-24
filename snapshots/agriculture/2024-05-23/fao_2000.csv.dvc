@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The State of Food and Agriculture 2000
+    title_snapshot: The State of Food and Agriculture 2000 - Daily calories in various countries
+    description: |-
+      This dataset contains daily calories in various countries, from Table 11 of FAO's "The State of Food and Agriculture 2000".
+    date_published: "2000-10-01"
+
+    # Citation
+    producer: Food and Agriculture Organization of the United Nations
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations (2000), "The State of Food and Agriculture 2000".
+      Data extracted from Table 11.
+    attribution_short: FAO (2000)
+
+    # Files
+    url_main: https://www.fao.org/agrifood-economics/publications/detail/en/c/122046/
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: © FAO 2000
+      url: https://www.fao.org/agrifood-economics/publications/detail/en/c/122046/
+outs:
+  - md5: 695a0bdbf3f50e6008d3be384cb8588c
+    size: 196
+    path: fao_2000.csv

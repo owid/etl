@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Joe draft of PIP and WID
+    title: Joe draft of PIP and WID
+    url_download: |-
+      gAAAAABmbXURWK7wxfGoi41-9CNljW1-4_Lqgdxbb0ERRATCdgbB7Ll977tGcPBiQ46CuV-F9Vfg_CWoMymCAy20jVAOZ8ivSbndZNGQA7d6LQWA2hM1p2M9uy5ylbU1cgOdCAKaFxmPcJByGz4KuAha5ROuCbYhe7MnO9HPsmvuUbhqiec79VjA4aG1Gz0PxfzBvYs32hfi8zOiVRXkepL6mIYrdWdXgOKrADxXauzgwpKzNkuSeQ7d3fjQkFpuU07fjzkZlqH2
+    date_accessed: '2024-06-15'
+  name: 'Draft: Joe – Difference in Gini, 1980-2018, PIP vs WID data (take2)'
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 9b5886b4c933c4d38eb3e579d3953bf3
+    size: 6813
+    path: draft_joe_gini_diff_1980_2018_take2.csv

@@ -10,7 +10,9 @@ It is often necessary to add `default=None` or `init=False` to make pyright happ
 """
 
 import json
+import random
 from datetime import date, datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
@@ -30,6 +32,7 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    and_,
     func,
     or_,
     select,
@@ -43,7 +46,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
@@ -264,6 +267,17 @@ class Chart(Base):
         return charts[0]
 
     @classmethod
+    def load_charts(cls, session: Session, chart_ids: List[int]) -> List["Chart"]:
+        """Load charts with id in `chart_ids`."""
+        cond = cls.id.in_(chart_ids)
+        charts = session.scalars(select(cls).where(cond)).all()
+
+        if len(charts) == 0:
+            raise NoResultFound()
+
+        return list(charts)
+
+    @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
@@ -298,6 +312,34 @@ class Chart(Base):
                 raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
+
+    @classmethod
+    def load_variables_checksums(cls, session: Session, chart_ids: List[int]) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            cd.chartId,
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId in %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "variableId"])
+
+    def load_variable_checksums(self, session: Session) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId = %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": self.id}).set_index("variableId")
 
     def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
         """Remap variable ids from source to target session. Variable in source is uniquely identified
@@ -374,7 +416,7 @@ class Chart(Base):
                 # When there are multiple indicators in a chart and it also has a map then this field tells the map which indicator to use.
                 # If the chart doesn't have the map tab active then it can be invalid quite often
                 log.warning(
-                    "staging_sync.remove_missing_map_column_slug",
+                    "chart_sync.remove_missing_map_column_slug",
                     chart_id=self.id,
                     column_slug=column_slug,
                 )
@@ -976,6 +1018,8 @@ class Variable(Base):
     grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -1016,7 +1060,8 @@ class Variable(Base):
             )
             conflict = session.scalars(q).one_or_none()
             if conflict:
-                conflict.name = f"{conflict.name} (conflict)"
+                # modify the conflicting variable name, it'll be cleaned up later
+                conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
                 session.add(conflict)
                 session.commit()
 
@@ -1351,8 +1396,17 @@ class Origin(Base):
         return origin
 
 
-# TODO: should we also add "rejected" status and exclude such charts from chart-sync?
-CHART_DIFF_STATUS = Literal["approved", "unapproved"]
+class ChartStatus(Enum):
+    APPROVED = "approved"
+    PENDING = "pending"
+    REJECTED = "rejected"
+
+
+CHART_DIFF_STATUS = Literal[
+    ChartStatus.APPROVED,
+    ChartStatus.PENDING,
+    ChartStatus.REJECTED,
+]
 
 
 class ChartDiffApprovals(Base):
@@ -1372,10 +1426,63 @@ class ChartDiffApprovals(Base):
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
-    def latest_chart_status(
-        cls, session: Session, chart_id: int, source_updated_at, target_updated_at
-    ) -> CHART_DIFF_STATUS:
-        """Load the latest approval of the chart. If there's none, return 'unapproved'."""
+    def latest_chart_status_batch(
+        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+    ) -> List[str]:
+        """Load the latest approval of the charts. If there's none, return ChartStatus.PENDING.
+
+        Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
+        """
+        if not (len(chart_ids) == len(source_updated_ats) == len(target_updated_ats)):
+            raise ValueError("All input lists must have the same length")
+
+        # Get matches from DB
+        criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
+
+        raw_results = session.scalars(
+            select(cls)
+            .where(
+                or_(
+                    *[
+                        and_(
+                            cls.chartId == chart_id,
+                            cls.sourceUpdatedAt == source_updated_at,
+                            cls.targetUpdatedAt == target_updated_at,
+                        )
+                        for chart_id, source_updated_at, target_updated_at in criteria
+                    ]
+                )
+            )
+            .order_by(cls.updatedAt.desc())
+        ).all()
+
+        # Take the latest approval for each chart - note that it's sorted by updatedAt, so we take just the
+        # first element
+        results = {}
+        for r in raw_results:
+            if r.chartId not in results:
+                results[r.chartId] = r
+
+        # List with statuses corresponding to charts specified by IDs in chart_ids
+        statuses = []
+        for chart_id in chart_ids:
+            if chart_id in results:
+                status = results[chart_id].status
+                # Legacy
+                if status == "unapproved":
+                    statuses.append(ChartStatus.PENDING.value)
+                else:
+                    statuses.append(results[chart_id].status)
+            else:
+                statuses.append(ChartStatus.PENDING.value)
+
+        assert len(chart_ids) == len(statuses), "Length of chart_ids and statuses must be the same."
+
+        return statuses
+
+    @classmethod
+    def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
+        """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
         result = session.scalars(
             select(cls)
             .where(
@@ -1387,9 +1494,25 @@ class ChartDiffApprovals(Base):
             .limit(1)
         ).first()
         if result:
-            return result.status
+            if result.status == "unapproved":
+                return ChartStatus.PENDING.value
+            return result.status  # type: ignore
         else:
-            return "unapproved"
+            return ChartStatus.PENDING.value
+
+    @classmethod
+    def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
+        """Get history of values."""
+        result = session.scalars(
+            select(cls)
+            .where(
+                cls.chartId == chart_id,
+                # cls.sourceUpdatedAt == source_updated_at,
+                # cls.targetUpdatedAt == target_updated_at,
+            )
+            .order_by(cls.updatedAt.desc())
+        ).fetchall()
+        return list(result)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

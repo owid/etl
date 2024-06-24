@@ -31,7 +31,16 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
     # Select the 't2m' variable from the combined dataset.
-    return ds.sel(expver=1).combine_first(ds.sel(expver=5))["t2m"]
+    da = ds.sel(expver=1).combine_first(ds.sel(expver=5))["t2m"]
+
+    # Convert temperature from Kelvin to Celsius.
+    da = da - 273.15
+
+    # Set the coordinate reference system for the temperature data to EPSG 4326.
+    da = da.rio.write_crs("epsg:4326")
+
+    # Convert temperature from Kelvin to Celsius.
+    return da
 
 
 def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
@@ -51,8 +60,8 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.gz")
 
-    # Read surface temperature data from snapshot and convert temperature from Kelvin to Celsius.
-    da = _load_data_array(snap) - 273.15
+    # Read surface temperature data from snapshot
+    da = _load_data_array(snap)
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
@@ -73,11 +82,15 @@ def run(dest_dir: str) -> None:
     # Initialize an empty dictionary to store the country-wise average temperature.
     temp_country = {}
 
+    # Add Global mean temperature
+    weights = np.cos(np.deg2rad(da.latitude))
+    weights.name = "weights"
+    clim_month_weighted = da.weighted(weights)
+    global_mean = clim_month_weighted.mean(["longitude", "latitude"])
+    temp_country["World"] = global_mean
+
     # Initialize a list to keep track of small countries where temperature data extraction fails.
     small_countries = []
-
-    # Set the coordinate reference system for the temperature data to EPSG 4326.
-    da = da.rio.write_crs("epsg:4326")
 
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
@@ -107,6 +120,11 @@ def run(dest_dir: str) -> None:
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
+            # Clean up the memory
+            del clip
+            del weights
+            del clim_month_weighted
+
         except (NoDataInBounds, OneDimensionalRaster):
             log.info(
                 f"No data was found in the specified bounds for {country_name}."
@@ -117,13 +135,6 @@ def run(dest_dir: str) -> None:
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
-
-    # Add Global mean temperature
-    weights = np.cos(np.deg2rad(da.latitude))
-    weights.name = "weights"
-    clim_month_weighted = da.weighted(weights)
-    global_mean = clim_month_weighted.mean(["longitude", "latitude"])
-    temp_country["World"] = global_mean
 
     # Define the start and end dates
     start_time = da["time"].min().dt.date.astype(str).item()

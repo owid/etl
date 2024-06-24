@@ -496,7 +496,7 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
         )
         tb_food_available_for_consumption[
             underscore(group)
-        ].metadata.title = f"Daily caloric intake per person from {group.lower().replace('other', 'other commodities')}"
+        ].metadata.title = f"Daily calorie supply per person from {group.lower().replace('other', 'other commodities')}"
         tb_food_available_for_consumption[underscore(group)].metadata.unit = CONSUMPTION_UNIT
         tb_food_available_for_consumption[underscore(group)].metadata.short_unit = "kcal"
         tb_food_available_for_consumption[underscore(group)].metadata.description_key = [description]
@@ -582,37 +582,37 @@ def generate_macronutrient_compositions(tb_fbsc: Table) -> Table:
     # Combine all tables.
     combined = pr.multi_merge(tables=tables, on=["country", "year"], how="outer")
 
-    # Daily caloric intake from fat, per person.
+    # Daily calorie supply from fat, per person.
     combined["Total energy from fat"] = combined["Total fat"] * KCAL_PER_GRAM_OF_FAT
-    # Daily caloric intake from protein, per person.
+    # Daily calorie supply from protein, per person.
     combined["Total energy from protein"] = combined["Total protein"] * KCAL_PER_GRAM_OF_PROTEIN
-    # Daily caloric intake from carbohydrates (assumed to be the rest of the daily caloric intake), per person.
-    # This is the difference between the total caloric intake minus the caloric intake from protein and fat.
+    # Daily calorie supply from carbohydrates (assumed to be the rest of the daily calorie supply), per person.
+    # This is the difference between the total calorie supply minus the calorie supply from protein and fat.
     combined["Total energy from carbohydrates"] = (
         combined["Total energy"] - combined["Total energy from fat"] - combined["Total energy from protein"]
     )
 
-    # Daily intake of carbohydrates per person.
+    # Daily supply of carbohydrates per person.
     combined["Total carbohydrates"] = combined["Total energy from carbohydrates"] / KCAL_PER_GRAM_OF_CARBOHYDRATES
 
-    # Caloric intake from fat as a percentage of the total daily caloric intake.
+    # Calorie supply from fat as a percentage of the total daily calorie supply.
     combined["Share of energy from fat"] = 100 * combined["Total energy from fat"] / combined["Total energy"]
-    # Caloric intake from protein as a percentage of the total daily caloric intake.
+    # Calorie supply from protein as a percentage of the total daily calorie supply.
     combined["Share of energy from protein"] = 100 * combined["Total energy from protein"] / combined["Total energy"]
-    # Caloric intake from carbohydrates as a percentage of the total daily caloric intake.
+    # Calorie supply from carbohydrates as a percentage of the total daily calorie supply.
     combined["Share of energy from carbohydrates"] = (
         100 * combined["Total energy from carbohydrates"] / combined["Total energy"]
     )
 
-    # Daily caloric intake from animal protein.
+    # Daily calorie supply from animal protein.
     combined["Energy from animal protein"] = combined["Protein from animal products"] * KCAL_PER_GRAM_OF_PROTEIN
-    # Caloric intake from animal protein as a percentage of the total daily caloric intake.
+    # Calorie supply from animal protein as a percentage of the total daily calorie supply.
     combined["Share of energy from animal protein"] = (
         100 * combined["Energy from animal protein"] / combined["Total energy"]
     )
-    # Daily caloric intake from vegetal protein.
+    # Daily calorie supply from vegetal protein.
     combined["Energy from vegetal protein"] = combined["Protein from vegetal products"] * KCAL_PER_GRAM_OF_PROTEIN
-    # Caloric intake from vegetal protein as a percentage of the total daily caloric intake.
+    # Calorie supply from vegetal protein as a percentage of the total daily calorie supply.
     combined["Share of energy from vegetal protein"] = (
         100 * combined["Energy from vegetal protein"] / combined["Total energy"]
     )

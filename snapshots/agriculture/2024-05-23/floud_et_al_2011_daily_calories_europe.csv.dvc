@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Changing Body
+    title_snapshot: The Changing Body - Daily calories in Western Europe
+    description: |-
+      This dataset contains the estimates on the daily caloric intake in the United States (Table 6.6) and Western Europe (Table 5.5) of "The Changing Body", by Floud et al. (2011).
+    date_published: "2011-03-31"
+
+    # Citation
+    producer: Floud et al.
+    citation_full: |-
+      Floud, R., Fogel, R. W., Harris, B. and Hong, S. C. (2011), "The Changing Body," Cambridge Books, Cambridge University Press, number 9780521879750.
+      Data extracted from Tables 5.5 and 6.6.
+    attribution_short: Floud et al. (2011)
+
+    # Files
+    url_main: https://www.cambridge.org/core/books/changing-body/DE3BB0E3577205AC26823CF2120D8B7E
+    date_accessed: 2024-05-27
+
+    # License
+    license:
+      name: © Cambridge University Press 2011
+      url: https://www.cambridge.org/core/books/changing-body/DE3BB0E3577205AC26823CF2120D8B7E
+outs:
+  - md5: 4f31506ded236dc72a590695f8868a1c
+    size: 554
+    path: floud_et_al_2011_daily_calories_europe.csv

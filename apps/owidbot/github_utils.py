@@ -6,9 +6,12 @@ import github.PullRequest
 import github.Repository
 import jwt
 import requests
+import structlog
 from github import Auth, Github
 
 from etl import config
+
+log = structlog.get_logger()
 
 
 def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repository.Repository:
@@ -28,7 +31,8 @@ def get_pr(repo: github.Repository.Repository, branch_name: str) -> github.PullR
     if len(pulls) == 0:
         raise AssertionError(f"No open PR found for branch {branch_name}")
     elif len(pulls) > 1:
-        raise AssertionError(f"More than one open PR found for branch {branch_name}")
+        log.warning(f"More than one open PR found for branch {branch_name}. Taking the most recent one.")
+        pulls = pulls[-1:]
 
     return pulls[0]
 
@@ -60,8 +64,8 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
 
 
 def github_app_access_token():
-    assert config.OWIDBOT_APP_CLIENT_ID, "OWIDBOT_CLIENT_ID is not set"
-    assert config.OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_PRIVATE_KEY_PATH is not set"
+    assert config.OWIDBOT_APP_CLIENT_ID, "OWIDBOT_APP_CLIENT_ID is not set"
+    assert config.OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_APP_PRIVATE_KEY_PATH is not set"
     assert config.OWIDBOT_APP_INSTALLATION_ID, "OWIDBOT_APP_INSTALLATION_ID is not set"
 
     jwt_token = generate_jwt(config.OWIDBOT_APP_CLIENT_ID, config.OWIDBOT_APP_PRIVATE_KEY_PATH)

@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import cast
 
 import streamlit as st
-from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
@@ -13,10 +12,10 @@ from etl.paths import DAG_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-# Page config
-st.set_page_config(page_title="Wizard: Create a Grapher step", page_icon="🪄")
-add_indentation()
-
+st.set_page_config(
+    page_title="Wizard: Grapher",
+    page_icon="🪄",
+)
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("grapher")
 

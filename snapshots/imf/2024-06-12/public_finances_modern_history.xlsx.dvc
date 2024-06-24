@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Public Finances in Modern History
+    description: |-
+      The Public Finances in Modern History Database documents two-hundred years of the history of budget deficits and government debts. The current version covers 151 countries over the period 1800–2022, subject to data availability. These data were assembled from a wide array of historical sources, which are documented in the Appendix of Data Sources. The initial database, which covered 55 countries, was analyzed in “A Modern History of Fiscal Prudence and Profligacy”, Journal of Monetary Economics, 2015, Vol. 76, pp. 55–70, by Paolo Mauro, Rafael Romeu, Ariel Binder, and Asad Zaman.
+
+      A distinguishing feature of the database is the presence of primary balance data, which is the difference between a government's revenues and its non-interest expenditures, alongside the corresponding government debt data. The primary balance is the most accurate reflection of government fiscal policy decisions. We invite you to explore these data through the interactive graphs below and take in a glimpse of the history of deficits and debts around the world.
+    date_published: "2023-12-01"
+
+    # Citation
+    producer: International Monetary Fund
+    citation_full: |-
+      International Monetary Fund (2023). Public Finances in Modern History
+    attribution_short: IMF
+
+    # Files
+    url_main: https://www.imf.org/external/datamapper/datasets/FPP
+    date_accessed: 2024-06-12
+
+    # License
+    license:
+      name: © International Monetary Fund
+      url: https://www.imf.org/external/terms.htm
+
+outs:
+  - md5: f3b259ec151e11d0e9dd808f59fd343c
+    size: 2407408
+    path: public_finances_modern_history.xlsx

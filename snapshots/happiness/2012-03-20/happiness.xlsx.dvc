@@ -1,23 +1,27 @@
 meta:
-  namespace: happiness
-  short_name: happiness
-  name: World Happiness Report (2012)
-  version: '2012-03-20'
-  publication_date: '2012-03-20'
-  source_name: World Happiness Report (2012)
-  source_published_by: 'Helliwell, John F., Richard Layard, and Jeffrey Sachs, eds.
-    2012. World Happiness Report 2012. New York: UN Sustainable Development Solutions
-    Network.'
-  url: https://worldhappiness.report/ed/2012/
-  source_data_url: https://happiness-report.s3.amazonaws.com/2012/2012.xlsx
-  file_extension: xlsx
-  license_url:
-  license_name: ''
-  date_accessed: 2023-06-21
-  is_public: true
-  description: |
+  origin:
+    # Data product / Snapshot
+    title: World Happiness Report
+    description: |-
+      The World Happiness Report is a partnership of Gallup, the Oxford Wellbeing Research Centre, the UN Sustainable Development Solutions Network, and the WHR’s Editorial Board.
+      It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+    date_published: "2012-03-20"
+    version_producer: 2012
 
-wdir: ../../../data/snapshots/happiness/2012-03-20
+    # Citation
+    producer: Sustainable Development Solutions Network
+    citation_full: |-
+      "Helliwell, John F., Richard Layard, and Jeffrey Sachs, eds. 2012. World Happiness Report 2012. New York: UN Sustainable Development Solutions Network."
+    # Files
+    url_main: https://worldhappiness.report/ed/2012/
+    url_download: https://happiness-report.s3.amazonaws.com/2012/2012.xlsx
+    date_accessed: 2024-06-17
+
+    # License
+    license:
+      name: ""
+      url: https://worldhappiness.report/faq/
+
 outs:
 - md5: 2a650a3c72fac976c4bbf51e79142ec1
   size: 250434

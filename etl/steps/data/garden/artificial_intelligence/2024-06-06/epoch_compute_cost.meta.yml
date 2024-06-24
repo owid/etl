@@ -1,0 +1,37 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+tables:
+  epoch_compute_cost:
+    variables:
+      domain:
+        title: Domain
+        unit: ''
+        short_unit: ''
+        description_short: Specific area, application, or field in which an AI system is designed to operate.
+        display:
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+
+      publication_date:
+          title: Publication date
+          unit: ''
+          description_short: The date when the AI system was first published.
+          description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
+
+      cost__inflation_adjusted:
+        title: Cost (inflation-adjusted)
+        unit: 'constant 2023 US$'
+        short_unit: '$'
+        description_short: The cost of developing the AI system expressed in 2023 US dollars, adjusted for inflation.
+        description_from_producer: |-
+          The cost of developing the AI system was adjusted for inflation using the Consumer Price Index (CPI) for the United States. The CPI was used to account for the changes in the price level of consumer goods and services over time. The inflation-adjusted cost is presented in 2023 US dollars.
+        display:
+          numDecimalPlaces: 0
+          name: Cost
+
