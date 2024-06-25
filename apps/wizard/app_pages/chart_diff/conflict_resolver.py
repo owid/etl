@@ -5,6 +5,8 @@ from typing import cast
 
 import requests
 import streamlit as st
+from requests.exceptions import HTTPError
+from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
@@ -23,9 +25,11 @@ class ChartDiffConflictResolver:
     Provides UI.
     """
 
-    def __init__(self, diff: ChartDiff):
+    def __init__(self, diff: ChartDiff, session: Session):
         # Chart diff
         self.diff = diff
+        # Session (needed to update conflict table in db)
+        self.session = session
         # Compare chart configs
         self.config_compare = compare_chart_configs(
             self.diff.target_chart.config,  # type: ignore
@@ -140,13 +144,22 @@ class ChartDiffConflictResolver:
 
             # Push to staging
             api = AdminAPI(SOURCE.engine, grapher_user_id=1)
-            api.update_chart(
-                chart_id=self.diff.chart_id,
-                chart_config=config_new,
-            )
-            st.success(
-                "Conflicts have been resolved. The chart in staging has been updated. You can close this window."
-            )
+            try:
+                api.update_chart(
+                    chart_id=self.diff.chart_id,
+                    chart_config=config_new,
+                )
+            except HTTPError as e:
+                st.error(
+                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}).\n\n {e}"
+                )
+            else:
+                # Set conflict as resolved
+                self.diff.set_conflict_to_resolved(self.session)
+                # Signal user that everything went well
+                st.success(
+                    "Conflicts have been resolved. The chart in staging has been updated. You can close this window."
+                )
         # if rerun:
         #     st.rerun()
 
@@ -210,6 +223,6 @@ def get_schema(schema_version: str = "004"):
     ).json()
 
 
-def st_show_conflict_resolver(diff: ChartDiff) -> None:
+def st_show_conflict_resolver(diff: ChartDiff, session: Session) -> None:
     """Conflict resolver."""
-    ChartDiffConflictResolver(diff).run()
+    ChartDiffConflictResolver(diff, session).run()
