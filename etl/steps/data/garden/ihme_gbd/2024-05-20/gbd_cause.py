@@ -115,6 +115,8 @@ def add_cancer_other_aggregates(tb: Table) -> Table:
         "Larynx cancer",
         "Tracheal, bronchus, and lung cancer",
     ]
+    # Cancers that are already called 'Other cancers' in the dataset, so we'll combine these in to avoid confusing labelling on the chart
+    other_cancers = ["Other malignant neoplasms", "Other neoplasms"]
     cancers_tb = tb[
         (tb["cause"].isin(cancers))
         & (tb["metric"] == "Number")
@@ -123,6 +125,8 @@ def add_cancer_other_aggregates(tb: Table) -> Table:
         & (tb["year"] == tb["year"].max())
     ]
     cancers_to_aggregate = cancers_tb[cancers_tb["value"] < 200000]["cause"].drop_duplicates().tolist()
+
+    cancers_to_aggregate = cancers_to_aggregate + other_cancers
 
     tb_cancer = tb[(tb["cause"].isin(cancers_to_aggregate)) & (tb["metric"] == "Number")]
     tb_cancer = tb_cancer.groupby(["country", "age", "metric", "year"], observed=True)["value"].sum().reset_index()
