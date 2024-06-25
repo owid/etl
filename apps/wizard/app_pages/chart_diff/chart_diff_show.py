@@ -445,6 +445,7 @@ class ChartDiffShow:
 
         st.markdown(text)
 
+    @st.experimental_fragment
     def _show(self) -> None:
         """Show chart diff.
 
