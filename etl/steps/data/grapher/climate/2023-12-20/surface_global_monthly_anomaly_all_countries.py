@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    # git
+    #
     # Load garden dataset.
     ds_garden = paths.load_dataset("surface_temperature")
     tb = ds_garden["surface_temperature"].reset_index()

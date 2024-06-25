@@ -55,7 +55,8 @@ steps:
     - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_country_level_monthly_anomaly:
     - data://garden/climate/2023-12-20/surface_temperature
-
+  data://grapher/climate/2023-12-20/surface_global_monthly_anomaly_all_countries:
+    - data://garden/climate/2023-12-20/surface_temperature
   #
   # Climate change impacts data explorer.
   #
