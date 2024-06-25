@@ -64,19 +64,11 @@ def cli(
 
     - **Note 1:** The dataset (with the new chart's underlying indicators) from `SOURCE` must exist in `TARGET`. This means that you have to merge your work to master and wait for the ETL to finish running all steps.
 
-    - **Note 2:** Staging servers are destroyed after 7 days of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
-
     **Considerations on charts:**
 
-    - Both published charts and drafts from staging are synced.
-    - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with `--approve-revisions` flag)
-    - You get a warning if the chart **_has been modified on live_** after staging server was created.
+    - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
-
-    **Considerations on chart revisions:**
-
-    - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
 
     **Considerations on tags:**
 
@@ -98,12 +90,6 @@ def cli(
 
     ```
     etl chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
-    ```
-
-    **Example 4:** Update charts directly without creating chart revisions (useful for large datasets updates like population)
-
-    ```
-    etl chart-sync staging-site-my-branch .env.prod.write --approve-revisions
     ```
     """
     if _is_commit_sha(source):

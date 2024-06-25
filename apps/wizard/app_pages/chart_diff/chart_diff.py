@@ -426,6 +426,17 @@ def _staging_creation(session: Session) -> dt.datetime:
 def _modified_data_metadata_by_admin(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
+    """
+    Get charts with modified data or metadata. This is done by taking all variables used in a chart from
+    the source changed by the Admin user and comparing their checksums to the target. The key aspect is how we
+    filter them - if a variable has been updated more recently on the target, we exclude it. This is not a perfect
+    solution, but it prevents showing numerous outdated charts when the source is lagging behind the target (master).
+
+    ISSUES:
+    Some datasets like COVID or certain AI datasets use {TODAY} in their metadata, making the metadata dependent
+    on the creation date. Merging a day later results in many metadata changes. The current workaround is to
+    exclude these datasets from comparison, similar to what we do for data-diff.
+    """
     # get modified variables that are used in charts
     base_q = """
     select
@@ -556,7 +567,6 @@ def _modified_chart_configs_by_admin(
     # NOTE: chart IDs and variable IDs in both environments do not necessarily correspond to the same charts or indicators! While there might be a chart with ID X in both environments that corresponds to different charts, it is rare that there is a chart with ID X using indicator with ID Y, that are different. However, this can't be ruled out. Therefore, aligning source_df and target_df by chartId and variableId can fail sometimes!
     source_df, target_df = source_df.align(target_df, join="left")
 
-    # return differences in data / metadata / config
     diff = source_df.copy()
     diff["configEdited"] = source_df["chartChecksum"] != target_df["chartChecksum"]
 
@@ -589,14 +599,6 @@ def modified_charts_by_admin(
 
         TESTING:
         - chartEditedInStaging: True if the chart config has been edited in staging.
-        - dataEditedInStaging: True if the chart data has been edited in staging.
-        - metadataEditedInStaging: True if the chart metadata has been edited in staging.
-
-        TODO:
-        - newInSource: True if the chart is new in source environment.
-        - newInTarget: True if the chart is new in target environment.
-        - deletedInSource: True if the chart is deleted in source environment.
-        - deletedInTarget: True if the chart is deleted in target environment.
     """
     df_config = _modified_chart_configs_by_admin(source_session, target_session, chart_ids=chart_ids)
     df_data_metadata = _modified_data_metadata_by_admin(source_session, target_session, chart_ids=chart_ids)
