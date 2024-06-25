@@ -96,7 +96,7 @@ steps:
   #
   # Energy - OWID Energy dataset.
   #
-  data://garden/energy/latest/owid_energy:
+  data://external/energy_data/latest/owid_energy:
     - data://garden/energy/2024-06-20/energy_mix
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/energy/2024-06-20/fossil_fuel_production
