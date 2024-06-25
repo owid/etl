@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Luxembourg Income Study (LIS)
+    description: |-
+      The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from about 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
+
+      Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
+    date_published: 2024-06-07
+    title_snapshot: Luxembourg Income Study (LIS) - Distributional indicators
+
+    # Citation
+    producer: Luxembourg Income Study
+    citation_full: |-
+      Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2024). Luxembourg: LIS.
+    attribution_short: LIS
+
+    # Files
+    url_main: https://www.lisdatacenter.org/our-data/lis-database/
+    date_accessed: 2024-06-19
+
+    # License
+    license:
+      name: LIS Privacy Policy
+      url: https://www.lisdatacenter.org/about-lis/terms-of-use/
+
+outs:
+  - md5: 676af09337cd4ee465d7f6f1d45bf5b3
+    size: 1975707
+    path: lis_distribution.csv
