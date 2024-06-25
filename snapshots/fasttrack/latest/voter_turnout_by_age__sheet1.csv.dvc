@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: |-
+      gAAAAABmeuYJ1BOmjbYafMsQEPWpQpVsGZgxZEP4BqaS4pFt2fZEN--puEFxqWFW-RULglALsvGFbljfu5t_Z0OBsx3Ay4D9bBVBz3r74kcIBdQGKk3vWcvGS9B8O5qMoylKmiO2EVk-
+    date_accessed: '2024-06-25'
+    date_published: '2024-06-25'
+  name: DRAFT Voter turnout by age - Sheet1
+  description: ''
+  is_public: false
+outs:
+  - md5: 74ecf6254b468c4e3d921489674c8df2
+    size: 304
+    path: voter_turnout_by_age__sheet1.csv
