@@ -52,9 +52,9 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["burden_disaggregated"].reset_index()
     # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
     #
     # Process data.
     #
