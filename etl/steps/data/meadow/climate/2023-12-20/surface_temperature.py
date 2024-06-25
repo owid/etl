@@ -28,9 +28,6 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     with gzip.open(snap.path, "r") as _file:
         ds = xr.open_dataset(_file)
 
-    # Use smaller types
-    ds["t2m"] = ds["t2m"].astype("float32")
-
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
     # Select the 't2m' variable from the combined dataset.
