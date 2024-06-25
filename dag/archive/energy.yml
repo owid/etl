@@ -351,3 +351,75 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/energy/2023-12-12/primary_energy_consumption:
     - data://garden/energy/2023-12-12/primary_energy_consumption
+  #
+  # Energy Institute - Statistical Review of World Energy.
+  #
+  data://meadow/energy_institute/2023-12-12/statistical_review_of_world_energy:
+    - snapshot://energy_institute/2023-12-12/statistical_review_of_world_energy.csv
+    - snapshot://energy_institute/2023-12-12/statistical_review_of_world_energy.xlsx
+  data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy:
+    - data://meadow/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Electricity mix (EI & Ember).
+  #
+  data://garden/energy/2024-05-08/electricity_mix:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ember/2024-05-08/yearly_electricity
+  #
+  # Energy - Global primary energy.
+  #
+  data://garden/energy/2024-05-08/global_primary_energy:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/papers/2023-12-12/smil_2017
+  data://grapher/energy_institute/2023-12-12/statistical_review_of_world_energy:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+  #
+  # Energy - Primary energy consumption.
+  #
+  data://garden/energy/2024-05-08/primary_energy_consumption:
+    - data://garden/eia/2023-12-12/energy_consumption
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/demography/2023-03-31/population
+  #
+  # Energy - Fossil Fuel Production.
+  #
+  data://garden/energy/2024-05-08/fossil_fuel_production:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/demography/2023-03-31/population
+    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
+  #
+  # Energy - Energy mix.
+  #
+  data://garden/energy/2024-05-08/energy_mix:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/demography/2023-03-31/population
+  #
+  # Energy - Fossil fuel reserves/production ratio.
+  #
+  data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+  #
+  # Energy - UK historical electricity.
+  #
+  data://garden/energy/2024-05-08/uk_historical_electricity:
+    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+    - data://garden/energy/2024-05-08/electricity_mix
+  data://grapher/energy/2024-05-08/electricity_mix:
+    - data://garden/energy/2024-05-08/electricity_mix
+  data://grapher/energy/2024-05-08/global_primary_energy:
+    - data://garden/energy/2024-05-08/global_primary_energy
+  data://grapher/energy/2024-05-08/primary_energy_consumption:
+    - data://garden/energy/2024-05-08/primary_energy_consumption
+  data://grapher/energy/2024-05-08/fossil_fuel_production:
+    - data://garden/energy/2024-05-08/fossil_fuel_production
+  data://grapher/energy/2024-05-08/energy_mix:
+    - data://garden/energy/2024-05-08/energy_mix
+  data://grapher/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio
+  data://grapher/energy/2024-05-08/uk_historical_electricity:
+    - data://garden/energy/2024-05-08/uk_historical_electricity
