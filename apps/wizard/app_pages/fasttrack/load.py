@@ -83,7 +83,8 @@ def load_data_from_csv(uploaded_file):
     print("RUNNING FOR SHEETS")
     # Read CSV file as a dataframe
     st.write("Importing CSV...")
-    csv_df = pd.read_csv(uploaded_file)
+    # sep=None autodetects separators
+    csv_df = pd.read_csv(uploaded_file, sep=None)  # type: ignore
 
     # Parse dataframe
     st.write("Parsing data...")
