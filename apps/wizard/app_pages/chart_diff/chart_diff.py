@@ -7,6 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.wizard.utils import get_staging_creation_time
 from etl import grapher_model as gm
 from etl.db import read_sql
 
@@ -121,7 +122,8 @@ class ChartDiff:
         if self._in_conflict is None:
             if self.target_chart is None:
                 return False
-            self._in_conflict = self.target_chart.updatedAt > self.source_chart.updatedAt
+            # self._in_conflict = self.target_chart.updatedAt > self.source_chart.updatedAt
+            self._in_conflict = self.target_chart.updatedAt > get_staging_creation_time()
         return self._in_conflict
 
     @property
@@ -415,14 +417,6 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
-def _staging_creation(session: Session) -> dt.datetime:
-    # Get timestamp of creation of databas (i.e. proxy for staging server creation)
-    query_ts = "show table status like 'charts'"
-    df = read_sql(query_ts, session)
-    assert len(df) == 1
-    return df["Create_time"].item()
-
-
 def _modified_data_metadata_by_admin(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -515,7 +509,7 @@ def _modified_data_metadata_by_admin(
 def _modified_chart_configs_by_admin(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
-    TIMESTAMP_STAGING_CREATION = _staging_creation(source_session)
+    TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
 
     # get modified charts
     base_q = """
