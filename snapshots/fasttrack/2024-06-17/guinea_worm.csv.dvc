@@ -4,9 +4,9 @@ meta:
     url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
     source_data_url: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQxUg_FPFYvf4Uzc1rH6k_T6JaP2pmlVkBNpPnDiWpMaCTdqT_wkiaQ1rOgUIntSMx5VpILVn5hZ98D/pub?output=csv
-    date_accessed: '2024-06-14'
+    date_accessed: '2024-06-17'
     published_by: Dracunculiasis Eradication Portal
-  name: Guinea worm cases (WHO, 2023)
+  name: Guinea worm cases (WHO, 2024)
   description: |-
     Reported cases of guinea worm disease (dracunculiasis) as recorded by WHO.
 
@@ -27,7 +27,12 @@ meta:
     2023: Table 1a: https://iris.who.int/bitstream/handle/10665/376790/WER9920-249-269.pdf?sequence=1
 
     Global totals are calculated yearly as the sum of the number of reported cases in each country.
-  license: {}
+  license:
+    name: CC BY-NC-SA 3.0 IGO
+    url: https://www.who.int/about/policies/publishing/copyright
+
+
+
 outs:
   - md5: ad470e933652da5616882e1e9140665d
     size: 13383
