@@ -202,7 +202,7 @@ class ChartDiffShow:
     @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
     def _show_conflict_resolver_modal(self) -> None:
         """Show conflict resolver in modal page."""
-        st_show_conflict_resolver(self.diff)
+        st_show_conflict_resolver(self.diff, session=self.source_session)
 
     def _show_chart_diff_controls(self):
         # Three columns: status, refresh, link
@@ -226,6 +226,10 @@ class ChartDiffShow:
                     help="Note that the changes in the chart come from ETL changes (metadata/data) and therefore there is no way to reject them at this stage. If you are not happy with the changes, please look at the ETL steps involved. We present them to you here as a sanity check, and ask you to review them for correctness.",
                 )
             else:
+                if self.diff.in_conflict:
+                    help_text = "Resolve chart config conflicts before proceeding!"
+                else:
+                    help_text = "Approve or reject the chart. If you are not sure, please leave it as pending."
                 st.radio(
                     label="Approve or reject chart",
                     key=f"radio-{self.diff.chart_id}",
@@ -234,6 +238,8 @@ class ChartDiffShow:
                     format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
                     index=self.status_names.index(self.diff.approval_status),  # type: ignore
                     on_change=self._push_status,
+                    disabled=self.diff.in_conflict,
+                    help=help_text,
                 )
 
         # Refresh chart
