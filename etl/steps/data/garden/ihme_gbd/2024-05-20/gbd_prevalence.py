@@ -77,6 +77,8 @@ def run(dest_dir: str) -> None:
         tables=[tb_prevalence, tb_incidence],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
+        # Table has optimal types already and repacking can be time consuming.
+        repack=False,
     )
 
     # Save changes in the new garden dataset.

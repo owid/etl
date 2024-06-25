@@ -149,6 +149,7 @@ def create_dataset(
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     errors: Literal["ignore", "warn", "raise"] = "raise",
+    repack: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -166,6 +167,7 @@ def create_dataset(
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
     :param if_origins_exist: What to do if origins already exist in the dataset metadata.
+    :param repack: Repack dataframe before adding it to the dataset.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -208,7 +210,7 @@ def create_dataset(
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
-        ds.add(table, formats=formats)
+        ds.add(table, formats=formats, repack=repack)
 
     # set metadata from dest_dir
     pattern = (

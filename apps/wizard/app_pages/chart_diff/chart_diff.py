@@ -219,67 +219,6 @@ class ChartDiff:
 
         return chart_diffs
 
-    @classmethod
-    def from_chart_id(
-        cls, chart_id, server_creation_time, source_session: Session, target_session: Optional[Session] = None
-    ):
-        """Get chart diff from chart id.
-
-        - Get charts from source and target
-        - Get its approval state
-        - Build diff object
-
-        TODO: replace with call to `from_charts_df` with chart_ids = [chart_id]
-        """
-        # Get charts
-        source_chart = gm.Chart.load_chart(source_session, chart_id=chart_id)
-        if target_session is not None:
-            try:
-                target_chart = gm.Chart.load_chart(target_session, chart_id=chart_id)
-            except NoResultFound:
-                target_chart = None
-        else:
-            target_chart = None
-
-        # It can happen that both charts have the same ID, but are completely different (this
-        # happens when two charts are created independently on two servers). If they
-        # have same createdAt then they are the same chart.
-        if target_chart and source_chart.createdAt != target_chart.createdAt:
-            target_chart = None
-
-        # Checks
-        if target_chart:
-            assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
-
-        # Get approval status
-        approval_status = gm.ChartDiffApprovals.latest_chart_status(
-            source_session,
-            chart_id,
-            source_chart.updatedAt,
-            target_chart.updatedAt if target_chart else None,
-        )
-
-        # Load checksums for underlying indicators
-        # TODO: is this fast enough for large datasets? maybe we should avoid dataframes at all
-        if target_chart and target_session is not None:
-            source_df = source_chart.load_variable_checksums(source_session)
-            target_df = target_chart.load_variable_checksums(target_session)
-            source_df, target_df = source_df.align(target_df)
-            modified_checksum = source_df != target_df
-
-            # If checksum has not been filled yet, assume unchanged
-            modified_checksum[target_df.isna()] = False
-        else:
-            modified_checksum = None
-
-        # Get edited in staging
-        edited_in_staging = source_chart.updatedAt > server_creation_time
-
-        # Build object
-        chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
-
-        return chart_diff
-
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
         # Get history
@@ -414,11 +353,11 @@ class ChartDiffsLoader:
         # Cache
         self._diffs: List[ChartDiff] | None = None
 
-    def load_df(self) -> pd.DataFrame:
+    def load_df(self, chart_ids: List[int] | None = None) -> pd.DataFrame:
         """Load changes in charts between environments from sessions."""
         with Session(self.source_engine) as source_session:
             with Session(self.target_engine) as target_session:
-                return modified_charts_by_admin(source_session, target_session)
+                return modified_charts_by_admin(source_session, target_session, chart_ids=chart_ids)
 
     @property
     def chart_ids_all(self):
@@ -441,10 +380,13 @@ class ChartDiffsLoader:
         data: bool = False,
         metadata: bool = False,
         sync: bool = False,
+        chart_ids: Optional[List[int]] = None,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
+        if chart_ids:
+            assert sync, "If chart_ids are provided, sync must be True."
         if sync:
-            self.df = self.load_df()
+            self.df = self.load_df(chart_ids=chart_ids)
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
 
@@ -473,6 +415,172 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
+def _staging_creation(session: Session) -> dt.datetime:
+    # Get timestamp of creation of databas (i.e. proxy for staging server creation)
+    query_ts = "show table status like 'charts'"
+    df = read_sql(query_ts, session)
+    assert len(df) == 1
+    return df["Create_time"].item()
+
+
+def _modified_data_metadata_by_admin(
+    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+) -> pd.DataFrame:
+    """
+    Get charts with modified data or metadata. This is done by taking all variables used in a chart from
+    the source changed by the Admin user and comparing their checksums to the target. The key aspect is how we
+    filter them - if a variable has been updated more recently on the target, we exclude it. This is not a perfect
+    solution, but it prevents showing numerous outdated charts when the source is lagging behind the target (master).
+
+    ISSUES:
+    Some datasets like COVID or certain AI datasets use {TODAY} in their metadata, making the metadata dependent
+    on the creation date. Merging a day later results in many metadata changes. The current workaround is to
+    exclude these datasets from comparison, similar to what we do for data-diff.
+    """
+    # get modified variables that are used in charts
+    base_q = """
+    select
+        v.catalogPath as catalogPath,
+        cd.chartId,
+        v.dataChecksum,
+        v.metadataChecksum,
+        d.dataEditedByUserId,
+        d.dataEditedAt as dataLastEditedAt,
+        d.metadataEditedByUserId,
+        d.metadataEditedAt as metadataLastEditedAt
+    from chart_dimensions as cd
+    join variables as v on cd.variableId = v.id
+    join datasets as d on v.datasetId = d.id
+    where v.dataChecksum is not null and
+    """
+    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
+    #   set automatically if you use STAGING env variable.
+    where = """
+        -- include all charts from datasets that have been updated
+        (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
+    """
+    query_source = base_q + where
+    # Add filter for chart IDs
+    if chart_ids is not None:
+        where_charts = """
+            -- filter and get only charts with given IDs
+            cd.chartId in %(chart_ids)s
+        """
+        query_source += " and " + where_charts
+        params = {"chart_ids": tuple(chart_ids)}
+    else:
+        params = {}
+    source_df = read_sql(query_source, source_session, params=params)
+
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
+
+    # read those variables from target
+    where = """
+        v.catalogPath in %(catalog_paths)s
+    """
+    target_df = read_sql(
+        base_q + where, target_session, params={"catalog_paths": tuple(source_df.catalogPath.unique())}
+    )
+
+    source_df = source_df.set_index(["chartId", "catalogPath"])
+    target_df = target_df.set_index(["chartId", "catalogPath"])
+
+    # align dataframes with INNER join
+    # the inner join is on purpose, because we only want to compare variables that are used in both environments
+    # if the variable is not present in target, it could mean that the chart was updated in target (but we don't
+    # care about that, because it's not a data/metadata change, but chart config change)
+    source_df, target_df = source_df.align(target_df, join="inner")
+
+    # Only include variables with more recent update in source. If the variable has been updated in target, then
+    # exclude it (typically an automatic update or source hasn't been merged with master and it's lagging behind it)
+    ix = source_df.dataLastEditedAt >= target_df.dataLastEditedAt
+    source_df = source_df[ix]
+    target_df = target_df[ix]
+
+    # Get differences
+    diff = pd.DataFrame(
+        {
+            "dataEdited": source_df.dataChecksum != target_df.dataChecksum,
+            "metadataEdited": source_df.metadataChecksum != target_df.metadataChecksum,
+        }
+    )
+
+    diff = diff.groupby("chartId").any()
+
+    return diff
+
+
+def _modified_chart_configs_by_admin(
+    source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
+) -> pd.DataFrame:
+    TIMESTAMP_STAGING_CREATION = _staging_creation(source_session)
+
+    # get modified charts
+    base_q = """
+    select
+        c.id as chartId,
+        MD5(c.config) as chartChecksum,
+        c.lastEditedByUserId as chartLastEditedByUserId,
+        c.publishedByUserId as chartPublishedByUserId,
+        c.lastEditedAt as chartLastEditedAt
+    from charts as c
+    where
+    """
+    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
+    #   set automatically if you use STAGING env variable.
+    where = """
+        -- only compare charts that have been updated on staging server by Admin user
+        (
+            c.lastEditedByUserId = 1 or c.publishedByUserId = 1
+        )
+    """
+    query_source = base_q + where
+    # Add filter for chart IDs
+    if chart_ids is not None:
+        where_charts = """
+            -- filter and get only charts with given IDs
+            c.id in %(chart_ids)s
+        """
+        query_source += " and " + where_charts
+        params = {"chart_ids": tuple(chart_ids)}
+    else:
+        params = {}
+    source_df = read_sql(query_source, source_session, params=params)
+
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "configEdited", "chartEditedInStaging"]).set_index("chartId")
+
+    # read those charts from target
+    where = """
+        c.id in %(chart_ids)s
+    """
+    target_df = read_sql(base_q + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())})
+
+    source_df = source_df.set_index("chartId")
+    target_df = target_df.set_index("chartId")
+
+    # align dataframes with left join (so that source has non-null values)
+    # NOTE: new charts will be already in source
+    # NOTE: chart IDs and variable IDs in both environments do not necessarily correspond to the same charts or indicators! While there might be a chart with ID X in both environments that corresponds to different charts, it is rare that there is a chart with ID X using indicator with ID Y, that are different. However, this can't be ruled out. Therefore, aligning source_df and target_df by chartId and variableId can fail sometimes!
+    source_df, target_df = source_df.align(target_df, join="left")
+
+    diff = source_df.copy()
+    diff["configEdited"] = source_df["chartChecksum"] != target_df["chartChecksum"]
+
+    # Add flag 'edited in staging'
+    diff["chartEditedInStaging"] = source_df["chartLastEditedAt"] >= TIMESTAMP_STAGING_CREATION
+
+    assert (
+        diff["chartEditedInStaging"].notna().all()
+    ), "chartEditedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
+
+    # Remove charts with no changes
+    return diff[["configEdited", "chartEditedInStaging"]]
+
+
 def modified_charts_by_admin(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -491,146 +599,13 @@ def modified_charts_by_admin(
 
         TESTING:
         - chartEditedInStaging: True if the chart config has been edited in staging.
-        - dataEditedInStaging: True if the chart data has been edited in staging.
-        - metadataEditedInStaging: True if the chart metadata has been edited in staging.
-
-        TODO:
-        - newInSource: True if the chart is new in source environment.
-        - newInTarget: True if the chart is new in target environment.
-        - deletedInSource: True if the chart is deleted in source environment.
-        - deletedInTarget: True if the chart is deleted in target environment.
     """
-    # Get timestamp of creation of databas (i.e. proxy for staging server creation)
-    query_ts = "show table status like 'charts'"
-    df = read_sql(query_ts, source_session)
-    assert len(df) == 1
-    TIMESTAMP_STAGING_CREATION = df["Create_time"].item()
+    df_config = _modified_chart_configs_by_admin(source_session, target_session, chart_ids=chart_ids)
+    df_data_metadata = _modified_data_metadata_by_admin(source_session, target_session, chart_ids=chart_ids)
 
-    # TODO: we could aggregate it by charts and get a combined checksum, for now we want
-    #   a view with variable granularity
-    # get modified charts and charts from modified datasets
-    base_q = """
-    select
-        v.id as variableId,
-        cd.chartId,
-        v.dataChecksum,
-        v.metadataChecksum,
-        MD5(c.config) as chartChecksum,
-        c.lastEditedByUserId as chartLastEditedByUserId,
-        c.publishedByUserId as chartPublishedByUserId,
-        c.lastEditedAt as chartLastEditedAt,
-        d.dataEditedByUserId,
-        d.dataEditedAt as dataLastEditedAt,
-        d.metadataEditedByUserId,
-        d.metadataEditedAt as metadataLastEditedAt
-    from chart_dimensions as cd
-    join charts as c on cd.chartId = c.id
-    join variables as v on cd.variableId = v.id
-    join datasets as d on v.datasetId = d.id
-    where
-    """
-    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
-    #   set automatically if you use STAGING env variable.
-    where = """
-        -- only compare datasets or charts that have been updated on staging server
-        -- by Admin user
-        (
-            (c.lastEditedByUserId = 1 or c.publishedByUserId = 1)
-            or
-            -- include all charts from datasets that have been updated
-            (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
-        )
-    """
-    query_source = base_q + where
-    # Add filter for chart IDs
-    if chart_ids is not None:
-        where_charts = """
-            -- filter and get only charts with given IDs
-            cd.chartId in %(chart_ids)s
-        """
-        query_source += " and " + where_charts
-        params = {"chart_ids": tuple(chart_ids)}
-    else:
-        params = {}
-    source_df = read_sql(query_source, source_session, params=params)
+    df = df_config.join(df_data_metadata, how="outer").fillna(False)
 
-    # no charts, return empty dataframe
-    if source_df.empty:
-        return pd.DataFrame(
-            columns=["chartId", "dataEdited", "metadataEdited", "configEdited", "chartEditedInStaging"]
-        ).set_index("chartId")
-
-    # read those charts from target
-    where = """
-        c.id in %(chart_ids)s
-    """
-    target_df = read_sql(base_q + where, target_session, params={"chart_ids": tuple(source_df.chartId.unique())})
-
-    source_df = source_df.set_index(["chartId", "variableId"])
-    target_df = target_df.set_index(["chartId", "variableId"])
-
-    # charts not edited by Admin and with null checksums should be excluded
-    # TODO: Review this condition
-    ix = (
-        (source_df.chartLastEditedByUserId != 1)
-        & (source_df.chartPublishedByUserId != 1)
-        & (source_df.dataChecksum.isnull() | source_df.metadataChecksum.isnull())
-    )
-    source_df = source_df[~ix]
-
-    # align dataframes with left join (so that source has non-null values)
-    # NOTE: new charts will be already in source
-    # NOTE: chart IDs and variable IDs in both environments do not necessarily correspond to the same charts or indicators! While there might be a chart with ID X in both environments that corresponds to different charts, it is rare that there is a chart with ID X using indicator with ID Y, that are different. However, this can't be ruled out. Therefore, aligning source_df and target_df by chartId and variableId can fail sometimes!
-    source_df, target_df = source_df.align(target_df, join="left")
-
-    # return differences in data / metadata / config
-    diff = (
-        (source_df != target_df)
-        .groupby("chartId")
-        .max()
-        .rename(
-            columns={
-                "dataChecksum": "dataEdited",
-                "metadataChecksum": "metadataEdited",
-                "chartChecksum": "configEdited",
-            }
-        )
-    )
-    diff = diff[["dataEdited", "metadataEdited", "configEdited"]]
-
-    # Add flag 'edited in staging'
-    edited = source_df.groupby("chartId")[
-        [
-            "chartLastEditedAt",
-            # "dataLastEditedAt",
-            # "metadataLastEditedAt"
-        ]
-    ].max()
-    edited["chartEditedInStaging"] = edited >= TIMESTAMP_STAGING_CREATION
-    diff = diff.merge(
-        edited[["chartEditedInStaging"]],
-        left_index=True,
-        right_index=True,
-        how="left",
-    )
-    assert (
-        diff["chartEditedInStaging"].notna().all()
-    ), "chartEditedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
-
-    # If chart hasn't been edited by Admin, then make `configEdited` false
-    # This can happen when you merge master to your branch and staging rebuilds a dataset.
-    # Then dataset will be edited by Admin and will be included, but your charts might be outdated
-    # compared to production. Hence, only consider config updates for charts edited by Admin.
-    chart_ids = source_df[
-        (source_df.chartLastEditedByUserId != 1) & (source_df.chartPublishedByUserId != 1)
-    ].index.get_level_values("chartId")
-    diff.loc[chart_ids, "configEdited"] = False
-
-    # Remove charts with no changes
-    cols_exclude = ["chartEditedInStaging"]
-    diff = diff[diff[[col for col in diff.columns if col not in cols_exclude]].any(axis=1)]
-
-    return diff
+    return df
 
 
 def get_chart_diffs_from_grapher(
