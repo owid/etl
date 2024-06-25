@@ -16,11 +16,6 @@ def run(dest_dir: str) -> None:
     tb_deaths = ds_garden["gbd_child_mortality_deaths"]
     tb_dalys = ds_garden["gbd_child_mortality_dalys"]
 
-    #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
