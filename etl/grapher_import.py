@@ -381,7 +381,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: List[int]) -> None:
+def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: List[int]) -> bool:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -389,6 +389,8 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
     :param dataset_id: ID of the dataset
     :param upserted_variable_ids: variables upserted in grapher step
     :param workers: delete variables in parallel
+
+    :return: True if successful
     """
     with engine.connect() as con:
         # get all those variables first
@@ -405,7 +407,7 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
 
         # nothing to delete, quit
         if not variable_ids_to_delete:
-            return
+            return True
 
         log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
 
@@ -420,7 +422,14 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         ).fetchall()
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
-            raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
+
+            # show a warning
+            log.warning(
+                "Variables used in charts will not be deleted automatically",
+                rows=rows,
+                variables=variable_ids_to_delete,
+            )
+            return False
 
         # then variables themselves with related data in other tables
         con.execute(
@@ -485,6 +494,8 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             size=result.rowcount,
             variables=variable_ids_to_delete,
         )
+
+        return True
 
 
 def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: List[int]) -> None:
