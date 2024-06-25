@@ -40,7 +40,7 @@ definitions:
     The annual change in energy consumption by source is calculated as the difference with respect to the previous year.
   # Processing description for all per capita quantities.
   description_processing_per_capita: &description_processing_per_capita |-
-    Per capita figures are calculated by dividing by a population dataset that is built and maintained by Our World in Data, based on [different sources](https://ourworldindata.org/grapher/population).
+    Per capita figures are calculated by dividing by a population dataset that is built and maintained by Our World in Data, based on [different sources](https://ourworldindata.org/population-sources).
   # Title variant for non-fossil sources in terms of direct primary energy.
   title_variant_direct: &title_variant_direct |-
     In terms of direct primary energy

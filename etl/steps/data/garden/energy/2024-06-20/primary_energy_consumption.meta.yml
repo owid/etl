@@ -6,8 +6,8 @@ definitions:
         - Energy
     description_processing: |
       - Primary energy consumption data was compiled based on two key data sources: [Energy Institute (EI) Statistical Review of World Energy](https://www.energyinst.org/statistical-review), and [International energy data from the U.S. Energy Information Administration (EIA)](https://www.eia.gov/international/data/world/total-energy/more-total-energy-data). EI provides the longest and most up-to-date time-series of primary energy. However, it does not provide data for all countries. We have therefore supplemented this dataset with energy data from the EIA. Where EI provides data for a given country, this data is adopted; for countries where this data is missing, we rely on EIA energy figures.
-      - Per capita figures have been calculated using a population dataset that is based on [different sources](https://ourworldindata.org/grapher/population).
-      - To calculate energy per unit of GDP, we divide by total real GDP figures from [the Maddison Project Database](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/).
+      - Per capita figures have been calculated using a population dataset that is based on [different sources](https://ourworldindata.org/population-sources).
+      - To calculate energy per unit of GDP, we divide by total real GDP figures from [the Maddison Project Database](https://ourworldindata.org/grapher/gdp-maddison-project-database).
 
 dataset:
   update_period_days: 365

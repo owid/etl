@@ -14,7 +14,7 @@ meta:
     date_published: '2024-06-20'
     license:
       name: © Energy Institute 2024
-      url: https://www.energyinst.org/__data/assets/pdf_file/0006/1542714/EI_Stats_Review_2024_single_pages.pdf
+      url: https://www.energyinst.org/terms
 outs:
   - md5: 1233b1b9be6fb7a34d138dafb2bf3fb1
     size: 37605465
