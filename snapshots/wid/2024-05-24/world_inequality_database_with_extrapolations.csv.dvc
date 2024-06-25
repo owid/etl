@@ -24,7 +24,6 @@ meta:
       name: CC BY 4.0
       url: https://wid.world/
 
-wdir: ../../../data/snapshots/wid/2024-05-24
 outs:
   - md5: d4b6b5f84ee300b5346c2eadebf6fd0c
     size: 21878702
