@@ -612,6 +612,25 @@ def run(dest_dir: str) -> None:
     # Fill spurious nans in nuclear energy data with zeros.
     tb = fix_missing_nuclear_energy_data(tb=tb)
 
+    ####################################################################################################################
+    # Wind generation for Saudi Arabia in 2022 and 2023 is possibly wrong.
+    # It goes from 0.005678 TWh in 2021 to 1.45 TWh in 2022 and 2023.
+    # According to IRENA, Saudi Arabia's wind capacity was 3MW in 2022:
+    # https://www.irena.org/Publications/2023/Jul/Renewable-energy-statistics-2023
+    # Either generation or capacity must be wrong.
+    # For now, first assert that the (possibly spurious) jump is in the data, and then remove those points.
+    error = "Data for Saudi Arabia may have changed (possibly fixing a data issue). Remove this part of the code."
+    assert (
+        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2021)]["wind_electricity_generation_twh"].item() < 0.006
+    ), error
+    assert (
+        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_electricity_generation_twh"].item() > 1.45
+    ), error
+    tb = tb.drop(tb[(tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023]))].index.tolist()).reset_index(
+        drop=True
+    )
+    ####################################################################################################################
+
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
     tb = create_additional_variables(tb=tb)
 
