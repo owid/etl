@@ -475,6 +475,7 @@ class ChartDiffShow:
             with tab2:
                 self._show_approval_history()
 
+    @st.experimental_fragment
     def show(self):
         """Show chart diff."""
         # Show in expander or not
