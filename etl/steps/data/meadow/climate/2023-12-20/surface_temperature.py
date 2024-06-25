@@ -31,7 +31,10 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
     # Select the 't2m' variable from the combined dataset.
-    da = ds.sel(expver=1).combine_first(ds.sel(expver=5))["t2m"]
+    ds1 = ds.sel(expver=1)
+    ds5 = ds.sel(expver=5)
+    da = ds1.combine_first(ds5)["t2m"]
+    del ds1, ds5
 
     # Convert temperature from Kelvin to Celsius.
     da = da - 273.15
