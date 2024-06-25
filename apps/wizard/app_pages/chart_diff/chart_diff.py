@@ -20,8 +20,6 @@ class ChartDiff:
     source_chart: gm.Chart
     # Chart in target environment (if new in source environment, there won't be one)
     target_chart: Optional[gm.Chart]
-    # Three state: 'approved', 'pending', 'rejected'
-    approval_status: gm.CHART_DIFF_STATUS | str
     # DataFrame for all variables with columns dataChecksum and metadataChecksum
     # If True, then the checksum has changed
     modified_checksum: Optional[pd.DataFrame]
@@ -32,13 +30,16 @@ class ChartDiff:
         self,
         source_chart: gm.Chart,
         target_chart: Optional[gm.Chart],
-        approval_status: gm.CHART_DIFF_STATUS | str,
+        approval: gm.ChartDiffApprovals | None,
+        conflict: gm.ChartDiffConflicts | None,
+        # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
-        self.approval_status = approval_status
+        self.approval = approval
+        self.conflict = conflict
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
@@ -48,6 +49,16 @@ class ChartDiff:
         # Cached
         self._in_conflict = None
         self._change_types = None
+        self._approval_status: Optional[gm.CHART_DIFF_STATUS | str] = None
+
+    @property
+    def approval_status(self) -> gm.CHART_DIFF_STATUS | str:
+        if self._approval_status is None:
+            if self.approval is None:
+                self._approval_status = gm.ChartStatus.PENDING.value
+            else:
+                self._approval_status = self.approval.status
+        return self._approval_status
 
     @property
     def is_reviewed(self) -> bool:
@@ -122,8 +133,18 @@ class ChartDiff:
         if self._in_conflict is None:
             if self.target_chart is None:
                 return False
-            # self._in_conflict = self.target_chart.updatedAt > self.source_chart.updatedAt
-            self._in_conflict = self.target_chart.updatedAt > get_staging_creation_time()
+
+            # Check if chart has been edited in production
+            chart_edited_in_prod = self.target_chart.updatedAt > get_staging_creation_time()
+
+            # If edited, check if conflict was resolved
+            if chart_edited_in_prod:
+                resolved = False
+                if self.conflict is not None:
+                    resolved = self.conflict.conflict == "resolved"
+                self._in_conflict = chart_edited_in_prod & (not resolved)
+            else:
+                self._in_conflict = False
         return self._in_conflict
 
     @property
@@ -187,7 +208,11 @@ class ChartDiff:
         target_charts = cls._get_target_charts(target_session, source_charts)
 
         # Get approval status
-        approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
+        # approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
+        approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts)
+
+        # Get conflicts
+        conflicts = cls._get_conflicts(source_session, chart_ids, target_charts)
 
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
@@ -202,9 +227,13 @@ class ChartDiff:
             if target_chart:
                 assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
 
-            # Approval status
-            assert chart_id in approval_statuses, f"Approval status not found for chart {chart_id}"
-            approval_status = approval_statuses[chart_id]
+            # Approval
+            assert chart_id in approvals, f"Approval not found for chart {chart_id}"
+            approval = approvals[chart_id]
+
+            # Conflict
+            assert chart_id in approvals, f"Conflict not found for chart {chart_id}"
+            conflict = conflicts[chart_id]
 
             # Checksums
             modified_checksum = checksums_diff.loc[chart_id] if target_chart else None
@@ -216,7 +245,7 @@ class ChartDiff:
                 edited_in_staging = None
 
             # Build Chart Diff object
-            chart_diff = cls(source_chart, target_chart, approval_status, modified_checksum, edited_in_staging)
+            chart_diff = cls(source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging)
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -249,9 +278,6 @@ class ChartDiff:
         """Update the state of the chart diff."""
         # Only perform action if status changes!
         if self.approval_status != status:
-            # Update status variable
-            self.approval_status = status
-
             # Update approval status (in database)
             assert self.chart_id
             if self.is_modified:
@@ -260,10 +286,32 @@ class ChartDiff:
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
                 targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # type: ignore
-                status=self.approval_status,  # type: ignore
+                status=status,  # type: ignore
             )
             session.add(approval)
             session.commit()
+
+            # Add approval to object
+            self.approval = approval
+
+    def set_conflict_to_resolved(self, session: Session) -> None:
+        """Update the state of the chart diff."""
+        # Only perform action if status changes!
+        assert self.is_modified, "Conflicts can only occur for modified charts!"
+        # Update approval status (in database)
+        assert self.chart_id
+        if self.is_modified:
+            assert self.target_chart
+        conflict = gm.ChartDiffConflicts(
+            chartId=self.chart_id,
+            targetUpdatedAt=self.target_chart.updatedAt,  # type: ignore
+            conflict="resolved",
+        )
+        session.add(conflict)
+        session.commit()
+
+        # Add conflict to object
+        self.conflict = conflict
 
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
@@ -316,21 +364,39 @@ class ChartDiff:
         return target_charts
 
     @staticmethod
-    def _get_approval_statuses(source_session, chart_ids, source_charts, target_charts) -> Dict[int, str]:
+    def _get_approvals(
+        source_session, chart_ids, source_charts, target_charts
+    ) -> Dict[int, Optional[gm.ChartDiffApprovals]]:
         target_updated_ats = []
         for chart_id in chart_ids:
             if target_charts.get(chart_id) is not None:
                 target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
             else:
                 target_updated_ats.append(None)
-        approval_statuses = gm.ChartDiffApprovals.latest_chart_status_batch(
+        approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
             source_session,
             chart_ids,
             [source_charts[chart_id].updatedAt for chart_id in chart_ids],
             target_updated_ats,
         )
-        approval_statuses = dict(zip(chart_ids, approval_statuses))
-        return approval_statuses
+        approvals = dict(zip(chart_ids, approvals))
+        return approvals
+
+    @staticmethod
+    def _get_conflicts(source_session, chart_ids, target_charts) -> Dict[int, Optional[gm.ChartDiffConflicts]]:
+        target_updated_ats = []
+        for chart_id in chart_ids:
+            if target_charts.get(chart_id) is not None:
+                target_updated_ats.append(target_charts[chart_id].updatedAt)  # type: ignore
+            else:
+                target_updated_ats.append(None)
+        conflicts = gm.ChartDiffConflicts.get_conflict_batch(
+            source_session,
+            chart_ids,
+            target_updated_ats,
+        )
+        conflicts = dict(zip(chart_ids, conflicts))
+        return conflicts
 
     @staticmethod
     def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
