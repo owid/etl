@@ -854,10 +854,19 @@ class GrapherStep(Step):
             variable_upsert_results = [future.result() for future in as_completed(futures)]
 
         if not config.GRAPHER_FILTER and not config.SUBSET:
-            self._cleanup_ghost_resources(engine, dataset_upsert_results, variable_upsert_results)
+            # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
+            # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
+            # needed for remapping. However, we can delete it on next ETL run
+            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, variable_upsert_results)
 
             # set checksum and updatedAt timestamps after all data got inserted
-            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+            if success:
+                checksum = self.data_step.checksum_input()
+            # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
+            else:
+                checksum = "to_be_rerun"
+
+            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
@@ -868,11 +877,13 @@ class GrapherStep(Step):
         engine: Engine,
         dataset_upsert_results,
         variable_upsert_results: List[Any],
-    ) -> None:
+    ) -> bool:
         """
         Cleanup all ghost variables and sources that weren't upserted
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
+
+        Return True if cleanup was successfull, False otherwise.
         """
         import etl.grapher_import as gi
 
@@ -883,13 +894,15 @@ class GrapherStep(Step):
         upserted_source_ids = [source_id for source_id in upserted_source_ids if source_id is not None]
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        gi.cleanup_ghost_variables(
+        success = gi.cleanup_ghost_variables(
             engine,
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
         gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
+
+        return success
 
 
 @dataclass
