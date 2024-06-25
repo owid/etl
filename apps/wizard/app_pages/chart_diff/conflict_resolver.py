@@ -142,9 +142,9 @@ class ChartDiffConflictResolver:
             # Verify config
             config_new = validate_chart_config_and_set_defaults(config, schema=get_schema("004"))
 
-            # Push to staging
             api = AdminAPI(SOURCE.engine, grapher_user_id=1)
             try:
+                # Push new chart to staging
                 api.update_chart(
                     chart_id=self.diff.chart_id,
                     chart_config=config_new,
@@ -157,11 +157,11 @@ class ChartDiffConflictResolver:
                 # Set conflict as resolved
                 self.diff.set_conflict_to_resolved(self.session)
                 # Signal user that everything went well
-                st.success(
-                    "Conflicts have been resolved. The chart in staging has been updated. You can close this window."
-                )
-        # if rerun:
-        #     st.rerun()
+                # st.success(
+                #     "Conflicts have been resolved. The chart in staging has been updated. You can close this window."
+                # )
+        if rerun:
+            st.rerun()
 
 
 def as_valid_json(s):  # -> Any:
