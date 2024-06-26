@@ -725,6 +725,8 @@ class Table(pd.DataFrame):
 
         This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
 
+        Underscoring is the first step, so make sure to use correct values in `keys` (e.g. use 'country' if original table had 'Country').
+
         ```
         tb.format(["country", "year"])
         ```
@@ -761,7 +763,16 @@ class Table(pd.DataFrame):
         # Set index
         if keys is None:
             keys = ["country", "year"]
-        t = t.set_index(keys, verify_integrity=verify_integrity)
+        ## Sanity check
+        try:
+            t = t.set_index(keys, verify_integrity=verify_integrity)
+        except KeyError as e:
+            if underscore:
+                raise KeyError(
+                    f"Make sure that you are using valid column names! Note that the column names have been underscored! Available column names are: {t.columns}. You used {keys}."
+                )
+            else:
+                raise e
         if sort_columns:
             t = t.sort_index(axis=1)
         # Sort rows
