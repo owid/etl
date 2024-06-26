@@ -1,0 +1,49 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display:
+      name: Share in relative poverty
+      numDecimalPlaces: 1
+    processing_level: major
+    description_key:
+      - Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.
+      - Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    presentation:
+      title_public: Share in relative poverty
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  relative_poverty_france:
+    variables:
+      headcount_ratio_40_median:
+        title: 40% of the median - Share of population in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with an income below 50% of the median.
+
+      headcount_ratio_50_median:
+        title: 50% of the median - Share of population in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with an income below 50% of the median.
+
+      headcount_ratio_60_median:
+        title: 60% of the median - Share of population in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with an income below 60% of the median.
+
+      headcount_ratio_70_median:
+        title: 70% of the median - Share of population in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with an income below 70% of the median.
