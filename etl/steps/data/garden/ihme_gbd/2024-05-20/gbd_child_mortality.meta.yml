@@ -112,3 +112,9 @@ tables:
         display:
           numDecimalPlaces: |-
             <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+  gbd_child_mortality_entity:
+    variables:
+      under_five_deaths:
+        title: Deaths among children under five years old
+        unit: deaths
+        description_short: The estimated number of deaths among children under five years old, from each disease or injury.

@@ -40,6 +40,7 @@ def run(dest_dir: str) -> None:
     # Split into two tables: one for deaths, one for DALYs
     tb_deaths = tb[tb["measure"] == "Deaths"].copy()
     tb_deaths = add_additional_age_groups(tb_deaths)
+    tb_ent = disease_as_entity(tb_deaths)
     tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
     # Shorten the metric name for DALYs
     tb_dalys["measure"] = "DALYs"
@@ -54,6 +55,10 @@ def run(dest_dir: str) -> None:
     )
     tb_dalys = tb_dalys.format(
         ["country", "year", "metric", "age", "sex", "cause"], short_name="gbd_child_mortality_dalys"
+    )
+    tb_ent = tb_ent.format(
+        ["country", "year"],
+        short_name="gbd_child_mortality_slope",
     )
 
     #
@@ -97,3 +102,21 @@ def add_additional_age_groups(tb: Table) -> Table:
     tb = tb.drop(columns=tb.filter(like="_").columns)
 
     return tb
+
+
+def disease_as_entity(tb: Table) -> Table:
+    """
+    For this Slope chart (https://ourworldindata.org/grapher/global-child-deaths-by-cause) we need to have the death rates for <5s, where the country is the disease or injury
+    """
+    tb_ent = tb[
+        (tb["age"] == "<5 years")
+        & (tb["metric"] == "Number")
+        & (tb["sex"] == "Both")
+        & (tb["country"] == "World")
+        & (tb["year"].isin([tb["year"].min(), tb["year"].max()]))
+    ]
+
+    tb_ent = tb_ent[["year", "cause", "value"]].rename(columns={"cause": "country", "value": "under_five_deaths"})
+
+    tb_ent = tb_ent[tb_ent["country"] != "All causes"]
+    return tb_ent
