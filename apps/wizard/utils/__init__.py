@@ -117,6 +117,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+# Session state to track staging creation time
+VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
 
 
 def get_namespaces(step_type: str) -> List[str]:
@@ -814,31 +816,33 @@ class Pagination:
             )
 
 
-def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
+def _get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     query_ts = "show table status like 'charts'"
-
-    if session:
-        df = read_sql(query_ts, session)
-    else:
-        with Session(OWID_ENV.engine) as source_session:
-            df = read_sql(query_ts, source_session)
+    df = read_sql(query_ts, session)
     assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
-
     create_time = df["Create_time"].item()
-
-    if key not in st.session_state:
-        st.session_state[key] = create_time
-
     return create_time
 
 
-def set_staging_creation_time(key: str = "server_creation_time") -> None:
+def get_staging_creation_time(session: Optional[Session] = None):
+    """Get staging server creation time."""
+    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
+        set_staging_creation_time(session)
+    return st.session_state[VARNAME_STAGING_CREATION_TIME]
+
+
+def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
     """Gest staging server creation time estimate."""
-    if OWID_ENV.env_local == "staging":
-        st.session_state[key] = get_staging_creation_time()
+
+    if session is None:
+        if OWID_ENV.env_local == "staging":
+            with Session(OWID_ENV.engine) as session:
+                st.session_state[key] = _get_staging_creation_time(session)
+        else:
+            st.session_state[key] = None
     else:
-        st.session_state[key] = None
+        st.session_state[key] = _get_staging_creation_time(session)
 
 
 def st_toast_error(message: str) -> None:
