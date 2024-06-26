@@ -497,7 +497,6 @@ class ChartDiffShow:
             self._show_metadata_diff()
 
         # SHOW MODIFIED CHART
-        st.write(self.diff.in_conflict)
         if self.diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
