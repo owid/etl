@@ -122,31 +122,42 @@ if st.session_state.submitted_datasets:
     indicator_mapping = render_indicator_mapping(search_form)
     # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
 
-##########################################################################################
-# 3 GET CHARTS
-#
-# Once the indicator mapping is done, we retrieve the affected charts (those that rely on
-# the indicators in the mapping. create the revisions. We store these under what we
-# call the "submission_config". This is a dataclass that holds the charts and updaters.
-#
-##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_indicators:
-    # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
-    # st.write(reset_indicator_form)
-    if indicator_mapping is not None:
-        if indicator_mapping == {}:
-            msg_error = "No indicators selected! Please select at least one indicator."
-            st.error(msg_error)
-        else:
-            charts = get_affected_charts_and_preview(
-                indicator_mapping,
-            )
+    ##########################################################################################
+    # 3 GET CHARTS
+    #
+    # Once the indicator mapping is done, we retrieve the affected charts (those that rely on
+    # the indicators in the mapping. create the revisions. We store these under what we
+    # call the "submission_config". This is a dataclass that holds the charts and updaters.
+    #
+    ##########################################################################################
+    if st.session_state.submitted_indicators:
+        # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
+        # st.write(reset_indicator_form)
+        if indicator_mapping is not None:
+            if indicator_mapping == {}:
+                msg_error = "No indicators selected! Please select at least one indicator."
+                st.error(msg_error)
+            else:
+                charts = get_affected_charts_and_preview(
+                    indicator_mapping,
+                )
+
+        ##########################################################################################
+        # 4 UPDATE CHARTS
+        #
+        # TODO: add description
+        ##########################################################################################
+        if st.session_state.submitted_charts:
+            if isinstance(charts, list) and len(charts) > 0:
+                st.toast("Updating charts...")
+                push_new_charts(charts, SCHEMA_CHART_CONFIG)
+
 ##########################################################################################
 # 4 UPDATE CHARTS
 #
 # TODO: add description
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
-    if isinstance(charts, list) and len(charts) > 0:
-        st.toast("Updating charts...")
-        push_new_charts(charts, SCHEMA_CHART_CONFIG)
+# if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
+#     if isinstance(charts, list) and len(charts) > 0:
+#         st.toast("Updating charts...")
+#         push_new_charts(charts, SCHEMA_CHART_CONFIG)
