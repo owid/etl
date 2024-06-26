@@ -7,31 +7,19 @@ definitions:
         - Causes of Death
     processing_level: minor
   sex: |-
-    <% if sex == "Both" %>
-    individuals
-    <% elif sex == "Male" %>
-    males
-    <% elif sex == "Female" %>
-    females
-    <%- endif -%>
+    <% if sex == "Both" %>individuals<% elif sex == "Male" %>males<% elif sex == "Female" %>females<%- endif -%>
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
   value_deaths:
     unit: |-
-      <% if metric == "Number" %>
-      deaths
-      <% elif metric == "Rate" %>
-      deaths per 100,000 people
-      <% elif metric == "Percent" %>
-      %
-      <%- endif -%>
+      <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
     short_unit: |-
       <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from << cause.lower() >>, among {definitions.sex} aged << age >>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause.lower() >>  among {definitions.sex}
+      Age-standardized deaths from << cause.lower() >> among {definitions.sex}
       <% elif metric == "Number" and age == 'All ages'%>
       Total number of deaths from << cause.lower()  >> among {definitions.sex}
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
