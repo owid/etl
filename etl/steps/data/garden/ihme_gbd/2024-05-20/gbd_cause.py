@@ -68,7 +68,12 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_deaths, tb_dalys], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb_deaths, tb_dalys],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        # Table has optimal types already and repacking can be time consuming.
+        repack=False,
     )
 
     # Save changes in the new garden dataset.
@@ -115,6 +120,8 @@ def add_cancer_other_aggregates(tb: Table) -> Table:
         "Larynx cancer",
         "Tracheal, bronchus, and lung cancer",
     ]
+    # Cancers that are already called 'Other cancers' in the dataset, so we'll combine these in to avoid confusing labelling on the chart
+    other_cancers = ["Other malignant neoplasms", "Other neoplasms"]
     cancers_tb = tb[
         (tb["cause"].isin(cancers))
         & (tb["metric"] == "Number")
@@ -123,6 +130,8 @@ def add_cancer_other_aggregates(tb: Table) -> Table:
         & (tb["year"] == tb["year"].max())
     ]
     cancers_to_aggregate = cancers_tb[cancers_tb["value"] < 200000]["cause"].drop_duplicates().tolist()
+
+    cancers_to_aggregate = cancers_to_aggregate + other_cancers
 
     tb_cancer = tb[(tb["cause"].isin(cancers_to_aggregate)) & (tb["metric"] == "Number")]
     tb_cancer = tb_cancer.groupby(["country", "age", "metric", "year"], observed=True)["value"].sum().reset_index()

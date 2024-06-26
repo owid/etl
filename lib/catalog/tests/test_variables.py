@@ -581,3 +581,10 @@ def test_combine_variables_metadata_uses_all_fields() -> None:
         # TODO: we should implement this, if not identical, append one after another
         "description_processing",
     }
+
+
+def test_set_categories(variable_3) -> None:
+    new_var = variable_3.astype("category")
+    new_var = new_var.set_categories(["a", "b", "c", "d"])
+    assert new_var.m.title == "Title of Variable 3"
+    assert tuple(new_var.cat.categories) == ("a", "b", "c", "d")

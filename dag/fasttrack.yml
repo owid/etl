@@ -202,3 +202,5 @@ steps:
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/fasttrack/latest/emissions_energy_heating_cooling_iea:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
+  data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
+    - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv

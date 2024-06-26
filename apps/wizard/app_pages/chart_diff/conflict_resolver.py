@@ -69,19 +69,28 @@ class ChartDiffConflictResolver:
     def _show_field_conflict_resolver(self, field):
         with st.container(border=True):
             # Title & layout
-            st.header(field["key"])
+            st.markdown(f"### {field['key']}")
 
             # Choose option
             choice = self._choose_env(field)
 
             # Show the fields values
+            msg_none = "The field might be `None` because it is not present in the config, but inherited automatically from the indicator's metadata."
             col1, col2 = st.columns(2)
             with col1:
-                with st.expander("PRODUCTION", expanded=True):
+                # with st.expander("PRODUCTION", expanded=True):
+                with st.container(border=True):
+                    st.markdown("#### Production")
                     st.write(field["value1"])
+                    if field["value1"] is None:
+                        st.warning(msg_none)
             with col2:
-                with st.expander("STAGING", expanded=True):
+                # with st.expander("STAGING", expanded=True):
+                with st.container(border=True):
+                    st.markdown("#### Staging")
                     st.write(field["value2"])
+                    if field["value2"] is None:
+                        st.warning(msg_none)
 
             # Merge editor
             self._show_merge_editor(field, choice)

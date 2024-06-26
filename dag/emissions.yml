@@ -31,19 +31,6 @@ steps:
     - snapshot://gcp/2023-12-12/global_carbon_budget_global_emissions.xlsx
     - snapshot://gcp/2023-12-12/global_carbon_budget_national_emissions.xlsx
     - snapshot://gcp/2023-12-12/global_carbon_budget_land_use_change_emissions.xlsx
-  data://garden/gcp/2023-12-12/global_carbon_budget:
-    - data://meadow/gcp/2023-12-12/global_carbon_budget
-    # Loaded to calculate emissions per unit energy.
-    - data://garden/energy/2024-05-08/primary_energy_consumption
-    # Loaded to calculate emissions per GDP.
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    # Loaded to create per-capita variables.
-    - data://garden/demography/2023-03-31/population
-    # Loaded to create region aggregates (including income groups).
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/gcp/2023-12-12/global_carbon_budget:
-    - data://garden/gcp/2023-12-12/global_carbon_budget
   #
   # RFF - World Carbon Pricing (2022-09-14).
   #
@@ -92,14 +79,6 @@ steps:
   data://grapher/emissions/2023-11-06/global_warming_potential_factors:
     - data://garden/emissions/2023-11-06/global_warming_potential_factors
   #
-  # Decoupling of GDP and CO2 (2023).
-  #
-  # The data from the following step will be used in this static chart:
-  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
-  data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
-    - data://garden/gcp/2023-12-12/global_carbon_budget
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  #
   # Jones et al. - National contributions to climate change.
   #
   data://meadow/emissions/2024-04-08/national_contributions:
@@ -116,21 +95,34 @@ steps:
   #
   # Emissions - CO2 dataset.
   #
-  data://garden/emissions/latest/owid_co2:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/energy/2024-05-08/primary_energy_consumption
-    - data://garden/emissions/2024-04-08/national_contributions
-    - data://garden/regions/2023-01-01/regions
+  data://external/co2_data/latest/owid_co2:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/emissions/2024-04-08/national_contributions
+    - data://garden/gcp/2024-06-20/global_carbon_budget
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
-    - data://garden/gcp/2023-12-12/global_carbon_budget
-
-  ######################################################################################################################
-  # Older versions that should be archived once they are not used by any other steps.
-
-  ######################################################################################################################
-
-  ######################################################################################################################
-  # Older versions that can safely be archived at any point, if needed.
-
-  ######################################################################################################################
+    - data://garden/energy/2024-06-20/primary_energy_consumption
+  #
+  # GCP - Global Carbon Budget (published on 2023-12-05, updated on 2024-06-20 to use the latest primary energy data).
+  #
+  data://garden/gcp/2024-06-20/global_carbon_budget:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://meadow/gcp/2023-12-12/global_carbon_budget
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/energy/2024-06-20/primary_energy_consumption
+  #
+  # GCP - Global Carbon Budget.
+  #
+  data://grapher/gcp/2024-06-20/global_carbon_budget:
+    - data://garden/gcp/2024-06-20/global_carbon_budget
+  #
+  # Decoupling of GDP and CO2 (2023).
+  #
+  # The data from the following step will be used in this static chart:
+  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+  data://garden/emissions/2024-06-20/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/gcp/2024-06-20/global_carbon_budget
