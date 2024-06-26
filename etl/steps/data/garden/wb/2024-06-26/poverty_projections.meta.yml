@@ -16,37 +16,65 @@ dataset:
 tables:
   poverty_projections:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
+      headcount_ratio_215_estimated:
+        title: $2.15 a day - Share of population in poverty (Estimated)
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated percentage of population living in households with an income or consumption per person below $2.15 a day.
+        description_key:
+          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+        presentation:
+          title_public: Share of population living in extreme poverty (Estimated)
+        display:
+          name: $2.15 a day - Share of population in poverty (Estimated)
+          numDecimalPlaces: 1
+          tolerance: 0
+          isProjection: false
+
+      headcount_215_estimated:
+        title: $2.15 a day - Number in poverty (Estimated)
+        unit: people
+        short_unit: ""
+        description_short: Estimated number of people in households with an income or consumption per person below $2.15 a day
+        description_key:
+          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+        presentation:
+          title_public: Number of people living in extreme poverty (Estimated)
+        display:
+          name: $2.15 a day - Number of people in poverty (Estimated)
+          numDecimalPlaces: 0
+          tolerance: 0
+          isProjection: false
+
+      headcount_ratio_215_projected:
+        title: $2.15 a day - Share of population in poverty (Projected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Projected percentage of population living in households with an income or consumption per person below $2.15 a day.
+        presentation:
+          title_public: Share of population living in extreme poverty (Projected)
+        display:
+          name: $2.15 a day - Share of population in poverty (Projected)
+          numDecimalPlaces: 1
+          tolerance: 0
+          isProjection: true
+
+      headcount_215_projected:
+        title: $2.15 a day - Number in poverty (Projected)
+        unit: people
+        short_unit: ""
+        description_short: Projected number of people in households with an income or consumption per person below $2.15 a day
+        presentation:
+          title_public: Number of people living in extreme poverty (Projected)
+        display:
+          name: $2.15 a day - Number of people in poverty (Projected)
+          numDecimalPlaces: 0
+          tolerance: 0
+          isProjection: true
 

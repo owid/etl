@@ -20,7 +20,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Separate estimated data from projected data in headcount_2015
+    # Separate estimated data from projected data in headcount_2015.
+    # 2019 was the last year with estimated data and I also leave it for projected for visualization purposes.
     tb["headcount_215_estimated"] = tb["headcount_215"].where(tb["year"] <= 2019)
     tb["headcount_215_projected"] = tb["headcount_215"].where(tb["year"] >= 2019)
 
