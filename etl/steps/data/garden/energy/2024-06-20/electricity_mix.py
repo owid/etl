@@ -5,10 +5,13 @@
 
 from typing import Dict, List
 
+import numpy as np
+import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
@@ -329,6 +332,75 @@ def add_share_variables(combined: Table) -> Table:
     return combined
 
 
+def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, combined: Table) -> Table:
+    # In Ember's data, we removed data for aggregate regions (e.g. income groups) for the latest year.
+    # We did that because the latest year is not informed for all countries, and aggregate regions therefore often
+    # present a significant (spurious) dip.
+    # This issue does not happen in the Statistical Review, which has data for aggregate regions in the latest year.
+    # But now, when combining both, the difference between data from the Statistical Review and Ember is notorious for
+    # aggregate regions.
+
+    # Remove data for aggregate regions for the latest year (which was removed from Ember data, as explained above).
+    for region in geo.REGIONS:
+        for col in combined.drop(columns=["country", "year"]).columns:
+            combined.loc[(combined["country"] == region) & (combined["year"] == combined["year"].max()), col] = np.nan
+
+    # Note that this issue does not only affect the latest year, but is also noticeable in the intersection between Statistical Review and Ember data (on year 2000).
+    # One solution to this problem would be to simply stick to one of the two sources (namely Ember, which tends to be more complete on the years where it is informed), but then we would lose a significant amount of data (all data prior to 2000 from the Statistical Review).
+    # Instead, we remove data prior to 2000 and for latest year only for specific indicators where the discrepancy is particularly significant.
+
+    # Define the maximum median relative error between Statistical Review and Ember (for a given region and indicator).
+    # If the error is larger than this, we will only take Ember data.
+    maximum_median_error = 0.2
+    # Define the regions and indicators where the median error is exceeded.
+    segments_not_combined = {region: [] for region in geo.REGIONS}
+    segments_not_combined.update(
+        {
+            "Lower-middle-income countries": [
+                "fossil_generation__twh",
+                "gas_generation__twh",
+                "hydro_generation__twh",
+                "low_carbon_generation__twh",
+                "oil_generation__twh",
+                "renewable_generation__twh",
+            ],
+            "Upper-middle-income countries": ["oil_generation__twh"],
+            "High-income countries": ["oil_generation__twh"],
+            "Europe": ["oil_generation__twh"],
+            "North America": ["oil_generation__twh"],
+            "European Union (27)": ["oil_generation__twh"],
+        }
+    )
+    for region in segments_not_combined:
+        _remove_combination = []
+        for col in combined.drop(columns=["country", "year"]).columns:
+            if (col in tb_review.columns) and (col in tb_ember.columns):
+                compared = pd.merge(
+                    tb_review[tb_review["country"] == region][["year", col]].dropna(),
+                    tb_ember[tb_ember["country"] == region][["year", col]].dropna(),
+                    how="inner",
+                    on="year",
+                    suffixes=("_review", "_ember"),
+                )
+                if len(compared) > 0:
+                    median_error = np.median(
+                        (abs(compared[f"{col}_review"] - compared[f"{col}_ember"])) / abs(compared[f"{col}_ember"])
+                    )
+                    if median_error > maximum_median_error:
+                        _remove_combination.append(col)
+                        # px.line(compared.melt(id_vars="year"), x="year", y="value", color="variable", markers=True, title=f"{region} - {col}").show()
+                        assert compared["year"].min() == 2000, "Minimum year changed."
+        error = f"Expected discrepancies between Statistical Review and Ember data for aggregate regions may have changed for region: {region}. Current discrepant indicators: {_remove_combination}. Use this list in 'segments_not_combined'."
+        assert set(segments_not_combined[region]) == set(_remove_combination), error
+
+        for col in _remove_combination:
+            # Remove data for years prior to 2000 (which correspond to the Statistical Review).
+            # NOTE: This may need to be generalized if Ember adds data prior to 2000 (which is the case already for European countries, but they are so far not affected by the discrepancies).
+            combined.loc[(combined["country"] == region) & (combined["year"] < 2000), col] = np.nan
+
+    return combined
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -377,6 +449,10 @@ def run(dest_dir: str) -> None:
 
     # Combine both tables, giving priority to Ember data (on overlapping values).
     combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_review, index_columns=["country", "year"])
+
+    # Remove combined data for aggregate regions where Ember and the Statistical Review have a strong disagreement.
+    # This way we avoid spurious jumps in the combined series.
+    combined = fix_discrepancies_in_aggregate_regions(tb_review=tb_review, tb_ember=tb_ember, combined=combined)
 
     # Add carbon intensities.
     # There is already a variable for this in the Ember dataset, but now that we have combined
