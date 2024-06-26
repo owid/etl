@@ -5,6 +5,7 @@ from typing import cast
 
 import requests
 import streamlit as st
+import structlog
 from requests.exceptions import HTTPError
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,8 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
+
+log = structlog.get_logger()
 
 ENVIRONMENT_IDS = {
     1: "PRODUCTION",
@@ -160,6 +163,7 @@ class ChartDiffConflictResolver:
                     chart_config=config_new,
                 )
             except HTTPError as e:
+                log.error(e)
                 st.error(
                     f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}).\n\n {e}"
                 )
