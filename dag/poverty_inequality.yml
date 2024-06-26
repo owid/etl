@@ -162,8 +162,15 @@ steps:
   data://garden/unu_wider/2024-04-22/world_income_inequality_database:
     - data://meadow/unu_wider/2024-04-22/world_income_inequality_database
 
-  # Wealth inequalith in France (Piketty et al. 2006)
+  # Wealth inequality in France (Piketty et al. 2006)
   data://meadow/chartbook/2024-05-23/wealth_france:
     - snapshot://chartbook/2024-05-23/wealth_france.csv
   data://garden/chartbook/2024-05-23/wealth_france:
     - data://meadow/chartbook/2024-05-23/wealth_france
+
+  # Poverty projections from the World Bank
+  data://meadow/wb/2024-06-26/poverty_projections:
+    - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
+    - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
+  data://garden/wb/2024-06-26/poverty_projections:
+    - data://meadow/wb/2024-06-26/poverty_projections
