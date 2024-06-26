@@ -165,7 +165,7 @@ class ChartDiffConflictResolver:
             except HTTPError as e:
                 log.error(e)
                 st.error(
-                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}).\n\n {e}"
+                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}), and then click on the 'Mark as resolved' button in the conflict resolver. \n\n {e}"
                 )
             else:
                 # Set conflict as resolved
