@@ -190,15 +190,16 @@ class ChartDiffShow:
 
         Sometimes, someone might edit a chart in production while we work on it on staging.
         """
-        if st.button(
-            "⚠️ Resolve conflict",
-            key=f"resolve-conflict-{self.diff.slug}",
-            help="This will update the chart in the staging server.",
-            type="primary",
-        ):
+        # if st.button(
+        #     "⚠️ Resolve conflict",
+        #     key=f"resolve-conflict-{self.diff.slug}",
+        #     help="This will update the chart in the staging server.",
+        #     type="primary",
+        # ):
+        with st.popover("⚠️ Conflict resolver"):
             self._show_conflict_resolver_modal()
 
-    @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
+    # @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
     def _show_conflict_resolver_modal(self) -> None:
         """Show conflict resolver in modal page."""
         st_show_conflict_resolver(self.diff)
