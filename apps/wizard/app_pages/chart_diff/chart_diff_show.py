@@ -18,7 +18,7 @@ from apps.backport.datasync.data_metadata import (
 )
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
-from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver, st_show_conflict_resolver
+from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
 from apps.wizard.utils import chart_html
 from etl.config import OWID_ENV
@@ -229,11 +229,6 @@ class ChartDiffShow:
             st.success(
                 "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
             )
-
-    @st.experimental_dialog("Resolve conflict", width="large")  # type: ignore
-    def _show_conflict_resolver_modal(self) -> None:
-        """Show conflict resolver in modal page."""
-        st_show_conflict_resolver(self.diff, session=self.source_session)
 
     def _show_chart_diff_controls(self):
         # Three columns: status, refresh, link
@@ -489,6 +484,8 @@ class ChartDiffShow:
         if self.diff.in_conflict:
             with st.popover("⚠️ Resolve conflict"):
                 self._show_conflict_resolver()
+        else:
+            st.empty()
 
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
