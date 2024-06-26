@@ -10,6 +10,8 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+          roundingMode: significantFigures
+          numSignificantFigures: 3
         processing_level: minor
         presentation:
           topic_tags:
