@@ -11,6 +11,11 @@ Usage:
     ```
     etl d profile --mem garden/biodiversity/2024-01-25/cherry_blossom -f calculate_multiple_year_average
     ```
+
+To profile grapher upserts, it is better to use cProfile and run something like this:
+```
+ssh owid@staging-site-my-branch "cd etl && poetry run python -m cProfile -s cumtime etl/command.py grapher://grapher/biodiversity/2024-01-25/cherry_blossom --grapher --only --force --workers 1" | head -n 100
+```
 """
 
 import importlib.util

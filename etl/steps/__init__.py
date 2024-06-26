@@ -31,7 +31,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.engine import Engine
 
-from etl import config, files, git, paths
+from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl.db import get_engine
 from etl.snapshot import Snapshot
@@ -917,7 +917,7 @@ class GithubStep(Step):
     """
 
     path: str
-    gh_repo: git.GithubRepo = field(repr=False)
+    gh_repo: git_helpers.GithubRepo = field(repr=False)
     version: str = "latest"
     dependencies = []
 
@@ -928,7 +928,7 @@ class GithubStep(Step):
         except ValueError:
             raise Exception("github step is not in the form github://<org>/<repo>")
 
-        self.gh_repo = git.GithubRepo(org, repo)
+        self.gh_repo = git_helpers.GithubRepo(org, repo)
 
     def __str__(self) -> str:
         return f"github://{self.path}"
