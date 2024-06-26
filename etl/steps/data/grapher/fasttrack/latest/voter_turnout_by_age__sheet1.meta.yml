@@ -25,3 +25,6 @@ tables:
       voter_turnout_group7:
         title: voter_turnout_group7
         unit: ''
+      voter_turnout_group8:
+        title: voter_turnout_group8
+        unit: ''
