@@ -20,7 +20,7 @@ definitions:
       Deaths from << cause.lower() >>, among {definitions.sex} aged << age >>
       <% elif metric == "Rate"%>
       Deaths from << cause.lower() >>, among {definitions.sex} aged << age >> per 100,000 people
-      <% elif metric == "Percent" )%>
+      <% elif metric == "Percent" %>
       Share of total deaths of among {definitions.sex} aged << age >> from << cause.lower() >>
       <%- endif -%>
     description_short: |-
