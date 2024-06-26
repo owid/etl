@@ -757,6 +757,24 @@
           }
         ]
       },
+      "roundingMode": {
+        "description": "Specifies the rounding mode to use.",
+        "type": "string",
+        "enum": ["significantFigures", "decimalPlaces"]
+      },
+      "numSignificantFigures": {
+        "description": "Number of significant rounding figures in charts.",
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "<%"
+          }
+        ]
+      },
       "zeroDay": {
         "type": "string",
         "description": "ISO date day string for the starting date if `yearIsDay` is `True`."
