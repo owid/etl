@@ -9,25 +9,22 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-REGIONS = {reg: reg_dict for reg, reg_dict in geo.REGIONS.items() if reg != "European Union (27)"}
-REGIONS.update({"World": {}})
+ALL_REGIONS = {reg: reg_dict for reg, reg_dict in geo.REGIONS.items() if reg != "European Union (27)"}
+ALL_REGIONS.update({"World": {}})
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset, previous years and population data.
+    # Load datasets: meadow dataset (latest happiness report), previous years, happiness by ages
+    # for regional aggregates: population dataset, regions dataset, income groups dataset
     ds_meadow = paths.load_dataset("happiness", version="2024-06-09")
     ds_prev_years = paths.load_dataset("happiness", channel="garden", version="2023-03-20")
-    ds_population = paths.load_dataset("population", channel="garden")
-
     ds_happiness_ages = paths.load_dataset("happiness_ages")
 
-    # Load regions dataset.
+    ds_population = paths.load_dataset("population", channel="garden")
     ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table datasets.
@@ -39,14 +36,15 @@ def run(dest_dir: str) -> None:
     cols_overlap = ["country", "cantril_ladder_score", "year"]
     tb = pr.concat([tb_this_year[cols_overlap], tb_prev_years], ignore_index=True)
 
+    # Read table including happiness by age group
     tb_ages = ds_happiness_ages["happiness_ages"].reset_index()
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb_ages = geo.harmonize_countries(
-        df=tb_ages, countries_file=paths.country_mapping_path, warn_on_missing_countries=False
+        df=tb_ages, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
     )
-
+    # Process happiness by age group data
     # drop unneeded columns from age table
     tb_ages = tb_ages.drop(
         columns=[
@@ -59,35 +57,56 @@ def run(dest_dir: str) -> None:
             "worry_count",
         ]
     )
-
     # remove leading "Age " from age_group
     tb_ages["age_group"] = tb_ages["age_group"].str.replace("Age ", "")
 
-    # Concatenate table happiness data with table happiness data by age group
+    # standardize happiness by age group and happiness data
     tb["age_group"] = "all ages"
     tb["happiness_score"] = tb["cantril_ladder_score"]
     tb = tb.drop(columns=["cantril_ladder_score"])
-    tb = pr.concat([tb, tb_ages], ignore_index=True)
 
-    # Process data (add population weighted averages for continents & income groups)
-
+    #
+    # Add population weighted averages for continents & income groups)
+    #
     # save data of Northern Cyrpus and Somaliland to concat later (they do not have population in population dataset)
     countries_no_pop_msk = tb["country"].isin(["Northern Cyprus", "Somaliland"])
     tb_countries_wo_population = tb[countries_no_pop_msk]
     tb = tb[~countries_no_pop_msk]
 
-    # add population to table
+    # add population to tables
     tb = geo.add_population_to_table(tb, ds_population)
+    tb_ages = geo.add_population_to_table(tb_ages, ds_population)
 
     # calculate population weighted averages by multiplying the population with the cantril ladder score
     # and then summing and dividing by the total population
     tb["happiness_times_pop"] = tb["happiness_score"] * tb["population"]
+    tb_ages["happiness_times_pop"] = tb_ages["happiness_score"] * tb_ages["population"]
+
+    # set population to NaN where happiness_score is NaN
+    tb["population"] = tb["population"].where(~tb["happiness_score"].isna(), other=None)
+    tb_ages["population"] = tb_ages["population"].where(~tb_ages["happiness_score"].isna(), other=None)
 
     aggr_score = {"happiness_times_pop": "sum", "population": "sum"}
     tb = geo.add_regions_to_table(
         tb,
         aggregations=aggr_score,
-        regions=REGIONS,
+        regions=ALL_REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        index_columns=["country", "year", "age_group"],
+        min_num_values_per_year=1,
+    )
+
+    # For happiness by age group, remove all regions where less than 50% of the population is covered
+    # Manual check: Africa and Low income regions are not sufficiently covered
+    regions_for_age_groups = {
+        reg: reg_dict for reg, reg_dict in ALL_REGIONS.items() if reg not in ["Africa", "Low-income countries"]
+    }
+
+    tb_ages = geo.add_regions_to_table(
+        tb_ages,
+        aggregations=aggr_score,
+        regions=regions_for_age_groups,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         index_columns=["country", "year", "age_group"],
@@ -95,6 +114,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Divide the sum of the cantril ladder score times population by the total population
+    # concatenate the two tables
+    tb = pr.concat([tb, tb_ages], ignore_index=True)
     tb["happiness_score"] = tb["happiness_times_pop"] / tb["population"]
 
     # drop unneeded columns
