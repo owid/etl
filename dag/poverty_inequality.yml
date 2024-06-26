@@ -174,3 +174,5 @@ steps:
     - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
   data://garden/wb/2024-06-26/poverty_projections:
     - data://meadow/wb/2024-06-26/poverty_projections
+  data://grapher/wb/2024-06-26/poverty_projections:
+    - data://garden/wb/2024-06-26/poverty_projections
