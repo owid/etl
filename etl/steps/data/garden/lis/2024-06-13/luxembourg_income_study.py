@@ -4,7 +4,6 @@ from typing import List
 
 import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
 from tabulate import tabulate
