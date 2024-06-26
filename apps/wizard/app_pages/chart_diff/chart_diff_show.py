@@ -133,6 +133,7 @@ class ChartDiffShow:
                     st.toast(f":red[Chart {self.diff.chart_id} has been **rejected**]", icon="❌")
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        self.diff._clean_cache()
 
     def _push_status_binary(self, session: Optional[Session] = None) -> None:
         """Change state of the ChartDiff based on session state."""
@@ -148,6 +149,7 @@ class ChartDiffShow:
                     st.toast(f":green[Chart {self.diff.chart_id} has been **reviewed**]", icon="✅")
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
+        self.diff._clean_cache()
 
     def _refresh_chart_diff(self):
         """Get latest chart version from database."""
@@ -471,7 +473,6 @@ class ChartDiffShow:
 
         st.markdown(text)
 
-    @st.experimental_fragment
     def _show(self) -> None:
         """Show chart diff.
 

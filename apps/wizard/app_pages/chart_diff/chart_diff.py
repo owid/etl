@@ -51,6 +51,11 @@ class ChartDiff:
         self._change_types = None
         self._approval_status: Optional[gm.CHART_DIFF_STATUS | str] = None
 
+    def _clean_cache(self):
+        self._in_conflict = None
+        self._change_types = None
+        self._approval_status = None
+
     @property
     def approval_status(self) -> gm.CHART_DIFF_STATUS | str:
         if self._approval_status is None:
