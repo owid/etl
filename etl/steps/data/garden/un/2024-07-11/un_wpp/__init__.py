@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -47,7 +47,6 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
-    # TODO: we currently report ages 0, 1-4, 5-year age groups and 100+. Maybe we want to add others (as in population), or 10-year age grogups (as in 2022 version)
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
 
     # Drop 55-59 age group in fertility (is all zero!)
@@ -146,6 +145,18 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
             "Total": "all",
         },
     )
+
+    # Add 10-year age groups from 20 to 100
+    age_group_mapping = {
+        key: value
+        for i in range(20, 100, 10)
+        for key, value in {f"{i}-{i+4}": f"{i}-{i+9}", f"{i+5}-{i+9}": f"{i}-{i+9}"}.items()
+    }
+    tb_10 = tb.copy()
+    tb_10["age"] = tb_10["age"].map(age_group_mapping)
+    tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
+    tb_10 = tb_10.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
+    tb = pr.concat([tb, tb_10], ignore_index=True)
 
     # Scale
     tb["deaths"] *= 1000

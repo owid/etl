@@ -178,7 +178,7 @@ def clean_table(tb: Table, indicator_name: str) -> Table:
 
 #################################################################################
 #################################################################################
-# Old code below. Left in case it's needed for reference.
+# Old code below. Left in case it's needed for reference. Might delete later.
 #################################################################################
 #################################################################################
 def extract_data(snap: Snapshot, output_dir: str) -> None:
