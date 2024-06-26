@@ -117,11 +117,12 @@ class ChartDiffConflictResolver:
         """Edit the content of the field."""
         is_none = field[f"value{choice}"] is None
         self.value_resolved[field["key"]] = st.text_area(
-            "Edit config",
-            value=None if is_none else str(field[f"value{choice}"]),
+            label="Edit config",
+            value="" if is_none else str(field[f"value{choice}"]),
             placeholder=f"This field is not present in {ENVIRONMENT_IDS[choice]}!" if is_none else "",
             help="Edit the final config here. When cliking on 'Resolve conflicts', this value will be used to update the chart config.",
             disabled=is_none,
+            key=f"conflict-editor-{field['key']}",
         )
 
     def resolve_conflicts(self, rerun: bool = False):
@@ -130,7 +131,7 @@ class ChartDiffConflictResolver:
             # Consolidate changes
             config = deepcopy(self.diff.source_chart.config)
             for field_key, field_resolution in self.value_resolved.items():
-                if self.value_resolved[field_key] is None:
+                if (self.value_resolved[field_key] is None) or (self.value_resolved[field_key] == ""):
                     config.pop(field_key, None)
                 else:
                     # st.write(field_key)
