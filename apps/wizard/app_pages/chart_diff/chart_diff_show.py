@@ -94,8 +94,7 @@ class ChartDiffShow:
 
         This contains the state of the approval (by means of an emoji), the slug of the chart, and any tags (like "NEW" or "DRAFT").
         """
-        emoji = DISPLAY_STATE_OPTIONS[self.diff.approval_status]["icon"]  # type: ignore
-        label = f"{emoji} {self.diff.slug}"
+        label = self.diff.slug
         tags = []
         if self.diff.is_new:
             tags.append(" :blue-background[**NEW**]")
@@ -476,11 +475,16 @@ class ChartDiffShow:
             with tab2:
                 self._show_approval_history()
 
+    @st.experimental_fragment
     def show(self):
         """Show chart diff."""
         # Show in expander or not
         if self.expander:
-            with st.expander(self.box_label, not self.diff.is_reviewed):
+            with st.expander(
+                label=self.box_label,
+                icon=DISPLAY_STATE_OPTIONS[cast(str, self.diff.approval_status)]["icon"],
+                expanded=not self.diff.is_reviewed,
+            ):
                 self._show()
         else:
             self._show()

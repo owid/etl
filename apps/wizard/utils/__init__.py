@@ -673,38 +673,53 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     chart_config_tmp = deepcopy(chart_config)
 
     chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
     chart_config_tmp["adminBaseUrl"] = owid_env.base_site
     chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
+    # HTML = f"""
+    # <!DOCTYPE html>
+    # <html>
+    #     <head>
+    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
+    #         <link
+    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+    #         rel="stylesheet"
+    #         />
+    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    #     </head>
+    #     <body class="StandaloneGrapherOrExplorerPage">
+    #         <main>
+    #             <figure data-grapher-src></figure>
+    #         </main>
+    #         <div class="site-tools"></div>
+    #         <script>
+    #             document.cookie = "isAdmin=true;max-age=31536000"
+    #         </script>
+    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+    #         <script type="module">
+    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+    #         </script>
+    #     </body>
+    # </html>
+    # """
+
     HTML = f"""
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link
-            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-            rel="stylesheet"
-            />
-            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-        </head>
-        <body class="StandaloneGrapherOrExplorerPage">
-            <main>
-                <figure data-grapher-src></figure>
-            </main>
-            <div class="site-tools"></div>
-            <script>
-                document.cookie = "isAdmin=true;max-age=31536000"
-            </script>
-            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-            <script type="module">
-                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-            </script>
-        </body>
-    </html>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    <div class="StandaloneGrapherOrExplorerPage">
+        <main>
+            <figure data-grapher-src></figure>
+        </main>
+        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
+        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+        <script type="module">
+            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+        </script>
+    </div>
     """
 
     components.html(HTML, height=height, **kwargs)
