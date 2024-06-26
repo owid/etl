@@ -149,13 +149,11 @@ class ChartDiffShow:
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
-    def _pull_latest_chart(self):
+    def _refresh_chart_diff(self):
         """Get latest chart version from database."""
-        st.toast("TESTING")
         diff_new = ChartDiffsLoader(self.source_session.get_bind(), self.target_session.get_bind()).get_diffs(  # type: ignore
             sync=True, chart_ids=[self.diff.chart_id]
         )[0]
-        print("REFRESHING")
         st.session_state.chart_diffs[self.diff.chart_id] = diff_new
         self.diff = diff_new
 
@@ -188,17 +186,25 @@ class ChartDiffShow:
 
         Sometimes, someone might edit a chart in production while we work on it on staging.
         """
-        # if st.button(
-        #     "⚠️ Resolve conflict",
-        #     key=f"resolve-conflict-{self.diff.slug}",
-        #     help="This will update the chart in the staging server.",
-        #     type="primary",
-        # ):
-        # with st.popover("⚠️ Conflict resolver"):
-        # self._show_conflict_resolver_modal()
-        # st_show_conflict_resolver(self.diff, session=self.source_session)
+
+        def _mark_as_resolved():
+            self.diff.set_conflict_to_resolved(self.source_session)
+            self._refresh_chart_diff()
+
+        def _resolve_conflicts(resolver):
+            resolver.resolve_conflicts(rerun=False)
+            self._refresh_chart_diff()
+
         resolver = ChartDiffConflictResolver(self.diff, self.source_session)
-        st.warning("This is under development! Find below a form with the different fields that present conflicts.")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.warning("This is under development! Find below a form with the different fields that present conflicts.")
+        with col2:
+            st.button(
+                label="⚠️ Mark as resolved: Accept all changes from staging",
+                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useul if you're happy with the changes in staging as they are.",
+                on_click=_mark_as_resolved,
+            )
 
         # If things to compare...
         if resolver.config_compare:
@@ -212,14 +218,13 @@ class ChartDiffShow:
                 resolver._show_field_conflict_resolver(field)
 
             # Button to resolve all conflicts
-            if st.button(
+            st.button(
                 "Resolve conflicts",
                 help="Click to resolve the conflicts and update the chart config.",
                 key="resolve-conflicts-btn",
                 type="primary",
-            ):
-                resolver.resolve_conflicts(rerun=False)
-                # st.rerun()
+                on_click=lambda r=resolver: _resolve_conflicts(r),
+            )
         else:
             st.success(
                 "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
@@ -270,12 +275,12 @@ class ChartDiffShow:
 
         # Refresh chart
         with col2:
-            if st.button(
-                "🔄 Refresh",
+            st.button(
+                label="🔄 Refresh",
                 key=f"refresh-btn-{self.diff.chart_id}",
                 help="Get the latest version of the chart from the staging server.",
-            ):
-                self._pull_latest_chart()
+                on_click=self._refresh_chart_diff,
+            )
         # Copy link
         if self.show_link:
             with col3:
@@ -481,6 +486,10 @@ class ChartDiffShow:
 
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
+        if self.diff.in_conflict:
+            with st.popover("⚠️ Resolve conflict"):
+                self._show_conflict_resolver()
+
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 
@@ -488,16 +497,9 @@ class ChartDiffShow:
             self._show_metadata_diff()
 
         # SHOW MODIFIED CHART
+        st.write(self.diff.in_conflict)
         if self.diff.is_modified:
-            if self.diff.in_conflict:
-                tab1, tab_conflict, tab2, tab3 = st.tabs(
-                    ["Charts", "⚠️ Conflict resolver", "Config diff", "Change history"]
-                )
-                with tab_conflict:
-                    self._show_conflict_resolver()
-            else:
-                tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
-
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:
