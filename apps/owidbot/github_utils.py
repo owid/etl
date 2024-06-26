@@ -64,8 +64,8 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
 
 
 def github_app_access_token():
-    assert config.OWIDBOT_APP_CLIENT_ID, "OWIDBOT_CLIENT_ID is not set"
-    assert config.OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_PRIVATE_KEY_PATH is not set"
+    assert config.OWIDBOT_APP_CLIENT_ID, "OWIDBOT_APP_CLIENT_ID is not set"
+    assert config.OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_APP_PRIVATE_KEY_PATH is not set"
     assert config.OWIDBOT_APP_INSTALLATION_ID, "OWIDBOT_APP_INSTALLATION_ID is not set"
 
     jwt_token = generate_jwt(config.OWIDBOT_APP_CLIENT_ID, config.OWIDBOT_APP_PRIVATE_KEY_PATH)

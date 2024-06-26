@@ -24,7 +24,7 @@ def test_catalog_entries():
     for filename, doc in iter_docs():
         try:
             validate(doc, schema)
-        except ValidationError as e:
+        except ValidationError:
             print("Error in file:", Path(filename).relative_to(INDEX_DIR))
             raise
 
@@ -59,7 +59,7 @@ def test_catalog_find_one_too_many():
         catalog.find_one()
 
     with pytest.raises(Exception):
-        catalog.find_one("who")
+        catalog.find_one("ihme_gbd")
 
 
 def test_catalog_find_one_too_few():
@@ -79,7 +79,7 @@ def test_metadata_pruning():
     catalog = Catalog()
     dataset = catalog.find_one("who", "2022-07-17", "who_vaccination")
     dataset.is_public = False
-    assert dataset.metadata["is_public"] == False
+    assert dataset.metadata["is_public"] is False
 
 
 def test_default_dataset_version():

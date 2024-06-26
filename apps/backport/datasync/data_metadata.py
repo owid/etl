@@ -17,8 +17,8 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
-from apps.wizard.utils.env import OWIDEnv
 from etl import config, files
+from etl.config import OWIDEnv
 from etl.db import read_sql
 
 log = get_logger()

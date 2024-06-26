@@ -192,23 +192,14 @@ sections:
           "production": True
           "staging": True
 
-legacy:
-  description: |-
-    The pages below are legacy now. They are kept in case the new pages are not working properly.
-  apps:
-    - title: "Chart Upgrader"
-      alias: charts
-      entrypoint: app_pages/charts/__main__.py
-      description: Prepare chart revisions
-      maintainer: "@lucas"
-      icon: ":material/upgrade:"
-      image_url: "https://camo.githubusercontent.com/38a295d2c16cd880446f874a786e94fb168d6aadfdcbc4c8b7dd45c8337b6d1d/68747470733a2f2f6f7572776f726c64696e646174612e6f72672f677261706865722f6578706f7274732f6c6966652d657870656374616e63792e737667"
-    - title: "Chart Sync"
-      alias: chart-sync
-      entrypoint: ../chart_sync/app.py
-      description: Sync charts between servers
-      maintainer: "@mojmir"
-      icon: ":material/sports_volleyball:"
-      image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
-      disable:
-        "staging": True
+# legacy:
+#   description: |-
+#     The pages below are legacy now. They are kept in case the new pages are not working properly.
+#   apps:
+#     - title:
+#       alias:
+#       entrypoint:
+#       description:
+#       maintainer:
+#       icon:
+#       image_url:

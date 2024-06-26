@@ -27,6 +27,7 @@ mistune = "^3.0.1"
 # from owid import catalog; catalog.find("global_carbon_budget").sort_values("version", ascending=False).iloc[0].load()
 dataclasses-json = "0.5.8"
 rdata = "0.9"
+owid-datautils = {path = "../datautils", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.5"

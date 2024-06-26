@@ -1,6 +1,6 @@
 definitions:
   description_key: &description_key
-    - For each country-year the disease or injury that caused the most deaths according to the [IHME - Global Burden of Disease Study (2019)](https://ghdx.healthdata.org/gbd-2019).
+    - For each country-year the disease or injury that caused the most deaths according to the [IHME - Global Burden of Disease Study](https://www.healthdata.org/research-analysis/gbd).
   common:
     presentation:
       topic_tags:
@@ -13,7 +13,7 @@ dataset:
 tables:
   leading_cause_level_1_in_all_ages:
     title: Leading causes of death in all ages, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
-    description: "The leading broad cause of death from the Global Burden of Disease Study (2019) in all ages. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
+    description: "The leading broad cause of death from the Global Burden of Disease Study in all ages. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
     variables:
       leading_deaths_level_1:
         title: The leading cause of death in all ages (level 1)

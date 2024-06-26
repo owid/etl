@@ -19,7 +19,7 @@ REPOS = Literal["etl", "owid-grapher"]
 SERVICES = Literal["data-diff", "chart-diff", "grapher"]
 
 
-@click.command(cls=RichCommand, help=__doc__)
+@click.command("owidbot", cls=RichCommand, help=__doc__)
 @click.argument("repo_branch", type=str)
 @click.option("--services", type=click.Choice(get_args(SERVICES)), multiple=True)
 @click.option(

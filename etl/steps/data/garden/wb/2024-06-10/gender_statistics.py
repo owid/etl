@@ -9,6 +9,22 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+PARENTAL_LEAVE = (
+    "**Assumptions**\n\n"
+    "It is assumed that the woman in question:\n\n"
+    "- Resides in the economy's main business city.\n"
+    "- Has reached the legal age of majority and is capable of making decisions as an adult, is in good health and has no criminal record.\n"
+    "- Is a lawful citizen of the economy being examined.\n"
+    "- Is a cashier in the food retail sector in a supermarket or grocery store that has 60 employees.\n"
+    "- Is a cisgender, heterosexual woman in a monogamous first marriage registered with the appropriate authorities (de facto marriages and customary unions are not measured).\n"
+    "- Is of the same religion as her husband.\n"
+    "- Is in a marriage under the rules of the default marital property regime, or the most common regime for that jurisdiction, which will not change during the course of the marriage.\n"
+    "- Is not a member of a union, unless membership is mandatory. Membership is considered mandatory when collective bargaining agreements cover more than 50 percent of the workforce in the food retail sector and when they apply to individuals who were not party to the original collective bargaining agreement.\n\n"
+    "For the questions on maternity, paternity, and parental leave, it is assumed that:\n\n"
+    "- The woman gave birth to her first child without complications on October 1, 2023, and her child is in good health. Answers will therefore correspond to legislation in force as of October 1, 2023, even if the law provides for changes over time.\n"
+    "- Both parents have been working long enough to accrue any maternity, paternity, and parental benefits.\n"
+    "- If maternity benefit systems are not mandatory or they were not in force as of October 1, 2023, they are not measured."
+)
 
 
 def run(dest_dir: str) -> None:
@@ -143,6 +159,10 @@ def add_metadata(tb: Table, metadata_tb: Table):
             description_string = "\n\n".join(filter(None, components))
             if not description_string:
                 description_string = "No detailed metadata available from World Bank."
+
+            # Add specific assumptions for parental leave indicators
+            if "SH." in column and "LEVE" in column:
+                description_string = f"{PARENTAL_LEAVE}\n\n" + description_string
 
             meta = tb[column].metadata
             meta.description_from_producer = description_string

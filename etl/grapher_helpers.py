@@ -11,6 +11,7 @@ import sqlalchemy
 import structlog
 from jinja2 import Environment
 from owid import catalog
+from owid.catalog import warnings
 from owid.catalog.utils import underscore
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
@@ -133,7 +134,10 @@ def _yield_wide_table(
             ), f"Unit for column {column} should not be None here!"
 
             # Select only one column and dimensions for performance
-            tab = table_to_yield[[column]].copy()
+            # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
+            # in a future version. Use public APIs instead.
+            with warnings.ignore_warnings([DeprecationWarning]):
+                tab = table_to_yield.loc[:, [column]].copy()
 
             # Drop NA values
             tab = tab.dropna() if na_action == "drop" else tab

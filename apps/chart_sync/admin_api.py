@@ -6,12 +6,15 @@ import string
 from typing import Any, Dict, List, Optional
 
 import requests
+import structlog
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
 from etl.db import Engine
+
+log = structlog.get_logger()
 
 
 class AdminAPI(object):
@@ -31,6 +34,8 @@ class AdminAPI(object):
             self.base_url = f"http://{engine.url.host}.tail6e23.ts.net"
 
     def _json_from_response(self, resp: requests.Response) -> dict:
+        if resp.status_code != 200:
+            log.error("Admin API error", status_code=resp.status_code, text=resp.text)
         resp.raise_for_status()
         try:
             js = resp.json()

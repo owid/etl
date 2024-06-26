@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: International Energy Agency (IEA). Buildings.
+    title: emissions_energy_heating_cooling_iea
+    description: |-
+      The IEA report on heating is found here: https://www.iea.org/energy-system/buildings/heating. The report on cooling is found here: https://www.iea.org/energy-system/buildings/space-cooling
+    citation_full: International Energy Agency (IEA). Buildings.
+    url_main: https://www.iea.org/energy-system/buildings
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQTPAE5Bt-fUExvze176RmSqzSZ-nnj5Ze1O65kTy3EYCbyN7kxwOvVAXUCFtg-V-dp4_ztrnNEL1IG/pub?output=csv
+    date_accessed: '2024-06-21'
+  name: Emissions and energy demand from cooling and heating (IEA, 2023)
+  description: Carbon emissions from heating and cooling, and estimated energy demand of air conditioning.
+  license: {}
+outs:
+  - md5: 1294d405632ede368fea027935e3bcaa
+    size: 710
+    path: emissions_energy_heating_cooling_iea.csv

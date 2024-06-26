@@ -200,26 +200,22 @@ nav:
       - Contributing: "contributing.md"
   - Guides:
       - "guides/index.md"
-      - Ingest data:
+      - Data work:
           - "guides/data-work/index.md"
           - Adding data: "guides/data-work/add-data.md"
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
       - Wizard: "guides/wizard.md"
       - CLI: "guides/etl-cli.md"
+      - Harmonize country names: "guides/harmonize-countries.md"
       - Using different environments: "guides/environment.md"
       - Staging servers: "guides/staging-servers.md"
-      - Backport a dataset to ETL: "guides/backport.md"
       - Private dataset import to ETL: "guides/private-import.md"
-      - Harmonize country names: "guides/harmonize-countries.md"
+      - Backport a dataset to ETL: "guides/backport.md"
       - Metadata in data pages: "guides/metadata-play.md"
       - Edit the documentation: "dev/docs.md"
       - OpenAI setup: "guides/openai.md"
 
-    # - Updating charts:
-    #   - Submitting chart revisions: "guides/charts/updating-charts.md"
-    #   - Reviewing chart revisions: "guides/charts/reviewing-charts.md"
-    #   - Using chatGPT: "guides/charts/chatgpt.md"
   - Design principles:
       - Design principles & workflow: architecture/index.md
       - Our journey:
@@ -237,13 +233,7 @@ nav:
           - Other steps: "architecture/workflow/other-steps.md"
   - Metadata:
       - Metadata: "architecture/metadata/index.md"
-      # - Workflow with metadata: "architecture/metadata/workflow.md"
-      # - Reference:
       - Reference: "architecture/metadata/reference/index.md"
-        # - Indicator: "architecture/metadata/reference/indicator.md"
-        # - Origin: "architecture/metadata/reference/origin.md"
-        # - Table: "architecture/metadata/reference/tables.md"
-        # - Dataset: "architecture/metadata/reference/dataset.md"
       - Working with Metadata:
           - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
           - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
@@ -255,9 +245,3 @@ nav:
       - API: "api/index.md"
       - Notebook: "api/python.ipynb"
       - Maintenance: "api/maintenance.md"
-    # - Dataset catalog:
-    #   - Dataset catalog: "data/index.md"
-    #   - Faostat: "data/faostat.md"
-    #   - Regions: "data/regions.md"
-  # - Blog:
-  #   - blog/index.md

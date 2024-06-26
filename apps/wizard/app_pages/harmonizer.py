@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.config import ENV_IS_REMOTE
-from etl.harmonize import CountryRegionMapper, harmonize_simple
+from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
@@ -25,6 +25,11 @@ if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
     garden_vars = st.session_state["steps"]["garden"]
     if ("namespace" in garden_vars) and ("meadow_version" in garden_vars) and ("short_name" in garden_vars):
         path = f"data://meadow/{garden_vars['namespace']}/{garden_vars['meadow_version']}/{garden_vars['short_name']}"
+
+# RANK OF PREFERED TABLE NAMES
+TABLE_NAME_PRIORITIES = ["main", "core"]
+# RANK OF PREFERED COLUMN NAMES (for country)
+COLUMN_NAME_PRIORITIES = ["country", "state", "location", "region", "iso"]
 
 
 ####################################################################################################
@@ -42,7 +47,7 @@ def sort_values(values: List[str], values_priority: List[str]) -> List[str]:
     values_with_priority = []
     for value in values[:]:
         added = False
-        for score, value_priority in enumerate(values_priority):
+        for score, value_priority in enumerate(values_priority, start=1):
             if value == value_priority:
                 values_with_priority.append((value, -score))
                 added = True
@@ -71,8 +76,11 @@ def sort_table_names(dataset: Dataset) -> List[str]:
     The rest is sorted alphabetically.
     """
     # Init
-    values_priority = [dataset.metadata.short_name, "main", "core"]
-    table_names = sort_values(dataset.table_names, values_priority)
+    if dataset.metadata.short_name is not None:
+        priorities = [dataset.metadata.short_name] + TABLE_NAME_PRIORITIES
+    else:
+        priorities = TABLE_NAME_PRIORITIES
+    table_names = sort_values(dataset.table_names, priorities)
 
     return table_names
 
@@ -84,9 +92,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
     The rest is sorted alphabetically.
     """
     # Init
-    values_priority = ["country", "state", "location", "region", "iso"]
-    indicators = sort_values(indicators, values_priority)
-
+    indicators = sort_values(indicators, COLUMN_NAME_PRIORITIES)
     return indicators
 
 
@@ -139,7 +145,7 @@ if option:
     table_names = sort_table_names(dataset)
     table_name = st.selectbox(
         "Select a table",
-        sorted(table_names),
+        options=table_names,
         placeholder="Choose a table",
         index=None if len(table_names) != 1 else 0,
     )
@@ -153,13 +159,22 @@ if option:
             label="Select the entity column",
             options=columns,
             placeholder="Choose an indicator",
-            index=0 if "country" in columns else None,
+            index=0 if set(COLUMN_NAME_PRIORITIES).intersection(set(columns)) else None,
         )
 
         ####################################################################################################
         # HARMONIZATION (generation)
         ####################################################################################################
         if column_name:
+            # Transform to string if category
+            if tb[column_name].apply(type).eq("category").all():
+                tb[column_name] = tb[column_name].astype(str)
+
+            # Raise error if nan
+            if tb[column_name].isna().any():
+                st.error(f"Column '{column_name}' contains missing values. Please clean the data before harmonizing.")
+                st.stop()
+
             # Sanity check on typing: only support for indicators of type string
             if not tb[column_name].apply(type).eq(str).all():
                 # if tb[column_name].dtype not in ["object", "category"]:
@@ -168,12 +183,14 @@ if option:
                 )
                 st.stop()
 
-            mapping = {}
-            to_map = sorted(set(tb[column_name]))
-            mapper = CountryRegionMapper()
+            harmonizer = Harmonizer(
+                tb=tb,
+                colname=column_name,
+            )
+            harmonizer.run_automatic()
 
-            # do the easy cases first
-            ambiguous, mapping = harmonize_simple(to_map, mapping, mapper)
+            ambiguous = cast(List, harmonizer.ambiguous)
+            mapping = harmonizer.mapping
 
             st.divider()
 
@@ -184,7 +201,8 @@ if option:
                     st.dataframe(mapping)
 
             ## 2/ MANUAL (user input needed)
-            with st.form("form"):
+            with st.container(border=True):
+                # with st.form("form"):
                 # Title
                 st.markdown("#### Manual entity mapping needed")
                 st.markdown(f"{len(ambiguous)} ambiguous regions")
@@ -194,34 +212,35 @@ if option:
                 # - a toggle to ignore the region (no mapping)
                 for i, region in enumerate(ambiguous, 1):
                     # no exact match, get nearby matches
-                    suggestions = mapper.suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
+                    suggestions = harmonizer.get_suggestions(region, institution=None, num_suggestions=NUM_SUGGESTIONS)
                     with st.container(border=True):
-                        col1, col2, col3 = st.columns(3)
                         # Original name
-                        with col1:
-                            st.markdown(f"**`{region}`**")
-                            value_ignore = st.toggle(
-                                label="Ignore",
-                                key=f"region_ignore_{i}",
+                        st.markdown(f"**{region}**")
+                        col1, col2 = st.columns(2)
+
+                        # New name, custom (useful if no suggestion is good enough)
+                        with col2:
+                            value_custom = st.text_input(
+                                label="Enter custom name",
+                                key=f"region_custom_{i}",
+                                # placeholder="Enter custom name",
+                                # label_visibility="collapsed",
+                                help="Use this when no suggestion is good enough",
                             )
                         # New name, from selectbox
-                        with col2:
+                        with col1:
                             value_selected = st.selectbox(
                                 label="Select a region",
                                 options=suggestions,
                                 index=0,
-                                label_visibility="collapsed",
+                                # label_visibility="collapsed",
                                 key=f"region_suggestion_{i}",
+                                disabled=value_custom != "",
                             )
-                        # New name, custom (useful if no suggestion is good enough)
-                        with col3:
-                            value_custom = st.text_input(
-                                label="Region name by source",
-                                key=f"region_custom_{i}",
-                                placeholder="Enter custom name",
-                                label_visibility="collapsed",
-                                help="Use this when no suggestion is good enough",
-                            )
+                        value_ignore = st.toggle(
+                            label="Ignore",
+                            key=f"region_ignore_{i}",
+                        )
                         # Add defined mapping (only if not ignored)
                         if not value_ignore:
                             st.session_state.entity_mapping[region] = cast(
@@ -243,7 +262,7 @@ if option:
                         value=path_export,
                     )
                     # Submit button
-                    export_btn = st.form_submit_button(
+                    export_btn = st.button(
                         label="Export mapping",
                         type="primary",
                     )

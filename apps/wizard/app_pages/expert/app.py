@@ -66,7 +66,7 @@ class Options:
     DATASETTE = "Datasette"
     METADATA = "Metadata"
     START = "Setting up your environment"
-    GUIDES = "How to use, tools, APIs, and guides"
+    GUIDES = "Tools, APIs, and guides"
     PRINCIPLES = "Design principles"
     FULL = "Complete documentation"
     DEBUG = "Debug"
@@ -131,21 +131,31 @@ def reset_messages() -> None:
 
 
 # Category for the chat
-st.selectbox(
-    label="Choose a category for the question",
-    options=[
-        Options.FULL,
-        Options.METADATA,
-        Options.DATASETTE,
-        Options.START,
-        Options.GUIDES,
-        Options.PRINCIPLES,
-    ],
-    index=1,
-    help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
-    key="category_gpt",
-    on_change=reset_messages,
-)
+options = [
+    Options.FULL,
+    Options.DATASETTE,
+    Options.METADATA,
+    Options.START,
+    Options.GUIDES,
+    Options.PRINCIPLES,
+]
+# captions = [
+#     "The most complete chat. Use all our documentation.",
+#     "Specific queries about the metadata, yaml files, etc.",
+#     "Create SQL queries on our Datasette instance.",
+#     "Specific queries about setting up your environment.",
+# ]
+# NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
+with st.container(border=True):
+    st.radio(
+        label="Choose a category for the question",
+        options=options,
+        index=0,
+        help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
+        key="category_gpt",
+        on_change=reset_messages,
+        horizontal=True,
+    )
 
 ## EXAMPLE QUERIES
 if st.session_state["category_gpt"] == Options.DATASETTE:

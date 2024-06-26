@@ -29,3 +29,21 @@ steps:
     - data://garden/artificial_intelligence/latest/epoch
   data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
     - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by organization
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations
+
+  # EPOCH notable systems, aggregates by organization
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
+
+  # EPOCH notable systes, aggregates by country
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries

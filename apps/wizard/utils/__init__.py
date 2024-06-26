@@ -16,23 +16,24 @@ import os
 import re
 import sys
 from copy import deepcopy
+from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
 import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
 from pymysql import OperationalError
+from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from apps.wizard.utils.env import OWIDEnv
 from apps.wizard.utils.step_form import StepForm
-from etl import config
-from etl.db import get_connection
+from etl.config import OWID_ENV, OWIDEnv, enable_bugsnag
+from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
@@ -63,7 +64,7 @@ DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
 
 # DAG dropdown options
-dag_files = sorted(os.listdir(DAG_DIR))
+dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
 dag_not_add_option = "(do not add to DAG)"
 ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
@@ -81,13 +82,25 @@ COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
 COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
 COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
 COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
+COOKIE_STEPS = {
+    "snapshot": COOKIE_SNAPSHOT,
+    "meadow": COOKIE_MEADOW,
+    "garden": COOKIE_GARDEN,
+    "grapher": COOKIE_GRAPHER,
+}
 # Paths to markdown templates
 MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
 MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
-
+MD_STEPS = {
+    "snapshot": MD_SNAPSHOT,
+    "meadow": MD_MEADOW,
+    "garden": MD_GARDEN,
+    "grapher": MD_GRAPHER,
+    "express": MD_EXPRESS,
+}
 # Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",
@@ -104,6 +117,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+# Session state to track staging creation time
+VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
 
 
 def get_namespaces(step_type: str) -> List[str]:
@@ -126,7 +141,7 @@ def get_namespaces(step_type: str) -> List[str]:
             )
         case _:
             raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
-    namespaces = [folder.name for folder in folders]
+    namespaces = sorted(set(folder.name for folder in folders))
     return namespaces
 
 
@@ -229,7 +244,7 @@ class AppState:
 
     def update_from_form(self, form: "StepForm") -> None:
         self._check_step()
-        st.session_state["steps"][self.step] = form.dict()
+        st.session_state["steps"][self.step] = form.model_dump()
 
     @property
     def state_step(self: "AppState") -> Dict[str, Any]:
@@ -238,7 +253,10 @@ class AppState:
         return st.session_state["steps"][self.step]
 
     def default_value(
-        self: "AppState", key: str, previous_step: Optional[str] = None, default_last: Optional[str | bool | int] = ""
+        self: "AppState",
+        key: str,
+        previous_step: Optional[str] = None,
+        default_last: Optional[str | bool | int | date] = "",
     ) -> str | bool | int:
         """Get the default value of a variable.
 
@@ -304,23 +322,33 @@ class AppState:
                 self._previous_step = "snapshot"
         return self._previous_step
 
+    @property
+    def vars(self):
+        return {
+            str(k).replace(f"{self.step}.", ""): v
+            for k, v in dict(st.session_state).items()
+            if str(k).startswith(f"{self.step}.")
+        }
+
     def st_widget(
         self: "AppState",
         st_widget: Callable,
-        default_last: Optional[str | bool | int] = "",
+        default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
-        **kwargs: Optional[str | int | List[str]],
+        default_value: Optional[str | bool | int | date] = None,
+        **kwargs: Optional[str | int | List[str] | date | Callable],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        if self.dataset_edit[self.step] is not None:
-            if dataset_field_name:
-                default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+        if default_value is None:
+            if self.dataset_edit[self.step] is not None:
+                if dataset_field_name:
+                    default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+                else:
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
             else:
-                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
-        else:
-            default_value = self.default_value(key, default_last=default_last)
+                default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Special behaviour for multiselect
@@ -344,6 +372,41 @@ class AppState:
         # Show error message
         self.display_error(key)
         return widget
+
+    def st_selectbox_responsive(
+        self: "AppState",
+        custom_label: str,
+        **kwargs,
+    ) -> None:
+        """Render the namespace field within the form.
+
+        We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+        This is a workaround to have repsonsive behaviour within a form.
+
+        Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+        """
+        # Handle kwargs
+        kwargs["options"] = [custom_label] + kwargs["options"]
+        key = cast(str, kwargs["key"])
+
+        # Render and get element depending on selection in selectbox
+        with st.container():
+            field = self.st_widget(**kwargs)
+        with st.empty():
+            if (field == custom_label) | (str(field) not in kwargs["options"]):
+                st.toast("showing custom input")
+                default_value = self.default_value(key)
+                field = self.st_widget(
+                    st.text_input,
+                    label="↳ *Use custom value*",
+                    placeholder="",
+                    help="Enter custom value.",
+                    key=f"{key}_custom",
+                    default_last=default_value,
+                )
+            # else:
+            #     st.session_state[f"{self.step}.{key}_custom"] = "nana"
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
@@ -405,7 +468,7 @@ def _check_env() -> bool:
     """Check if environment variables are set correctly."""
     ok = True
     for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
+        if getattr(OWID_ENV.conf, env_name) is None:
             ok = False
             st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
 
@@ -437,10 +500,10 @@ def _show_environment():
     **Environment variables**:
 
     ```
-    GRAPHER_USER_ID: {config.GRAPHER_USER_ID}
-    DB_USER: {config.DB_USER}
-    DB_NAME: {config.DB_NAME}
-    DB_HOST: {config.DB_HOST}
+    GRAPHER_USER_ID: {OWID_ENV.conf.GRAPHER_USER_ID}
+    DB_USER: {OWID_ENV.conf.DB_USER}
+    DB_NAME: {OWID_ENV.conf.DB_NAME}
+    DB_HOST: {OWID_ENV.conf.DB_HOST}
     ```
     """
     )
@@ -485,7 +548,7 @@ def render_responsive_field_in_form(
     Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
     """
     # Main decription
-    help_text = "## Description\n\nInstitution or topic name"
+    help_text = "## Institution or topic name"
 
     # Render and get element depending on selection in selectbox
     with field_1:
@@ -542,7 +605,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -550,7 +613,7 @@ def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        if only_if_not_exists:
+        if also_if_not_exists:
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
@@ -599,7 +662,7 @@ def enable_bugsnag_for_streamlit():
     """Enable bugsnag for streamlit. Uses this workaround
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
-    config.enable_bugsnag()
+    enable_bugsnag()
     # error_util = sys.modules["streamlit.error_util"]
     error_util = sys.modules["streamlit.runtime.scriptrunner.script_runner"]
     original_handler = error_util.handle_uncaught_app_exception
@@ -612,56 +675,74 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     chart_config_tmp = deepcopy(chart_config)
 
     chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
     chart_config_tmp["adminBaseUrl"] = owid_env.base_site
     chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
+    # HTML = f"""
+    # <!DOCTYPE html>
+    # <html>
+    #     <head>
+    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
+    #         <link
+    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+    #         rel="stylesheet"
+    #         />
+    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    #     </head>
+    #     <body class="StandaloneGrapherOrExplorerPage">
+    #         <main>
+    #             <figure data-grapher-src></figure>
+    #         </main>
+    #         <div class="site-tools"></div>
+    #         <script>
+    #             document.cookie = "isAdmin=true;max-age=31536000"
+    #         </script>
+    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+    #         <script type="module">
+    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+    #         </script>
+    #     </body>
+    # </html>
+    # """
+
     HTML = f"""
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link
-            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-            rel="stylesheet"
-            />
-            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-        </head>
-        <body class="StandaloneGrapherOrExplorerPage">
-            <main>
-                <figure data-grapher-src></figure>
-            </main>
-            <div class="site-tools"></div>
-            <script>
-                document.cookie = "isAdmin=true;max-age=31536000"
-            </script>
-            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-            <script type="module">
-                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-            </script>
-        </body>
-    </html>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    <div class="StandaloneGrapherOrExplorerPage">
+        <main>
+            <figure data-grapher-src></figure>
+        </main>
+        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
+        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+        <script type="module">
+            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+        </script>
+    </div>
     """
 
     components.html(HTML, height=height, **kwargs)
 
 
 class Pagination:
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-
+        # Action to perform when interacting with any of the buttons.
+        ## Example: Change the value of certain state in session_state
+        self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
             self.page = 1
 
     @property
     def page(self):
-        return st.session_state[self.pagination_key]
+        value = st.session_state[self.pagination_key]
+        return value
 
     @page.setter
     def page(self, value):
@@ -677,12 +758,17 @@ class Pagination:
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self) -> None:
-        # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1])
+    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
+        if mode == "bar":
+            self.show_controls_bar()
+        elif mode == "buttons":
+            self.show_controls_buttons()
+        else:
+            raise ValueError("Mode must be either 'buttons' or 'bar'.")
 
-        # Correct page number if exceeds maximum allowed
-        self.page = min(self.total_pages, self.page)
+    def show_controls_buttons(self):
+        # Pagination controls
+        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
             with col1:
@@ -690,6 +776,8 @@ class Pagination:
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
                         self.page -= 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
@@ -699,9 +787,69 @@ class Pagination:
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
                         self.page += 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
 
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
+
+    def show_controls_bar(self) -> None:
+        def _change_page():
+            # Internal action
+
+            # External action
+            if self.on_click is not None:
+                self.on_click()
+
+        col, _ = st.columns([1, 3])
+        with col:
+            st.number_input(
+                label=f"**Go to page** (total: {self.total_pages})",
+                min_value=1,
+                max_value=self.total_pages,
+                # value=self.page,
+                on_change=_change_page,
+                key=self.pagination_key,
+            )
+
+
+def _get_staging_creation_time(session: Session):
+    """Get staging server creation time."""
+    query_ts = "show table status like 'charts'"
+    df = read_sql(query_ts, session)
+    assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
+    create_time = df["Create_time"].item()
+    return create_time
+
+
+def get_staging_creation_time(session: Optional[Session] = None):
+    """Get staging server creation time."""
+    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
+        set_staging_creation_time(session)
+    return st.session_state[VARNAME_STAGING_CREATION_TIME]
+
+
+def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
+    """Gest staging server creation time estimate."""
+
+    if session is None:
+        if OWID_ENV.env_local == "staging":
+            with Session(OWID_ENV.engine) as session:
+                st.session_state[key] = _get_staging_creation_time(session)
+        else:
+            st.session_state[key] = None
+    else:
+        st.session_state[key] = _get_staging_creation_time(session)
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")

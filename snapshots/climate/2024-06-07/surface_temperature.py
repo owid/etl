@@ -16,6 +16,7 @@ from pathlib import Path
 # CDS API
 import cdsapi
 import click
+import xarray as xr
 
 from etl.snapshot import Snapshot
 
@@ -46,6 +47,14 @@ def main(upload: bool) -> None:
             },
             output_file,
         )
+
+        # Convert data to float32
+        with xr.open_dataset(output_file) as ds:
+            # Use smaller types
+            ds["t2m"] = ds["t2m"].astype("float32")
+
+            ds.to_netcdf(output_file)
+
         # Compress the file
         with open(output_file, "rb") as f_in:
             with gzip.open(str(output_file) + ".gz", "wb") as f_out:

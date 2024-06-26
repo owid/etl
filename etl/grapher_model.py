@@ -32,6 +32,7 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    and_,
     func,
     or_,
     select,
@@ -266,6 +267,17 @@ class Chart(Base):
         return charts[0]
 
     @classmethod
+    def load_charts(cls, session: Session, chart_ids: List[int]) -> List["Chart"]:
+        """Load charts with id in `chart_ids`."""
+        cond = cls.id.in_(chart_ids)
+        charts = session.scalars(select(cls).where(cond)).all()
+
+        if len(charts) == 0:
+            raise NoResultFound()
+
+        return list(charts)
+
+    @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
@@ -301,7 +313,22 @@ class Chart(Base):
 
         return variables
 
-    def load_variables_checksums(self, session: Session) -> pd.DataFrame:
+    @classmethod
+    def load_variables_checksums(cls, session: Session, chart_ids: List[int]) -> pd.DataFrame:
+        """Load checksums for all variables from the chart and return them as a list of dicts."""
+        q = """
+        select
+            cd.chartId,
+            v.id as variableId,
+            v.dataChecksum,
+            v.metadataChecksum
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId in %(chart_id)s
+        """
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "variableId"])
+
+    def load_variable_checksums(self, session: Session) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
         q = """
         select
@@ -660,88 +687,6 @@ class Source(Base):
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
         return [cls.from_dict(d) for d in sources.to_dict(orient="records")]  # type: ignore
-
-
-class SuggestedChartRevisions(Base):
-    __tablename__ = "suggested_chart_revisions"
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["chartId"],
-            ["charts.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="suggested_chart_revisions_ibfk_1",
-        ),
-        ForeignKeyConstraint(
-            ["createdBy"],
-            ["users.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="suggested_chart_revisions_ibfk_2",
-        ),
-        ForeignKeyConstraint(
-            ["updatedBy"],
-            ["users.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="suggested_chart_revisions_ibfk_3",
-        ),
-        Index("chartId", "chartId", "originalVersion", "suggestedVersion", "isPendingOrFlagged", unique=True),
-        Index("createdBy", "createdBy"),
-        Index("updatedBy", "updatedBy"),
-    )
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, init=False)
-    chartId: Mapped[int] = mapped_column(Integer)
-    createdBy: Mapped[int] = mapped_column(Integer)
-    originalConfig: Mapped[dict] = mapped_column(JSON)
-    suggestedConfig: Mapped[dict] = mapped_column(JSON)
-    status: Mapped[str] = mapped_column(VARCHAR(8))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    originalVersion: Mapped[int] = mapped_column(
-        Integer,
-        Computed("(json_unquote(json_extract(`originalConfig`,_utf8mb4'$.version')))", persisted=False),
-        init=False,
-    )
-    suggestedVersion: Mapped[int] = mapped_column(
-        Integer,
-        Computed("(json_unquote(json_extract(`suggestedConfig`,_utf8mb4'$.version')))", persisted=False),
-        init=False,
-    )
-    updatedBy: Mapped[Optional[int]] = mapped_column(Integer)
-    updatedAt: Mapped[datetime] = mapped_column(DateTime)
-    suggestedReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
-    decisionReason: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
-    isPendingOrFlagged: Mapped[Optional[int]] = mapped_column(
-        TINYINT(1),
-        Computed("(if((`status` in (_utf8mb4'pending',_utf8mb4'flagged')),true,NULL))", persisted=False),
-        init=False,
-    )
-    changesInDataSummary: Mapped[Optional[str]] = mapped_column(TEXT, default="")
-    experimental: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-
-    @classmethod
-    def load_pending(cls, session: Session, user_id: Optional[int] = None) -> List["SuggestedChartRevisions"]:
-        if user_id is None:
-            return list(
-                session.scalars(
-                    select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
-                ).all()
-            )
-        else:
-            return list(
-                session.scalars(
-                    select(SuggestedChartRevisions)
-                    .where(SuggestedChartRevisions.status == "pending")
-                    .where(SuggestedChartRevisions.createdBy == user_id)
-                ).all()
-            )
-
-    @classmethod
-    def load_revisions(cls, session: Session, chart_id: int) -> List["SuggestedChartRevisions"]:
-        return list(
-            session.scalars(select(SuggestedChartRevisions).where(SuggestedChartRevisions.chartId == chart_id)).all()
-        )
 
 
 class DimensionFilter(TypedDict):
@@ -1399,24 +1344,54 @@ class ChartDiffApprovals(Base):
     updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
 
     @classmethod
-    def latest_chart_status(cls, session: Session, chart_id: int, source_updated_at, target_updated_at) -> str:
-        """Load the latest approval of the chart. If there's none, return ChartStatus.PENDING."""
-        result = session.scalars(
+    def latest_chart_approval_batch(
+        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+    ) -> List[Optional["ChartDiffApprovals"]]:
+        """Load the latest approval of the charts.
+
+        Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
+        """
+        if not (len(chart_ids) == len(source_updated_ats) == len(target_updated_ats)):
+            raise ValueError("All input lists must have the same length")
+
+        # Get matches from DB
+        criteria = list(zip(chart_ids, source_updated_ats, target_updated_ats))
+
+        raw_results = session.scalars(
             select(cls)
             .where(
-                cls.chartId == chart_id,
-                cls.sourceUpdatedAt == source_updated_at,
-                cls.targetUpdatedAt == target_updated_at,
+                or_(
+                    *[
+                        and_(
+                            cls.chartId == chart_id,
+                            cls.sourceUpdatedAt == source_updated_at,
+                            cls.targetUpdatedAt == target_updated_at,
+                        )
+                        for chart_id, source_updated_at, target_updated_at in criteria
+                    ]
+                )
             )
             .order_by(cls.updatedAt.desc())
-            .limit(1)
-        ).first()
-        if result:
-            if result.status == "unapproved":
-                return ChartStatus.PENDING.value
-            return result.status  # type: ignore
-        else:
-            return ChartStatus.PENDING.value
+        ).all()
+
+        # Take the latest approval for each chart - note that it's sorted by updatedAt, so we take just the
+        # first element
+        results = {}
+        for r in raw_results:
+            if r.chartId not in results:
+                results[r.chartId] = r
+
+        # List with approval objects corresponding to charts specified by IDs in chart_ids
+        approvals = []
+        for chart_id in chart_ids:
+            approval = None
+            if chart_id in results:
+                approval = results[chart_id]
+            approvals.append(approval)
+
+        assert len(chart_ids) == len(approvals), "Length of chart_ids and approvals must be the same."
+
+        return approvals
 
     @classmethod
     def get_all(cls, session: Session, chart_id: int) -> List["ChartDiffApprovals"]:
@@ -1425,12 +1400,75 @@ class ChartDiffApprovals(Base):
             select(cls)
             .where(
                 cls.chartId == chart_id,
-                # cls.sourceUpdatedAt == source_updated_at,
-                # cls.targetUpdatedAt == target_updated_at,
             )
             .order_by(cls.updatedAt.desc())
         ).fetchall()
         return list(result)
+
+
+class ChartDiffConflicts(Base):
+    __tablename__ = "chart_diff_conflicts"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_conflicts_ibfk_1"
+        ),
+        Index("chartId", "chartId"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    chartId: Mapped[int] = mapped_column(Integer)
+    targetUpdatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    conflict: Mapped[Literal["resolved", "pending"]] = mapped_column(VARCHAR(255))
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
+
+    @classmethod
+    def get_conflict_batch(
+        cls, session: Session, chart_ids: list[int], target_updated_ats: list
+    ) -> List[Optional["ChartDiffConflicts"]]:
+        """Load the latest conflict of charts (if exist).
+
+        Returns: List of same length of chart_ids. First item in returned list corresponds to first chart_id in input list.
+        """
+        if not (len(chart_ids) == len(target_updated_ats)):
+            raise ValueError("All input lists must have the same length")
+
+        # Get matches from DB
+        criteria = list(zip(chart_ids, target_updated_ats))
+
+        raw_results = session.scalars(
+            select(cls)
+            .where(
+                or_(
+                    *[
+                        and_(
+                            cls.chartId == chart_id,
+                            cls.targetUpdatedAt == target_updated_at,
+                        )
+                        for chart_id, target_updated_at in criteria
+                    ]
+                )
+            )
+            .order_by(cls.updatedAt.desc())
+        ).all()
+
+        # Take the latest conflict for each chart - note that it's sorted by updatedAt, so we take just the
+        # first element
+        results = {}
+        for r in raw_results:
+            if r.chartId not in results:
+                results[r.chartId] = r
+
+        # List with conflicts objects corresponding to charts specified by IDs in chart_ids and timestamp in target_updated_ats
+        conflicts = []
+        for chart_id in chart_ids:
+            conflict = None
+            if chart_id in results:
+                conflict = results[chart_id]
+            conflicts.append(conflict)
+
+        assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
+
+        return conflicts
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

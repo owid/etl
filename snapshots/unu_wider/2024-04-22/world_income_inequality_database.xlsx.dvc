@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Income Inequality Database (WIID)
+    description: |-
+      The World Income Inequality Database (WIID) presents information on income inequality for developed, developing, and transition countries. It provides the most comprehensive set of income inequality statistics available and can be downloaded for free. ​
+    date_published: "2023-11-28"
+
+    # Citation
+    producer: UNU-WIDER
+    citation_full: |-
+      UNU-WIDER, World Income Inequality Database (WIID). Version 28 November 2023. https://doi.org/10.35188/UNU-WIDER/WIID-281123
+
+    # Files
+    url_main: https://www.wider.unu.edu/project/world-income-inequality-database-wiid
+    url_download: https://www.wider.unu.edu/sites/default/files/Data/WIID_28NOV2023.xlsx
+    date_accessed: 2024-04-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.wider.unu.edu/project/world-income-inequality-database-wiid
+
+outs:
+  - md5: 4d996ca2b59dc65bee980bddc429cba7
+    size: 9070639
+    path: world_income_inequality_database.xlsx

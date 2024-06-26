@@ -62,7 +62,7 @@ CATEGORIES_RENAMING = {
     },
     "age_of_consent": {
         "Equal": "Equal",
-        "Female equal, male N/A": "Female equal, male N/A",
+        "Female equal, male N/A": "Female equal, male illegal",
         "Varies by Region": "Varies by region",
         "Ambiguous": "Ambiguous",
         "Unequal": "Unequal",
@@ -155,14 +155,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow and regions and population datasets.
-    ds_meadow: Dataset = paths.load_dependency("equaldex")
+    ds_meadow = paths.load_dataset("equaldex")
     ds_regions = paths.load_dataset("regions")
     ds_population = paths.load_dataset("population")
+    ds_sovereign_countries = paths.load_dataset("isd")
 
     # Read tables from meadow dataset.
     tb = ds_meadow["equaldex"].reset_index()
     tb_current = ds_meadow["equaldex_current"].reset_index()
     tb_indices = ds_meadow["equaldex_indices"].reset_index()
+    tb_sovereign_countries = ds_sovereign_countries["isd_countries"].reset_index()
 
     #
     # Process data.
@@ -177,6 +179,14 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_indices, on=["country", "year"], how="left")
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # NOTE: Correcting data for France in changing_gender to "Legal, surgery required" between 1992 and 2018
+    tb.loc[
+        (tb["country"] == "France") & (tb["year"] >= 1992) & (tb["year"] < 2018), "changing_gender"
+    ] = "Legal, surgery required"
+
+    # Select only sovereign countries
+    tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)
 
     # Add population-weighted aggregations for the columns in the list
     tb = add_population_weighted_aggregations(
@@ -245,7 +255,13 @@ def make_table_wide_and_map_categories(tb: Table) -> Table:
 
         # Assign an order to the categories, by modifying the metadata of the column
         tb[issue].m.type = "ordinal"
-        tb[issue].m.sort = list(dict.fromkeys(CATEGORIES_RENAMING[issue].values()))
+        # Create a list of unique categories and remove duplicates
+        categories_from_dict = list(dict.fromkeys(CATEGORIES_RENAMING[issue].values()))
+        categories_from_column = list(tb[issue].dropna().unique().copy())
+
+        # Remove values in categories_from_dict that are not in categories_from_column
+        categories_list = [x for x in categories_from_dict if x in categories_from_column]
+        tb[issue].m.sort = categories_list
 
     # Assert if the issues available are EXPECTED_COLUMNS
     assert set(issue_list + ["country", "year"]) == set(tb.columns), paths.log.error(
@@ -422,3 +438,27 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
         paths.log.error(f"count_or_pop must be either 'count' or 'pop'. Got {count_or_pop}.")
 
     return meta  # type: ignore
+
+
+def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) -> Table:
+    """
+    Use the latest sovereign countries data to select only those countries in the table
+    """
+
+    # Format tb_sovereign_countries
+    # Rename regions to country
+    tb_sovereign_countries = tb_sovereign_countries.rename({"statename": "country"})
+    tb_sovereign_countries = tb_sovereign_countries[["country", "year"]]
+
+    # Filter data: max year
+    tb_sovereign_countries = tb_sovereign_countries[
+        (tb_sovereign_countries["year"] == tb_sovereign_countries["year"].max())
+    ]
+
+    # Drop year column
+    tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
+
+    # Merge the two tables
+    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+
+    return tb

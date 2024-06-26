@@ -92,7 +92,9 @@ class Variable(pd.Series):
         if data is None and not kwargs.get("dtype"):
             kwargs["dtype"] = "object"
 
-        super().__init__(data=data, index=index, name=name, **kwargs)
+        # DeprecationWarning: Passing a SingleBlockManager to Variable is deprecated and will raise in a future version. Use public APIs instead.
+        with warnings.ignore_warnings([DeprecationWarning]):
+            super().__init__(data=data, index=index, name=name, **kwargs)
 
     @property
     def m(self) -> VariableMeta:
@@ -288,6 +290,9 @@ class Variable(pd.Series):
             variables=[self], operation="pct_change", name=variable_name
         )
         return variable
+
+    def set_categories(self, *args, **kwargs) -> "Variable":
+        return Variable(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
     def update_log(
         self,
