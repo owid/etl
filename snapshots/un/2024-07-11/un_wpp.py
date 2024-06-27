@@ -17,58 +17,88 @@ Command:
         --migration-rate $FILE_DIR/migrate.xlsx \
         --deaths $FILE_DIR/deaths.xlsx \
         --deaths-age $FILE_DIR/deaths_age.xlsx \
+        --births-sex $FILE_DIR/births_sex.xlsx \
+        --births-age $FILE_DIR/births_age.xlsx \
+        --median-age $FILE_DIR/median_age.xlsx \
+        --le $FILE_DIR/le.xlsx \
+        --le-f $FILE_DIR/le_f.xlsx \
+        --le-m $FILE_DIR/le_m.xlsx
 
 
 Files needed:
 
     - Population
-        Title (page):   WPP2024_Population_1_July_by_Age1_long.csv.gz
-        Filename:       Population by Age July 1 2024.csv
-        Alias:          population.csv
+        Title (page):           WPP2024_Population_1_July_by_Age1_long.csv.gz
+        Filename:               Population by Age July 1 2024.csv
+        Alias:                  population.csv
     - Natural change
-        Title (page):   WPP2024_Rate_of_natural_change_%28per_thousand%29.xlsx
-        Filename:       WPP2024 Natural Change Rate.xlsx
-        Alias           natchange.xlsx
+        Title (page):           WPP2024_Rate_of_natural_change_%28per_thousand%29.xlsx
+        Filename:               WPP2024 Natural Change Rate.xlsx
+        Alias                   natchange.xlsx
     - Growth rate
-        Title (page):   WPP2024_Average_annual_rate_of_population_change-growth_rate_%28%25%29.xlsx
-        Filename:       Population Growth Rate 2024.xlsx
-        Alias           grrate.xlsx
+        Title (page):           WPP2024_Average_annual_rate_of_population_change-growth_rate_%28%25%29.xlsx
+        Filename:               Population Growth Rate 2024.xlsx
+        Alias                   grrate.xlsx
     - Fertility (total)
-        Title (page):   WPP2024_Total_fertility_rate_%28live_births_per_woman%29.xlsx
-        Filename:       WPP2024 Total Fertility Rate.xlsx
-        Alias:          frtot.xlsx
+        Title (page):           WPP2024_Total_fertility_rate_%28live_births_per_woman%29.xlsx
+        Filename:               WPP2024 Total Fertility Rate.xlsx
+        Alias:                  frtot.xlsx
     - Fertility (asfr)
-        Title (page):   WPP2024_Age-specific_fertility_rates_%28ASFR%3B_births_per_1%2C000_women%29_Abridged_Ages.xlsx
-        Filename:       ASFR Abridged Ages.xlsx
-        Alias:          frage.xlsx
+        Title (page):           WPP2024_Age-specific_fertility_rates_%28ASFR%3B_births_per_1%2C000_women%29_Abridged_Ages.xlsx
+        Filename:               ASFR Abridged Ages.xlsx
+        Alias:                  frage.xlsx
     - Migration (number)
-        Title (page):   WPP2024_Net_number_of_migrants_by_sex_%28in_thousands%29.xlsx
-        Filename:       Net migrants by sex 2024.xlsx
-        Alias:          mig.xlsx
+        Title (page):           WPP2024_Net_number_of_migrants_by_sex_%28in_thousands%29.xlsx
+        Filename:               Net migrants by sex 2024.xlsx
+        Alias:                  mig.xlsx
     - Migration rate
-        Title (page):   WPP2024_Crude_net_migration_rate_%28CNMR%29_%28per_1%2C000_population%29.xlsx
-        Filename:       WPP2024 Crude Net Migration Rate.xlsx
-        Alias:          migrate.xlsx
+        Title (page):           WPP2024_Crude_net_migration_rate_%28CNMR%29_%28per_1%2C000_population%29.xlsx
+        Filename:               WPP2024 Crude Net Migration Rate.xlsx
+        Alias:                  migrate.xlsx
     - Deaths (total)
-        Title (page):   https://www.dropbox.com/scl/fo/m5ubnjq0j0542px0vowpu/AJbGz8qywO0ZtsrIt4HmVJA/WPP2024_Total_deaths_by_sex_%28in_thousands%29.xlsx?rlkey=jgttagxx80mosd66yi4o61wjh&dl=0
-        Filename:       WPP2024 Total Deaths by Sex.xlsx
-        Alias:          deaths.xlsx
+        Title (page):           https://www.dropbox.com/scl/fo/m5ubnjq0j0542px0vowpu/AJbGz8qywO0ZtsrIt4HmVJA/WPP2024_Total_deaths_by_sex_%28in_thousands%29.xlsx?rlkey=jgttagxx80mosd66yi4o61wjh&dl=0
+        Filename:               WPP2024 Total Deaths by Sex.xlsx
+        Alias:                  deaths.xlsx
     - Deaths (age)
-        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Total.xlsx
-        Filename:       WPP2024 Deaths by Age.xlsx
-        Alias:          deaths_age.xlsx
+        Title (page):           WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Total.xlsx
+        Filename:               WPP2024 Deaths by Age.xlsx
+        Alias:                  deaths_age.xlsx
     - Deaths (age, fem)
-        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Female.xlsx
-        Filename:       WPP2024 Deaths by Age Female.xlsx
-        Alias:          deaths_age_female.xlsx
+        Title (page):           WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Female.xlsx
+        Filename:               WPP2024 Deaths by Age Female.xlsx
+        Alias:                  deaths_age_female.xlsx
     - Deaths (age, mal)
-        Title (page):   WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Male.xlsx
-        Filename:       WPP2024 Deaths by Age and Sex Male.xlsx
-        Alias:          deaths_age_male.xlsx
+        Title (page):           WPP2024_Deaths_by_age_and_sex_%28in_thousands%29_Abridged_Ages_Male.xlsx
+        Filename:               WPP2024 Deaths by Age and Sex Male.xlsx
+        Alias:                  deaths_age_male.xlsx
     - Death rate
-        Title (page):   WPP2024_Crude_death_rate_%28CDR%29_%28deaths_per_1%2C000_population%29.xlsx
-        Filename:       WPP2024 Crude Death Rate.xlsx
-        Alias:          death_rate.xlsx
+        Title (page):           WPP2024_Crude_death_rate_%28CDR%29_%28deaths_per_1%2C000_population%29.xlsx
+        Filename:               WPP2024 Crude Death Rate.xlsx
+        Alias:                  death_rate.xlsx
+    - Births (sex)
+        Title (page):           WPP2024_Total_births_by_sex_%28in_thousands%29.xlsx
+        Filename:               WPP2024 Total Births by Sex.xlsx
+        Alias:                  births_sex.xlsx
+    - Births (age)
+        Title (page):           WPP2024_Births_by_age_group_of_mother_%28in_thousands%29_Abridged_Ages.xlsx
+        Filename:               Births by Mother Age.xlsx
+        Alias:                  births_age.xlsx
+    - Median age
+        Title (page):           WPP2024_Median_age_of_population_%28years%29.xlsx
+        Filename:               Median Age of Population 2024
+        Alias:                  median_age.xlsx
+    - Life expectancy (total)
+        Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Total.xlsx
+        Filename:               Life Expectancy Indicators.xlsx
+        Alias:                  le.xlsx
+    - Life expectancy (fem)
+        Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Female.xlsx
+        Filename:               Life expectancy female.xlsx
+        Alias:                  le_fem.xlsx
+    - Life expectancy (male)
+        Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Male.xlsx
+        Filename:               Life Expectancy Male.xlsx
+        Alias:                  le_male.xlsx
 
 """
 
@@ -111,9 +141,15 @@ log = get_logger()
 @click.option("--migration-rate", type=str, help="Path to net-migration rate local file.")
 @click.option("--deaths", type=str, help="Path to total deaths local file.")
 @click.option("--deaths-age", type=str, help="Path to total deaths by age group local file.")
-@click.option("--deaths-age-fem", type=str, help="Path to female deaths by age group local file.")
-@click.option("--deaths-age-male", type=str, help="Path to male deaths by age group local file.")
+@click.option("--deaths-age-f", type=str, help="Path to female deaths by age group local file.")
+@click.option("--deaths-age-m", type=str, help="Path to male deaths by age group local file.")
 @click.option("--death-rate", type=str, help="Path to crude death rate local file.")
+@click.option("--births-sex", type=str, help="Path to births by sex.")
+@click.option("--births-age", type=str, help="Path to births by age group of the mother.")
+@click.option("--median-age", type=str, help="Path to median age of the population.")
+@click.option("--le", type=str, help="Path to median age of the population.")
+@click.option("--le-f", type=str, help="Path to median age of the population.")
+@click.option("--le-m", type=str, help="Path to median age of the population.")
 def main(
     upload: bool,
     population: str | None = None,
@@ -125,9 +161,15 @@ def main(
     migration_rate: str | None = None,
     deaths: str | None = None,
     deaths_age: str | None = None,
-    deaths_age_fem: str | None = None,
-    deaths_age_male: str | None = None,
+    deaths_age_f: str | None = None,
+    deaths_age_m: str | None = None,
     death_rate: str | None = None,
+    births_sex: str | None = None,
+    births_age: str | None = None,
+    median_age: str | None = None,
+    le: str | None = None,
+    le_f: str | None = None,
+    le_m: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
@@ -139,9 +181,14 @@ def main(
         (migration_rate, "un_wpp_migration_rate.xlsx"),
         (deaths, "un_wpp_deaths.xlsx"),
         (deaths_age, "un_wpp_deaths_age.xlsx"),
-        (deaths_age_fem, "un_wpp_deaths_age_fem.xlsx"),
-        (deaths_age_male, "un_wpp_deaths_age_male.xlsx"),
+        (deaths_age_f, "un_wpp_deaths_age_fem.xlsx"),
+        (deaths_age_m, "un_wpp_deaths_age_male.xlsx"),
         (death_rate, "un_wpp_death_rate.xlsx"),
+        (births_sex, "un_wpp_births_sex.xlsx"),
+        (births_age, "un_wpp_births_age.xlsx"),
+        (le, "un_wpp_le.xlsx"),
+        (le_f, "un_wpp_le_f.xlsx"),
+        (le_m, "un_wpp_le_m.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
