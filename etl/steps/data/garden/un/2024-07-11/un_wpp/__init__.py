@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List, Optional, cast
+from typing import Any, List, Optional, Tuple, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_population = process_population(tb_population, tb_population_density)
+    tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
@@ -81,6 +81,7 @@ def run(dest_dir: str) -> None:
     tb_births = set_variant_to_estimates(tb_births)
     tb_median_age = set_variant_to_estimates(tb_median_age)
     tb_le = set_variant_to_estimates(tb_le)
+    tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -95,6 +96,7 @@ def run(dest_dir: str) -> None:
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
     tb_le = tb_le.format(COLUMNS_INDEX)
+    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
 
     # Build tables list for dataset
     tables = [
@@ -107,6 +109,7 @@ def run(dest_dir: str) -> None:
         tb_births,
         tb_median_age,
         tb_le,
+        tb_sex_ratio,
     ]
 
     #
@@ -124,7 +127,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population(tb: Table, tb_density: Table) -> Table:
+def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table]:
     """Process the population table."""
     paths.log.info("Processing population variables...")
 
@@ -137,18 +140,30 @@ def process_population(tb: Table, tb_density: Table) -> Table:
     # Remove location_type
     tb = tb.drop(columns="location_type")
 
+    # Estimate sex ratio
+    tb_sex = estimate_sex_ratio(tb)
+
     # Estimate age groups
     tb = estimate_age_groups(tb)
 
     # Add population change
     tb = add_population_change(tb)
 
+    # Add sex ratio
+    tb_sex = add_sex_ratio_all(tb_sex, tb)
+
     # Harmonize country names
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+    tb_sex = geo.harmonize_countries(tb_sex, countries_file=paths.country_mapping_path)
 
     # Harmonize dimensions
     tb = harmonize_dimension(
         tb,
+        "variant",
+        mapping={"Medium variant": "medium"},
+    )
+    tb_sex = harmonize_dimension(
+        tb_sex,
         "variant",
         mapping={"Medium variant": "medium"},
     )
@@ -162,12 +177,15 @@ def process_population(tb: Table, tb_density: Table) -> Table:
         },
     )
 
+    # Multiply sex_ratio x 100
+    tb_sex["sex_ratio"] *= 100
+
     # Add population density
     tb_density = process_standard(tb_density)
     tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
     del tb_density
 
-    return tb
+    return tb, tb_sex
 
 
 def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
@@ -319,6 +337,26 @@ def process_standard(tb: Table) -> Table:
     return tb
 
 
+def estimate_sex_ratio(tb: Table, age_groups: Optional[List[str]] = None):
+    # Select relevant age groups
+    if age_groups is None:
+        age_groups = ["0", "5", "10", "15"] + [str(i) for i in range(20, 100, 10)] + ["100+"]
+
+    tb_sex = tb.loc[(tb["age"].isin(age_groups)) & (tb["sex"] != "Total")].copy()
+    # Pivot
+    tb_sex = tb_sex.pivot(columns="sex", index=[col for col in COLUMNS_INDEX if col != "sex"], values="population")
+    # Estimate ratio
+    tb_sex["sex_ratio"] = tb_sex["Male"] / tb_sex["Female"]
+    # Reset index
+    tb_sex = tb_sex.reset_index()
+    # Add missing sex column
+    tb_sex["sex"] = "all"
+    # Keep relevant columns
+    tb_sex = tb_sex[COLUMNS_INDEX + ["sex_ratio"]]
+
+    return tb_sex
+
+
 def set_variant_to_estimates(tb: Table) -> Table:
     """For data before YEAR_SPLIT, make sure to have variant = 'estimates'."""
     tb["variant"] = tb["variant"].astype("string")
@@ -438,6 +476,15 @@ def add_population_change(tb: Table) -> Table:
     assert (years := set(tb[tb[column_pop_change].isna()]["year"])) == {1950}, f"Other than year 1950 detected: {years}"
 
     return tb
+
+
+def add_sex_ratio_all(tb_sex: Table, tb: Table) -> Table:
+    """Estimate anual population change."""
+    tb_sex_all = estimate_sex_ratio(tb, age_groups=["all"])
+    tb_sex = pr.concat([tb_sex, tb_sex_all])
+    del tb_sex_all
+
+    return tb_sex
 
 
 #################################################################################
