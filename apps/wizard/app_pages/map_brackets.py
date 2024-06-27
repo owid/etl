@@ -456,7 +456,6 @@ class MapBracketer:
     def update_custom_brackets(self, brackets_manual) -> None:
         self.brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_manual
         self.brackets_selected = brackets_manual
-        # TODO: Raise warnings if the input manual brackets do not fulfil certain conditions (e.g. monotonically increasing).
         self._update_grapher_brackets()
 
     def update_brackets_selected(self, min_selected: float, max_selected: float) -> None:
@@ -638,6 +637,8 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
             )
             brackets_manual = json.loads(brackets_manual)
             brackets_manual = [float(bracket) for bracket in brackets_manual]
+            if (np.diff(brackets_manual) < 0).any():
+                st.warning("Custom brackets are not monotonically increasing.")
         except json.JSONDecodeError:
             st.error("Invalid format for input brackets.")
             st.stop()
