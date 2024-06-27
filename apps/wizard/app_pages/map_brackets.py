@@ -359,9 +359,6 @@ class MapBracketer:
                 bracket_min, bracket_max + increment, increment
             ).astype(float)
 
-        # Add an option for custom brackets, manually input by the user.
-        # brackets_all[BRACKET_LABELS["custom"]["custom"]] = brackets_all[self.bracket_type]
-
         return brackets_all
 
     def _get_dispersion_for_all_windows_for_given_brackets(self, brackets):
@@ -616,19 +613,23 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     )
 
     # Select bracket type.
-    bracket_type_options = (
-        list(BRACKET_LABELS["log"].values())
+    bracket_type_labels = {
+        value: value
+        for value in list(BRACKET_LABELS["log"].values())
         + list(BRACKET_LABELS["linear"].values())
         + list(BRACKET_LABELS["custom"].values())
-    )
-    mb.bracket_type = st.radio(  # type: ignore
+    }
+    # Add optimal choice.
+    bracket_type_labels[f"Optimal ({mb.brackets_optimal['optimal']})"] = mb.brackets_optimal["optimal"]
+    # Create a bracket type selector with radio buttons.
+    # NOTE: By default, the last option will be selected, which is expected to be the optimal one (the last element in bracket_type_labels, defined above).
+    bracket_type = st.radio(
         "Select linear or log-like",
-        options=bracket_type_options,
-        index=[
-            i for i, bracket_type in enumerate(bracket_type_options) if bracket_type == mb.brackets_optimal["optimal"]
-        ][0],
+        options=bracket_type_labels,
+        index=len(bracket_type_labels) - 1,
         horizontal=True,
     )
+    mb.bracket_type = bracket_type_labels[bracket_type]  # type: ignore
     if mb.bracket_type == BRACKET_LABELS["custom"]["custom"]:
         # Create an input text box for custom brackets.
         try:
