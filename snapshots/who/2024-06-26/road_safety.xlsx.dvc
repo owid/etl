@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global status report on road safety
+    description: |-
+      The Global status report on road safety 2023 details the scale of global road traffic deaths, and progress in advancing laws, strategies and actions to reduce them around the world. 
+    date_published: "2023"
+    version_producer: 2023
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Global status report on road safety 2023. Geneva: World Health Organization;
+      2023. Licence: CC BY-NC-SA 3.0 IGO
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.who.int/teams/social-determinants-of-health/safety-and-mobility/global-status-report-on-road-safety-2023
+    url_download: https://cdn.who.int/media/docs/default-source/documents/health-topics/road-traffic-injuries/gsrrs23-indicators-for-participating-countries-or-territories.xlsx
+    date_accessed: 2024-06-26
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+
+outs:
+  - md5: 5a47e509527c0909dd89d72573b43550
+    size: 170222
+    path: road_safety.xlsx
