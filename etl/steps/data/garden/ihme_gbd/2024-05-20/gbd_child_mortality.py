@@ -86,7 +86,14 @@ def under_five_death_rate_india(tb: Table) -> Table:
     https://ourworldindata.org/grapher/child-deaths-by-cause-by-sex-india
 
     """
-    tb_india = tb[(tb["country"] == "India") & (tb["age"] == "<5 years") & (tb["metric"] == "Rate")]
+    tb_india = tb[
+        (tb["measure"] == "Deaths")
+        & (tb["country"] == "India")
+        & (tb["age"] == "<5 years")
+        & (tb["metric"] == "Rate")
+        & (tb["year"] == tb["year"].max())
+    ]
+    tb_india = tb_india[["year", "cause", "value", "sex"]].copy()
     tb_india = tb_india.rename(columns={"value": "under_five_death_rate", "cause": "country"})
     # pivot by sex
 
