@@ -39,6 +39,8 @@ def run(dest_dir: str) -> None:
     tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
     tb_deaths = ds_meadow["deaths"].reset_index()
     tb_death_rate = ds_meadow["death_rate"].reset_index()
+    tb_births = ds_meadow["births"].reset_index()
+    tb_birth_rate = ds_meadow["birth_rate"].reset_index()
     tb_median_age = ds_meadow["median_age"].reset_index()
 
     #
@@ -48,15 +50,24 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
+    del tb_migration_rate
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
+    del tb_death_rate
+    tb_births = process_births(tb_births, tb_birth_rate)
+    del tb_birth_rate
     tb_median_age = process_standard(tb_median_age)
+    tb_fertility = process_standard(tb_fertility)
 
     # Drop 55-59 age group in fertility (is all zero!)
-    tb_fertility = process_standard(tb_fertility)
     assert (
         tb_fertility.loc[tb_fertility["age"] == "55-59", "fertility_rate"] == 0
     ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
     tb_fertility = tb_fertility.loc[tb_fertility["age"] != "55-59"]
+    # Drop 55-59 age group in births (is all zero!)
+    assert (
+        tb_births.loc[tb_births["age"] == "55-59", "births"] == 0
+    ).all(), "Unexpected non-zero births values for age group 55-59."
+    tb_births = tb_births.loc[tb_births["age"] != "55-59"]
 
     # Split estimates vs. projections
     tb_population = set_variant_to_estimates(tb_population)
@@ -65,6 +76,7 @@ def run(dest_dir: str) -> None:
     tb_fertility = set_variant_to_estimates(tb_fertility)
     tb_migration = set_variant_to_estimates(tb_migration)
     tb_deaths = set_variant_to_estimates(tb_deaths)
+    tb_births = set_variant_to_estimates(tb_births)
     tb_median_age = set_variant_to_estimates(tb_median_age)
 
     # Particular processing
@@ -77,6 +89,7 @@ def run(dest_dir: str) -> None:
     tb_fertility = tb_fertility.format(COLUMNS_INDEX)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
+    tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
@@ -87,6 +100,7 @@ def run(dest_dir: str) -> None:
         tb_fertility,
         tb_migration,
         tb_deaths,
+        tb_births,
         tb_median_age,
     ]
 
@@ -165,6 +179,43 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
 
     # Scale
     tb["deaths"] *= 1000
+
+    # Merge
+    tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
+
+    return tb
+
+
+def process_births(tb: Table, tb_rate: Table) -> Table:
+    """Process the migration tables.
+
+    Clean the individual tables and combine them into one with two indicators.
+    """
+    # Basic processing
+    tb = process_standard(tb)
+    tb_rate = process_standard(tb_rate)
+
+    # Standardise sex dimension values
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+    tb = harmonize_dimension(
+        tb,
+        "age",
+        mapping={
+            "Total": "all",
+        },
+        strict=False,
+    )
+
+    # Scale
+    tb["births"] *= 1000
 
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")

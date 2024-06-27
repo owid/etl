@@ -52,14 +52,25 @@ tables:
 
   deaths:
     variables:
-      death_rate:
-        title: Death rate
-        unit: deaths per 1,000 people
-        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
       deaths:
         title: Deaths
         unit: deaths
         description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+      death_rate:
+        title: Death rate
+        unit: deaths per 1,000 people
+        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
+
+  births:
+    variables:
+      births:
+        title: Births
+        unit: births
+        description_short: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+      birth_rate:
+        title: Birth rate
+        unit: births per 1,000 people
+        description_short: Number of births over a given period divided by the person-years lived by the population over that period.
 
   median_age:
     variables:
