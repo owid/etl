@@ -43,6 +43,8 @@ steps:
     - snapshot-private://un/2024-07-11/un_wpp_deaths_age_male.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_death_rate.xlsx
     ## Births
+    - snapshot-private://un/2024-07-11/un_wpp_births_age.xlsx
+    - snapshot-private://un/2024-07-11/un_wpp_births_sex.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_birth_rate.xlsx
     ## Median age
     - snapshot-private://un/2024-07-11/un_wpp_median_age.xlsx
