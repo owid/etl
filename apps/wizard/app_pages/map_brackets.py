@@ -165,8 +165,7 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
     hist_sum = sum(hist)
     if (hist_len == 0) or (hist_sum == 0):
         return 1
-    sum_absolute_differences = sum(abs(x_i - x_j) for x_i in hist for x_j in hist)
-    gini = sum_absolute_differences / (2 * hist_len * hist_sum)
+    gini = sum(abs(x_i - x_j) for x_i in hist for x_j in hist) / (2 * hist_len * hist_sum)
 
     return gini
 
@@ -237,7 +236,7 @@ class MapBracketer:
 
         if reload_rank:
             # Get optimal brackets for all bracket types.
-            self.brackets_df = self._rank_all_brackets()
+            self.brackets_df = self._get_bracket_score()
 
         if reload_optimal_brackets:
             # Create a dictionary with the optimal brackets of all types.
@@ -415,16 +414,50 @@ class MapBracketer:
 
         return ranking
 
-    def _rank_all_brackets(self):
-        #  We can also have a button "Choose optimal" (or two, one in general, and another for this bracket type).
+    def _get_bracket_score(self):
         df = pd.DataFrame()
         for bracket_type, brackets in self.brackets_all.items():
             _df = self._get_dispersion_for_all_windows_for_given_brackets(brackets=brackets)
             _df["bracket_type"] = bracket_type
             df = pd.concat([df, _df], ignore_index=True)
-        rank = df.sort_values("dispersion").reset_index(drop=True)
 
-        return rank
+        # There are different criteria to select the optimal score.
+        # (1) Countries should be as equally distributed among bins as possible.
+        #  For that, we create the "score_dispersion": The closer to 1, the more homogeneous the bins are.
+        # (2) Each bin should contain as few countries as possible.
+        #  For that, we create the "score_histogram": The closer to 1, the smaller the number of countries per bin is.
+
+        # The final score should be a combination of both.
+
+        # A simple way to obtain the optimal brackets is to choose the configuration with minimum dispersion.
+        # That would give the brackets where countries are most homogeneously distributed.
+        # However, this could happen with very few brackets (usually the minimum, 4).
+        # But we want as few countries in each bracket as possible, so that brackets are as informative as possible.
+
+        # Alternatively, we could define a score that is 0.5 when the number of brackets is MIN_NUM_BRACKETS, and 1 when it is MAX_NUM_BRACKETS.
+        # This would strongly reward brackets with MAX_NUM_BRACKETS.
+        # df["n_bins"] = df["histogram"].apply(len)
+        # df["score_bins"] = (df["n_bins"] + MAX_NUM_BRACKETS - 2 * MIN_NUM_BRACKETS)/( 2 * (MAX_NUM_BRACKETS - MIN_NUM_BRACKETS))
+
+        # In the end, the score is defined as follows:
+        # def score(hist):
+        #     norm = sum(hist)
+        #     return (1 - max(hist)/norm) * (1 - min(hist)/norm) * (1 - dispersion(hist))
+
+        # Get the minimum and maximum value in each histogram.
+        histogram_min = df["histogram"].apply(min)
+        histogram_max = df["histogram"].apply(max)
+        histogram_sum = df["histogram"].apply(sum).unique()
+        assert len(histogram_sum) == 1, "Unexpected error in histograms: Sums do not add up to the same number."
+        norm = histogram_sum[0]
+        df["score_histogram"] = (1 - histogram_min / norm) * (1 - histogram_max / norm)
+        df["score_dispersion"] = 1 - df["dispersion"]
+        df["score"] = df["score_histogram"] * df["score_dispersion"]
+
+        # Sort the resulting dataframe by score from highest to lowest.
+        df = df.sort_values("score", ascending=False).reset_index(drop=True)
+
+        return df
 
     def get_optimal_brackets(self):
         # Get the best brackets for each bracket type.
@@ -795,6 +828,8 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 899976
     # The following also causes issues (because the latest year only has zeros).
     # variable_id = 899859
+    # TODO: The following fails (I haven't checked why).
+    # variable_id = 899768
 
     # Initialize map bracketer.
     mb = MapBracketer(variable_id=variable_id)  # type: ignore
