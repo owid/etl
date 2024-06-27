@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 from owid.catalog import VariableMeta
+from tqdm import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -43,11 +44,12 @@ def run(dest_dir: str) -> None:
             long_definition[indicator] = ""
 
     tb["long_description"] = tb["indicator_label_en"].map(long_definition)
+    tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
 
     # Pivot the table to have the indicators as columns to add descriptions from producer
-    tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_id", values="value")
+    tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
 
-    for column in tb_pivoted.columns:
+    for column in tqdm(tb_pivoted.columns):
         meta = tb_pivoted[column].metadata
         meta.display = {}
         long_definition = tb["long_description"].loc[tb["indicator_label_en"] == column]
