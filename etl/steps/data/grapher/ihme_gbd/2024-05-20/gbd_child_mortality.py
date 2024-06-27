@@ -16,13 +16,14 @@ def run(dest_dir: str) -> None:
     tb_deaths = ds_garden["gbd_child_mortality_deaths"]
     tb_dalys = ds_garden["gbd_child_mortality_dalys"]
     tb_deaths_slope = ds_garden["gbd_child_mortality_slope"]
+    tb_india = ds_garden["gbd_child_mortality_india"]
 
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
         dest_dir,
-        tables=[tb_deaths, tb_dalys, tb_deaths_slope],
+        tables=[tb_deaths, tb_dalys, tb_deaths_slope, tb_india],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )
