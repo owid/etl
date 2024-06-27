@@ -40,7 +40,10 @@ def run(dest_dir: str) -> None:
     # Split into two tables: one for deaths, one for DALYs
     tb_deaths = tb[tb["measure"] == "Deaths"].copy()
     tb_deaths = add_additional_age_groups(tb_deaths)
+    # Creating a table where the disease is the entity - for total under 5 deaths by cause - for a specific chart
     tb_ent = disease_as_entity(tb_deaths)
+    # Creating a table where the disease is the entity - under 5 death rates for India - for a specific chart
+    tb_india = under_five_death_rate_india(tb_deaths)
     tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
     # Shorten the metric name for DALYs
     tb_dalys["measure"] = "DALYs"
@@ -60,6 +63,7 @@ def run(dest_dir: str) -> None:
         ["country", "year"],
         short_name="gbd_child_mortality_slope",
     )
+    tb_india = tb_india.format(["country", "year"], short_name="gbd_child_mortality_india")
 
     #
     # Save outputs.
@@ -67,13 +71,30 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_deaths, tb_dalys, tb_ent],
+        tables=[tb_deaths, tb_dalys, tb_ent, tb_india],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def under_five_death_rate_by_cause(tb: Table) -> Table:
+    """
+    Creating the data format needed for this chart:
+    https://ourworldindata.org/grapher/child-deaths-by-cause-by-sex-india
+
+    """
+    tb_india = tb[(tb["country"] == "India") & (tb["age"] == "<5 years") & (tb["metric"] == "Rate")]
+    tb_india = tb_india.rename(columns={"value": "under_five_death_rate", "cause": "country"})
+    # pivot by sex
+
+    tb_pivot = tb_india.pivot(values=["under_five_death_rate"], index=["year", "country"], columns=["sex"])
+    tb_pivot.columns = ["_".join(col).strip() if isinstance(col, tuple) else col for col in tb_pivot.columns.values]
+    tb_pivot = tb_pivot.reset_index()
+
+    return tb_pivot
 
 
 def add_additional_age_groups(tb: Table) -> Table:
