@@ -80,7 +80,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def under_five_death_rate_by_cause(tb: Table) -> Table:
+def under_five_death_rate_india(tb: Table) -> Table:
     """
     Creating the data format needed for this chart:
     https://ourworldindata.org/grapher/child-deaths-by-cause-by-sex-india
