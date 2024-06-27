@@ -140,3 +140,23 @@ tables:
         description_short: The estimated number of deaths among boys under five years old, from each disease or injury, per 100,000 people.
         display:
           numDecimalPlaces: 1
+  gbd_child_mortality_infant:
+    variables:
+      infant_death_rate_both:
+        title: Infant mortality rate by cause for both sexes
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among children under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
+      infant_death_rate_female:
+        title: Infant mortality rate by cause for girls
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among girls under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
+      infant_death_rate_male:
+        title: Infant mortality rate by cause for boys
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among boys under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
