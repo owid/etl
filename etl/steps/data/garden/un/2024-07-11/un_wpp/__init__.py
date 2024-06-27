@@ -143,11 +143,6 @@ def process_population(tb: Table, tb_density: Table) -> Table:
     # Add population change
     tb = add_population_change(tb)
 
-    # Add population density
-    tb_density = process_standard(tb_density)
-    tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
-    del tb_density
-
     # Harmonize country names
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
 
@@ -166,6 +161,11 @@ def process_population(tb: Table, tb_density: Table) -> Table:
             "Total": "all",
         },
     )
+
+    # Add population density
+    tb_density = process_standard(tb_density)
+    tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
+    del tb_density
 
     return tb
 
