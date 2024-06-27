@@ -42,6 +42,7 @@ def run(dest_dir: str) -> None:
     tb_births = ds_meadow["births"].reset_index()
     tb_birth_rate = ds_meadow["birth_rate"].reset_index()
     tb_median_age = ds_meadow["median_age"].reset_index()
+    tb_le = ds_meadow["life_expectancy"].reset_index()
 
     #
     # Process data.
@@ -57,6 +58,7 @@ def run(dest_dir: str) -> None:
     del tb_birth_rate
     tb_median_age = process_standard(tb_median_age)
     tb_fertility = process_standard(tb_fertility)
+    tb_le = process_standard(tb_le)
 
     # Drop 55-59 age group in fertility (is all zero!)
     assert (
@@ -78,6 +80,7 @@ def run(dest_dir: str) -> None:
     tb_deaths = set_variant_to_estimates(tb_deaths)
     tb_births = set_variant_to_estimates(tb_births)
     tb_median_age = set_variant_to_estimates(tb_median_age)
+    tb_le = set_variant_to_estimates(tb_le)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -91,6 +94,7 @@ def run(dest_dir: str) -> None:
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
+    tb_le = tb_le.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
     tables = [
@@ -102,6 +106,7 @@ def run(dest_dir: str) -> None:
         tb_deaths,
         tb_births,
         tb_median_age,
+        tb_le,
     ]
 
     #
@@ -265,6 +270,22 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
 
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
+
+    return tb
+
+
+def process_le(tb: Table) -> Table:
+    """Process the life expectancy table."""
+    # Basic processing
+    tb = process_standard(tb)
+
+    assert set(tb["age"].unique()) == {str(i) for i in range(0, 100, 5)} | {"1", "100+"}, "Unexpected age values!"
+
+    # Replace 100+ with 100
+    tb["age"] = tb["age"].replace("100+", "100").astype(int)
+
+    # Estimate actual life expectancy (not years left)
+    tb["life_expectancy"] += tb["age"]
 
     return tb
 
