@@ -68,10 +68,7 @@ USE_TYPE_ETL = "by etl path"
 
 
 class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
-    """The selected range of values has a minimum and a maximum that are identical. This indicator should possibly not have a map chart."""
-
-    # TODO: The way this error appears could be relaxed. Maybe the problem happens only in the latest year, but we still want to have map brackets considering the full data for all years.
-    #  To improve this, we would need to catch this error after the selector of latest_year appears.
+    """The selected range of values has a minimum and a maximum that are identical. If you are considering only data from the latest year, you might want to consider all data instead and try again. Otherwise, this indicator should possibly not have a map chart."""
 
 
 @st.cache_data
@@ -207,8 +204,6 @@ class MapBracketer:
         self.values = pd.Series()
         self.min_value = -np.inf
         self.max_value = np.inf
-        # Run calculations that will select the relevant values in the data.
-        self.run()
 
     def run(
         self,
@@ -575,26 +570,26 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     )
 
     # Add toggle to control whether the brackets are based only on the data for the latest year, or all years.
-    latest_year = st.toggle("Consider only latest year", mb.latest_year)
-    if latest_year != mb.latest_year:
+    mb.latest_year = st.toggle("Consider only latest year", mb.latest_year)
+    if not mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
-        mb.latest_year = latest_year
-        try:
-            mb.run(
-                reload_data_values=True,
-                reload_openness=True,
-                reload_all_brackets=True,
-                reload_rank=True,
-                reload_optimal_brackets=True,
-            )
-        except Exception as e:
-            log.error(e)
-            st.error(e)
-            st.stop()
+
+    try:
+        mb.run(
+            reload_data_values=True,
+            reload_openness=True,
+            reload_all_brackets=True,
+            reload_rank=True,
+            reload_optimal_brackets=True,
+        )
+    except Exception as e:
+        log.error(e)
+        st.error(e)
+        st.stop()
 
     # Add toggles to control whether lower and upper brackets should be open.
     _message = ""
-    if latest_year:
+    if mb.latest_year:
         _message = "Note that, even if set to close, a bracket may still remain open."
         _message = " This happens when closing the bracket implies breaking the scale. For example, if the maximum data value is 100 and the scale is [0, 10, 20, 30, 40], closing the upper bracket would mean breaking the scale: [0, 10, 20, 30, 100], which is undesirable."
         if mb.latest_year:
@@ -800,9 +795,10 @@ elif use_type == USE_TYPE_EXPLORERS:
     # The following also causes issues (because the latest year only has zeros).
     # variable_id = 899859
 
+    # Initialize map bracketer.
+    mb = MapBracketer(variable_id=variable_id)  # type: ignore
+
     try:
-        # Initialize map bracketer.
-        mb = MapBracketer(variable_id=variable_id)  # type: ignore
         # Interact with map bracketer.
         map_bracketer_interactive(mb=mb)
     except Exception as e:
