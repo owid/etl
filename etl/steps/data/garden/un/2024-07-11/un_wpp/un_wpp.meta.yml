@@ -4,13 +4,18 @@ tables:
     variables:
       population:
         title: Population
-        unit: persons
+        unit: people
         description_short: De facto population in a country, area or region as of 1 July of the year indicated.
       population_change:
         title: Population change
-        unit: persons
+        unit: people
         description_short: |-
           Population yearly increment. This is the difference between the population on 1st of July of the year indicated and the population on 1st of July of the previous year.
+      population_density:
+        title: Population density
+        unit: people per square kilometer
+        short_unit: people/km²
+        description_short: Population density in a country, area or region as of 1 July of the year indicated.
 
   growth_rate:
     variables:

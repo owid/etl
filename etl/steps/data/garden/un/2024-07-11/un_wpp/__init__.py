@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, List, cast
+from typing import Any, List, Optional, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -10,7 +10,6 @@ import pandas as pd
 # from dep_ratio import process as process_depratio
 # from fertility import process as process_fertility
 from owid.catalog import Table
-from population import process as process_population
 from shared import harmonize_dimension
 
 from etl.data_helpers import geo
@@ -32,6 +31,7 @@ def run(dest_dir: str) -> None:
 
     # Load tables
     tb_population = ds_meadow["population"].reset_index()
+    tb_population_density = ds_meadow["population_density"].reset_index()
     tb_growth_rate = ds_meadow["growth_rate"].reset_index()
     tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
     tb_fertility = ds_meadow["fertility_rate"].reset_index()
@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_population = process_population(tb_population)
+    tb_population = process_population(tb_population, tb_population_density)
     tb_growth_rate = process_standard(tb_growth_rate)
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
@@ -117,6 +117,52 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def process_population(tb: Table, tb_density: Table) -> Table:
+    """Process the population table."""
+    paths.log.info("Processing population variables...")
+
+    # Sanity check
+    assert tb.notna().all(axis=None), "Some NaNs detected"
+
+    # Scale
+    tb["population"] *= 1000
+
+    # Remove location_type
+    tb = tb.drop(columns="location_type")
+
+    # Estimate age groups
+    tb = estimate_age_groups(tb)
+
+    # Add population change
+    tb = add_population_change(tb)
+
+    # Add population density
+    tb_density = process_standard(tb_density)
+    tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
+    del tb_density
+
+    # Harmonize country names
+    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+
+    # Harmonize dimensions
+    tb = harmonize_dimension(
+        tb,
+        "variant",
+        mapping={"Medium variant": "medium"},
+    )
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        {
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    return tb
 
 
 def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
@@ -256,6 +302,120 @@ def set_variant_to_estimates(tb: Table) -> Table:
     """For data before YEAR_SPLIT, make sure to have variant = 'estimates'."""
     tb["variant"] = tb["variant"].astype("string")
     tb.loc[tb["year"] < YEAR_SPLIT, "variant"] = "estimates"
+    return tb
+
+
+# Population
+def estimate_age_groups(tb: Table) -> Table:
+    """Estimate population values for all age groups."""
+    tb_ = tb.copy()
+
+    # List with all agge groups
+    tbs = []
+
+    # 1/ Basic age groups
+    age_map = {
+        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{"100+": "100+"},
+    }
+    tb_basic = tb_.assign(age=tb_.age.map(age_map))
+    tb_basic = tb_basic.groupby(
+        ["country", "year", "sex", "age", "variant"],
+        as_index=False,
+        observed=True,
+    )["population"].sum()
+    tbs.append(tb_basic)
+
+    # 2/ Additional age groups (NOTE: they are not disjoint!)
+    age_groups = [
+        0,
+        1,
+        (1, 4),  # 1-4
+        (0, 14),  # 0-14
+        (0, 24),  # 0-24
+        (5, 14),  # 5-14
+        (15, 24),  # 15-24
+        (15, 64),  # 15-64
+        (20, 29),  # 20-29
+        (25, 64),  # 25-64
+        (30, 39),  # 30-39
+        (40, 49),  # 40-49
+        (50, 59),  # 50-59
+        (60, 69),  # 60-69
+        (70, 79),  # 70-79
+        (80, 89),  # 80-89
+        (90, 99),  # 90-99
+        (15, 200, "15+"),  # 15+
+        (18, 200, "18+"),  # 18+
+        (65, 200, "65+"),  # 65+
+    ]
+    for age_group in age_groups:
+        if isinstance(age_group, int):
+            tb_age = tb_[tb_.age == str(age_group)].copy()
+        else:
+            tb_age = _add_age_group(tb_, *age_group)
+
+        tbs.append(tb_age)
+
+    # 3/ All-age group
+    tb_all = (
+        tb_.groupby(
+            ["country", "year", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )["population"]
+        .sum()
+        .assign(age="all")
+    )
+    tbs.append(tb_all)
+
+    # 4/ Merge all age groups
+    tb_population = pr.concat(
+        tbs,
+        ignore_index=True,
+    )
+
+    return tb_population
+
+
+def _add_age_group(tb: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
+    """Estimate a new age group."""
+    # Get subset of entries, apply groupby-sum if needed
+    if age_min == age_max:
+        tb_age = tb.loc[tb["age"] == str(age_min)].copy()
+    else:
+        ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
+        tb_age = tb.loc[tb["age"].isin(ages_accepted)].drop(columns="age").copy()
+
+        tb_age = tb_age.groupby(
+            ["country", "year", "sex", "variant"],
+            as_index=False,
+            observed=True,
+        )["population"].sum()
+
+    # Assign age group name
+    if age_group:
+        tb_age["age"] = age_group
+    else:
+        tb_age["age"] = f"{age_min}-{age_max}"
+
+    return tb_age
+
+
+def add_population_change(tb: Table) -> Table:
+    """Estimate anual population change."""
+    column_pop_change = "population_change"
+
+    # Sort by year
+    tb.sort_values("year")
+
+    # Estimate population change
+    pop_change = tb.groupby(["country", "sex", "age", "variant"])["population"].diff()
+    tb[column_pop_change] = pop_change
+
+    # Sanity check
+    assert (years := set(tb[tb[column_pop_change].isna()]["year"])) == {1950}, f"Other than year 1950 detected: {years}"
+
     return tb
 
 
