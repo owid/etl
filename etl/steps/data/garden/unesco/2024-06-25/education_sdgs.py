@@ -44,6 +44,8 @@ def run(dest_dir: str) -> None:
             long_definition[indicator] = ""
 
     tb["long_description"] = tb["indicator_label_en"].map(long_definition)
+    # Drop rows with missing indicator labels
+    tb = tb[tb["indicator_label_en"].notna()]
     tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
 
     # Pivot the table to have the indicators as columns to add descriptions from producer
