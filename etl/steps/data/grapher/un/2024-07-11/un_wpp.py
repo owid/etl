@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
         ds_garden["deaths"],
         ds_garden["births"],
         ds_garden["median_age"],
+        ds_garden["life_expectancy"],
     ]
     #
     # Save outputs.
