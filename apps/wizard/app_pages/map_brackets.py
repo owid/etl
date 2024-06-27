@@ -203,6 +203,7 @@ class MapBracketer:
         self.values = pd.Series()
         self.min_value = -np.inf
         self.max_value = np.inf
+        self.percentiles_ignored = False
 
     def run(
         self,
@@ -343,7 +344,13 @@ class MapBracketer:
         # smallest_increment = (self.max_value - self.min_value) / (MAX_NUM_BRACKETS)
         _min_value = np.percentile(self.values, self.percentile_min)
         _max_value = np.percentile(self.values, self.percentile_max)
+
         smallest_increment = (_max_value - _min_value) / (MAX_NUM_BRACKETS)
+        if smallest_increment == 0:
+            smallest_increment = (self.min_value - self.max_value) / (MAX_NUM_BRACKETS)
+            self.percentiles_ignored = True
+        else:
+            self.percentiles_ignored = False
 
         shifts = [1, 2, 5]
         for shift in shifts:
@@ -354,9 +361,14 @@ class MapBracketer:
             # Find the smallest bracket that would fully cover the maximum data value.
             bracket_max = increment * np.ceil(self.max_value / increment).astype(int)
             # Create map brackets linearly spaced.
-            brackets_all[BRACKET_LABELS["linear"][str(shift)]] = np.arange(
-                bracket_min, bracket_max + increment, increment
-            ).astype(float)
+            # NOTE: Here, we add two increments to ensure the output always has at least MIN_NUM_BRACKETS.
+            #  This may need to be rethought.
+            bracket_values = np.arange(bracket_min, bracket_max + increment * 2, increment).astype(float)
+            if len(bracket_values) == 0:
+                # If no brackets are possible, then fill the brackets with the minimum and maximum values possible, and
+                # zeros in between.
+                bracket_values = [self.min_value] + [0] * (MIN_NUM_BRACKETS - 1) + [self.max_value]
+            brackets_all[BRACKET_LABELS["linear"][str(shift)]] = bracket_values
 
         return brackets_all
 
@@ -644,6 +656,10 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         reload_rank=True,
         reload_optimal_brackets=True,
     )
+    if mb.percentiles_ignored:
+        st.warning(
+            "Minimum and maximum percentiles are identical. Percentiles are ignored. Consider broadening the percentile range."
+        )
 
     # Select bracket type.
     bracket_type_labels = {
@@ -828,7 +844,7 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 899976
     # The following also causes issues (because the latest year only has zeros).
     # variable_id = 899859
-    # TODO: The following fails (I haven't checked why).
+    # The following fails (because 5th and 95th percentiles coincide).
     # variable_id = 899768
 
     # Initialize map bracketer.
