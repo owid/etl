@@ -237,8 +237,7 @@ class MapBracketer:
 
         if reload_rank:
             # Get optimal brackets for all bracket types.
-            # TODO: Rename.
-            self.rank = self.rank_all_brackets()
+            self.brackets_df = self._rank_all_brackets()
 
         if reload_optimal_brackets:
             # Create a dictionary with the optimal brackets of all types.
@@ -419,7 +418,7 @@ class MapBracketer:
 
         return ranking
 
-    def rank_all_brackets(self):
+    def _rank_all_brackets(self):
         #  We can also have a button "Choose optimal" (or two, one in general, and another for this bracket type).
         df = pd.DataFrame()
         for bracket_type, brackets in self.brackets_all.items():
@@ -432,7 +431,7 @@ class MapBracketer:
 
     def get_optimal_brackets(self):
         # Get the best brackets for each bracket type.
-        rank = self.rank.drop_duplicates(subset="bracket_type", keep="first").reset_index(drop=True)
+        rank = self.brackets_df.drop_duplicates(subset="bracket_type", keep="first").reset_index(drop=True)
 
         # Create a dictionary.
         _brackets_all_optimal = rank.set_index("bracket_type").to_dict()["brackets"]
