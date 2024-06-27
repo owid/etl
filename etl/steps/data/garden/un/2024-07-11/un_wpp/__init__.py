@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     del tb_birth_rate
     tb_median_age = process_standard(tb_median_age)
     tb_fertility = process_standard(tb_fertility)
-    tb_le = process_standard(tb_le)
+    tb_le = process_le(tb_le)
 
     # Drop 55-59 age group in fertility (is all zero!)
     assert (

@@ -13,7 +13,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def process(tb: Table) -> Table:
+def process(tb: Table, tb_density: Table) -> Table:
     """Process the population table."""
     paths.log.info("Processing population variables...")
 
