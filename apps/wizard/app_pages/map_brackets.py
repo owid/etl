@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 import streamlit as st
 from owid.catalog import find
+from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -64,6 +65,13 @@ BRACKET_LABELS = {
 USE_TYPE_EXPLORERS = "by explorer"
 USE_TYPE_CHART = "by chart"
 USE_TYPE_ETL = "by etl path"
+
+
+class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
+    """The selected range of values has a minimum and a maximum that are identical. This indicator should possibly not have a map chart."""
+
+    # TODO: The way this error appears could be relaxed. Maybe the problem happens only in the latest year, but we still want to have map brackets considering the full data for all years.
+    #  To improve this, we would need to catch this error after the selector of latest_year appears.
 
 
 @st.cache_data
@@ -193,6 +201,12 @@ class MapBracketer:
         self.percentile_max = MAX_PERCENTILE
         # Define the bracket type (by default, pick an arbitrary one).
         self.bracket_type = BRACKET_LABELS["log"]["x10"]
+        # Define all remaining attributes with arbitrary values (they will be updated by self.run()).
+        self.lower_bracket_open = False
+        self.upper_bracket_open = True
+        self.values = pd.Series()
+        self.min_value = -np.inf
+        self.max_value = np.inf
         # Run calculations that will select the relevant values in the data.
         self.run()
 
@@ -215,19 +229,26 @@ class MapBracketer:
             # Get minimum and maximum values in the data.
             self.min_value = self.values.min()
             self.max_value = self.values.max()
+            if self.min_value == self.max_value:
+                raise EqualMinimumAndMaximumValues()
+
         if reload_openness:
             # Estimate whether the lower and upper brackets should be open.
             self.lower_bracket_open, self.upper_bracket_open = self.are_brackets_open()
+
         if reload_all_brackets:
             # Get the most complete list of map brackets that would fully contain the data.
             self.brackets_all = self.get_all_brackets()
+
         if reload_rank:
             # Get optimal brackets for all bracket types.
             # TODO: Rename.
             self.rank = self.rank_all_brackets()
+
         if reload_optimal_brackets:
             # Create a dictionary with the optimal brackets of all types.
             self.brackets_optimal = self.get_optimal_brackets()
+
         # Define default selected brackets (which will be updated later on).
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the "grapher version" of the selected brackets, which needs a minimum value and a list of brackets.
@@ -558,13 +579,19 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     if latest_year != mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
         mb.latest_year = latest_year
-        mb.run(
-            reload_data_values=True,
-            reload_openness=True,
-            reload_all_brackets=True,
-            reload_rank=True,
-            reload_optimal_brackets=True,
-        )
+        try:
+            mb.run(
+                reload_data_values=True,
+                reload_openness=True,
+                reload_all_brackets=True,
+                reload_rank=True,
+                reload_optimal_brackets=True,
+            )
+        except Exception as e:
+            log.error(e)
+            st.error(e)
+            st.stop()
+
     # Add toggles to control whether lower and upper brackets should be open.
     _message = ""
     if latest_year:
@@ -770,13 +797,18 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 900950
     # The following may have nans that cause issues.
     # variable_id = 899976
-    # The following also causes issues (I haven't checked why).
+    # The following also causes issues (because the latest year only has zeros).
     # variable_id = 899859
 
-    # Initialize map bracketer.
-    mb = MapBracketer(variable_id=variable_id)  # type: ignore
-
-    map_bracketer_interactive(mb=mb)
+    try:
+        # Initialize map bracketer.
+        mb = MapBracketer(variable_id=variable_id)  # type: ignore
+        # Interact with map bracketer.
+        map_bracketer_interactive(mb=mb)
+    except Exception as e:
+        log.error(e)
+        st.error(e)
+        st.stop()
 
     if st.button("Save brackets in explorer file", type="primary"):
         update_explorer_file(mb=mb, explorer=explorer)
