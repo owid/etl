@@ -568,12 +568,15 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Add toggles to control whether lower and upper brackets should be open.
     _message = ""
     if latest_year:
-        _message = "Note that, even if set to close, it may still remain open if a value in a previous year exceeds the current bracket."
+        _message = "Note that, even if set to close, a bracket may still remain open."
+        _message = " This happens when closing the bracket implies breaking the scale. For example, if the maximum data value is 100 and the scale is [0, 10, 20, 30, 40], closing the upper bracket would mean breaking the scale: [0, 10, 20, 30, 100], which is undesirable."
+        if mb.latest_year:
+            _message += " Also, it is possible that a value in a previous year exceeds the current brackets. For example, suppose the maximum data value for the latest year is 35, and brackets are [0, 10, 20, 30, 40]. The maximum bracket will still remain open if the maximum data value in a previous year is larger than 40."
     mb.lower_bracket_open = st.toggle("Lower bracket open", mb.lower_bracket_open, help=_message)
     mb.upper_bracket_open = st.toggle("Upper bracket open", mb.upper_bracket_open, help=_message)
     mb.run(
         reload_data_values=False,
-        reload_openness=True,
+        reload_openness=False,
         reload_all_brackets=True,
         reload_rank=True,
         reload_optimal_brackets=True,
