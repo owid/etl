@@ -8,7 +8,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
 from tabulate import tabulate
@@ -373,5 +372,5 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
     return tb
 
 
-def _tabulate(df: pd.DataFrame, headers="keys", tablefmt=TABLEFMT, **kwargs):
-    return tabulate(df.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
+def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)

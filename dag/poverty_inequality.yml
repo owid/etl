@@ -9,7 +9,7 @@ steps:
   data://explorers/poverty_inequality/latest/poverty_inequality_export:
     - data://garden/wb/2024-03-27/world_bank_pip
     - data://garden/wid/2024-05-24/world_inequality_database
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/lis/2024-06-13/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
@@ -42,22 +42,22 @@ steps:
     - data://garden/wid/2024-05-24/world_inequality_database
 
   # Luxembourg Income Study
-  data://meadow/lis/2023-08-30/luxembourg_income_study:
-    - snapshot://lis/2023-08-30/lis_keyvars.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty.csv
-    - snapshot://lis/2023-08-30/lis_distribution.csv
-    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
-    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
-    - snapshot://lis/2023-08-30/lis_percentiles.csv
-    - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
+  data://meadow/lis/2024-06-13/luxembourg_income_study:
+    - snapshot://lis/2024-06-13/lis_keyvars.csv
+    - snapshot://lis/2024-06-13/lis_distribution_adults.csv
+    - snapshot://lis/2024-06-13/lis_keyvars_adults.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty.csv
+    - snapshot://lis/2024-06-13/lis_distribution.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
+    - snapshot://lis/2024-06-13/lis_percentiles.csv
+    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2023-08-30/luxembourg_income_study:
-    - data://meadow/lis/2023-08-30/luxembourg_income_study
-  data://grapher/lis/2023-08-30/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+  data://garden/lis/2024-06-13/luxembourg_income_study:
+    - data://meadow/lis/2024-06-13/luxembourg_income_study
+  data://grapher/lis/2024-06-13/luxembourg_income_study:
+    - data://garden/lis/2024-06-13/luxembourg_income_study
   data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/lis/2024-06-13/luxembourg_income_study
 
   # Multidimensional Poverty Index
   data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
@@ -117,3 +117,53 @@ steps:
     - data://meadow/oecd/2024-04-30/affordable_housing_database
   data://grapher/oecd/2024-04-30/affordable_housing_database:
     - data://garden/oecd/2024-04-30/affordable_housing_database
+
+  # Inequality data from France (INSEE)
+  # 1999 report
+  data://meadow/insee/2024-03-21/inequality_france_1999:
+    - snapshot://insee/2024-03-21/inequality_france_1999.csv
+  data://garden/insee/2024-03-21/inequality_france_1999:
+    - data://meadow/insee/2024-03-21/inequality_france_1999
+  # 2021 report
+  data://meadow/insee/2024-04-25/insee_premiere_1875:
+    - snapshot://insee/2024-04-25/insee_premiere_1875.xlsx
+  data://garden/insee/2024-04-25/insee_premiere_1875:
+    - data://meadow/insee/2024-04-25/insee_premiere_1875
+  # Key figures (inequality) - live version
+  data://meadow/insee/2024-04-05/inequality_france:
+    - snapshot://insee/2024-04-05/inequality_france.xlsx
+  data://garden/insee/2024-04-05/inequality_france:
+    - data://meadow/insee/2024-04-05/inequality_france
+  # Key figures (relative poverty) - live version
+  data://meadow/insee/2024-04-26/relative_poverty_france:
+    - snapshot://insee/2024-04-26/relative_poverty_france.xlsx
+  data://garden/insee/2024-04-26/relative_poverty_france:
+    - data://meadow/insee/2024-04-26/relative_poverty_france
+  # Interdecile ratio for net salary (version 2022)
+  data://meadow/insee/2024-05-23/interdecile_ratio_2022:
+    - snapshot://insee/2024-05-23/interdecile_ratio_2022.csv
+  data://garden/insee/2024-05-23/interdecile_ratio_2022:
+    - data://meadow/insee/2024-05-23/interdecile_ratio_2022
+  # Interdecile ratio for net salary (live version)
+  data://meadow/insee/2024-05-23/interdecile_ratio:
+    - snapshot://insee/2024-05-23/interdecile_ratio.csv
+  data://garden/insee/2024-05-23/interdecile_ratio:
+    - data://meadow/insee/2024-05-23/interdecile_ratio
+
+  # France historical Ginis (Concialdi, 1997)
+  data://meadow/chartbook/2024-04-22/concialdi:
+    - snapshot://chartbook/2024-04-22/concialdi.csv
+  data://garden/chartbook/2024-04-22/concialdi:
+    - data://meadow/chartbook/2024-04-22/concialdi
+
+  # UNU-WIDER World Income Inequality Database (WIID)
+  data://meadow/unu_wider/2024-04-22/world_income_inequality_database:
+    - snapshot://unu_wider/2024-04-22/world_income_inequality_database.xlsx
+  data://garden/unu_wider/2024-04-22/world_income_inequality_database:
+    - data://meadow/unu_wider/2024-04-22/world_income_inequality_database
+
+  # Wealth inequalith in France (Piketty et al. 2006)
+  data://meadow/chartbook/2024-05-23/wealth_france:
+    - snapshot://chartbook/2024-05-23/wealth_france.csv
+  data://garden/chartbook/2024-05-23/wealth_france:
+    - data://meadow/chartbook/2024-05-23/wealth_france

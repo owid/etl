@@ -18,7 +18,7 @@ import sys
 from copy import deepcopy
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
 import streamlit as st
@@ -117,6 +117,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+# Session state to track staging creation time
+VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
 
 
 def get_namespaces(step_type: str) -> List[str]:
@@ -603,7 +605,7 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not_exists: bool = False) -> None:
+def set_states(states_values: Dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
     """Set states from any key in dictionary.
 
     Set logging to true to log the state changes
@@ -611,7 +613,7 @@ def set_states(states_values: Dict[str, Any], logging: bool = False, only_if_not
     for key, value in states_values.items():
         if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
-        if only_if_not_exists:
+        if also_if_not_exists:
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
@@ -673,63 +675,77 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     chart_config_tmp = deepcopy(chart_config)
 
     chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
     chart_config_tmp["adminBaseUrl"] = owid_env.base_site
     chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
+    # HTML = f"""
+    # <!DOCTYPE html>
+    # <html>
+    #     <head>
+    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
+    #         <link
+    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+    #         rel="stylesheet"
+    #         />
+    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    #     </head>
+    #     <body class="StandaloneGrapherOrExplorerPage">
+    #         <main>
+    #             <figure data-grapher-src></figure>
+    #         </main>
+    #         <div class="site-tools"></div>
+    #         <script>
+    #             document.cookie = "isAdmin=true;max-age=31536000"
+    #         </script>
+    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+    #         <script type="module">
+    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+    #         </script>
+    #     </body>
+    # </html>
+    # """
+
     HTML = f"""
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link
-            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-            rel="stylesheet"
-            />
-            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-        </head>
-        <body class="StandaloneGrapherOrExplorerPage">
-            <main>
-                <figure data-grapher-src></figure>
-            </main>
-            <div class="site-tools"></div>
-            <script>
-                document.cookie = "isAdmin=true;max-age=31536000"
-            </script>
-            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-            <script type="module">
-                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-            </script>
-        </body>
-    </html>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    <div class="StandaloneGrapherOrExplorerPage">
+        <main>
+            <figure data-grapher-src></figure>
+        </main>
+        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
+        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+        <script type="module">
+            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+        </script>
+    </div>
     """
 
     components.html(HTML, height=height, **kwargs)
 
 
 class Pagination:
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str):
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-
+        # Action to perform when interacting with any of the buttons.
+        ## Example: Change the value of certain state in session_state
+        self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
             self.page = 1
 
     @property
     def page(self):
-        # value = min(self.total_pages, st.session_state[self.pagination_key])
         value = st.session_state[self.pagination_key]
         return value
 
     @page.setter
     def page(self, value):
-        # Correct page number if exceeds maximum allowed
-
         st.session_state[self.pagination_key] = value
 
     @property
@@ -742,9 +758,17 @@ class Pagination:
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self) -> None:
+    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
+        if mode == "bar":
+            self.show_controls_bar()
+        elif mode == "buttons":
+            self.show_controls_buttons()
+        else:
+            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+
+    def show_controls_buttons(self):
         # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
             with col1:
@@ -752,6 +776,8 @@ class Pagination:
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
                         self.page -= 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
@@ -761,6 +787,8 @@ class Pagination:
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
                         self.page += 1
+                        if self.on_click is not None:
+                            self.on_click()
                         st.rerun()
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
@@ -768,29 +796,60 @@ class Pagination:
             with col2:
                 st.text(f"Page {self.page} of {self.total_pages}")
 
+    def show_controls_bar(self) -> None:
+        def _change_page():
+            # Internal action
 
-def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
+            # External action
+            if self.on_click is not None:
+                self.on_click()
+
+        col, _ = st.columns([1, 3])
+        with col:
+            st.number_input(
+                label=f"**Go to page** (total: {self.total_pages})",
+                min_value=1,
+                max_value=self.total_pages,
+                # value=self.page,
+                on_change=_change_page,
+                key=self.pagination_key,
+            )
+
+
+def _get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     query_ts = "show table status like 'charts'"
-
-    if session:
-        df = read_sql(query_ts, session)
-    else:
-        with Session(OWID_ENV.engine) as source_session:
-            df = read_sql(query_ts, source_session)
+    df = read_sql(query_ts, session)
     assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
-
     create_time = df["Create_time"].item()
-
-    if key not in st.session_state:
-        st.session_state[key] = create_time
-
     return create_time
 
 
-def set_staging_creation_time(key: str = "server_creation_time") -> None:
+def get_staging_creation_time(session: Optional[Session] = None):
+    """Get staging server creation time."""
+    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
+        set_staging_creation_time(session)
+    return st.session_state[VARNAME_STAGING_CREATION_TIME]
+
+
+def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
     """Gest staging server creation time estimate."""
-    if OWID_ENV.env_local == "staging":
-        st.session_state[key] = get_staging_creation_time()
+
+    if session is None:
+        if OWID_ENV.env_local == "staging":
+            with Session(OWID_ENV.engine) as session:
+                st.session_state[key] = _get_staging_creation_time(session)
+        else:
+            st.session_state[key] = None
     else:
-        st.session_state[key] = None
+        st.session_state[key] = _get_staging_creation_time(session)
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")

@@ -230,13 +230,10 @@ def create_long_dataset(df_current, df_historical):
 
     # Fill start_date_formatted with START_YEAR if it is null
     df_current.loc[df_current["start_date_formatted"].isnull(), "date_modified"] = True
-    df_current.loc[df_current["start_date_formatted"].isnull(), "start_date_formatted"] = f"Jan 1, {START_YEAR}"
+    df_current.loc[df_current["start_date_formatted"].isnull(), "start_date_formatted"] = f"Jan 1, {CURRENT_YEAR}"
 
     # Get year after comma in the column name start_date_formatted
     df_current["year_start"] = df_current["start_date_formatted"].str.extract(REGEX_PATTERN, expand=False).astype(int)
-
-    # Obtain current year
-    current_year = datetime.datetime.now().year
 
     # Create dataframe filling the years between year_start and year_end
 
@@ -245,7 +242,7 @@ def create_long_dataset(df_current, df_historical):
         df_country_issue = pd.DataFrame(
             {
                 "country": df_current.iloc[i]["country"],
-                "year": range(df_current.iloc[i]["year_start"], current_year + 1),
+                "year": range(df_current.iloc[i]["year_start"], CURRENT_YEAR + 1),
                 "issue": df_current.iloc[i]["issue"],
                 "id": df_current.iloc[i]["id"],
                 "value": df_current.iloc[i]["value"],

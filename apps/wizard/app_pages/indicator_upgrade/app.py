@@ -28,7 +28,7 @@ from structlog import get_logger
 from apps.wizard import utils
 from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
-from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import ask_and_get_indicator_mapping
+from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets, get_schema
 from etl.match_variables import SIMILARITY_NAMES
 
@@ -53,7 +53,6 @@ st.set_page_config(
     },
 )
 st.title("Indicator 🧬 **:gray[Upgrader]**")
-st.warning("This tool is being developed! Please report any issues you encounter in #proj-new-data-workflow")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
 
 # Get all datasets
@@ -68,7 +67,7 @@ utils.set_states(
         "submitted_charts": False,
         "indicator_mapping": {},
     },
-    only_if_not_exists=True,
+    also_if_not_exists=True,
 )
 # Avoid "unbound" errors
 old_var_selectbox = []
@@ -77,8 +76,7 @@ ignore_selectbox = []
 charts = []
 updaters = []
 num_charts = 0
-indicator_mapping = {}
-indicator_config = None
+indicator_mapping = None
 submission_config = None
 
 
@@ -112,7 +110,6 @@ st.session_state.show_step_name = st.session_state.get("show_step_name", False)
 with st.container(border=True):
     search_form = build_dataset_form(DATASETS, SIMILARITY_NAMES)
 
-
 ##########################################################################################
 # 2 INDICATORS MAPPING
 #
@@ -122,37 +119,45 @@ with st.container(border=True):
 ##########################################################################################
 if st.session_state.submitted_datasets:
     # log.info(f"SEARCH FORM: {search_form}")
-    indicator_config = ask_and_get_indicator_mapping(search_form)
+    indicator_mapping = render_indicator_mapping(search_form)
     # log.info(f"INDICATORS CONFIG (2): {indicator_config}")
 
+    ##########################################################################################
+    # 3 GET CHARTS
+    #
+    # Once the indicator mapping is done, we retrieve the affected charts (those that rely on
+    # the indicators in the mapping. create the revisions. We store these under what we
+    # call the "submission_config". This is a dataclass that holds the charts and updaters.
+    #
+    ##########################################################################################
+    if st.session_state.submitted_indicators:
+        # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
+        # st.write(reset_indicator_form)
+        if indicator_mapping is not None:
+            if indicator_mapping == {}:
+                msg_error = "No indicators selected! Please select at least one indicator."
+                st.error(msg_error)
+            else:
+                charts = get_affected_charts_and_preview(
+                    indicator_mapping,
+                )
 
-##########################################################################################
-# 3 GET CHARTS
-#
-# Once the indicator mapping is done, we retrieve the affected charts (those that rely on
-# the indicators in the mapping. create the revisions. We store these under what we
-# call the "submission_config". This is a dataclass that holds the charts and updaters.
-#
-##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_indicators:
-    # log.info(f"INDICATOR CONFIG (3): {indicator_config}")
-    # st.write(reset_indicator_form)
-    if indicator_config is not None:
-        if not indicator_config.indicator_mapping:
-            msg_error = "No indicators selected! Please select at least one indicator."
-            st.error(msg_error)
-        elif indicator_config.is_valid:
-            charts = get_affected_charts_and_preview(
-                indicator_config.indicator_mapping,
-            )
-        else:
-            "Something went wrong when trying to update the charts and pushing them to the database. Please try again or report the error #003001"
+        ##########################################################################################
+        # 4 UPDATE CHARTS
+        #
+        # TODO: add description
+        ##########################################################################################
+        if st.session_state.submitted_charts:
+            if isinstance(charts, list) and len(charts) > 0:
+                st.toast("Updating charts...")
+                push_new_charts(charts, SCHEMA_CHART_CONFIG)
 
 ##########################################################################################
 # 4 UPDATE CHARTS
 #
 # TODO: add description
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_indicators and st.session_state.submitted_charts:
-    if isinstance(charts, list) and len(charts) > 0:
-        push_new_charts(charts, SCHEMA_CHART_CONFIG)
+# if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
+#     if isinstance(charts, list) and len(charts) > 0:
+#         st.toast("Updating charts...")
+#         push_new_charts(charts, SCHEMA_CHART_CONFIG)

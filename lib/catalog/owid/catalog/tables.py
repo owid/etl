@@ -32,6 +32,7 @@ import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 
+from owid.datautils import dataframes
 from owid.repack import repack_frame
 
 from . import processing_log as pl
@@ -46,6 +47,7 @@ from .meta import (
     VariableMeta,
 )
 from .utils import underscore
+from .variables import Variable
 
 log = structlog.get_logger()
 
@@ -54,6 +56,9 @@ METADATA_FIELDS = list(SCHEMA["properties"])
 
 # New type required for pandas reading functions.
 AnyStr = TypeVar("AnyStr", str, bytes)
+
+# pd.Series or Variable
+SeriesOrVariable = TypeVar("SeriesOrVariable", pd.Series, Variable)
 
 
 class Table(pd.DataFrame):
@@ -720,6 +725,8 @@ class Table(pd.DataFrame):
 
         This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
 
+        Underscoring is the first step, so make sure to use correct values in `keys` (e.g. use 'country' if original table had 'Country').
+
         ```
         tb.format(["country", "year"])
         ```
@@ -756,7 +763,16 @@ class Table(pd.DataFrame):
         # Set index
         if keys is None:
             keys = ["country", "year"]
-        t = t.set_index(keys, verify_integrity=verify_integrity)
+        ## Sanity check
+        try:
+            t = t.set_index(keys, verify_integrity=verify_integrity)
+        except KeyError as e:
+            if underscore:
+                raise KeyError(
+                    f"Make sure that you are using valid column names! Note that the column names have been underscored! Available column names are: {t.columns}. You used {keys}."
+                )
+            else:
+                raise e
         if sort_columns:
             t = t.sort_index(axis=1)
         # Sort rows
@@ -1109,6 +1125,27 @@ class VariableGroupBy:
         return func  # type: ignore
 
 
+def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> Tuple[SeriesOrVariable, SeriesOrVariable]:
+    """Align categorical columns if possible. If not, return originals. This is necessary for
+    efficient merging."""
+    if left.dtype.name == "category" and right.dtype.name == "category":
+        common_categories = left.cat.categories.union(right.cat.categories)
+
+        if isinstance(left, Variable):
+            left = left.set_categories(common_categories)
+        else:
+            left = left.cat.set_categories(common_categories)
+
+        if isinstance(right, Variable):
+            right = right.set_categories(common_categories)
+        else:
+            right = right.cat.set_categories(common_categories)
+
+        return left, right
+    else:
+        return left, right
+
+
 def merge(
     left,
     right,
@@ -1125,6 +1162,26 @@ def merge(
         raise NotImplementedError(
             "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
         )
+
+    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
+    if isinstance(on, str):
+        on = [on]
+    if isinstance(left_on, str):
+        left_on = [left_on]
+    if isinstance(right_on, str):
+        right_on = [right_on]
+
+    # Align categorical columns to make them survive pd.merge.
+    if left_on and right_on:
+        lefts_rights = zip(left_on, right_on)
+    elif on:
+        lefts_rights = zip(on, on)
+    else:
+        lefts_rights = []
+
+    for left_col, right_col in lefts_rights:
+        left[left_col], right[right_col] = align_categoricals(left[left_col], right[right_col])
+
     # Create merged table.
     tb = Table(
         pd.merge(
@@ -1140,14 +1197,6 @@ def merge(
             **kwargs,
         )
     )
-
-    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
-    if isinstance(on, str):
-        on = [on]
-    if isinstance(left_on, str):
-        left_on = [left_on]
-    if isinstance(right_on, str):
-        right_on = [right_on]
 
     if (on is None) and (left_on is None):
         # By construction, either "on" is passed, or both "left_on" and "right_on".
@@ -1211,7 +1260,8 @@ def concat(
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
         table = Table(
-            pd.concat(
+            # use our concatenate that gracefully handles categoricals
+            dataframes.concatenate(
                 objs=objs,
                 axis=axis,  # type: ignore
                 join=join,
@@ -1232,7 +1282,8 @@ def concat(
             if pd.__version__ != "2.2.1":
                 # Check if patch is no longer needed.
                 df_0 = pd.DataFrame({"a": ["original value"]})
-                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                # use our concatenate that gracefully handles categoricals
+                df_1 = dataframes.concatenate([pd.DataFrame(), df_0], ignore_index=True)
                 df_0.loc[:, "a"] = "new value"
                 if df_1["a"].item() != "new value":
                     log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")

@@ -82,6 +82,14 @@ def variable_2(sources, origins, licenses):
 
 
 @pytest.fixture
+def variable_3(origins):
+    v3 = Variable(pd.Series(["a", "b", "c"]), name="Variable 3")
+    v3.metadata.title = "Title of Variable 3"
+    v3.metadata.origins = [origins[2]]
+    return v3
+
+
+@pytest.fixture
 def table_1(sources, licenses, origins):
     tb1 = Table({"country": ["Spain", "Spain", "France"], "year": [2020, 2021, 2021], "a": [1, 2, 3], "b": [4, 5, 6]})
     tb1.metadata = TableMeta(

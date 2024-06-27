@@ -61,6 +61,12 @@ definitions:
   gendermarker: Measures if the gender marker can be legally changed.
   propaganda: Measures the adoption of policies banning “propaganda for non-traditional sexual relations”. Vaguely written, these laws are utilized to discriminate against LGBT individuals in the name of protecting “public morality, particularly pertaining to children”.
 
+  processing_age_of_consent: |-
+    From the original dataset, we combined data from two different indicators: age of consent equal and age of consent unequal, to consolidate in one indicator laws that define or outlaw age of consent equality between same-sex and different-sex partners.
+  processing_marriage: |-
+    From the original dataset, we combined data from three different indicators: marriage equality, ban on marriage equality and civil unions.
+  processing_military: |-
+    From the original dataset, we combined data from two different indicators: LGB allowed in military and LGB military ban.
 tables:
   lgbti_policy_index:
     variables:
@@ -1116,10 +1122,12 @@ tables:
         title: Age of consent (combined)
         description_short: |
           Measures the presence of a law defining the same age of consent between same-sex and different-sex partners or outlawing different ages of consent between them. Outlawing serves as a tool to inhibit same-sex acts between consenting adults.
+        description_key:
+          - "The indicator is coded as follows: **_Equal_** (age of consent is equal and implemented), **_Partial implementation_** (age of consent is equal or unequal, but not completely implemented), **_No legal provisions**_ (there are no laws regulating the age of consent between same-sex and different-sex partners) and **_Unequal_** (age of consent is different and implemented)."
         description_processing: |-
           {definitions.common.description_processing}
 
-          From the original dataset, we combined data from two different indicators: age of consent equal and age of consent unequal, to consolidate in one indicator laws that define or outlaw age of consent equality between same-sex and different-sex partners.
+          {definitions.processing_age_of_consent}
         short_unit: ''
         unit: ''
         display:
@@ -1136,10 +1144,12 @@ tables:
         title: Marriage equality (combined)
         description_short: |
           Measures if there is no legal distinction between same-sex and different-sex marriages, if civil unions are considered instead or if same-sex marriages are banned.
+        description_key:
+          - "The indicator is coded as follows: **_Legal_** (equal marriage is legal and fully implemented. There might be civil unions or not), **_Partially legal_** (equal marriage is legal, but not fully implemented. There might be civil unions or not), **_No legal provisions**_ (there are no laws regulating marriage equality nor civil unions), **_Ban and marriage both partial_** (equal marriage is partially implemented or equal marriage is banned but not fully implemented. Civil unions are partially implemented as well), **_Partially banned_** (equal marriage is banned but not fully implemented or it is banned but there is partial implementation of civil unions or equal marriage) and **_Banned_** (equal marriage is banned and fully implemented. There are no civil unions)."
         description_processing: |-
           {definitions.common.description_processing}
 
-          From the original dataset, we combined data from three different indicators: marriage equality, ban on marriage equality and civil unions.
+          {definitions.processing_marriage}
         short_unit: ''
         unit: ''
         display:
@@ -1148,10 +1158,10 @@ tables:
         type: ordinal
         sort:
           - Legal
-          - Partial
+          - Partially legal
           - No legal provisions
-          - Marriage and ban both partial
-          - Partial ban
+          - Ban and marriage both partial
+          - Partially banned
           - Banned
 
       lgb_military_join:
@@ -1161,7 +1171,9 @@ tables:
         description_processing: |-
           {definitions.common.description_processing}
 
-          From the original dataset, we combined data from two different indicators: LGB allowed in military and LGB military ban.
+          {definitions.processing_military}
+        description_key:
+          - "The indicator is coded as follows: **_Allowed_** (LGB people are allowed to serve in the military), **_No policy_** (there is no policy allowing nor banning LGB military service) and **_Banned_** (LGB people are banned to serve in the military)."
         short_unit: ''
         unit: ''
         display:
@@ -1176,7 +1188,11 @@ tables:
       age_of_consent_no_legal_provisions_count:
         title: Age of consent (no legal provisions, number of countries)
         description_short: |
-          This is the number of countries that do not have legal provisions for the age of consent.
+          This is the number of countries that do not have legal provisions regulating the age of consent between same-sex and different-sex partners.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "No legal provisions" means that there are no laws regulating the age of consent between same-sex and different-sex partners.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1186,7 +1202,11 @@ tables:
       age_of_consent_equal_count:
         title: Age of consent (equal, number of countries)
         description_short: |
-          This is the number of countries that have equal age of consent for same-sex and different-sex partners.
+          This is the number of countries that have equal age of consent for same-sex and different-sex partners and this law is implemented.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Equal" means that the age of consent is equal and implemented.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1196,7 +1216,11 @@ tables:
       age_of_consent_partial_implementation_count:
         title: Age of consent (partial implementation, number of countries)
         description_short: |
-          This is the number of countries that have partial implementation of the age of consent legislation.
+          This is the number of countries where the age of consent between same-sex and different-sex partners is equal or unequal, but it is partially implemented.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Partial implementation" means that the age of consent is equal or unequal, but not completely implemented.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1206,7 +1230,11 @@ tables:
       age_of_consent_unequal_count:
         title: Age of consent (unequal, number of countries)
         description_short: |
-          This is the number of countries that have unequal age of consent for same-sex and different-sex partners.
+          This is the number of countries that have unequal age of consent for same-sex and different-sex partners, with full implementation of the law.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Unequal" means that the age of consent is different and implemented.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1216,7 +1244,11 @@ tables:
       age_of_consent_missing_count:
         title: Age of consent (missing, number of countries)
         description_short: |
-          This is the number of countries that have missing data on the age of consent.
+          This is the number of countries that do not have data on laws regulating the age of consent between same-sex and different-sex partners.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Missing" means that there are no data on the age of consent between same-sex and different-sex partners.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1226,27 +1258,39 @@ tables:
       marriage_no_legal_provisions_count:
         title: Marriage equality (no legal provisions, number of countries)
         description_short: |
-          This is the number of countries that do not have legal provisions for marriage equality.
+          This is the number of countries where there are no laws regulating marriage equality nor civil unions.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "No legal provisions" means that there are no laws regulating marriage equality nor civil unions.
         short_unit: ''
         unit: 'countries'
         display:
           name: "No legal provisions"
           numDecimalPlaces: 0
 
-      marriage_partial_count:
-        title: Marriage equality (partial, number of countries)
+      marriage_partially_legal_count:
+        title: Marriage equality (partially legal, number of countries)
         description_short: |
-          This is the number of countries that have partial implementation of marriage equality.
+          This is the number of countries where marriage equality is legal, but not fully implemented. There might be civil unions or not.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Partially legal" means that equal marriage is legal, but not fully implemented. There might be civil unions or not.
         short_unit: ''
         unit: 'countries'
         display:
-          name: "Partial"
+          name: "Partially legal"
           numDecimalPlaces: 0
 
       marriage_legal_count:
         title: Marriage equality (legal, number of countries)
         description_short: |
-          This is the number of countries that have legal marriage equality.
+          This is the number of countries where equal marriage is legal and fully implemented. There might be civil unions or not.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Legal" means that equal marriage is legal and fully implemented. There might be civil unions or not.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1256,37 +1300,53 @@ tables:
       marriage_banned_count:
         title: Marriage equality (banned, number of countries)
         description_short: |
-          This is the number of countries that have banned marriage equality.
+          This is the number of countries where equal marriage is banned and fully implemented. There are no civil unions.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Banned" means that equal marriage is banned and fully implemented. There are no civil unions.
         short_unit: ''
         unit: 'countries'
         display:
           name: "Banned"
           numDecimalPlaces: 0
 
-      marriage_partial_ban_count:
-        title: Marriage equality (partial ban, number of countries)
+      marriage_partially_banned_count:
+        title: Marriage equality (partially banned, number of countries)
         description_short: |
-          This is the number of countries that have partial implementation of a ban on marriage equality.
+          This is the number of countries where equal marriage is banned but not fully implemented or it is banned but there is partial implementation of civil unions or equal marriage.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Partially banned" means that equal marriage is banned but not fully implemented or it is banned but there is partial implementation of civil unions or equal marriage.
         short_unit: ''
         unit: 'countries'
         display:
-          name: "Partial ban"
+          name: "Partially banned"
           numDecimalPlaces: 0
 
-      marriage_marriage_and_ban_both_partial_count:
-        title: Marriage equality (marriage and ban both partial, number of countries)
+      marriage_ban_and_marriage_both_partial_count:
+        title: Marriage equality (ban and marriage both partial, number of countries)
         description_short: |
-          This is the number of countries that have partial implementation of both marriage equality and a ban on marriage equality.
+          This is the number of countries where equal marriage is partially implemented or equal marriage is banned but not fully implemented. Civil unions are partially implemented as well.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Ban and marriage both partial" means that equal marriage is partially implemented or equal marriage is banned but not fully implemented. Civil unions are partially implemented as well.
         short_unit: ''
         unit: 'countries'
         display:
-          name: "Marriage and ban both partial"
+          name: "Ban and marriage both partial"
           numDecimalPlaces: 0
 
       marriage_missing_count:
         title: Marriage equality (missing, number of countries)
         description_short: |
-          This is the number of countries that have missing data on marriage equality.
+          This is the number of countries that do not have data on laws regulating marriage equality.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Missing" means that there are no data on laws regulating marriage equality.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1296,7 +1356,11 @@ tables:
       lgb_military_join_no_policy_count:
         title: LGB military (no policy, number of countries)
         description_short: |
-          This is the number of countries that do not have a policy on LGB military service.
+          This is the number of countries where there is no policy allowing nor banning LGB military service.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "No policy" means that there is no policy allowing nor banning LGB military service.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1306,7 +1370,11 @@ tables:
       lgb_military_join_allowed_count:
         title: LGB military (allowed, number of countries)
         description_short: |
-          This is the number of countries that allow LGB military service.
+          This is the number of countries where LGB people are allowed to serve in the military.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Allowed" means that LGB people are allowed to serve in the military.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1316,7 +1384,11 @@ tables:
       lgb_military_join_banned_count:
         title: LGB military (banned, number of countries)
         description_short: |
-          This is the number of countries that ban LGB military service.
+          This is the number of countries where LGB people are banned to serve in the military.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Banned" means that LGB people are banned to serve in the military.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1326,7 +1398,11 @@ tables:
       lgb_military_join_missing_count:
         title: LGB military (missing, number of countries)
         description_short: |
-          This is the number of countries that have missing data on LGB military service.
+          This is the number of countries that do not have data on laws regulating LGB military service.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Missing" means that there are no data on laws regulating LGB military service.
         short_unit: ''
         unit: 'countries'
         display:
@@ -1336,7 +1412,11 @@ tables:
       age_of_consent_no_legal_provisions_pop:
         title: Age of consent (no legal provisions, total population)
         description_short: |
-          This is the total population of countries that do not have legal provisions for the age of consent.
+          This is the total population of countries that do not have legal provisions regulating the age of consent between same-sex and different-sex partners.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "No legal provisions" means that there are no laws regulating the age of consent between same-sex and different-sex partners.
         short_unit: ''
         unit: ''
         display:
@@ -1346,7 +1426,11 @@ tables:
       age_of_consent_equal_pop:
         title: Age of consent (equal, total population)
         description_short: |
-          This is the total population of countries that have equal age of consent between same-sex and different-sex partners.
+          This is the total population of countries that have equal age of consent for same-sex and different-sex partners and this law is implemented.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Equal" means that the age of consent is equal and implemented.
         short_unit: ''
         unit: ''
         display:
@@ -1356,7 +1440,11 @@ tables:
       age_of_consent_partial_implementation_pop:
         title: Age of consent (partial implementation, total population)
         description_short: |
-          This is the total population of countries that have partial implementation of the age of consent legislation.
+          This is the total population of countries where the age of consent between same-sex and different-sex partners is equal or unequal, but it is partially implemented.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Partial implementation" means that the age of consent is equal or unequal, but not completely implemented.
         short_unit: ''
         unit: ''
         display:
@@ -1366,7 +1454,11 @@ tables:
       age_of_consent_unequal_pop:
         title: Age of consent (unequal, total population)
         description_short: |
-          This is the total population of countries that have unequal age of consent between same-sex and different-sex partners.
+          This is the total population of countries that have unequal age of consent for same-sex and different-sex partners, with full implementation of the law.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Unequal" means that the age of consent is different and implemented.
         short_unit: ''
         unit: ''
         display:
@@ -1376,7 +1468,11 @@ tables:
       age_of_consent_missing_pop:
         title: Age of consent (missing, total population)
         description_short: |
-          This is the total population of countries that have missing data on the age of consent.
+          This is the total population of countries that do not have data on laws regulating the age of consent between same-sex and different-sex partners.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_age_of_consent}. "Missing" means that there are no data on the age of consent between same-sex and different-sex partners.
         short_unit: ''
         unit: ''
         display:
@@ -1386,27 +1482,39 @@ tables:
       marriage_no_legal_provisions_pop:
         title: Marriage equality (no legal provisions, total population)
         description_short: |
-          This is the total population of countries that do not have legal provisions for marriage equality.
+          This is the total population of countries where there are no laws regulating marriage equality nor civil unions.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "No legal provisions" means that there are no laws regulating marriage equality nor civil unions.
         short_unit: ''
         unit: ''
         display:
           name: "No legal provisions"
           numDecimalPlaces: 0
 
-      marriage_partial_pop:
-        title: Marriage equality (partial, total population)
+      marriage_partially_legal_pop:
+        title: Marriage equality (partially legal, total population)
         description_short: |
-          This is the total population of countries that have partial implementation of marriage equality.
+          This is the total population of countries where marriage equality is legal, but not fully implemented. There might be civil unions or not.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Partially legal" means that equal marriage is legal, but not fully implemented. There might be civil unions or not.
         short_unit: ''
         unit: ''
         display:
-          name: "Partial"
+          name: "Partially legal"
           numDecimalPlaces: 0
 
       marriage_legal_pop:
         title: Marriage equality (legal, total population)
         description_short: |
-          This is the total population of countries that have legal marriage equality.
+          This is the total population of countries where equal marriage is legal and fully implemented. There might be civil unions or not.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Legal" means that equal marriage is legal and fully implemented. There might be civil unions or not.
         short_unit: ''
         unit: ''
         display:
@@ -1416,37 +1524,53 @@ tables:
       marriage_banned_pop:
         title: Marriage equality (banned, total population)
         description_short: |
-          This is the total population of countries that have banned marriage equality.
+          This is the total population of countries where equal marriage is banned and fully implemented. There are no civil unions.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Banned" means that equal marriage is banned and fully implemented. There are no civil unions.
         short_unit: ''
         unit: ''
         display:
           name: "Banned"
           numDecimalPlaces: 0
 
-      marriage_partial_ban_pop:
-        title: Marriage equality (partial ban, total population)
+      marriage_partially_banned_pop:
+        title: Marriage equality (partially banned, total population)
         description_short: |
-          This is the total population of countries that have partial implementation of a ban on marriage equality.
+          This is the total population of countries where equal marriage is banned but not fully implemented or it is banned but there is partial implementation of civil unions or equal marriage.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Partially banned" means that equal marriage is banned but not fully implemented or it is banned but there is partial implementation of civil unions or equal marriage.
         short_unit: ''
         unit: ''
         display:
-          name: "Partial ban"
+          name: "Partially banned"
           numDecimalPlaces: 0
 
-      marriage_marriage_and_ban_both_partial_pop:
-        title: Marriage equality (marriage and ban both partial, total population)
+      marriage_ban_and_marriage_both_partial_pop:
+        title: Marriage equality (ban and marriage both partial, total population)
         description_short: |
-          This is the total population of countries that have partial implementation of both marriage equality and a ban on marriage equality.
+          This is the total population of countries where equal marriage is partially implemented or equal marriage is banned but not fully implemented. Civil unions are partially implemented as well.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Ban and marriage both partial" means that equal marriage is partially implemented or equal marriage is banned but not fully implemented. Civil unions are partially implemented as well.
         short_unit: ''
         unit: ''
         display:
-          name: "Marriage and ban both partial"
+          name: "Ban and marriage both partial"
           numDecimalPlaces: 0
 
       marriage_missing_pop:
         title: Marriage equality (missing, total population)
         description_short: |
-          This is the total population of countries that have missing data on marriage equality.
+          This is the total population of countries where there are no data on laws regulating marriage equality.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_marriage}. "Missing" means that there are no data on laws regulating marriage equality.
         short_unit: ''
         unit: ''
         display:
@@ -1456,7 +1580,11 @@ tables:
       lgb_military_join_no_policy_pop:
         title: LGB military (no policy, total population)
         description_short: |
-          This is the total population of countries that do not have a policy on LGB military service.
+          This is the total population of countries where there is no policy allowing nor banning LGB military service.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "No policy" means that there is no policy allowing nor banning LGB military service.
         short_unit: ''
         unit: ''
         display:
@@ -1466,7 +1594,11 @@ tables:
       lgb_military_join_allowed_pop:
         title: LGB military (allowed, total population)
         description_short: |
-          This is the total population of countries that allow LGB military service.
+          This is the total population of countries where LGB people are allowed to serve in the military.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Allowed" means that LGB people are allowed to serve in the military.
         short_unit: ''
         unit: ''
         display:
@@ -1476,7 +1608,11 @@ tables:
       lgb_military_join_banned_pop:
         title: LGB military (banned, total population)
         description_short: |
-          This is the total population of countries that ban LGB military service.
+          This is the total population of countries where LGB people are banned to serve in the military.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Banned" means that LGB people are banned to serve in the military.
         short_unit: ''
         unit: ''
         display:
@@ -1486,7 +1622,11 @@ tables:
       lgb_military_join_missing_pop:
         title: LGB military (missing, total population)
         description_short: |
-          This is the total population of countries that have missing data on LGB military service.
+          This is the total population of countries where there are no data on laws regulating LGB military service.
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          {definitions.processing_military}. "Missing" means that there are no data on laws regulating LGB military service.
         short_unit: ''
         unit: ''
         display:
