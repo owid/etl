@@ -426,12 +426,12 @@ class MapBracketer:
             _brackets = np.array(brackets)
             brackets_all_optimal[bracket_type] = {"brackets": _brackets.tolist()}
             if bracket_type in list(BRACKET_LABELS["log"].values()):
-                # TODO: Improve this logic.
+                # TODO: Improve this logic. I suppose it depends on the openness of the limits
                 brackets_all_optimal[bracket_type]["lower"] = min(_brackets[_brackets > 0])
                 brackets_all_optimal[bracket_type]["upper"] = _brackets[-2]
             else:
-                brackets_all_optimal[bracket_type]["lower"] = min(_brackets)
-                brackets_all_optimal[bracket_type]["upper"] = max(_brackets)
+                brackets_all_optimal[bracket_type]["lower"] = _brackets[1]
+                brackets_all_optimal[bracket_type]["upper"] = _brackets[-2]
 
         # Create an additional dictionary with the configuration of the optimal brackets.
         brackets_all_optimal["optimal"] = rank.iloc[0].to_dict()["bracket_type"]
@@ -767,6 +767,8 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 900950
     # The following may have nans that cause issues.
     # variable_id = 899976
+    # The following also causes issues (I haven't checked why).
+    # variable_id = 899859
 
     # Initialize map bracketer.
     mb = MapBracketer(variable_id=variable_id)  # type: ignore
