@@ -24,18 +24,33 @@ steps:
 
   # WPP (2024)
   data-private://meadow/un/2024-07-11/un_wpp:
+    ## Population
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
+    - snapshot-private://un/2024-07-11/un_wpp_population_density.xlsx
+    ## Growth
     - snapshot-private://un/2024-07-11/un_wpp_growth_rate.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_nat_change_rate.xlsx
+    ## Fertility
     - snapshot-private://un/2024-07-11/un_wpp_fert_rate_tot.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_fert_rate_age.xlsx
+    ## Migration
     - snapshot-private://un/2024-07-11/un_wpp_migration.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_migration_rate.xlsx
+    ## Deaths
     - snapshot-private://un/2024-07-11/un_wpp_deaths.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_deaths_age.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_deaths_age_fem.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_deaths_age_male.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_death_rate.xlsx
+    ## Births
+    - snapshot-private://un/2024-07-11/un_wpp_birth_rate.xlsx
+    ## Median age
+    - snapshot-private://un/2024-07-11/un_wpp_median_age.xlsx
+    ## Life expectancy
+    - snapshot-private://un/2024-07-11/un_wpp_le.xlsx
+    - snapshot-private://un/2024-07-11/un_wpp_le_f.xlsx
+    - snapshot-private://un/2024-07-11/un_wpp_le_m.xlsx
+
   data-private://garden/un/2024-07-11/un_wpp:
     - data-private://meadow/un/2024-07-11/un_wpp
   data-private://grapher/un/2024-07-11/un_wpp:

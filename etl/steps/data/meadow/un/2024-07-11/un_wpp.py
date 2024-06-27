@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
     # Population
     paths.log.info("reading population...")
     tb_population = paths.read_snap_table("un_wpp_population.csv")
+    tb_population_density = read_estimates_and_projections_from_snap("un_wpp_population_density.xlsx")
     # Growth rate
     tb_growth_rate = read_estimates_and_projections_from_snap("un_wpp_growth_rate.xlsx")
     # Natural change rate
@@ -45,12 +46,22 @@ def run(dest_dir: str) -> None:
     tb_deaths = combine_death(tb_deaths_tot, tb_deaths_age, tb_deaths_age_fem, tb_deaths_age_male)
     # Death rate
     tb_death_rate = read_estimates_and_projections_from_snap("un_wpp_death_rate.xlsx")
+    # Birth rate
+    tb_birth_rate = read_estimates_and_projections_from_snap("un_wpp_birth_rate.xlsx")
+    # Median age
+    tb_median_age = read_estimates_and_projections_from_snap("un_wpp_median_age.xlsx")
+    # Life Expectancy
+    tb_le = read_estimates_and_projections_from_snap("un_wpp_le.xlsx")
+    tb_le_f = read_estimates_and_projections_from_snap("un_wpp_le_f.xlsx")
+    tb_le_m = read_estimates_and_projections_from_snap("un_wpp_le_m.xlsx")
+    tb_le = combine_life_expectancy(tb_le, tb_le_f, tb_le_m)
 
     #
     # Process data.
     #
     # Process tables
     tb_population = clean_table(tb_population, "population")
+    tb_population_density = clean_table(tb_population_density, "population_density")
     tb_growth_rate = clean_table(tb_growth_rate, "growth_rate")
     tb_nat_change = clean_table(tb_nat_change, "natural_change_rate")
     tb_fertility = clean_table(tb_fertility, "fertility_rate")
@@ -58,12 +69,16 @@ def run(dest_dir: str) -> None:
     tb_migration_rate = clean_table(tb_migration_rate, "net_migration_rate")
     tb_deaths = clean_table(tb_deaths, "deaths")
     tb_death_rate = clean_table(tb_death_rate, "death_rate")
+    tb_birth_rate = clean_table(tb_birth_rate, "birth_rate")
+    tb_median_age = clean_table(tb_median_age, "median_age")
+    tb_le = clean_table(tb_le, "life_expectancy")
 
     #
     # Save outputs.
     #
     tables = [
         tb_population,
+        tb_population_density,
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
@@ -71,6 +86,9 @@ def run(dest_dir: str) -> None:
         tb_migration_rate,
         tb_deaths,
         tb_death_rate,
+        tb_median_age,
+        tb_birth_rate,
+        tb_le,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
@@ -117,11 +135,11 @@ def combine_death(tb_tot: Table, tb_age: Table, tb_age_fem: Table, tb_age_male: 
     tb_age = tb_age.melt(list(columns), var_name="Age", value_name="Value")
     tb_age["Sex"] = "Total"
 
-    # Unpivot age table (all sex)
+    # Unpivot age table (female)
     tb_age_fem = tb_age_fem.melt(list(columns), var_name="Age", value_name="Value")
     tb_age_fem["Sex"] = "Female"
 
-    # Unpivot age table (all sex)
+    # Unpivot age table (male)
     tb_age_male = tb_age_male.melt(list(columns), var_name="Age", value_name="Value")
     tb_age_male["Sex"] = "Male"
 
@@ -129,6 +147,51 @@ def combine_death(tb_tot: Table, tb_age: Table, tb_age_fem: Table, tb_age_male: 
     tb_deaths = concat([tb_tot, tb_age, tb_age_fem, tb_age_male], ignore_index=True)
 
     return tb_deaths
+
+
+def combine_life_expectancy(tb_le: Table, tb_le_f: Table, tb_le_m: Table) -> Table:
+    # Drop column 'Sex'
+    tb_le = tb_le.drop(columns=["Sex"])
+    tb_le_f = tb_le_f.drop(columns=["Sex"])
+    tb_le_m = tb_le_m.drop(columns=["Sex"])
+
+    age_groups = {str(i) for i in range(0, 100, 5)} | {"1", "100+"}
+    columns = {
+        "ISO2_code",
+        "ISO3_code",
+        "LocTypeID",
+        "LocTypeName",
+        "LocationID",
+        "LocationName",
+        "Notes",
+        "ParentID",
+        "SDMX_code",
+        "SortOrder",
+        "VariantID",
+        "VariantName",
+        "Year",
+    }
+    # Sanity check
+    assert set(tb_le.columns) == age_groups | columns, "LE contains unknown columns"
+    assert set(tb_le_f.columns) == age_groups | columns, "LE_F contains unknown columns"
+    assert set(tb_le_m.columns) == age_groups | columns, "LE_M contains unknown columns"
+
+    # Unpivot total table (all sex)
+    tb_le = tb_le.melt(list(columns), var_name="Age", value_name="Value")
+    tb_le["Sex"] = "all"
+
+    # Unpivot total table (all sex)
+    tb_le_f = tb_le_f.melt(list(columns), var_name="Age", value_name="Value")
+    tb_le_f["Sex"] = "female"
+
+    # Unpivot total table (all sex)
+    tb_le_m = tb_le_m.melt(list(columns), var_name="Age", value_name="Value")
+    tb_le_m["Sex"] = "male"
+
+    # Combine
+    tb_le = concat([tb_le, tb_le_f, tb_le_m], ignore_index=True)
+
+    return tb_le
 
 
 def to_long_format_migration(tb: Table) -> Table:

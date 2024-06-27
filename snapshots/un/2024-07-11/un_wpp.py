@@ -5,10 +5,11 @@ Command:
 
     FILE_DIR=''
     python snapshots/un/2024-07-11/un_wpp.py \
-        --deaths-age-fem $FILE_DIR/deaths_age_female.xlsx \
-        --deaths-age-male $FILE_DIR/deaths_age_male.xlsx \
+        --deaths-age-f $FILE_DIR/deaths_age_female.xlsx \
+        --deaths-age-m $FILE_DIR/deaths_age_male.xlsx \
         --death-rate $FILE_DIR/death_rate.xlsx \
         --population $FILE_DIR/population.csv \
+        --population-density $FILE_DIR/population_density.xlsx \
         --growth-rate $FILE_DIR/grrate.xlsx \
         --nat-change-rate $FILE_DIR/natchange.xlsx \
         --fertility-tot $FILE_DIR/frtot.xlsx \
@@ -19,6 +20,7 @@ Command:
         --deaths-age $FILE_DIR/deaths_age.xlsx \
         --births-sex $FILE_DIR/births_sex.xlsx \
         --births-age $FILE_DIR/births_age.xlsx \
+        --birth-rate $FILE_DIR/birth_rate.xlsx \
         --median-age $FILE_DIR/median_age.xlsx \
         --le $FILE_DIR/le.xlsx \
         --le-f $FILE_DIR/le_f.xlsx \
@@ -31,6 +33,10 @@ Files needed:
         Title (page):           WPP2024_Population_1_July_by_Age1_long.csv.gz
         Filename:               Population by Age July 1 2024.csv
         Alias:                  population.csv
+    - Population density
+        Title (page):           WPP2024_Population_density_%28persons_per_square_km%29.xlsx
+        Filename:               Population density 2024.xlsx
+        Alias:                  population_density.csv
     - Natural change
         Title (page):           WPP2024_Rate_of_natural_change_%28per_thousand%29.xlsx
         Filename:               WPP2024 Natural Change Rate.xlsx
@@ -83,6 +89,10 @@ Files needed:
         Title (page):           WPP2024_Births_by_age_group_of_mother_%28in_thousands%29_Abridged_Ages.xlsx
         Filename:               Births by Mother Age.xlsx
         Alias:                  births_age.xlsx
+    - Birth rate
+        Title (page):           WPP2024_Crude_birth_rate_%28CBR%29_%28births_per_1%2C000_population%29.xlsx
+        Filename:               WPP2024 Crude Birth Rate.xlsx
+        Alias:                  birth_rate.xlsx
     - Median age
         Title (page):           WPP2024_Median_age_of_population_%28years%29.xlsx
         Filename:               Median Age of Population 2024
@@ -133,6 +143,7 @@ log = get_logger()
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--population", type=str, help="Path to population local file.")
+@click.option("--population-density", type=str, help="Path to population density local file.")
 @click.option("--growth-rate", type=str, help="Path to population growth rate local file.")
 @click.option("--nat-change-rate", type=str, help="Path to rate natural change local file.")
 @click.option("--fertility-tot", type=str, help="Path to total fertility rate local file.")
@@ -144,15 +155,17 @@ log = get_logger()
 @click.option("--deaths-age-f", type=str, help="Path to female deaths by age group local file.")
 @click.option("--deaths-age-m", type=str, help="Path to male deaths by age group local file.")
 @click.option("--death-rate", type=str, help="Path to crude death rate local file.")
-@click.option("--births-sex", type=str, help="Path to births by sex.")
-@click.option("--births-age", type=str, help="Path to births by age group of the mother.")
-@click.option("--median-age", type=str, help="Path to median age of the population.")
-@click.option("--le", type=str, help="Path to median age of the population.")
-@click.option("--le-f", type=str, help="Path to median age of the population.")
-@click.option("--le-m", type=str, help="Path to median age of the population.")
+@click.option("--births-sex", type=str, help="Path to births by sex local file.")
+@click.option("--births-age", type=str, help="Path to births by age group of the mother local file.")
+@click.option("--birth-rate", type=str, help="Path to births rate local file.")
+@click.option("--median-age", type=str, help="Path to median age of the population local file.")
+@click.option("--le", type=str, help="Path to life expectancy local file.")
+@click.option("--le-f", type=str, help="Path to life expectancy (females) local file.")
+@click.option("--le-m", type=str, help="Path to life expectancy (males) local file.")
 def main(
     upload: bool,
     population: str | None = None,
+    population_density: str | None = None,
     growth_rate: str | None = None,
     nat_change_rate: str | None = None,
     fertility_tot: str | None = None,
@@ -166,6 +179,7 @@ def main(
     death_rate: str | None = None,
     births_sex: str | None = None,
     births_age: str | None = None,
+    birth_rate: str | None = None,
     median_age: str | None = None,
     le: str | None = None,
     le_f: str | None = None,
@@ -173,6 +187,7 @@ def main(
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
+        (population_density, "un_wpp_population_density.xlsx"),
         (growth_rate, "un_wpp_growth_rate.xlsx"),
         (nat_change_rate, "un_wpp_nat_change_rate.xlsx"),
         (fertility_tot, "un_wpp_fert_rate_tot.xlsx"),
@@ -186,6 +201,8 @@ def main(
         (death_rate, "un_wpp_death_rate.xlsx"),
         (births_sex, "un_wpp_births_sex.xlsx"),
         (births_age, "un_wpp_births_age.xlsx"),
+        (birth_rate, "un_wpp_birth_rate.xlsx"),
+        (median_age, "un_wpp_median_age.xlsx"),
         (le, "un_wpp_le.xlsx"),
         (le_f, "un_wpp_le_f.xlsx"),
         (le_m, "un_wpp_le_m.xlsx"),
