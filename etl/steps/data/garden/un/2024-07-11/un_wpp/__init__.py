@@ -233,6 +233,14 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
             "Total": "all",
         },
     )
+    tb = harmonize_dimension(
+        tb,
+        "age",
+        mapping={
+            "Total": "all",
+        },
+        strict=False,
+    )
 
     # Add 10-year age groups from 20 to 100
     age_group_mapping = {
