@@ -61,6 +61,13 @@ tables:
         unit: deaths
         description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
 
+  median_age:
+    variables:
+      median_age:
+        title: Median age
+        unit: years
+        description_short: |-
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
 
   # un_wpp:
   #   variables:

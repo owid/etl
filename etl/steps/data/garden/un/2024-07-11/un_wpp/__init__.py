@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
     tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
     tb_deaths = ds_meadow["deaths"].reset_index()
     tb_death_rate = ds_meadow["death_rate"].reset_index()
+    tb_median_age = ds_meadow["median_age"].reset_index()
 
     #
     # Process data.
@@ -48,6 +49,7 @@ def run(dest_dir: str) -> None:
     tb_nat_change = process_standard(tb_nat_change)
     tb_migration = process_migration(tb_migration, tb_migration_rate)
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
+    tb_median_age = process_standard(tb_median_age)
 
     # Drop 55-59 age group in fertility (is all zero!)
     tb_fertility = process_standard(tb_fertility)
@@ -63,6 +65,7 @@ def run(dest_dir: str) -> None:
     tb_fertility = set_variant_to_estimates(tb_fertility)
     tb_migration = set_variant_to_estimates(tb_migration)
     tb_deaths = set_variant_to_estimates(tb_deaths)
+    tb_median_age = set_variant_to_estimates(tb_median_age)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -74,6 +77,7 @@ def run(dest_dir: str) -> None:
     tb_fertility = tb_fertility.format(COLUMNS_INDEX)
     tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
+    tb_median_age = tb_median_age.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
     tables = [
@@ -83,6 +87,7 @@ def run(dest_dir: str) -> None:
         tb_fertility,
         tb_migration,
         tb_deaths,
+        tb_median_age,
     ]
 
     #
