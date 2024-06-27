@@ -401,9 +401,10 @@ class MapBracketer:
         # TODO: If latest_year is False, we need to calculate the minimum average dispersion (averaged over all years).
         for bracket_low in range(len(brackets)):
             for bracket_upp in range(
-                bracket_low + MIN_NUM_BRACKETS, min(len(histogram) + 1, bracket_low + MAX_NUM_BRACKETS)
+                bracket_low + MIN_NUM_BRACKETS, min(len(histogram) + 1, bracket_low + MAX_NUM_BRACKETS + 1)
             ):
                 _brackets = np.hstack([brackets[0], brackets[bracket_low + 1 : bracket_upp], brackets[-1]])
+
                 _histogram = np.hstack(
                     [
                         [sum(histogram[: bracket_low + 1])],
