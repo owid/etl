@@ -205,9 +205,6 @@ class MapBracketer:
         # Define the bracket type (by default, pick an arbitrary one).
         self.bracket_type = BRACKET_LABELS["log"]["x10"]
         # Define all remaining attributes with arbitrary values (they will be updated by self.run()).
-        # TODO: Currently, when loading a variable config from explorer, the openness of the brackets works well, but
-        #  the following parameters do not reflect the true openness.
-        #  We could have a radio button to select not only log, linear, custom and optimal, but also current brackets.
         self.lower_bracket_open = False
         self.upper_bracket_open = True
         self.values = pd.Series()
@@ -255,7 +252,7 @@ class MapBracketer:
 
         # Define default selected brackets (which will be updated later on).
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
-        # Define the "grapher version" of the selected brackets, which needs a minimum value and a list of brackets.
+        # Define the grapher version of the selected brackets, which needs a minimum value and a list of brackets.
         self.brackets_selected_grapher_min_value = None
         self.brackets_selected_grapher_values = self.brackets_selected.copy()
 
@@ -562,9 +559,9 @@ class MapBracketer:
                 # The reason is that some country in a year different to the one currently selected has a larger value.
                 # This is a limitation of considering only the values of the current year, but I think it's fine.
                 # (We shouldn't use closed brackets anyway if the data is not restricted to a closed interval).
-                self.brackets_selected_grapher_values[-1] = min(
+                self.brackets_selected_grapher_values.append(min(
                     [bracket for bracket in self.brackets if bracket >= self.max_value]
-                )
+                ))
 
         if (self.brackets_selected_grapher_values[0] == self.brackets_selected_grapher_min_value) or (
             self.brackets_selected_grapher_values[0] == 0
