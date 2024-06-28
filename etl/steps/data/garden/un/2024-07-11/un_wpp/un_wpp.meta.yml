@@ -135,6 +135,7 @@ tables:
           <% else %>
           << sex.title() >> child mortality
           <% endif %>
+          <% endif %>
         unit: |-
           <% if age == 0 %>
           % of infants
