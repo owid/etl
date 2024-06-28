@@ -9,7 +9,7 @@ from structlog import get_logger
 
 from apps.utils.map_datasets import get_grapher_changes
 from etl.db import config, get_all_datasets, get_connection, get_dataset_charts, get_variables_in_dataset
-from etl.git import get_changed_files
+from etl.git_helpers import get_changed_files
 from etl.indicator_upgrade.schema import get_schema_chart_config
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 from etl.version_tracker import VersionTracker

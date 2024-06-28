@@ -1223,6 +1223,7 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     tb_locations_inter["is_location_of_conflict"] = tb_locations_inter["is_location_of_conflict"].fillna(0)
     # Filter irrelevant entries
     tb_locations_inter = tb_locations_inter[tb_locations_inter["year"] <= tb_chupilkin["year"].max()]
+    tb_locations_inter["country"] = tb_locations_inter["country"].astype("string")
     # Reduce
     tb_locations_inter = tb_locations_inter.groupby(["year", "country"], as_index=False).agg(
         {"is_location_of_conflict": lambda x: min(1, x.sum())}
