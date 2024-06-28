@@ -90,6 +90,7 @@ tables:
       life_expectancy:
         title: Life expectancy
         unit: years
+        short_unit: years
         description_short: |-
           <% if age == 0 %>
           Life expectancy for individuals at birth.
@@ -111,7 +112,7 @@ tables:
         title: Sex ratio
         unit: "males per 100 females"
         description_short: |-
-          <% if age == 0 %>
+          <% if age == 'at_birth' %>
           The number of male births per 100 female births. Biological birth ratios are slightly male-biased, with an expected ratio of 105 male births per 100 female births.
           <% elif age == 'all' %>
           ​​The number of male population per 100 female population.
