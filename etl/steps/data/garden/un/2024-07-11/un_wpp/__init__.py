@@ -208,6 +208,9 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
     # Merge
     tb = tb_mig.merge(tb_mig_rate, on=COLUMNS_INDEX, how="left")
 
+    # Scale
+    tb["net_migration"] *= 1000
+
     return tb
 
 
