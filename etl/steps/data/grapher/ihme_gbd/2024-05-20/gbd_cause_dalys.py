@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_cause")
-    ds_garden.metadata.title = "GBD Cause - DALYs"
+    ds_garden.metadata.title = "Global Burden of Disease - Cause - DALYs"
     ds_garden.metadata.short_name = "gbd_cause_dalys"
     # Read table from garden dataset.
     # tb_deaths = ds_garden["gbd_cause_deaths"]
