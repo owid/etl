@@ -62,7 +62,14 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["measure", "unit"])
     tb = add_population_column(tb)
     tb = combining_sexes_for_all_age_groups(tb)
-    tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = geo.add_regions_to_table(
+        tb,
+        regions=REGIONS_TO_ADD,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        aggregations={"best": "sum", "lo": "sum", "hi": "sum", "population": "sum"},
+        index_columns=["country", "year", "age_group", "sex", "risk_factor"],
+    )
     tb, tb_rate = calculate_incidence_rates(tb)
     tb = tb.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
     tb_rate = tb_rate.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
@@ -100,43 +107,6 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, short_name=paths.short_name)
 
     return tb
-
-
-def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    """
-    Calculate region aggregates for all for each combination of age-group, sex and risk factor in the dataset.
-    """
-    # Create the groups we want to aggregate over.
-    tb_gr = tb.groupby(["year", "age_group", "sex", "risk_factor"])
-    tb_gr_out = Table()
-    for gr_name, gr in tb_gr:
-        for region in REGIONS_TO_ADD:
-            # List of countries in region.
-            countries_in_region = geo.list_members_of_region(
-                region=region,
-                ds_regions=ds_regions,
-                ds_income_groups=ds_income_groups,
-            )
-            gr_cal = gr[["country", "year", "best", "lo", "hi", "population"]]
-            # Add region aggregates.
-            gr_reg = geo.add_region_aggregates(
-                df=gr_cal,
-                region=region,
-                countries_in_region=countries_in_region,
-                countries_that_must_have_data=[],
-                frac_allowed_nans_per_year=0.5,
-                num_allowed_nans_per_year=None,
-            )
-            # Take only region values
-            gr_reg = gr_reg[gr_reg["country"] == region]
-            # Ensure the region values are assigned the same group values as the original group.
-            gr_reg[["age_group", "sex", "risk_factor"]] = [gr_name[1], gr_name[2], gr_name[3]]
-            # Combine the region values with the original group.
-            gr = pr.concat([gr, gr_reg], axis=0, ignore_index=True, copy=False)
-        # Add the group to the output table.
-        tb_gr_out = pr.concat([tb_gr_out, gr], axis=0, ignore_index=True, short_name=paths.short_name)
-
-    return tb_gr_out
 
 
 def add_population_column(tb: Table) -> Table:
