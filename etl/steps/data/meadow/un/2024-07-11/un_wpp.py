@@ -57,6 +57,11 @@ def run(dest_dir: str) -> None:
     del tb_deaths_tot, tb_deaths_age, tb_deaths_age_fem
     # Death rate
     tb_death_rate = read_estimates_and_projections_from_snap("un_wpp_death_rate.xlsx")
+    # Mortality rates
+    tb_child_mort = read_estimates_and_projections_from_snap("un_wpp_child_mortality.xlsx")
+    tb_infant_mort = read_estimates_and_projections_from_snap("un_wpp_infant_mortality.xlsx")
+    tb_mortality = combine_mortality(tb_child_mort, tb_infant_mort)
+    del tb_child_mort, tb_infant_mort
     # Births
     tb_births_age = read_estimates_and_projections_from_snap("un_wpp_births_age.xlsx")
     tb_births_sex = read_estimates_and_projections_from_snap("un_wpp_births_sex.xlsx")
@@ -90,6 +95,7 @@ def run(dest_dir: str) -> None:
     tb_birth_rate = clean_table(tb_birth_rate, "birth_rate")
     tb_median_age = clean_table(tb_median_age, "median_age")
     tb_le = clean_table(tb_le, "life_expectancy")
+    tb_mortality = clean_table(tb_mortality, "mortality_rate")
 
     #
     # Save outputs.
@@ -108,6 +114,7 @@ def run(dest_dir: str) -> None:
         tb_birth_rate,
         tb_median_age,
         tb_le,
+        tb_mortality,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=tables, check_variables_metadata=True)
@@ -249,6 +256,26 @@ def to_long_format_migration(tb: Table) -> Table:
         var_name="Sex",
         value_name="Value",
     )
+    return tb
+
+
+def combine_mortality(tb_infant: Table, tb_child: Table) -> Table:
+    """Convert migration table to long format."""
+    # Melt
+    tb_infant = tb_infant.melt(
+        id_vars=[col for col in tb_infant.columns if col not in {"Male", "Female", "Total"}],
+        var_name="Sex",
+        value_name="Value",
+    )
+    tb_infant["Age"] = "0"
+    tb_child = tb_child.melt(
+        id_vars=[col for col in tb_child.columns if col not in {"Male", "Female", "Total"}],
+        var_name="Sex",
+        value_name="Value",
+    )
+    tb_child["Age"] = "0-4"
+
+    tb = pr.concat([tb_infant, tb_child], ignore_index=True)
     return tb
 
 

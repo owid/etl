@@ -44,6 +44,7 @@ def run(dest_dir: str) -> None:
     tb_birth_rate = ds_meadow["birth_rate"].reset_index()
     tb_median_age = ds_meadow["median_age"].reset_index()
     tb_le = ds_meadow["life_expectancy"].reset_index()
+    tb_mortality = ds_meadow["mortality"].reset_index()
 
     #
     # Process data.
@@ -60,6 +61,7 @@ def run(dest_dir: str) -> None:
     tb_median_age = process_standard(tb_median_age)
     tb_fertility = process_standard(tb_fertility)
     tb_le = process_le(tb_le)
+    tb_mortality = process_mortality(tb_mortality)
 
     # Drop 55-59 age group in fertility (is all zero!)
     assert (
@@ -83,6 +85,7 @@ def run(dest_dir: str) -> None:
     tb_median_age = set_variant_to_estimates(tb_median_age)
     tb_le = set_variant_to_estimates(tb_le)
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
+    tb_mortality = set_variant_to_estimates(tb_mortality)
 
     # Particular processing
     tb_nat_change["natural_change_rate"] /= 10
@@ -275,7 +278,7 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     tb = process_standard(tb)
     tb_rate = process_standard(tb_rate)
 
-    # Standardise sex dimension values
+    # Standardise sex/age dimension values
     tb = harmonize_dimension(
         tb,
         "sex",
@@ -308,6 +311,17 @@ def process_le(tb: Table) -> Table:
     # Basic processing
     tb = process_standard(tb)
 
+    # Standardise sex dimension values
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
     assert set(tb["age"].unique()) == {str(i) for i in range(0, 100, 5)} | {"1", "100+"}, "Unexpected age values!"
 
     # Replace 100+ with 100
@@ -315,6 +329,28 @@ def process_le(tb: Table) -> Table:
 
     # Estimate actual life expectancy (not years left)
     tb["life_expectancy"] += tb["age"]
+
+    return tb
+
+
+def process_mortality(tb: Table) -> Table:
+    """Process the mortality table."""
+    # Basic processing
+    tb = process_standard(tb)
+
+    # Standardise sex dimension values
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    # per 1,000 -> per 100
+    tb["mortality_rate"] /= 10
 
     return tb
 

@@ -24,7 +24,9 @@ Command:
         --median-age $FILE_DIR/median_age.xlsx \
         --le $FILE_DIR/le.xlsx \
         --le-f $FILE_DIR/le_f.xlsx \
-        --le-m $FILE_DIR/le_m.xlsx
+        --le-m $FILE_DIR/le_m.xlsx \
+        --child-mort $FILE_DIR/child_mortality.xlsx \
+        --infant-mort $FILE_DIR/infant_mortality.xlsx
 
 
 Files needed:
@@ -81,6 +83,14 @@ Files needed:
         Title (page):           WPP2024_Crude_death_rate_%28CDR%29_%28deaths_per_1%2C000_population%29.xlsx
         Filename:               WPP2024 Crude Death Rate.xlsx
         Alias:                  death_rate.xlsx
+    - Child mortality
+        Title (page):           WPP2024_Under_five_mortality_by_sex_%285q0%29_per_1%2C000_live_births.xlsx
+        Filename:               WPP2024 Under 5 Mortality.xlsx
+        Alias:                  child_mortality.xlsx
+    - Infant mortality
+        Title (page):           WPP2024_Crude_death_rate_%28CDR%29_%28deaths_per_1%2C000_population%29.xlsx
+        Filename:               Infant Mortality Rate by Sex.xlsx
+        Alias:                  infant_mortality.xlsx
     - Births (sex)
         Title (page):           WPP2024_Total_births_by_sex_%28in_thousands%29.xlsx
         Filename:               WPP2024 Total Births by Sex.xlsx
@@ -162,6 +172,8 @@ log = get_logger()
 @click.option("--le", type=str, help="Path to life expectancy local file.")
 @click.option("--le-f", type=str, help="Path to life expectancy (females) local file.")
 @click.option("--le-m", type=str, help="Path to life expectancy (males) local file.")
+@click.option("--child-mort", type=str, help="Path to child mortality rates local file.")
+@click.option("--infant-mort", type=str, help="Path to infant mortality rates local file.")
 def main(
     upload: bool,
     population: str | None = None,
@@ -184,6 +196,8 @@ def main(
     le: str | None = None,
     le_f: str | None = None,
     le_m: str | None = None,
+    child_mort: str | None = None,
+    infant_mort: str | None = None,
 ) -> None:
     snapshot_paths = [
         (population, "un_wpp_population.csv"),
@@ -206,6 +220,8 @@ def main(
         (le, "un_wpp_le.xlsx"),
         (le_f, "un_wpp_le_f.xlsx"),
         (le_m, "un_wpp_le_m.xlsx"),
+        (child_mort, "un_wpp_child_mortality.xlsx"),
+        (infant_mort, "un_wpp_infant_mortality.xlsx"),
     ]
     for paths in snapshot_paths:
         if paths[0] is not None:
