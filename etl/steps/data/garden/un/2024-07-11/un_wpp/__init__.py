@@ -59,20 +59,9 @@ def run(dest_dir: str) -> None:
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
     tb_median_age = process_standard(tb_median_age)
-    tb_fertility = process_standard(tb_fertility)
+    tb_fertility = process_fertility(tb_fertility)
     tb_le = process_le(tb_le)
     tb_mortality = process_mortality(tb_mortality)
-
-    # Drop 55-59 age group in fertility (is all zero!)
-    assert (
-        tb_fertility.loc[tb_fertility["age"] == "55-59", "fertility_rate"] == 0
-    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
-    tb_fertility = tb_fertility.loc[tb_fertility["age"] != "55-59"]
-    # Drop 55-59 age group in births (is all zero!)
-    assert (
-        tb_births.loc[tb_births["age"] == "55-59", "births"] == 0
-    ).all(), "Unexpected non-zero births values for age group 55-59."
-    tb_births = tb_births.loc[tb_births["age"] != "55-59"]
 
     # Split estimates vs. projections
     tb_population = set_variant_to_estimates(tb_population)
@@ -304,6 +293,34 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
 
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
+
+    # Drop 55-59 age group in births (is all zero!)
+    assert (tb.loc[tb["age"] == "55-59", "births"] == 0).all(), "Unexpected non-zero births values for age group 55-59."
+    tb = tb.loc[tb["age"] != "55-59"]
+
+    return tb
+
+
+def process_fertility(tb: Table) -> Table:
+    # Basic processing
+    tb = process_standard(tb)
+
+    # Standardise sex dimension values
+    tb = harmonize_dimension(
+        tb,
+        "sex",
+        mapping={
+            "Female": "female",
+            "Male": "male",
+            "Total": "all",
+        },
+    )
+
+    # Drop 55-59 age group in fertility (is all zero!)
+    assert (
+        tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0
+    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    tb = tb.loc[tb["age"] != "55-59"]
 
     return tb
 
