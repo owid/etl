@@ -406,6 +406,19 @@ class MapBracketer:
         # In such a case, it's better to collapse the first and second bin together.
         results = {"brackets": [], "histogram": [], "dispersion": []}
         # TODO: If latest_year is False, we need to calculate the minimum average dispersion (averaged over all years).
+        # TODO: For brackets with negative values, the following search will not work. Currently, it goes like:
+        # [-1000.0, -1.0, -0.1, -0.01, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 0.01, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1.0, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1.0, 10.0, 1000.0]
+        # [-1000.0, -1.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+        # [-1000.0, -0.1, -0.01, -0.0, 1000.0]
+        # [-1000.0, -0.1, -0.01, -0.0, 0.01, 1000.0]
+        # [-1000.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1000.0]
+        # [-1000.0, -0.1, -0.01, -0.0, 0.01, 0.1, 1.0, 1000.0]
+        # But we want to try all combinations of the lower bracket, the upper bracket, and the first increment above and below zero (which should be symmetrical). This would be a bit trickier to implement.
         for bracket_low in range(len(brackets)):
             for bracket_upp in range(
                 bracket_low + MIN_NUM_BRACKETS, min(len(histogram) + 1, bracket_low + MAX_NUM_BRACKETS + 1)
@@ -559,9 +572,9 @@ class MapBracketer:
                 # The reason is that some country in a year different to the one currently selected has a larger value.
                 # This is a limitation of considering only the values of the current year, but I think it's fine.
                 # (We shouldn't use closed brackets anyway if the data is not restricted to a closed interval).
-                self.brackets_selected_grapher_values.append(min(
-                    [bracket for bracket in self.brackets if bracket >= self.max_value]
-                ))
+                self.brackets_selected_grapher_values.append(
+                    min([bracket for bracket in self.brackets if bracket >= self.max_value])
+                )
 
         if (self.brackets_selected_grapher_values[0] == self.brackets_selected_grapher_min_value) or (
             self.brackets_selected_grapher_values[0] == 0
@@ -590,6 +603,9 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     mb.latest_year = st.toggle("Consider only latest year", mb.latest_year)
     if not mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
+
+    if mb.min_value < -mb.smallest_number:
+        st.warning("The optimal bracket search is only properly implemented for purely positive brackets.")
 
     try:
         mb.run(
@@ -680,8 +696,8 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
             "Select a range of values:",
             options=mb.brackets_positive,
             value=(
-                mb.brackets_optimal[mb.bracket_type]["lower"],
-                mb.brackets_optimal[mb.bracket_type]["upper"],
+                abs(mb.brackets_optimal[mb.bracket_type]["lower"]),
+                abs(mb.brackets_optimal[mb.bracket_type]["upper"]),
             ),  # default range
         )
         # Update log map brackets.
@@ -738,7 +754,9 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
         )
     else:
         # If a minimum bracket is not defined in map bracketer, but it was in the original explorer, delete it from the latter.
-        if ("colorScaleNumericMinValue" in explorer.df_columns.columns) and (pd.notnull(explorer.df_columns.loc[index]["colorScaleNumericMinValue"])):
+        if ("colorScaleNumericMinValue" in explorer.df_columns.columns) and (
+            pd.notnull(explorer.df_columns.loc[index]["colorScaleNumericMinValue"])
+        ):
             explorer.df_columns.loc[index, "colorScaleNumericMinValue"] = None
 
     # Overwrite explorer file.
