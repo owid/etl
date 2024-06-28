@@ -13,12 +13,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("happiness")
 
     # Read table from garden dataset.
-    tb = ds_garden["happiness"].reset_index()
-
-    # pivot table
-    tb = tb.drop(columns=["population"])
-
-    tb = tb.format(["country", "year", "age_group"])
+    tb = ds_garden["happiness"]
 
     # Save outputs.
     #

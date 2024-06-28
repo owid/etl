@@ -8,8 +8,6 @@ definitions:
     display:
       numDecimalPlaces: 2
     processing_level: major
-    unit: ""
-    short_unit: ""
     origins:
         # Data product / Snapshot
       - title: World Happiness Report
@@ -46,26 +44,52 @@ definitions:
       - The data is the compilation of all previous World Happiness Reports, which can be found at https://worldhappiness.report/archive/.
   metric:
     title:
-      <% if age_group == "below 30"%>
+      <% if age_group == "below 30" %>
       Life satisfaction of people below 30
-      <% elsif age_group != "all ages"%>
-      Life satisfaction of people aged <<age_group>>
-      <% elsif age_group == "all ages"%>
+      <% elif age_group == "30-44" %>
+      Life satisfaction of people aged 30-44
+      <% elif age_group == "45-59" %>
+      Life satisfaction of people aged 45-59
+      <% elif age_group == "60 and above" %>
+      Life satisfaction of people aged 60 and above
+      <% elif age_group == "all ages" %>
       Cantril ladder score
       <% endif %>
+    unit: ""
+    short_unit: ""
     description_short:
-      <% if age_group == "all ages"%>
+      <% if age_group == "all ages" %>
       Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
       <% endif %>
     presentation:
       attribution:
-        <% if age_group == "all ages"%>
+        <% if age_group == "all ages" %>
         World Happiness Report (2012-2024)
+        <% endif %>
       title_public:
-        <% if age_group == "all ages"%>
+        <% if age_group == "all ages" %>
         Self-reported life satisfaction
+        <% endif %>
+
 
 
 
 dataset:
   update_period_days: 365
+
+
+tables:
+  happiness:
+    variables:
+      happiness_score:
+        title: |-
+          {definitions.metric.title}
+        unit: |-
+          {definitions.metric.unit}
+        description_short: |-
+          {definitions.metric.description_short}
+        presentation:
+          attribution: |-
+            {definitions.metric.presentation.attribution}
+          title_public: |-
+            {definitions.metric.presentation.title_public}

@@ -137,6 +137,9 @@ def run(dest_dir: str) -> None:
     # add back Northern Cyprus and Somaliland
     tb = pr.concat([tb, tb_countries_wo_population], ignore_index=True)
 
+    # drop population
+    tb = tb.drop(columns=["population"])
+
     tb = tb.format(["country", "year", "age_group"])
 
     # Save outputs.
