@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  Most conferences in 2020–2021 were held virtually due to the COVID-19 pandemic.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_conferences:
+    variables:
+      number_of_attendees__in_thousands:
+        title: Number of attendees
+        unit: ''
+        short_unit: ''
+        description_short: Thirteen major conferences are included.
+
+

@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  As awareness grows, incident tracking and reporting also improve, indicating that earlier incidents may have been underreported.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_incidents:
+    variables:
+      number_of_ai_incidents:
+        title: Annual reported artificial intelligence incidents and controversies
+        unit: ''
+        short_unit: ''
+        description_short: Notable incidents include a “deepfake” video of Ukrainian President Volodymyr Zelenskyy surrendering, and U.S. prisons using AI to monitor their inmates’ calls.
+
+
