@@ -292,3 +292,22 @@ steps:
     - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
   data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
     - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
+
+  # AI Index Report 2024 - Conference Attendance
+  data://garden/artificial_intelligence/2024-06-28/ai_conferences:
+     - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_conferences:
+    - data://garden/artificial_intelligence/2024-06-28/ai_conferences
+
+  # AI Index Report 2024 - Incidents
+  data://garden/artificial_intelligence/2024-06-28/ai_incidents:
+     - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_incidents:
+    - data://garden/artificial_intelligence/2024-06-28/ai_incidents
+
+
+  # AI Index Report 2024 - AI job postings
+  data://garden/artificial_intelligence/2024-06-28/ai_jobs:
+     - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_jobs:
+    - data://garden/artificial_intelligence/2024-06-28/ai_jobs

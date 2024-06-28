@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_jobs:
+    variables:
+      ai_job_postings__pct_of_all_job_postings:
+        title: Share of artificial intelligence jobs among all job postings
+        unit: '%'
+        short_unit: '%'
+        description_short: A job posting is considered an AI job if it requests one or more AI skills, e.g., "natural language processing", "neural networks", "machine learning", or "robotics".
+
+
