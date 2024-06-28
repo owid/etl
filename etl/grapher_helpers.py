@@ -1,5 +1,6 @@
 import copy
 from dataclasses import dataclass, field, is_dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
@@ -103,6 +104,9 @@ def _yield_wide_table(
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
 
+    # Keep only entity_id and year in index
+    table = table.reset_index(level=dim_names)
+
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
         grouped = table.groupby(
@@ -115,6 +119,9 @@ def _yield_wide_table(
     for dim_values, table_to_yield in grouped:
         if not isinstance(dim_values, tuple):
             dim_values = (dim_values,)
+
+        # Exclude dimensions
+        table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
         dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
@@ -137,7 +144,8 @@ def _yield_wide_table(
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
             # in a future version. Use public APIs instead.
             with warnings.ignore_warnings([DeprecationWarning]):
-                tab = table_to_yield.loc[:, [column]].copy()
+                # NOTE: this copy is important, otherwise we'd ruin metadata
+                tab = table_to_yield.loc[:, [column]].copy(deep=False)
 
             # Drop NA values
             tab = tab.dropna() if na_action == "drop" else tab
@@ -151,7 +159,7 @@ def _yield_wide_table(
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
-            tab = tab.rename(columns={column: short_name})
+            tab.rename(columns={column: short_name}, inplace=True)
 
             # add info about dimensions to metadata
             if dim_dict:
@@ -181,7 +189,7 @@ def _yield_wide_table(
             tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
 
             # Keep only entity_id and year in index
-            yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
+            yield tab
 
 
 def _uses_jinja(text: Optional[str]):
@@ -190,12 +198,17 @@ def _uses_jinja(text: Optional[str]):
     return "<%" in text or "<<" in text
 
 
+@lru_cache(maxsize=None)
+def _cached_jinja_template(text: str) -> jinja2.environment.Template:
+    return jinja_env.from_string(text)
+
+
 def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
     if not _uses_jinja(text):
         return text
 
     try:
-        return jinja_env.from_string(text).render(dim_dict)
+        return _cached_jinja_template(text).render(dim_dict)
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e

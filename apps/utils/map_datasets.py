@@ -18,7 +18,7 @@ import pandas as pd
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from etl.git import get_changed_files
+from etl.git_helpers import get_changed_files
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.version_tracker import VersionTracker
 

@@ -1,0 +1,6 @@
+tables:
+  wdi:
+    variables:
+      sh_alc_pcap_li:
+        presentation:
+          title_public: Total alcohol consumption per capita
