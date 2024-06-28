@@ -123,10 +123,17 @@ tables:
     variables:
       mortality_rate:
         title: |-
-          <% if age == 0 %>
+          <% if sex == 'all' %>
+          <% if age == '0' %>
           Infant mortality rate
           <% else %>
           Child mortality rate
+          <% endif %>
+          <% else %>
+          <% if age == '0' %>
+          << sex.title() >> infant mortality
+          <% else %>
+          << sex.title() >> child mortality
           <% endif %>
         unit: |-
           <% if age == 0 %>
