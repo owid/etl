@@ -186,6 +186,7 @@ if option:
             harmonizer = Harmonizer(
                 tb=tb,
                 colname=column_name,
+                output_file=f"{STEP_DIR}/data/garden/{dataset.m.namespace}/{dataset.m.version}/{dataset.m.short_name}.countries.json",
             )
             harmonizer.run_automatic()
 
@@ -247,8 +248,7 @@ if option:
                                 str, value_custom if value_custom not in ("", None) else value_selected
                             )
                 # 3/ PATH to export & export button
-                directory = f"{STEP_DIR}/data/garden/{dataset.m.namespace}/{dataset.m.version}"
-                path_export = f"{directory}/{dataset.m.short_name}.countries.json"
+                path_export = cast(str, harmonizer.output_file)
                 if ENV_IS_REMOTE:
                     # Submit button
                     export_btn = st.form_submit_button(
