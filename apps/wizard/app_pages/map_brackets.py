@@ -765,7 +765,6 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
         )
 
     # Overwrite explorer file.
-    # TODO: Check if the explorer works after these changes, I think the format that the explorer needs may be different (using semicolons?).
     if not explorer.has_changed():
         st.error("Explorer has not changed")
         return

@@ -60,11 +60,11 @@ class Explorer:
                 continue
             else:
                 if graphers_content_starts:
-                    graphers_content.append(line)
+                    graphers_content.append(line.lstrip())
                 elif columns_content_starts:
-                    columns_content.append(line)
+                    columns_content.append(line.lstrip())
                 else:
-                    config_content.append(line)
+                    config_content.append(line.lstrip())
 
         # Store comment lines.
         self.comments = comment_lines
@@ -137,7 +137,7 @@ class Explorer:
             df[column] = df[column].astype(str).str.lower()
 
         df_tsv = df.to_csv(sep="\t", index=False)
-        lines = [line.rstrip() for line in df_tsv.split("\n")]  # type: ignore
+        lines = ["\t" + line.rstrip() if len(line) > 0 else "" for line in df_tsv.split("\n")]  # type: ignore
 
         return lines
 
