@@ -830,6 +830,20 @@ elif use_type == USE_TYPE_EXPLORERS:
         dict.fromkeys(sum(explorer.df_graphers[explorer.df_graphers["hasMapTab"]]["yVariableIds"].tolist(), []))
     )
 
+    # Add toggle to include variable ids for which brackets have already been defined in the explorer file.
+    include_all_variable_ids = st.toggle("Include variables with brackets already defined", False)
+    if not include_all_variable_ids:
+        if "colorScaleNumericBins" in explorer.df_columns.columns:
+            # Ignore variable_ids for which a map bracket is already defined.
+            variable_ids_with_brackets_already_defined = set(
+                explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
+            )
+            variable_ids = [
+                variable_id
+                for variable_id in variable_ids
+                if variable_id not in variable_ids_with_brackets_already_defined
+            ]
+
     # Select a variable id from a dropdown menu.
     variable_id: int = st.selectbox(  # type: ignore
         label="Indicator id",
