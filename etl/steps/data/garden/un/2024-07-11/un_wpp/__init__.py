@@ -311,12 +311,11 @@ def process_fertility(tb: Table) -> Table:
     # Standardise sex dimension values
     tb = harmonize_dimension(
         tb,
-        "sex",
+        "age",
         mapping={
-            "Female": "female",
-            "Male": "male",
             "Total": "all",
         },
+        strict=False,
     )
 
     # Drop 55-59 age group in fertility (is all zero!)
