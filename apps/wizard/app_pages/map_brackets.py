@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -124,9 +124,7 @@ def load_variable_data(variable: Variable) -> pd.DataFrame:
 
 
 @st.cache_data
-def create_default_chart_config_for_variable(
-    metadata: Dict[str, Any], additional_config: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """Create a default chart for a variable with id `variable_id`."""
     chart_config = {
         "hasMapTab": True,
@@ -147,14 +145,6 @@ def create_default_chart_config_for_variable(
         "dimensions": [{"property": "y", "variableId": metadata["id"]}],
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.004.json",
     }
-
-    if additional_config is not None:
-        # NOTE: This additional_config is used to load custom configuration of a variable from an explorer file.
-        #  In the future, when working with charts, it could also include the relevant part of the chart config.
-        for key_explorer, value in additional_config.items():
-            key_grapher = EXPLORER_TO_GRAPHER_KEYS[key_explorer]
-            # Update values in "map" with the additional configuration.
-            chart_config["map"]["colorScale"][key_grapher] = value
 
     return chart_config
 
@@ -188,7 +178,7 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 
 class MapBracketer:
-    def __init__(self, variable_id: int, additional_config: Optional[Dict[str, Any]] = None):
+    def __init__(self, variable_id: int):
         self.variable_id = variable_id
         # Load variable from db.
         self.variable = load_variable_from_id(variable_id)
@@ -199,9 +189,7 @@ class MapBracketer:
         # Load regions to entity id mapping.
         self.regions_to_id = load_mappable_regions_and_ids(df=self.df)
         # Create a chart config.
-        self.chart_config = create_default_chart_config_for_variable(
-            metadata=self.metadata, additional_config=additional_config
-        )
+        self.chart_config = create_default_chart_config_for_variable(metadata=self.metadata)
         # Define a flag that, if True, the brackets will be decided based on the latest year only.
         # Otherwise, the data for all years will be considered.
         # To begin with, assume True.
@@ -555,37 +543,6 @@ class MapBracketer:
         # Update grapher version of the selected brackets.
         self._update_grapher_brackets()
 
-    # def _to_grapher_brackets(self, brackets):
-    #     brackets_grapher_values = brackets.copy()
-    #     if self.lower_bracket_open:
-    #         # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
-    #         brackets_grapher_min_value = self.max_value
-    #     else:
-    #         # Otherwise, I'm not sure what the default is, but simply leave it undefined.
-    #         brackets_grapher_min_value = min(brackets)
-
-    #     brackets_grapher_max_value = brackets_grapher_values[-1]
-    #     if self.upper_bracket_open:
-    #         brackets_grapher_values[-1] = self.min_value
-    #     else:
-    #         # To ensure the upper bracket is closed, ensure the upper bracket value is larger than any data value.
-    #         if brackets_grapher_values[-1] < self.max_value:
-    #             # Find the lowest bracket that is above the maximum value in the data, and use that as the upper bracket.
-    #             # NOTE: The result may still show an open bracket.
-    #             # The reason is that some country in a year different to the one currently selected has a larger value.
-    #             # This is a limitation of considering only the values of the current year, but I think it's fine.
-    #             # (We shouldn't use closed brackets anyway if the data is not restricted to a closed interval).
-    #             brackets_grapher_values[-1] = min(
-    #                 [bracket for bracket in brackets if bracket >= self.max_value]
-    #             )
-
-    #     if (brackets_grapher_values[0] == brackets_grapher_min_value) or (brackets_grapher_values[0] == 0):
-    #         # For some reason, when the lowest bracket is 0, the zeroth bracket gets repeated.
-    #         # No sure what the best solution is. For now, I'll remove the lowest bracket.
-    #         brackets_grapher_values = brackets_grapher_values[1:]
-
-    #     return brackets_grapher_values, brackets_grapher_min_value, brackets_grapher_max_value
-
     def _update_grapher_brackets(self):
         self.brackets_selected_grapher_values = self.brackets_selected.copy()
         if self.lower_bracket_open:
@@ -748,9 +705,6 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Update chart config given the selections.
     mb.update_chart_config()
 
-    # Display the chart.
-    chart_html(mb.chart_config, owid_env=OWID_ENV)
-
 
 def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
     if "variableId" not in explorer.df_columns.columns:
@@ -887,15 +841,30 @@ elif use_type == USE_TYPE_EXPLORERS:
     additional_config = explorer.get_variable_config(variable_id=variable_id)
 
     # Initialize map bracketer.
-    mb = MapBracketer(variable_id=variable_id, additional_config=additional_config)  # type: ignore
+    mb = MapBracketer(variable_id=variable_id)  # type: ignore
 
-    try:
-        # Interact with map bracketer.
-        map_bracketer_interactive(mb=mb)
-    except Exception as e:
-        log.error(e)
-        st.error(e)
-        st.stop()
+    edit_brackets = True
+    if len(additional_config) > 0:
+        edit_brackets = st.toggle("Edit variable with defined brackets", False)
 
-    if st.button("Save brackets in explorer file", type="primary"):
+    if edit_brackets:
+        try:
+            # Interact with map bracketer.
+            map_bracketer_interactive(mb=mb)
+        except Exception as e:
+            log.error(e)
+            st.error(e)
+            st.stop()
+    else:
+        # NOTE: This additional_config is used to load custom configuration of a variable from an explorer file.
+        #  In the future, when working with charts, it could also include the relevant part of the chart config.
+        for key_explorer, value in additional_config.items():
+            key_grapher = EXPLORER_TO_GRAPHER_KEYS[key_explorer]
+            # Update values in "map" with the additional configuration.
+            mb.chart_config["map"]["colorScale"][key_grapher] = value
+
+    # Display the chart.
+    chart_html(mb.chart_config, owid_env=OWID_ENV)
+
+    if edit_brackets and st.button("Save brackets in explorer file", type="primary"):
         update_explorer_file(mb=mb, explorer=explorer)
