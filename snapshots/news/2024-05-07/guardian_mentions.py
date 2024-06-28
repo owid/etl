@@ -164,6 +164,13 @@ WHAT IF THERE IS MISSING DATA?
 OR
 
 >>> # Get current tags for subset of countries.
+>>> country_names = get_country_name_variations(country_names={"country1", "country2"})
+>>> get_data_by_raw_mention(output_file="news_yearly-Y.csv", country_names=country_names)
+
+
+OR
+
+>>> # Get current tags for subset of countries.
 >>> COUNTRY_NAMES = get_country_name_variations()
 >>> country_names = {c: t for c, t in COUNTRY_NAMES.items() if c in {"country1", "country2"}}
 >>> get_data_by_raw_mention(output_file="news_yearly-Y.csv", country_names=country_names)
@@ -177,7 +184,7 @@ OR
 RUN SNAPSHOT STEP
 =================
 
-python snapshots/news/2024-05-07/guardian_mentions.py --path-to-file-tags snapshots/news/2024-05-07/news-yearly-combined.csv --path-to-file-mentions snapshots/news/2024-05-07/news-b-yearly-combined.csv
+python snapshots/news/2024-05-07/guardian_mentions.py --tags snapshots/news/2024-05-07/news-yearly-combined.csv --mentions snapshots/news/2024-05-07/news-b-yearly-combined.csv
 """
 
 import ast
@@ -193,6 +200,7 @@ import pandas as pd
 import requests
 import yaml
 from owid.catalog import Dataset
+from structlog import get_logger
 
 from etl.paths import DATA_DIR
 from etl.snapshot import Snapshot
@@ -219,21 +227,25 @@ with open(COUNTRY_TAGS_FILE, "r") as file:
     COUNTRY_TAGS = yaml.safe_load(file)
 COUNTRIES = list(COUNTRY_TAGS.keys())
 
+# Logger
+log = get_logger()
+
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file-tags", prompt=True, type=str, help="Path to local data file.")
-@click.option("--path-to-file-mentions", prompt=True, type=str, help="Path to local data file.")
-def main(path_to_file_tags: str, path_to_file_mentions: str, upload: bool) -> None:
-    uris = [
-        f"news/{SNAPSHOT_VERSION}/guardian_mentions.csv",
-        f"news/{SNAPSHOT_VERSION}/guardian_mentions_raw.csv",
+@click.option("--tags", type=str, help="Path to local data file.")
+@click.option("--mentions", type=str, help="Path to local data file.")
+def main(tags: Optional[str], mentions: Optional[str], upload: bool) -> None:
+    params = [
+        (tags, f"news/{SNAPSHOT_VERSION}/guardian_mentions.csv"),
+        (mentions, f"news/{SNAPSHOT_VERSION}/guardian_mentions_raw.csv"),
     ]
-    path_to_files = [
-        path_to_file_tags,
-        path_to_file_mentions,
-    ]
-    for uri, path_to_file in zip(uris, path_to_files):
+    for path_to_file, uri in params:
+        if path_to_file is None:
+            log.warning(f"Skipping {path_to_file}")
+            continue
+        log.info(f"{path_to_file}")
+
         # Create a new snapshot.
         snap = Snapshot(uri)
 
@@ -596,6 +608,11 @@ def combine_files(input_files, output_file):
 ########################################
 
 # Define exceptions (words not include, words to exclude)
+# For each country, we use various country name variations, based on our regions.yml file. These variations may not be enough, or might include unwanted keywords. To control this we define:
+## add: additional keywords to include in the query (collect also pages with these keywords)
+## remove: keywords from the original list that should not be used in the search
+# Finally, there are sometimes words that we DO NOT WANT to include in the search, since some countries might have similar names (e.g. 'Guinea' and 'Guinea-Bissau').
+## avoid: exclude pages WITH this word
 COUNTRY_EXCEPTIONS = {
     "Central African Republic": {
         "remove": {"CAR"},
@@ -631,6 +648,9 @@ COUNTRY_EXCEPTIONS = {
     "Jersey": {
         "avoid": {"United States", "US", "State", "America", "New Jersey"},  # No news with Jersey & America
     },
+    "Jordan": {
+        "avoid": {"Michael Jordan"},
+    },
     "Northern Mariana Islands": {"add": {"Northern Marianas Islands"}},
     "Niger": {"avoid": {"Nigeria"}},
     "Palestine": {"add": ["Gaza"]},
@@ -654,7 +674,7 @@ COUNTRY_EXCEPTIONS = {
 }
 
 
-def get_country_name_variations():
+def get_country_name_variations(country_names: Optional[Set[str]] = None):
     # Load regions table from disk
     tb_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
     # Extract list with country names
@@ -693,6 +713,8 @@ def get_country_name_variations():
     names_sorted = sorted(name_variations)  # type: ignore
     name_variations = {k: name_variations[k] for k in names_sorted}
 
+    if country_names is not None:
+        name_variations = {c: t for c, t in name_variations.items() if c in country_names}
     return name_variations
 
 
@@ -756,6 +778,32 @@ def get_data_by_raw_mention(country_names=None, year_range=None, output_file=Non
             if num_pages:
                 data_["num_pages"] = num_pages
             DATA.append(data_)
+
+        if output_file_base_year:
+            pd.DataFrame(DATA).to_csv(f"{output_file_base_year}-{year}.csv", index=False)
+
+    if output_file:
+        pd.DataFrame(DATA).to_csv(output_file, index=False)
+
+    return DATA
+
+
+def get_number_pages(year_range=None, output_file=None, output_file_base_year=None):
+    """Get total number of pages."""
+    # Get year range
+    if year_range is None:
+        year_range = range(YEAR_START, YEAR_END)
+
+    DATA = []
+    for year in year_range:
+        data_ = {
+            "country": "Total",
+            "year": year,
+        }
+        num_pages = get_pages_from_mentions("", year)
+        if num_pages:
+            data_["num_pages"] = num_pages
+        DATA.append(data_)
 
         if output_file_base_year:
             pd.DataFrame(DATA).to_csv(f"{output_file_base_year}-{year}.csv", index=False)
