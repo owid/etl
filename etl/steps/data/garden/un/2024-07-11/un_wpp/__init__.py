@@ -347,6 +347,7 @@ def process_le(tb: Table) -> Table:
 
     # Replace 100+ with 100
     tb["age"] = tb["age"].replace("100+", "100").astype(int)
+    tb["age"] = tb["age"].replace("0", "at_birth").astype(int)
 
     # Estimate actual life expectancy (not years left)
     tb["life_expectancy"] += tb["age"]
