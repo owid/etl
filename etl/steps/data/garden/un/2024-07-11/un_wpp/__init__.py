@@ -176,7 +176,6 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb_sex["sex_ratio"] *= 100
     # Ensure no infinit values
     tb_sex["sex_ratio"] = tb_sex["sex_ratio"].replace([float("inf"), float("-inf")], np.nan)
-    tb_sex["age"] = tb_sex["age"].replace("0", "at_birth")
 
     # Add population density
     tb_density = process_standard(tb_density)
@@ -347,8 +346,7 @@ def process_le(tb: Table) -> Table:
     assert set(tb["age"].unique()) == {str(i) for i in range(0, 100, 5)} | {"1", "100+"}, "Unexpected age values!"
 
     # Replace 100+ with 100
-    tb["age"] = tb["age"].replace("100+", "100")
-    tb["age"] = tb["age"].replace("0", "at_birth")
+    tb["age"] = tb["age"].replace("100+", "100").astype(int)
 
     # Estimate actual life expectancy (not years left)
     tb["life_expectancy"] += tb["age"]

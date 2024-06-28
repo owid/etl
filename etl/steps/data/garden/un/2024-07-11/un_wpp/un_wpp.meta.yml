@@ -100,7 +100,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              <% if age == 'at_birth' %>
+              <% if age == 0 %>
               Shown is the 'period life expectancy' at birth. This is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
               <% else %>
               Shown is the 'period life expectancy' at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
@@ -112,7 +112,7 @@ tables:
         title: Sex ratio
         unit: "males per 100 females"
         description_short: |-
-          <% if age == 'at_birth' %>
+          <% if age == 0 %>
           The number of male births per 100 female births. Biological birth ratios are slightly male-biased, with an expected ratio of 105 male births per 100 female births.
           <% elif age == 'all' %>
           ​​The number of male population per 100 female population.
