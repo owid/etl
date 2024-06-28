@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
-
 import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -11,6 +11,23 @@ paths = PathFinder(__file__)
 
 ALL_REGIONS = {reg: reg_dict for reg, reg_dict in geo.REGIONS.items() if reg != "European Union (27)"}
 ALL_REGIONS.update({"World": {}})
+
+
+def remove_regions_below_population_threshold(
+    tb: Table, regions: dict, ds_population: Dataset, threshold: float
+) -> Table:
+    """
+    Check the share of population covered by the regions in the table.
+    """
+    msk = tb["country"].isin(regions.keys())
+    tb_region = tb[msk]
+    tb_no_regions = tb[~msk]
+    tb_region = geo.add_population_to_table(tb_region, ds_population, population_col="total_population")
+    tb_region["share_population"] = tb_region["population"] / tb_region["total_population"]
+    tb_region = tb_region[tb_region["share_population"] >= threshold]
+    tb_region = tb_region.drop(columns=["total_population", "share_population"])
+    tb = pr.concat([tb_region, tb_no_regions])
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -83,7 +100,6 @@ def run(dest_dir: str) -> None:
     tb_ages["happiness_times_pop"] = tb_ages["happiness_score"] * tb_ages["population"]
 
     # set population to NaN where happiness_score is NaN
-    tb["population"] = tb["population"].where(~tb["happiness_score"].isna(), other=None)
     tb_ages["population"] = tb_ages["population"].where(~tb_ages["happiness_score"].isna(), other=None)
 
     aggr_score = {"happiness_times_pop": "sum", "population": "sum"}
@@ -97,21 +113,18 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
 
-    # For happiness by age group, remove all regions where less than 50% of the population is covered
-    # Manual check: Africa and Low income regions are not sufficiently covered
-    regions_for_age_groups = {
-        reg: reg_dict for reg, reg_dict in ALL_REGIONS.items() if reg not in ["Africa", "Low-income countries"]
-    }
-
     tb_ages = geo.add_regions_to_table(
         tb_ages,
         aggregations=aggr_score,
-        regions=regions_for_age_groups,
+        regions=ALL_REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         index_columns=["country", "year", "age_group"],
         min_num_values_per_year=1,
     )
+
+    # For happiness by age group, remove all regions where less than 50% of the population is covered
+    tb_ages = remove_regions_below_population_threshold(tb_ages, ALL_REGIONS, ds_population, threshold=0.5)
 
     # Divide the sum of the cantril ladder score times population by the total population
     # concatenate the two tables

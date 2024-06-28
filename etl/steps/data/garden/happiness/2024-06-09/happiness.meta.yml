@@ -1,34 +1,71 @@
+# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: major
     presentation:
       topic_tags:
         - Happiness & Life Satisfaction
+      attribution_short: WHR
+    display:
+      numDecimalPlaces: 2
+    processing_level: major
+    unit: ""
+    short_unit: ""
+    origins:
+        # Data product / Snapshot
+      - title: World Happiness Report
+        description: |-
+          The World Happiness Report is a partnership of Gallup, the Oxford Wellbeing Research Centre, the UN Sustainable Development Solutions Network, and the WHR’s Editorial Board.
+          It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+        date_published: "2024-03-08"
+        version_producer: 2024
+        # Citation
+        producer: Wellbeing Research Centre
+        citation_full: |-
+          Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2024). World Happiness Report 2024. University of Oxford: Wellbeing Research Centre.
+        attribution_short: WHR
+        # Files
+        url_main: https://worldhappiness.report/ed/2024/
+        date_accessed: 2024-06-20
+        # License
+        license:
+          name: ""
+          url: https://worldhappiness.report/ed/2024/
+    description_short:
+      "Self-reported life satisfaction is the answer to the question:
+      'Imagine a ladder with the best possible life being a 10, and the worst possible life being a 0.
+      Which step on that ladder would you say you stand on right now?'"
+    description_processing:
+      Average of regions is calculated by taking a population-weighted average over all countries within that region.
+      Since data per age group is not available for all countries, regional aggregates can sometimes differ.
+    description_key:
+      - The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale.
+      - The rankings are calculated by the source based on nationally representative samples for the three years prior to the year of the report, so that data for the 2024 report will draw from survey data from 2021-2023. We show the data for final year of the three-year survey period, i.e. we show the 2021-2023 survey data as 2023.
+      - The only exception is the data for the 2012 report, which uses survey data from 2005-2011, we show this data as the final year of the survey data - 2011.
+      - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
+      - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
+      - The data is the compilation of all previous World Happiness Reports, which can be found at https://worldhappiness.report/archive/.
+  metric:
+    title:
+      <% if age_group == "below 30"%>
+      Life satisfaction of people below 30
+      <% elsif age_group != "all ages"%>
+      Life satisfaction of people aged <<age_group>>
+      <% elsif age_group == "all ages"%>
+      Cantril ladder score
+      <% endif %>
+    description_short:
+      <% if age_group == "all ages"%>
+      Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
+      <% endif %>
+    presentation:
+      attribution:
+        <% if age_group == "all ages"%>
+        World Happiness Report (2012-2024)
+      title_public:
+        <% if age_group == "all ages"%>
+        Self-reported life satisfaction
+
 
 
 dataset:
   update_period_days: 365
-
-
-tables:
-  happiness:
-    variables:
-      happiness_score:
-        title: Cantril ladder score
-        unit: ""
-        short_unit: ""
-        description_short: Average of survey responses to the 'Cantril Ladder' question in the Gallup World Poll. The survey question asks respondents to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0.
-        description_processing: Average of regions is calculated by taking a population-weighted average over all countries within that region.
-        description_key:
-          - The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale.
-          - The rankings are calculated by the source based on nationally representative samples for the three years prior to the year of the report, so that data for the 2024 report will draw from survey data from 2021-2023. We show the data for final year of the three-year survey period, i.e. we show the 2021-2023 survey data as 2023.
-          - The only exception is the data for the 2012 report, which uses survey data from 2005-2011, we show this data as the final year of the survey data - 2011.
-          - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
-          - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
-          - The data is the compilation of all previous World Happiness Reports, which can be found at https://worldhappiness.report/archive/.
-        presentation:
-          attribution: World Happiness Report (2012-2024)
-          attribution_short: WHR
-          title_public: Self-reported life satisfaction
-        display:
-          numDecimalPlaces: 2
