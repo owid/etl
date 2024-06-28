@@ -119,6 +119,28 @@ tables:
           The number of male individuals per 100 female individuals, at age << age >>.
           <% endif %>
 
+  mortality_rate:
+    variables:
+      mortality_rate:
+        title: |-
+          <% if age == 0 %>
+          Infant mortality rate
+          <% else %>
+          Child mortality rate
+          <% endif %>
+        unit: |-
+          <% if age == 0 %>
+          % of infants
+          <% else %>
+          % of children
+          <% endif %>
+        description_short: |-
+          <% if age == 0 %>
+          The share of newborns who die before reaching the age of one.
+          <% else %>
+          The share of children who die before reaching the age of 5.
+          <% endif %>
+
   # un_wpp:
   #   variables:
   #     birth_rate:

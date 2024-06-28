@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     tb_birth_rate = ds_meadow["birth_rate"].reset_index()
     tb_median_age = ds_meadow["median_age"].reset_index()
     tb_le = ds_meadow["life_expectancy"].reset_index()
-    tb_mortality = ds_meadow["mortality"].reset_index()
+    tb_mortality = ds_meadow["mortality_rate"].reset_index()
 
     #
     # Process data.
@@ -101,6 +101,7 @@ def run(dest_dir: str) -> None:
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
     tb_le = tb_le.format(COLUMNS_INDEX)
     tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
+    tb_mortality = tb_mortality.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
     tables = [
@@ -114,6 +115,7 @@ def run(dest_dir: str) -> None:
         tb_median_age,
         tb_le,
         tb_sex_ratio,
+        tb_mortality,
     ]
 
     #
