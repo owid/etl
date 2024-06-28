@@ -369,7 +369,7 @@ class MapBracketer:
 
         smallest_increment = (_max_value - _min_value) / (MAX_NUM_BRACKETS)
         if smallest_increment == 0:
-            smallest_increment = (self.min_value - self.max_value) / (MAX_NUM_BRACKETS)
+            smallest_increment = (self.max_value - self.min_value) / (MAX_NUM_BRACKETS)
             self.percentiles_ignored = True
         else:
             self.percentiles_ignored = False
@@ -882,7 +882,6 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 899859
     # The following fails (because 5th and 95th percentiles coincide).
     # variable_id = 899768
-    variable_id = 899767
 
     # Load additional configuration for this variable from the explorer file, if any.
     additional_config = explorer.get_variable_config(variable_id=variable_id)
