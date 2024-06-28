@@ -127,8 +127,10 @@ def get_relative_indicator(tb, colname):
     """
     tb_ = tb.copy()
 
-    tb_["total"] = tb_.groupby("year")[colname].transform(sum)
-    return tb_[colname] / tb_["total"] * 100_000
+    tb_total = tb_[tb_["country"] == "Total"]
+    tb_ = tb_.merge(tb_total[["year", colname]], on="year", suffixes=["", "_total"])
+
+    return tb_[colname] / tb_[f"{colname}_total"] * 100_000
 
     # tb[f"{colname.replace('num_', 'relative_')}"] = tb[colname] / tb["total"] * 100_000
     # tb = tb.drop(columns=["total"])

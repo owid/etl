@@ -593,11 +593,6 @@ steps:
     # Soil-transmitted helminthiases
   data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
-  data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
 
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2024-05-18/funding:
