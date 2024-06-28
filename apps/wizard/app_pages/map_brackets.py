@@ -594,7 +594,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Add a dropdown for color scheme.
     # TODO: Add full list of color schemes.
     mb.color_scheme = st.selectbox(  # type: ignore
-        label="Color scheme (not fully implemented!)",
+        label="Color scheme (list not yet complete!)",
         options=["BuGn", "BinaryMapPaletteA"],
         help="Color scheme for the map.",
     )
@@ -603,9 +603,6 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     mb.latest_year = st.toggle("Consider only latest year", mb.latest_year)
     if not mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
-
-    if mb.min_value < -mb.smallest_number:
-        st.warning("The optimal bracket search is only properly implemented for purely positive brackets.")
 
     try:
         mb.run(
@@ -619,6 +616,9 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         log.error(e)
         st.error(e)
         st.stop()
+
+    if mb.min_value < -mb.smallest_number:
+        st.warning("The optimal bracket search is only properly implemented for purely positive brackets.")
 
     # Add toggles to control whether lower and upper brackets should be open.
     _message = ""
@@ -778,8 +778,15 @@ st.set_page_config(
     page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
-st.title("ETL Map bracket generator")
-st.markdown("""🔨 WIP.""")
+st.title("🗺️ Map bracketer")
+st.markdown(
+    """This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines. It still has various limitations, most notably:\n
+(1) It works only for indicator-based explorers.\n
+(2) It can find optimal brackets for the latest year in the data, but not all years.\n
+(3) The search for optimal brackets does not work well when there are negative values.\n
+(4) There are still many edge cases that will make this tool fail. It's work in progress!
+"""
+)
 
 # Radio buttons to choose how to use this tool.
 use_type = st.radio(
@@ -826,7 +833,7 @@ elif use_type == USE_TYPE_EXPLORERS:
     )
 
     # Add toggle to include variable ids for which brackets have already been defined in the explorer file.
-    include_all_variable_ids = st.toggle("Include variables with brackets already defined", False)
+    include_all_variable_ids = st.toggle("Include indicators with brackets already defined in the explorer file", False)
     if not include_all_variable_ids:
         if "colorScaleNumericBins" in explorer.df_columns.columns:
             # Ignore variable_ids for which a map bracket is already defined.
@@ -855,6 +862,8 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 899859
     # The following fails (because 5th and 95th percentiles coincide).
     # variable_id = 899768
+    # The following fails for some reason (I haven't looked into it).
+    # variable_id = 899774
 
     # Load additional configuration for this variable from the explorer file, if any.
     additional_config = explorer.get_variable_config(variable_id=variable_id)
@@ -864,7 +873,7 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     edit_brackets = True
     if len(additional_config) > 0:
-        edit_brackets = st.toggle("Edit variable with defined brackets", False)
+        edit_brackets = st.toggle("Edit indicator with already defined brackets", False)
 
     if edit_brackets:
         try:

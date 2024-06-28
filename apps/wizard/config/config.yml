@@ -147,13 +147,13 @@ sections:
         entrypoint: app_pages/datainsight_robot.py
         icon: ":material/lightbulb:"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
-      - title: "Map Brackets Generator"
+      - title: "Map Bracketer"
         alias: map_brackets
         entrypoint: app_pages/map_brackets.py
-        description: WIP
+        description: Create optimal map brackets
         maintainer: "@pablo"
-        icon: ":material/tv_gen:"
-        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
+        icon: ":material/map:"
+        image_url: "https://pixabay.com/get/gf9e3d46f7662d2cef0475ba068212ed47f718536e194aa51fd13ddf209507b7a68cb551facfa908a58934a316be1104debeaf736a07610b2ec1a76a51887b6cb47204cc68b02f3535cebf316ebaef9fe_640.jpg"
 
   - title: "Misc"
     description: |-
