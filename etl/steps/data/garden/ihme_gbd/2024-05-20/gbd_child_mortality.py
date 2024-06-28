@@ -42,8 +42,6 @@ def run(dest_dir: str) -> None:
     tb_deaths = add_additional_age_groups(tb_deaths)
     # Creating a table where the disease is the entity - for total under 5 deaths by cause - for a specific chart
     tb_ent = disease_as_entity(tb_deaths)
-    # Creating a table where the disease is the entity - under 5 death rates for India - for a specific chart
-    tb_india = under_five_death_rate_india(tb_deaths)
     # Creating a table for infant mortality rate - for a specific chart
     tb_infant = global_infant_mortality_rate(tb_deaths)
     tb_dalys = tb[tb["measure"] == "DALYs (Disability-Adjusted Life Years)"].copy()
@@ -65,7 +63,6 @@ def run(dest_dir: str) -> None:
         ["country", "year"],
         short_name="gbd_child_mortality_slope",
     )
-    tb_india = tb_india.format(["country", "year"], short_name="gbd_child_mortality_india")
 
     tb_infant = tb_infant.format(["country", "year"], short_name="gbd_child_mortality_infant")
     #
@@ -74,7 +71,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_deaths, tb_dalys, tb_ent, tb_india, tb_infant],
+        tables=[tb_deaths, tb_dalys, tb_ent, tb_infant],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
@@ -99,30 +96,6 @@ def global_infant_mortality_rate(tb: Table) -> Table:
     tb_infant = tb_infant.rename(columns={"value": "infant_death_rate", "cause": "country"})
 
     tb_pivot = tb_infant.pivot(values=["infant_death_rate"], index=["year", "country"], columns=["sex"])
-    tb_pivot.columns = ["_".join(col).strip() if isinstance(col, tuple) else col for col in tb_pivot.columns.values]
-    tb_pivot = tb_pivot.reset_index()
-
-    return tb_pivot
-
-
-def under_five_death_rate_india(tb: Table) -> Table:
-    """
-    Creating the data format needed for this chart:
-    https://ourworldindata.org/grapher/child-deaths-by-cause-by-sex-india
-
-    """
-    tb_india = tb[
-        (tb["measure"] == "Deaths")
-        & (tb["country"] == "India")
-        & (tb["age"] == "<5 years")
-        & (tb["metric"] == "Rate")
-        & (tb["year"] == tb["year"].max())
-    ]
-    tb_india = tb_india[["year", "cause", "value", "sex"]].copy()
-    tb_india = tb_india.rename(columns={"value": "under_five_death_rate", "cause": "country"})
-    # pivot by sex
-
-    tb_pivot = tb_india.pivot(values=["under_five_death_rate"], index=["year", "country"], columns=["sex"])
     tb_pivot.columns = ["_".join(col).strip() if isinstance(col, tuple) else col for col in tb_pivot.columns.values]
     tb_pivot = tb_pivot.reset_index()
 

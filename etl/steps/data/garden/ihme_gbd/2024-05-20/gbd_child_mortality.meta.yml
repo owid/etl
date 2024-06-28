@@ -120,26 +120,6 @@ tables:
         description_short: The estimated number of deaths among children under five years old, from each disease or injury.
         display:
           numDecimalPlaces: 0
-  gbd_child_mortality_india:
-    variables:
-      under_five_death_rate_both:
-        title: Under five death rate by cause for both sexes
-        unit: deaths per 100,000 people
-        description_short: The estimated number of deaths among children under five years old, from each disease or injury, per 100,000 people.
-        display:
-          numDecimalPlaces: 1
-      under_five_death_rate_female:
-        title: Under five death rate by cause for girls
-        unit: deaths per 100,000 people
-        description_short: The estimated number of deaths among girls under five years old, from each disease or injury, per 100,000 people.
-        display:
-          numDecimalPlaces: 1
-      under_five_death_rate_male:
-        title: Under five death rate by cause for boys
-        unit: deaths per 100,000 people
-        description_short: The estimated number of deaths among boys under five years old, from each disease or injury, per 100,000 people.
-        display:
-          numDecimalPlaces: 1
   gbd_child_mortality_infant:
     variables:
       infant_death_rate_both:
