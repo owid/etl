@@ -8,6 +8,7 @@ paths = PathFinder(__file__)
 # As reference
 ALL_COLUMNS = [
     "Country name",
+    "Population",
     # reported fatalities
     "Reported fatalities",
     "Year reported fatalities",
@@ -108,7 +109,6 @@ ALL_COLUMNS = [
 COLS_TO_DROP = [
     "WHO status",
     "ISO_3 country name",
-    "Population",
     "Income group",
     "WHO Region",
     "GRSSR participation 2009",
@@ -277,7 +277,6 @@ def run(dest_dir: str) -> None:
     tb = snap.read(header=1)
 
     tb = tb.drop(columns=COLS_TO_DROP)
-
     #
     # Process data.
     #
@@ -290,9 +289,12 @@ def run(dest_dir: str) -> None:
 
     tb = tb.rename(columns={"Country name": "country"})
 
+    # change dtype of all 'object' columns to string
+    object_columns = tb.select_dtypes(include="object").columns.tolist()
+    tb[object_columns] = tb[object_columns].astype(str)
+
     tb = tb.format(["country"])
 
-    #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
