@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -66,6 +66,13 @@ USE_TYPE_EXPLORERS = "by explorer"
 USE_TYPE_CHART = "by chart"
 USE_TYPE_ETL = "by etl path"
 
+# Create a dictionary that maps explorer elements (from the "columns" table) to grapher config elements.
+# TODO: Complete with additional keys.
+EXPLORER_TO_GRAPHER_KEYS = {
+    "colorScaleNumericBins": "customNumericValues",
+    "colorScaleNumericMinValue": "customNumericMinValue",
+}
+
 
 class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
     """The selected range of values has a minimum and a maximum that are identical. If you are considering only data from the latest year, you might want to consider all data instead and try again. Otherwise, this indicator should possibly not have a map chart."""
@@ -117,7 +124,9 @@ def load_variable_data(variable: Variable) -> pd.DataFrame:
 
 
 @st.cache_data
-def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[str, Any]:
+def create_default_chart_config_for_variable(
+    metadata: Dict[str, Any], additional_config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """Create a default chart for a variable with id `variable_id`."""
     chart_config = {
         "hasMapTab": True,
@@ -138,6 +147,14 @@ def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[s
         "dimensions": [{"property": "y", "variableId": metadata["id"]}],
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.004.json",
     }
+
+    if additional_config is not None:
+        # NOTE: This additional_config is used to load custom configuration of a variable from an explorer file.
+        #  In the future, when working with charts, it could also include the relevant part of the chart config.
+        for key_explorer, value in additional_config.items():
+            key_grapher = EXPLORER_TO_GRAPHER_KEYS[key_explorer]
+            # Update values in "map" with the additional configuration.
+            chart_config["map"]["colorScale"][key_grapher] = value
 
     return chart_config
 
@@ -171,7 +188,7 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 
 class MapBracketer:
-    def __init__(self, variable_id: int):
+    def __init__(self, variable_id: int, additional_config: Optional[Dict[str, Any]] = None):
         self.variable_id = variable_id
         # Load variable from db.
         self.variable = load_variable_from_id(variable_id)
@@ -182,7 +199,9 @@ class MapBracketer:
         # Load regions to entity id mapping.
         self.regions_to_id = load_mappable_regions_and_ids(df=self.df)
         # Create a chart config.
-        self.chart_config = create_default_chart_config_for_variable(metadata=self.metadata)
+        self.chart_config = create_default_chart_config_for_variable(
+            metadata=self.metadata, additional_config=additional_config
+        )
         # Define a flag that, if True, the brackets will be decided based on the latest year only.
         # Otherwise, the data for all years will be considered.
         # To begin with, assume True.
@@ -198,6 +217,9 @@ class MapBracketer:
         # Define the bracket type (by default, pick an arbitrary one).
         self.bracket_type = BRACKET_LABELS["log"]["x10"]
         # Define all remaining attributes with arbitrary values (they will be updated by self.run()).
+        # TODO: Currently, when loading a variable config from explorer, the openness of the brackets works well, but
+        #  the following parameters do not reflect the true openness.
+        #  We could have a radio button to select not only log, linear, custom and optimal, but also current brackets.
         self.lower_bracket_open = False
         self.upper_bracket_open = True
         self.values = pd.Series()
@@ -860,9 +882,13 @@ elif use_type == USE_TYPE_EXPLORERS:
     # variable_id = 899859
     # The following fails (because 5th and 95th percentiles coincide).
     # variable_id = 899768
+    variable_id = 899767
+
+    # Load additional configuration for this variable from the explorer file, if any.
+    additional_config = explorer.get_variable_config(variable_id=variable_id)
 
     # Initialize map bracketer.
-    mb = MapBracketer(variable_id=variable_id)  # type: ignore
+    mb = MapBracketer(variable_id=variable_id, additional_config=additional_config)  # type: ignore
 
     try:
         # Interact with map bracketer.

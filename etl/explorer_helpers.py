@@ -1,9 +1,13 @@
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
+from structlog import get_logger
 
 from etl.paths import BASE_DIR
+
+# Initialize logger.
+log = get_logger()
 
 # Default path to the explorers folder.
 EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
@@ -110,6 +114,10 @@ class Explorer:
                 for row in df["colorScaleNumericBins"]
             ]
 
+        if "colorScaleNumericMinValue" in df.columns:
+            # Convert strings of numbers to floats.
+            df["colorScaleNumericMinValue"] = df["colorScaleNumericMinValue"].astype(float)
+
         return df
 
     @staticmethod
@@ -188,3 +196,17 @@ class Explorer:
 
         # Write parsed content to file.
         Path(path).write_text(self.generate_content())
+
+    def get_variable_config(self, variable_id: int) -> Dict[str, Any]:
+        variable_config = {}
+        # Load configuration for a variable from the explorer columns section, if any.
+        if "variableId" in self.df_columns:
+            variable_row = self.df_columns.loc[self.df_columns["variableId"] == variable_id]
+
+            if len(variable_row) == 1:
+                variable_config = variable_row.set_index("variableId").loc[variable_id].to_dict()
+            elif len(variable_row) > 1:
+                # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
+                log.error(f"Explorer 'columns' table contains multiple rows for variable {variable_id}")
+
+        return variable_config
