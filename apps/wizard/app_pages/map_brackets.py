@@ -739,6 +739,10 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             mb.variable_id,
             mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
         )
+    else:
+        # If a minimum bracket is not defined in map bracketer, but it was in the original explorer, delete it from the latter.
+        if ("colorScaleNumericMinValue" in explorer.df_columns.columns) and (pd.notnull(explorer.df_columns.loc[index]["colorScaleNumericMinValue"])):
+            explorer.df_columns.loc[index, "colorScaleNumericMinValue"] = None
 
     # Overwrite explorer file.
     if not explorer.has_changed():
