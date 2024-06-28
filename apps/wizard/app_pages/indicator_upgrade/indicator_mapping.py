@@ -43,8 +43,6 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     # 1/ PROCESSING: Get indicators, find similarities and suggestions, etc.
     ###########################################################################
     indicator_upgrades, indicator_id_to_display, df_data = get_params(search_form)
-    if "indicator_upgrades_ignore" not in st.session_state:
-        st.session_state.indicator_upgrades_ignore = {iu.key: False for iu in indicator_upgrades}
 
     ###########################################################################
     # 2/ DISPLAY: Show the indicator mapping form
@@ -86,15 +84,22 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     return indicator_mapping
 
 
-def get_params(search_form):
-    """Get all the parameters required to display the widgets.
+@st.cache_data
+def _get_params_cached(
+    dataset_old_id,
+    dataset_new_id,
+    map_identical_indicators,
+    similarity_function_name,
+    enable_bulk_explore,
+):
+    """Cached version of `get_params`.
 
-    It creates IndicatorUpgrade objects.
+    `get_params` can't be hashed because its input is a custom object.
     """
     # 1/ Get indicators from old and new datasets
     old_indicators, new_indicators = get_indicators_from_datasets(
-        search_form.dataset_old_id,
-        search_form.dataset_new_id,
+        dataset_old_id,
+        dataset_new_id,
         show_new_not_in_old=False,
     )
 
@@ -110,7 +115,7 @@ def get_params(search_form):
     indicator_mapping_auto, missing_old, missing_new = preliminary_mapping_cached(
         old_indicators=old_indicators,
         new_indicators=new_indicators,
-        match_identical=search_form.map_identical_indicators,
+        match_identical=map_identical_indicators,
     )
 
     # 1.4/ Get remaining mapping suggestions
@@ -118,7 +123,7 @@ def get_params(search_form):
     suggestions = find_mapping_suggestions_cached(
         missing_old=missing_old,
         missing_new=missing_new,
-        similarity_name=search_form.similarity_function_name,
+        similarity_name=similarity_function_name,
     )  # type: ignore
 
     iu = []
@@ -144,10 +149,29 @@ def get_params(search_form):
         iu = iu_auto + iu_man
 
     # Get datapoints
-    if search_form.enable_bulk_explore:
+    if enable_bulk_explore:
         df_data = get_indicator_data_cached(list(set(old_indicators["id"]) | set(new_indicators["id"])))
     else:
         df_data = None
+
+    # Set states
+    st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
+
+    return iu, indicator_id_to_display, df_data
+
+
+def get_params(search_form):
+    """Get all the parameters required to display the widgets.
+
+    It creates IndicatorUpgrade objects.
+    """
+    iu, indicator_id_to_display, df_data = _get_params_cached(
+        search_form.dataset_old_id,
+        search_form.dataset_new_id,
+        search_form.map_identical_indicators,
+        search_form.similarity_function_name,
+        search_form.enable_bulk_explore,
+    )
 
     return iu, indicator_id_to_display, df_data
 
@@ -270,9 +294,9 @@ class IndicatorUpgrade:
                 if self.key in st.session_state["indicator_upgrades_ignore"]:
                     return st.session_state["indicator_upgrades_ignore"][self.key]
                 else:
-                    raise ValueError(
-                        f"No key {self.key} in st.session_state['indicator_upgrades_ignore']! It should be created when creating the indicator upgrades."
-                    )
+                    error_msg = f"No key {self.key} in st.session_state['indicator_upgrades_ignore']! It should be created when creating the indicator upgrades."
+                    log.error(error_msg)
+                    raise ValueError(error_msg)
             else:
                 raise ValueError(
                     "No indicator_upgrades_ignore in session state! It should be created when creating the indicator upgrades."

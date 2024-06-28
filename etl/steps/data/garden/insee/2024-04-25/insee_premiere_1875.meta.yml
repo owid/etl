@@ -1,0 +1,174 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+    processing_level: minor
+  description_from_producer_inequality: |-
+    The data from 1996 to 2011 are backcasted to allow a temporal comparison and may therefore differ from those published elsewhere on INSEE presenting the long series with breaks in the series in 2010 and 2012.
+  description_from_producer_poverty: |-
+    Includes people surveyed in Metropolitan France, living in a household whose declared income is positive or zero and whose reference person is not a student.
+  description_key_post_tax_income: Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.
+  description_key_equivalized_income: Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+  description_key_relative_poverty: This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  insee_premiere_1875:
+    variables:
+      gini:
+        title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_inequality}"
+        presentation:
+          title_public: Gini coefficient
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 2
+          tolerance: 5
+
+      p90_p10_ratio:
+        title: P90/P10 ratio
+        unit: ""
+        short_unit: ""
+        description_short: P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_inequality}"
+        presentation:
+          title_public: P90/P10 ratio
+        display:
+          name: P90/P10 ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      s80_s20_ratio:
+        title: S80/S20 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The S80/S20 ratio is the share of income received by the richest 20% divided by the share received by the poorest 20%.
+        description_key:
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_inequality}"
+        presentation:
+          title_public: S80/S20 ratio
+        display:
+          name: S80/S20 ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      headcount_50_median:
+        title: 50% of the median - Number in poverty
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people with an income below 50% of the median.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Number of people below 50% of median income
+        display:
+          name: Number of people below 50% of median income
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      headcount_60_median:
+        title: 60% of the median - Number in poverty
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people with an income below 60% of the median.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Number of people below 60% of median income
+        display:
+          name: Number of people below 60% of median income
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      headcount_ratio_50_median:
+        title: 50% of the median - Share in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population with an income below 50% of the median.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Share of population below 50% of median income
+        display:
+          name: Share of population below 50% of median income
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      headcount_ratio_60_median:
+        title: 60% of the median - Share in poverty
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population with an income below 60% of the median.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Share of population below 60% of median income
+        display:
+          name: Share of population below 60% of median income
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      income_gap_ratio_50_median:
+        title: 50% of the median - Average shortfall (%)
+        unit: "%"
+        short_unit: "%"
+        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the 'income gap ratio'. It captures the depth of poverty of those living on less than 50% of the median income.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Average shortfall from a poverty line of 50% of the median income or consumption (as a share of the poverty line)
+        display:
+          name: Average shortfall from a poverty line of 50% of the median income or consumption (as a share of the poverty line)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      income_gap_ratio_60_median:
+        title: 60% of the median - Average shortfall (%)
+        unit: "%"
+        short_unit: "%"
+        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the 'income gap ratio'. It captures the depth of poverty of those living on less than 60% of the median income.
+        description_key:
+          - "{definitions.description_key_relative_poverty}"
+          - "{definitions.description_key_post_tax_income}"
+          - "{definitions.description_key_equivalized_income}"
+        description_from_producer: "{definitions.description_from_producer_poverty}"
+        presentation:
+          title_public: Average shortfall from a poverty line of 60% of the median income or consumption (as a share of the poverty line)
+        display:
+          name: Average shortfall from a poverty line of 60% of the median income or consumption (as a share of the poverty line)
+          numDecimalPlaces: 1
+          tolerance: 5
+

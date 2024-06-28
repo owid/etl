@@ -372,7 +372,7 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
         )
         ## Show controls only if needed
         if len(chart_diffs) > st.session_state["charts-per-page"]:
-            pagination.show_controls()
+            pagination.show_controls(mode="bar")
 
     # Show charts
     with Session(TARGET_ENGINE) as target_session:

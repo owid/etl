@@ -61,7 +61,7 @@ def sanity_checks(tb: Table) -> None:
 
     """
     column_checks = (
-        tb.groupby("jurisdiction")
+        tb.groupby("jurisdiction", observed=True)
         .agg(
             {
                 # Columns 'tax' and 'ets' must contain only 0 and/or 1.
@@ -211,7 +211,9 @@ def combine_national_and_subnational_data(tb_any_sector_national: Table, tb_any_
     # Combine national and subnational data.
     tb_any_sector = tb_any_sector_national.merge(
         tb_any_sector_subnational, on=["country", "year"], how="left", suffixes=("_national", "_subnational")
-    ).fillna(0)
+    )
+    cols = [c for c in tb_any_sector.columns if c not in ["country", "year"]]
+    tb_any_sector[cols] = tb_any_sector[cols].fillna(0)
 
     # Create two new columns ets and tax, that are:
     # * 0 if no ets/tax exists.

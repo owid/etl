@@ -1,4 +1,10 @@
-"""Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`."""
+"""
+Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
+    nohup poetry run etl run luxembourg_income_study > output.log 2>&1 &
+
+"""
 
 from typing import List
 
@@ -6,6 +12,7 @@ import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
+from tabulate import tabulate
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -17,6 +24,15 @@ RELATIVE_POVLINES = [40, 50, 60]
 
 # Set age suffixes
 AGE_DICT = {"all": "", "adults": "_adults"}
+
+# Define welfare variables for sanity checks
+WELFARE_LIST = ["dhi", "mi", "dhci"]
+
+# Define equivalization
+EQUIVALIZATION_LIST = ["eq", "pc"]
+
+# Set table format when printing
+TABLEFMT = "pretty"
 
 
 def run(dest_dir: str) -> None:
@@ -109,6 +125,11 @@ def run(dest_dir: str) -> None:
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
+    # Sanity checks
+    tb_sanity = ds_garden["luxembourg_income_study"].reset_index()
+    tb_sanity_adults = ds_garden["luxembourg_income_study_adults"].reset_index()
+    sanity_checks(tb_sanity)
+    sanity_checks(tb_sanity_adults)
     ds_garden.save()
 
 
@@ -362,3 +383,207 @@ def percentiles_table(tb_name: str, ds_meadow: Dataset, tb_keyvars: Table) -> Ta
     tb = add_metadata_vars_distribution(tb)
 
     return tb
+
+
+def sanity_checks(tb: Table) -> Table:
+    """
+    Perform sanity checks on the data
+    """
+
+    tb = tb.copy()
+
+    check_between_0_and_1(tb, variables=["gini"], welfare=WELFARE_LIST)
+    check_shares_sum_100(tb, welfare=WELFARE_LIST, margin=0.5)
+    check_negative_values(tb)
+    check_monotonicity(tb, metric=["avg", "thr", "share"], welfare=WELFARE_LIST)
+    check_avg_between_thr(tb, welfare=WELFARE_LIST)
+
+    return tb
+
+
+def check_between_0_and_1(tb: Table, variables: list, welfare: list):
+    """
+    Check that indicators are between 0 and 1
+    """
+
+    tb = tb.copy()
+
+    for e in EQUIVALIZATION_LIST:
+        for v in variables:
+            for w in welfare:
+                col = f"{v}_{w}_{e}"
+                mask = (tb[col] > 1) | (tb[col] < 0)
+                any_error = mask.any()
+
+                if any_error:
+                    # Filter only values lower than 0 or higher than 1
+                    tb_error = tb[mask].copy().reset_index()
+                    paths.log.fatal(
+                        f"""Values for {col} are not between 0 and 1 in {tb_error.m.short_name}:
+                        {_tabulate(tb_error[['country', 'year', col]])}"""
+                    )
+
+    return tb
+
+
+def check_shares_sum_100(tb: Table, welfare: list, margin: float):
+    """
+    Check if the sum of the variables is 100
+    """
+
+    tb = tb.copy()
+    # Create a list of variables containing pxpy_share
+    variables = [f"share_p{i}" for i in range(10, 110, 10)]
+    for e in EQUIVALIZATION_LIST:
+        for w in welfare:
+            # Set columns to evaluate
+            cols = [f"{v}_{w}_{e}" for v in variables]
+            # Get sum of shares
+            tb["sum_check"] = tb[cols].sum(axis=1)
+            # Count the nulls between the 10 decile share variables
+            tb["null_check"] = tb[cols].isnull().sum(1)
+
+            mask = (tb["sum_check"] >= 100 + margin) | (tb["sum_check"] <= 100 - margin) & (tb["null_check"] == 0)
+            any_error = mask.any()
+
+            if any_error:
+                tb_error = tb[mask].reset_index(drop=True).copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} share observations ({w}_{e}) are not adding up to 100% in {tb_error.m.short_name}:
+                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
+                )
+
+    return tb
+
+
+def check_negative_values(tb: Table):
+    """
+    Check if there are negative values in the variables
+    """
+
+    tb = tb.copy()
+
+    # Define columns as all the columns minus country and year and the ones containing "gini"
+    variables = [col for col in tb.columns if "gini" not in col and col not in ["country", "year"]]
+
+    for v in variables:
+        # Create a mask to check if any value is negative
+        mask = tb[v] < 0
+        any_error = mask.any()
+
+        if any_error:
+            tb_error = tb[mask].reset_index(drop=True).copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {v} are negative in {tb_error.m.short_name}:
+                {_tabulate(tb_error[['country', 'year', v]])}"""
+            )
+
+    return tb
+
+
+def check_monotonicity(tb: Table, metric: list, welfare: list):
+    """
+    Check monotonicity for shares, thresholds and averages
+    """
+
+    tb = tb.copy()
+
+    # Create a list of variables containing pxpy_share
+    variables = [f"p{i}" for i in range(10, 110, 10)]
+
+    for e in EQUIVALIZATION_LIST:
+        for w in welfare:
+            for m in metric:
+                # Set columns to evaluate
+                cols = [f"{m}_{v}_{w}_{e}" for v in variables]
+
+                check_vars = []
+                for i in range(len(cols) - 1):
+                    # Create a column that checks if the next value is higher than the previous one
+                    tb[f"monotonicity_check_{i}"] = tb[cols[i + 1]] >= tb[cols[i]]
+                    check_vars.append(f"monotonicity_check_{i}")
+
+                # Create a column that checks if all the previous columns are True
+                tb["monotonicity_check"] = tb[check_vars].all(1)
+
+                # Count the nulls between the 10 decile share variables
+                tb["null_check"] = tb[cols].isnull().sum(1)
+
+                # Create a mask to check if all the previous columns are True
+                mask = (~tb["monotonicity_check"]) & (tb["null_check"] == 0)
+                any_error = mask.any()
+
+                if any_error:
+                    tb_error = tb[mask].reset_index(drop=True).copy()
+                    paths.log.fatal(
+                        f"""{len(tb_error)} observations for {m}_{w}_{e} are not monotonically increasing in {tb_error.m.short_name}:
+                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f")}"""
+                    )
+
+    return tb
+
+
+def check_avg_between_thr(tb: Table, welfare: list) -> Table:
+    """
+    Check that each avg is between the corresponding thr
+    """
+
+    tb = tb.copy()
+
+    for e in EQUIVALIZATION_LIST:
+        for w in welfare:
+            check_cols = []
+            check_nulls = []
+            for i in range(10, 110, 10):
+                # Create lower bound, avg and upper bound columns
+                tb["avg"] = tb[f"avg_p{i}_{w}_{e}"]
+
+                if i == 10:
+                    tb["thr_lower"] = 0
+                    tb["thr_upper"] = tb[f"thr_p{i}_{w}_{e}"]
+
+                    # Count the nulls between the vars I am checking
+                    tb[f"null_check_{i}"] = tb[["thr_lower", "avg", "thr_upper"]].isnull().sum(1)
+
+                    # Create check column
+                    tb[f"check_{i}"] = (tb["avg"] >= tb["thr_lower"]) & (tb["avg"] <= tb["thr_upper"])
+
+                elif i < 100:
+                    tb["thr_lower"] = tb[f"thr_p{i-10}_{w}_{e}"]
+                    tb["thr_upper"] = tb[f"thr_p{i}_{w}_{e}"]
+
+                    # Count the nulls between the vars I am checking
+                    tb[f"null_check_{i}"] = tb[["thr_lower", "avg", "thr_upper"]].isnull().sum(1)
+
+                    # Create check column
+                    tb[f"check_{i}"] = (tb["avg"] >= tb["thr_lower"]) & (tb["avg"] <= tb["thr_upper"])
+
+                else:
+                    tb["thr_lower"] = tb[f"thr_p{i-10}_{w}_{e}"]
+                    # Count the nulls between the vars I am checking
+                    tb[f"null_check_{i}"] = tb[["thr_lower", "avg"]].isnull().sum(1)
+
+                    # Create check column
+                    tb[f"check_{i}"] = tb["avg"] >= tb["thr_lower"]
+
+                check_cols.append(f"check_{i}")
+                check_nulls.append(f"null_check_{i}")
+
+            tb["check"] = tb[check_cols].all(1)
+            tb["null_check"] = tb[check_nulls].sum(1)
+
+            mask = (~tb["check"]) & (tb["null_check"] == 0)
+            any_error = mask.any()
+
+            if any_error:
+                tb_error = tb[mask].reset_index(drop=True).copy()
+                paths.log.fatal(
+                    f"""{len(tb_error)} observations for avg {w}_{e} are not between the corresponding thresholds in {tb_error.m.short_name}:
+                    {_tabulate(tb_error[['country', 'year'] + check_cols])}"""
+                )
+
+    return tb
+
+
+def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)

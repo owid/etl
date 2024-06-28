@@ -20,7 +20,7 @@ We obtain after tax income by using the disposable household income variable (`d
 
 We estimate before tax income by calculating the sum of income from labor and capital (variable `hifactor`), cash transfers and in-kind goods and services from privates (`hiprivate`) and private pensions (`hi33`). We do this only for surveys where tax and contributions are fully captured, collected or imputed.
 
-We obtain after tax income (cash) by using the disposable household cash income variable (dhci).
+We obtain after tax income (cash) by using the disposable household cash income variable (`dhci`).
 
 We convert income data from local currency into international-$ by dividing by the [LIS PPP factor](https://www.lisdatacenter.org/resources/ppp-deflators/), available as an additional database in the LISSY platform.
 
@@ -388,7 +388,7 @@ def var_metadata_income_and_equivalence_scale(var, origins, wel, e) -> VariableM
             description_key=[INC_CONS_DICT[wel]["description"], EQUIVALENCE_SCALES_DICT[e]["description"]],
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-        {PROCESSING_GINI_MEAN_MEDIAN}""",
+{PROCESSING_GINI_MEAN_MEDIAN}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,

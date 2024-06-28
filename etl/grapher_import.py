@@ -12,6 +12,7 @@ Usage:
 import datetime
 import json
 import os
+import warnings
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
@@ -199,6 +200,10 @@ def upsert_table(
     in the format (year, entityId, value)) into mysql. The metadata
     of the variable is used to fill the required fields.
     """
+
+    # We sometimes get a warning, but it's unclear where it is coming from
+    # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
     assert set(table.index.names) == {"year", "entity_id"}, (
         "Tables to be upserted must have only 2 indices: year and entity_id. Instead" f" they have: {table.index.names}"

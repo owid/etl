@@ -532,8 +532,9 @@ def concatenate(objs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
     """
     # Iterate on categorical columns common to all dfs
     for col in set.intersection(*[set(df.select_dtypes(include="category").columns) for df in objs]):
+        ignore_order = any([not df[col].cat.ordered for df in objs])
         # Generate the union category across dfs for this column
-        uc = union_categoricals([df[col] for df in objs])
+        uc = union_categoricals([df[col] for df in objs], ignore_order=ignore_order)
         # Change to union category for all dataframes
         for df in objs:
             df.loc[:, col] = pd.Categorical(df[col].values, categories=uc.categories)

@@ -117,6 +117,8 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+# Session state to track staging creation time
+VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
 
 
 def get_namespaces(step_type: str) -> List[str]:
@@ -673,38 +675,53 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=500, **kwargs):
+def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     chart_config_tmp = deepcopy(chart_config)
 
     chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
     chart_config_tmp["adminBaseUrl"] = owid_env.base_site
     chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
 
+    # HTML = f"""
+    # <!DOCTYPE html>
+    # <html>
+    #     <head>
+    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
+    #         <link
+    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
+    #         rel="stylesheet"
+    #         />
+    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    #     </head>
+    #     <body class="StandaloneGrapherOrExplorerPage">
+    #         <main>
+    #             <figure data-grapher-src></figure>
+    #         </main>
+    #         <div class="site-tools"></div>
+    #         <script>
+    #             document.cookie = "isAdmin=true;max-age=31536000"
+    #         </script>
+    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+    #         <script type="module">
+    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+    #         </script>
+    #     </body>
+    # </html>
+    # """
+
     HTML = f"""
-    <!DOCTYPE html>
-    <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link
-            href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-            rel="stylesheet"
-            />
-            <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-        </head>
-        <body class="StandaloneGrapherOrExplorerPage">
-            <main>
-                <figure data-grapher-src></figure>
-            </main>
-            <div class="site-tools"></div>
-            <script>
-                document.cookie = "isAdmin=true;max-age=31536000"
-            </script>
-            <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-            <script type="module">
-                var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-            </script>
-        </body>
-    </html>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
+    <div class="StandaloneGrapherOrExplorerPage">
+        <main>
+            <figure data-grapher-src></figure>
+        </main>
+        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
+        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
+        <script type="module">
+            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+        </script>
+    </div>
     """
 
     components.html(HTML, height=height, **kwargs)
@@ -799,31 +816,33 @@ class Pagination:
             )
 
 
-def get_staging_creation_time(session: Optional[Session] = None, key: str = "server_creation_time"):
+def _get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     query_ts = "show table status like 'charts'"
-
-    if session:
-        df = read_sql(query_ts, session)
-    else:
-        with Session(OWID_ENV.engine) as source_session:
-            df = read_sql(query_ts, source_session)
+    df = read_sql(query_ts, session)
     assert len(df) == 1, "There was some error. Make sure that the staging server was properly set."
-
     create_time = df["Create_time"].item()
-
-    if key not in st.session_state:
-        st.session_state[key] = create_time
-
     return create_time
 
 
-def set_staging_creation_time(key: str = "server_creation_time") -> None:
+def get_staging_creation_time(session: Optional[Session] = None):
+    """Get staging server creation time."""
+    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
+        set_staging_creation_time(session)
+    return st.session_state[VARNAME_STAGING_CREATION_TIME]
+
+
+def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
     """Gest staging server creation time estimate."""
-    if OWID_ENV.env_local == "staging":
-        st.session_state[key] = get_staging_creation_time()
+
+    if session is None:
+        if OWID_ENV.env_local == "staging":
+            with Session(OWID_ENV.engine) as session:
+                st.session_state[key] = _get_staging_creation_time(session)
+        else:
+            st.session_state[key] = None
     else:
-        st.session_state[key] = None
+        st.session_state[key] = _get_staging_creation_time(session)
 
 
 def st_toast_error(message: str) -> None:
