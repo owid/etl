@@ -532,6 +532,9 @@ class Table(pd.DataFrame):
 
     def copy(self, deep: bool = True) -> "Table":
         """Copy table together with all its metadata."""
+        # This could be causing this warning:
+        #   Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+        # but I'm not sure how to fix it
         tab = super().copy(deep=deep)
         return tab.copy_metadata(self)
 

@@ -110,6 +110,9 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
     tb_gr = tb.groupby(["year", "age_group", "sex", "risk_factor"])
     tb_gr_out = Table()
     for gr_name, gr in tb_gr:
+        # Exclude regions from the original dataset and replace them with ours. The original dataset has `Low-income countries` etc.
+        gr = gr.loc[~gr["country"].isin(REGIONS_TO_ADD), :]
+
         for region in REGIONS_TO_ADD:
             # List of countries in region.
             countries_in_region = geo.list_members_of_region(
@@ -117,7 +120,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
                 ds_regions=ds_regions,
                 ds_income_groups=ds_income_groups,
             )
-            gr_cal = gr[["country", "year", "best", "lo", "hi", "population"]]
+            gr_cal = gr.loc[:, ["country", "year", "best", "lo", "hi", "population"]]
             # Add region aggregates.
             gr_reg = geo.add_region_aggregates(
                 df=gr_cal,
