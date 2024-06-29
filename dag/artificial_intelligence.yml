@@ -305,9 +305,16 @@ steps:
   data://grapher/artificial_intelligence/2024-06-28/ai_incidents:
     - data://garden/artificial_intelligence/2024-06-28/ai_incidents
 
-
   # AI Index Report 2024 - AI job postings
   data://garden/artificial_intelligence/2024-06-28/ai_jobs:
      - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_jobs:
     - data://garden/artificial_intelligence/2024-06-28/ai_jobs
+
+  # AI Index Report 2024 - AI investment trends
+  data://garden/artificial_intelligence/2024-06-28/ai_investment:
+     - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
+     - data://garden/bls/2024-05-16/us_consumer_prices
+
+  data://grapher/artificial_intelligence/2024-06-28/ai_investment:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
