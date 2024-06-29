@@ -1,3 +1,4 @@
+import pandas as pd
 from owid.catalog import Table
 
 
