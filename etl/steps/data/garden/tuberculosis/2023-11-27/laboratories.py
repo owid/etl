@@ -33,8 +33,8 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("laboratories")
     snap = paths.load_snapshot("data_dictionary.csv")
     ds_un_wpp = paths.load_dataset("un_wpp")
-    ds_regions = paths.load_dependency("regions")
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     ds_pop = ds_un_wpp["population"].reset_index()
     # Load data dictionary from snapshot.

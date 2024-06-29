@@ -34,11 +34,11 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("burden_estimates")
     snap = paths.load_snapshot("data_dictionary.csv")
     # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
     # Load population dataset.
-    ds_population = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     # Load data dictionary from snapshot.
     dd = snap.read()

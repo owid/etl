@@ -1,6 +1,4 @@
-from typing import cast
-
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -12,7 +10,7 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    ds_garden = cast(Dataset, paths.load_dependency("un_wpp"))
+    ds_garden = paths.load_dataset("un_wpp")
     tb_pop = ds_garden["population"].reset_index()
 
     age_group_size = [5, 10]

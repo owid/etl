@@ -34,9 +34,9 @@ def run(dest_dir: str) -> None:
     # Load data dictionary from snapshot.
     dd = snap.read()
     # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
     # Read table from meadow dataset.
     tb = ds_meadow["drug_resistance_surveillance"].reset_index()
     #

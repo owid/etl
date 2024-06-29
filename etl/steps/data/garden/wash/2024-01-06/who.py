@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("who")
     # Add population
-    ds_population = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
     tb = ds_meadow["who"].reset_index()
     tb = tb.rename(columns={"name": "country"})
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
