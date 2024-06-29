@@ -602,6 +602,39 @@ class Table(pd.DataFrame):
     def astype(self, *args, **kwargs) -> "Table":
         return super().astype(*args, **kwargs)  # type: ignore
 
+    @overload
+    def __getitem__(
+        self,
+        item: Union[
+            "Table",
+            pd.DataFrame,
+            variables.Variable,
+            pd.Series,
+            List[str | Literal[Any]],
+            Tuple[str | Literal[Any]],
+            ...,
+        ],
+    ) -> "Table":
+        ...
+
+    @overload
+    def __getitem__(self, item: str) -> "variables.Variable":
+        ...
+
+    def __getitem__(self, item: Any) -> Union["Table", "variables.Variable"]:
+        return super().__getitem__(item)
+
+    @overload
+    def drop_duplicates(self, *args, **kwargs) -> "Table":
+        ...
+
+    @overload
+    def drop_duplicates(self, inplace: Literal[True], *args, **kwargs) -> None:
+        ...
+
+    def drop_duplicates(self, *args, **kwargs) -> "Table":
+        return super().drop_duplicates(*args, **kwargs)
+
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
         """Fix type signature of join."""
         t = super().join(other, *args, **kwargs)
@@ -787,7 +820,7 @@ class Table(pd.DataFrame):
 
         return t
 
-    def dropna(self, *args, **kwargs) -> Optional["Table"]:
+    def dropna(self, *args, **kwargs) -> "Table":
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
         if tb is None:
