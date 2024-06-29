@@ -8,13 +8,16 @@ definitions:
       grapher_config:
         note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
 
-    description_key:
+    description_processing: |-
           - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
           - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
           - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
           - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
           - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+    description_short: Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
 
+    unit: 'constant 2021 US $'
+    short_unit: '$'
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -26,127 +29,105 @@ tables:
     variables:
       ai_infrastructure_research_governance:
         title: AI infrastructure, research, and governance
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       ar_vr:
-        title: AR/VR
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Augmented or virtual reality
+
       av:
         title: Autonomous vehicles
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       agritech:
-        title: Agritech
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Agricultural technology
+
       creative__music__video_content:
         title: Creative, music, and video content
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       cybersecurity__data_protection:
         title: Cybersecurity and data protection
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       data_management__processing:
         title: Data management and processing
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       drones:
         title: Drones
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       ed_tech:
-        title: Ed-tech
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Educational technology
+
       energy__oil__and_gas:
         title: Energy, oil, and gas
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       entertainment:
         title: Entertainment
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       facial_recognition:
         title: Facial recognition
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       fintech:
-        title: Fintech
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Financial technology
+
       fitness_and_wellness:
         title: Fitness and wellness
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       quantum_computing:
         title: Quantum computing
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       hardware:
         title: Hardware
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       insurtech:
-        title: Insurtech
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Insurance technology
+
       retail:
         title: Retail
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       semiconductor:
         title: Semiconductor
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       vc:
         title: Venture capital
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       legal_tech:
-        title: Legal tech
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        title: Legal technology
+
       manufacturing:
         title: Manufacturing
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       marketing__digital_ads:
         title: Marketing and digital ads
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
       medical_and_healthcare:
         title: Medical and healthcare
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+
+      nlp__customer_support:
+        title: Natural Language Processing and customer support
+
       merger_acquisition:
         title: Merger and acquisition
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        description_short: A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
+
       minority_stake:
         title: Minority stake
-        unit: 'constant 2021 US $'
-        short_unit: '$'
-      nlp__customer_support:
-        title: NLP and customer support
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        description_short: A minority stake is an ownership interest of less than 50% of the total shares of a company.
+
       private_investment:
         title: Private investment
-        unit: 'constant 2021 US $'
-        short_unit: '$'
-        description_short: Includes companies that received more than $1.5 million in investment. This data is expressed in US dollars, adjusted for inflation.
+        description_short: Private investment in AI companies in each year that received an investment of more than $1.5 million (not adjusted for inflation).
+
       public_offering:
         title: Public offering
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        description_short: A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
+
       generative_ai:
         title: Generative AI
-        unit: 'constant 2021 US $'
-        short_unit: '$'
+        description_short: Generative AI refers to AI systems that can create new content, such as images, text, or music, based on patterns learned from existing data.
+
       companies:
         title: Newly founded AI companies
         unit: 'companies'
         short_unit: ''
         description_short: Newly-funded AI companies in each year that received an investment of more than $1.5 million (not adjusted for inflation).
+        description_processing: ''
+        presentation:
+          grapher_config:
+            note: ''
