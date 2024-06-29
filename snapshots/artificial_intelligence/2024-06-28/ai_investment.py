@@ -16,7 +16,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/ai_conferences.csv")
+    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/ai_investment.csv")
     all_dfs = get_data()
     df_to_file(all_dfs, file_path=snap.path)
     # Download data from source, add file to DVC and upload to S3.
@@ -37,20 +37,34 @@ def get_data():
     common_path = "https://drive.google.com/uc?export=download&id="
     # IDs of the download files (in Google Drive) (Investment by focus area 1 - by country and 2 - World)
     ids = [
-        "1MQSBF5fpEfZs8IqlOJvndSwHXxDtFrn1",
-        "1cifefnHzGq6lHAnNYNKB1mqGM6l5AOJz",
-        "1EdjkbUmvniu_VADZ_n4ZWwyOXjnbllTB",
+        "13iuXuFMyn7BYjZ83l7NpVpPT5LDjM9xl",  # 4.3.1 corporate
+        "18g2Li2wbimD2Xb08p8aOPsHEuD43LqpJ",  # 4.3.3 generative
+        "1ujGe-xe6e1ZHPAHmYT6rURfBoSHLC0-R",  # 4.3.4. companies
+        "1W12tO7AxcSQkJMfPg4MsVz_QqlloCqGO",  # 4.3.17 investment by focus area and region
     ]
-
     df_list = []
 
     try:
         # Fetch data from Google Drive and store in a list of DataFrames
         for i, drive_id in enumerate(ids):
             df_add = pr.read_csv(common_path + drive_id)
-            # Total conferences csv doesn't have a conference column, so we add "Total" to the Conference column
-            if "Conference" not in df_add.columns:
-                df_add["Conference"] = "Total"
+            if "Investment activity" not in df_add.columns:
+                if i == 1:
+                    df_add["Investment activity"] = "Generative AI"
+                elif i == 2:
+                    df_add["Investment activity"] = "Companies"
+            if "Geographic area" not in df_add.columns:
+                df_add["Geographic area"] = "World"
+            if "Focus area" in df_add.columns:
+                df_add = df_add.rename(columns={"Focus area": "Investment activity"})
+
+            df_add = df_add.rename(columns={"Investment activity": "Investment type"})
+            if "Total investment (in billions of U.S. dollars)" in df_add.columns:
+                df_add["variable_name"] = "Total investment (in billions of U.S. dollars)"
+                df_add = df_add.rename(columns={"Total investment (in billions of U.S. dollars)": "value"})
+            elif "Number of newly funded AI companies in the world" in df_add.columns:
+                df_add["variable_name"] = "Number of newly funded AI companies"
+                df_add = df_add.rename(columns={"Number of newly funded AI companies in the world": "value"})
             df_list.append(df_add)
 
         # Concatenate the DataFrames from the list

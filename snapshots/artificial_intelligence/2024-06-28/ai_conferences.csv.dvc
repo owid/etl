@@ -7,6 +7,7 @@ meta:
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
     date_published: "2024"
+    title_snapshot: AI Index Report - AI Conferences
     description_snapshot: |-
       Data from AI Index Report on annual attendance of large conferences (split by type).
 

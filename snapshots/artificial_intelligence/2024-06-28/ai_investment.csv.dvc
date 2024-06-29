@@ -7,26 +7,25 @@ meta:
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
     date_published: "2024"
-    title_snapshot: AI Index Report - AI Job Postings by Geographic Area
+    title_snapshot: AI Index Report - Investment Data
 
     description_snapshot: |-
-      Data from Lightcast via the AI Index Report on the share of AI job postings by geographic area. Lightcast has analyzed hundreds of millions of job postings from over 51,000 websites since 2010, identifying those that require AI skills.
+      Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing. Quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
+
     # Citation
-    producer: Lightcast via AI Index
+    producer: Quid via AI Index
     citation_full: |-
       Nestor Maslej, Loredana Fattorini, Raymond Perrault, Vanessa Parli, Anka Reuel, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald, and Jack Clark, “The AI Index 2024 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2024.
     attribution_short: AI Index
 
     # Files
     url_main: https://drive.google.com/uc?export=download&id=1EdjkbUmvniu_VADZ_n4ZWwyOXjnbllTB
-    url_download: https://drive.google.com/uc?export=download&id=1tWMmU9QdCAknlW_1KaDSMqhRdt21TLXb
     date_accessed: 2024-06-28
     # License
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by-nd/4.0/?ref=chooser-v1
-
 outs:
-  - md5: e4529eb4466156647f5bfe244cc39a52
-    size: 2542
-    path: ai_jobs.csv
+  - md5: 23e22964542b878ab8564a737ce6ff70
+    size: 47789
+    path: ai_investment.csv
