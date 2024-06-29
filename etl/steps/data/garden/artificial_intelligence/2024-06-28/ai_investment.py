@@ -70,7 +70,7 @@ def run(dest_dir: str) -> None:
     # Adjust CPI values so that 2021 is the reference year (2021 = 100)
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
 
-    # Adjust 'fp_cpi_totl' column by the 2021 CPI
+    # Adjust 'all_items' column by the 2021 CPI
     tb_us_cpi["cpi_adj_2021"] = 100 * tb_us_cpi["all_items"] / cpi_2021
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
     tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="inner")
@@ -79,7 +79,6 @@ def run(dest_dir: str) -> None:
         tb_cpi_inv[col] = round(100 * tb_cpi_inv[col] / tb_cpi_inv["cpi_adj_2021"])
 
     tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
-
     tb_cpi_inv = tb_cpi_inv.format(["country", "year"])
 
     #
