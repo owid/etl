@@ -116,6 +116,14 @@ sections:
       entrypoint: app_pages/harmonizer.py
       icon: ":material/music_note:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+    - title: "Map Bracketer"
+      alias: map_brackets
+      entrypoint: app_pages/map_brackets.py
+      description: Create optimal map brackets
+      maintainer: "@pablo"
+      icon: ":material/map:"
+      image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
+
 
   - title: "Monitoring"
     description: |-
