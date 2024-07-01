@@ -4,7 +4,7 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Mental Health Prevalence
+    title: Global Burden of Disease - Mental Health Burden
     description: |-
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the prevalence of mental health conditions for a range of age-groups across males and females.
     date_published: "2024-05-17"
@@ -15,13 +15,13 @@ meta:
     attribution_short: "IHME-GBD"
     # Files
     url_main: https://vizhub.healthdata.org/gbd-results/
-    date_accessed: 2024-05-20
+    date_accessed: 2024-07-01
 
     # License
     license:
       name: Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
-  - md5: a40650b60f29c1a311c3b5455e8080d9
-    size: 343355042
-    path: gbd_mental_health.feather
+  - md5: 67a4b1633a73010028224dc62d585cfe
+    size: 1897426
+    path: gbd_mental_health_burden.feather
