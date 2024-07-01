@@ -602,7 +602,11 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     )
 
     # Add toggle to control whether the brackets are based only on the data for the latest year, or all years.
-    mb.latest_year = st.toggle("Consider only latest year", mb.latest_year)
+    mb.latest_year = st.toggle(
+        "Consider only latest year",
+        mb.latest_year,
+        help="Consider only the values of the latest year in the data, given that the latest year is usually the default view of the chart. These values will be used to create the ranges of values available for the brackets, as well as the optimal brackets. NOTE: Currently, the search for optimal brackets works only for the latest year in the data.",
+    )
     if not mb.latest_year:
         st.warning("The optimal bracket search is only properly implemented if choosing data for the latest year.")
 
@@ -643,7 +647,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         min_value=0,
         max_value=100,
         value=(MIN_PERCENTILE, MAX_PERCENTILE),
-        help="Currently, this only affects linear brackets",
+        help="This range is used to calculate the total range of values for brackets, to avoid creating a bracket just for one or a few outliers. For example, if there is a single, very high value, the upper bracket will cover only values below the 95th percentile, and the outlier will be placed in the very last (open) bracket. NOTE: Currently, this range only affects linear brackets.",
     )
     mb.run(
         reload_data_values=False,
@@ -671,11 +675,12 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     }
     # Create a bracket type selector with a select box.
     bracket_type = st.selectbox(
-        "Select linear or log-like",
+        "Bracket type (linear, log-like, or custom)",
         options=bracket_type_labels,
         # NOTE: By default, the first option will be selected, which is expected to be the optimal one.
         index=0,
         # horizontal=True,
+        help="We usually use either linear or log-like brackets. And we usually prefer certain increments for linear brackets (e.g. 100, or 20, or 5000) rather than arbitrary increments (e.g. 700, 42, or 3.14). Similarly, we usually prefer certain factors for log-like brackets, namely 2 (and 2.5), 3 (and 3.33), and 10. Here you can choose among those options. Alternatively, you can manually enter custom values.",
     )
     mb.bracket_type = bracket_type_labels[bracket_type]  # type: ignore
     if mb.bracket_type == BRACKET_LABELS["custom"]["custom"]:
@@ -699,24 +704,26 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
             st.error("No brackets possible.")
             st.stop()
         min_selected, max_selected = st.select_slider(  # type: ignore
-            "Select a range of values:",
+            "Full range of valid positive brackets",
             options=mb.brackets_positive,
             value=(
                 abs(mb.brackets_optimal[mb.bracket_type]["lower"]),
                 abs(mb.brackets_optimal[mb.bracket_type]["upper"]),
-            ),  # default range
+            ),
+            help="Select the value of the minimum and maximum brackets (in absolute value).",
         )
         # Update log map brackets.
         mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
     elif mb.bracket_type in list(BRACKET_LABELS["linear"].values()):
         # Create a slider for all values.
         min_selected, max_selected = st.select_slider(  # type: ignore
-            "Select a range of values:",
+            "Full range of values",
             options=mb.brackets,
             value=(
                 mb.brackets_optimal[mb.bracket_type]["lower"],
                 mb.brackets_optimal[mb.bracket_type]["upper"],
-            ),  # default range
+            ),
+            help="Select the value of the minimum and maximum brackets.",
         )
         # Update linear map brackets.
         mb.update_brackets_selected(min_selected=min_selected, max_selected=max_selected)
