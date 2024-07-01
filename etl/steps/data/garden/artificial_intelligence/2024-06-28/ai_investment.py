@@ -2,7 +2,6 @@
 
 import owid.catalog.processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -69,7 +68,6 @@ def run(dest_dir: str) -> None:
 
     # Adjust CPI values so that 2021 is the reference year (2021 = 100)
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
-
     # Adjust 'all_items' column by the 2021 CPI
     tb_us_cpi["cpi_adj_2021"] = 100 * tb_us_cpi["all_items"] / cpi_2021
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
