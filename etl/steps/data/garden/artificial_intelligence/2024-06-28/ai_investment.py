@@ -62,6 +62,7 @@ def run(dest_dir: str) -> None:
         "Retail",
         "Semiconductor",
         "VC",
+        "Total private investment",
     ]
 
     tb.loc[:, tb.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9
