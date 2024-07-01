@@ -1,5 +1,5 @@
 dataset:
-  title: Rock-to-metal mining ratio (Nassar et al. 2022)
+  title: Material footprint of electricity (Wang et al. 2024)
   description: Material footprint of electricity sources, measured with and without waste rock from mining.
   licenses:
     - {}

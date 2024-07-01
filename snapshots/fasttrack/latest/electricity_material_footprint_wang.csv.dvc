@@ -7,7 +7,7 @@ meta:
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTQyVJx22AzXYK66CpIpfZoJRTWhCqlDKjGFpl_pIyNdV89rxVVW-DJ34HTKP4Q5ha-VphKMMvTdVgB/pub?output=csv
     date_accessed: '2024-07-01'
-  name: Rock-to-metal mining ratio (Nassar et al. 2022)
+  name: Material footprint of electricity (Wang et al. 2024)
   description: Material footprint of electricity sources, measured with and without waste rock from mining.
   license: {}
 outs:
