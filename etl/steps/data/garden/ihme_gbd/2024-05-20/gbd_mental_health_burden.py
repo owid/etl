@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
 from shared import add_share_population
 
 from etl.data_helpers import geo
@@ -23,22 +24,18 @@ def run(dest_dir: str) -> None:
     # Add a share of the population column
     tb = add_share_population(tb)
     #
-
-    tb_prev = tb.query("measure == 'Prevalence'").drop(columns="measure")
     tb_daly = tb.query("measure == 'DALYs (Disability-Adjusted Life Years)'").drop(columns="measure")
-    # Format the tables
-    tb_prev = tb_prev.format(
-        ["country", "year", "cause", "metric", "age"], short_name="gbd_mental_health_burden_prevalence"
-    )
     tb_daly = tb_daly.format(["country", "year", "cause", "metric", "age"], short_name="gbd_mental_health_burden_dalys")
 
+    tb_entities = diseases_as_entities(tb)
+    tb_entities = tb_entities.format(["cause", "year"], short_name="gbd_mental_health_burden_entities")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_prev, tb_daly],
+        tables=[tb_entities, tb_daly],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         # Table has optimal types already and repacking can be time consuming.
@@ -47,3 +44,15 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def diseases_as_entities(tb: Table) -> Table:
+    """
+    Save the diseases as entities, and measure as variable, for use in this chart: https://ourworldindata.org/grapher/estimated-prevalence-vs-burden-mental-illnesses
+    """
+    tb = tb[(tb["country"] == "World") & (tb["age"] == "All ages")]
+
+    tb = tb.pivot_table(index=["cause", "year"], columns=["measure", "metric"], values="value").reset_index()
+    tb.columns = ["_".join(filter(None, col)).strip() for col in tb.columns.values]
+    tb = tb.rename(columns={"cause": "country"})
+    return tb
