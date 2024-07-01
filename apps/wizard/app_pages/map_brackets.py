@@ -32,6 +32,7 @@ log = get_logger()
 # Default path to the explorers folder.
 EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 EXPLORER_NAME_DEFAULT = "natural-disasters-temp"
+# EXPLORER_NAME_DEFAULT = "animal-welfare"
 
 # Maximum number of brackets allowed in a chart.
 MAX_NUM_BRACKETS = 10
@@ -71,6 +72,7 @@ USE_TYPE_ETL = "by etl path"
 EXPLORER_TO_GRAPHER_KEYS = {
     "colorScaleNumericBins": "customNumericValues",
     "colorScaleNumericMinValue": "customNumericMinValue",
+    "colorScaleScheme": "baseColorScheme",
 }
 
 
@@ -135,11 +137,11 @@ def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[s
             "colorScale": {
                 # "baseColorScheme": "BrBG",
                 "binningStrategy": "manual",
-                #     "customNumericMinValue": 0,
-                #     "customNumericValues": [
-                #         10,
-                #         20,
-                #     ]
+                # "customNumericMinValue": 0,
+                # "customNumericValues": [
+                #     10,
+                #     20,
+                # ]
             },
         },
         "dimensions": [{"property": "y", "variableId": metadata["id"]}],
@@ -595,7 +597,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     # TODO: Add full list of color schemes.
     mb.color_scheme = st.selectbox(  # type: ignore
         label="Color scheme (list not yet complete!)",
-        options=["BuGn", "BinaryMapPaletteA"],
+        options=["BuGn", "BinaryMapPaletteA", "YlOrBr"],
         help="Color scheme for the map.",
     )
 
