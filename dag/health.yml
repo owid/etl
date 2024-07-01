@@ -639,8 +639,8 @@ steps:
   data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health_burden
     - data://garden/un/2022-07-11/un_wpp
-  data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health_burden_prevalence:
-    - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden
+  #data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health_burden_entities:
+  #  - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden
   data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health_burden_dalys:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden
 
