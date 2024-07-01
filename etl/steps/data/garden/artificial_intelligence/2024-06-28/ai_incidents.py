@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
     tb["Number of AI incidents"] = tb["Number of AI incidents"] * 1000
 
     tb = tb.format(["year"])
-    print(tb)
 
     #
     # Save outputs.

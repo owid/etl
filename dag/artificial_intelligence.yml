@@ -316,5 +316,14 @@ steps:
      - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
      - data://garden/bls/2024-05-16/us_consumer_prices
 
-  data://grapher/artificial_intelligence/2024-06-28/ai_investment:
+  # Grapher dataset for private investment in AI
+  data://grapher/artificial_intelligence/2024-06-28/ai_private_investment:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # Grapher dataset for corporate investment in AI
+  data://grapher/artificial_intelligence/2024-06-28/ai_corporate_investment:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # Grapher dataset for generative investment in AI and number of companies
+  data://grapher/artificial_intelligence/2024-06-28/ai_investment_generative_companies:
     - data://garden/artificial_intelligence/2024-06-28/ai_investment
