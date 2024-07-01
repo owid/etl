@@ -93,8 +93,8 @@ class Explorer:
         df = pd.DataFrame.from_records([line.split("\t") for line in lines[1:]], columns=lines[0].split("\t"))
         # Improve dataframe format.
         for column in df.columns:
-            if set(df[column]) == {"false", "true"}:
-                df[column] = df[column].map({"false": False, "true": True}).astype(bool)
+            if set(df[column]) <= {"false", "true", None}:
+                df[column] = df[column].map({"false": False, "true": True, None: None}).astype(bool)
 
         if "variableId" in df.columns:
             # Convert string variable ids to integers.
@@ -110,7 +110,9 @@ class Explorer:
         if "colorScaleNumericBins" in df.columns:
             # Convert strings of brackets separated by ";" to list of brackets.
             df["colorScaleNumericBins"] = [
-                [int(bracket) if bracket.isdigit() else float(bracket) for bracket in row.split(";")]
+                [int(bracket) if bracket.isdigit() else float(bracket) for bracket in row.rstrip(";").split(";")]
+                if row
+                else None
                 for row in df["colorScaleNumericBins"]
             ]
 
