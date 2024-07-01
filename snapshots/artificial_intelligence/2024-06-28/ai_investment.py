@@ -56,7 +56,7 @@ def get_data():
                 elif i == 2:
                     df_add["Investment activity"] = "Companies"
                 elif i == 3:
-                    df_add["Investment activity"] = "Total private investment"
+                    df_add["Investment activity"] = "Private Investment"
             if "Geographic Area" in df_add.columns:
                 df_add = df_add.rename(columns={"Geographic Area": "Geographic area"})
             if "Geographic area" not in df_add.columns:

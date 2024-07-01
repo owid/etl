@@ -26,6 +26,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by-nd/4.0/?ref=chooser-v1
 outs:
-  - md5: d51591df44e16b1445163123465d433e
-    size: 64451
+  - md5: b720682a96af499fdaa8a6896dd1f19f
+    size: 64253
     path: ai_investment.csv

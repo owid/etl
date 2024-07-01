@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
         "marketing__digital_ads": "Marketing and digital ads",
         "medical_and_healthcare": "Medical and healthcare",
         "nlp__customer_support": "Natural Language Processing and customer support",
-        "total_private_investment": "Total",
+        "private_investment": "Total",
     }
     tb = tb[list(industries.keys()) + ["year", "country"]]
 
