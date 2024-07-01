@@ -116,6 +116,14 @@ sections:
       entrypoint: app_pages/harmonizer.py
       icon: ":material/music_note:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+    - title: "Map Bracketer"
+      alias: map_brackets
+      entrypoint: app_pages/map_brackets.py
+      description: Create optimal map brackets
+      maintainer: "@pablo"
+      icon: ":material/map:"
+      image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
+
 
   - title: "Monitoring"
     description: |-
@@ -147,13 +155,6 @@ sections:
         entrypoint: app_pages/datainsight_robot.py
         icon: ":material/lightbulb:"
         image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
-      - title: "Map Bracketer"
-        alias: map_brackets
-        entrypoint: app_pages/map_brackets.py
-        description: Create optimal map brackets
-        maintainer: "@pablo"
-        icon: ":material/map:"
-        image_url: "https://pixabay.com/get/gf9e3d46f7662d2cef0475ba068212ed47f718536e194aa51fd13ddf209507b7a68cb551facfa908a58934a316be1104debeaf736a07610b2ec1a76a51887b6cb47204cc68b02f3535cebf316ebaef9fe_640.jpg"
 
   - title: "Misc"
     description: |-
