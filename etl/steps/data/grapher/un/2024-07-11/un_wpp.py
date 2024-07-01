@@ -41,21 +41,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-#################################################################################
-#################################################################################
-# Old code below. Left in case it's needed for reference.
-#################################################################################
-#################################################################################
-def _filter_rows(table: Table) -> Table:
-    """Keep only relevant fertility-scenarios.
-
-    TODO: use or not?
-    """
-    variants_valid = ["estimates", "low", "medium", "high", "constant fertility"]
-    shape_0 = table.shape[0]
-    table = table[table.index.isin(variants_valid, level=4)]
-    r = 100 - 100 * round(table.shape[0] / shape_0, 2)
-    paths.log.info(f"Removed {r}% rows, by only keeping variants {variants_valid}")
-    return table
