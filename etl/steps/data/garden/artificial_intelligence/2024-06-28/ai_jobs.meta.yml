@@ -12,7 +12,7 @@ dataset:
 
 
 tables:
-  ai_investment:
+  ai_jobs:
     variables:
       ai_job_postings__pct_of_all_job_postings:
         title: Share of artificial intelligence jobs among all job postings
