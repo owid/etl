@@ -204,3 +204,7 @@ steps:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
   data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
     - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
+  data://grapher/fasttrack/latest/rock_metal_ratio_nassar:
+    - snapshot://fasttrack/latest/rock_metal_ratio_nassar.csv
+  data://grapher/fasttrack/latest/electricity_material_footprint_wang:
+    - snapshot://fasttrack/latest/electricity_material_footprint_wang.csv
