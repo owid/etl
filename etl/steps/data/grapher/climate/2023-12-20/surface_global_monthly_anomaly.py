@@ -51,8 +51,11 @@ def run(dest_dir: str) -> None:
     # Create annual temperature anomalies
     tb_pivot["annual"] = tb_pivot.mean(axis=1)
     tb_pivot["annual"] = tb_pivot["annual"].copy_metadata(tb["temperature_anomaly"])
-
-    #
+    tb_pivot[
+        "annual"
+    ].metadata.description_short = (
+        "The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius."
+    )
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
