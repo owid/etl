@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb_daly = tb_daly.format(["country", "year", "cause", "metric", "age"], short_name="gbd_mental_health_burden_dalys")
 
     tb_entities = diseases_as_entities(tb)
-    tb_entities = tb_entities.format(["cause", "year"], short_name="gbd_mental_health_burden_entities")
+    tb_entities = tb_entities.format(["country", "year"], short_name="gbd_mental_health_burden_entities")
     #
     # Save outputs.
     #
