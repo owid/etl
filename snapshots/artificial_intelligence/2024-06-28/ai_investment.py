@@ -40,11 +40,10 @@ def get_data():
         "13iuXuFMyn7BYjZ83l7NpVpPT5LDjM9xl",  # 4.3.1 corporate
         "18g2Li2wbimD2Xb08p8aOPsHEuD43LqpJ",  # 4.3.3 generative
         "1ujGe-xe6e1ZHPAHmYT6rURfBoSHLC0-R",  # 4.3.4. companies
-        "13U5SyhtRi8TfbRqFQ0GhusNcezucehU-",  # 4.3.13 total private investment by geographic region
+        "1kCOsxJqKgBO-nSe0ApW5JbRvCi_DryLf",  # 4.3.10 total private investment by geographic region
         "1hrEMTrCyl6CcWrhgipNo0zboZUinLR8P",  # 4.3.16 investment by focus area - World
         "1W12tO7AxcSQkJMfPg4MsVz_QqlloCqGO",  # 4.3.17 investment by focus area and region
     ]
-
     df_list = []
 
     try:
