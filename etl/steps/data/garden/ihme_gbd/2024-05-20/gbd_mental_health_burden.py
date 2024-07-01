@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     #
 
     tb_prev = tb.query("measure == 'Prevalence'").drop(columns="measure")
-    tb_daly = tb.query("measure == 'DALYs'").drop(columns="measure")
+    tb_daly = tb.query("measure == 'DALYs (Disability-Adjusted Life Years)'").drop(columns="measure")
     # Format the tables
     tb_prev = tb_prev.format(
         ["country", "year", "cause", "metric", "age"], short_name="gbd_mental_health_burden_prevalence"
