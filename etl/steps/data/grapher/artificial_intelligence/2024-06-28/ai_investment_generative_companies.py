@@ -16,6 +16,9 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["ai_investment"]
 
+    tb = tb[["generative_ai", "companies"]]
+    tb.metadata.short_name = paths.short_name
+
     #
     # Save outputs.
     #
