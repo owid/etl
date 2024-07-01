@@ -659,7 +659,9 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
 
     # Select bracket type.
     bracket_type_labels = {
+        # Add optimal choice
         f"Optimal ({mb.brackets_optimal['optimal']})": mb.brackets_optimal["optimal"],
+        # Rest of the options
         **{
             value: value
             for value in list(BRACKET_LABELS["log"].values())
@@ -667,13 +669,11 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
             + list(BRACKET_LABELS["custom"].values())
         },
     }
-    # Add optimal choice.
-    # bracket_type_labels[f"Optimal ({mb.brackets_optimal['optimal']})"] =
-    # Create a bracket type selector with radio buttons.
-    # NOTE: By default, the last option will be selected, which is expected to be the optimal one (the last element in bracket_type_labels, defined above).
+    # Create a bracket type selector with a select box.
     bracket_type = st.selectbox(
         "Select linear or log-like",
         options=bracket_type_labels,
+        # NOTE: By default, the first option will be selected, which is expected to be the optimal one.
         index=0,
         # horizontal=True,
     )
