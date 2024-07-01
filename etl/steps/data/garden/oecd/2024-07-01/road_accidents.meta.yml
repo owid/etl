@@ -14,7 +14,7 @@ dataset:
 
 
 tables:
-  road_safety:
+  road_accidents:
     variables:
       # testing_variable:
       #   title: Testing variable title

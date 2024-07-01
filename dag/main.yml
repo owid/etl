@@ -777,12 +777,6 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
-  data://meadow/who/2024-06-26/road_safety:
-    - snapshot://who/2024-06-26/road_safety.xlsx
-  data://garden/who/2024-06-26/road_safety:
-    - data://meadow/who/2024-06-26/road_safety
-  data://grapher/who/2024-06-26/road_safety:
-    - data://garden/who/2024-06-26/road_safety
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
