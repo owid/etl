@@ -69,6 +69,14 @@ definitions:
       title_public:
         <% if age_group == "all ages" %>
         Self-reported life satisfaction
+        <% elif age_group == "below 30" %>
+        Life satisfaction of people below 30
+        <% elif age_group == "30-44" %>
+        Life satisfaction of people aged 30-44
+        <% elif age_group == "45-59" %>
+        Life satisfaction of people aged 45-59
+        <% elif age_group == "60 and above" %>
+        Life satisfaction of people aged 60 and above
         <% endif %>
 
 
