@@ -13,6 +13,6 @@ meta:
   description: The amount of rock that has to be mined to produce one unit of metal.
   license: {}
 outs:
-  - md5: 2daa00ba6cb8256ba49a60cf77f6c44c
-    size: 496
+  - md5: 901760b108a4d250829b435216b4836e
+    size: 411
     path: rock_metal_ratio_nassar.csv
