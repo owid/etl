@@ -50,11 +50,12 @@ def diseases_as_entities(tb: Table) -> Table:
     """
     Save the diseases as entities, and measure as variable, for use in this chart: https://ourworldindata.org/grapher/estimated-prevalence-vs-burden-mental-illnesses
     """
-    tb = tb[(tb["country"] == "World") & (tb["age"] == "All ages")]
+    tb_ent = tb[(tb["country"] == "World") & (tb["age"] == "All ages")]
 
-    tb = tb.pivot_table(index=["cause", "year"], columns=["measure", "metric"], values="value").reset_index()
-    tb.columns = ["_".join(filter(None, col)).strip() for col in tb.columns.values]
-    tb = tb.rename(columns={"cause": "country"})
-    tb = tb.drop(columns="DALYs (Disability-Adjusted Life Years)_Share")
+    tb_ent = tb_ent.pivot_table(index=["cause", "year"], columns=["measure", "metric"], values="value").reset_index()
+    tb_ent.columns = ["_".join(filter(None, col)).strip() for col in tb_ent.columns.values]
+    tb_ent = tb_ent.rename(columns={"cause": "country"})
+    tb_ent = tb_ent.drop(columns="DALYs (Disability-Adjusted Life Years)_Share")
 
-    return tb
+    tb_ent = tb_ent.copy_metadata(tb)
+    return tb_ent
