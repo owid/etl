@@ -55,4 +55,6 @@ def diseases_as_entities(tb: Table) -> Table:
     tb = tb.pivot_table(index=["cause", "year"], columns=["measure", "metric"], values="value").reset_index()
     tb.columns = ["_".join(filter(None, col)).strip() for col in tb.columns.values]
     tb = tb.rename(columns={"cause": "country"})
+    tb = tb.drop(columns="DALYs (Disability-Adjusted Life Years)_Share")
+
     return tb

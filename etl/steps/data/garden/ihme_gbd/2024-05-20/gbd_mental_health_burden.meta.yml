@@ -71,16 +71,23 @@ dataset:
 tables:
   gbd_mental_health_burden_entities:
     variables:
-      dalys:
+      dalys__disability_adjusted_life_years__rate:
         title: Disability-adjusted life years (DALYs)
         unit: DALYs
         description_short: Disability-adjusted life years (DALYs) from each mental illness
         display:
           numDecimalPlaces: 1
-      prevalence:
+      prevalence_rate:
         title: Current rate of cases of each mental illness
         unit: cases per 100,000 people
         description_short: Current rate of cases of each mental illness, per 100,000 people
+        display:
+          numDecimalPlaces: 1
+      prevalence_share:
+        title: Current share of population with each mental illness
+        unit: '%'
+        short_unit: '%'
+        description_short: Current share of population with each mental illness
         display:
           numDecimalPlaces: 1
   gbd_mental_health_burden_dalys:
