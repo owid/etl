@@ -1,0 +1,142 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+    processing_level: minor
+  sex: |-
+    <% if sex == "Both" %>individuals <% elif sex == "Male" %>males <% elif sex == "Female" %>females <%- endif -%>
+  description_key: |-
+    <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
+  value_deaths:
+    unit: |-
+      <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
+    short_unit: |-
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+    title: |-
+      <% if metric == "Number"%>
+      Deaths from << cause.lower() >>, among {definitions.sex} aged << age >>
+      <% elif metric == "Rate"%>
+      Deaths from << cause.lower() >>, among {definitions.sex} aged << age >> per 100,000 people
+      <% elif metric == "Percent" %>
+      Share of total deaths of among {definitions.sex} aged << age >> from << cause.lower() >>
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Number"%>
+      The estimated number of deaths from << cause.lower() >> among {definitions.sex} aged << age >>.
+      <% elif metric == "Rate" %>
+      The estimated number of deaths from << cause.lower() >> among {definitions.sex} aged << age >>, per 100,000 people.
+      <% elif metric == "Percent" %>
+      The estimated share of deaths from << cause.lower() >> among {definitions.sex} aged << age >>.
+      <%- endif -%>
+    description_processing: |-
+      <% if cause == "All forms of violence" %>
+      This was calculated by summing the number of deaths from 'Interpersonal violence', 'Conflict and terrorism', and 'Police conflict and executions'.
+      <% elif cause == "Infectious diseases" %>
+      This was calculated by subtracting 'Maternal and neonatal disorders' and 'Nutritional deficiencies' from 'Communicable, maternal, neonatal and nutritional diseases'.
+      <% elif cause == "Other cancers (OWID)"%>
+      This was calculated by summing deaths from all cancers that caused fewer than 200,000 deaths in the most recent year of data.
+      <%- endif -%>
+  value_dalys:
+    unit: |-
+      <% if metric == "Number" %>
+      DALYs
+      <% elif metric == "Rate" %>
+      DALYs per 100,000 people
+      <% elif metric == "Percent" %>
+      share of total DALYs
+      <%- endif -%>
+    short_unit: |-
+      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+    title: |-
+      <% if metric == "Number" %>
+      DALYs from << cause.lower() >>, among {definitions.sex} aged << age >>
+      <% elif metric == "Rate" %>
+      DALYs from << cause.lower() >>, among {definitions.sex} aged << age >> per 100,000 people
+      <% elif metric == "Percent" %>
+      Share of total DALYs of {definitions.sex} aged << age >> from << cause.lower() >>
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Number" %>
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged << age >>.
+      <% elif metric == "Rate" %>
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from << cause.lower() >> in those aged << age >>, per 100,000 people.
+      <% elif metric == "Percent" %>
+      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from << cause.lower() >> in those aged << age >>.
+      <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+tables:
+  gbd_child_mortality_deaths:
+    variables:
+      value:
+        title: |-
+          {definitions.value_deaths.title}
+        unit: |-
+          {definitions.value_deaths.unit}
+        description_short: |-
+          {definitions.value_deaths.description_short}
+        description_processing: |-
+          {definitions.value_deaths.description_processing}
+        description_key:
+          - |-
+            {definitions.description_key}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+  gbd_child_mortality_dalys:
+    variables:
+      value:
+        title: |-
+          {definitions.value_dalys.title}
+        unit: |-
+          {definitions.value_dalys.unit}
+        description_short: |-
+          {definitions.value_dalys.description_short}
+        description_key:
+          - |-
+            {definitions.description_key}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+  gbd_child_mortality_slope:
+    variables:
+      under_five_deaths:
+        title: Deaths among children under five years old
+        unit: deaths
+        description_short: The estimated number of deaths among children under five years old, from each disease or injury.
+        display:
+          numDecimalPlaces: 0
+  gbd_child_mortality_infant:
+    variables:
+      infant_death_rate_both:
+        title: Infant mortality rate by cause for both sexes
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among children under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
+      infant_death_rate_female:
+        title: Infant mortality rate by cause for girls
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among girls under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
+      infant_death_rate_male:
+        title: Infant mortality rate by cause for boys
+        unit: deaths per 100,000 people
+        description_short: The estimated number of deaths among boys under one year old, from each disease or injury, per 100,000 people.
+        display:
+          numDecimalPlaces: 1
