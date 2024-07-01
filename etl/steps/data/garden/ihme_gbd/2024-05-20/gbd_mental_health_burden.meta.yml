@@ -49,9 +49,9 @@ definitions:
       Age-standardized DALYs from << cause.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
       DALYs from << cause.lower() >> per 100,000 people
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
+      <% elif metric == "Share" and age == 'Age-standardized'%>
       Share of total age-standardized DALYs that are from << cause.lower() >>
-      <% elif metric == "Percent" and age == 'All ages'%>
+      <% elif metric == "Share" and age == 'All ages'%>
       Share of total DALYs that are from << cause.lower() >>
       <%- endif -%>
     description_short: |-
@@ -59,9 +59,9 @@ definitions:
       The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
       The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
+      <% elif metric == "Share" and age == 'Age-standardized'%>
       The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
-      <% elif metric == "Percent" and age == 'All ages'%>
+      <% elif metric == "Share" and age == 'All ages'%>
       The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
       <%- endif -%>
   footnote: |-
