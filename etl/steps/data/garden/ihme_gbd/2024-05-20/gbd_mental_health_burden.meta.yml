@@ -5,7 +5,6 @@ definitions:
       topic_tags:
         - Mental Health
     processing_level: major
-
   prevalence:
     unit: |-
       <% if metric == "Rate" %>
