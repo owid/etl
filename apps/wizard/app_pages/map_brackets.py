@@ -887,7 +887,7 @@ elif use_type == USE_TYPE_EXPLORERS:
         # NOTE: This additional_config is used to load custom configuration of a variable from an explorer file.
         #  In the future, when working with charts, it could also include the relevant part of the chart config.
         for key_explorer, value in additional_config.items():
-            key_grapher = EXPLORER_TO_GRAPHER_KEYS[key_explorer]
+            key_grapher = EXPLORER_TO_GRAPHER_KEYS.get(key_explorer, key_explorer)
             # Update values in "map" with the additional configuration.
             mb.chart_config["map"]["colorScale"][key_grapher] = value
 
