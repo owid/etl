@@ -658,20 +658,23 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
 
     # Select bracket type.
     bracket_type_labels = {
-        value: value
-        for value in list(BRACKET_LABELS["log"].values())
-        + list(BRACKET_LABELS["linear"].values())
-        + list(BRACKET_LABELS["custom"].values())
+        f"Optimal ({mb.brackets_optimal['optimal']})": mb.brackets_optimal["optimal"],
+        **{
+            value: value
+            for value in list(BRACKET_LABELS["log"].values())
+            + list(BRACKET_LABELS["linear"].values())
+            + list(BRACKET_LABELS["custom"].values())
+        },
     }
     # Add optimal choice.
-    bracket_type_labels[f"Optimal ({mb.brackets_optimal['optimal']})"] = mb.brackets_optimal["optimal"]
+    # bracket_type_labels[f"Optimal ({mb.brackets_optimal['optimal']})"] =
     # Create a bracket type selector with radio buttons.
     # NOTE: By default, the last option will be selected, which is expected to be the optimal one (the last element in bracket_type_labels, defined above).
-    bracket_type = st.radio(
+    bracket_type = st.selectbox(
         "Select linear or log-like",
         options=bracket_type_labels,
-        index=len(bracket_type_labels) - 1,
-        horizontal=True,
+        index=0,
+        # horizontal=True,
     )
     mb.bracket_type = bracket_type_labels[bracket_type]  # type: ignore
     if mb.bracket_type == BRACKET_LABELS["custom"]["custom"]:
@@ -778,34 +781,46 @@ st.set_page_config(
     page_title="Wizard: ETL Map bracket generator",
     # layout="wide",
     page_icon="🪄",
-    initial_sidebar_state="collapsed",
+    # initial_sidebar_state="collapsed",
 )
 st.title("🗺️ Map bracketer")
-st.markdown(
-    """This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines. It still has various limitations, most notably:\n
-(1) It works only for indicator-based explorers.\n
-(2) It can find optimal brackets for the latest year in the data, but not all years.\n
-(3) The search for optimal brackets does not work well when there are negative values.\n
-(4) There are still many edge cases that will make this tool fail. It's work in progress!
-"""
-)
+with st.popover("ℹ️ Learn about it"):
+    st.markdown(
+        "This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines."
+    )
+    st.markdown(
+        """
+    **Limitations:**\n
+    (1) It works only for indicator-based explorers.\n
+    (2) It can find optimal brackets for the latest year in the data, but not all years.\n
+    (3) The search for optimal brackets does not work well when there are negative values.\n
+    (4) There are still many edge cases that will make this tool fail. It's work in progress!
+    """
+    )
+    st.warning(
+        "Currently only supports indicator-based explorers. In the future, we will add support for individual charts and indicators."
+    )
 
+# TODO: Change when more use cases are implemented.
 # Radio buttons to choose how to use this tool.
-use_type = st.radio(
-    "Select how to use this tool",
-    options=[
-        USE_TYPE_EXPLORERS,
-        USE_TYPE_CHART,
-        USE_TYPE_ETL,
-    ],
-    captions=[
-        "Select an indicator-based explorer, improve map brackets one by one, and update the explorer file.",
-        "NOT IMPLEMENTED: Search for a chart by id or slug, improve its brackets, and save map configuration in the chart config to (staging) db.",
-        "NOT IMPLEMENTED: Search for an ETL path to a dataset, improve indicator map brackets one by one, and save the configuration to a grapher yaml file.",
-    ],
-    index=0,
-    horizontal=True,
-)
+# use_type = st.radio(
+#     "Select how to use this tool",
+#     options=[
+#         USE_TYPE_EXPLORERS,
+#         USE_TYPE_CHART,
+#         USE_TYPE_ETL,
+#     ],
+#     captions=[
+#         "Select an indicator-based explorer, improve map brackets one by one, and update the explorer file.",
+#         "NOT IMPLEMENTED: Search for a chart by id or slug, improve its brackets, and save map configuration in the chart config to (staging) db.",
+#         "NOT IMPLEMENTED: Search for an ETL path to a dataset, improve indicator map brackets one by one, and save the configuration to a grapher yaml file.",
+#     ],
+#     index=0,
+#     horizontal=True,
+# )
+
+use_type = USE_TYPE_EXPLORERS
+
 
 if use_type in [USE_TYPE_CHART, USE_TYPE_ETL]:
     st.error(f"Use type '{use_type}' not yet implemented.")
@@ -814,46 +829,51 @@ elif use_type == USE_TYPE_EXPLORERS:
     if not EXPLORERS_DIR.is_dir():
         st.error(f"Explorer directory not found: {EXPLORERS_DIR}")
         st.stop()
-    # List all explorer names.
-    explorer_names = [
-        explorer_file.stem.replace(".explorer", "") for explorer_file in sorted(EXPLORERS_DIR.glob("*.explorer.tsv"))
-    ]
-    # Select an explorer name from a dropdown menu.
-    explorer_name: str = st.selectbox(  # type: ignore
-        label="Name of explorer file",
-        options=explorer_names,
-        index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
-        help="Name of .explorer.tsv file inside owid-content/explorers.",
-    )
 
-    # Load and parse explorer content.
-    explorer = Explorer(name=explorer_name)
+    with st.container(border=True):
+        # List all explorer names.
+        explorer_names = [
+            explorer_file.stem.replace(".explorer", "")
+            for explorer_file in sorted(EXPLORERS_DIR.glob("*.explorer.tsv"))
+        ]
+        # Select an explorer name from a dropdown menu.
+        explorer_name: str = st.selectbox(  # type: ignore
+            label="Name of explorer file",
+            options=explorer_names,
+            index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
+            help="Name of .explorer.tsv file inside owid-content/explorers.",
+        )
 
-    # Gather all variable ids of indicators with a map tab.
-    variable_ids = list(
-        dict.fromkeys(sum(explorer.df_graphers[explorer.df_graphers["hasMapTab"]]["yVariableIds"].tolist(), []))
-    )
+        # Load and parse explorer content.
+        explorer = Explorer(name=explorer_name)
 
-    # Add toggle to include variable ids for which brackets have already been defined in the explorer file.
-    include_all_variable_ids = st.toggle("Include indicators with brackets already defined in the explorer file", False)
-    if not include_all_variable_ids:
-        if "colorScaleNumericBins" in explorer.df_columns.columns:
-            # Ignore variable_ids for which a map bracket is already defined.
-            variable_ids_with_brackets_already_defined = set(
-                explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
-            )
-            variable_ids = [
-                variable_id
-                for variable_id in variable_ids
-                if variable_id not in variable_ids_with_brackets_already_defined
-            ]
+        # Gather all variable ids of indicators with a map tab.
+        variable_ids = list(
+            dict.fromkeys(sum(explorer.df_graphers[explorer.df_graphers["hasMapTab"]]["yVariableIds"].tolist(), []))
+        )
 
-    # Select a variable id from a dropdown menu.
-    variable_id: int = st.selectbox(  # type: ignore
-        label="Indicator id",
-        options=variable_ids,
-        index=0,
-    )
+        # Add toggle to include variable ids for which brackets have already been defined in the explorer file.
+        include_all_variable_ids = st.toggle(
+            "Include indicators with brackets already defined in the explorer file", False
+        )
+        if not include_all_variable_ids:
+            if "colorScaleNumericBins" in explorer.df_columns.columns:
+                # Ignore variable_ids for which a map bracket is already defined.
+                variable_ids_with_brackets_already_defined = set(
+                    explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
+                )
+                variable_ids = [
+                    variable_id
+                    for variable_id in variable_ids
+                    if variable_id not in variable_ids_with_brackets_already_defined
+                ]
+
+        # Select a variable id from a dropdown menu.
+        variable_id: int = st.selectbox(  # type: ignore
+            label="Indicator id",
+            options=variable_ids,
+            index=0,
+        )
 
     # For debugging, fix the value of variable id.
     # Energy variable that has both negative and positive values.
@@ -878,13 +898,14 @@ elif use_type == USE_TYPE_EXPLORERS:
         edit_brackets = st.toggle("Edit indicator with already defined brackets", False)
 
     if edit_brackets:
-        try:
-            # Interact with map bracketer.
-            map_bracketer_interactive(mb=mb)
-        except Exception as e:
-            log.error(e)
-            st.error(e)
-            st.stop()
+        with st.sidebar:
+            try:
+                # Interact with map bracketer.
+                map_bracketer_interactive(mb=mb)
+            except Exception as e:
+                log.error(e)
+                st.error(e)
+                st.stop()
     else:
         # NOTE: This additional_config is used to load custom configuration of a variable from an explorer file.
         #  In the future, when working with charts, it could also include the relevant part of the chart config.
@@ -894,7 +915,7 @@ elif use_type == USE_TYPE_EXPLORERS:
             mb.chart_config["map"]["colorScale"][key_grapher] = value
 
     # Display the chart.
-    chart_html(mb.chart_config, owid_env=OWID_ENV)
+    chart_html(mb.chart_config, owid_env=OWID_ENV, height=550)
 
     if edit_brackets and st.button("Save brackets in explorer file", type="primary"):
         update_explorer_file(mb=mb, explorer=explorer)
