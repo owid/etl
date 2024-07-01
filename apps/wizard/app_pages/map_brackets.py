@@ -639,10 +639,11 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
         reload_optimal_brackets=True,
     )
     mb.percentile_min, mb.percentile_max = st.slider(
-        label="Percentile range to be covered by brackets (so far only for linear brackets)",
+        label="Percentile range covered by brackets",
         min_value=0,
         max_value=100,
         value=(MIN_PERCENTILE, MAX_PERCENTILE),
+        help="Currently, this only affects linear brackets",
     )
     mb.run(
         reload_data_values=False,
@@ -915,7 +916,8 @@ elif use_type == USE_TYPE_EXPLORERS:
             mb.chart_config["map"]["colorScale"][key_grapher] = value
 
     # Display the chart.
-    chart_html(mb.chart_config, owid_env=OWID_ENV, height=550)
+    chart_html(chart_config=mb.chart_config, owid_env=OWID_ENV, height=540)
 
-    if edit_brackets and st.button("Save brackets in explorer file", type="primary"):
-        update_explorer_file(mb=mb, explorer=explorer)
+    with st.sidebar:
+        if edit_brackets and st.button("Save brackets in explorer file", type="primary"):
+            update_explorer_file(mb=mb, explorer=explorer)
