@@ -29,6 +29,9 @@ def run(dest_dir: str) -> None:
             print("No CSV file found in the zip archive.")
 
     tb.metadata = snap.to_table_metadata()
+    # Some issue with this not propagating
+    for col in tb.columns:
+        tb[col].metadata.origins = snap.m.origin
 
     tb = tb.format(["location_name", "year"])
 

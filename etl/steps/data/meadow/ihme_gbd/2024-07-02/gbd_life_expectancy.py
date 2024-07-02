@@ -30,6 +30,8 @@ def run(dest_dir: str) -> None:
 
     tb.metadata = snap.to_table_metadata()
 
+    for col in tb.columns:
+        tb[col].metadata.origins = snap.m.origin
     tb = tb.format(["location_name", "year"])
 
     #
