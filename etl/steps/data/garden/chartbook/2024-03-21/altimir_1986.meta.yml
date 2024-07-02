@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  altimir_1986:
+    variables:
+      gini:
+        title: Gini coefficient
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        unit: ''
+        short_unit: ''
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 1
+          tolerance: 5
+        presentation:
+          title_public: Gini coefficient
+
