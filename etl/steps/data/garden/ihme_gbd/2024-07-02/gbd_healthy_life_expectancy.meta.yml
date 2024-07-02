@@ -1,51 +1,26 @@
 definitions:
-  description_key: &description_key
-    - For each country-year the disease or injury that caused the most deaths according to the [IHME - Global Burden of Disease Study](https://www.healthdata.org/research-analysis/gbd).
   common:
     presentation:
       topic_tags:
-        - Causes of Death
+        - Life Expectancy
+        - Global Health
     processing_level: major
 
 dataset:
-  update_period_days: 365
   non_redistributable: true
 tables:
-  leading_cause_level_1_in_all_ages:
-    title: Leading causes of death in all ages, based on IHME GBD cause level 1. There are 7 broad categories in level 2.
-    description: "The leading broad cause of death from the Global Burden of Disease Study in all ages. Broken into three broad causes: non-communicable diseases; communicable, maternal, neo-natal and nutritional diseases, and injuries."
+  gbd_healthy_life_expectancy:
     variables:
-      leading_deaths_level_1:
-        title: The leading cause of death in all ages (level 1)
-        description_key: *description_key
-        unit: ""
-        presentation:
-          title_public: Leading causes of death
-  leading_cause_level_2_in_all_ages:
-    title: Leading causes of death in all ages, based on IHME GBD cause level 2. There are 22 broad categories in level 2.
-    variables:
-      leading_deaths_level_2:
-        title: The leading cause of death in all ages (level 2)
-        description_key: *description_key
-        unit: ""
-  leading_cause_level_3_in_all_ages:
-    title: Leading causes of death in all ages, based on IHME GBD cause level 3. There are 169 categories in level 3.
-    variables:
-      leading_deaths_level_3:
-        title: The leading cause of death in all ages (level 3)
-        description_key: *description_key
-        unit: ""
-  leading_cause_level_4_in_all_ages:
-    title: Leading causes of death in all ages, based on IHME GBD cause level 4. There are 165 categories in level 4.
-    variables:
-      leading_deaths_level_4:
-        title: The leading cause of death in all ages (level 4)
-        description_key: *description_key
-        unit: ""
-  leading_cause_level_owid_in_all_ages:
-    title: Leading causes of death in all ages, based on OWIDs mix of IHME GBD hierarchies.
-    variables:
-      leading_deaths_level_owid:
-        title: The leading cause of death in all ages (OWID mix)
-        description_key: *description_key
-        unit: ""
+      healthy_life_expectancy_newborn:
+        title: Health-adjusted life expectancy at birth
+        unit: years
+        description_short: The number of years that a newborn can expect to live in good health, if the rates of all-cause mortality and all-cause disability in a specified year of interest would remain constant into the future.
+      life_expectancy_newborn:
+        title: Life expectancy at birth
+        unit: years
+        description_short: The number of years a person is expected to live from birth, assuming they will experience the age-specific mortality rate observed in a given year throughout their lifetime.
+      years_lived_with_disability:
+        title: Years lived with disability or diseases
+        unit: years
+        description_processing: The life expectancy at birth minus the health-adjusted life expectancy at birth
+
