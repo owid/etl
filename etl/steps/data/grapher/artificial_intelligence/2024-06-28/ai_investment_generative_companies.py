@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["ai_investment"]
 
     tb = tb[["generative_ai", "companies"]]
-    tb.short_name = paths.short_name
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
