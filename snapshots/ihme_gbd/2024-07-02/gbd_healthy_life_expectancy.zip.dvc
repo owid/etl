@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  is_public: false
+  origin:
+    # Data product / Snapshot
+    title: Global Burden of Disease - Health-adjusted life expectancy
+    description: |-
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the health-adjusted life expectancy, which is defined as: 'The number of years that a person at a given age can expect to live in good health, if the rates of all-cause mortality and all-cause disability in a specified year of interest would remain constant into the future.'
+    date_published: "2024-05-17"
+    # Citation
+    producer: IHME, Global Burden of Disease
+    citation_full: |-
+      "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2021 (GBD 2021). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2024. Available from https://vizhub.healthdata.org/gbd-results/."
+    attribution_short: "IHME-GBD"
+    # Files
+    url_main: https://vizhub.healthdata.org/gbd-results/
+    url_download: https://dl.healthdata.org:443/gbd-api-2021-public/2247c6bc02cc38e7750ae8b733de5c7b_files/IHME-GBD_2021_DATA-2247c6bc-1.zip
+    date_accessed: 2024-07-02
+
+    # License
+    license:
+      name: Free-of-Charge Non-commercial User Agreement
+      url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 57e0005095799e8b41e39697fcafbf5b
+    size: 252977
+    path: gbd_healthy_life_expectancy.zip
