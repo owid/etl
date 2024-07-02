@@ -456,7 +456,7 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
+    # Define the dataset short name.
     dataset_short_name = f"{NAMESPACE}_qcl"
 
     # Define path to current step file.

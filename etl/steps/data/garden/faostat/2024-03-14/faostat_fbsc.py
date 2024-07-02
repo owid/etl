@@ -15,7 +15,6 @@ update.
 
 """
 
-from pathlib import Path
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -126,8 +125,8 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
-    dataset_short_name = Path(dest_dir).name
+    # Define the dataset short name.
+    dataset_short_name = f"{NAMESPACE}_fbsc"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
