@@ -703,11 +703,11 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Poutry meat production
+          name: Poultry meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Poutry meat production
+          title_public: Poultry meat production
       meat__poultry__00001808__yield__005424__kilograms_per_animal:
         title: Meat, poultry | 00001808 || Yield | 005424 || kilograms per animal
         unit: kilograms per animal
