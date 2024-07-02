@@ -4,9 +4,9 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Health-adjusted life expectancy
+    title: Global Burden of Disease - Life expectancy
     description: |-
-      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the health-adjusted life expectancy, which is defined as: 'The number of years that a person at a given age can expect to live in good health, if the rates of all-cause mortality and all-cause disability in a specified year of interest would remain constant into the future.'
+      The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends.'
     date_published: "2024-05-17"
     # Citation
     producer: IHME, Global Burden of Disease
