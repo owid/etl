@@ -10,7 +10,7 @@ meta:
     title_snapshot: AI Index Report - Investment Data
 
     description_snapshot: |-
-      Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing. Quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
+      Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
 
     # Citation
     producer: Quid via AI Index
@@ -19,12 +19,12 @@ meta:
     attribution_short: AI Index
 
     # Files
-    url_main: https://drive.google.com/uc?export=download&id=1EdjkbUmvniu_VADZ_n4ZWwyOXjnbllTB
+    url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
     date_accessed: 2024-06-28
     # License
     license:
       name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by-nd/4.0/?ref=chooser-v1
+      url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
   - md5: b720682a96af499fdaa8a6896dd1f19f
     size: 64253

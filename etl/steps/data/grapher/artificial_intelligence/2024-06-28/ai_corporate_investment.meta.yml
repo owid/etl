@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Artificial Intelligence
       grapher_config:
-        note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+        note: This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
 
     description_processing: |-
           - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
@@ -21,8 +21,10 @@ definitions:
       - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
 
     description_short: This data is expressed in US dollars, adjusted for inflation.
-    unit: 'constant 2021 US $'
+    unit: 'constant 2021 US$'
     short_unit: '$'
+    display:
+      numDecimalPlaces: 0
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:

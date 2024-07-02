@@ -4,7 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
-
+    display:
+      numDecimalPlaces: 0
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -16,7 +17,7 @@ tables:
     variables:
       generative_ai:
         title: Global investment in generative AI
-        unit: 'constant 2021 US $'
+        unit: 'constant 2021 US$'
         short_unit: '$'
         description_short: Generative AI refers to AI systems that can create new content, such as images, text, or music, based on patterns learned from existing data.
         description_processing: |-
@@ -27,7 +28,7 @@ tables:
           - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
         presentation:
           grapher_config:
-            note: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+            note: This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
         processing_level: major
 
       companies:

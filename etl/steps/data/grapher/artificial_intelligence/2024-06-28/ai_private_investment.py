@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["ai_investment"].reset_index()
 
     industries = {
-        "ai_infrastructure_research_governance": "AI infrastructure, research, and governance",
+        "ai_infrastructure_research_governance": "AI infrastructure and governance",
         "ar_vr": "Augmented or virtual reality",
         "av": "Autonomous vehicles",
         "agritech": "Agricultural technology",
@@ -51,8 +51,7 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(index=["year", "investment_type"], columns="country", values="value").reset_index()
     tb = tb.rename(columns={"investment_type": "country"})
 
-    tb = tb.format(["year", "country"])
-    tb.metadata.short_name = paths.short_name
+    tb = tb.format(["year", "country"], paths.short_name)
 
     #
     # Save outputs.

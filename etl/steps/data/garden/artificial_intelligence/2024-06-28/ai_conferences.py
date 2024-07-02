@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
 
     # Convert number of attendees to absolute numbers.
     tb["Number of attendees (in thousands)"] = tb["Number of attendees (in thousands)"] * 1000
-
+    tb = tb.rename(columns={"Number of attendees (in thousands)": "attendees"})
     tb = tb.format(["conference", "year"])
 
     #
