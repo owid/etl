@@ -1,6 +1,7 @@
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # naming conventions
@@ -25,6 +26,7 @@ def run(dest_dir: str) -> None:
     # calculate years lived with disability/disease
     tb["years_lived_with_disability"] = tb["life_expectancy_newborn"] - tb["healthy_life_expectancy_newborn"]
 
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
