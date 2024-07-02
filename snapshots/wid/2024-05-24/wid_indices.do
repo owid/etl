@@ -42,7 +42,7 @@ global age 992
 global unit j
 
 *Select the dataset to extract. "all" for the entire LIS data, "test" for test data, small (CL GB)
-global dataset = "all"
+global dataset = "test"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -72,10 +72,10 @@ global max_year = r(max)
 dis "Year of PPP data: $max_year"
 
 *Get ppp data to convert to USD
-wid, indicators(xlcusp) year($max_year) clear
+qui wid, indicators(xlcusp) year($max_year) clear
 rename value ppp
 tempfile ppp
-save "`ppp'"
+qui save "`ppp'"
 
 
 foreach option in $options {
@@ -106,21 +106,21 @@ foreach option in $options {
 		}
 
 		*Get average and threshold income for pre tax and post tax (nat and dis) data
-		wid, indicators($indicators_avg_thr) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
+		qui wid, indicators($indicators_avg_thr) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
 
 		*Merge with ppp data to transform monetary values to international-$
-		merge n:1 country using "`ppp'", keep(match)
-		replace value = value/ppp
+		qui merge n:1 country using "`ppp'", keep(match)
+		qui replace value = value/ppp
 		drop ppp
 		drop _merge
 		tempfile avgthr
-		save "`avgthr'"
+		qui save "`avgthr'"
 
 		*Gets shares and Gini for pre and post tax income
-		wid, indicators($indicators_gini_share) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
+		qui wid, indicators($indicators_gini_share) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
 
 		*Union with average and threshold income
-		append using "`avgthr'"
+		qui append using "`avgthr'"
 
 		if `option' == 1 {
 
@@ -135,13 +135,13 @@ foreach option in $options {
 
 			*Replace all occurrences of "." in the newly created `varp` (mainly in p99.9p100 and similar)
 			*This is because names of variables with "." are not allowed
-			replace varp = subinstr(varp, ".", "_", .)
+			qui replace varp = subinstr(varp, ".", "_", .)
 
 			*Reshape dataset: couy is the main index and varp are what Stata calls subobservations, in this case metrics associated with percentiles
-			reshape wide value, j(varp) i(couy) string
+			qui reshape wide value, j(varp) i(couy) string
 
 			*After the reshape, country and years are split into two variables again and the outcome is renamed
-			split couy, p(+) destring
+			qui split couy, p(+) destring
 			rename couy1 country
 			rename couy2 year
 
@@ -182,19 +182,19 @@ foreach option in $options {
 			* Also, generate a variable for the share between p90 and p99 and recalculate p50p90_share, because their components are more available.
 			foreach var in `var_names' {
 
-				gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
-				gen s90_s10_ratio_`var' = p90p100_share_`var' / p0p10_share_`var'
-				gen s80_s20_ratio_`var' = (p80p90_share_`var' + p90p100_share_`var') / (p0p10_share_`var' + p10p20_share_`var')
-				gen s90_s50_ratio_`var' = p90p100_share_`var' / p0p50_share_`var'
-				gen p90_p10_ratio_`var' = p90p100_thr_`var' / p10p20_thr_`var'
-				gen p90_p50_ratio_`var' = p90p100_thr_`var' / p50p60_thr_`var'
-				gen p50_p10_ratio_`var' = p50p60_thr_`var' / p10p20_thr_`var'
+				qui gen palma_ratio_`var' = p90p100_share_`var' / (p0p50_share_`var' - p40p50_share_`var')
+				qui gen s90_s10_ratio_`var' = p90p100_share_`var' / p0p10_share_`var'
+				qui gen s80_s20_ratio_`var' = (p80p90_share_`var' + p90p100_share_`var') / (p0p10_share_`var' + p10p20_share_`var')
+				qui gen s90_s50_ratio_`var' = p90p100_share_`var' / p0p50_share_`var'
+				qui gen p90_p10_ratio_`var' = p90p100_thr_`var' / p10p20_thr_`var'
+				qui gen p90_p50_ratio_`var' = p90p100_thr_`var' / p50p60_thr_`var'
+				qui gen p50_p10_ratio_`var' = p50p60_thr_`var' / p10p20_thr_`var'
 
-				gen median_`var' = p50p60_thr_`var'
+				qui gen median_`var' = p50p60_thr_`var'
 
-				gen p90p99_share_`var' = p90p100_share_`var' - p99p100_share_`var'
+				qui gen p90p99_share_`var' = p90p100_share_`var' - p99p100_share_`var'
 
-				gen p50p90_share_`var' = p50p60_share_`var' + p60p70_share_`var' + p70p80_share_`var' + p80p90_share_`var'
+				qui gen p50p90_share_`var' = p50p60_share_`var' + p60p70_share_`var' + p70p80_share_`var' + p80p90_share_`var'
 
 			}
 
@@ -221,10 +221,10 @@ foreach option in $options {
 			drop country year percentile welfare variable age pop
 
 			* Make the table wide
-			reshape wide value, j(indicator) i(couypw) string
+			qui reshape wide value, j(indicator) i(couypw) string
 
 			* Split the index variable to recover the columns
-			split couypw, p(+) destring
+			qui split couypw, p(+) destring
 
 			* Rename resulting columns and drop what's not needed
 			rename couypw1 country
@@ -240,15 +240,15 @@ foreach option in $options {
 			rename valuet thr
 
 			* Replace welfare codes with new text
-			replace welfare = "pretax" if welfare == "ptinc"
-			replace welfare = "posttax_nat" if welfare == "diinc"
-			replace welfare = "posttax_dis" if welfare == "cainc"
-			replace welfare = "wealth" if welfare == "hweal"
+			qui replace welfare = "pretax" if welfare == "ptinc"
+			qui replace welfare = "posttax_nat" if welfare == "diinc"
+			qui replace welfare = "posttax_dis" if welfare == "cainc"
+			qui replace welfare = "wealth" if welfare == "hweal"
 
 			* Extract percentile from WID's name
-			split percentile, p(p)
-			destring percentile2, generate(p)
-			replace p = p/100
+			qui split percentile, p(p)
+			qui destring percentile2, generate(p)
+			qui replace p = p/100
 			drop percentile1 percentile2 percentile3
 
 			* Sort, order and save
@@ -265,7 +265,7 @@ foreach option in $options {
 }
 
 * Add fiscal income data (Chartbook of Economic Inequality)
-wid, indicators(sfiinc) perc(p99p100) ages(992) pop(i j t) exclude clear
+qui wid, indicators(sfiinc) perc(p99p100) ages(992) pop(i j t) exclude clear
 
 *Variable adjustments to create a wide dataset
 
@@ -276,15 +276,11 @@ egen couy = concat(country year), punct(+)
 *Drop variables to only keep joined indices
 drop variable percentile country year pop age
 
-*Replace all occurrences of "." in the newly created `varp`
-*This is because names of variables with "." are not allowed
-replace varp = subinstr(varp, ".", "_", .)
-
 *Reshape dataset: couy is the main index and varp are what Stata calls subobservations, in this case metrics associated with percentiles
-reshape wide value, j(varp) i(couy) string
+qui reshape wide value, j(varp) i(couy) string
 
 *After the reshape, country and years are split into two variables again and the outcome is renamed
-split couy, p(+) destring
+qui split couy, p(+) destring
 rename couy1 country
 rename couy2 year
 
