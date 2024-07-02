@@ -1,0 +1,110 @@
+
+definitions:
+  common:
+    unit: °C
+    short_unit: °C
+    presentation:
+      topic_tags:
+      - Climate Change
+    display:
+      numDecimalPlaces: 2
+    processing_level: major
+  common_processing: |-
+    - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.
+
+    - Initially, the temperature dataset is provided with specific coordinates in terms of longitude and latitude. To tailor this data to each country, we utilize geographical boundaries as defined by the World Bank. The method involves trimming the global temperature dataset to match the exact geographical shape of each country. To correct for potential distortions caused by the Earth's curvature on a flat map, we apply a latitude-based weighting. This step is essential for maintaining accuracy, especially in high-latitude regions where distortion is more pronounced. The result of this process is a latitude-weighted average temperature for each nation.
+
+    - It's important to note, however, that due to the resolution constraints of the Copernicus dataset, this methodology might not be as effective for countries with very small landmasses. In these cases, the process may not yield reliable data.
+
+    - The derived 2-meter temperature readings for each country are calculated based on administrative borders, encompassing all land surface types within these defined areas. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
+
+    - Global temperature averages are calculated over all land and ocean surfaces.
+  temperature_anomaly: The temperature anomaly is determined by comparing the average surface temperature of a given year to the 1991-2020 mean, highlighting climate variations.
+  temperature_anomaly_above: Calculated when the average surface temperature for a year is higher than the 1991-2020 average, this anomaly indicates a hotter-than-average temperature for that year.
+  temperature_anomaly_below: Calculated when the average surface temperature for a year is lower than the 1991-2020 average, this anomaly indicates a colder-than-average temperature for that year.
+
+dataset:
+  title: Country level monthly temperature anomalies
+
+tables:
+  surface_temperature:
+    variables:
+
+      january:
+        title: January
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      february:
+        title: February
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      march:
+        title: March
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      april:
+        title: April
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      may:
+        title: May
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      june:
+        title: June
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      july:
+        title: July
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      august:
+        title: August
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      september:
+        title: September
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      october:
+        title: October
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      november:
+        title: November
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      december:
+        title: December
+        description_short: |-
+            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
+      annual:
+        title: Annual
+        description_short: |-
+            The deviation in a specific year's average surface temperature from the mean temperature of the same year during the period 1991-2020, measured in degrees Celsius.
+        description_processing: |-
+            {definitions.common_processing}
