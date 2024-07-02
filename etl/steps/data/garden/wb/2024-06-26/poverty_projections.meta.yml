@@ -5,6 +5,13 @@ definitions:
     presentation:
       topic_tags:
         - Poverty
+  description_key_estimated_extreme_poverty: Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+  description_key_estimated_international_dollars: The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+  description_key_estimated_income_consumption: The data is constructed as an aggregate of income measured after taxes and benefits, and consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+  description_key_estimated_non_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+  description_key_estimated_version: These estimates are based on the September 2022 release of World Bank PIP data. For the most recent data on global poverty from the World Bank, you can visit our [poverty data explorer](https://ourworldindata.org/explorers/poverty-explorer).
+
+  description_key_projected_method: This is projected data, based on World Bank PIP (September 2022 version) and estimates from [Mahler, Yonzan and Lakner (2022)](https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b). The projections are constructed by using growth rates from the [June 2022 Global Economic Prospects (GEP) database](https://openknowledge.worldbank.org/bitstream/handle/10986/37224/9781464818431.pdf) for poverty up to 2024 and country-level average annual historical (2010–19) growth rates for the remaining years.
 
 
 # Learn more about the available fields:
@@ -22,10 +29,11 @@ tables:
         short_unit: "%"
         description_short: Estimated percentage of population living in households with an income or consumption per person below $2.15 a day.
         description_key:
-          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
-          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
-          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
-          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+          - "{definitions.description_key_estimated_extreme_poverty}"
+          - "{definitions.description_key_estimated_international_dollars}"
+          - "{definitions.description_key_estimated_income_consumption}"
+          - "{definitions.description_key_estimated_non_market_income}"
+          - "{definitions.description_key_estimated_version}"
         presentation:
           title_public: Share of population living in extreme poverty (Estimated)
         display:
@@ -40,10 +48,11 @@ tables:
         short_unit: ""
         description_short: Estimated number of people in households with an income or consumption per person below $2.15 a day
         description_key:
-          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
-          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
-          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
-          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+          - "{definitions.description_key_estimated_extreme_poverty}"
+          - "{definitions.description_key_estimated_international_dollars}"
+          - "{definitions.description_key_estimated_income_consumption}"
+          - "{definitions.description_key_estimated_non_market_income}"
+          - "{definitions.description_key_estimated_version}"
         presentation:
           title_public: Number of people living in extreme poverty (Estimated)
         display:
@@ -57,6 +66,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Projected percentage of population living in households with an income or consumption per person below $2.15 a day.
+        description_key:
+          - "{definitions.description_key_estimated_extreme_poverty}"
+          - "{definitions.description_key_estimated_international_dollars}"
+          - "{definitions.description_key_estimated_income_consumption}"
+          - "{definitions.description_key_estimated_non_market_income}"
+          - "{definitions.description_key_projected_method}"
         presentation:
           title_public: Share of population living in extreme poverty (Projected)
         display:
@@ -70,6 +85,12 @@ tables:
         unit: people
         short_unit: ""
         description_short: Projected number of people in households with an income or consumption per person below $2.15 a day
+        description_key:
+          - "{definitions.description_key_estimated_extreme_poverty}"
+          - "{definitions.description_key_estimated_international_dollars}"
+          - "{definitions.description_key_estimated_income_consumption}"
+          - "{definitions.description_key_estimated_non_market_income}"
+          - "{definitions.description_key_projected_method}"
         presentation:
           title_public: Number of people living in extreme poverty (Projected)
         display:
