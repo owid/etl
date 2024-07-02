@@ -16,6 +16,8 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("gbd_healthy_life_expectancy.zip")
 
+    # Get origins
+
     with zipfile.ZipFile(snap.path, "r") as z:
         # Find the first CSV file in the zip archive
         csv_filename = next((name for name in z.namelist() if name.endswith(".csv")), None)
@@ -24,14 +26,9 @@ def run(dest_dir: str) -> None:
             # Open the CSV file within the zip archive
             with z.open(csv_filename) as csv_file:
                 # Read the CSV file into a pandas DataFrame
-                tb = pr.read_csv(csv_file)
+                tb = pr.read_csv(csv_file, metadata=snap.to_table_metadata(), origin=snap.m.origin)
         else:
             print("No CSV file found in the zip archive.")
-
-    tb.metadata = snap.to_table_metadata()
-    # Some issue with this not propagating
-    for col in tb.columns:
-        tb[col].metadata.origins = snap.m.origin
 
     tb = tb.format(["location_name", "year"])
 
