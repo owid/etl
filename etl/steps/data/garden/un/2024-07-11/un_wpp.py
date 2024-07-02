@@ -129,6 +129,9 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     # Scale
     tb["population"] *= 1000
 
+    # As integer
+    tb["population"] = tb["population"].astype(int)
+
     # Remove location_type
     tb = tb.drop(columns="location_type")
 
