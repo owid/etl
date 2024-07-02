@@ -18,6 +18,7 @@ def run(dest_dir: str) -> None:
     tb_hale = format_data(tb_hale, "healthy_life_expectancy_newborn")
     tb_le = format_data(tb_le, "life_expectancy_newborn")
 
+    tb = Table()
     tb = pr.merge(tb_hale, tb_le, on=["country", "year"], how="outer")
     tb.metadata = ds_hale.metadata
 
