@@ -51,7 +51,8 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(index=["year", "investment_type"], columns="country", values="value").reset_index()
     tb = tb.rename(columns={"investment_type": "country"})
 
-    tb = tb.format(["year", "country"], paths.short_name)
+    tb = tb.format(["year", "country"])
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.

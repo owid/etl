@@ -31,7 +31,8 @@ def run(dest_dir: str) -> None:
     # Only keep the world data (others are NaN for corporate investment)
     tb = tb[["year", "country", "World"]]
 
-    tb = tb.format(["year", "country"], short_name=paths.short_name)
+    tb = tb.format(["year", "country"])
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
