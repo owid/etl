@@ -7,17 +7,17 @@ tables:
   electricity_material_footprint_wang:
     variables:
       material_footprint_excl_rock:
-        title: Materials (incl. rock)
-        unit: kilograms per GWh
-        short_unit: kg
-        description: |-
-          Material footprint of each electricity source, including waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
-      material_footprint_incl_rock:
         title: Materials (excl. rock)
         unit: kilograms per GWh
         short_unit: kg
         description: |-
           Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      material_footprint_incl_rock:
+        title: Materials (incl. rock)
+        unit: kilograms per GWh
+        short_unit: kg
+        description: |-
+          Material footprint of each electricity source, including waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
       rock:
         title: Rock
         unit: kilograms per GWh
