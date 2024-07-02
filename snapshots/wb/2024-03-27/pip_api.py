@@ -48,7 +48,7 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
-from owid.catalog import connect_r2_cached
+from owid.catalog.s3_utils import connect_r2_cached
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
