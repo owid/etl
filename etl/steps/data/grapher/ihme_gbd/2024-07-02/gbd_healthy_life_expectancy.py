@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
         dest_dir,
-        tables=tb,
+        tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
     )
