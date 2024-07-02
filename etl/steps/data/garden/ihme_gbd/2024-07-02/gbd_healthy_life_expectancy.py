@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
 
     tb = Table()
     tb = pr.merge(tb_hale, tb_le, on=["country", "year"], how="outer")
-    tb.metadata = ds_hale.metadata
+    tb.metadata = tb_hale.metadata
 
     # calculate years lived with disability/disease
     tb["years_lived_with_disability"] = tb["life_expectancy_newborn"] - tb["healthy_life_expectancy_newborn"]
