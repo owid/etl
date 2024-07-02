@@ -167,3 +167,9 @@ steps:
     - snapshot://chartbook/2024-05-23/wealth_france.csv
   data://garden/chartbook/2024-05-23/wealth_france:
     - data://meadow/chartbook/2024-05-23/wealth_france
+
+  # Altimir (1986) - Income distribution estimates in Argentina (1953-1980)
+  data://meadow/chartbook/2024-03-21/altimir_1986:
+    - snapshot://chartbook/2024-03-21/altimir_1986.csv
+  data://garden/chartbook/2024-03-21/altimir_1986:
+    - data://meadow/chartbook/2024-03-21/altimir_1986
