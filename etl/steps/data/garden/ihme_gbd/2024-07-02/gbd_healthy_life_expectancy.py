@@ -9,7 +9,7 @@ def run(dest_dir: str) -> None:
     ds_hale = paths.load_dataset("gbd_healthy_life_expectancy")
     ds_le = paths.load_dataset("gbd_life_expectancy")
 
-    tb_hale = ds_hale["gbd_healthy_life_expectancy"].reset_index()
+    tb_hale = ds_hale["gbd_hale"].reset_index()
     tb_le = ds_le["gbd_life_expectancy"].reset_index()
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
