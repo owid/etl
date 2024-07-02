@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("gbd_life_expectancy.zip")
+    snap = paths.load_snapshot("gbd_healthy_life_expectancy.zip")
 
     with zipfile.ZipFile(snap.path, "r") as z:
         # Find the first CSV file in the zip archive
