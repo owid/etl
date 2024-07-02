@@ -22,7 +22,7 @@ tables:
     variables:
       attendees:
         title: Number of attendees
-        unit: ''
+        unit: 'attendees'
         short_unit: ''
         description_short: Thirteen major conferences are included.
 
