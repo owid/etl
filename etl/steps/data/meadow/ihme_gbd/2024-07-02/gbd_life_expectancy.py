@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 import zipfile
 
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -16,7 +17,7 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("gbd_life_expectancy.zip")
     # Get origins
-
+    tb = Table()
     with zipfile.ZipFile(snap.path, "r") as z:
         # Find the first CSV file in the zip archive
         csv_filename = next((name for name in z.namelist() if name.endswith(".csv")), None)

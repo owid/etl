@@ -16,8 +16,6 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("gbd_healthy_life_expectancy.zip")
 
-    # Get origins
-
     with zipfile.ZipFile(snap.path, "r") as z:
         # Find the first CSV file in the zip archive
         csv_filename = next((name for name in z.namelist() if name.endswith(".csv")), None)
@@ -31,8 +29,6 @@ def run(dest_dir: str) -> None:
             print("No CSV file found in the zip archive.")
 
     tb = tb.format(["location_name", "year"])
-
-    #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
