@@ -14,7 +14,11 @@ meta:
     url_download: |-
       https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/analysis/diagnostics/HadCRUT.5.0.2.0.analysis.summary_series.southern_hemisphere.annual.csv
     date_accessed: '2024-07-02'
-    date_published: '2024-05-20'
+    date_published: '2024-07-02'
     license:
       name: Open Government License v3
       url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
+outs:
+  - md5: b50049c11af3c9dc221a663e6de53eb9
+    size: 6977
+    path: near_surface_temperature_southern_hemisphere.csv

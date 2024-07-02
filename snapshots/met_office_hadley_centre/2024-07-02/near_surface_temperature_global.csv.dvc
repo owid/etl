@@ -14,7 +14,11 @@ meta:
     url_download: |-
       https://www.metoffice.gov.uk/hadobs/hadcrut5/data/HadCRUT.5.0.2.0/analysis/diagnostics/HadCRUT.5.0.2.0.analysis.summary_series.global.annual.csv
     date_accessed: '2024-07-02'
-    date_published: '2024-05-20'
+    date_published: '2024-07-02'
     license:
       name: Open Government License v3
       url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
+outs:
+  - md5: 1e6dbe5a5c4949f361562705432c7c8f
+    size: 6988
+    path: near_surface_temperature_global.csv
