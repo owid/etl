@@ -5,6 +5,8 @@ definitions:
         - Life Expectancy
         - Global Health
     processing_level: major
+    display:
+      numDecimalPlaces: 1
 
 dataset:
   non_redistributable: true
