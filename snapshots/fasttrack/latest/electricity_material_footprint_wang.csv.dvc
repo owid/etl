@@ -11,6 +11,6 @@ meta:
   description: Material footprint of electricity sources, measured with and without waste rock from mining.
   license: {}
 outs:
-  - md5: 5ecbd3cea403a1051900ca94a12c29c5
-    size: 303
+  - md5: cfbf34942eb76526991ce0c4fccb5bbb
+    size: 340
     path: electricity_material_footprint_wang.csv
