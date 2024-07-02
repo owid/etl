@@ -22,7 +22,7 @@ tables:
     variables:
       number_of_ai_incidents:
         title: Annual reported artificial intelligence incidents and controversies
-        unit: ''
+        unit: 'incidents'
         short_unit: ''
         description_short: Notable incidents include a “deepfake” video of Ukrainian President Volodymyr Zelenskyy surrendering, and U.S. prisons using AI to monitor their inmates’ calls.
 
