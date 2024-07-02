@@ -18,13 +18,13 @@ meta:
     attribution_short: AI Index
 
     # Files
-    url_main: https://drive.google.com/uc?export=download&id=1EdjkbUmvniu_VADZ_n4ZWwyOXjnbllTB
+    url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
     date_accessed: 2024-06-28
 
     # License
     license:
       name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by-nd/4.0/?ref=chooser-v1
+      url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
   - md5: 197c39c01f894daa8f6bf5aa630e08e2
     size: 2873

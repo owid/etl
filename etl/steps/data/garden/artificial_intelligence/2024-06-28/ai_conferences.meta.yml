@@ -8,6 +8,8 @@ definitions:
 
       grapher_config:
               note:  Most conferences in 2020–2021 were held virtually due to the COVID-19 pandemic.
+    display:
+      numDecimalPlaces: 0
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -18,7 +20,7 @@ dataset:
 tables:
   ai_conferences:
     variables:
-      number_of_attendees__in_thousands:
+      attendees:
         title: Number of attendees
         unit: ''
         short_unit: ''
