@@ -5,7 +5,16 @@ definitions:
       topic_tags:
         - Transport
         - Causes of Death
-
+    description_from_producer: |-
+      Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether
+      immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor
+      vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry
+      people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles
+      used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are
+      registered, while deaths are attributed to the countries in which they occur.
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -16,6 +25,38 @@ dataset:
 tables:
   road_accidents:
     variables:
+      accident_deaths:
+        title: Road accident deaths
+        unit: deaths
+        short_unit: deaths
+        description_short: Number of deaths due to road accidents.
+        description_processing: |-
+          "The majority of series data is sourced from the OECD Statistics.
+          For particular countries, historical data (before 1970) have been sourced from specific national records as referenced below.
+          Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
+          New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
+          Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+          Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
+          Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+          United States: https://www.bts.gov/content/transportation-fatalities-mode"
+      accident_injuries:
+        title: Road accident injuries
+        unit: injuries
+        short_unit: injuries
+        description_short: Number of injuries due to road accidents.
+      accidents_with_injuries:
+        title: Road accidents with injuries
+        unit: accidents
+        short_unit: accidents
+        description_short: Number of road accidents where one or more people were injured.
+      deaths_per_million_population:
+        title: Road accident deaths per million inhabitants
+        unit: deaths per million inhabitants
+        short_unit: deaths
+        description_short: Number of deaths due to road accidents per million inhabitants.
+
+
+
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
@@ -50,5 +91,4 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
-      {}
 
