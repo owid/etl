@@ -701,8 +701,9 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
     description = (  # type: ignore
         "The number of poultry birds in Europe, the EU, and High-income countries, has spurious jumps on recent years. "
         "The reason is that some European countries (a least Germany, Italy and Spain) lack data on those years. "
-        "The odd thing is that Europe (FAO) and European Union (27) (FAO) do have data for those years, even though "
-        "the member countries don't. So, the ideal solution is to replace those years with the (FAO) data."
+        "However, the original FAO data for Europe and the EU does have data for those years (even though the member countries do not). "
+        "So, we replace the affected years of Europe and the EU by the original FAO data. "
+        "On the other hand, the affected years for High-income countries will be removed (since this aggregate is not included in the original FAO data)."
     )
 
     affected_item_codes = [
@@ -789,7 +790,11 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
 
 
 class MalaysiaHighMilkConsumption(DataAnomaly):
-    description = "Malaysia's milk consumption from 2010 onwards is unreasonably high."  # type: ignore
+    description = (  # type: ignore
+        "Malaysia's milk consumption from 2010 onwards is unreasonably high. "
+        "Its per capita consumption is significantly larger than any other country. "
+        "We therefore remove Malaysia's milk consumption (total and per capita) from 2010 on."
+    )
 
     affected_item_codes = [
         "00002848",
