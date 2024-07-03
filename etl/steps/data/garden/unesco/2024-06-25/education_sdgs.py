@@ -70,9 +70,11 @@ def run(dest_dir: str) -> None:
         elif "index" in column.lower():
             update_metadata(meta, display_decimals=1, unit="index", short_unit="")
         elif "(current us$)" in column.lower():
-            update_metadata(meta, display_decimals=1, unit="current US$", short_unit="current $")
+            update_metadata(meta, display_decimals=1, unit="current US$", short_unit="$")
         elif "(number)" in column.lower():
             update_metadata(meta, display_decimals=0, unit="number", short_unit="")
+        elif "PPP$" in column.lower():
+            update_metadata(meta, display_decimals=1, unit="constant 2019 US$", short_unit="$")
 
         else:
             # Default metadata update when no other conditions are met.
