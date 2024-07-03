@@ -77,8 +77,10 @@ def run(dest_dir: str) -> None:
         tb = geo.harmonize_countries(
             df=tb,
             countries_file=paths.country_mapping_path,
+            excluded_countries_file=paths.excluded_countries_path,
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
+            warn_on_unknown_excluded_countries=False,
         )
 
         # Add region source as suffix to region name, e.g. Africa (WHO)
