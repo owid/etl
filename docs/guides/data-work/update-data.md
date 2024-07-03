@@ -3,26 +3,29 @@ tags:
   - 👷 Staff
 ---
 
-# Update data: Quick guide
-In a nutshell, these are the steps to follow:
+# Update data
 
-- Create a "reference" git branch.
-- Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
-- Commit the new files (without any further changes, and without committing changes to the dag) and push them to the "reference" branch.
-- Create a "review" branch (which is a sub-branch of the "reference" branch). This will also create a staging server where your chart work will take place.
-- Adapt the code of the new steps and ensure ETL (e.g. `etlr step-names --grapher`) can execute them successfully.
-- Commit changes to the code to the "review" branch.
-- Use Indicator Upgrader to update the charts (so they use the new variables instead of the old ones).
-    - If needed, adapt existing charts or create new ones on the staging server.
-- Archive old steps (i.e. move old steps from the dag to the archive dag).
-- Commit all your final work to the "review" branch, and set your PR (merging "review" to "reference") to be ready for reviewed.
-    - Make any further changes, if any is suggested by the reviewer.
-- Once approved, edit your PR, so that it merges "review" to "master", and merge the PR.
-- Archive old grapher dataset(s).
-- Announce your update.
+!!! tip "Quick summary guide"
+    In a nutshell, these are the steps to follow:
 
-# Update data: Full guide
+    - Create a "reference" git branch.
+    - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
+    - Commit the new files (without any further changes, and without committing changes to the dag) and push them to the "reference" branch.
+    - Create a "review" branch (which is a sub-branch of the "reference" branch). This will also create a staging server where your chart work will take place.
+    - Adapt the code of the new steps and ensure ETL (e.g. `etlr step-names --grapher`) can execute them successfully.
+    - Commit changes to the code to the "review" branch.
+    - Use Indicator Upgrader to update the charts (so they use the new variables instead of the old ones).
+        - If needed, adapt existing charts or create new ones on the staging server.
+    - Archive old steps (i.e. move old steps from the dag to the archive dag).
+    - Commit all your final work to the "review" branch, and set your PR (merging "review" to "reference") to be ready for reviewed.
+        - Make any further changes, if any is suggested by the reviewer.
+    - Once approved, edit your PR, so that it merges "review" to "master", and merge the PR.
+    - Archive old grapher dataset(s).
+    - Announce your update.
+
+
 This guide explains the general workflow to update a dataset that already exists in ETL.
+
 For simplicity, let's go through it with a real example: Assume you have to update the "Near-surface temperature anomaly" dataset, by the Met Office Hadley Centre.
 
 This guide assumes you have already a working installation of `etl`, and use VSCode with the appropriate configuration and plugins.
@@ -34,7 +37,7 @@ Firstly, you will create the "reference" code, which is the code that the final 
 This is not strictly necessary, but it will be very helpful for the PR reviewer.
 
 - Go to ETL `master` branch, and ensure it's up-to-date in your local repository (by running `git pull`).
-    - Ensure that, in your `.env` file, you have set `STAGING=1`. For more details on the `.env` file see this guide***.
+    - Ensure that, in your `.env` file, you have set `STAGING=1`.
 - Create a "reference" branch (a temporary branch that will be convenient for the reviewer later on):
 ```bash
 etl d draft-pr temp-update-temperature-anomaly
@@ -58,14 +61,17 @@ In this case, it has only 1 chart, so it will be an easy update.
     - Scroll down and expand the "Additional parameters to update steps" box, to deactivate the "Dry run" option.
     - Then click on "Update X steps" (in this case, X equals 6).
 This will create all the new ETL code files needed for the update, and write those steps in the dag (in this case, in the `climate.yml` dag file).
-You can close the Wizard (and kill it with `ctrl+c`).
+You can close the Wizard (and kill it with ++ctrl+c++).
 - Commit those new files in `snapshots` and `etl` folders to your branch:
 ```bash
 git add etl
 git add snapshots
 git commit -m "Duplicate previous Met Office steps"
 ```
-NOTE: For convenience, do not commit the changes in the `dag`. In a few moments you will see why.
+
+    !!! note
+        For convenience, do not commit the changes in the `dag`. In a few moments you will see why.
+
 - Create a "review" branch (the branch that will be reviewed):
 ```bash
 etl d draft-pr update-temperature-anomaly --base-branch temp-update-temperature-anomaly --title "Update Near-surface temperature anomaly data" --category data
@@ -79,8 +85,8 @@ This is where the main update work happens.
 
 - Edit the snapshot metadata files in VSCode, if any modifications are needed (for example, the `date_published` field may need to be manually updated).
     ![Chart Upgrader](../../assets/etl-dag-open-file.gif)
-    - For convenience (throughout the rest of the work), open the corresponding dag file in a tab (`cmd+p` to open the Quick Open bar, then type `climate.yml` and `enter`).
-    - To open a specific snapshot, go to the bottom of the dag, where the new steps are. Select the dag entry of one of the snapshots (without including the `snapshot://`), namely `met_office_hadley_centre/2024-07-02/near_surface_temperature_global.csv`, and then hit `cmd+c`, `cmd+p`, `cmd+v`, `enter`.
+    - For convenience (throughout the rest of the work), open the corresponding dag file in a tab (++cmd+p++ to open the Quick Open bar, then type `climate.yml` and `enter`).
+    - To open a specific snapshot, go to the bottom of the dag, where the new steps are. Select the dag entry of one of the snapshots (without including the `snapshot://`), namely `met_office_hadley_centre/2024-07-02/near_surface_temperature_global.csv`, and then hit ++cmd+c++, ++cmd+p++, ++cmd+v++, ++enter++.
 - Execute the snapshot:
 ```bash
 python snapshots/met_office_hadley_centre/2024-07-02/near_surface_temperature.py
@@ -96,7 +102,10 @@ Or all at once:
 ```bash
 etlr near_surface_temperature --grapher
 ```
-NOTE: The ETL code is run locally, but the database you are accessing is the one from the staging server.
+
+    !!! note
+        The ETL code is run locally, but the database you are accessing is the one from the staging server.
+
 - Commit your changes to the branch (now you should also include the changes in the dag).
 ```bash
 git add .
@@ -117,9 +126,11 @@ And click on "Indicator Upgrader".
     - By default, you should see selected the new grapher dataset (which has no charts), and its corresponding old version (with one chart). Press "Next".
     - Ensure the mapping from old to new indicators is correct. Press "Next".
     - Ensure the list of affected charts is as expected. Press "Update charts".
-    - If you have more datasets to update, simply refresh the page (`cmd+r`) and, by default, the next new dataset will be selected.
+    - If you have more datasets to update, simply refresh the page (++cmd+r++) and, by default, the next new dataset will be selected.
 - You can make any further changes to charts in your staging server, if needed.
-    - NOTE: You should be making changes to charts in the "review" branch (namely [http://staging-site-update-temperature-anomaly/](http://staging-site-update-temperature-anomaly/)), and **not** in the "reference" branch (namely [http://staging-site-temp-update-temperature-anomaly/](http://staging-site-temp-update-temperature-anomaly/)).
+
+    !!! note
+        You should be making changes to charts in the "review" branch (namely [http://staging-site-update-temperature-anomaly/](http://staging-site-update-temperature-anomaly/)), and **not** in the "reference" branch (namely [http://staging-site-temp-update-temperature-anomaly/](http://staging-site-temp-update-temperature-anomaly/)).
 
 ## 4. Approve chart differences
 Review all changes in charts.
@@ -146,7 +157,9 @@ This is not strictly necessary, but it's convenient for us to minimize the risk 
 
 ## 6. Get your pull request reviewed
 Get a second opinion.
-NOTE: Your current draft PR (called "📊 Update Near-surface temperature anomaly data") attempts to merge the sub-branch `update-temperature-anomaly` into `temp-update-temperature-anomaly`.
+!!! note
+    Your current draft PR (called "📊 Update Near-surface temperature anomaly data") attempts to merge the sub-branch `update-temperature-anomaly` into `temp-update-temperature-anomaly`.
+
 We do it this way so that the reviewer will see how the code has changed with respect to its previous version.
 Otherwise, if the PR was comparing your branch with `master`, the reviewer would need to see all the code (that was already reviewed in the past) as if the steps were new.
 
@@ -169,7 +182,8 @@ Share the result of your work with the world.
 ## 8. Archive old grapher datasets
 For convenience, we should archive grapher datasets that have been replaced by new ones.
 
-NOTE: This step is a bit cumbersome, feel free to skip if you don't feel confident about it. There is [an open issue](https://github.com/owid/owid-grapher/issues/3308) to make this easier.
+!!! note
+    This step is a bit cumbersome, feel free to skip if you don't feel confident about it. There is [an open issue](https://github.com/owid/owid-grapher/issues/3308) to make this easier.
 
 - Go to [the grapher dataset admin](https://admin.owid.io/admin/datasets).
 - Search for the dataset (type "Near-surface"). Click on it.
