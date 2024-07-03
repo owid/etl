@@ -11,7 +11,6 @@ meta:
 
     description_snapshot: |-
       Data on national AI strategies, which are policy plans created by governments to guide the development and deployment of AI within their country. Monitoring trends in these strategies is important for assessing how countries prioritize the development and regulation of AI technologies. Sources include national or regional government websites, the OECD AI Policy Observatory (oecd.ai), and news reports.
-      The AI Index also analyzed legislation containing “artificial intelligence” in 128 countries from 2016 to 2023.The analysis of passed AI policies may undercount the number of actual bills, given that large bills can include multiple sub-bills related to AI; for example, the CHIPS and Science Act passed by the United States in 2022. The AI Index monitored AI-related bills passed in Hong Kong and Macao, despite these not being officially recognized countries. Thus, the Index covers a total of 130 geographic areas. Laws passed by Hong Kong and Macao were counted in the overall tally of AI-related bills. This year, the Index expanded its country sample compared to previous years, resulting in a difference between the number of AI-related bills reported this year and those in prior reports.
 
     # Citation
     producer: AI Index
