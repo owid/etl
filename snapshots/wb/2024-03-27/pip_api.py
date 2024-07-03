@@ -294,7 +294,13 @@ def _fetch_percentiles(version: int) -> pd.DataFrame:
         url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv"
     else:
         raise ValueError(f"Version {version} is not supported")
-    return pd.read_csv(url)
+
+    _df_percentiles = pd.read_csv(url)
+
+    # Drop  Unnamed: 0 column (it sometimes appears in the files)
+    _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])
+
+    return _df_percentiles
 
 
 ############################################################################################################
