@@ -282,11 +282,3 @@ steps:
      - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
-
-  # AI Robots
-  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
-    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
-  data://garden/artificial_intelligence/2023-06-14/ai_robots:
-    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
-  data://grapher/artificial_intelligence/2023-06-14/ai_robots:
-    - data://garden/artificial_intelligence/2023-06-14/ai_robots

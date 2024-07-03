@@ -39,7 +39,7 @@ def get_data():
     ids = [
         "1XlRybKjTwZZLGT2i23ZVQyTUwXvHNFA0",  # 4.5.1 number of robots installed
         "1-KiWFJznt_DyYCwR7IV-o7yPoKQk25uQ",  # 4.5.2 opearational stock of robots
-        "11zu7VYGixCq2bt_mcKPpRdXN8sXW46_Z",  # 4.5.4 number of robots installed by geographic region
+        "1Iea7ejTc0EORVgB5Ez6gpfc9ws46itFY",  # 4.5.5 number of robots installed by geographic region (top 5 countries)
         "1gCNYZqP0ctUbY4girVfwdu3_LHvfTS_Z",  # 4.5.8 professional service robots
     ]
 
