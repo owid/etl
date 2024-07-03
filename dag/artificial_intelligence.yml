@@ -327,3 +327,10 @@ steps:
   # Grapher dataset for generative investment in AI and number of companies
   data://grapher/artificial_intelligence/2024-06-28/ai_investment_generative_companies:
     - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+
+  # AI Index Report 2024 - AI robots
+  data://garden/artificial_intelligence/2024-06-28/ai_robots:
+     - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_robots:
+    - data://garden/artificial_intelligence/2024-06-28/ai_robots
