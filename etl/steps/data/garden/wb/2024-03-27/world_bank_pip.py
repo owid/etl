@@ -159,7 +159,7 @@ def run(dest_dir: str) -> None:
     tb_wdi = ds_wdi["wdi"].reset_index()
 
     # Only keep CPI and PPP data from WDI
-    tb_wdi = tb_wdi[["country", "year", "fp_cpi_totl", "pa_nus_prvt_pp"]]
+    tb_wdi = tb_wdi[["country", "year", "fp_cpi_totl", "pa_nus_prvt_pp", "pa_nus_fcrf"]]
 
     # Process data
     # Make table wide and change column names
@@ -1380,30 +1380,49 @@ def add_indicators_in_constant_usd(tb: Table, tb_wdi: Table, columns_list: List[
     """
 
     # Rename indicators from WDI
-    tb_wdi = tb_wdi.rename(columns={"fp_cpi_totl": "cpi", "pa_nus_prvt_pp": "ppp"})
+    tb_wdi = tb_wdi.rename(columns={"fp_cpi_totl": "cpi", "pa_nus_prvt_pp": "ppp", "pa_nus_fcrf": "exchange_rate"})
 
     # Merge with WDI data
-    tb = pr.merge(tb, tb_wdi[["country", "year", "cpi"]], on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_wdi[["country", "year", "cpi", "exchange_rate"]], on=["country", "year"], how="left")
+    tb = pr.merge(
+        tb, tb_wdi[tb_wdi["year"] == 2017][["country", "cpi"]], on="country", how="left", suffixes=("", "_2017")
+    )
+    tb = pr.merge(
+        tb,
+        tb_wdi[tb_wdi["year"] == year_adjustment][["country", "cpi"]],
+        on="country",
+        how="left",
+        suffixes=("", f"_{year_adjustment}"),
+    )
     tb = pr.merge(tb, tb_wdi[tb_wdi["year"] == 2017][["country", "ppp"]], on="country", how="left")
 
-    # Define cpi_2017, as the cpi value in the year 2017 for each country
-    tb["cpi_2017"] = tb.groupby("country").apply(lambda x: x[x["year"] == 2017])["cpi"].reset_index(drop=True)
-    tb["cpi_base_2017"] = tb["cpi"] / tb["cpi_2017"]
+    # Calculate inflation_base_2017 as the value of the cpi adjusted to 2017
+    tb["inflation_base_2017"] = tb["cpi"] / tb["cpi_2017"]
 
     # Calculate ppp_factor as the product between cpi_base_2017 and ppp
-    tb["ppp_factor"] = tb["cpi_base_2017"] * tb["ppp"]
+    tb["ppp_factor"] = tb["inflation_base_2017"] * tb["ppp"]
 
-    # Calculate cpi_year_adjustment as the value of the cpi in the year of the adjustment
-    tb[f"cpi_{year_adjustment}"] = (
-        tb.groupby("country").apply(lambda x: x[x["year"] == year_adjustment])["cpi"].reset_index(drop=True)
-    )
-    tb[f"cpi_base_{year_adjustment}"] = tb["cpi"] / tb[f"cpi_{year_adjustment}"]
+    # Calculate inflation_base_year_adjustment as the value of the cpi adjusted to year_adjustment
+    tb[f"inflation_base_{year_adjustment}"] = tb["cpi"] / tb[f"cpi_{year_adjustment}"]
 
     # Add columns to constant USD
     for col in columns_list:
-        tb[f"{col}_constant_usd"] = tb[col] / (tb["ppp_factor"] * tb[f"cpi_base_{year_adjustment}"])
+        tb[f"{col}_constant_usd"] = (
+            tb[col] * tb["ppp_factor"] / (tb[f"inflation_base_{year_adjustment}"] * tb["exchange_rate"])
+        )
 
     # Drop columns
-    tb = tb.drop(columns=["cpi", "ppp", "cpi_2017", "cpi_base_2017", "ppp_factor", f"cpi_{year_adjustment}"])
+    tb = tb.drop(
+        columns=[
+            "cpi",
+            "ppp",
+            "cpi_2017",
+            "inflation_base_2017",
+            "ppp_factor",
+            f"cpi_{year_adjustment}",
+            f"inflation_base_{year_adjustment}",
+            "exchange_rate",
+        ]
+    )
 
     return tb
