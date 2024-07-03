@@ -91,7 +91,7 @@ tables:
       passenger_kms_bus:
         title: Passenger kilometers by bus
         unit: passenger-kilometers
-        short_unit: p-km
+        short_unit: km
         description_short: Number of kilometers traveled by passengers by bus.
         description_from_producer: |-
           "Road passenger transport: any movement of passengers using a road vehicle on a given

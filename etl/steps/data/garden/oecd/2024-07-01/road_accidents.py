@@ -57,7 +57,6 @@ def run(dest_dir: str) -> None:
     tb_passenger = ds_passenger["passenger_travel"].reset_index()
 
     # standardize both tables
-    tb = tb.drop(columns=["unit_of_measure"])
     tb_passenger = tb_passenger.rename(columns={"vehicle_type": "measure"})
 
     # concatenate the two tables
@@ -77,28 +76,29 @@ def run(dest_dir: str) -> None:
     # Combine new and old data
     tb = tb.merge(tb_old, how="outer", on=["country", "year"], suffixes=("", "_old")).copy_metadata(tb)
 
+    # make all column names lowercase
+    tb.columns = tb.columns.str.lower()
+
     #
     # process data - combine indicators and add death per million inhabitants/ per thousand passenger kilometers
     #
     # if one column is nan use other column, otherwise use new data (in columns Fatalities, Injured, Injury crashes)
-    tb["accident_deaths"] = tb.apply(lambda x: x["deaths"] if pd.isna(x["Fatalities"]) else x["Fatalities"], axis=1)
-    tb["accident_injuries"] = tb.apply(lambda x: x["injuries"] if pd.isna(x["Injured"]) else x["Injured"], axis=1)
+    tb["accident_deaths"] = tb.apply(lambda x: x["deaths"] if pd.isna(x["fatalities"]) else x["fatalities"], axis=1)
+    tb["accident_injuries"] = tb.apply(lambda x: x["injuries"] if pd.isna(x["injured"]) else x["injured"], axis=1)
     tb["accidents_with_injuries"] = tb.apply(
-        lambda x: x["accidents_involving_casualties"] if pd.isna(x["Injury crashes"]) else x["Injury crashes"],
+        lambda x: x["accidents_involving_casualties"] if pd.isna(x["crashes"]) else x["crashes"],
         axis=1,
     )
     # drop old columns
-    tb = tb.drop(
-        columns=["Fatalities", "Injured", "Injury crashes", "deaths", "injuries", "accidents_involving_casualties"]
-    )
+    tb = tb.drop(columns=["fatalities", "injured", "crashes", "deaths", "injuries", "accidents_involving_casualties"])
 
     # rename passenger travel columns
     tb = tb.rename(
         columns={
-            "Rail": "passenger_kms_rail",
-            "Road": "passenger_kms_road",
-            "Passenger cars": "passenger_kms_car",
-            "Buses": "passenger_kms_bus",
+            "rail": "passenger_kms_rail",
+            "road": "passenger_kms_road",
+            "passenger cars": "passenger_kms_car",
+            "buses": "passenger_kms_bus",
         }
     )
 
