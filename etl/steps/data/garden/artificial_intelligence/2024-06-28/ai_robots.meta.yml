@@ -1,0 +1,67 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  "Example machines that are not classified as robots: software (e.g., voice assistants), remote-controlled drones, self-driving cars, “smart” washing machines."
+    display:
+      numDecimalPlaces: 0
+
+  description_short_industrial: Industrial robots are automated, reprogrammable machines that perform a variety of tasks in industrial settings.
+  description_short_professional:  Professional service robots are semi- or fully autonomous machines that perform useful tasks in a professional setting outside of industrial applications, such as in cleaning or medical surgery. Consumer service robots are not included.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_robots:
+    variables:
+      agriculture:
+        title: Agriculture
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_professional}
+      hospitality:
+        title: Hospitality
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_professional}
+      professional_cleaning:
+        title: Professional cleaning
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_professional}
+      transportation_and_logistics:
+        title: Transportation and logistics
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_professional}
+      medical_robotics:
+        title: Medical robotics
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_professional}
+      installations:
+        title: Annual industrial robots installed
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_industrial}
+      operational_stock:
+        title: Total industrial robots in operation
+        unit: 'robots'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_industrial}
+
