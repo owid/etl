@@ -13,11 +13,11 @@ meta:
     # Citation
     producer: World Bank Poverty and Inequality Platform
     citation_full: |-
-      World Bank (2024). Poverty and Inequality Platform (version 20240326_2017 and 20240326_2011) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed 02 July 2024.
+      World Bank (2024). Poverty and Inequality Platform (version 20240326_2017 and 20240326_2011) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed March 27, 2024.
 
     # Files
     url_main: https://pip.worldbank.org
-    date_accessed: 2024-07-02
+    date_accessed: 2024-03-27
 
     # License
     license:
@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/wb/2024-01-17
 outs:
-  - md5: a323c80d17998f3859ba348a48d8d0f5
-    size: 35557040
+  - md5: 89a74ce0a636f6b0e317664b99eebd51
+    size: 35912832
     path: world_bank_pip.csv
