@@ -1,5 +1,9 @@
 definitions:
   global:
+    projections:
+      <%- if variant != 'estimates' %>
+        Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
+      <%- endif %>
     dimensions:
       title: |-
         <% macro generate_title_variant(sex, age, variant) %>
@@ -36,9 +40,23 @@ definitions:
         <%- endif %>.
         <% endif %>
 
-        <%- if variant != 'estimates' %>
-          Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
+        {definitions.global.projections}
+
+        <% endmacro %>
+        << generate_description_short(sex, age, variant) >>
+      description_short_births: |-
+        <% macro generate_description_short(sex, age, variant) %>
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex != 'all' %>
+          << sex >> babies<%- if variant != 'estimates' %>, and <% endif %>
         <%- endif %>
+        <%- elif age != 'all' %>
+          mothers aged << age >>
+        <%- endif %>.
+        <% endif %>
+
+        {definitions.global.projections}
 
         <% endmacro %>
         << generate_description_short(sex, age, variant) >>
@@ -66,7 +84,7 @@ tables:
         title: Population change
         unit: people
         description_short: |-
-          Population yearly increment. This is the difference between the population on 1st of July of the year indicated and the population on 1st of July of the previous year.
+          Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
         presentation:
           title_public: |-
             Population change, {definitions.global.dimensions.title}
@@ -76,7 +94,7 @@ tables:
         unit: people per square kilometer
         short_unit: people/km²
         description_short: |-
-          Population density in a country, area or region as of 1 July of the year indicated.
+          Population density in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
         presentation:
           title_public: |-
             Population density, {definitions.global.dimensions.title}
@@ -84,18 +102,27 @@ tables:
   growth_rate:
     variables:
       growth_rate:
-        title: Growth rate
+        title: Population growth rate
         short_unit: "%"
         unit: "%"
-        description_short: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+        description_short: |-
+          Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on 1 January of subsequent years. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Growth rate, {definitions.global.dimensions.title}
 
   natural_change_rate:
     variables:
       natural_change_rate:
-        title: Natural growth rate
+        title: Natural population growth rate
         short_unit: "%"
         unit: "%"
-        description_short: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+        description_short: |-
+          Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Natural growth rate, {definitions.global.dimensions.title}
+
 
   fertility_rate:
     variables:
@@ -103,53 +130,78 @@ tables:
         title: Fertility rate
         unit: |-
           <% if age == 'all' %>
-          live births per 1,000 women
+          live births per woman
           <% else %>
-          live births per 1,000 women aged << age >>
+          live births per 1,000 mothers aged << age >>
           <% endif %>
         description_short: |-
           <% if age == 'all' %>
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. {definitions.global.dimensions.description_short}
           <% else %>
-          The annual number of live births from mothers aged << age >> years.
+          The annual number of live births from mothers aged << age >> years. {definitions.global.dimensions.description_short}
           <% endif %>
         description_key:
           - |-
-            It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
+            It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
+        presentation:
+          title_public: |-
+            Fertility rate, {definitions.global.dimensions.title}
 
   migration:
     variables:
       net_migration:
         title: Net migration
         unit: migrants
-        description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
-
+        description_short: |-
+          Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
       net_migration_rate:
         title: Net migration rate
         unit: migrants per 1,000 people
-        description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
+        description_short: |-
+          Net number of immigrants minus the number of emigrants, divided by the population of the receiving country over a year. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Net migration, {definitions.global.dimensions.title}
 
   deaths:
     variables:
       deaths:
         title: Deaths
         unit: deaths
-        description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        description_short: |-
+          Number of deaths recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Death rate, {definitions.global.dimensions.title}
+
       death_rate:
         title: Death rate
         unit: deaths per 1,000 people
-        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
+        description_short: |-
+          Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Death rate, {definitions.global.dimensions.title}
 
   births:
     variables:
       births:
         title: Births
         unit: births
-        description_short: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+        description_short: |-
+          Number of births recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short_births}
+        presentation:
+          title_public: |-
+            Births, {definitions.global.dimensions.title}
+
       birth_rate:
         title: Birth rate
         unit: births per 1,000 people
-        description_short: Number of births over a given period divided by the person-years lived by the population over that period.
+        description_short: |-
+          Number of births recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Birth rate, {definitions.global.dimensions.title}
 
   median_age:
     variables:
@@ -157,7 +209,10 @@ tables:
         title: Median age
         unit: years
         description_short: |-
-          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Median age, {definitions.global.dimensions.title}
 
   life_expectancy:
     variables:
@@ -166,12 +221,20 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          <% if age == 0 %>
-          Life expectancy for individuals at birth.
+          <% if sex == 'all' %>
+          <% set individuals='people' %>
           <% else %>
-          Life expectancy for individuals who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
+          <% set individuals=sex+'s' %>
           <% endif %>
+
+          <% if age == 0 %>
+          Life expectancy for << individuals >> at birth.
+          <% else %>
+          Life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
+          <% endif %> {definitions.global.projections}
         presentation:
+          title_public: |-
+            Life Expectancy, {definitions.global.dimensions.title}
           grapher_config:
             note: |-
               <% if age == 0 %>
@@ -192,7 +255,10 @@ tables:
           ​​The number of male population per 100 female population.
           <% else %>
           The number of male individuals per 100 female individuals, at age << age >>.
-          <% endif %>
+          <% endif %> {definitions.global.projections}
+        presentation:
+          title_public: |-
+            Sex ratio, {definitions.global.dimensions.title}
 
   mortality_rate:
     variables:
@@ -214,7 +280,10 @@ tables:
           The share of newborns who die before reaching the age of one.
           <% else %>
           The share of children who die before reaching the age of 5.
-          <% endif %>
+          <% endif %> {definitions.global.projections}
+        presentation:
+          title_public: |-
+            {tables.mortality_rate.variables.mortality_rate.title}, {definitions.global.dimensions.title}
 
   # un_wpp:
   #   variables:
