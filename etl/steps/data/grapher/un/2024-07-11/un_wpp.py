@@ -1,5 +1,3 @@
-from owid.catalog import Table
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -17,16 +15,16 @@ def run(dest_dir: str) -> None:
     #
     tables = [
         ds_garden["population"],
-        ds_garden["growth_rate"],
-        ds_garden["natural_change_rate"],
-        ds_garden["fertility_rate"],
-        ds_garden["migration"],
-        ds_garden["deaths"],
-        ds_garden["births"],
-        ds_garden["median_age"],
-        ds_garden["life_expectancy"],
-        ds_garden["sex_ratio"],
-        ds_garden["mortality_rate"],
+        # ds_garden["growth_rate"],
+        # ds_garden["natural_change_rate"],
+        # ds_garden["fertility_rate"],
+        # ds_garden["migration"],
+        # ds_garden["deaths"],
+        # ds_garden["births"],
+        # ds_garden["median_age"],
+        # ds_garden["life_expectancy"],
+        # ds_garden["sex_ratio"],
+        # ds_garden["mortality_rate"],
     ]
     #
     # Save outputs.

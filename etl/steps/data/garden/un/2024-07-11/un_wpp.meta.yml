@@ -1,21 +1,83 @@
+definitions:
+  global:
+    dimensions:
+      title: |-
+        <% macro generate_title_variant(sex, age, variant) %>
+        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
+        total
+        <% else %>
+          <%- if sex != 'all' %>
+            << sex >><%- if age != 'all' or variant != 'estimates' %>, <% endif %>
+          <%- endif %>
+          <%- if age == '0' %>
+            at birth<%- if variant != 'estimates' %>, <% endif %>
+          <%- elif age != 'all' %>
+            aged << age >><%- if variant != 'estimates' %>, <% endif %>
+          <%- endif %>
+          <%- if variant != 'estimates' %>
+            << variant >> projection
+          <%- endif %>
+        <% endif %>
+        <% endmacro %>
+        << generate_title_variant(sex, age, variant) >>
+      description_short: |-
+        <% macro generate_title_variant(sex, age, variant) %>
+        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
+        <% else %>
+          This only includes
+          <%- if sex != 'all' %>
+            << sex >>s
+          <%- endif %>
+          <%- if age == '0' %>
+            at birth
+          <%- elif age != 'all' %>
+            aged << age >>
+          <%- endif %>
+          .
+          <%- if variant != 'estimates' %>
+            Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
+          <%- endif %>
+        <% endif %>
+        <% endmacro %>
+        << generate_title_variant(sex, age, variant) >>
+  common:
+    presentation:
+      attribution_short: UN WPP
+      # title_variant: "{definitions.global.dimensions}"
+
+
 # this metadata file is not used in garden step, but in grapher step
 tables:
   population:
     variables:
+
       population:
         title: Population
         unit: people
-        description_short: De facto population in a country, area or region as of 1 July of the year indicated.
+        description_short: |-
+          De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population, {definitions.global.dimensions.title}
+
       population_change:
         title: Population change
         unit: people
         description_short: |-
           Population yearly increment. This is the difference between the population on 1st of July of the year indicated and the population on 1st of July of the previous year.
+        presentation:
+          title_public: |-
+            Population change, {definitions.global.dimensions.title}
+
       population_density:
         title: Population density
         unit: people per square kilometer
         short_unit: people/km²
-        description_short: Population density in a country, area or region as of 1 July of the year indicated.
+        description_short: |-
+          Population density in a country, area or region as of 1 July of the year indicated.
+        presentation:
+          title_public: |-
+            Population density, {definitions.global.dimensions.title}
 
   growth_rate:
     variables:
@@ -37,9 +99,18 @@ tables:
     variables:
       fertility_rate:
         title: Fertility rate
-        unit: live births per woman
+        unit: |-
+          <% if age == 'all' %>
+          live births per 1,000 women
+          <% else %>
+          live births per 1,000 women aged << age >>
+          <% endif %>
         description_short: |-
+          <% if age == 'all' %>
           The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+          <% else %>
+          The annual number of live births from mothers aged << age >> years.
+          <% endif %>
         description_key:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
@@ -50,6 +121,7 @@ tables:
         title: Net migration
         unit: migrants
         description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
+
       net_migration_rate:
         title: Net migration rate
         unit: migrants per 1,000 people
@@ -130,13 +202,13 @@ tables:
           Child mortality rate - Sex: << sex >> - Variant: << variant >>
           <% endif %>
         unit: |-
-          <% if age == 0 %>
+          <% if age == '0' %>
           % of infants
           <% else %>
           % of children
           <% endif %>
         description_short: |-
-          <% if age == 0 %>
+          <% if age == '0' %>
           The share of newborns who die before reaching the age of one.
           <% else %>
           The share of children who die before reaching the age of 5.
