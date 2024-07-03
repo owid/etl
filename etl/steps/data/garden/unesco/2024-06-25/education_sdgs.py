@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
             update_metadata(meta, display_decimals=1, unit="current US$", short_unit="$")
         elif "(number)" in column.lower():
             update_metadata(meta, display_decimals=0, unit="number", short_unit="")
-        elif "PPP$" in column.lower():
+        elif "ppp$" in column.lower():
             update_metadata(meta, display_decimals=1, unit="constant 2019 US$", short_unit="$")
 
         else:
