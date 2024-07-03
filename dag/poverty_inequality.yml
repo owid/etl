@@ -19,6 +19,7 @@ steps:
     - snapshot://wb/2024-03-27/world_bank_pip_percentiles.csv
   data://garden/wb/2024-03-27/world_bank_pip:
     - data://meadow/wb/2024-03-27/world_bank_pip
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
   data://grapher/wb/2024-03-27/world_bank_pip_2011ppp:
     - data://garden/wb/2024-03-27/world_bank_pip
   data://grapher/wb/2024-03-27/world_bank_pip_2017ppp:

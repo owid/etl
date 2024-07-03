@@ -7,7 +7,7 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
     nohup poetry run etl run world_bank_pip > output.log 2>&1 &
 """
 
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -144,8 +144,9 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and WDI
     ds_meadow = paths.load_dataset("world_bank_pip")
+    ds_wdi = paths.load_dataset("wdi")
 
     # Read tables from meadow dataset.
     # Key indicators
@@ -153,6 +154,12 @@ def run(dest_dir: str) -> None:
 
     # Percentiles
     tb_percentiles = ds_meadow["world_bank_pip_percentiles"].reset_index()
+
+    # WDI
+    tb_wdi = ds_wdi["wdi"].reset_index()
+
+    # Only keep CPI and PPP data from WDI
+    tb_wdi = tb_wdi[["country", "year", "fp_cpi_totl", "pa_nus_prvt_pp"]]
 
     # Process data
     # Make table wide and change column names
@@ -201,6 +208,11 @@ def run(dest_dir: str) -> None:
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
+
+    # Add indicators in constant USD
+    tb_inc_or_cons_2017 = add_indicators_in_constant_usd(
+        tb=tb_inc_or_cons_2017, tb_wdi=tb_wdi, columns_list=["median"], year_adjustment=2021
+    )
 
     # Add metadata by code
     tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
@@ -461,7 +473,9 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> Tuple[Table, list, list]:
+def create_stacked_variables(
+    tb: Table, povlines_dict: Dict[int, List[int]], ppp_version: int
+) -> Tuple[Table, List[str], List[str]]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -605,7 +619,11 @@ def identify_rural_urban(tb: Table) -> Table:
 
 
 def sanity_checks(
-    tb: Table, povlines_dict: dict, ppp_version: int, col_stacked_n: list, col_stacked_pct: list
+    tb: Table,
+    povlines_dict: Dict[int, List[int]],
+    ppp_version: int,
+    col_stacked_n: List[str],
+    col_stacked_pct: List[str],
 ) -> Table:
     """
     Sanity checks for the table
@@ -1308,7 +1326,7 @@ def combine_tables_2011_2017(tb_2011: Table, tb_2017: Table, short_name: str) ->
     return tb_2011_2017
 
 
-def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int) -> Table:
+def define_columns_for_ppp_comparison(tb: Table, id_cols: List[str], ppp_version: int) -> Table:
     """
     Define columns to use for the comparison of 2011 and 2017 PPPs
     """
@@ -1341,7 +1359,7 @@ def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int
     return tb
 
 
-def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
+def regional_data_from_1990(tb: Table, regions_list: List[str]) -> Table:
     """
     Select regional data only from 1990 onwards, due to the uncertainty in 1980s data
     """
@@ -1353,4 +1371,39 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
+    return tb
+
+
+def add_indicators_in_constant_usd(tb: Table, tb_wdi: Table, columns_list: List[str], year_adjustment: int) -> Table:
+    """
+    Add columns transformed to constant USD
+    """
+
+    # Rename indicators from WDI
+    tb_wdi = tb_wdi.rename(columns={"fp_cpi_totl": "cpi", "pa_nus_prvt_pp": "ppp"})
+
+    # Merge with WDI data
+    tb = pr.merge(tb, tb_wdi[["country", "year", "cpi"]], on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_wdi[tb_wdi["year"] == 2017][["country", "ppp"]], on="country", how="left")
+
+    # Define cpi_2017, as the cpi value in the year 2017 for each country
+    tb["cpi_2017"] = tb.groupby("country").apply(lambda x: x[x["year"] == 2017])["cpi"].reset_index(drop=True)
+    tb["cpi_base_2017"] = tb["cpi"] / tb["cpi_2017"]
+
+    # Calculate ppp_factor as the product between cpi_base_2017 and ppp
+    tb["ppp_factor"] = tb["cpi_base_2017"] * tb["ppp"]
+
+    # Calculate cpi_year_adjustment as the value of the cpi in the year of the adjustment
+    tb[f"cpi_{year_adjustment}"] = (
+        tb.groupby("country").apply(lambda x: x[x["year"] == year_adjustment])["cpi"].reset_index(drop=True)
+    )
+    tb[f"cpi_base_{year_adjustment}"] = tb["cpi"] / tb[f"cpi_{year_adjustment}"]
+
+    # Add columns to constant USD
+    for col in columns_list:
+        tb[f"{col}_constant_usd"] = tb[col] / (tb["ppp_factor"] * tb[f"cpi_base_{year_adjustment}"])
+
+    # Drop columns
+    tb = tb.drop(columns=["cpi", "ppp", "cpi_2017", "cpi_base_2017", "ppp_factor", f"cpi_{year_adjustment}"])
+
     return tb

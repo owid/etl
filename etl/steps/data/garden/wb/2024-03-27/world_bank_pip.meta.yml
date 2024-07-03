@@ -463,3 +463,17 @@ tables:
           For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
         display:
           numDecimalPlaces: 0
+
+      median_constant_usd:
+        title: Median income or consumption (constant USD)
+        unit: 'constant 2021 US$'
+        short_unit: '$'
+        description_short: Median income or consumption.
+        description_key:
+          - The data is measured in 2021 US dollars – this adjusts for inflation but does not account for differences in the cost of living between countries..
+          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+        description_processing: |-
+          We have converted the median from 2017 international-$ to 2021 US$ using the World Bank's [Purchasing Power Parity (PPP) rates](https://data.worldbank.org/indicator/PA.NUS.PRVT.PP) and the [World Bank's Consumer Price Index](https://data.worldbank.org/indicator/FP.CPI.TOTL).
+        display:
+          numDecimalPlaces: 2
