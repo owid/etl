@@ -5,8 +5,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-COLS_TO_KEEP = ["Reference area", "MEASURE", "TIME_PERIOD", "OBS_VALUE"]
+COLS_TO_KEEP = ["Reference area", "Vehicle type", "TIME_PERIOD", "OBS_VALUE"]
 
 
 def run(dest_dir: str) -> None:
@@ -14,12 +13,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("road_accidents.csv")
+    snap = paths.load_snapshot("passenger_travel.csv")
 
     # Load data from snapshot.
     tb = snap.read()
 
-    # drop unneeded columns
     tb = tb[COLS_TO_KEEP]
 
     # Rename columns
@@ -33,10 +31,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["year"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "measure"])
-
-    #
-    # Save outputs.
+    tb = tb.format(["country", "year", "vehicle_type"])
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Annual passenger transport
+    description: |-
+      Includes data on passenger transport via rail and road. Data are collected from Ministries of Transport, national statistical offices and other institutions designated as the official data source.
+    date_published: "2024-04-29"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD 2024, Annual passenger transport, Trends in the Transport Sector, https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CTransport%23TRA%23%7CAnnual%20transport%20trends%23TRA_ATT%23&pg=0&fc=Topic&bp=true&snb=6&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_TRENDS%40DF_TRENDSPASS&df[ag]=OECD.ITF&df[vs]=1.0, accessed on July 3rd, 2024.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CTransport%23TRA%23%7CAnnual%20transport%20trends%23TRA_ATT%23&pg=0&fc=Topic&bp=true&snb=6&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_TRENDS%40DF_TRENDSPASS&df[ag]=OECD.ITF&df[vs]=1.0&dq=.A.....&to[TIME_PERIOD]=false&vw=tb&pd=%2C
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ITF,DSD_TRENDS@DF_TRENDSPASS,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2024-07-03
+
+    # License
+    license:
+      name: ""
+      url: ttps://www.oecd.org/termsandconditions.html
+
+outs:
+  - md5: dee35364728c854813d407d792f5e74e
+    size: 1593548
+    path: passenger_travel.csv
