@@ -282,3 +282,21 @@ steps:
      - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
+
+  # AI Index Report 2024 - AI bills
+  data://garden/artificial_intelligence/2024-06-28/ai_bills:
+    - snapshot://artificial_intelligence/2024-06-28/ai_bills.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_bills:
+    - data://garden/artificial_intelligence/2024-06-28/ai_bills
+
+  # AI Index Report 2024 - AI strategies
+  data://garden/artificial_intelligence/2024-06-28/ai_strategies:
+    - snapshot://artificial_intelligence/2024-06-28/ai_strategies.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_strategies:
+    - data://garden/artificial_intelligence/2024-06-28/ai_strategies
+
+  # AI Index Report 2024 - AI PhDs
+  data://garden/artificial_intelligence/2024-06-28/ai_phds:
+    - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_phds:
+    - data://garden/artificial_intelligence/2024-06-28/ai_phds

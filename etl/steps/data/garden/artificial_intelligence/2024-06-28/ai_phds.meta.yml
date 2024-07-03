@@ -1,0 +1,67 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  Since 2004, total response rates for the Taulbee Survey have ranged between 61–83%. This means that not every graduate is included, and the share who are varies from year to year.
+    display:
+      numDecimalPlaces: 0
+  description_short_sector: There is a subset of new AI PhDs each year who become self-employed, unemployed, or report an “other” employment status in the CRA survey. These students are not included in the chart.
+  description_short_gender: PhDs who graduated in the given year from academic units of computer science, computer engineering, and information that esponded to the Computing Research Association's Taulbee Survey.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_phds:
+    variables:
+      academia:
+        title: AI PhDs employed in academia
+        unit: 'PhD students'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_sector}
+
+      government:
+        title: AI PhDs employed in government
+        unit: 'PhD students'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_sector}
+      industry:
+        title: AI PhDs employed in industry
+        unit: 'PhD students'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_sector}
+      total:
+        title: Total AI PhDs
+        unit: 'PhD students'
+        short_unit: ''
+        description_short: |-
+          {definitions.description_short_sector}
+      female:
+        title: Share of women among new computer science PhDs, United States and Canada
+        unit: '%'
+        short_unit: '%'
+        description_short: |-
+          {definitions.description_short_gender}
+      male:
+        title: Share of men among new computer science PhDs, United States and Canada
+        unit: '%'
+        short_unit: '%'
+        description_short: |-
+          {definitions.description_short_gender}
+      nonbinary_other:
+        title: Share of as "other/non-binary" among new computer science PhDs, United States and Canada
+        unit: '%'
+        short_unit: '%'
+        description_short: |-
+          {definitions.description_short_gender}

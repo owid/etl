@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  Does not include broader innovation or digital strategy documents that do not focus predominantly on AI.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_strategies:
+    variables:
+      strategy_released:
+        title: Countries with national artificial intelligence strategies
+        unit: 'strategies'
+        short_unit: ''
+        description_short: An AI strategy is a policy document that communicates the objective of supporting the development of AI while also maximizing the benefits of AI for society.
