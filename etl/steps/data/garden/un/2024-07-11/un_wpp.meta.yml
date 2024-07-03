@@ -21,25 +21,27 @@ definitions:
         <% endmacro %>
         << generate_title_variant(sex, age, variant) >>
       description_short: |-
-        <% macro generate_title_variant(sex, age, variant) %>
-        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
-        <% else %>
-          This only includes
-          <%- if sex != 'all' %>
-            << sex >>s
-          <%- endif %>
-          <%- if age == '0' %>
-            at birth
-          <%- elif age != 'all' %>
-            aged << age >>
-          <%- endif %>
-          .
-          <%- if variant != 'estimates' %>
-            Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
-          <%- endif %>
+        <% macro generate_description_short(sex, age, variant) %>
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex != 'all' %>
+          << sex >>s
+        <%- elif sex != 'all' %>
+          individuals
+        <%- endif %>
+        <%- if age == '0' %>
+          at birth
+        <%- elif age != 'all' %>
+          aged << age >>
+        <%- endif %>.
         <% endif %>
+
+        <%- if variant != 'estimates' %>
+          Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
+        <%- endif %>
+
         <% endmacro %>
-        << generate_title_variant(sex, age, variant) >>
+        << generate_description_short(sex, age, variant) >>
   common:
     presentation:
       attribution_short: UN WPP
