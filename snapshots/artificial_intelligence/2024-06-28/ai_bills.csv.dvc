@@ -7,25 +7,27 @@ meta:
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
     date_published: "2024"
-    title_snapshot: AI Index Report - Investment Data
+    title_snapshot: AI Index Report - AI bills
 
     description_snapshot: |-
-      Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
+      The AI Index analyzed legislation containing “artificial intelligence” in 128 countries from 2016 to 2023.The analysis of passed AI policies may undercount the number of actual bills, given that large bills can include multiple sub-bills related to AI; for example, the CHIPS and Science Act passed by the United States in 2022. The AI Index monitored AI-related bills passed in Hong Kong and Macao, despite these not being officially recognized countries. Thus, the Index covers a total of 130 geographic areas. Laws passed by Hong Kong and Macao were counted in the overall tally of AI-related bills. This year, the Index expanded its country sample compared to previous years, resulting in a difference between the number of AI-related bills reported this year and those in prior reports.
 
     # Citation
-    producer: Quid via AI Index
+    producer: AI Index
     citation_full: |-
       Nestor Maslej, Loredana Fattorini, Raymond Perrault, Vanessa Parli, Anka Reuel, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald, and Jack Clark, “The AI Index 2024 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2024.
     attribution_short: AI Index
 
     # Files
     url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+    url_download: https://drive.google.com/uc?export=download&id=1nzoAhxNHbe6dScOMyybHms2ngihu-hrK
     date_accessed: 2024-06-28
+
     # License
     license:
       name: CC BY 4.0
       url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
-  - md5: 1d97a5be4f79548ecbb1f41972ac0ba5
-    size: 1449
-    path: ai_investment.csv
+  - md5: 96af9d1e99df40de1e5a9f731bde5ebd
+    size: 960
+    path: ai_bills.csv

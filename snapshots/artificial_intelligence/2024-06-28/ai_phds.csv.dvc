@@ -7,13 +7,12 @@ meta:
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
     date_published: "2024"
-    title_snapshot: AI Index Report - Investment Data
+    title_snapshot: AI Index Report - AI PhDs
 
     description_snapshot: |-
-      Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
-
+      Data from the Computing Research Association’s Taulbee Survey via the AI Index report, which evaluates the state of CS and AI postsecondary education in the United States and Canada. The survey covers 297 PhD-granting CS departments across the United States and Canada.
     # Citation
-    producer: Quid via AI Index
+    producer: CRA Taulbee Survey via AI Index
     citation_full: |-
       Nestor Maslej, Loredana Fattorini, Raymond Perrault, Vanessa Parli, Anka Reuel, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald, and Jack Clark, “The AI Index 2024 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2024.
     attribution_short: AI Index
@@ -21,6 +20,7 @@ meta:
     # Files
     url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
     date_accessed: 2024-06-28
+
     # License
     license:
       name: CC BY 4.0
@@ -28,4 +28,4 @@ meta:
 outs:
   - md5: 1d97a5be4f79548ecbb1f41972ac0ba5
     size: 1449
-    path: ai_investment.csv
+    path: ai_phds.csv
