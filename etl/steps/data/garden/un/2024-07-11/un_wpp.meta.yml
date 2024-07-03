@@ -6,7 +6,6 @@ definitions:
       <%- endif %>
     dimensions:
       title: |-
-        <% macro generate_title_variant(sex, age, variant) %>
         <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
         total
         <% else %>
@@ -22,10 +21,7 @@ definitions:
             << variant >> projection
           <%- endif %>
         <% endif %>
-        <% endmacro %>
-        << generate_title_variant(sex, age, variant) >>
       description_short: |-
-        <% macro generate_description_short(sex, age, variant) %>
         <% if not (sex == 'all' and age == 'all') %>
         This only includes
         <%- if sex != 'all' %>
@@ -42,24 +38,19 @@ definitions:
 
         {definitions.global.projections}
 
-        <% endmacro %>
-        << generate_description_short(sex, age, variant) >>
       description_short_births: |-
-        <% macro generate_description_short(sex, age, variant) %>
         <% if not (sex == 'all' and age == 'all') %>
         This only includes
         <%- if sex != 'all' %>
           << sex >> babies<%- if variant != 'estimates' %>, and <% endif %>
         <%- endif %>
-        <%- elif age != 'all' %>
+        <%- if age != 'all' %>
           mothers aged << age >>
         <%- endif %>.
         <% endif %>
 
         {definitions.global.projections}
 
-        <% endmacro %>
-        << generate_description_short(sex, age, variant) >>
   common:
     presentation:
       attribution_short: UN WPP
@@ -283,7 +274,11 @@ tables:
           <% endif %> {definitions.global.projections}
         presentation:
           title_public: |-
-            {tables.mortality_rate.variables.mortality_rate.title}, {definitions.global.dimensions.title}
+            <% if age == '0' %>
+            Infant mortality rate
+            <% else %>
+            Child mortality rate
+            <% endif %>, {definitions.global.dimensions.title}
 
   # un_wpp:
   #   variables:
