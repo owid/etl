@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Origin, Table
 
@@ -10,7 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-data_cols = [
+old_data_cols = [
     "Fatalities",
     "Injured",
     "Injury crashes",
@@ -19,6 +20,18 @@ data_cols = [
     "accidents_involving_casualties",
     "deaths_per_million_inhabitants",
     "deaths__per_million_vehicles",
+]
+
+new_data_cols = [
+    "accident_deaths",
+    "accident_injuries",
+    "accidents_with_injuries",
+    "deaths_per_million_population",
+    "passenger_kms_rail",
+    "passenger_kms_road",
+    "passenger_kms_car",
+    "passenger_kms_bus",
+    "deaths_per_thousand_kms",
 ]
 
 
@@ -34,15 +47,25 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("road_accidents", channel="meadow", version="2024-07-01")
+    ds_passenger = paths.load_dataset("passenger_travel", channel="meadow", version="2024-07-01")
     ds_old = paths.load_dataset("road_accidents", version="2023-08-11")
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["road_accidents"].reset_index()
     tb_old = ds_old["road_accidents"].reset_index()
+    tb_passenger = ds_passenger["passenger_travel"].reset_index()
+
+    # standardize both tables
+    tb = tb.drop(columns=["unit_of_measure"])
+    tb_passenger = tb_passenger.rename(columns={"vehicle_type": "measure"})
+
+    # concatenate the two tables
+    tb = pr.concat([tb, tb_passenger], ignore_index=True)
 
     col_origins = tb["obs_value"].origins.copy()
 
+    # pivot table
     tb = tb.pivot_table(index=["country", "year"], columns=["measure"], values="obs_value").reset_index()
 
     # harmonize country names
@@ -55,43 +78,50 @@ def run(dest_dir: str) -> None:
     tb = tb.merge(tb_old, how="outer", on=["country", "year"], suffixes=("", "_old")).copy_metadata(tb)
 
     #
-    # process data - combine indicators and add death per million inhabitants
+    # process data - combine indicators and add death per million inhabitants/ per thousand passenger kilometers
     #
-
-    # change NA to -1 for easier handling
-    tb[data_cols] = tb[data_cols].fillna(-1)
-    # if one column is -1 use other column, otherwise use new data (in columns Fatalities, Injured, Injury crashes)
-    tb["accident_deaths"] = tb.apply(lambda x: x["Fatalities"] if x["Fatalities"] != -1 else x["deaths"], axis=1)
-    tb["accident_injuries"] = tb.apply(lambda x: x["Injured"] if x["Injured"] != -1 else x["injuries"], axis=1)
+    # if one column is nan use other column, otherwise use new data (in columns Fatalities, Injured, Injury crashes)
+    tb["accident_deaths"] = tb.apply(lambda x: x["deaths"] if pd.isna(x["Fatalities"]) else x["Fatalities"], axis=1)
+    tb["accident_injuries"] = tb.apply(lambda x: x["injuries"] if pd.isna(x["Injured"]) else x["Injured"], axis=1)
     tb["accidents_with_injuries"] = tb.apply(
-        lambda x: x["Injury crashes"] if x["Injury crashes"] != -1 else x["accidents_involving_casualties"], axis=1
+        lambda x: x["accidents_involving_casualties"] if pd.isna(x["Injury crashes"]) else x["Injury crashes"],
+        axis=1,
     )
-    # change -1 back to NA
-    tb = tb.replace(-1, pd.NA)
-
     # drop old columns
     tb = tb.drop(
         columns=["Fatalities", "Injured", "Injury crashes", "deaths", "injuries", "accidents_involving_casualties"]
     )
 
-    # add death per million inhabitants to compare
+    # rename passenger travel columns
+    tb = tb.rename(
+        columns={
+            "Rail": "passenger_kms_rail",
+            "Road": "passenger_kms_road",
+            "Passenger cars": "passenger_kms_car",
+            "Buses": "passenger_kms_bus",
+        }
+    )
+
+    # add death per million inhabitants
     tb = geo.add_population_to_table(tb, ds_population)
     tb["deaths_per_million_population"] = (tb["accident_deaths"] / tb["population"]) * 1_000_000
-
     # drop population as well as old death per million and per vehicle (these numbers are most likely wrong)
     tb = tb.drop(columns=["population", "deaths_per_million_inhabitants", "deaths__per_million_vehicles"])
 
+    # add death per 1000 passenger kilometers:
+    tb["deaths_per_thousand_kms"] = tb["accident_deaths"] / tb["passenger_kms_road"] * 1_000
+
     # change dtypes:
-    for col in ["accident_deaths", "accident_injuries", "accidents_with_injuries"]:
+    for col in [
+        col for col in new_data_cols if col not in ["deaths_per_million_population", "deaths_per_thousand_kms"]
+    ]:
         tb[col] = tb[col].astype("Int64")
+
     tb["deaths_per_million_population"] = tb["deaths_per_million_population"].astype("Float64")
+    tb["deaths_per_thousand_kms"] = tb["deaths_per_thousand_kms"].astype("Float64")
 
     # add back origins
-    tb = add_origins(
-        tb,
-        ["accident_deaths", "accident_injuries", "accidents_with_injuries", "deaths_per_million_population"],
-        col_origins,
-    )
+    tb = add_origins(tb, new_data_cols, col_origins)
 
     # format table
     tb = tb.format(["country", "year"])

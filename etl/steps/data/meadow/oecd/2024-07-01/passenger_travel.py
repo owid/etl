@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
 
     # recast year and obs value column to int
     tb["year"] = tb["year"].astype("Int64")
+    # TODO: scale data up - no way this is simply passenger kilometers, has to be 1000s or 100ks
     tb["OBS_VALUE"] = tb["OBS_VALUE"].astype("Int64")
 
     # drop rows where year is null

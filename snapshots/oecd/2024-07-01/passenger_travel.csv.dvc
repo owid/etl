@@ -5,7 +5,8 @@ meta:
     # Data product / Snapshot
     title: Annual passenger transport
     description: |-
-      Includes data on passenger transport via rail and road. Data are collected from Ministries of Transport, national statistical offices and other institutions designated as the official data source.
+      Passenger transport covers inland movement of passengers by rail and road, measured in passenger-kilometres for International Transport Forum (ITF) member countries.
+      Data are collected from Ministries of Transport, national statistical offices and other institutions designated as the official data source.
     date_published: "2024-04-29"
 
     # Citation

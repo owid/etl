@@ -54,3 +54,59 @@ tables:
         unit: deaths per million inhabitants
         short_unit: deaths
         description_short: Number of deaths due to road accidents per million inhabitants.
+        display:
+          numDecimalPlaces: 1
+      passenger_kms_rail:
+        title: Passenger kilometers by rail
+        unit: passenger-kilometers
+        short_unit: p-km
+        description_short: Number of kilometers traveled by passengers by rail.
+        description_from_producer: |-
+          "Rail passenger transport: any movement of passengers using a rail vehicle on a given rail network.
+          Rail passenger: any person, excluding members of the train crew, who makes a journey by rail.
+          Passenger-kilometre by rail: unit of measurement representing the transport of one rail passenger by rail over a distance of one kilometre."
+      passenger_kms_road:
+        title: Passenger kilometers by road
+        unit: passenger-kilometers
+        short_unit: p-km
+        description_short: Number of kilometers traveled by passengers by road.
+        description_from_producer: |-
+          "Road passenger transport: any movement of passengers using a road vehicle on a given
+          road network.
+          Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers. Service staff assigned to buses,
+          coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+      passenger_kms_car:
+        title: Passenger kilometers by car
+        unit: passenger-kilometers
+        short_unit: p-km
+        description_short: Number of kilometers traveled by passengers by car.
+        description_from_producer: |-
+          "Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+      passenger_kms_bus:
+        title: Passenger kilometers by bus
+        unit: passenger-kilometers
+        short_unit: p-km
+        description_short: Number of kilometers traveled by passengers by bus.
+        description_from_producer: |-
+          "Road passenger transport: any movement of passengers using a road vehicle on a given
+          road network.
+          Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers. Service staff assigned to buses,
+          coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+      deaths_per_thousand_kms:
+        title: Road accident deaths per thousand passenger kilometers
+        unit: deaths
+        short_unit: deaths
+        description_short: Number of deaths due to road accidents per thousand passenger kilometers traveled on the road.
+        description_from_producer: ""
+        display:
+          numDecimalPlaces: 1
+
