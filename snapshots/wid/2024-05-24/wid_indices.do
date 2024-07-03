@@ -42,7 +42,7 @@ global age 992
 global unit j
 
 *Select the dataset to extract. "all" for the entire LIS data, "test" for test data, small (CL GB)
-global dataset = "test"
+global dataset = "all"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
