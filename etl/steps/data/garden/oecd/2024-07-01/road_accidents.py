@@ -10,18 +10,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-old_data_cols = [
-    "Fatalities",
-    "Injured",
-    "Injury crashes",
-    "deaths",
-    "injuries",
-    "accidents_involving_casualties",
-    "deaths_per_million_inhabitants",
-    "deaths__per_million_vehicles",
-]
-
 new_data_cols = [
     "accident_deaths",
     "accident_injuries",
@@ -39,6 +27,28 @@ def add_origins(tb: Table, cols: list, origins: Origin) -> Table:
     for col in cols:
         tb[col].origins = origins
     return tb
+
+
+def check_road_passenger_travel(tb_row: pd.Series):
+    """Check if road passenger travel is identical to bus or car passenger travel. If so, remove road passenger travel."""
+    road_passengers = tb_row["passenger_kms_road"]
+    # if road passenger travel is NA or both bus and car passenger travel are NA, there is nothing to compare
+    if pd.isna(road_passengers) or (pd.isna(tb_row["passenger_kms_bus"]) & pd.isna(tb_row["passenger_kms_car"])):
+        return road_passengers
+    # check whether road passenger travel is identical to bus travel
+    elif not pd.isna(tb_row["passenger_kms_bus"]) and tb_row["passenger_kms_bus"] == road_passengers:
+        return None
+    # check whether road passenger travel is identical to car travel
+    elif not pd.isna(tb_row["passenger_kms_car"]) and tb_row["passenger_kms_car"] == road_passengers:
+        tb_row["passenger_kms_road"] = None
+        return None
+
+
+def choose_latest_data(tb_row: pd.Series, old_col: str, new_col: str):
+    if pd.isna(tb_row[new_col]):
+        return tb_row[old_col]
+    else:
+        return tb_row[new_col]
 
 
 def run(dest_dir: str) -> None:
@@ -67,6 +77,16 @@ def run(dest_dir: str) -> None:
     # pivot table
     tb = tb.pivot_table(index=["country", "year"], columns=["measure"], values="obs_value").reset_index()
 
+    # rename passenger travel columns
+    tb = tb.rename(
+        columns={
+            "Rail": "passenger_kms_rail",
+            "Road": "passenger_kms_road",
+            "Passenger cars": "passenger_kms_car",
+            "Buses": "passenger_kms_bus",
+        }
+    )
+
     # harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
     tb_old = geo.harmonize_countries(
@@ -82,30 +102,23 @@ def run(dest_dir: str) -> None:
     #
     # process data - combine indicators and add death per million inhabitants/ per thousand passenger kilometers
     #
-    # if one column is nan use other column, otherwise use new data (in columns Fatalities, Injured, Injury crashes)
-    tb["accident_deaths"] = tb.apply(lambda x: x["deaths"] if pd.isna(x["fatalities"]) else x["fatalities"], axis=1)
-    tb["accident_injuries"] = tb.apply(lambda x: x["injuries"] if pd.isna(x["injured"]) else x["injured"], axis=1)
+    # if one column is nan use other column, otherwise use new data
+    tb["accident_deaths"] = tb.apply(lambda x: choose_latest_data(x, "deaths", "fatalities"), axis=1)
+    tb["accident_injuries"] = tb.apply(lambda x: choose_latest_data(x, "injuries", "injured"), axis=1)
     tb["accidents_with_injuries"] = tb.apply(
-        lambda x: x["accidents_involving_casualties"] if pd.isna(x["crashes"]) else x["crashes"],
-        axis=1,
+        lambda x: choose_latest_data(x, "accidents_involving_casualties", "crashes"), axis=1
     )
+
     # drop old columns
     tb = tb.drop(columns=["fatalities", "injured", "crashes", "deaths", "injuries", "accidents_involving_casualties"])
 
-    # rename passenger travel columns
-    tb = tb.rename(
-        columns={
-            "rail": "passenger_kms_rail",
-            "road": "passenger_kms_road",
-            "passenger cars": "passenger_kms_car",
-            "buses": "passenger_kms_bus",
-        }
-    )
+    # remove passenger travel by road if it is identical to bus or car column
+    tb["passenger_kms_road"] = tb.apply(lambda x: check_road_passenger_travel(x), axis=1)
 
     # add death per million inhabitants
     tb = geo.add_population_to_table(tb, ds_population)
     tb["deaths_per_million_population"] = (tb["accident_deaths"] / tb["population"]) * 1_000_000
-    # drop population as well as old death per million and per vehicle (these numbers are most likely wrong)
+    # drop population as well as old death per million and per vehicle (these numbers are wrong)
     tb = tb.drop(columns=["population", "deaths_per_million_inhabitants", "deaths__per_million_vehicles"])
 
     # add death per billion passenger kilometers:
