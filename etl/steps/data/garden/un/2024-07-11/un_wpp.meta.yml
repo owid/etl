@@ -235,6 +235,9 @@ tables:
         presentation:
           title_public: |-
             Median age, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The median age divides the population into two parts of equal size; that is, there are as many people with ages above the median age as there are with ages below. {definitions.global.projections}
 
   childbearing_age:
     variables:
