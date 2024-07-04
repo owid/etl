@@ -25,6 +25,6 @@ meta:
       url: https://wid.world/
 
 outs:
-  - md5: d5f1421397329eae202829bbc337349b
-    size: 16918964
+  - md5: ef5fa85e49c49a8ccb82e10b1baabc04
+    size: 16669128
     path: world_inequality_database.csv
