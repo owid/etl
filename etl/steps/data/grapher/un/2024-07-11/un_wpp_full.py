@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names]
 
     # Edit title
-    ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + "projections full timeseries"
+    ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + " (projections full timeseries)"
 
     #
     # Save outputs.
