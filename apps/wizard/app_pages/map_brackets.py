@@ -82,7 +82,6 @@ class EqualMinimumAndMaximumValues(ExceptionFromDocstring):
 
 @st.cache_data
 def load_mappable_regions_and_ids(df: pd.DataFrame) -> Dict[str, int]:
-    # TODO: Is there a better way to obtain the list of mappable countries, and their entity ids?
     # Load the external regions dataset.
     regions = find(
         "regions", dataset="regions", namespace="owid_grapher", channels=["external"], version="latest"
@@ -158,6 +157,14 @@ def load_explorer(explorer_path: Path) -> str:
         explorer = f.read()
 
     return explorer
+
+
+@st.cache_data
+def load_color_schemes() -> List[str]:
+    data = requests.get("https://files.ourworldindata.org/schemas/grapher-schema.004.json").json()
+    color_schemes = data["$defs"]["colorScale"]["properties"]["baseColorScheme"]["enum"]
+
+    return color_schemes
 
 
 def dispersion(hist: Union[List[float], np.ndarray]) -> float:
@@ -594,10 +601,11 @@ class MapBracketer:
 
 def map_bracketer_interactive(mb: MapBracketer) -> None:
     # Add a dropdown for color scheme.
-    # TODO: Add full list of color schemes.
+    color_schemes = load_color_schemes()
     mb.color_scheme = st.selectbox(  # type: ignore
-        label="Color scheme (list not yet complete!)",
-        options=["BuGn", "BinaryMapPaletteA", "YlOrBr"],
+        label="Color scheme",
+        options=color_schemes,
+        index=[i for i, color in enumerate(color_schemes) if color == "BuGn"][0],
         help="Color scheme for the map.",
     )
 
