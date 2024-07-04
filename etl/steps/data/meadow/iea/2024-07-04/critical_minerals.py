@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+from typing import Optional
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -35,7 +37,7 @@ def transform_header_rows_into_new_column(tb: Table, header_row_name: str, norma
 
 
 def process_demand_for_key_minerals(
-    data: pr.ExcelFile, sheet_name: str, header_row_name: str, normal_row_name: str, tb_short_name: str
+    data: pr.ExcelFile, sheet_name: str, header_row_name: Optional[str], normal_row_name: str, tb_short_name: str
 ) -> Table:
     tb = data.parse(sheet_name)
 
@@ -70,22 +72,28 @@ def process_demand_for_key_minerals(
     # Drop rows containing notes at the end of the sheet.
     tb = drop_all_rows_of_notes(tb=tb)
 
-    # Separate minerals and technology in different columns.
-    tb = transform_header_rows_into_new_column(tb=tb, header_row_name=header_row_name, normal_row_name=normal_row_name)
+    if header_row_name is not None:
+        # Separate minerals and technology in different columns.
+        tb = transform_header_rows_into_new_column(
+            tb=tb, header_row_name=header_row_name, normal_row_name=normal_row_name
+        )
+        main_index_columns = [header_row_name, normal_row_name]
+    else:
+        main_index_columns = [normal_row_name]
 
     # Transform table to end up with another table that has a "year" and "scenario" columns.
     scenarios_names = ["current"] + [scenario for scenario in scenarios.values() if scenario != ""]
     tables = []
     for scenario in scenarios_names:
-        _tb = tb[[header_row_name, normal_row_name] + [column for column in tb.columns if column.startswith(scenario)]]
+        _tb = tb[main_index_columns + [column for column in tb.columns if column.startswith(scenario)]]
         _tb = _tb.rename(columns={column: column.replace(f"{scenario}__", "") for column in _tb.columns})
-        _tb = _tb.melt(id_vars=[header_row_name, normal_row_name], value_name="demand", var_name="year")
+        _tb = _tb.melt(id_vars=main_index_columns, value_name="demand", var_name="year")
         _tb = _tb.assign(**{"scenario": scenario})
         tables.append(_tb)
     tb = pr.concat(tables, short_name=tb_short_name)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format([header_row_name, normal_row_name, "year", "scenario"])
+    tb = tb.format(main_index_columns + ["year", "scenario"])
 
     return tb
 
@@ -160,6 +168,13 @@ def run(dest_dir: str) -> None:
         normal_row_name="technology",
         tb_short_name="demand_for_clean_energy_technologies",
     )
+    tb_demand_for_clean_energy_technologies_by_mineral = process_demand_for_key_minerals(
+        data=data,
+        sheet_name="3.2 Cleantech demand by mineral",
+        header_row_name=None,
+        normal_row_name="mineral",
+        tb_short_name="demand_for_clean_energy_technologies_by_mineral",
+    )
     tb_demand_for_solar_pv = process_demand_for_key_minerals(
         data=data,
         sheet_name="4.1 Solar PV",
@@ -209,6 +224,7 @@ def run(dest_dir: str) -> None:
             tb_demand_for_key_minerals,
             tb_supply,
             tb_demand_for_clean_energy_technologies,
+            tb_demand_for_clean_energy_technologies_by_mineral,
             tb_demand_for_solar_pv,
             tb_demand_for_wind,
             tb_demand_for_ev,
