@@ -29,7 +29,7 @@ tables:
         title: Road accident deaths
         unit: deaths
         short_unit: deaths
-        description_short: Number of deaths due to road accidents.
+        description_short: Number of reported deaths due to road accidents.
         description_processing: |-
           "The majority of series data is sourced from the OECD Statistics.
           For particular countries, historical data (before 1970) have been sourced from specific national records as referenced below.
@@ -39,27 +39,35 @@ tables:
           Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
           Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
           United States: https://www.bts.gov/content/transportation-fatalities-mode"
+        presentation:
+          title_public: Reported road accident deaths
       accident_injuries:
         title: Road accident injuries
         unit: injuries
         short_unit: injuries
-        description_short: Number of injuries due to road accidents.
+        description_short: Number of reported injuries due to road accidents.
+        presentation:
+          title_public: Reported road accident injuries
       accidents_with_injuries:
         title: Road accidents with injuries
         unit: accidents
         short_unit: accidents
         description_short: Number of road accidents where one or more people were injured.
+        presentation:
+          title_public: Reported road accidents with injuries
       deaths_per_million_population:
         title: Road accident deaths per million inhabitants
         unit: deaths per million inhabitants
         short_unit: deaths
-        description_short: Number of deaths due to road accidents per million inhabitants.
+        description_short: Number of reported deaths due to road accidents per million inhabitants.
         display:
           numDecimalPlaces: 1
+        presentation:
+          title_public: Reported road accident deaths per million inhabitants
       passenger_kms_rail:
         title: Passenger kilometers by rail
         unit: passenger-kilometers
-        short_unit: p-km
+        short_unit: km
         description_short: Number of kilometers traveled by passengers by rail.
         description_from_producer: |-
           "Rail passenger transport: any movement of passengers using a rail vehicle on a given rail network.
@@ -68,7 +76,7 @@ tables:
       passenger_kms_road:
         title: Passenger kilometers by road
         unit: passenger-kilometers
-        short_unit: p-km
+        short_unit: km
         description_short: Number of kilometers traveled by passengers by road.
         description_from_producer: |-
           "Road passenger transport: any movement of passengers using a road vehicle on a given
@@ -81,7 +89,7 @@ tables:
       passenger_kms_car:
         title: Passenger kilometers by car
         unit: passenger-kilometers
-        short_unit: p-km
+        short_unit: km
         description_short: Number of kilometers traveled by passengers by car.
         description_from_producer: |-
           "Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
@@ -101,11 +109,11 @@ tables:
           coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
           Road passenger-kilometre: unit of measurement representing the transport of one passenger
           by road over one kilometre."
-      deaths_per_thousand_kms:
-        title: Road accident deaths per thousand passenger kilometers
+      deaths_per_million_kms:
+        title: Road accident deaths per million passenger kilometers
         unit: deaths
         short_unit: deaths
-        description_short: Number of deaths due to road accidents per thousand passenger kilometers traveled on the road.
+        description_short: Number of deaths due to road accidents per million passenger kilometers traveled on the road.
         description_from_producer: ""
         display:
           numDecimalPlaces: 1
