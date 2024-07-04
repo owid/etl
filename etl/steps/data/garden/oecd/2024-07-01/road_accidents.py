@@ -31,7 +31,7 @@ new_data_cols = [
     "passenger_kms_road",
     "passenger_kms_car",
     "passenger_kms_bus",
-    "deaths_per_million_kms",
+    "deaths_per_billion_kms",
 ]
 
 
@@ -108,15 +108,15 @@ def run(dest_dir: str) -> None:
     # drop population as well as old death per million and per vehicle (these numbers are most likely wrong)
     tb = tb.drop(columns=["population", "deaths_per_million_inhabitants", "deaths__per_million_vehicles"])
 
-    # add death per million passenger kilometers:
-    tb["deaths_per_million_kms"] = tb["accident_deaths"] / tb["passenger_kms_road"] * 1_000_000
+    # add death per billion passenger kilometers:
+    tb["deaths_per_billion_kms"] = tb["accident_deaths"] / tb["passenger_kms_road"] * 1_000_000_000
 
     # change dtypes:
-    for col in [col for col in new_data_cols if col not in ["deaths_per_million_population", "deaths_per_million_kms"]]:
+    for col in [col for col in new_data_cols if col not in ["deaths_per_million_population", "deaths_per_billion_kms"]]:
         tb[col] = tb[col].astype("Int64")
 
     tb["deaths_per_million_population"] = tb["deaths_per_million_population"].astype("Float64")
-    tb["deaths_per_million_kms"] = tb["deaths_per_million_kms"].astype("Float64")
+    tb["deaths_per_billion_kms"] = tb["deaths_per_billion_kms"].astype("Float64")
 
     # add back origins
     tb = add_origins(tb, new_data_cols, col_origins)

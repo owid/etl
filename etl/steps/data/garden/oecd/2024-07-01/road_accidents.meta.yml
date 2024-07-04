@@ -109,11 +109,11 @@ tables:
           coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
           Road passenger-kilometre: unit of measurement representing the transport of one passenger
           by road over one kilometre."
-      deaths_per_million_kms:
-        title: Road accident deaths per million passenger kilometers
+      deaths_per_billion_kms:
+        title: Road accident deaths per billion passenger kilometers
         unit: deaths
         short_unit: deaths
-        description_short: Number of deaths due to road accidents per million passenger kilometers traveled on the road.
+        description_short: Number of deaths due to road accidents per billion passenger kilometers traveled on the road.
         description_from_producer: ""
         display:
           numDecimalPlaces: 1
