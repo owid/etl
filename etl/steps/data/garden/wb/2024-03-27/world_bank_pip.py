@@ -211,7 +211,7 @@ def run(dest_dir: str) -> None:
 
     # Add indicators in constant USD
     tb_inc_or_cons_2017 = add_indicators_in_constant_usd(
-        tb=tb_inc_or_cons_2017, tb_wdi=tb_wdi, columns_list=["median"], year_adjustment=2021
+        tb=tb_inc_or_cons_2017, tb_wdi=tb_wdi, columns_list=["median"], year_adjustment=2022
     )
 
     # Add metadata by code
@@ -1383,7 +1383,8 @@ def add_indicators_in_constant_usd(tb: Table, tb_wdi: Table, columns_list: List[
     tb_wdi = tb_wdi.rename(columns={"fp_cpi_totl": "cpi", "pa_nus_prvt_pp": "ppp", "pa_nus_fcrf": "exchange_rate"})
 
     # Merge with WDI data
-    tb = pr.merge(tb, tb_wdi[["country", "year", "cpi", "exchange_rate"]], on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_wdi[["country", "year", "cpi"]], on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_wdi[tb_wdi["year"] == year_adjustment][["country", "exchange_rate"]], on="country", how="left")
     tb = pr.merge(
         tb, tb_wdi[tb_wdi["year"] == 2017][["country", "cpi"]], on="country", how="left", suffixes=("", "_2017")
     )
