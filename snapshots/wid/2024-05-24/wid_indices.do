@@ -46,15 +46,6 @@ global dataset = "all"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-* If condition to select all the data or a part of it
-if "$dataset" == "all" {
-	global areas _all
-}
-
-else if "$dataset" == "test" {
-	global areas CL GB
-}
-
 *Run this code to include and exclude extrapolations
 global exclude_extrapolations 1 0
 
@@ -76,6 +67,19 @@ qui wid, indicators(xlcusp) year($max_year) clear
 rename value ppp
 tempfile ppp
 qui save "`ppp'"
+
+* If condition to select all the data or a part of it
+if "$dataset" == "all" {
+	*Get distinct values of countries and call it list_of countries
+	*I will use this list to extract data per country instead of one big dataset that generates issues
+	qui levelsof country, local(list_of_countries) clean
+}
+
+else if "$dataset" == "test" {
+	local list_of_countries CL GB
+}
+
+
 
 
 foreach option in $options {
@@ -104,9 +108,25 @@ foreach option in $options {
 			global exclude_option
 			local excl_option_slug = "include"
 		}
+		
+		foreach c in `list_of_countries' {
 
-		*Get average and threshold income for pre tax and post tax (nat and dis) data
-		qui wid, indicators($indicators_avg_thr) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
+			*Get average and threshold income for pre tax and post tax (nat and dis) data
+			qui wid, indicators($indicators_avg_thr) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
+			
+			local c: subinstr local c "-" "_", all
+	
+			tempfile avgthr_`c'
+			qui save "`avgthr_`c''"
+		}
+		
+		clear
+
+		foreach c in `list_of_countries' {
+			local c: subinstr local c "-" "_", all
+			append using "`avgthr_`c''"
+
+		}
 
 		*Merge with ppp data to transform monetary values to international-$
 		qui merge n:1 country using "`ppp'", keep(match)
@@ -115,9 +135,25 @@ foreach option in $options {
 		drop _merge
 		tempfile avgthr
 		qui save "`avgthr'"
+		
+		foreach c in `list_of_countries' {
 
-		*Gets shares and Gini for pre and post tax income
-		qui wid, indicators($indicators_gini_share) perc($percentiles) areas($areas) ages($age) pop($unit) $exclude_option clear
+			*Gets shares and Gini for pre and post tax income
+			qui wid, indicators($indicators_gini_share) perc($percentiles) areas(`c') ages($age) pop($unit) $exclude_option clear
+			
+			local c: subinstr local c "-" "_", all
+	
+			tempfile ginishare_`c'
+			qui save "`ginishare_`c''"
+		}
+		
+		clear
+
+		foreach c in `list_of_countries' {
+			local c: subinstr local c "-" "_", all
+			append using "`ginishare_`c''"
+
+		}
 
 		*Union with average and threshold income
 		qui append using "`avgthr'"
