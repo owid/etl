@@ -127,6 +127,9 @@ tables:
         presentation:
           title_public: |-
             Growth rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The growth rate is the population change determined by births, deaths, and migration flows. {definitions.global.projections}
 
   natural_change_rate:
     variables:
@@ -139,6 +142,9 @@ tables:
         presentation:
           title_public: |-
             Natural growth rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The natural growth rate is the population change determined by births and deaths. Migration flows are not taken into account. {definitions.global.projections}
 
 
   fertility_rate:
@@ -163,6 +169,11 @@ tables:
         presentation:
           title_public: |-
             Fertility rate, {definitions.global.dimensions.title}
+          grapher_config:
+            note: |-
+              <% if age == 'all' %>
+              The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
+              <% endif %>
 
   migration:
     variables:
@@ -171,6 +182,17 @@ tables:
         unit: migrants
         description_short: |-
           Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Net migration, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              <% if sex == "all" %>
+              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+              <% else %>
+              The total number of << sex >> immigrants (people moving into a given country) minus the number of << sex >> emigrants (people moving out of the country).
+              <% endif %> {definitions.global.projections}
+
       net_migration_rate:
         title: Net migration rate
         unit: migrants per 1,000 people
@@ -179,6 +201,9 @@ tables:
         presentation:
           title_public: |-
             Net migration, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population. {definitions.global.dimensions.description_short}
 
   deaths:
     variables:
@@ -287,7 +312,7 @@ tables:
         title: Sex ratio
         unit: "males per 100 females"
         description_short: |-
-          <% if age == 0 %>
+          <% if age == '0' %>
           The number of male births per 100 female births. Biological birth ratios are slightly male-biased, with an expected ratio of 105 male births per 100 female births.
           <% elif age == 'all' %>
           ​​The number of male population per 100 female population.
@@ -297,6 +322,15 @@ tables:
         presentation:
           title_public: |-
             Sex ratio, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              <% if age == 'all' %>
+              ​​The number of male population per 100 female population.
+              <% elif age == '0' %>
+              The number of male births per 100 female births. Biological birth ratios are slightly male biased, with an expected ratio of 105 male births per 100 female births.
+              <% else %>
+              The number of male individuals per 100 female individuals, at age << age >>.
+              <% endif %> {definitions.global.projections}
 
   mortality_rate:
     variables:
@@ -328,9 +362,15 @@ tables:
             <% endif %>, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The share of <%- if sex != 'all' %> << sex >> <% endif %>
+              The share of <%- if sex != 'all' %><< sex >><% endif %>
               <% if age == '0' %>
-              children who die before reaching the age of one.
+               children who die before reaching the age of one.
               <% else %>
-              newborns who die before reaching the age of 5.
+               newborns who die before reaching the age of 5.
+              <% endif %> {definitions.global.projections}
+            note: |-
+              <% if age == '0' %>
+              This is the probability of a child born in a specific year or period dying before reaching the age of 1, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+              <% else %>
+              This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
               <% endif %> {definitions.global.projections}
