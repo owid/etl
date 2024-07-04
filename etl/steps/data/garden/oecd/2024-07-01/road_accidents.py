@@ -2,53 +2,13 @@
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Origin, Table
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-new_data_cols = [
-    "accident_deaths",
-    "accident_injuries",
-    "accidents_with_injuries",
-    "deaths_per_million_population",
-    "passenger_kms_rail",
-    "passenger_kms_road",
-    "passenger_kms_car",
-    "passenger_kms_bus",
-    "deaths_per_billion_kms",
-]
-
-
-def add_origins(tb: Table, cols: list, origins: Origin) -> Table:
-    for col in cols:
-        tb[col].origins = origins
-    return tb
-
-
-def check_road_passenger_travel(tb_row: pd.Series):
-    """Check if road passenger travel is identical to bus or car passenger travel. If so, remove road passenger travel."""
-    road_passengers = tb_row["passenger_kms_road"]
-    # if road passenger travel is NA or both bus and car passenger travel are NA, there is nothing to compare
-    if pd.isna(road_passengers) or (pd.isna(tb_row["passenger_kms_bus"]) & pd.isna(tb_row["passenger_kms_car"])):
-        return road_passengers
-    # check whether road passenger travel is identical to bus travel
-    elif not pd.isna(tb_row["passenger_kms_bus"]) and tb_row["passenger_kms_bus"] == road_passengers:
-        return None
-    # check whether road passenger travel is identical to car travel
-    elif not pd.isna(tb_row["passenger_kms_car"]) and tb_row["passenger_kms_car"] == road_passengers:
-        tb_row["passenger_kms_road"] = None
-        return None
-
-
-def choose_latest_data(tb_row: pd.Series, old_col: str, new_col: str):
-    if pd.isna(tb_row[new_col]):
-        return tb_row[old_col]
-    else:
-        return tb_row[new_col]
 
 
 def run(dest_dir: str) -> None:
@@ -57,13 +17,14 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("road_accidents", channel="meadow", version="2024-07-01")
-    ds_passenger = paths.load_dataset("passenger_travel", channel="meadow", version="2024-07-01")
-    ds_old = paths.load_dataset("road_accidents", version="2023-08-11")
+    ds_passenger = paths.load_dataset("passenger_travel")
+    # load old data (includes long-run historical data from national statistic divisions)
+    ds_old = paths.load_dataset("road_deaths_and_injuries")
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["road_accidents"].reset_index()
-    tb_old = ds_old["road_accidents"].reset_index()
+    tb_old = ds_old["road_deaths_and_injuries"].reset_index()
     tb_passenger = ds_passenger["passenger_travel"].reset_index()
 
     # standardize both tables
@@ -71,8 +32,6 @@ def run(dest_dir: str) -> None:
 
     # concatenate the two tables
     tb = pr.concat([tb, tb_passenger], ignore_index=True)
-
-    col_origins = tb["obs_value"].origins.copy()
 
     # pivot table
     tb = tb.pivot_table(index=["country", "year"], columns=["measure"], values="obs_value").reset_index()
@@ -89,9 +48,6 @@ def run(dest_dir: str) -> None:
 
     # harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
-    tb_old = geo.harmonize_countries(
-        df=tb_old, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-    )
 
     # Combine new and old data
     tb = tb.merge(tb_old, how="outer", on=["country", "year"], suffixes=("", "_old")).copy_metadata(tb)
@@ -119,7 +75,9 @@ def run(dest_dir: str) -> None:
     tb = geo.add_population_to_table(tb, ds_population)
     tb["deaths_per_million_population"] = (tb["accident_deaths"] / tb["population"]) * 1_000_000
     # drop population as well as old death per million and per vehicle (these numbers are wrong)
-    tb = tb.drop(columns=["population", "deaths_per_million_inhabitants", "deaths__per_million_vehicles"])
+    tb = tb.drop(
+        columns=["population", "road_deaths_per_100_million_vehicle_kilometres", "deaths__per_million_vehicles"]
+    )
 
     # add death per billion passenger kilometers:
     tb["deaths_per_billion_kms"] = tb["accident_deaths"] / tb["passenger_kms_road"] * 1_000_000_000
@@ -132,7 +90,7 @@ def run(dest_dir: str) -> None:
     tb["deaths_per_billion_kms"] = tb["deaths_per_billion_kms"].astype("Float64")
 
     # add back origins
-    tb = add_origins(tb, new_data_cols, col_origins)
+    tb = add_origins(tb, new_data_cols)
 
     # format table
     tb = tb.format(["country", "year"])
@@ -147,3 +105,45 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+new_data_cols = [
+    "accident_deaths",
+    "accident_injuries",
+    "accidents_with_injuries",
+    "deaths_per_million_population",
+    "passenger_kms_rail",
+    "passenger_kms_road",
+    "passenger_kms_car",
+    "passenger_kms_bus",
+    "deaths_per_billion_kms",
+]
+
+
+def add_origins(tb: Table, cols: list) -> Table:
+    for col in cols:
+        tb[col] = tb[col].copy_metadata(tb["country"])
+    return tb
+
+
+def check_road_passenger_travel(tb_row: pd.Series):
+    """Check if road passenger travel is identical to bus or car passenger travel. If so, remove road passenger travel."""
+    road_passengers = tb_row["passenger_kms_road"]
+    # if road passenger travel is NA or both bus and car passenger travel are NA, there is nothing to compare
+    if pd.isna(road_passengers) or (pd.isna(tb_row["passenger_kms_bus"]) and pd.isna(tb_row["passenger_kms_car"])):
+        return road_passengers
+    # check whether road passenger travel is identical to bus travel
+    elif (not pd.isna(tb_row["passenger_kms_bus"])) and tb_row["passenger_kms_bus"] == road_passengers:
+        return None
+    # check whether road passenger travel is identical to car travel
+    elif (not pd.isna(tb_row["passenger_kms_car"])) and tb_row["passenger_kms_car"] == road_passengers:
+        return None
+    else:
+        return road_passengers
+
+
+def choose_latest_data(tb_row: pd.Series, old_col: str, new_col: str):
+    if pd.isna(tb_row[new_col]):
+        return tb_row[old_col]
+    else:
+        return tb_row[new_col]

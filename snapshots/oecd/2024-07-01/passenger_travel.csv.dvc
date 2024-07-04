@@ -22,7 +22,7 @@ meta:
 
     # License
     license:
-      name: ""
+      name: "OECD Terms & Conditions"
       url: ttps://www.oecd.org/termsandconditions.html
 
 outs:

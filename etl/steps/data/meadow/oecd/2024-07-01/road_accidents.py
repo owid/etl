@@ -6,7 +6,12 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-COLS_TO_KEEP = ["Reference area", "MEASURE", "TIME_PERIOD", "OBS_VALUE"]
+COLS_TO_KEEP = {
+    "Reference area": "country",
+    "MEASURE": "measure",
+    "TIME_PERIOD": "year",
+    "OBS_VALUE": "obs_value",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -20,14 +25,14 @@ def run(dest_dir: str) -> None:
     tb = snap.read()
 
     # drop unneeded columns
-    tb = tb[COLS_TO_KEEP]
+    tb = tb[COLS_TO_KEEP.keys()]
 
     # Rename columns
-    tb = tb.rename(columns={"Reference area": "country", "TIME_PERIOD": "year"})
+    tb = tb.rename(columns=COLS_TO_KEEP)
 
     # recast year and obs value column to int
     tb["year"] = tb["year"].astype("Int64")
-    tb["OBS_VALUE"] = tb["OBS_VALUE"].astype("Int64")
+    tb["obs_value"] = tb["obs_value"].astype("Int64")
 
     # drop rows where year is null
     tb = tb.dropna(subset=["year"])

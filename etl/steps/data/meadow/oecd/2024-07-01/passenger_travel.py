@@ -5,7 +5,12 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-COLS_TO_KEEP = ["Reference area", "Vehicle type", "TIME_PERIOD", "OBS_VALUE"]
+COLS_TO_KEEP = {
+    "Reference area": "country",
+    "Vehicle type": "vehicle_type",
+    "TIME_PERIOD": "year",
+    "OBS_VALUE": "obs_value",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -19,14 +24,14 @@ def run(dest_dir: str) -> None:
     tb = snap.read()
 
     # drop columns not needed
-    tb = tb[COLS_TO_KEEP]
+    tb = tb[COLS_TO_KEEP.keys()]
 
     # Rename columns
-    tb = tb.rename(columns={"Reference area": "country", "TIME_PERIOD": "year"})
+    tb = tb.rename(columns=COLS_TO_KEEP)
 
-    # fix dtypes and scale up data
+    # fix dtypes and scale up data (passenger-kilometers are given in millions)
     tb["year"] = tb["year"].astype("Int64")
-    tb["OBS_VALUE"] = tb["OBS_VALUE"].astype("Int64") * 1_000_000
+    tb["obs_value"] = tb["obs_value"].astype("Int64") * 1_000_000
 
     # drop rows where year is null
     tb = tb.dropna(subset=["year"])

@@ -14,7 +14,6 @@ definitions:
       registered, while deaths are attributed to the countries in which they occur.
     display:
       numDecimalPlaces: 0
-    processing_level: major
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -41,6 +40,7 @@ tables:
           United States: https://www.bts.gov/content/transportation-fatalities-mode"
         presentation:
           title_public: Reported road accident deaths
+        processing_level: major
       accident_injuries:
         title: Road accident injuries
         unit: injuries
@@ -48,6 +48,7 @@ tables:
         description_short: Number of reported injuries due to road accidents.
         presentation:
           title_public: Reported road accident injuries
+        processing_level: minor
       accidents_with_injuries:
         title: Road accidents with injuries
         unit: accidents
@@ -55,6 +56,7 @@ tables:
         description_short: Number of road accidents where one or more people were injured.
         presentation:
           title_public: Reported road accidents with injuries
+        processing_level: minor
       deaths_per_million_population:
         title: Road accident deaths per million inhabitants
         unit: deaths per million inhabitants
@@ -64,6 +66,9 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: Reported road accident deaths per million inhabitants
+        description_processing: |-
+          "Death per million population is calculated by dividing the number of deaths by the population with a factor of 1M"
+        processing_level: major
       passenger_kms_rail:
         title: Passenger kilometers by rail
         unit: passenger-kilometers
@@ -73,6 +78,7 @@ tables:
           "Rail passenger transport: any movement of passengers using a rail vehicle on a given rail network.
           Rail passenger: any person, excluding members of the train crew, who makes a journey by rail.
           Passenger-kilometre by rail: unit of measurement representing the transport of one rail passenger by rail over a distance of one kilometre."
+        processing_level: minor
       passenger_kms_road:
         title: Passenger kilometers by road
         unit: passenger-kilometers
@@ -86,6 +92,9 @@ tables:
           coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
           Road passenger-kilometre: unit of measurement representing the transport of one passenger
           by road over one kilometre."
+        processing_level: major
+        description_processing: |-
+          "We removed data points which are identical to total passenger kilometers by car or bus, since they do not include all passenger kilometers travelled by road."
       passenger_kms_car:
         title: Passenger kilometers by car
         unit: passenger-kilometers
@@ -96,6 +105,7 @@ tables:
           excluding taxi drivers, are counted as passengers.
           Road passenger-kilometre: unit of measurement representing the transport of one passenger
           by road over one kilometre."
+        processing_level: minor
       passenger_kms_bus:
         title: Passenger kilometers by bus
         unit: passenger-kilometers
@@ -109,6 +119,7 @@ tables:
           coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
           Road passenger-kilometre: unit of measurement representing the transport of one passenger
           by road over one kilometre."
+        processing_level: minor
       deaths_per_billion_kms:
         title: Road accident deaths per billion passenger kilometers
         unit: deaths
@@ -117,4 +128,7 @@ tables:
         description_from_producer: ""
         display:
           numDecimalPlaces: 1
+        processing_level: major
+        description_processing: |-
+          "Death per billion passenger kilometers is calculated by dividing the number of deaths by the passenger kilometers with a factor of 1B"
 
