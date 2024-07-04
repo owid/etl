@@ -130,11 +130,15 @@ def process_supply_for_key_minerals(data: pr.ExcelFile) -> Table:
     # Separate minerals and technology in different columns.
     tb = transform_header_rows_into_new_column(tb=tb, header_row_name="mineral_process", normal_row_name="country")
 
+    # Separate mineral and process.
+    tb["mineral"] = tb["mineral_process"].str.split(" - ").str[0]
+    tb["process"] = tb["mineral_process"].str.split(" - ").str[1]
+
     # Reformat table to have "year" and "supply" columns.
-    tb = tb.melt(id_vars=["mineral_process", "country", "case"], value_name="supply", var_name="year")
+    tb = tb.melt(id_vars=["mineral", "process", "country", "case"], value_name="supply", var_name="year")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "mineral_process", "case"])
+    tb = tb.format(["country", "year", "mineral", "process", "case"], short_name="supply_for_key_minerals")
 
     return tb
 
