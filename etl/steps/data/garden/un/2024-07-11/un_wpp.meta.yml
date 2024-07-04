@@ -342,7 +342,7 @@ tables:
           Youth dependency ratio
           <% else %>
           Old-age dependency ratio
-          <% endif %>
+          <% endif %> - Sex: << sex >> - Variant: << variant >>
         unit: "%"
         description_short: |-
           <% if sex != "all" %>
@@ -359,7 +359,13 @@ tables:
           <% endif %>
         presentation:
           title_public: |-
-            {tables.dependency_ratio.variables.dependency_ratio.title}, {definitions.global.dimensions.title}
+            <% if age == "total" %>
+            Total dependency ratio
+            <% elif age == "youth" %>
+            Youth dependency ratio
+            <% else %>
+            Old-age dependency ratio
+            <% endif %>, {definitions.global.dimensions.title}
 
 
   mortality_rate:
