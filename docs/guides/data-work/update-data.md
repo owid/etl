@@ -49,8 +49,6 @@ This is not strictly necessary, but it will be very helpful for the PR reviewer.
     All these things are temporary (which is why we added the `temp-` in the name of the branch).
     Wait for a notification from `owidbot`. It should take a few minutes, and will inform you that the staging server [http://staging-site-temp-update-temperature-anomaly/admin](http://staging-site-temp-update-temperature-anomaly/admin) has been created.
 
-    !!! info "[Learn more about `etl d draft-pr`](../etl-cli/#etl-d-draft-pr)"
-
 - **Update steps using the ETL Dashboard**:
     - Start the ETL Wizard, by running:
     ```bash
