@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Atlas of Sustainable Development Goals 2023
+    description: |-
+      The Atlas of Sustainable Development Goals 2023 presents interactive storytelling and data visualizations about the 17 Sustainable Development Goals. It highlights trends for selected targets within each goal and introduces concepts about how some SDGs are measured.
+    date_published: "2023-06-22"
+    title_snapshot: Atlas of Sustainable Development Goals 2023 - Projection of the number in extreme poverty
+    description_snapshot: |-
+      Close to 11 percent more people lived in extreme poverty in 2020 compared to 2019. Since then, an uneven economic recovery, rising food prices, and conflict among some of the world’s biggest food producers have stalled progress further.
+
+      As a result, it has become more difficult to reach SDG target 1.1 of ending poverty by 2030 unless the poorest countries grow at rates not seen before. Current projections suggest that in 2030, 574 million people, equivalent to nearly seven percent of the world’s population, will remain in extreme poverty.
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      Mahler, Daniel Gerszon, and Maarten Lambrechts. 2023. “Progress, challenges in ending extreme poverty” In Atlas of Sustainable Development Goals 2023, edited by A. F. Pirlea, U. Serajuddin, A. Thudt, D. Wadhwa, and M. Welch. Washington, DC: World Bank. License: Creative Commons Attribution CC BY 3.0 IGO. https://doi.org/10.60616/f7gk-me57
+
+    # Files
+    url_main: https://datatopics.worldbank.org/sdgatlas/goal-1-no-poverty
+    url_download: https://datatopics.worldbank.org/sdgatlas/data/goal01/goal01.povertyprojection.csv
+    date_accessed: 2024-06-26
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://datatopics.worldbank.org/sdgatlas/goal-1-no-poverty
+
+outs:
+  - md5: e8fb3bbd64bddcd77eeac400231b347e
+    size: 165
+    path: poverty_projections_number_global.csv

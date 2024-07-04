@@ -20,45 +20,50 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Filter to include only global data
     tb_global = tb[tb["country"] == "World"]
-    tb_anomalies = tb_global[["year", "month", "anomaly_below_0", "anomaly_above_0"]]
-    tb_anomalies = tb_anomalies.rename(
-        columns={"anomaly_below_0": "Below the average", "anomaly_above_0": "Above the average"}
-    )
 
-    tb_melted = tb_anomalies.melt(id_vars=["year", "month"], value_vars=["Below the average", "Above the average"])
-    tb_melted.rename(columns={"variable": "country"}, inplace=True)
-    month_map = {
-        "01": "January",
-        "02": "February",
-        "03": "March",
-        "04": "April",
-        "05": "May",
-        "06": "June",
-        "07": "July",
-        "08": "August",
-        "09": "September",
-        "10": "October",
-        "11": "November",
-        "12": "December",
-    }
-    tb_melted["month"] = tb_melted["month"].map(month_map)
+    # Group the data by year and calculate the mean temperature anomaly for each year
+    average_anomaly = tb_global.groupby("year")["temperature_anomaly"].mean().reset_index()
 
-    tb_melted = tb_melted.rename(columns={"value": "temperature_anomaly"})
-    tb_pivot = tb_melted.pivot(index=["country", "year"], columns="month", values="temperature_anomaly").reset_index()
-    tb_pivot = tb_pivot.set_index(["country", "year"])
+    # Create a new column for temperature anomalies below 0
+    average_anomaly["Below the average"] = average_anomaly["temperature_anomaly"].copy()
+    # Set the values in the 'annual_below_0' column to None for rows where the temperature anomaly is not below 0
+    average_anomaly.loc[average_anomaly["Below the average"] >= 0, "Below the average"] = None
 
-    # Create annual temperature anomalies
-    tb_pivot["annual"] = tb_pivot.mean(axis=1)
-    tb_pivot["annual"] = tb_pivot["annual"].copy_metadata(tb["temperature_anomaly"])
-    tb_pivot[
-        "annual"
+    # Create a new column for temperature anomalies above 0
+    average_anomaly["Above the average"] = average_anomaly["temperature_anomaly"].copy()
+    # Set the values in the 'annual_above_0' column to None for rows where the temperature anomaly is not above 0
+    average_anomaly.loc[average_anomaly["Above the average"] <= 0, "Above the average"] = None
+
+    # Drop the original 'temperature_anomaly' column
+    average_anomaly = average_anomaly.drop(columns=["temperature_anomaly"])
+
+    # Reshape so that the 'annual_below_0' and 'annual_above_0' columns are stacked into a single column
+    average_anomaly = average_anomaly.melt(id_vars="year", var_name="anomaly_type", value_name="Temperature Anomaly")
+
+    # Copy the metadata from the 'temperature_anomaly' column in the original DataFrame to the 'anomaly_type' column in the reshaped DataFrame
+    average_anomaly["anomaly_type"] = average_anomaly["anomaly_type"].copy_metadata(tb["temperature_anomaly"])
+
+    # Set a short description for the 'anomaly_type' column
+    average_anomaly[
+        "anomaly_type"
     ].metadata.description_short = (
         "The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius."
     )
+
+    # Rename the 'anomaly_type' column to 'country'
+    average_anomaly = average_anomaly.rename(columns={"anomaly_type": "country"})
+
+    # Format the 'year' and 'country' columns
+    average_anomaly = average_anomaly.format(["year", "country"])
+
+    # Set a short name for the DataFrame
+    average_anomaly.metadata.short_name = paths.short_name
+
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_pivot], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(dest_dir, tables=[average_anomaly], default_metadata=ds_garden.metadata)
     ds_grapher.metadata.title = "Global monthly temperature anomalies"
     ds_grapher.save()

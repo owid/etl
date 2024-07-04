@@ -5,7 +5,7 @@ Load a meadow dataset and create a garden dataset.
 from typing import List
 
 import numpy as np
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 
@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("funding")
+    ds_meadow = paths.load_dataset("funding")
 
     # Read table from meadow dataset.
     tb = ds_meadow["funding"].reset_index()
