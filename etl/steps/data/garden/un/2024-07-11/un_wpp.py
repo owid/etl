@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -8,7 +8,6 @@ import owid.catalog.processing as pr
 # from dep_ratio import process as process_depratio
 # from fertility import process as process_fertility
 from owid.catalog import Table
-from shared import harmonize_dimension
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -30,6 +29,7 @@ def run(dest_dir: str) -> None:
     # Load tables
     tb_population = ds_meadow["population"].reset_index()
     tb_population_density = ds_meadow["population_density"].reset_index()
+    tb_population_doubling = ds_meadow["population_doubling_time"].reset_index()
     tb_growth_rate = ds_meadow["growth_rate"].reset_index()
     tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
     tb_fertility = ds_meadow["fertility_rate"].reset_index()
@@ -42,51 +42,74 @@ def run(dest_dir: str) -> None:
     tb_median_age = ds_meadow["median_age"].reset_index()
     tb_le = ds_meadow["life_expectancy"].reset_index()
     tb_mortality = ds_meadow["mortality_rate"].reset_index()
+    tb_childbearing_age = ds_meadow["childbearing_age"].reset_index()
 
     #
     # Process data.
     #
-    tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
+
+    ## Population, Sex ratio
+    tb_population, tb_sex_ratio = process_population_sex_ratio(
+        tb_population, tb_population_density, tb_population_doubling
+    )
+    tb_population = set_variant_to_estimates(tb_population)
+    tb_population = tb_population.format(COLUMNS_INDEX)
+
+    tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
+    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
+
+    ## Growth rate
     tb_growth_rate = process_standard(tb_growth_rate)
+    tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
+    tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX)
+
+    ## Natural growth rate
     tb_nat_change = process_standard(tb_nat_change)
+    tb_nat_change = set_variant_to_estimates(tb_nat_change)
+    tb_nat_change["natural_change_rate"] /= 10
+    tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
+
+    ## Migration
     tb_migration = process_migration(tb_migration, tb_migration_rate)
     del tb_migration_rate
+    tb_migration = set_variant_to_estimates(tb_migration)
+    tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
+
+    ## Deaths
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
     del tb_death_rate
+    tb_deaths = set_variant_to_estimates(tb_deaths)
+    tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
+
+    ## Births
     tb_births = process_births(tb_births, tb_birth_rate)
     del tb_birth_rate
-    tb_median_age = process_standard(tb_median_age)
-    tb_fertility = process_fertility(tb_fertility)
-    tb_le = process_le(tb_le)
-    tb_mortality = process_mortality(tb_mortality)
-
-    # Split estimates vs. projections
-    tb_population = set_variant_to_estimates(tb_population)
-    tb_growth_rate = set_variant_to_estimates(tb_growth_rate)
-    tb_nat_change = set_variant_to_estimates(tb_nat_change)
-    tb_fertility = set_variant_to_estimates(tb_fertility)
-    tb_migration = set_variant_to_estimates(tb_migration)
-    tb_deaths = set_variant_to_estimates(tb_deaths)
     tb_births = set_variant_to_estimates(tb_births)
-    tb_median_age = set_variant_to_estimates(tb_median_age)
-    tb_le = set_variant_to_estimates(tb_le)
-    tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
-    tb_mortality = set_variant_to_estimates(tb_mortality)
-
-    # Particular processing
-    tb_nat_change["natural_change_rate"] /= 10
-
-    # Format
-    tb_population = tb_population.format(COLUMNS_INDEX)
-    tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX)
-    tb_nat_change = tb_nat_change.format(COLUMNS_INDEX)
-    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
-    tb_migration = tb_migration.format(COLUMNS_INDEX, short_name="migration")
-    tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
     tb_births = tb_births.format(COLUMNS_INDEX, short_name="births")
+
+    ## Median age
+    tb_median_age = process_standard(tb_median_age)
+    tb_median_age = set_variant_to_estimates(tb_median_age)
     tb_median_age = tb_median_age.format(COLUMNS_INDEX)
+
+    # Childbearing age
+    tb_childbearing_age = process_standard(tb_childbearing_age)
+    tb_childbearing_age = set_variant_to_estimates(tb_childbearing_age)
+    tb_childbearing_age = tb_childbearing_age.format(COLUMNS_INDEX)
+
+    ## Fertility
+    tb_fertility = process_fertility(tb_fertility)
+    tb_fertility = set_variant_to_estimates(tb_fertility)
+    tb_fertility = tb_fertility.format(COLUMNS_INDEX)
+
+    ## Life Expectancy
+    tb_le = process_le(tb_le)
+    tb_le = set_variant_to_estimates(tb_le)
     tb_le = tb_le.format(COLUMNS_INDEX)
-    tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
+
+    ## Mortality
+    tb_mortality = process_mortality(tb_mortality)
+    tb_mortality = set_variant_to_estimates(tb_mortality)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
@@ -102,6 +125,7 @@ def run(dest_dir: str) -> None:
         tb_le,
         tb_sex_ratio,
         tb_mortality,
+        tb_childbearing_age,
     ]
 
     #
@@ -119,7 +143,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, Table]:
+def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Table) -> Tuple[Table, Table]:
     """Process the population table."""
     paths.log.info("Processing population variables...")
 
@@ -181,6 +205,11 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb_density = process_standard(tb_density)
     tb = tb.merge(tb_density, on=COLUMNS_INDEX, how="left")
     del tb_density
+
+    # Add population doubling times
+    tb_doubling = process_standard(tb_doubling, allowed_nans={"population_doubling_time": 31})
+    tb = tb.merge(tb_doubling, on=COLUMNS_INDEX, how="left")
+    del tb_doubling
 
     return tb, tb_sex
 
@@ -376,12 +405,21 @@ def process_mortality(tb: Table) -> Table:
     return tb
 
 
-def process_standard(tb: Table) -> Table:
+def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -> Table:
     """Process the population table."""
     paths.log.info("Processing population variables...")
 
     # Sanity check
-    assert tb.notna().all(axis=None), "Some NaNs detected"
+    if allowed_nans:
+        for colname, num_nans in allowed_nans.items():
+            assert (
+                num_nans_real := tb[colname].isna().sum()
+            ) == num_nans, f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
+        assert (
+            tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None)
+        ), "Some NaNs detected"
+    else:
+        assert tb.notna().all(axis=None), "Some NaNs detected"
 
     # Remove location_type
     tb = tb.drop(columns="location_type")
@@ -553,3 +591,20 @@ def add_sex_ratio_all(tb_sex: Table, tb: Table) -> Table:
     del tb_sex_all
 
     return tb_sex
+
+
+def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], strict: bool = True) -> Table:
+    """Harmonize a dimension in a table using a mapping.
+
+    tb: Table to harmonize.
+    column_name: Column name to harmonize.
+    mapping: Mapping to harmonize the column.
+    """
+    if strict:
+        # Assert column_name does not contain any other column but those in mapping
+        assert set(tb[column_name].unique()) == set(mapping.keys())
+
+    # Replace values in column_name
+    tb[column_name] = tb[column_name].replace(mapping)
+
+    return tb

@@ -27,6 +27,8 @@ steps:
     ## Population
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
     - snapshot-private://un/2024-07-11/un_wpp_population_density.xlsx
+    ## Population doubling times
+    - snapshot-private://un/2024-07-11/un_wpp_population_doubling.xlsx
     ## Growth
     - snapshot-private://un/2024-07-11/un_wpp_growth_rate.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_nat_change_rate.xlsx
@@ -50,6 +52,8 @@ steps:
     - snapshot-private://un/2024-07-11/un_wpp_birth_rate.xlsx
     ## Median age
     - snapshot-private://un/2024-07-11/un_wpp_median_age.xlsx
+    ## Child bearing age
+    - snapshot-private://un/2024-07-11/un_wpp_childbearing_age.xlsx
     ## Life expectancy
     - snapshot-private://un/2024-07-11/un_wpp_le.xlsx
     - snapshot-private://un/2024-07-11/un_wpp_le_f.xlsx
@@ -58,6 +62,8 @@ steps:
   data-private://garden/un/2024-07-11/un_wpp:
     - data-private://meadow/un/2024-07-11/un_wpp
   data-private://grapher/un/2024-07-11/un_wpp:
+    - data-private://garden/un/2024-07-11/un_wpp
+  data-private://grapher/un/2024-07-11/un_wpp_full:
     - data-private://garden/un/2024-07-11/un_wpp
 
   # Population (Fariss et al.)

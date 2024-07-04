@@ -27,6 +27,8 @@ def run(dest_dir: str) -> None:
     paths.log.info("reading population...")
     tb_population = paths.read_snap_table("un_wpp_population.csv")
     tb_population_density = read_estimates_and_projections_from_snap("un_wpp_population_density.xlsx")
+    # Population doubling times
+    tb_population_doubling = read_estimates_and_projections_from_snap("un_wpp_population_doubling.xlsx")
     # Growth rate
     tb_growth_rate = read_estimates_and_projections_from_snap("un_wpp_growth_rate.xlsx")
     # Natural change rate
@@ -36,6 +38,8 @@ def run(dest_dir: str) -> None:
     tb_fertility_age = read_estimates_and_projections_from_snap("un_wpp_fert_rate_age.xlsx")
     tb_fertility = combine_fertility_tables(tb_fertility_tot, tb_fertility_age)
     del tb_fertility_tot, tb_fertility_age
+    # Childbearing age
+    tb_childbearing_age = read_estimates_and_projections_from_snap("un_wpp_childbearing_age.xlsx")
     # Migration
     tb_migration = read_estimates_and_projections_from_snap("un_wpp_migration.xlsx")
     tb_migration = to_long_format_migration(tb_migration)
@@ -76,9 +80,11 @@ def run(dest_dir: str) -> None:
     # Process tables
     tb_population = clean_table(tb_population, "population")
     tb_population_density = clean_table(tb_population_density, "population_density")
+    tb_population_doubling = clean_table(tb_population_doubling, "population_doubling_time")
     tb_growth_rate = clean_table(tb_growth_rate, "growth_rate")
     tb_nat_change = clean_table(tb_nat_change, "natural_change_rate")
     tb_fertility = clean_table(tb_fertility, "fertility_rate")
+    tb_childbearing_age = clean_table(tb_childbearing_age, "childbearing_age")
     tb_migration = clean_table(tb_migration, "net_migration")
     tb_migration_rate = clean_table(tb_migration_rate, "net_migration_rate")
     tb_deaths = clean_table(tb_deaths, "deaths")
@@ -95,9 +101,11 @@ def run(dest_dir: str) -> None:
     tables = [
         tb_population,
         tb_population_density,
+        tb_population_doubling,
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
+        tb_childbearing_age,
         tb_migration,
         tb_migration_rate,
         tb_deaths,
@@ -120,10 +128,21 @@ def read_estimates_and_projections_from_snap(short_name: str) -> Table:
     # Read snap
     snap = paths.load_snapshot(short_name)
     # Read tables
+    # TODO: Add support for Low, and High variants
     tb_estimates = snap.read(sheet_name="Estimates")
-    tb_projections = snap.read(sheet_name="Medium")
+    tb_projections_medium = snap.read(sheet_name="Medium")
+    # tb_projections_low = snap.read(sheet_name="Low")
+    # tb_projections_high = snap.read(sheet_name="High")
     # Merge tables
-    tb = concat([tb_estimates, tb_projections], ignore_index=True)
+    tb = concat(
+        [
+            tb_estimates,
+            tb_projections_medium,
+            # tb_projections_low,
+            # tb_projections_high,
+        ],
+        ignore_index=True,
+    )
     return tb
 
 

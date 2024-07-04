@@ -90,6 +90,21 @@ tables:
           title_public: |-
             Population density, {definitions.global.dimensions.title}
 
+      population_doubling_time:
+        title: Population doubling time
+        unit: years
+        short_unit: years
+        description_short: &pop2_description_short |-
+          Years required for the population to double if the current growth rate continues. When population is declining, negative values indicate years needed for the population to halve if it is declining. {definitions.global.dimensions.description_short}
+        description_key:
+          - It is calculated as ln(2)/r where r is the annual population growth rate.
+          - Doubling time is computed only for fast growing populations with growth rates exceeding 0.5 per cent.
+        presentation:
+          title_public: |-
+            Population doubling time, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: *pop2_description_short
+
   growth_rate:
     variables:
       growth_rate:
@@ -204,6 +219,19 @@ tables:
         presentation:
           title_public: |-
             Median age, {definitions.global.dimensions.title}
+
+  childbearing_age:
+    variables:
+      childbearing_age:
+        title: Mean age at childbearing
+        unit: years
+        description_short: &cb_description_short |-
+          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Mean age at childbearing, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: *cb_description_short
 
   life_expectancy:
     variables:
