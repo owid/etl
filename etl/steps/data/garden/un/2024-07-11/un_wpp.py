@@ -55,8 +55,13 @@ def run(dest_dir: str) -> None:
     tb_population = set_variant_to_estimates(tb_population)
     tb_population = tb_population.format(COLUMNS_INDEX)
 
+    ## Sex ratio
     tb_sex_ratio = set_variant_to_estimates(tb_sex_ratio)
     tb_sex_ratio = tb_sex_ratio.format(COLUMNS_INDEX, short_name="sex_ratio")
+
+    ## Dependency ratio
+    tb_dependency = process_dependency(tb_population)
+    tb_dependency = tb_dependency.format(COLUMNS_INDEX, short_name="dependency_ratio")
 
     ## Growth rate
     tb_growth_rate = process_standard(tb_growth_rate)
@@ -126,6 +131,7 @@ def run(dest_dir: str) -> None:
         tb_sex_ratio,
         tb_mortality,
         tb_childbearing_age,
+        tb_dependency,
     ]
 
     #
@@ -144,7 +150,10 @@ def run(dest_dir: str) -> None:
 
 
 def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Table) -> Tuple[Table, Table]:
-    """Process the population table."""
+    """Process the population table.
+
+    Also estimate sex ratio.
+    """
     paths.log.info("Processing population variables...")
 
     # Sanity check
@@ -212,6 +221,44 @@ def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Tabl
     del tb_doubling
 
     return tb, tb_sex
+
+
+def process_dependency(tb: Table) -> Table:
+    """Get dependency ratios.
+
+    Total: (0-14 + 65+) / 15-64
+    Youth: 0-14 / 15-64
+    Old: 65+ / 15-64
+    """
+    # Get relevant rows
+    ages = ["0-14", "15-64", "65+"]
+    tb_dependency = tb["population"].reset_index().copy()
+    tb_dependency = tb_dependency.loc[tb_dependency["age"].isin(ages)]
+
+    # Pivot table
+    tb_dependency = tb_dependency.pivot(
+        columns="age", index=[col for col in COLUMNS_INDEX if col != "age"], values="population"
+    ).reset_index()
+
+    # Estimate ratios
+    tb_dependency["total"] = (tb_dependency["0-14"] + tb_dependency["65+"]) / tb_dependency["15-64"]
+    tb_dependency["youth"] = tb_dependency["0-14"] / tb_dependency["15-64"]
+    tb_dependency["old"] = tb_dependency["65+"] / tb_dependency["15-64"]
+
+    # Drop unused column
+    tb_dependency = tb_dependency.drop(columns=ages)
+
+    # Unpivot
+    tb_dependency = tb_dependency.melt(
+        id_vars=[col for col in COLUMNS_INDEX if col != "age"],
+        var_name="age",
+        value_name="dependency_ratio",
+    )
+
+    # Scale
+    tb_dependency["dependency_ratio"] *= 100
+
+    return tb_dependency
 
 
 def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:

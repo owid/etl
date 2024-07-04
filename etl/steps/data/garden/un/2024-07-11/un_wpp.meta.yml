@@ -332,6 +332,36 @@ tables:
               The number of male individuals per 100 female individuals, at age << age >>.
               <% endif %> {definitions.global.projections}
 
+  dependency_ratio:
+    variables:
+      dependency_ratio:
+        title: |-
+          <% if age == "total" %>
+          Total dependency ratio
+          <% elif age == "youth" %>
+          Youth dependency ratio
+          <% else %>
+          Old-age dependency ratio
+          <% endif %>
+        unit: "%"
+        description_short: |-
+          <% if sex != "all" %>
+          <% set individuals = 'population'%>
+          <% else %>
+          <% set individuals = sex + ' population'%>
+          <% endif %>
+          <% if age == "total" %>
+          The ratio of the young << individuals >> (under age 15) and elderly << individuals >> (aged 65 and over) to the working-age population (aged 15 to 64).
+          <% elif age == "youth" %>
+          The ratio of the young << individuals >> (under age 15) to the working-age << individuals >> (aged 15 to 64).
+          <% else %>
+          The ratio of the elderly << individuals >> (aged 65 and over) to the working-age << individuals >> (aged 15 to 64).
+          <% endif %>
+        presentation:
+          title_public: |-
+            {tables.dependency_ratio.variables.dependency_ratio.title}, {definitions.global.dimensions.title}
+
+
   mortality_rate:
     variables:
       mortality_rate:
