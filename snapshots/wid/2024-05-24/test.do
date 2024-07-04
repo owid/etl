@@ -1,17 +1,28 @@
-global areas CL GB ZA
+qui wid, indicators(xlcusp) clear
 
-foreach a in $areas {
+*Get distinct values of countries and call it list_of countries
+*I will use this list to extract data per country instead of one big dataset that generates issues
+qui levelsof country, local(list_of_countries) clean
+
+local list_of_countries CL GB ZA
+
+foreach c in `list_of_countries' {
 	
-	wid, indicators(aptinc tptinc adiinc tdiinc acainc tcainc ahweal thweal) perc(p0p10 p10p20 p20p30 p30p40 p40p50 p50p60 p60p70 p70p80 p80p90 p90p100 p0p100 p0p50 p99p100 p99.9p100 p99.99p100 p99.999p100) areas(`a') ages(992) pop(j) exclude clear
+	dis "`c'"
 	
-	tempfile country_`a'
-	save "`country_`a''"
+	wid, indicators(aptinc tptinc adiinc tdiinc acainc tcainc ahweal thweal) perc(p99p100) areas(`c') ages(992) pop(j) exclude clear
+	
+	local c: subinstr local c "-" "_", all
+	
+	tempfile country_`c'
+	save "`country_`c''"
 	
 }
 
 clear
 
-foreach a in $areas {
-	append using "`country_`a''"
+foreach c in `list_of_countries' {
+	local c: subinstr local c "-" "_", all
+	append using "`country_`c''"
 
 }
