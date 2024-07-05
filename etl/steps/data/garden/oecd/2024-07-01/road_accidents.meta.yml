@@ -1,0 +1,134 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Transport
+        - Causes of Death
+    description_from_producer: |-
+      Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether
+      immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor
+      vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry
+      people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles
+      used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are
+      registered, while deaths are attributed to the countries in which they occur.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  road_accidents:
+    variables:
+      accident_deaths:
+        title: Road accident deaths
+        unit: deaths
+        short_unit: deaths
+        description_short: Number of reported deaths due to road accidents.
+        description_processing: |-
+          "The majority of series data is sourced from the OECD Statistics.
+          For particular countries, historical data (before 1970) have been sourced from specific national records as referenced below.
+          Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
+          New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
+          Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+          Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
+          Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+          United States: https://www.bts.gov/content/transportation-fatalities-mode"
+        presentation:
+          title_public: Reported road accident deaths
+        processing_level: major
+      accident_injuries:
+        title: Road accident injuries
+        unit: injuries
+        short_unit: injuries
+        description_short: Number of reported injuries due to road accidents.
+        presentation:
+          title_public: Reported road accident injuries
+        processing_level: minor
+      accidents_with_injuries:
+        title: Road accidents with injuries
+        unit: accidents
+        short_unit: accidents
+        description_short: Number of road accidents where one or more people were injured.
+        presentation:
+          title_public: Reported road accidents with injuries
+        processing_level: minor
+      deaths_per_million_population:
+        title: Road accident deaths per million inhabitants
+        unit: deaths per million inhabitants
+        short_unit: deaths
+        description_short: Number of reported deaths due to road accidents per million inhabitants.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Reported road accident deaths per million inhabitants
+        description_processing: |-
+          "Death per million population is calculated by dividing the number of deaths by the population with a factor of 1M"
+        processing_level: major
+      passenger_kms_rail:
+        title: Passenger kilometers by rail
+        unit: passenger-kilometers
+        short_unit: km
+        description_short: Number of kilometers traveled by passengers by rail.
+        description_from_producer: |-
+          "Rail passenger transport: any movement of passengers using a rail vehicle on a given rail network.
+          Rail passenger: any person, excluding members of the train crew, who makes a journey by rail.
+          Passenger-kilometre by rail: unit of measurement representing the transport of one rail passenger by rail over a distance of one kilometre."
+        processing_level: minor
+      passenger_kms_road:
+        title: Passenger kilometers by road
+        unit: passenger-kilometers
+        short_unit: km
+        description_short: Number of kilometers traveled by passengers by road.
+        description_from_producer: |-
+          "Road passenger transport: any movement of passengers using a road vehicle on a given
+          road network.
+          Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers. Service staff assigned to buses,
+          coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+        processing_level: major
+        description_processing: |-
+          "We removed data points which are identical to total passenger kilometers by car or bus, since they do not include all passenger kilometers travelled by road."
+      passenger_kms_car:
+        title: Passenger kilometers by car
+        unit: passenger-kilometers
+        short_unit: km
+        description_short: Number of kilometers traveled by passengers by car.
+        description_from_producer: |-
+          "Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+        processing_level: minor
+      passenger_kms_bus:
+        title: Passenger kilometers by bus
+        unit: passenger-kilometers
+        short_unit: km
+        description_short: Number of kilometers traveled by passengers by bus.
+        description_from_producer: |-
+          "Road passenger transport: any movement of passengers using a road vehicle on a given
+          road network.
+          Road passenger: any person who makes a journey by a road vehicle. Drivers of passenger cars,
+          excluding taxi drivers, are counted as passengers. Service staff assigned to buses,
+          coaches, trolleybuses, trams and goods road vehicles are not included as passengers.
+          Road passenger-kilometre: unit of measurement representing the transport of one passenger
+          by road over one kilometre."
+        processing_level: minor
+      deaths_per_billion_kms:
+        title: Road accident deaths per billion passenger kilometers
+        unit: deaths
+        short_unit: deaths
+        description_short: Number of deaths due to road accidents per billion passenger kilometers traveled on the road.
+        description_from_producer: ""
+        display:
+          numDecimalPlaces: 1
+        processing_level: major
+        description_processing: |-
+          "Death per billion passenger kilometers is calculated by dividing the number of deaths by the passenger kilometers with a factor of 1B"
+

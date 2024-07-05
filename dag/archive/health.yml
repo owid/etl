@@ -29,3 +29,11 @@ steps:
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
+  # OECD Road Accidents
+  data://grapher/oecd/2023-08-11/road_accidents:
+    - data://garden/oecd/2023-08-11/road_accidents
+  data://meadow/oecd/2023-08-11/road_accidents:
+    - snapshot://oecd/2023-08-11/road_accidents.csv
+  data://garden/oecd/2023-08-11/road_accidents:
+    - data://meadow/oecd/2023-08-11/road_accidents
+    - data://garden/oecd/2018-03-11/road_deaths_and_injuries
