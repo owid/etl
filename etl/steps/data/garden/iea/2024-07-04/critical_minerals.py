@@ -1,5 +1,6 @@
 """Curate data from the IEA's Critical Minerals Dataset.
 
+Analysis of the Critical Mineral Dataset file:
 * Sheet 2 is the only table on supply, which is also the only table with country data.
   NOTE: Region aggregates are not possible, since there is data for "Rest of world" for each mineral.
 * Sheets 4.1, ..., 4.6 are called, e.g. "4.1 Solar" (so let's call them 4.x sheets, or individual demand sheets). They contain all relevant data on demand for individual technologies.
@@ -18,6 +19,7 @@
 TODO: Therefore, the strategy should be:
 * Combine the 4.x sheets into one demand table.
 * Assign a "case" column to sheet 3.2 (always assume Base case).
+* In demand table, create an aggregate "Magnet rare earth elements" that combines Praseodymium, Neodymium, Terbium and Dysprosium.
 * From sheet 3.2, remove rows for Praseodymium, Neodymium, Terbium and Dysprosium, and rename "Total rare earth elements" -> "Magnet rare earth elements".
 * Calculate "Other low emissions power generation", which should be the total from 3.2 minus the total from 4.x for each mineral. Add those other low emission uses to the demand table.
 * Fix the mispelled "iridum".
@@ -38,6 +40,8 @@ Then, in the metadata:
 """
 
 import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
+from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -56,17 +60,14 @@ technologies = {
     "wind": "Wind",
 }
 
+# Name of rare earth elements aggregate.
+RARE_ELEMENTS_LABEL = "Magnet rare earth elements"
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("critical_minerals")
+# List of rare element magnets.
+RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
 
-    #
-    # Process data.
-    #
+
+def prepare_supply_table(ds_meadow: Dataset) -> Table:
     # Read supply table.
     tb_supply = ds_meadow["supply_for_key_minerals"].reset_index()
 
@@ -76,6 +77,10 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb_supply = geo.harmonize_countries(df=tb_supply, countries_file=paths.country_mapping_path)
 
+    return tb_supply
+
+
+def combine_individual_demand_tables(ds_meadow: Dataset) -> Table:
     # Read, prepare, and concatenate all tables.
     tables = []
     for table_name in [
@@ -94,10 +99,75 @@ def run(dest_dir: str) -> None:
     # Ignore aggregates in the data.
     tb_demand = tb_demand[~tb_demand["mineral"].str.startswith(("Total"))].reset_index(drop=True)
 
-    _tb = ds_meadow["demand_for_clean_energy_technologies_by_mineral"].reset_index()
-    _tb_check = tb_demand.groupby(["mineral", "year", "scenario"], observed=True, as_index=False).agg({"demand": "sum"})
-    # Check that all minerals in the individual demand tables are contained in the clean technologies by mineral table.
-    assert set(_tb_check["mineral"]) < set(_tb["mineral"]), "Unexpected minerals in individual demand tables."
+    # Combine data for magnet rare earth elements.
+    # Check that they are all in the data.
+    assert all(
+        [(tb_demand["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]
+    ), "Missing rare elements in demand table."
+    # Calculate total demand of rare elements.
+    rare_elements_data = (
+        tb_demand[tb_demand["mineral"].isin(RARE_ELEMENTS_LIST)]
+        .groupby(["case", "year", "scenario", "technology"], observed=True, as_index=False)
+        .agg({"demand": "sum"})
+        .assign(**{"mineral": RARE_ELEMENTS_LABEL})
+    )
+    # Remove individual rare elements and add combined total demand of rare elements.
+    tb_demand = pr.concat(
+        [tb_demand[~tb_demand["mineral"].isin(RARE_ELEMENTS_LIST)].reset_index(drop=True), rare_elements_data],
+        ignore_index=True,
+        short_name="demand_for_key_minerals"
+    )
+
+    return tb_demand
+
+
+def prepare_clean_technologies_by_mineral_table(ds_meadow: Dataset) -> Table:
+    # Read table of total clean technology uses by mineral.
+    tb_clean = ds_meadow["demand_for_clean_energy_technologies_by_mineral"].reset_index()
+    # Even if not explicitly mentioned, it seems that "Base case" is assumed in this sheet.
+    tb_clean["case"] = "Base case"
+    # Check that they are all in the data.
+    assert all(
+        [(tb_clean["mineral"] == element).any() for element in RARE_ELEMENTS_LIST]
+    ), "Missing rare elements in clean tech by mineral demand table."
+    # Remove rows for individual rare earth elements.
+    tb_clean = tb_clean[~tb_clean["mineral"].isin(RARE_ELEMENTS_LIST)].reset_index(drop=True)
+    # Rename "Total rare earth elements" -> "Magnet rare earth elements".
+    # Also, fix typo "iridum".
+    mapping = {
+        "Total rare earth elements": RARE_ELEMENTS_LABEL,
+        "PGMs (other than iridum)": "PGMs other than iridium",
+    }
+    tb_clean["mineral"] = map_series(tb_clean["mineral"], mapping=mapping)
+
+    # Remove row with total demand for minerals.
+    tb_clean = tb_clean[~tb_clean["mineral"].str.startswith("Total")].reset_index(drop=True)
+
+    return tb_clean
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("critical_minerals")
+
+    #
+    # Process data.
+    #
+    # Read and prepare supply table.
+    tb_supply = prepare_supply_table(ds_meadow=ds_meadow)
+
+    # Read and prepare demand table (by combining individual demand sheets).
+    tb_demand = combine_individual_demand_tables(ds_meadow=ds_meadow)
+
+    # Read and prepare data from the sheet on demand in clean technologies by mineral.
+    # tb_clean = prepare_clean_technologies_by_mineral_table(ds_meadow=ds_meadow)
+
+    # Format output tables conveniently.
+    tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
+    tb_demand = tb_demand.format(["case", "scenario", "technology", "mineral", "year"])
 
     #
     # Save outputs.
