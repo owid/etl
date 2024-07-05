@@ -20,9 +20,8 @@ TODO: Therefore, the strategy should be:
 * Combine the 4.x sheets into one demand table.
 * Assign a "case" column to sheet 3.2 (always assume Base case).
 * In demand table, create an aggregate "Magnet rare earth elements" that combines Praseodymium, Neodymium, Terbium and Dysprosium.
-* From sheet 3.2, remove rows for Praseodymium, Neodymium, Terbium and Dysprosium, and rename "Total rare earth elements" -> "Magnet rare earth elements".
+* From sheet 3.2, remove rows for Praseodymium, Neodymium, Terbium and Dysprosium, and rename "Total rare earth elements" -> "Magnet rare earth elements". Also, fix the misspelled "iridum".
 * Calculate "Other low emissions power generation", which should be the total from 3.2 minus the total from 4.x for each mineral. Add those other low emission uses to the demand table.
-* Fix the mispelled "iridum".
 * Assign a "case" column to sheet 1.
 * Add the other uses of graphite from sheet 1 to the demand table (EV and battery storage).
 * Add "Other uses" from sheet 1 to the demand table.
@@ -115,7 +114,7 @@ def combine_individual_demand_tables(ds_meadow: Dataset) -> Table:
     tb_demand = pr.concat(
         [tb_demand[~tb_demand["mineral"].isin(RARE_ELEMENTS_LIST)].reset_index(drop=True), rare_elements_data],
         ignore_index=True,
-        short_name="demand_for_key_minerals"
+        short_name="demand_for_key_minerals",
     )
 
     return tb_demand
@@ -146,6 +145,36 @@ def prepare_clean_technologies_by_mineral_table(ds_meadow: Dataset) -> Table:
     return tb_clean
 
 
+def add_demand_from_other_clean(tb_demand: Table, tb_clean: Table) -> Table:
+    # Calculate "Other low emissions power generation", which should be the total from sheet 3.2 minus the total from sheets 4.x for each mineral. Add those other low emission uses to the demand table.
+    tb_demand_total = tb_demand.groupby(["case", "scenario", "mineral", "year"], observed=True, as_index=False).agg(
+        {"demand": "sum"}
+    )
+    combined = tb_demand_total.merge(
+        tb_clean, how="inner", on=["case", "scenario", "mineral", "year"], suffixes=("", "_summary")
+    )
+    # Check that the totals in sheet 3.2 are always larger than the totals calculated from combining the 4.x sheets (or within 1%).
+    error = "Sheet on clean technology demand by mineral should be >= the sum of the demands from the 4.x sheets."
+    assert combined[(combined["demand_summary"] < (combined["demand"] * 0.99))].empty, error
+    combined["difference"] = combined["demand_summary"] - combined["demand"]
+    # TODO: Move up.
+    OTHER_LOW_LABEL = "Other low emissions power generation"
+    # Create a new technology that contains all the remaining demand not included in the 4.x sheets.
+    # NOTE: Only include it if the difference is larger than 1%.
+    tb_other_low = (
+        combined[combined["difference"] >= combined["demand"] * 1.01]
+        .assign(**{"technology": OTHER_LOW_LABEL})
+        .drop(columns=["demand", "demand_summary"])
+        .rename(columns={"difference": "demand"})
+        .reset_index(drop=True)
+    )
+
+    # Append the demand from other low emissions power generation to the demand table.
+    tb_demand_with_other = pr.concat([tb_demand, tb_other_low], ignore_index=True)
+
+    return tb_demand_with_other
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -163,7 +192,10 @@ def run(dest_dir: str) -> None:
     tb_demand = combine_individual_demand_tables(ds_meadow=ds_meadow)
 
     # Read and prepare data from the sheet on demand in clean technologies by mineral.
-    # tb_clean = prepare_clean_technologies_by_mineral_table(ds_meadow=ds_meadow)
+    tb_clean = prepare_clean_technologies_by_mineral_table(ds_meadow=ds_meadow)
+
+    # Add demand from other low emissions power generation (not accounted for in the individual technology demand sheets) to the demand table.
+    tb_demand = add_demand_from_other_clean(tb_demand=tb_demand, tb_clean=tb_clean)
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
