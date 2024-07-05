@@ -65,6 +65,15 @@ RARE_ELEMENTS_LABEL = "Magnet rare earth elements"
 # List of rare element magnets.
 RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
 
+# Name of all graphite uses, listed in sheet 1 (of total demand including uses outside of clean tech).
+GRAPHITE_ALL_LABEL = "Graphite (all grades: natural and synthetic)"
+
+# Name of a new mineral category, which encompasses the difference in demand between sheet 1 and the combined 4.x sheets.
+OTHER_GRAPHITE_LABEL = "Graphite, other"
+
+# Name of other uses in clean tech.
+OTHER_LOW_LABEL = "Other low emissions power generation"
+
 
 def prepare_supply_table(ds_meadow: Dataset) -> Table:
     # Read supply table.
@@ -157,8 +166,6 @@ def add_demand_from_other_clean(tb_demand: Table, tb_clean: Table) -> Table:
     error = "Sheet on clean technology demand by mineral should be >= the sum of the demands from the 4.x sheets."
     assert combined[(combined["demand_summary"] < (combined["demand"] * 0.99))].empty, error
     combined["difference"] = combined["demand_summary"] - combined["demand"]
-    # TODO: Move up.
-    OTHER_LOW_LABEL = "Other low emissions power generation"
     # Create a new technology that contains all the remaining demand not included in the 4.x sheets.
     # NOTE: Only include it if the difference is larger than 1%.
     tb_other_low = (
@@ -173,6 +180,65 @@ def add_demand_from_other_clean(tb_demand: Table, tb_clean: Table) -> Table:
     tb_demand_with_other = pr.concat([tb_demand, tb_other_low], ignore_index=True)
 
     return tb_demand_with_other
+
+
+def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
+    # Calculate "Graphite, other uses", which should be the total from sheet 1 minus the total from sheets 4.x for each mineral. Add those other uses to the demand table.
+
+    # List all graphite-related minerals listed in the 4.x sheets.
+    graphite_uses = ["Battery-grade graphite"]
+
+    # Sanity checks.
+    error = "There are new unexpected uses of graphite in the 4.x sheets."
+    assert set(tb_demand[tb_demand["mineral"].str.lower().str.contains("graphite")]["mineral"]) == set(
+        graphite_uses
+    ), error
+    error = "There are new unexpected uses of graphite in Sheet 1."
+    assert set(tb_total[tb_total["mineral"].str.lower().str.contains("graphite")]["mineral"]) == set(
+        [GRAPHITE_ALL_LABEL]
+    ), error
+
+    # Calculate the total graphite demand in the total demand sheet.
+    tb_graphite_total = tb_total[tb_total["mineral"] == GRAPHITE_ALL_LABEL].reset_index(drop=True)
+
+    # Calculate the total graphite demand in the 4.x sheets.
+    tb_graphite_demand_total = (
+        tb_demand[tb_demand["mineral"].isin(graphite_uses)]
+        .groupby(["case", "scenario", "mineral", "year"], observed=True, as_index=False)
+        .agg({"demand": "sum"})
+    )
+    combined = tb_graphite_demand_total.merge(
+        tb_graphite_total, how="inner", on=["case", "scenario", "mineral", "year"], suffixes=("", "_summary")
+    )
+    # Check that the totals in sheet 1 are always larger than the totals calculated from combining the 4.x sheets (or within 1%).
+    error = "Sheet on clean technology graphite demand by mineral should be >= the sum of the graphite demands from the 4.x sheets."
+    assert combined[(combined["demand_summary"] < (combined["demand"] * 0.99))].empty, error
+    combined["difference"] = combined["demand_summary"] - combined["demand"]
+
+    # Create a new technology that contains all the remaining graphite demand not included in the 4.x sheets.
+    # NOTE: Only include it if the difference is larger than 1%.
+    tb_graphite_other = (
+        combined[combined["difference"] >= combined["demand"] * 1.01]
+        .assign(**{"technology": OTHER_GRAPHITE_LABEL})
+        .drop(columns=["demand", "demand_summary"])
+        .rename(columns={"difference": "demand"})
+        .reset_index(drop=True)
+    )
+
+    # Append the demand from other low emissions power generation to the demand table.
+    tb_demand_with_graphite_other = pr.concat([tb_demand, tb_graphite_other], ignore_index=True)
+
+    return tb_demand_with_graphite_other
+
+
+def prepare_total_demand_table(ds_meadow: Dataset) -> Table:
+    # Read table on total demand of minerals (including uses outside of clean tech).
+    tb_total = ds_meadow["demand_for_key_minerals"].reset_index()
+
+    # Even if not explicitly mentioned, it seems that "Base case" is assumed in this sheet.
+    tb_total["case"] = "Base case"
+
+    return tb_total
 
 
 def run(dest_dir: str) -> None:
@@ -194,8 +260,18 @@ def run(dest_dir: str) -> None:
     # Read and prepare data from the sheet on demand in clean technologies by mineral.
     tb_clean = prepare_clean_technologies_by_mineral_table(ds_meadow=ds_meadow)
 
+    # Read and prepare table on total demand of minerals.
+    tb_total = prepare_total_demand_table(ds_meadow=ds_meadow)
+
+    # Add demand from other graphite uses that are accounted for in sheet 1 but not in sheets 4.x.
+    tb_demand = add_demand_from_other_graphite(tb_demand=tb_demand, tb_total=tb_total)
+
     # Add demand from other low emissions power generation (not accounted for in the individual technology demand sheets) to the demand table.
     tb_demand = add_demand_from_other_clean(tb_demand=tb_demand, tb_clean=tb_clean)
+
+    # TODO:
+    # * Add "Other uses" from sheet 1 to the demand table.
+    # * Sanity check that the totals from the resulting demand table coincides with the totals from sheet 1.
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
