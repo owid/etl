@@ -398,7 +398,7 @@ tables:
             <% endif %>, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The share of <%- if sex != 'all' %><< sex >><% endif %>
+              The share of <% if sex != 'all' %><< sex >><% endif %>
               <% if age == '0' %>
                children who die before reaching the age of one.
               <% else %>
