@@ -74,6 +74,9 @@ OTHER_GRAPHITE_LABEL = "Graphite, other"
 # Name of other uses in clean tech.
 OTHER_LOW_LABEL = "Other low emissions power generation"
 
+# Name of other uses (in sheet 1).
+OTHER_LABEL = "Other uses"
+
 
 def prepare_supply_table(ds_meadow: Dataset) -> Table:
     # Read supply table.
@@ -241,6 +244,18 @@ def prepare_total_demand_table(ds_meadow: Dataset) -> Table:
     return tb_total
 
 
+def add_demand_from_other_uses(tb_demand: Table, tb_total: Table) -> Table:
+    # Add "Other uses" from sheet 1 to the demand table.
+    error = f"Technology category '{OTHER_LABEL}' not found in sheet 1."
+    assert OTHER_LABEL in set(tb_total[tb_total["technology"].str.lower().str.contains("other")]["technology"]), error
+
+    tb_demand_with_other_uses = pr.concat(
+        [tb_demand, tb_total[tb_total["technology"] == OTHER_LABEL].reset_index(drop=True)], ignore_index=True
+    )
+
+    return tb_demand_with_other_uses
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -269,8 +284,10 @@ def run(dest_dir: str) -> None:
     # Add demand from other low emissions power generation (not accounted for in the individual technology demand sheets) to the demand table.
     tb_demand = add_demand_from_other_clean(tb_demand=tb_demand, tb_clean=tb_clean)
 
+    # Add other uses of minerals (outside of clean tech) from sheet 1 to the total demand.
+    tb_demand = add_demand_from_other_uses(tb_demand=tb_demand, tb_total=tb_total)
+
     # TODO:
-    # * Add "Other uses" from sheet 1 to the demand table.
     # * Sanity check that the totals from the resulting demand table coincides with the totals from sheet 1.
 
     # Format output tables conveniently.
