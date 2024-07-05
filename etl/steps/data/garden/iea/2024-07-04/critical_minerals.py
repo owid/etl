@@ -16,7 +16,7 @@ Analysis of the Critical Mineral Dataset file:
     - "Magnet rare earth elements". As they mention in the notes of sheet 1, this corresponds to praseodymium (Pr), neodymium (Nd), terbium (Tb) and dysprosium (Dy). Therefore, it should coincide with "Total rare earth elements" from sheet 3.2 (and it roughly does). The easiest solution (to avoid double counting and to be able to include other uses) is to remove the rows for the individual rare earth elements, and keep only "Total rare earth elements" (and rename them as "Magnet rare earth elements").
     - "Graphite (all grades: natural and synthetic)". This is the most problematic case. It shows, for example, 1147kt for EV, whereas, in the EV sheet, we see "Battery-grade graphite" 685.56kt (and no other use of graphite appears). A similar inconsistency happens with grid battery storage. So, it seems that there are additional uses of graphite that are not accounted for in the EV and battery storage sheets. We can include a "Graphite, other" mineral, with the difference.
 
-TODO: Therefore, the strategy should be:
+Therefore, the strategy should be:
 * Combine the 4.x sheets into one demand table.
 * Assign a "case" column to sheet 3.2 (always assume Base case).
 * In demand table, create an aggregate "Magnet rare earth elements" that combines Praseodymium, Neodymium, Terbium and Dysprosium.
@@ -69,13 +69,16 @@ RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
 GRAPHITE_ALL_LABEL = "Graphite (all grades: natural and synthetic)"
 
 # Name of a new mineral category, which encompasses the difference in demand between sheet 1 and the combined 4.x sheets.
-OTHER_GRAPHITE_LABEL = "Graphite, other"
+OTHER_GRAPHITE_LABEL = "Graphite, other than battery-grade"
 
 # Name of other uses in clean tech.
 OTHER_LOW_LABEL = "Other low emissions power generation"
 
 # Name of other uses (in sheet 1).
 OTHER_LABEL = "Other uses"
+
+# Name of total demand (in sheet 1).
+TOTAL_DEMAND_LABEL = "Total demand"
 
 
 def prepare_supply_table(ds_meadow: Dataset) -> Table:
@@ -172,7 +175,7 @@ def add_demand_from_other_clean(tb_demand: Table, tb_clean: Table) -> Table:
     # Create a new technology that contains all the remaining demand not included in the 4.x sheets.
     # NOTE: Only include it if the difference is larger than 1%.
     tb_other_low = (
-        combined[combined["difference"] >= combined["demand"] * 1.01]
+        combined[combined["difference"] >= (combined["demand"] * 0.01)]
         .assign(**{"technology": OTHER_LOW_LABEL})
         .drop(columns=["demand", "demand_summary"])
         .rename(columns={"difference": "demand"})
@@ -202,16 +205,23 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
     ), error
 
     # Calculate the total graphite demand in the total demand sheet.
-    tb_graphite_total = tb_total[tb_total["mineral"] == GRAPHITE_ALL_LABEL].reset_index(drop=True)
+    tb_graphite_total = (
+        tb_total[tb_total["mineral"] == GRAPHITE_ALL_LABEL].drop(columns=["mineral"]).reset_index(drop=True)
+    )
+
+    # For now we only want to add the "other graphite uses" to each individual technology.
+    # But the "Other uses" will be added to all minerals later.
+    # Hence, remove other uses and total demand.
+    tb_graphite_total = tb_graphite_total[
+        ~tb_graphite_total["technology"].isin([TOTAL_DEMAND_LABEL, OTHER_LABEL])
+    ].reset_index(drop=True)
 
     # Calculate the total graphite demand in the 4.x sheets.
-    tb_graphite_demand_total = (
-        tb_demand[tb_demand["mineral"].isin(graphite_uses)]
-        .groupby(["case", "scenario", "mineral", "year"], observed=True, as_index=False)
-        .agg({"demand": "sum"})
+    tb_graphite_demand = (
+        tb_demand[tb_demand["mineral"].isin(graphite_uses)].drop(columns=["mineral"]).reset_index(drop=True)
     )
-    combined = tb_graphite_demand_total.merge(
-        tb_graphite_total, how="inner", on=["case", "scenario", "mineral", "year"], suffixes=("", "_summary")
+    combined = tb_graphite_demand.merge(
+        tb_graphite_total, how="inner", on=["case", "scenario", "technology", "year"], suffixes=("", "_summary")
     )
     # Check that the totals in sheet 1 are always larger than the totals calculated from combining the 4.x sheets (or within 1%).
     error = "Sheet on clean technology graphite demand by mineral should be >= the sum of the graphite demands from the 4.x sheets."
@@ -221,8 +231,8 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
     # Create a new technology that contains all the remaining graphite demand not included in the 4.x sheets.
     # NOTE: Only include it if the difference is larger than 1%.
     tb_graphite_other = (
-        combined[combined["difference"] >= combined["demand"] * 1.01]
-        .assign(**{"technology": OTHER_GRAPHITE_LABEL})
+        combined[combined["difference"] >= combined["demand"] * 0.01]
+        .assign(**{"mineral": OTHER_GRAPHITE_LABEL})
         .drop(columns=["demand", "demand_summary"])
         .rename(columns={"difference": "demand"})
         .reset_index(drop=True)
@@ -237,6 +247,18 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
 def prepare_total_demand_table(ds_meadow: Dataset) -> Table:
     # Read table on total demand of minerals (including uses outside of clean tech).
     tb_total = ds_meadow["demand_for_key_minerals"].reset_index()
+
+    # Sanity checks.
+    total_clean_label = "Total clean technologies"
+    assert total_clean_label in set(tb_total["technology"]), f"'{total_clean_label}' not found in sheet 1."
+    assert not tb_total[
+        (tb_total["technology"].str.startswith("Share of"))
+    ].empty, "Rows for 'Share of...' not found in sheet 1."
+
+    # Remove rows of shares and total clean technology demand (but keep grand total).
+    tb_total = tb_total[
+        (tb_total["technology"] != total_clean_label) & (~tb_total["technology"].str.startswith("Share of"))
+    ].reset_index(drop=True)
 
     # Even if not explicitly mentioned, it seems that "Base case" is assumed in this sheet.
     tb_total["case"] = "Base case"
@@ -254,6 +276,42 @@ def add_demand_from_other_uses(tb_demand: Table, tb_total: Table) -> Table:
     )
 
     return tb_demand_with_other_uses
+
+
+def run_sanity_checks_on_outputs(tb_demand: Table, tb_total: Table) -> None:
+    tb_total_expected = tb_demand.copy()
+    # Rename all graphite cases to simply "Graphite".
+    all_graphite = tb_total_expected[tb_total_expected["mineral"].str.lower().str.contains("graphite")][
+        "mineral"
+    ].unique()
+    tb_total_expected["mineral"] = map_series(
+        tb_total_expected["mineral"], {graphite_case: "Graphite" for graphite_case in all_graphite}
+    )
+
+    # Check that the totals from the resulting demand table coincides with the totals from sheet 1.
+    tb_total_expected = tb_total_expected.groupby(
+        ["case", "scenario", "mineral", "year"], observed=True, as_index=False
+    ).agg({"demand": "sum"})
+
+    assert TOTAL_DEMAND_LABEL in set(tb_total["technology"]), f"Technology '{TOTAL_DEMAND_LABEL}' not found in sheet 1."
+    tb_total_given = tb_total[tb_total["technology"] == TOTAL_DEMAND_LABEL].reset_index(drop=True)
+
+    # Idem in the total table.
+    tb_total_given["mineral"] = map_series(tb_total_given["mineral"], {GRAPHITE_ALL_LABEL: "Graphite"})
+
+    compared = pr.merge(
+        tb_total_expected,
+        tb_total_given,
+        how="inner",
+        on=["case", "scenario", "mineral", "year"],
+        suffixes=("_expected", "_given"),
+    )
+    compared["_deviation"] = (
+        100 * abs(compared["demand_expected"] - compared["demand_given"]) / compared["demand_given"]
+    )
+
+    error = "Larger than 1% discrepancy between the total expected demand from sheets 4.x and the ones from sheet 1."
+    assert compared[compared["_deviation"] > 1].empty, error
 
 
 def run(dest_dir: str) -> None:
@@ -287,8 +345,8 @@ def run(dest_dir: str) -> None:
     # Add other uses of minerals (outside of clean tech) from sheet 1 to the total demand.
     tb_demand = add_demand_from_other_uses(tb_demand=tb_demand, tb_total=tb_total)
 
-    # TODO:
-    # * Sanity check that the totals from the resulting demand table coincides with the totals from sheet 1.
+    # Sanity checks.
+    run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
