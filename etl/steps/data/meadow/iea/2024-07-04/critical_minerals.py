@@ -43,9 +43,9 @@ def process_demand_for_key_minerals(
 
     scenarios = {
         "": "",
-        "Stated Policies scenario": "stated_policies",
-        "Announced Pledges scenario": "announced_pledges",
-        "Net Zero Emissions by 2050 scenario": "net_zero_by_2050",
+        "Stated Policies scenario": "Stated policies",
+        "Announced Pledges scenario": "Announced pledges",
+        "Net Zero Emissions by 2050 scenario": "Net zero by 2050",
     }
     scenarios_columns = tb.iloc[2].ffill().fillna("").values
     assert set(scenarios) == set(scenarios_columns), f"Format has changed for sheet: {sheet_name}"
@@ -57,7 +57,7 @@ def process_demand_for_key_minerals(
         + tb.iloc[3].astype("Int64").astype(object).fillna("").astype(str).values
     )
     new_columns[0] = normal_row_name
-    new_columns[1] = f"current{new_columns[1]}"
+    new_columns[1] = f"Current{new_columns[1]}"
     tb = tb.rename(columns={tb.columns[i]: column for i, column in enumerate(new_columns)}, errors="raise")
 
     # By construction, all columns that end in "__" do not correspond to any data, so drop them.
@@ -82,7 +82,7 @@ def process_demand_for_key_minerals(
         main_index_columns = [normal_row_name]
 
     # Transform table to end up with another table that has a "year" and "scenario" columns.
-    scenarios_names = ["current"] + [scenario for scenario in scenarios.values() if scenario != ""]
+    scenarios_names = ["Current"] + [scenario for scenario in scenarios.values() if scenario != ""]
     tables = []
     for scenario in scenarios_names:
         _tb = tb[main_index_columns + [column for column in tb.columns if column.startswith(scenario)]]
@@ -124,8 +124,8 @@ def process_supply_for_key_minerals(data: pr.ExcelFile) -> Table:
     _tb_2 = _prepare_sub_table(tb[tb.columns[column_position + 1 :]])
     tb = pr.concat([_tb_1, _tb_2])
 
-    # All predictions seems to be of the "Base case" scenario.
-    tb["case"] = "base_case"
+    # All predictions correspond to the "Base case" scenario (as stated in the title).
+    tb["case"] = "Base case"
 
     # Separate minerals and technology in different columns.
     tb = transform_header_rows_into_new_column(tb=tb, header_row_name="mineral_process", normal_row_name="country")
