@@ -359,13 +359,13 @@ tables:
           <% endif %>
         presentation:
           title_public: |-
-            <% if age == "total" %>
+            <% if age == "total" -%>
             Total dependency ratio
-            <% elif age == "youth" %>
+            <% elif age == "youth" -%>
             Youth dependency ratio
-            <% else %>
+            <% else -%>
             Old-age dependency ratio
-            <% endif %>, {definitions.global.dimensions.title}
+            <% endif -%>, {definitions.global.dimensions.title}
 
 
   mortality_rate:
