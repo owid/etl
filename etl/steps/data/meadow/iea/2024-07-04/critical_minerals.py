@@ -133,6 +133,7 @@ def process_supply_for_key_minerals(data: pr.ExcelFile) -> Table:
     # Separate mineral and process.
     tb["mineral"] = tb["mineral_process"].str.split(" - ").str[0]
     tb["process"] = tb["mineral_process"].str.split(" - ").str[1]
+    tb = tb.drop(columns="mineral_process")
 
     # Reformat table to have "year" and "supply" columns.
     tb = tb.melt(id_vars=["mineral", "process", "country", "case"], value_name="supply", var_name="year")
