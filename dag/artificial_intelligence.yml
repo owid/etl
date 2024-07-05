@@ -292,6 +292,7 @@ steps:
   # AI Index Report 2024 - AI strategies
   data://garden/artificial_intelligence/2024-06-28/ai_strategies:
     - snapshot://artificial_intelligence/2024-06-28/ai_strategies.csv
+    - data://garden/regions/2023-01-01/regions
   data://grapher/artificial_intelligence/2024-06-28/ai_strategies:
     - data://garden/artificial_intelligence/2024-06-28/ai_strategies
 
