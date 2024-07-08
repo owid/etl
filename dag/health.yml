@@ -703,3 +703,5 @@ steps:
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
 
+  data://meadow/gapminder/2024-07-08/maternal_mortality:
+    - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx

@@ -8,7 +8,9 @@ meta:
       Maternal Mortality is defined as a death of a woman while pregnant or within 42
       days of termination of pregnancy, irrespective of the duration and site of pregnancy, from
       any cause related or aggravated by the pregnancy or its management, but not from
-      accidental or incidental causes. Maternal mortality ratio (usually abbreviated MMR) is the number of maternal deaths during a given time period per 100,000 live births during the same time period
+      accidental or incidental causes.
+      Maternal mortality ratio (usually abbreviated MMR) is the number of maternal deaths
+      during a given time period per 100,000 live births during the same time period
     date_published: "2010-07-01"
     version_producer: V1
 
