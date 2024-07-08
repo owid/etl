@@ -10,7 +10,7 @@ Various privacy configurations are available:
 - Skip re-publishing to GitHub.
 - Disable data downloading options on Grapher.
 - Disable public access to the original file (snapshot).
-- Hide the dataset from our public catalog (accessible vua `owid-catalog-py`).
+- Hide the dataset from our public catalog (accessible via `owid-catalog-py`).
 
 In the following, we explain how to create private steps in the ETL pipeline and how to run them.
 
@@ -34,7 +34,7 @@ This will prevent the file to be publicly accessible without the appropriate cre
 
 ### Meadow, Garden, Grapher
 
-Creating a private data step means that the data is not listed in the public catalog. Also, private datasets will not be re-published to GitHub.
+Creating a private data step means that the data will not be listed in the public catalog, and therefore will not be accessible via `owid-catalog-py`. In addition, private datasets will not be re-published to GitHub.
 
 To create a private data step (meadow, garden or grapher) simply use `data-private` prefix in the step name in the DAG. For example, the step `grapher/ihme_gbd/2024-06-10/leading_causes_deaths` (this is from [health.yml](https://github.com/owid/etl/blob/master/dag/health.yml)) is private:
 
@@ -51,7 +51,7 @@ data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
 
 !!! note "Make the data non-downloadable"
 
-    To make the data non-downloadable on Grapher, set the `non_redistributable` property in the dataset metadata to `true`:
+    To make the data non-downloadable on Grapher, set the `non_redistributable` property in the dataset metadata (typically the garden metadata yaml file) to `true`:
 
     ```yaml
     dataset:
