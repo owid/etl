@@ -1,5 +1,8 @@
 """
 The file has been provided by the IGH team by email on 2024-07-04. It is not available online.
+Our main contacts are
+    - Julia Wagner, jwagner@ighomelessness.org
+    - Yamitza Yuivar, yyuivar@ighomelessness.org
 """
 
 from pathlib import Path

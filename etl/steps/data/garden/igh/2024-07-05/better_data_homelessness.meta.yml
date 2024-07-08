@@ -33,14 +33,14 @@ tables:
 
       people_homeless_per_10k:
         title: People experiencing homelessness per 10,000 people
-        unit: people
+        unit: people in homelessness per 10,000 population
         short_unit: ""
         description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
         presentation:
           title_public: People experiencing homelessness per 10,000 people
         display:
           name: People experiencing homelessness per 10,000 people
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           <<: *common_display
 
       igh_framework_category_simplified:
@@ -294,7 +294,7 @@ tables:
         title: Homeless Data Scorecard
         unit: ""
         short_unit: ""
-        description_short: The Homeless Data Scorecard is an 11-point scale that provides an assessment of the current state of a country’s enumeration and data practices on homelessness.
+        description_short: The Homeless Data Scorecard is an 11-point scale that provides an assessment of the current state of a country’s enumeration and data practices on homelessness. Higher values indicate better data on homelessness.
         description_key:
           - "Countries are given one point for each criterion satisfied under five key categories: Methodology, Timeliness, Definition, Geographic Scope, and Disaggregation."
           - These five categories are further broken down into 11 criteria, each of which is worth one point. Methodology comprises whether the methodology used to collect the homelessness data is listed by the source and whether the enumeration is from a primary data source. Timeliness includes whether the enumeration was conducted within the last four years and whether the enumeration was conducted at the same time of year or based on routinely updated data. Definition measures whether the definition of homelessness includes people without accommodation, living in emergency accommodation, and living in insecure or inadequate housing. Geographic Scope assesses whether the geographic scope of the data is listed by the source and dissagregation by region, city, or community. Disaggregation assesses whether the data is disaggregated by gender, age or two additional categories (disability status, income, race or ethnicity, migratory status, length of time homeless, and relevant health data)."
