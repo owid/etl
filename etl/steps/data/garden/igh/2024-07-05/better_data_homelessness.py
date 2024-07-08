@@ -93,39 +93,39 @@ def add_igh_framework_category_simplified(tb: Table) -> Table:
     tb.loc[
         tb["igh_framework_category"].str.contains("1"),
         "igh_framework_category_simplified",
-    ] = "People without accommodation"
+    ] = "No accommodation"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("2"),
         "igh_framework_category_simplified",
-    ] = "People living in temporary or crisis accommodation"
+    ] = "Temporary and crisis accommodation"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("3"),
         "igh_framework_category_simplified",
-    ] = "People living in severely inadequate and insecure accommodation"
+    ] = "Severely inadequate accommodation"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("1") & tb["igh_framework_category"].str.contains("2"),
         "igh_framework_category_simplified",
-    ] = "No or in temporary accommodation"
+    ] = "None or temporary"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("1") & tb["igh_framework_category"].str.contains("3"),
         "igh_framework_category_simplified",
-    ] = "No or in inadequate accommodation"
+    ] = "None or inadequate"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("2") & tb["igh_framework_category"].str.contains("3"),
         "igh_framework_category_simplified",
-    ] = "In temporary or inadequate accommodation"
+    ] = "Temporary or inadequate"
 
     tb.loc[
         tb["igh_framework_category"].str.contains("1")
         & tb["igh_framework_category"].str.contains("2")
         & tb["igh_framework_category"].str.contains("3"),
         "igh_framework_category_simplified",
-    ] = "No or in temporary or inadequate accommodation"
+    ] = "None, temporary or inadequate"
 
     # Rename category, from "Definition does not align or provide enough detail for IGH Framework classification." to "Not enough information"
     tb.loc[

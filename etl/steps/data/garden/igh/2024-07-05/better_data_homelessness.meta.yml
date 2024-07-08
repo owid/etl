@@ -49,7 +49,7 @@ tables:
         short_unit: ""
         description_short: The category of the IGH Framework that the homelessness data falls under.
         description_key:
-          - The IGH Global Framework captures three broad categories of people who may be considered homeless, defined as "lacking access to minimally adequate housing". These categories are (1) People without accommodation, (2) People living in temporary or crisis accommodation, and (3) People living in severely inadequate or insecure accommodation.
+          - The [IGH Global Framework](https://ighomelessness.org/wp-content/uploads/2019/10/globalframeworkforundertanding.pdf) captures three broad categories of people who may be considered homeless, defined as "lacking access to minimally adequate housing". These categories are (1) People without accommodation, (2) People living in temporary or crisis accommodation, and (3) People living in severely inadequate or insecure accommodation.
           - Among the first category, people without accommodation, the IGH Framework distinguishes (1A) People sleeping in the streets or in other open spaces, (1B) People sleeping in public roofed spaces or buidlings not intended for human habitation, (1C) People sleeping in their cars, rickshaws, open fishing boats and other forms of transport, and (1D) "Pavement dwellers" - individuals or households who live on the street in a regular spot, usually with some form of makeshift cover.
           - Among the second category, people living in temporary or crisis accommodation, the IGH Framework distinguishes (2A) People staying in night shelters, (2B) People living in homeless hostels and other types of temporary accommodation, (2C) Women and children living in refuges for those fleeing domestic violence, (2D) People living in camps provided for "internally displaced people", and (2E) People living in camps or reception centres/temporary accommodation for asylum seekers, refugees and other immigrants.
           - Among the third category, people living in severely inadequate or insecure accommodation, the IGH Framework distinguishes (3A) People sharing with friends and relatives on a temporary basis, (3B) People living under threat of violence, (3C) People living in cheap hotels, bed and breakfasts and similar, (3D) People squatting in conventional housing, (3E) People living in conventional housing that is unfit for human habitation, (3F) People living in trailers, caravans and tents, (3G) People living in extremely overcrowded conditions, and (3H) People living in non-conventional buildings and temporary structures, including those living in slums/informal settlements.
@@ -58,13 +58,13 @@ tables:
         description_processing: |-
           We have simplified the original version of the IGH Framework Category in order to make the metric more clear in a chart. Regardless of the subcategories, we classify the homelessness data into these categories:
 
-          - "People without accommodation" refers to mentions to the category 1 of the IGH Framework.
-          - "People living in temporary or crisis accommodation" refers to mentions to the category 2 of the IGH Framework.
-          - "People living in severely inadequate and insecure accommodation" refers to mentions to the category 3 of the IGH Framework.
-          - "No or in temporary accommodation" refers to mentions to the categories 1 and 2 of the IGH Framework.
-          - "No or in inadequate accommodation" refers to mentions to the categories 1 and 3 of the IGH Framework.
-          - "In temporary or inadequate accommodation" refers to mentions to the categories 2 and 3 of the IGH Framework.
-          - "No or in temporary or inadequate accommodation" refers to mentions to the categories 1, 2 and 3 of the IGH Framework.
+          - "No accommodation" refers to mentions to the category 1 of the IGH Framework.
+          - "Temporary and crisis accommodation" refers to mentions to the category 2 of the IGH Framework.
+          - "Severely inadequate accommodation" refers to mentions to the category 3 of the IGH Framework.
+          - "None or temporary" refers to mentions to the categories 1 and 2 of the IGH Framework.
+          - "None or inadequate" refers to mentions to the categories 1 and 3 of the IGH Framework.
+          - "Temporary or inadequate" refers to mentions to the categories 2 and 3 of the IGH Framework.
+          - "None, temporary or inadequate" refers to mentions to the categories 1, 2 and 3 of the IGH Framework.
           - "Not enough information" refers to the cases where the definition does not align or provide enough detail for IGH Framework classification.
         presentation:
           title_public: IGH Framework Category
@@ -74,13 +74,13 @@ tables:
           <<: *common_display
         type: ordinal
         sort:
-          - "People without accommodation"
-          - "People living in temporary or crisis accommodation"
-          - "People living in severely inadequate and insecure accommodation"
-          - "No or in temporary accommodation"
-          - "No or in inadequate accommodation"
-          - "In temporary or inadequate accommodation"
-          - "No or in temporary or inadequate accommodation"
+          - "No accommodation"
+          - "Temporary and crisis accommodation"
+          - "Severely inadequate accommodation"
+          - "None or temporary"
+          - "None or inadequate"
+          - "Temporary or inadequate"
+          - "None, temporary or inadequate"
           - "Not enough information"
 
       methodology:
