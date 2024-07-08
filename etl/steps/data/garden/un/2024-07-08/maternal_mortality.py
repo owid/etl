@@ -7,6 +7,20 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+DATA_COLS = [
+    "births",
+    "hiv_related_indirect_maternal_deaths",
+    "hiv_related_indirect_mmr",
+    "hiv_related_indirect_percentage",
+    "lifetime_risk",
+    "lifetime_risk_1_in",
+    "maternal_deaths",
+    "mmr",
+    "mmr_rate",
+    "pm",
+]
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -17,12 +31,24 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["maternal_mortality"].reset_index()
 
+    # drop rows where parameter is mmr_mean or pm_mean
+    tb = tb[~tb["parameter"].str.contains("mean")]
+    # drop uncertainty intervals (thresholds 10% and 90%)
+    tb = tb.drop(columns=["_0_1", "_0_9"])
+
+    tb = tb.pivot_table(index=["country", "year"], columns=["parameter"], values="_0_5").reset_index()
+
     #
     # Process data.
     #
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    # Add origins to columns.
+    tb = add_origins(tb, DATA_COLS)
+    tb = tb.rename(columns={"mmr_rate": "mm_rate"})
+
     tb = tb.format(["country", "year"])
 
     #
@@ -35,3 +61,9 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_origins(tb, cols):
+    for col in cols:
+        tb[col] = tb[col].copy_metadata(tb["country"])
+    return tb
