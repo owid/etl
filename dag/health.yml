@@ -705,3 +705,5 @@ steps:
 
   data://meadow/gapminder/2024-07-08/maternal_mortality:
     - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx
+  data://garden/gapminder/2024-07-08/maternal_mortality:
+    - data://meadow/gapminder/2024-07-08/maternal_mortality

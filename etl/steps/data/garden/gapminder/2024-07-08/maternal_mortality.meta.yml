@@ -1,0 +1,68 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Maternal Mortality
+        - Causes of Death
+    description_processing: |-
+      Where a data point is attached to a range of years in the original data set, we used the midpoint of the range.
+
+dataset:
+  update_period_days: 9999 #last update was 2010, no further update planned
+
+
+tables:
+  maternal_mortality:
+    variables:
+      mmr:
+        title: Maternal mortality ratio
+        description_short: |-
+          The maternal mortality ratio (MMR) is the number of maternal deaths per 100,000 live births.
+        unit: deaths per 100k live births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      live_births:
+        title: Live births
+        description_short: The number of live births in a given year.
+        unit: births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      maternal_deaths:
+        title: Maternal deaths
+        description_short: The number of maternal deaths in a given year.
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          Maternal deaths are defined as a death of a woman while pregnant or within 42
+          days of termination of pregnancy, irrespective of the duration and site of pregnancy, from
+          any cause related or aggravated by the pregnancy or its management, but not from
+          accidental or incidental causes.
+      number_of_women_between_15_49_years:
+        title: Number of women of reproductive age (15-49 years)
+        description_short: The number of women and girls aged 15-49 years in a given year.
+        unit: women
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      mm_rate:
+        title: Maternal mortality rate
+        description_short: |-
+          The maternal mortality rate is the number of maternal deaths
+          per 100,000 women of reproductive age (15-49 years).
+        unit: deaths per 100k women
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      skilled_attendance_pct:
+        title: Skilled personnel attendance at birth (%)
+        description_short: |-
+          The percentage of births attended by skilled health personnel.
+        unit: percentage
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+
