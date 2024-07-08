@@ -516,7 +516,7 @@ def _modified_data_metadata_by_admin(
     from chart_dimensions as cd
     join variables as v on cd.variableId = v.id
     join datasets as d on v.datasetId = d.id
-    where v.dataChecksum is not null and
+    where v.dataChecksum is not null and v.metadataChecksum is not null and
     """
     # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
     #   set automatically if you use STAGING env variable.
