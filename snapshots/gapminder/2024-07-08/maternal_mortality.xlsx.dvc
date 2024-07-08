@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Maternal mortality ratio
+    description: |-
+      Maternal Mortality is defined as a death of a woman while pregnant or within 42
+      days of termination of pregnancy, irrespective of the duration and site of pregnancy, from
+      any cause related or aggravated by the pregnancy or its management, but not from
+      accidental or incidental causes. Maternal mortality ratio (usually abbreviated MMR) is the number of maternal deaths during a given time period per 100,000 live births during the same time period
+    date_published: "2010-07-01"
+    version_producer: V1
+
+    # Citation
+    producer: Gapminder
+    citation_full: |-
+      Based on free material from GAPMINDER.ORG (https://www.gapminder.org/data/documentation/gd010/), CC-BY LICENSE
+    attribution_short: Gapminder
+
+    # Files
+    url_main: https://www.gapminder.org/data/documentation/gd010/
+    url_download: https://www.gapminder.org/documentation/documentation/gapdata010.xls
+    date_accessed: 2024-07-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.gapminder.org/free-material/
+
+outs:
+  - md5: de6a4bd6f9136a9c8432592c0204d56a
+    size: 287744
+    path: maternal_mortality.xlsx
