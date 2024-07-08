@@ -176,3 +176,9 @@ steps:
     - data://meadow/wb/2024-06-26/poverty_projections
   data://grapher/wb/2024-06-26/poverty_projections:
     - data://garden/wb/2024-06-26/poverty_projections
+
+  # Altimir (1986) - Income distribution estimates in Argentina (1953-1980)
+  data://meadow/chartbook/2024-03-21/altimir_1986:
+    - snapshot://chartbook/2024-03-21/altimir_1986.csv
+  data://garden/chartbook/2024-03-21/altimir_1986:
+    - data://meadow/chartbook/2024-03-21/altimir_1986
