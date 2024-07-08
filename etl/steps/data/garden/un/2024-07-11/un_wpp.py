@@ -181,8 +181,8 @@ def process_population_sex_ratio(tb: Table, tb_density: Table, tb_doubling: Tabl
     tb_sex = add_sex_ratio_all(tb_sex, tb)
 
     # Harmonize country names
-    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
-    tb_sex = geo.harmonize_countries(tb_sex, countries_file=paths.country_mapping_path)
+    tb = harmonize_country_names(tb)
+    tb_sex = harmonize_country_names(tb_sex)
 
     # Harmonize dimensions
     tb = harmonize_dimension(
@@ -472,7 +472,7 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     tb = tb.drop(columns="location_type")
 
     # Harmonize country names
-    tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+    tb = harmonize_country_names(tb)
 
     # Harmonize dimensions
     tb = harmonize_dimension(
@@ -654,4 +654,13 @@ def harmonize_dimension(tb: Table, column_name: str, mapping: Dict[str, str], st
     # Replace values in column_name
     tb[column_name] = tb[column_name].replace(mapping)
 
+    return tb
+
+
+def harmonize_country_names(tb: Table):
+    tb = geo.harmonize_countries(
+        tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+    )
     return tb
