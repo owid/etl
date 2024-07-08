@@ -26,15 +26,6 @@ Therefore, the strategy should be:
 * Add the other uses of graphite from sheet 1 to the demand table (EV and battery storage).
 * Add "Other uses" from sheet 1 to the demand table.
 * Sanity check that the totals from the resulting demand table coincides with the totals from sheet 1.
-Then, in the metadata:
-* Add the notes extracted from the total demand sheet:
-  - Lithium demand is in lithium (Li) content, not carbonate equivalent (LCE).
-  - Demand for magnet rare earth elements covers praseodymium (Pr), neodymium (Nd), terbium (Tb) and dysprosium (Dy).
-  - Graphite demand  includes all grades of mined and synthetic graphite.
-* Add the notes extracted from the supply sheet:
-  - Supply projections for the key energy transition minerals are built using the data for the pipeline of operating and announced mining and refining projects by country.
-* Add general note:
-# - "Base case" is assessed through their probability of coming online based on various factors such as the status of financing, permitting and feasibility studies.
 
 """
 

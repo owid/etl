@@ -216,5 +216,5 @@ steps:
   #
   # IEA - Critical minerals.
   #
-  data://grapher/iea/2024-07-04/critical_minerals:
+  data://grapher/iea/2024-07-04/critical_minerals_supply:
     - data://garden/iea/2024-07-04/critical_minerals

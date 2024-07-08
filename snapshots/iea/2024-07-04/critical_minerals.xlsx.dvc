@@ -12,7 +12,7 @@ meta:
     # Citation
     producer: International Energy Agency
     citation_full: |-
-      International Energy Agency - Critical Minerals Dataset (2024).
+      International Energy Agency (2024), Critical Minerals Data Explorer, IEA, Paris https://www.iea.org/data-and-statistics/data-tools/critical-minerals-data-explorer
     attribution_short: IEA
 
     # Files
