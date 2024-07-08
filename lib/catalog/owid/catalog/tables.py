@@ -595,28 +595,6 @@ class Table(pd.DataFrame):
         return super().astype(*args, **kwargs)  # type: ignore
 
     @overload
-    def __getitem__(
-        self,
-        item: Union[
-            "Table",
-            pd.DataFrame,
-            variables.Variable,
-            pd.Series,
-            List[str | Literal[Any]],
-            Tuple[str | Literal[Any]],
-            ...,
-        ],
-    ) -> "Table":
-        ...
-
-    @overload
-    def __getitem__(self, item: str) -> "variables.Variable":
-        ...
-
-    def __getitem__(self, item: Any) -> Union["Table", "variables.Variable"]:
-        return super().__getitem__(item)
-
-    @overload
     def drop_duplicates(self, *args, **kwargs) -> "Table":
         ...
 
