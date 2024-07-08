@@ -434,6 +434,8 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
     def _show_df(df, tab_name):
         if "**(0)**" not in tab_name:
             st.dataframe(df)
+        else:
+            st.empty()
 
     if tab_names:
         tabs = st.tabs(tab_names)
