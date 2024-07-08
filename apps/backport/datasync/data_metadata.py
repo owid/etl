@@ -428,9 +428,6 @@ def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str
     for origin in meta_.get("origins", []):
         origin.pop("id", None)
 
-    # Drop dimensions to make it faster. It is captured in `dataChecksum` anyway
-    meta_.pop("dimensions", None)
-
     # Ignore updatedAt timestamps
     meta_.pop("updatedAt", None)
 
