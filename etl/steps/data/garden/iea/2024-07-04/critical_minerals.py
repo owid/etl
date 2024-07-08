@@ -348,6 +348,10 @@ def run(dest_dir: str) -> None:
     # Sanity checks.
     run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
 
+    # Convert units from kilotonnes to tonnes.
+    tb_demand["demand"] *= 1000
+    tb_supply["supply"] *= 1000
+
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
     tb_demand = tb_demand.format(["case", "scenario", "technology", "mineral", "year"])
