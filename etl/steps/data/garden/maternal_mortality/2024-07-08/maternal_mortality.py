@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     tb_un["mmr"] = tb_un.apply(lambda x: calc_mmr(x), axis=1)
 
     # join the two tables
-    tb = tb_un.merge(tb_gm, how="outer", on=["country", "year"], suffixes=("_gm", "_un"))
+    tb = tb_un.merge(tb_gm, how="outer", on=["country", "year"], suffixes=("_un", "_gm"))
 
     # combine rows, using UN data where available
     tb["maternal_deaths"] = tb["maternal_deaths_un"].combine_first(tb["maternal_deaths_gm"])

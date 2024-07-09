@@ -714,6 +714,9 @@ steps:
     - snapshot://un/2024-07-08/maternal_mortality.zip
   data://garden/un/2024-07-08/maternal_mortality:
     - data://meadow/un/2024-07-08/maternal_mortality
+  data://grapher/un/2024-07-08/maternal_mortality:
+    - data://garden/un/2024-07-08/maternal_mortality
+
 
   # Maternal Mortality long run data set (Gapminder and UN)
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
@@ -721,3 +724,5 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
+  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/maternal_mortality/2024-07-08/maternal_mortality

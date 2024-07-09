@@ -100,4 +100,11 @@ tables:
           numDecimalPlaces: 1
         description_from_producer: |-
           - "{definitions.description_hiv}"
+      maternal_deaths:
+        title: Estimated maternal deaths
+        description_short: The estimated number of maternal deaths in a given year.
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
 

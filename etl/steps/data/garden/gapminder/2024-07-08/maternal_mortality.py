@@ -26,9 +26,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"women_reproductive_age__15_49": "number_of_women_between_15_49_years"})
 
     # harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb.format(["country", "year"])
 
