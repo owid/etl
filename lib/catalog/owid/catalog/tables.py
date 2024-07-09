@@ -166,18 +166,18 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to save to: {path}")
 
     @classmethod
-    def read(cls, path: Union[str, Path]) -> "Table":
+    def read(cls, path: Union[str, Path], **kwargs) -> "Table":
         if isinstance(path, Path):
             path = path.as_posix()
 
         if path.endswith(".csv"):
-            table = cls.read_csv(path)
+            table = cls.read_csv(path, **kwargs)
 
         elif path.endswith(".feather"):
-            table = cls.read_feather(path)
+            table = cls.read_feather(path, **kwargs)
 
         elif path.endswith(".parquet"):
-            table = cls.read_parquet(path)
+            table = cls.read_parquet(path, **kwargs)
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
@@ -293,7 +293,7 @@ class Table(pd.DataFrame):
             json.dump(metadata, ostream, indent=2, default=str)
 
     @classmethod
-    def read_csv(cls, path: Union[str, Path]) -> "Table":
+    def read_csv(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from csv plus accompanying JSON sidecar.
         """
@@ -303,21 +303,9 @@ class Table(pd.DataFrame):
         if not path.endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
-        # load the data
+        # load the data and add metadata
         df = Table(pd.read_csv(path, index_col=False, na_values=[""], keep_default_na=False))
-
-        # load the metadata
-        metadata = cls._read_metadata(path)
-
-        primary_key = metadata.pop("primary_key") if "primary_key" in metadata else []
-        fields = metadata.pop("fields") if "fields" in metadata else {}
-
-        df.metadata = TableMeta(**metadata)
-        df._fields = defaultdict(VariableMeta, {k: VariableMeta.from_dict(v) for k, v in fields.items()})
-
-        if primary_key:
-            df.set_index(primary_key, inplace=True)
-
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     def update_metadata(self, **kwargs) -> "Table":
@@ -328,11 +316,12 @@ class Table(pd.DataFrame):
         return self
 
     @classmethod
-    def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
+    def _add_metadata(cls, df: pd.DataFrame, path: str, primary_key: Optional[list[str]] = None) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
         metadata = cls._read_metadata(path)
 
-        primary_key = metadata.get("primary_key", [])
+        if primary_key is None:
+            primary_key = metadata.get("primary_key", [])
         fields = metadata.pop("fields") if "fields" in metadata else {}
 
         df.metadata = TableMeta.from_dict(metadata)
@@ -343,7 +332,7 @@ class Table(pd.DataFrame):
             df.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: Union[str, Path]) -> "Table":
+    def read_feather(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from feather plus accompanying JSON sidecar.
 
@@ -357,11 +346,11 @@ class Table(pd.DataFrame):
 
         # load the data and add metadata
         df = Table(pd.read_feather(path))
-        cls._add_metadata(df, path)
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     @classmethod
-    def read_parquet(cls, path: Union[str, Path]) -> "Table":
+    def read_parquet(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from a parquet file plus accompanying JSON sidecar.
 
@@ -375,7 +364,7 @@ class Table(pd.DataFrame):
 
         # load the data and add metadata
         df = Table(pd.read_parquet(path))
-        cls._add_metadata(df, path)
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     def _get_fields_as_dict(self) -> Dict[str, Any]:
