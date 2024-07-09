@@ -149,7 +149,7 @@ def cli(
                     continue
 
                 # Map variable IDs from source to target
-                diff.source_chart = diff.source_chart.migrate_to_db(source_session, target_session)
+                migrated_chart = diff.source_chart.migrate_to_db(source_session, target_session)
 
                 # Chart in target exists, update it
                 if diff.target_chart:
@@ -168,7 +168,7 @@ def cli(
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
                         if not dry_run:
-                            target_api.update_chart(chart_id, diff.source_chart.config)
+                            target_api.update_chart(chart_id, migrated_chart.config)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
@@ -196,13 +196,13 @@ def cli(
                     if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
-                            resp = target_api.create_chart(diff.source_chart.config)
+                            resp = target_api.create_chart(migrated_chart.config)
                             target_api.set_tags(resp["chartId"], chart_tags)
                         else:
                             resp = {"chartId": None}
                         log.info(
                             "chart_sync.create_chart",
-                            published=diff.source_chart.config.get("isPublished"),
+                            published=migrated_chart.config.get("isPublished"),
                             slug=chart_slug,
                             new_chart_id=resp["chartId"],
                         )
