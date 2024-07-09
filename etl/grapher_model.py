@@ -408,6 +408,7 @@ class Chart(Base):
 
     def tags(self, session: Session) -> List[Dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
+        assert self.id, "Chart must come from a database"
         q = text(
             """
         select

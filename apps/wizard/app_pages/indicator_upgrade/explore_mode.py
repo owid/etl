@@ -420,25 +420,29 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
     # Get missing datapoints
     df_missing = df_show.loc[df_show["NEW"].isna(), COLUMNS_INDEX + ["OLD"]]
 
-    tab_names = []
-    if len(df_changes) > 0:
-        tab_names.append(f"Datapoint changes **({len(df_changes)})**")
-    if len(df_new) > 0:
-        tab_names.append(f"New datapoints **({len(df_new)})**")
-    if len(df_missing) > 0:
-        tab_names.append(f"Missing datapoints **({len(df_missing)})** ")
+    dfs = [
+        df_changes,
+        df_new,
+        df_missing,
+    ]
+    tab_names = [
+        f"Datapoint changes **({len(df_changes)})**",
+        f"New datapoints **({len(df_new)})**",
+        f"Missing datapoints **({len(df_missing)})**",
+    ]
+
+    def _show_df(df, tab_name):
+        if "**(0)**" not in tab_name:
+            st.dataframe(df)
+        else:
+            st.empty()
 
     if tab_names:
         tabs = st.tabs(tab_names)
 
-        for tab, tab_name in zip(tabs, tab_names):
+        for tab, tab_name, df in zip(tabs, tab_names, dfs):
             with tab:
-                if "Datapoint changes" in tab_name:
-                    st.dataframe(df_changes)
-                elif "New datapoints" in tab_name:
-                    st.dataframe(df_new)
-                elif "Missing datapoints" in tab_name:
-                    st.dataframe(df_missing)
+                _show_df(df, tab_name)
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
