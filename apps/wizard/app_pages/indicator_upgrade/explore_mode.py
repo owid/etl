@@ -61,6 +61,10 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
 
     # Show indicator names
     # st_show_indicator_names(name_old, name_new)
+    # st.markdown(f":blue-background[Mapping: {indicator_old} → {indicator_new}]")
+    with st.container(border=False):
+        st.markdown(f":red-background[- {name_old}]")
+        st.markdown(f":green-background[+ {name_new}]")
 
     # Check if there is any change
     num_changes = (df_indicators[indicator_old] != df_indicators[indicator_new]).sum()
