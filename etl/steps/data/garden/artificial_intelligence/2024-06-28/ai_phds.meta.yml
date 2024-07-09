@@ -23,27 +23,27 @@ tables:
   ai_phds:
     variables:
       academia:
-        title: AI PhDs employed in academia
-        unit: 'PhD students'
+        title: AI PhD graduates employed in academia
+        unit: 'PhD graduates'
         short_unit: ''
         description_short: |-
           {definitions.description_short_sector}
 
       government:
-        title: AI PhDs employed in government
-        unit: 'PhD students'
+        title: AI PhD graduates employed in government
+        unit: 'PhD graduates'
         short_unit: ''
         description_short: |-
           {definitions.description_short_sector}
       industry:
-        title: AI PhDs employed in industry
-        unit: 'PhD students'
+        title: AI PhD graduates employed in industry
+        unit: 'PhD graduates'
         short_unit: ''
         description_short: |-
           {definitions.description_short_sector}
       total:
-        title: Total AI PhDs
-        unit: 'PhD students'
+        title: Total AI PhD graduates
+        unit: 'PhD graduates'
         short_unit: ''
         description_short: |-
           {definitions.description_short_sector}
@@ -53,15 +53,21 @@ tables:
         short_unit: '%'
         description_short: |-
           {definitions.description_short_gender}
+        display:
+          numDecimalPlaces: 1
       male:
         title: Share of men among new computer science PhDs, United States and Canada
         unit: '%'
         short_unit: '%'
         description_short: |-
           {definitions.description_short_gender}
+        display:
+            numDecimalPlaces: 1
       nonbinary_other:
-        title: Share of as "other/non-binary" among new computer science PhDs, United States and Canada
+        title: Share identifying as "other/non-binary" among new computer science PhDs, United States and Canada
         unit: '%'
         short_unit: '%'
         description_short: |-
           {definitions.description_short_gender}
+        display:
+              numDecimalPlaces: 1
