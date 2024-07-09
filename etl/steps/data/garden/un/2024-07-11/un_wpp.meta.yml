@@ -2,7 +2,7 @@ definitions:
   global:
     projections:
       <%- if variant != 'estimates' %>
-        Projections from 2024 onwards are based on the UN's << variant >>-fertility scenario.
+        Projections from 2024 onwards are based on the UN's << variant >> scenario.
       <%- endif %>
     dimensions:
       title: |-
