@@ -257,6 +257,8 @@ tables:
         unit: years
         description_short: |-
           Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
+        display:
+          numDecimalPlaces: 2
         presentation:
           title_public: |-
             Median age, {definitions.global.dimensions.title}
