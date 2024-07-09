@@ -703,11 +703,21 @@ steps:
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
 
+  # Gapminder Maternal Mortality (long run dataset)
   data://meadow/gapminder/2024-07-08/maternal_mortality:
     - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx
   data://garden/gapminder/2024-07-08/maternal_mortality:
     - data://meadow/gapminder/2024-07-08/maternal_mortality
+
+  # UN MMEIG Maternal Mortality (1985-2020)
   data://meadow/un/2024-07-08/maternal_mortality:
     - snapshot://un/2024-07-08/maternal_mortality.zip
   data://garden/un/2024-07-08/maternal_mortality:
     - data://meadow/un/2024-07-08/maternal_mortality
+
+  # Maternal Mortality long run data set (Gapminder and UN)
+  data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/gapminder/2024-07-08/maternal_mortality
+    - data://garden/un/2024-07-08/maternal_mortality
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
