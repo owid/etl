@@ -17,7 +17,7 @@ from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
-from etl import config, files
+from etl import config
 from etl.config import OWIDEnv
 from etl.db import read_sql
 
@@ -392,18 +392,6 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 def _omit_nullable_values(d: dict) -> dict:
     return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}
-
-
-def checksum_data_str(var_data_str: str) -> str:
-    return files.checksum_str(var_data_str)
-
-
-def checksum_metadata(meta: Dict[str, Any]) -> str:
-    """Calculate checksum for metadata. It modifies the metadata dict!"""
-    # Drop fields not needed for checksum computation
-    meta = filter_out_fields_in_metadata_for_checksum(meta)
-
-    return files.checksum_str(json.dumps(meta, default=str))
 
 
 def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:

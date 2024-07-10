@@ -1,5 +1,7 @@
 import datetime as dt
+import hashlib
 import re
+from dataclasses import fields, is_dataclass
 from pathlib import Path
 from typing import Any, Optional, TypeVar, Union, overload
 
@@ -200,3 +202,28 @@ def dynamic_yaml_to_dict(yd: Any) -> dict:
     """Convert dynamic yaml to dict. Using dynamic yaml can cause problems when you
     try to run e.g. Origin(**yd). It's safer to run Origin(**dynamic_yaml_to_dict(yd)) instead."""
     return yaml.safe_load(dynamic_yaml.dump(yd))
+
+
+def hash_any(x: Any) -> int:
+    """Return unique deterministic hash for an arbitrary object. This is useful if you can't make your dataclasses
+    frozen but still want to use operations such as `set` or `unique`.
+
+    The problem with using `hash` function directly is that Python uses random hash seed (PYTHONHASHSEED) for
+    security reasons. So the hash of the same object can be different in different runs for strings. This is
+    why we use md5 hash for strings.
+    """
+    if is_dataclass(x):
+        return hash(
+            tuple([(hash_any(f.name), hash_any(getattr(x, f.name))) for f in sorted(fields(x), key=lambda f: f.name)])
+        )
+    elif isinstance(x, list):
+        return hash(tuple([hash_any(y) for y in x]))
+    elif isinstance(x, dict):
+        return hash(tuple([(hash_any(k), hash_any(v)) for k, v in sorted(x.items())]))
+    elif isinstance(x, str):
+        # get md5 of the string and truncate to 64 bits
+        return int(hashlib.md5(x.encode()).hexdigest(), 16) & ((1 << 64) - 1)
+    elif x is None:
+        return 0
+    else:
+        return hash(x)

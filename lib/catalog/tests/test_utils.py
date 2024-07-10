@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
-from owid.catalog.utils import underscore
+from owid.catalog.utils import hash_any, underscore
 
 
 def test_underscore():
@@ -149,3 +149,14 @@ def test_pruned_json():
         "origins": [{"producer": "Producer", "title": "Title"}],
         "presentation": {"title_public": "Title public"},
     }
+
+
+def test_hash_any():
+    assert hash_any("abc") == 15462616177412505458
+    assert hash_any(123) == 123
+    assert hash_any({"a": [1, 2, 3]}) == 2363935703804446291
+    meta = VariableMeta(
+        origins=[Origin(title="Title", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert hash_any(meta) == -9144178991352262819

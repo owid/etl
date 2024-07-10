@@ -53,24 +53,6 @@ class RuntimeCache:
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
 
-TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
-DEFAULT_CHUNK_SIZE = 512
-
-
-def istextblock(block: bytes) -> bool:
-    if not block:
-        # An empty file is considered a valid text file
-        return True
-
-    if b"\x00" in block:
-        # Files with null bytes are binary
-        return False
-
-    # Use translate's 'deletechars' argument to efficiently remove all
-    # occurrences of TEXT_CHARS from the block
-    nontext = block.translate(None, TEXT_CHARS)
-    return float(len(nontext)) / len(block) <= 0.30
-
 
 def checksum_str(s: str) -> str:
     "Return the md5 hex digest of the string."
