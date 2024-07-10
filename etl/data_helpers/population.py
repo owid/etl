@@ -71,7 +71,7 @@ def add_population(
         log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
         # Load granular population dataset
         ds_un_wpp = Dataset(ds_un_wpp_path)
-    pop = ds_un_wpp.read_table("population_granular", primary_key=[])  # type: ignore
+    pop = ds_un_wpp.read_table("population_granular")  # type: ignore
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
     # Keep only metric='population'

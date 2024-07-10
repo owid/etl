@@ -144,20 +144,19 @@ class Dataset:
             table_filename = join(self.path, table.metadata.checked_name + f".{format}")
             table.to(table_filename, repack=repack)
 
-    def read_table(self, name: str, primary_key: Optional[list[str]] = None) -> tables.Table:
+    def read_table(self, name: str, reset_index: bool = True) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
 
-        :param primary_key: Set primary keys of the table. If not set, it will be read from the metadata.
-            Setting primary keys can be very slow for large datasets, so make sure to set it to primary_key=[]
-            instead of using ds[table].reset_index()
+        :param reset_index: If true, don't set primary keys of the table. This can make loading
+            large datasets with multi-indexes much faster.
         """
         stem = self.path / Path(name)
 
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                t = tables.Table.read(path, primary_key=primary_key)
+                t = tables.Table.read(path, primary_key=[] if reset_index else None)
                 # dataset metadata might have been updated, refresh it
                 t.metadata.dataset = self.metadata
                 return t
@@ -165,7 +164,7 @@ class Dataset:
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
 
     def __getitem__(self, name: str) -> tables.Table:
-        return self.read_table(name)
+        return self.read_table(name, reset_index=False)
 
     def __contains__(self, name: str) -> bool:
         return any((Path(self.path) / name).with_suffix(f".{format}").exists() for format in SUPPORTED_FORMATS)
