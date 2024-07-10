@@ -599,7 +599,7 @@ class Table(pd.DataFrame):
     def drop_duplicates(self, inplace: Literal[True], *args, **kwargs) -> None:
         ...
 
-    def drop_duplicates(self, *args, **kwargs) -> "Table":
+    def drop_duplicates(self, *args, **kwargs) -> Optional["Table"]:
         return super().drop_duplicates(*args, **kwargs)
 
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
@@ -787,7 +787,7 @@ class Table(pd.DataFrame):
 
         return t
 
-    def dropna(self, *args, **kwargs) -> "Table":
+    def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
         if tb is None:
