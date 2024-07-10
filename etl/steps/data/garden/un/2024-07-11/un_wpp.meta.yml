@@ -339,12 +339,12 @@ tables:
       dependency_ratio:
         title: |-
           <% if age == "total" %>
-          Total dependency ratio
+          Total dependency ratio - Sex: << sex >> - Variant: << variant >>
           <% elif age == "youth" %>
-          Youth dependency ratio
+          Child dependency ratio - Sex: << sex >> - Variant: << variant >>
           <% else %>
-          Old-age dependency ratio
-          <% endif %> - Sex: << sex >> - Variant: << variant >>
+          Old-age dependency ratio - Sex: << sex >> - Variant: << variant >>
+          <% endif %>
         unit: "%"
         description_short: |-
           <% if sex != "all" %>
