@@ -57,6 +57,7 @@ definitions:
       # title_variant: "{definitions.global.dimensions}"
       grapher_config:
         subtitle: "{definitions.global.projections}"
+        originUrl: "https://ourworldindata.org/population-growth"
 
 
 # this metadata file is not used in garden step, but in grapher step
@@ -287,9 +288,9 @@ tables:
         short_unit: years
         description_short: |-
           <% if sex == 'all' %>
-          <% set individuals='people' %>
+          <% set individuals='individuals' %>
           <% else %>
-          <% set individuals=sex+'s' %>
+          <% set individuals=sex+' individuals' %>
           <% endif %>
 
           <% if age == 0 %>
@@ -301,11 +302,19 @@ tables:
           title_public: |-
             Life Expectancy, {definitions.global.dimensions.title}
           grapher_config:
+            subtitle: |-
+              {tables.life_expectancy.variables.life_expectancy.description_short}
+
             note: |-
-              <% if age == 0 %>
-              Shown is the 'period life expectancy' at birth. This is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+              <% if sex == 'all' %>
+              <% set sex_name='' %>
               <% else %>
-              Shown is the 'period life expectancy' at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
+              <% set sex_name=' for ' + sex+'s' %>
+              <% endif %>
+              <%- if age == 0 -%>
+              Shown is the 'period life expectancy'<< sex_name >> at birth<< sex_name >>. This is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+              <% else %>
+              Shown is the 'period life expectancy'<< sex_name >> at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
               <%- endif %>
 
   sex_ratio:
@@ -405,10 +414,10 @@ tables:
                children who die before reaching the age of one.
               <% else %>
                newborns who die before reaching the age of 5.
-              <% endif %> {definitions.global.projections}
+              <%- endif -%> {definitions.global.projections}
             note: |-
               <% if age == '0' %>
-              This is the probability of a child born in a specific year or period dying before reaching the age of 1, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+              This is the probability of a child born in a specific year or period dying before reaching the age of one, if subject to age-specific mortality rates of that period. This is given as the share of live births.
               <% else %>
               This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
-              <% endif %> {definitions.global.projections}
+              <%- endif -%> {definitions.global.projections}
