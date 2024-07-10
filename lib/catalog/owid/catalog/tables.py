@@ -1565,6 +1565,17 @@ def read_from_dict(
     return table
 
 
+def read_from_df(
+    data: pd.DataFrame,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    table = Table(data, underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return table
+
+
 def read_json(
     path_or_buf: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
