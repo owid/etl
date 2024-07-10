@@ -544,3 +544,18 @@ def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, in
                 "new": st.column_config.LineChartColumn("New"),
             },
         )
+
+        # Get value max
+        # y_max = max(df_countries["old"].max(), df_countries["new"].max())
+        # y_min = max(df_countries["old"].min(), df_countries["new"].min())
+        # Pivot
+        # melted_df = df_countries.melt(id_vars=["Country"], var_name="type", value_name="value")
+        # reshaped_df = melted_df.pivot(index="type", columns="Country", values="value")  # .reset_index()
+        # reshaped_df.index.name = None
+        # # Sort
+        # reshaped_df = reshaped_df.T.sort_values("Average error", ascending=False).T
+        # # Show
+        # st.dataframe(
+        #     data=reshaped_df,
+        #     column_config={k: st.column_config.LineChartColumn(str(k)) for k in reshaped_df.columns},
+        # )
