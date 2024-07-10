@@ -59,8 +59,8 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     name_old = var_id_to_display[indicator_old]
     name_new = var_id_to_display[indicator_new]
 
-    st.markdown(f"Old: `{name_old}`")
-    st.markdown(f"New: `{name_new}`")
+    # Show indicator names
+    st_show_indicator_names(name_old, name_new)
 
     # Check if there is any change
     num_changes = (df_indicators[indicator_old] != df_indicators[indicator_new]).sum()
@@ -76,7 +76,7 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
         else:
             tab_names = ["Summary"]
             if is_numeric:
-                tab_names.append("Error distribution")
+                tab_names.extend(["Error distribution", "Country overview"])
             if ((summary.num_categories_old < 10) & (summary.num_categories_new < 10)) | (not is_numeric):
                 tab_names.append("Confusion Matrix")
 
@@ -96,12 +96,38 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
                         )
                     elif tab_name == "Error distribution":
                         st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
+                    elif tab_name == "Country overview":
+                        try:
+                            st_show_country_overview(df_indicators, indicator_old, indicator_new)
+                        except Exception as e:
+                            st.error(
+                                "Couldn't show country overview. This is experimental. Please report the following error."
+                            )
+                            st.exception(e)
                     elif tab_name == "Confusion Matrix":
                         df_ = df_indicators.copy()
                         df_[indicator_old] = df_[indicator_old].fillna("None")
                         df_[indicator_new] = df_[indicator_new].fillna("None")
                         confusion_matrix = pd.crosstab(df_[indicator_old], df_[indicator_new], dropna=False)
                         st.dataframe(confusion_matrix)
+
+
+def st_show_indicator_names(name_old: str, name_new: str):
+    # df_names = (
+    #     pd.DataFrame(
+    #         {
+    #             "": ["Old", "New"],
+    #             "variableName": [name_old, name_new],
+    #         }
+    #     )
+    #     .set_index("")
+    #     .rename(columns={"variableName": "Indicator name"})
+    # )
+    # st.dataframe(df_names)
+
+    with st.container(border=False):
+        st.markdown(f":red-background[- {name_old}]")
+        st.markdown(f":green-background[+ {name_new}]")
 
 
 def st_show_tab_main(
@@ -431,9 +457,9 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
         f"Missing datapoints **({len(df_missing)})**",
     ]
 
-    def _show_df(df, tab_name):
+    def _show_df(df, tab_name, **kwargs):
         if "**(0)**" not in tab_name:
-            st.dataframe(df)
+            st.dataframe(df, **kwargs)
         else:
             st.empty()
 
@@ -442,7 +468,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
         for tab, tab_name, df in zip(tabs, tab_names, dfs):
             with tab:
-                _show_df(df, tab_name)
+                _show_df(df, tab_name, hide_index=True)
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
@@ -477,3 +503,63 @@ def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool)
         if COLUMN_LOG_ERROR in df.columns:
             fig = px.histogram(df, x=COLUMN_LOG_ERROR, nbins=100, title="Distribution of relative log error")
             st.plotly_chart(fig, use_container_width=True)
+
+
+def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, indicator_new: str):
+    """Show timeseries.
+
+    This is experimental.
+    """
+    dfg = df_indicators.groupby("entityName")
+    # Build row per country
+    df_countries = []
+    for name, df_ in dfg:
+        df_ = df_.sort_values("year").rename(
+            columns={
+                indicator_old: "Old",
+                indicator_new: "New",
+            }
+        )
+        error = df_[COLUMN_RELATIVE_ERROR].dropna()
+        error_max = error.replace([np.inf, -np.inf], np.nan).abs().max()
+        error = error.replace([np.inf], error_max)
+        error = error.replace([-np.inf], -error_max)
+
+        df_countries.append(
+            {
+                "Country": name,
+                "error": list(error),
+                "old": list(df_["Old"].dropna()),
+                "new": list(df_["New"].dropna()),
+                "Average error": df_[COLUMN_ABS_RELATIVE_ERROR].mean(),
+            }
+        )
+    df_countries = pd.DataFrame(df_countries).sort_values("Average error", ascending=False).set_index("Country")
+    df_countries = df_countries[["Average error", "error", "new", "old"]]
+
+    st.dataframe(
+        data=df_countries,
+        column_config={
+            "error": st.column_config.LineChartColumn(
+                "Error(year)", help="Difference between old and new indicator values."
+            ),
+            "old": st.column_config.LineChartColumn("Old"),
+            "new": st.column_config.LineChartColumn("New"),
+        },
+        # hide_index=True,
+    )
+
+    # Get value max
+    # y_max = max(df_countries["old"].max(), df_countries["new"].max())
+    # y_min = max(df_countries["old"].min(), df_countries["new"].min())
+    # Pivot
+    # melted_df = df_countries.melt(id_vars=["Country"], var_name="type", value_name="value")
+    # reshaped_df = melted_df.pivot(index="type", columns="Country", values="value")  # .reset_index()
+    # reshaped_df.index.name = None
+    # # Sort
+    # reshaped_df = reshaped_df.T.sort_values("Average error", ascending=False).T
+    # # Show
+    # st.dataframe(
+    #     data=reshaped_df,
+    #     column_config={k: st.column_config.LineChartColumn(str(k)) for k in reshaped_df.columns},
+    # )
