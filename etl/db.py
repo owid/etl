@@ -258,8 +258,9 @@ def get_charts_slugs(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFra
     query = """\
     SELECT
         c.id AS chart_id,
-        c.slug AS chart_slug
+        cc.config->>'$.slug' AS chart_slug
     FROM charts c
+    JOIN chart_configs cc ON c.configId = cc.id
     LEFT JOIN chart_dimensions cd ON c.id = cd.chartId
     LEFT JOIN variables v ON cd.variableId = v.id
     WHERE
@@ -365,8 +366,9 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
             JOIN variables v ON v.datasetId = d.id
             JOIN chart_dimensions cd ON cd.variableId = v.id
             JOIN charts c ON c.id = cd.chartId
+            JOIN chart_configs cc ON c.configId = cc.id
         WHERE
-            json_extract(c.config, "$.isPublished") = TRUE
+            json_extract(cc.config, "$.isPublished") = TRUE
         GROUP BY
             d.id) q2
         ON q1.datasetId = q2.datasetId

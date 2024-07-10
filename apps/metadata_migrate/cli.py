@@ -104,8 +104,11 @@ def cli(
         assert not table_name, "specify either chart-slug or table-name, not both"
 
         q = f"""
-        select config from charts
-        where slug = '{chart_slug}'
+        SELECT
+            cc.config
+        FROM charts c
+        JOIN chart_configs cc ON c.configId = cc.id
+        WHERE cc.config->>'$.slug' = '{chart_slug}';
         """
         df = read_sql(q, engine)
         if df.empty:
@@ -347,11 +350,12 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
     """TODO: This is work in progress! Update this function as you like."""
     q = f"""
     select
-        c.config
+        cc.config
     from variables as v
     join datasets as d on v.datasetId = d.id
     join chart_dimensions as cd on v.id = cd.variableId
     join charts as c on cd.chartId = c.id
+    join chart_configs as cc on c.configId = cc.id
     where
         v.shortName = '{col}' and
         d.namespace = '{ds_meta.namespace}' and
