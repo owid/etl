@@ -154,9 +154,6 @@ def _get_params_cached(
     else:
         df_data = None
 
-    # Set states
-    st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
-
     return iu, indicator_id_to_display, df_data
 
 
@@ -172,6 +169,9 @@ def get_params(search_form):
         search_form.similarity_function_name,
         search_form.enable_bulk_explore,
     )
+
+    # Set states
+    st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
 
     return iu, indicator_id_to_display, df_data
 
