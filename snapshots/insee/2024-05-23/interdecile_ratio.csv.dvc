@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: D9/D5 interdecile ratio for net salary in France
+    description: |-
+      D9/D5 interdecile ratio of annual net salary in full-time equivalent in the private sector - All employees.
+    date_published: "2023-12-13"
+
+    # Citation
+    producer: National Institute of Statistics and Economic Studies
+    citation_full: |-
+      INSEE (2023) Rapport interdécile D9/D5 du salaire net annuel en équivalent temps plein dans le secteur privé - Ensemble des salariés [D9/D5 interdecile ratio of annual net salary in full-time equivalent in the private sector - All employees].
+    attribution_short: INSEE
+
+    # Files
+    url_main: https://www.insee.fr/fr/statistiques/serie/010752360
+    date_accessed: 2024-05-23
+
+    # License
+    license:
+      name: Mentions légales et crédits [Legal notices and credits]
+      url: https://www.insee.fr/fr/information/2008466
+
+outs:
+  - md5: 237111f1c668f38a614f3559cf7fe03d
+    size: 715
+    path: interdecile_ratio.csv

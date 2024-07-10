@@ -1,0 +1,51 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Income distribution estimates in Argentina (1953-1980)
+    description: >-
+      This study atempts to close the gap
+      between certain analytical methods and
+      an effective use of stratified income distribution statistics.
+      It summarizes available research and discusses the level of
+      comparability and accuracy achieved by
+      the data produced. Moreover, the piece
+      reflects on tendencies in social welfare
+      distribution.
+
+
+      One of the study's relevant conclusions
+      is that in the post-1975 period one sees a
+      change, probably structural, in Argentine
+      income distribution patterns. Argentina,
+      which in the early 1970s, among the countries
+      of moderate income inequalities, had
+      the highest income participation of its
+      lowest strata, has fallen to the bottom end
+      within this grouping, or among those with
+      the least participation of the lowest income
+      sectors.
+    date_published: "1986-03-01"
+    title_snapshot: Income distribution estimates in Argentina (1953-1980) - Gini coefficients
+    description_snapshot: |-
+      This snapshot extracts the data from Table 7, Estimación de la distribución nacional de los ingresos [Estimation of the national income distribution], in the columns Distribución del ingreso de los hogares [Household income distribution]. Only Gini estimates are extracted.
+
+    # Citation
+    producer: Altimir
+    citation_full: |-
+      Altimir (1986). Estimaciones de la distribución del ingreso en la Argentina, 1953-1980 [Income distribution estimates in Argentina, 1953-1980]. Desarrollo Económico, Vol. 25, No. 100. pp. 521-566. Table 7.
+
+    # Files
+    url_main: https://www.jstor.org/stable/3466844
+    date_accessed: 2024-03-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.jstor.org/stable/3466844
+
+outs:
+  - md5: b503a1277ba73b9eafef0d1868296465
+    size: 179
+    path: altimir_1986.csv

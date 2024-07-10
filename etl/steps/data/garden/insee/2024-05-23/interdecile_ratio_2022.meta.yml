@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  interdecile_ratio_2022:
+    variables:
+      p90_p50_ratio:
+        title: P90/P50 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
+        description_key:
+          - Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.
+          - Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+        description_from_producer: Data includes people from Metropolitan France until 1999, France (mainland + overseas territories) since 2000
+        presentation:
+          title_public: P90/P50 ratio
+        display:
+          name: P90/P50 ratio
+          numDecimalPlaces: 1
+          tolerance: 5
+

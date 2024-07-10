@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Homelessness - Better Data Project
+    description: |-
+      Mapping and measuring homelessness as a global phenomenon has never been done, due in part to differing definitions of homelessness and varying methods for data collection which render side-by-side comparisons impossible. In order to showcase the difference between definitions and methodologies and to spotlight gaps in the data, the Ruff Institute of Global Homelessness's Better Data Project reviewed publicly available information from government sources, nongovernmental organizations, intergovernmental organizations, and news media reports. We found that the data varied widely from country to country, with vast differences in the quality, transparency, accuracy, and reliability of the enumeration.
+
+      We have called this experiment the Better Data Project, as we recognize that much of global homelessness data is outdated, not collected best practices, and not comparable across countries. Without standardized definitions and consistent methodologies, current measures of homelessness are incomplete, and policy-makers lack adequate and timely information about the scale of the problem. The goal of the data visualization is to demonstrate the gaps and issues of the data and where and how countries can align on definition and methodologies, improving over time.
+
+       Only then will we be able to accurately track the effectiveness of strategies that address homelessness and answer the question, “how many people are experiencing homelessness globally?”
+    date_published: "2024-07-04"
+
+    # Citation
+    producer: Institute of Global Homelessness
+    citation_full: |-
+      Institute of Global Homelessness (2024). Better Data Project Homeless Data
+    attribution_short: IGH
+
+    # Files
+    url_main: https://ighomelessness.org/global-homeless-data/
+    date_accessed: 2024-07-05
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ighomelessness.org/global-homeless-data/
+
+outs:
+  - md5: 692dc2de28f921e55cb2fd4ebfd4a6c7
+    size: 464018
+    path: better_data_homelessness.xlsx

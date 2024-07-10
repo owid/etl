@@ -49,5 +49,5 @@ STAGING=my-branch etl metadata-migrate --chart-slug my-chart-slug
 After running this, follow the terminal prompts.
 
 !!! info
-    This is only a band-aid solution. A proper solution would involve converting the entire pipeline to use origins instead of sources and it would
-    define all metadata in garden channel.
+
+    This is only a band-aid solution. A proper solution would involve converting the entire pipeline to use origins instead of sources and it would define all metadata in garden channel.

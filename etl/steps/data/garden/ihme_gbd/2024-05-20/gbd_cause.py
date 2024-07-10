@@ -57,6 +57,8 @@ def run(dest_dir: str) -> None:
     tb_deaths = add_all_forms_of_violence(tb_deaths)
     # Create a category for all infectious diseases - for Deaths only
     tb_deaths = add_infectious_diseases(tb_deaths)
+    # Aggregate all cancers which cause less than 200,000 deaths a year - for Deaths only
+    tb_deaths = add_cancer_other_aggregates(tb_deaths)
     # Format the tables
     tb_deaths = tb_deaths.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_deaths")
     tb_dalys = tb_dalys.format(["country", "year", "metric", "age", "cause"], short_name="gbd_cause_dalys")
@@ -66,11 +68,77 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_deaths, tb_dalys], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb_deaths, tb_dalys],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        # Table has optimal types already and repacking can be time consuming.
+        repack=False,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_cancer_other_aggregates(tb: Table) -> Table:
+    """
+    We want a chart showing changes in the deaths from cancer over time, but we don't want to show every single type of cancer. We'll aggregate all cancers which cause less than 200,000 deaths a year
+    """
+    cancers = [
+        "Eye cancer",
+        "Soft tissue and other extraosseous sarcomas",
+        "Malignant neoplasm of bone and articular cartilage",
+        "Neuroblastoma and other peripheral nervous cell tumors",
+        "Breast cancer",
+        "Cervical cancer",
+        "Uterine cancer",
+        "Prostate cancer",
+        "Colon and rectum cancer",
+        "Lip and oral cavity cancer",
+        "Nasopharynx cancer",
+        "Other pharynx cancer",
+        "Gallbladder and biliary tract cancer",
+        "Pancreatic cancer",
+        "Malignant skin melanoma",
+        "Non-melanoma skin cancer",
+        "Ovarian cancer",
+        "Testicular cancer",
+        "Kidney cancer",
+        "Bladder cancer",
+        "Brain and central nervous system cancer",
+        "Thyroid cancer",
+        "Mesothelioma",
+        "Hodgkin lymphoma",
+        "Non-Hodgkin lymphoma",
+        "Multiple myeloma",
+        "Leukemia",
+        "Other malignant neoplasms",
+        "Other neoplasms",
+        "Esophageal cancer",
+        "Stomach cancer",
+        "Liver cancer",
+        "Larynx cancer",
+        "Tracheal, bronchus, and lung cancer",
+    ]
+    # Cancers that are already called 'Other cancers' in the dataset, so we'll combine these in to avoid confusing labelling on the chart
+    other_cancers = ["Other malignant neoplasms", "Other neoplasms"]
+    cancers_tb = tb[
+        (tb["cause"].isin(cancers))
+        & (tb["metric"] == "Number")
+        & (tb["age"] == "All ages")
+        & (tb["country"] == "World")
+        & (tb["year"] == tb["year"].max())
+    ]
+    cancers_to_aggregate = cancers_tb[cancers_tb["value"] < 200000]["cause"].drop_duplicates().tolist()
+
+    cancers_to_aggregate = cancers_to_aggregate + other_cancers
+
+    tb_cancer = tb[(tb["cause"].isin(cancers_to_aggregate)) & (tb["metric"] == "Number")]
+    tb_cancer = tb_cancer.groupby(["country", "age", "metric", "year"], observed=True)["value"].sum().reset_index()
+    tb_cancer["cause"] = "Other cancers (OWID)"
+    tb = pr.concat([tb, tb_cancer], ignore_index=True)
+
+    return tb
 
 
 def add_all_forms_of_violence(tb: Table) -> Table:

@@ -1,6 +1,4 @@
-from typing import cast
-
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -15,7 +13,7 @@ def run(dest_dir: str) -> None:
     log.info("cherry_blossom.start")
 
     # read dataset from meadow
-    ds_meadow = cast(Dataset, paths.load_dependency("cherry_blossom"))
+    ds_meadow = paths.load_dataset("cherry_blossom")
     tb = ds_meadow["cherry_blossom"].reset_index()
 
     # Calculate a 20,40 and 50 year average

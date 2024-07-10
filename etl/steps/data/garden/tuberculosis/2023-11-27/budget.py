@@ -31,9 +31,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("budget")
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
     snap = paths.load_snapshot("data_dictionary.csv")
     # Read table from meadow dataset.
     tb = ds_meadow["budget"].reset_index()

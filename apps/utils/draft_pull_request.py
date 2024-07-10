@@ -1,11 +1,11 @@
 """This script creates a new draft pull request in GitHub, which starts a new staging server.
 
-Usage:
-- If you have already created a new local branch, run this script without specifying any argument.
-  The 'master' branch will be assumed as the base branch of the new draft pull request.
-- If you are in the master branch on your local ETL repo, pass the name of the new branch as an argument.
-  This will create a new local branch, which will be pushed to remote to create a new draft pull request.
+Usages:
+
+- If you have already created a new local branch, run this script without specifying any argument. The 'master' branch will be assumed as the base branch of the new draft pull request.
+- If you are in the master branch on your local ETL repo, pass the name of the new branch as an argument. This will create a new local branch, which will be pushed to remote to create a new draft pull request.
 - If you want the base branch to be different from 'master', specify it with the --base-branch argument.
+- Use --category, and --title to further customize the title of the PR.
 
 The resulting draft pull request will be new_branch -> base_branch.
 

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Wealth Concentration in a Developing Economy: Paris and France, 1807-1994"
+    description: |-
+      Using large samples of estate tax returns, we construct new series on wealth concentration in Paris and France from 1807 to 1994. Inequality increased until 1914 because industrial and financial estates grew dramatically. Then, adverse shocks, rather than a Kuznets-type process, led to a massive decline in inequality. The very high wealth concentration prior to 1914 benefited retired individuals living off capital income (rentiers) rather than entrepreneurs. The very rich were in their seventies and eighties, whereas they had been in their fifties a half century earlier and would be so again after World War II. Our results shed new light on ongoing debates about wealth inequality and growth.
+    date_published: "2006-03-01"
+
+    # Citation
+    producer: Piketty et al.
+    citation_full: |-
+      Piketty, Thomas, Gilles Postel-Vinay, and Jean-Laurent Rosenthal. 2006. "Wealth Concentration in a Developing Economy: Paris and France, 1807-1994." American Economic Review, 96 (1): 236-256, Table 2.
+
+    # Files
+    url_main: https://www.aeaweb.org/articles?id=10.1257/000282806776157614
+    date_accessed: 2024-05-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.aeaweb.org/articles?id=10.1257/000282806776157614
+
+outs:
+  - md5: 66e56ad3a768a60b3ea1af468da7c804
+    size: 378
+    path: wealth_france.csv

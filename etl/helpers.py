@@ -27,7 +27,7 @@ from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.datautils.common import ExceptionFromDocstring
+from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
@@ -149,6 +149,7 @@ def create_dataset(
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     errors: Literal["ignore", "warn", "raise"] = "raise",
+    repack: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -166,6 +167,7 @@ def create_dataset(
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
     :param if_origins_exist: What to do if origins already exist in the dataset metadata.
+    :param repack: Repack dataframe before adding it to the dataset.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -208,7 +210,7 @@ def create_dataset(
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
-        ds.add(table, formats=formats)
+        ds.add(table, formats=formats, repack=repack)
 
     # set metadata from dest_dir
     pattern = (
@@ -365,11 +367,11 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
     """Current step must be listed in the dag."""
 
 
-class NoMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """No steps found among dependencies of current ETL step, that match the given specifications."""
 
 
-class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """Multiple steps found among dependencies of current ETL step, that match the given specifications."""
 
 
@@ -478,6 +480,16 @@ class PathFinder:
     @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
+
+    @property
+    def step_name(self) -> str:
+        """Return step name."""
+        return self.create_step_name(
+            short_name=self.short_name,
+            channel=self.channel,  # type: ignore
+            namespace=self.namespace,
+            version=self.version,
+        )
 
     @staticmethod
     def create_step_name(
@@ -599,9 +611,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies
+            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies
+            raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
         dependency = matches[0]
 
@@ -639,9 +651,9 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+    def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
-        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name, **kwargs)
         assert isinstance(snap, Snapshot)
         return snap
 

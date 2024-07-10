@@ -580,6 +580,36 @@ def test_merge_keeps_metadata(table_1, table_2, origins) -> None:
     assert table_1.a.m.origins == [origins[1]]
 
 
+def test_merge_categoricals(table_1, table_2, origins) -> None:
+    table_1.country.m.origins = [origins[1]]
+    table_2.loc[0, "country"] = "Poland"
+
+    # both tables have different categories for "country"
+    table_1 = table_1.astype({"country": "category"})
+    table_2 = table_2.astype({"country": "category"})
+
+    tb = tables.merge(table_1, table_2, on=["country", "year"])
+
+    # categorical type and metadata are preserved despite having different categories
+    assert tb.country.dtype == "category"
+    assert tb.country.m.origins[0] == origins[1]
+
+
+def test_concat_categoricals(table_1, table_2, origins) -> None:
+    table_1.country.m.origins = [origins[1]]
+    table_2.loc[0, "country"] = "Poland"
+
+    # both tables have different categories for "country"
+    table_1 = table_1.astype({"country": "category"})
+    table_2 = table_2.astype({"country": "category"})
+
+    tb = tables.concat([table_1, table_2])
+
+    # categorical type and metadata are preserved despite having different categories
+    assert tb.country.dtype == "category"
+    assert tb.country.m.origins[0] == origins[1]
+
+
 def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> None:
     tb = tables.concat([table_1, table_2])
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
