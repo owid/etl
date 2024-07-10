@@ -4,7 +4,6 @@ import zipfile
 
 import geopandas as gpd
 import numpy as np
-import pandas as pd
 import rasterio
 from owid.catalog import Table
 from rasterio.features import geometry_mask
@@ -71,7 +70,7 @@ def run(dest_dir: str) -> None:
 
     tb = Table(results)
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "category"], short_name="dominant_driver")
+    tb = tb.format(["country", "category"], short_name=paths.short_name)
     for col in tb.columns:
         tb[col].metadata.origins = snap.metadata.origin
 
