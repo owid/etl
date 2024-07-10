@@ -592,11 +592,15 @@ class Table(pd.DataFrame):
         return super().astype(*args, **kwargs)  # type: ignore
 
     @overload
-    def drop_duplicates(self, *args, **kwargs) -> "Table":
+    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
 
     @overload
-    def drop_duplicates(self, inplace: Literal[True], *args, **kwargs) -> None:
+    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table":
+        ...
+
+    @overload
+    def drop_duplicates(self, **kwargs) -> "Table":
         ...
 
     def drop_duplicates(self, *args, **kwargs) -> Optional["Table"]:
@@ -787,6 +791,18 @@ class Table(pd.DataFrame):
 
         return t
 
+    @overload
+    def dropna(self, *, inplace: Literal[True], **kwargs) -> None:
+        ...
+
+    @overload
+    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table":
+        ...
+
+    @overload
+    def dropna(self, **kwargs) -> "Table":
+        ...
+
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
@@ -804,6 +820,9 @@ class Table(pd.DataFrame):
 
     def drop(self, *args, **kwargs) -> "Table":
         return cast(Table, super().drop(*args, **kwargs))
+
+    def filter(self, *args, **kwargs) -> "Table":
+        return super().filter(*args, **kwargs)  # type: ignore
 
     def update_log(
         self,
