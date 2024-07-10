@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
         "minority_stake": "Minority stake",
         "private_investment": "Private investment",
         "public_offering": "Public offering",
+        "total_corporate_investment": "Total",
     }
     tb = tb[list(industries.keys()) + ["year", "country"]]
 
