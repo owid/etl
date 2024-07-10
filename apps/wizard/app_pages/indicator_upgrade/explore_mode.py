@@ -60,11 +60,7 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
     name_new = var_id_to_display[indicator_new]
 
     # Show indicator names
-    # st_show_indicator_names(name_old, name_new)
-    # st.markdown(f":blue-background[Mapping: {indicator_old} → {indicator_new}]")
-    with st.container(border=False):
-        st.markdown(f":red-background[- {name_old}]")
-        st.markdown(f":green-background[+ {name_new}]")
+    st_show_indicator_names(name_old, name_new)
 
     # Check if there is any change
     num_changes = (df_indicators[indicator_old] != df_indicators[indicator_new]).sum()
@@ -111,17 +107,21 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
 
 
 def st_show_indicator_names(name_old: str, name_new: str):
-    df_names = (
-        pd.DataFrame(
-            {
-                "": ["Old", "New"],
-                "variableName": [name_old, name_new],
-            }
-        )
-        .set_index("")
-        .rename(columns={"variableName": "Indicator name"})
-    )
-    st.dataframe(df_names)
+    # df_names = (
+    #     pd.DataFrame(
+    #         {
+    #             "": ["Old", "New"],
+    #             "variableName": [name_old, name_new],
+    #         }
+    #     )
+    #     .set_index("")
+    #     .rename(columns={"variableName": "Indicator name"})
+    # )
+    # st.dataframe(df_names)
+
+    with st.container(border=False):
+        st.markdown(f":red-background[- {name_old}]")
+        st.markdown(f":green-background[+ {name_new}]")
 
 
 def st_show_tab_main(
@@ -451,9 +451,9 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
         f"Missing datapoints **({len(df_missing)})**",
     ]
 
-    def _show_df(df, tab_name):
+    def _show_df(df, tab_name, **kwargs):
         if "**(0)**" not in tab_name:
-            st.dataframe(df)
+            st.dataframe(df, **kwargs)
         else:
             st.empty()
 
@@ -462,7 +462,7 @@ def st_show_dataframe(df: pd.DataFrame, col_old: str, col_new: str) -> None:
 
         for tab, tab_name, df in zip(tabs, tab_names, dfs):
             with tab:
-                _show_df(df, tab_name)
+                _show_df(df, tab_name, hide_index=True)
 
 
 def st_show_plot(df: pd.DataFrame, col_old: str, col_new: str, is_numeric: bool) -> None:
@@ -543,4 +543,5 @@ def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, in
                 "old": st.column_config.LineChartColumn("Old"),
                 "new": st.column_config.LineChartColumn("New"),
             },
+            hide_index=True,
         )
