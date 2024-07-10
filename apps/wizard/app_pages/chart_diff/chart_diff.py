@@ -139,8 +139,8 @@ class ChartDiff:
         If slug of the chart miss-matches between target and source sessions, an error is displayed.
         """
         if self.target_chart:
-            assert self.source_chart.config["slug"] == self.target_chart.config["slug"], "Slug mismatch!"
-        return self.source_chart.config.get("slug", "no-slug")
+            assert self.source_chart.slug == self.target_chart.slug, "Slug mismatch!"
+        return self.source_chart.slug or "no-slug"
 
     @property
     def in_conflict(self) -> bool:
@@ -607,11 +607,12 @@ def _modified_chart_configs_by_admin(
     base_q = """
     select
         c.id as chartId,
-        MD5(c.config) as chartChecksum,
+        MD5(cc.config) as chartChecksum,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt
     from charts as c
+    join chart_configs as cc on c.configId = cc.id
     where
     """
     # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is

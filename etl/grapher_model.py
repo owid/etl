@@ -21,8 +21,8 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
-from sqlalchemy import JSON as _JSON
 from sqlalchemy import (
+    BINARY,
     BigInteger,
     Computed,
     Date,
@@ -32,12 +32,14 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    String,
     and_,
     func,
     or_,
     select,
     text,
 )
+from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
     ENUM,
     LONGTEXT,
@@ -46,7 +48,15 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import (  # type: ignore
+    DeclarativeBase,
+    Mapped,
+    MappedAsDataclass,
+    Session,
+    mapped_column,
+    relationship,
+)
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
@@ -224,9 +234,28 @@ class ChartRevisions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
+class ChartConfig(Base):
+    __tablename__ = "chart_configs"
+    __table_args__ = (Index("idx_chart_configs_uuid", "uuid", unique=True),)
+
+    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True)
+    patchConfig: Mapped[dict] = mapped_column(JSON)
+    config: Mapped[dict] = mapped_column(JSON)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    uuid: Mapped[Optional[str]] = mapped_column(
+        String(36, "utf8mb4_0900_as_cs"), Computed("(bin_to_uuid(`id`,1))", persisted=False)
+    )
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
+
+
 class Chart(Base):
     __tablename__ = "charts"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["configId"], ["chart_configs.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="charts_configId"
+        ),
         ForeignKeyConstraint(
             ["lastEditedByUserId"],
             ["users.id"],
@@ -243,27 +272,39 @@ class Chart(Base):
         ),
         Index("charts_lastEditedByUserId", "lastEditedByUserId"),
         Index("charts_publishedByUserId", "publishedByUserId"),
-        Index("charts_slug", "slug"),
+        Index("configId", "configId", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    config: Mapped[dict] = mapped_column(JSON)
+    configId: Mapped[bytes] = mapped_column(BINARY(16))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    slug: Mapped[str] = mapped_column(
-        VARCHAR(255), Computed("(json_unquote(json_extract(`config`,_utf8mb4'$.slug')))", persisted=False)
-    )
-    type: Mapped[Optional[str]] = mapped_column(
-        VARCHAR(255),
-        Computed(
-            "(coalesce(json_unquote(json_extract(`config`,_utf8mb4'$.type')),_utf8mb4'LineChart'))", persisted=False
-        ),
-    )
     updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss")
+
+    @hybrid_property
+    def config(self) -> dict[str, Any]:  # type: ignore
+        return self.chart_config.config
+
+    @config.expression
+    def config(cls):
+        return select(ChartConfig.config).where(ChartConfig.id == cls.configId).scalar_subquery()
+
+    @hybrid_property
+    def slug(self) -> Optional[str]:  # type: ignore
+        if self.chart_config and self.chart_config.config:
+            return self.chart_config.config.get("slug")
+        return None
+
+    @slug.expression
+    def slug(cls):
+        # NOTE: this is really slow because `slug` is in JSON and is not indexed
+        return select(ChartConfig.config["slug"]).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
     def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
