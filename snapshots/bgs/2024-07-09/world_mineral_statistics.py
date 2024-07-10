@@ -142,16 +142,36 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
     # NOTE: The following is a bit convoluted, there may be an easier approach.
     df = df_raw.copy()
     df.columns = ["_".join(col).strip() if col[1] else col[0] for col in df.columns]
-    df = df.melt(id_vars=["Country", "Sub-commodity"])
+    df = df.melt(id_vars=["Category", "Country", "Commodity", "Sub-commodity"])
     df["Year"] = df["variable"].str.split("_").str[0]
     df["note"] = df["variable"].str.split("_").str[1]
     df = df.drop(columns="variable")
     # Drop rows that have no values.
     df = df[df["value"] != ""].reset_index(drop=True)
-    # TODO: There are separate rows for the same country and sub-commodity, for example, for Imports of cobalt in Australia, Oxides, 1988 appears in one row, and all other years appear in a different row.
-    #  For now, drop duplicates. But check this issue and fix it properly.
-    df = df.drop_duplicates(subset=["Country", "Sub-commodity", "Year"], keep="last").reset_index(drop=True)
-    df = df.pivot(index=["Country", "Sub-commodity", "Year"], columns=["note"]).reset_index()
+    # There are separate rows for the same country and sub-commodity.
+    # For example, Imports of cobalt in Australia, Oxides, 1988 appears in one row, and all other years appear in a different row.
+    # Check if there are multiple rows for the same country-commodity-year-note (we include note, which can be either "Value" or "Note").
+    df_repeated = df[
+        df.duplicated(subset=["Category", "Country", "Commodity", "Sub-commodity", "Year", "note"], keep=False)
+    ]
+    if not df_repeated.empty:
+        # Check that the repeated rows have the exact same data values, in which case, simply drop them.
+        df_repeated_with_same_values = df_repeated[
+            df_repeated.duplicated(
+                subset=["Category", "Country", "Commodity", "Sub-commodity", "Year", "note", "value"], keep=False
+            )
+        ]
+        index_issues = sorted(set(df_repeated.index) - set(df_repeated_with_same_values.index))
+        if not df_repeated.equals(df_repeated_with_same_values):
+            df_issues = df.loc[index_issues]
+            log.warning(
+                f'Duplicated entries with different values on Category {set(df_issues["Category"])}, {len(df_issues["Country"].unique())} countries, Commodity {set(df_issues["Commodity"])}, and Sub-commodities: {set(df_issues["Sub-commodity"])}.'
+            )
+        # Drop duplicates.
+        df = df.drop_duplicates(
+            subset=["Category", "Country", "Commodity", "Sub-commodity", "Year", "note"], keep="last"
+        ).reset_index(drop=True)
+    df = df.pivot(index=["Category", "Country", "Commodity", "Sub-commodity", "Year"], columns=["note"]).reset_index()
     df.columns = [columns[0] if columns[0] != "value" else columns[1] for columns in df.columns]
     if "Note" not in df.columns:
         # If there were no notes in this table, there is no "Note" column in the pivoted table. Create one.
@@ -162,7 +182,9 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
 
 def process_raw_data(data: Dict[str, Any]):
     # Initialize a dataframe that will contain all the combined data.
-    df_all = pd.DataFrame(columns=["Country", "Sub-commodity", "Year", "Category", "Note", "Value", "General notes"])
+    df_all = pd.DataFrame(
+        columns=["Country", "Commodity", "Sub-commodity", "Year", "Category", "Note", "Value", "General notes"]
+    )
     # Go through all nests in the fetched data, process and add to the combined dataframe.
     for data_type in tqdm(list(data), desc="Data type"):
         for commodity in tqdm(list(data[data_type]), desc="Commodity"):
@@ -185,21 +207,37 @@ def process_raw_data(data: Dict[str, Any]):
                 # Create a raw dataframe with the data extracted from the soup.
                 df_raw = _create_raw_dataframe_from_soup(soup=soup)
 
-                # There are rows with a valid value, but with an empty Sub-commodity, e.g. Imports of cobalt in Argentina 1988. This seems to correspond to the Sub-commodity "aggregates, primary". Add a sanity check to see if it corresponds to the sum of all other.
+                # The field Sub-commodity is often empty.
+                # I assume that this is the total of that commodity.
+                # Although we will see below that sometimes there are rows with different values for the same
+                # country, commodity, sub-commodity, and year, which seems to be an issue in the dataset.
                 df_raw.loc[df_raw["Sub-commodity"] == "", "Sub-commodity"] = "Total"
+
+                # Add column for commodity.
+                df_raw["Commodity"] = commodity
+
+                # Add a column specifying the data type.
+                df_raw["Category"] = data_type
 
                 # Process dataframe.
                 df = _clean_raw_dataframe(df_raw=df_raw)
 
-                df["Note"] = [
-                    ". ".join([footnotes[note] for note in str(notes).replace("(", "").replace(")", "")]).replace(
-                        "..", "."
-                    )
+                # Map the row note symbol to its corresponding note text.
+                notes_mapped = [
+                    [footnotes.get(note, None) for note in str(notes).replace("(", "").replace(")", "")]
                     for notes in df["Note"].fillna("")
                 ]
-
-                # Add a column specifying the data type.
-                df["Category"] = data_type
+                if None in sum(notes_mapped, []):
+                    log.warning(f"Missing footnotes for: {data_type} - {commodity} - {year_start}")
+                df["Note"] = [
+                    ". ".join(
+                        [
+                            footnotes[note] if note in footnotes else ""
+                            for note in str(notes).replace("(", "").replace(")", "")
+                        ]
+                    ).replace("..", ".")
+                    for notes in df["Note"].fillna("")
+                ]
 
                 # Add general notes as a new column.
                 df["General notes"] = ". ".join(notes).replace("..", ".")
