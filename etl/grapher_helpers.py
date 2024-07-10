@@ -17,6 +17,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from apps.backport.datasync import data_metadata as dm
 from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
 from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
@@ -45,7 +46,12 @@ jinja_env.globals["raise"] = raise_helper
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple(
-    {f"{n}{b}{p}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64") for p in ("", "[pyarrow]")}
+    {
+        f"{n}{b}{p}"
+        for n in ("int", "Int", "uint", "UInt")
+        for b in ("8", "16", "32", "64")
+        for p in ("", "[pyarrow]")
+    }
 )
 
 
@@ -65,7 +71,11 @@ def expand_dimensions(tb: catalog.Table) -> catalog.Table:
     This function is not very memory efficient as it returns a table that will be very sparse.
     """
     # rename country to entity_id for the sake of `_yield_wide_table`
-    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
+    tb = (
+        tb.reset_index("country")
+        .rename(columns={"country": "entity_id"})
+        .set_index("entity_id", append=True)
+    )
     tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
 
     # join all tables
@@ -109,11 +119,19 @@ def _yield_wide_table(
         for col in table.columns:
             if table[col].isna().any():
                 raise ValueError(f"Column `{col}` contains missing values")
-    cols_with_none_units = [col for col in table.columns if table[col].metadata.unit is None]
+    cols_with_none_units = [
+        col for col in table.columns if table[col].metadata.unit is None
+    ]
     if cols_with_none_units:
-        raise Exception("Columns with missing units: " + ", ".join(cols_with_none_units))
+        raise Exception(
+            "Columns with missing units: " + ", ".join(cols_with_none_units)
+        )
 
-    dim_names = [k for k in table.primary_key if k not in ("year", "entityId", "entityCode", "entityName")]
+    dim_names = [
+        k
+        for k in table.primary_key
+        if k not in ("year", "entityId", "entityCode", "entityName")
+    ]
 
     # Keep only entity_id and year in index
     table = table.reset_index(level=dim_names)
@@ -121,7 +139,10 @@ def _yield_wide_table(
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
         grouped = table.groupby(
-            dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True, dropna=False
+            dim_names if len(dim_names) > 1 else dim_names[0],
+            as_index=False,
+            observed=True,
+            dropna=False,
         )
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
@@ -132,7 +153,9 @@ def _yield_wide_table(
             dim_values = (dim_values,)
 
         # Exclude dimensions
-        table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
+        table_to_yield = table_to_yield[
+            [c for c in table_to_yield.columns if c not in dim_names]
+        ]
 
         # Filter NaN values from dimensions and return dictionary
         dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
@@ -143,7 +166,11 @@ def _yield_wide_table(
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
                 if warn_null_variables:
-                    log.warning("yield_wide_table.null_variable", column=column, dim_dict=dim_dict)
+                    log.warning(
+                        "yield_wide_table.null_variable",
+                        column=column,
+                        dim_dict=dim_dict,
+                    )
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -172,12 +199,16 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
+            tab[short_name].metadata = _metadata_for_dimensions(
+                tab[short_name].metadata, dim_dict, column
+            )
 
             yield tab
 
 
-def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+def _metadata_for_dimensions(
+    meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str
+) -> catalog.VariableMeta:
     """Add dimensions to metadata and expand Jinja in metadata fields."""
     # add info about dimensions to metadata
     if dim_dict:
@@ -186,7 +217,8 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
                 "originalShortName": column,
                 "originalName": meta.title,
                 "filters": [
-                    {"name": dim_name, "value": sanitize_numpy(dim_value)} for dim_name, dim_value in dim_dict.items()
+                    {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                    for dim_name, dim_value in dim_dict.items()
                 ],
             }
         }
@@ -247,7 +279,9 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
         if short_name in short_names:
             duplicate_short_name_ix = short_names.index(short_name)
             # raise ValueError(f"Duplicate short name: {short_name} for column: {column} and dimensions: {dim_dict}")
-            duplicate_dim_dict = dict(zip(dim_names, wide_tb.columns[duplicate_short_name_ix][1:]))
+            duplicate_dim_dict = dict(
+                zip(dim_names, wide_tb.columns[duplicate_short_name_ix][1:])
+            )
             raise ValueError(
                 f"Duplicate short name for column '{column}' with dim values:\n{duplicate_dim_dict}\n{dim_dict}"
             )
@@ -255,7 +289,9 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
         short_names.append(short_name)
 
         # Create metadata for the column from dimensions
-        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column))
+        metadatas.append(
+            _metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column)
+        )
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
@@ -315,7 +351,9 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return obj
 
 
-def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
+def render_yaml_file(
+    path: Union[str, Path], dim_dict: Dict[str, str]
+) -> Dict[str, Any]:
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
@@ -329,7 +367,9 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     return _expand_jinja(meta, dim_dict)
 
 
-def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -> catalog.VariableMeta:
+def render_variable_meta(
+    meta: catalog.VariableMeta, dim_dict: Dict[str, str]
+) -> catalog.VariableMeta:
     """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
 
     Usage:
@@ -347,11 +387,16 @@ def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
     Deaths - Age: 10-18 - Sex: male
     """
-    dims = [f"{dim_name.replace('_', ' ').capitalize()}: {dim_value}" for dim_name, dim_value in dim_dict.items()]
+    dims = [
+        f"{dim_name.replace('_', ' ').capitalize()}: {dim_value}"
+        for dim_name, dim_value in dim_dict.items()
+    ]
     return " - ".join([title] + dims)
 
 
-def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], trim_long_short_name: bool = True) -> str:
+def _underscore_column_and_dimensions(
+    column: str, dim_dict: Dict[str, Any], trim_long_short_name: bool = True
+) -> str:
     # add dimension names to dimensions
     dims = [f"{dim_name}_{dim_value}" for dim_name, dim_value in dim_dict.items()]
 
@@ -370,7 +415,9 @@ def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], tri
                 dims=dim_dict,
             )
         else:
-            raise AssertionError(f"short_name {short_name} is too long for MySQL variables.shortName column")
+            raise AssertionError(
+                f"short_name {short_name} is too long for MySQL variables.shortName column"
+            )
 
     return short_name
 
@@ -414,9 +461,9 @@ def long_to_wide_tables(
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
         t.pop("variable")
-        assert set(meta.map(id)) == {
-            id(meta.iloc[0])
-        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        assert (
+            set(meta.map(id)) == {id(meta.iloc[0])}
+        ), f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
         t[var_name].metadata = meta.iloc[0]
 
         # name table as variable name
@@ -436,7 +483,9 @@ def _get_entities_from_db(
     return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
-def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
+def _get_and_create_entities_in_db(
+    countries: Set[str], engine: Engine | None = None
+) -> Dict[str, int]:
     engine = engine or get_engine()
     with Session(engine) as session:
         log.info("Creating entities in DB", countries=countries)
@@ -502,10 +551,16 @@ def country_to_entity_id(
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
         entity_id[ix] = (  # type: ignore[reportCallIssue]
-            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # type: ignore[reportCallIssue]
+            country[ix]
+            .map(
+                _get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)
+            )
+            .astype(float)  # type: ignore[reportCallIssue]
         )
 
-    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
+    assert (
+        not entity_id.isnull().any()
+    ), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
 
     return cast(pd.Series, entity_id.astype(int))
 
@@ -549,7 +604,13 @@ def combine_metadata_sources(sources: List[catalog.Source]) -> catalog.Source:
     # Combine sources' attributes into the first source (which is the only one that grapher will interpret).
     for attribute in attributes:
         # Gather non-empty values from each source for current attribute.
-        values = _unique([getattr(source, attribute) for source in sources if getattr(source, attribute) is not None])
+        values = _unique(
+            [
+                getattr(source, attribute)
+                for source in sources
+                if getattr(source, attribute) is not None
+            ]
+        )
         if attribute == "description":
             # Descriptions are usually long, so it is better so put together descriptions from different sources in
             # separate lines.
@@ -603,7 +664,9 @@ def _adapt_dataset_metadata_for_grapher(
                     metadata.sources[0].description not in metadata.description
                     and metadata.description not in metadata.sources[0].description
                 ):
-                    metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+                    metadata.sources[0].description = (
+                        metadata.description + "\n" + metadata.sources[0].description
+                    )
             else:
                 metadata.sources[0].description = metadata.description
 
@@ -637,7 +700,11 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
 
     # Remember original dimensions
-    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]
+    dim_names = [
+        n
+        for n in table.index.names
+        if n and n not in ("year", "date", "entity_id", "country")
+    ]
 
     # Reset index unless we have default index
     if table.index.names != [None]:
@@ -646,21 +713,30 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     # If a table contains `date` instead of `year`, adapt it for grapher
     if "date" in table.columns:
         # NOTE: this can be relaxed if we ever need it
-        assert "year" not in table.columns, "Table cannot have both `date` and `year` columns."
+        assert (
+            "year" not in table.columns
+        ), "Table cannot have both `date` and `year` columns."
         table = adapt_table_with_dates_to_grapher(table)
 
-    assert {"year", "country"} <= set(table.columns), "Table must have columns country and year."
+    assert {"year", "country"} <= set(
+        table.columns
+    ), "Table must have columns country and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entityId"] = country_to_entity_id(table["country"], create_entities=True, engine=engine)
+    table["entityId"] = country_to_entity_id(
+        table["country"], create_entities=True, engine=engine
+    )
     table = table.drop(columns=["country"])
 
     # Add entity code and name
     with Session(engine) as session:
         table = add_entity_code_and_name(session, table).copy_metadata(table)
+        # table = dm.add_entity_code_and_name(session, table).copy_metadata(table)
 
-    table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
+    table = table.set_index(
+        ["entityId", "entityCode", "entityName", "year"] + dim_names
+    )
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
@@ -677,7 +753,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
         # If neither variable and dataset has no sources, we're using origins instead.
         if len(variable_meta.sources) == 0 and len(dataset_meta.sources) == 0:
-            assert len(variable_meta.origins) > 0, f"Variable `{column}` has no sources or origins."
+            assert (
+                len(variable_meta.origins) > 0
+            ), f"Variable `{column}` has no sources or origins."
             continue
 
         if len(variable_meta.sources) == 0:
@@ -690,7 +768,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
             # Add the dataset description as if it was a source's description.
             if dataset_meta.description is not None:
                 if source.description:
-                    source.description = dataset_meta.description + "\n" + source.description
+                    source.description = (
+                        dataset_meta.description + "\n" + source.description
+                    )
                 else:
                     source.description = dataset_meta.description
         else:
@@ -824,7 +904,10 @@ def add_columns_for_multiindicator_chart(
         return f"{old_column_name}_chart_{underscore(chart_slug)}"
 
     # Create new columns.
-    new_columns = [_rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_in_chart]
+    new_columns = [
+        _rename_column(old_column_name=column, chart_slug=chart_slug)
+        for column in columns_in_chart
+    ]
     table[new_columns] = table[columns_in_chart].copy()
 
     # Optionally fill some of the new columns with zeros.
@@ -834,9 +917,12 @@ def add_columns_for_multiindicator_chart(
         assert set(columns_to_fill_with_zeros) <= set(columns_in_chart), error
         # Fill nans with zeros (in new columns).
         new_columns_to_fill_with_zeros = [
-            _rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_to_fill_with_zeros
+            _rename_column(old_column_name=column, chart_slug=chart_slug)
+            for column in columns_to_fill_with_zeros
         ]
-        table[new_columns_to_fill_with_zeros] = table[new_columns_to_fill_with_zeros].fillna(0)
+        table[new_columns_to_fill_with_zeros] = table[
+            new_columns_to_fill_with_zeros
+        ].fillna(0)
 
     # For each row, if any of the columns in the chart is nan, fill other columns in the same row with nan.
     table.loc[table[new_columns].isnull().any(axis=1), new_columns] = np.nan
@@ -844,7 +930,9 @@ def add_columns_for_multiindicator_chart(
     # Handle metadata.
     for column in new_columns:
         # If the indicator did not have any display name, use the original title.
-        if ("name" not in table[column].display) or (table[column].metadata.display["name"] is None):
+        if ("name" not in table[column].display) or (
+            table[column].metadata.display["name"] is None
+        ):
             table[column].metadata.display["name"] = table[column].metadata.title
         # To avoid having multiple indicators with the same title, add a suffix to the title.
         if suffix_for_titles is None:
@@ -893,7 +981,11 @@ def adapt_table_with_dates_to_grapher(
 
     # If no columns are specified, list all columns in the table (except the country and date columns).
     if columns is None:
-        columns = [column for column in tb.columns if column not in [date_column, country_column]]
+        columns = [
+            column
+            for column in tb.columns
+            if column not in [date_column, country_column]
+        ]
 
     for column in columns:
         # Find earliest date in the table.

@@ -52,7 +52,7 @@ dependencies = [
     "html2text>=2020.1.16",
     "pygithub>=2.3.0",
     "pandas==2.2.3",
-    "sqlalchemy>=2.0.30",
+    sqlalchemy = {extras = ["asyncio"], version = "^2.0.34"}
     "pymysql>=1.1.1",
     "tiktoken>=0.7.0",
     "earthengine-api>=0.1.411",
@@ -68,6 +68,8 @@ dependencies = [
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
+    aiobotocore = "^2.14.0"
+    aiomysql = "^0.2.0"
 ]
 
 [tool.uv.sources]

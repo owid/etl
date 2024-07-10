@@ -2,6 +2,7 @@
 #  __init__.py
 #  steps
 #
+import asyncio
 import graphlib
 import hashlib
 import json
@@ -41,6 +42,7 @@ from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl import grapher_model as gm
 from etl.config import OWID_ENV, TLS_VERIFY
+from etl.config import TLS_VERIFY
 from etl.db import get_engine
 from etl.snapshot import Snapshot
 
@@ -897,12 +899,10 @@ class GrapherStep(Step):
             futures = []
             verbose = True
             i = 0
+        # import yappi
 
-            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-            # table. This won't be a problem after we introduce the concept of "tables"
-            for table in dataset:
-                assert not table.empty, f"table {table.metadata.short_name} is empty"
+        # yappi.set_clock_type("wall")  # Use "cpu" for CPU time profiling
+        # yappi.start()
 
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
@@ -911,8 +911,12 @@ class GrapherStep(Step):
                         continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
                     table = table.loc[:, cols]
+        catalog_paths = asyncio.run(
+            gi._upsert_tables_from_dataset_async(self.path, dataset, engine, admin_api, dataset_upsert_results)
+        )
 
-                table = gh._adapt_table_for_grapher(table, engine)
+        # # Stop profiling
+        # yappi.stop()
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1

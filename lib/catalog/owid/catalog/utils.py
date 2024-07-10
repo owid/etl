@@ -327,3 +327,13 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             init_args[field_name] = v
 
     return cls(**init_args)
+        return hash(tuple([hash_any(y) for y in x]))
+    elif isinstance(x, dict):
+        return hash(tuple([(hash_any(k), hash_any(v)) for k, v in sorted(x.items())]))
+    elif isinstance(x, str):
+        # get md5 of the string and truncate to 64 bits
+        return int(hashlib.md5(x.encode()).hexdigest(), 16) & ((1 << 64) - 1)
+    elif x is None:
+        return 0
+    else:
+        return hash(x)

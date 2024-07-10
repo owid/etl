@@ -149,8 +149,12 @@ class Origin(MetaBase):
             if isinstance(self.date_published, (dt.date, int)):
                 self.date_published = YearDateLatest(str(self.date_published))
 
-            if self.date_published != "latest" and not is_year_or_date(self.date_published):
-                raise ValueError("date_published should be either a year or a date or latest")
+            if self.date_published != "latest" and not is_year_or_date(
+                self.date_published
+            ):
+                raise ValueError(
+                    "date_published should be either a year or a date or latest"
+                )
 
 
 # Minor is for cases where we only harmonized the countries or similar
@@ -223,14 +227,18 @@ class VariableMeta(MetaBase):
     description_from_producer: Optional[str] = None
     # List of bullet points for the description key (can use markdown formatting)
     description_key: List[str] = field(default_factory=list)
-    origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    origins: List[Origin] = field(
+        default_factory=list
+    )  # Origins is the new replacement for sources
     # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: List[License] = field(default_factory=list)
     unit: Optional[str] = None
     short_unit: Optional[str] = None
     # We keep display for the time being as the "less powerful sibling" of grapherConfig below
     display: Optional[Dict[str, Any]] = None
-    additional_info: Optional[Dict[str, Any]] = None  # Only used for internal bookkeeping
+    additional_info: Optional[Dict[str, Any]] = (
+        None  # Only used for internal bookkeeping
+    )
 
     # How much processing did we do to this data?
     processing_level: Optional[PROCESSING_LEVELS] = None
@@ -420,7 +428,9 @@ def to_html(record: Any) -> Optional[str]:
                     k, v_str
                 )
             )
-        return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format("".join(rows))
+        return '<table style="margin: 0em"><tbody>{}</tbody></table>'.format(
+            "".join(rows)
+        )
 
     elif isinstance(record, list):
         record = list(filter(None, record))
@@ -430,7 +440,9 @@ def to_html(record: Any) -> Optional[str]:
         rows = []
         for item in record:
             rows.append("<li>{}</li>".format(to_html(item)))
-        return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
+        return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format(
+            "".join(rows)
+        )
 
     else:
         return mistune.html(str(record))  # type: ignore
@@ -460,7 +472,14 @@ def _deepcopy_dataclass(dc) -> Any:
                 lis = type(v)(lis)
             setattr(dc, k, lis)
         elif isinstance(v, dict):
-            setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
+            setattr(
+                dc,
+                k,
+                {
+                    x: _deepcopy_dataclass(y) if is_dataclass(y) else y
+                    for x, y in v.items()
+                },
+            )
         else:
             pass
     return dc

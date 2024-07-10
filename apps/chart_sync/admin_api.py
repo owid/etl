@@ -6,6 +6,7 @@ import string
 from functools import cache
 from typing import Any, Dict, List, Optional
 
+import aiohttp
 import requests
 import structlog
 from requests.adapters import HTTPAdapter, Retry
@@ -25,7 +26,9 @@ def is_502_error(exception):
 
 
 class AdminAPI(object):
-    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = GRAPHER_USER_ID):
+    def __init__(
+        self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = GRAPHER_USER_ID
+    ):
         self.owid_env = owid_env
         self.session_id = create_session_id(owid_env, grapher_user_id)
 
@@ -64,7 +67,9 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
+    def update_chart(
+        self, chart_id: int, chart_config: dict, user_id: Optional[int] = None
+    ) -> dict:
         resp = requests.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
             cookies={"sessionid": self._get_session_id(user_id)},
@@ -75,7 +80,9 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def set_tags(self, chart_id: int, tags: List[Dict[str, Any]], user_id: Optional[int] = None) -> dict:
+    def set_tags(
+        self, chart_id: int, tags: List[Dict[str, Any]], user_id: Optional[int] = None
+    ) -> dict:
         resp = requests.post(
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
             cookies={"sessionid": self._get_session_id(user_id)},
@@ -86,7 +93,9 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
-    def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+    def put_grapher_config(
+        self, variable_id: int, grapher_config: Dict[str, Any]
+    ) -> dict:
         # If schema is missing, use the default one
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
 
@@ -98,9 +107,31 @@ class AdminAPI(object):
         )
         js = self._json_from_response(resp)
         if not js["success"]:
-            raise AdminAPIError({"error": js["error"], "variable_id": variable_id, "grapher_config": grapher_config})
+            raise AdminAPIError(
+                {
+                    "error": js["error"],
+                    "variable_id": variable_id,
+                    "grapher_config": grapher_config,
+                }
+            )
         return js
 
+    async def put_grapher_config(
+        self, variable_id: int, grapher_config: Dict[str, Any]
+    ) -> dict:
+        async with aiohttp.ClientSession(
+            cookies={"sessionid": self.session_id}
+        ) as session:
+            async with session.put(
+                self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+                json=grapher_config,
+            ) as resp:
+                # TODO: make _json_from_response async
+                js = await resp.json()
+                assert js["success"]
+                return js
+
+    # TODO: make it async
     def delete_grapher_config(self, variable_id: int) -> dict:
         resp = requests.delete(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
@@ -111,7 +142,9 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
-    def put_mdim_config(self, slug: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
+    def put_mdim_config(
+        self, slug: str, mdim_config: dict, user_id: Optional[int] = None
+    ) -> dict:
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/multi-dim/{slug}",
@@ -120,7 +153,9 @@ class AdminAPI(object):
         )
         js = self._json_from_response(resp)
         if not js["success"]:
-            raise AdminAPIError({"error": js["error"], "slug": slug, "mdim_config": mdim_config})
+            raise AdminAPIError(
+                {"error": js["error"], "slug": slug, "mdim_config": mdim_config}
+            )
         return js
 
 
@@ -153,7 +188,9 @@ def _generate_random_string(length=32) -> str:
     return result_str
 
 
-def _create_user_session(session: Session, user_email: str, expiration_seconds=3600) -> str:
+def _create_user_session(
+    session: Session, user_email: str, expiration_seconds=3600
+) -> str:
     """Create a new short-lived session for given user and return its session id."""
     # Generate a random string
     session_key = _generate_random_string()
@@ -161,7 +198,9 @@ def _create_user_session(session: Session, user_email: str, expiration_seconds=3
     json_str = json.dumps({"user_email": user_email})
 
     # Base64 encode
-    session_data = base64.b64encode(("prefix:" + json_str).encode("utf-8")).decode("utf-8")
+    session_data = base64.b64encode(("prefix:" + json_str).encode("utf-8")).decode(
+        "utf-8"
+    )
 
     query = text(
         """
@@ -174,7 +213,8 @@ def _create_user_session(session: Session, user_email: str, expiration_seconds=3
         params={
             "session_key": session_key,
             "session_data": session_data,
-            "expire_date": dt.datetime.utcnow() + dt.timedelta(seconds=expiration_seconds),
+            "expire_date": dt.datetime.utcnow()
+            + dt.timedelta(seconds=expiration_seconds),
         },
     )
 

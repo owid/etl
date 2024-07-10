@@ -15,6 +15,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["cherry_blossom"]
+
+    # tb = tb[["full_flowering_date"]]
+
     #
     # Save outputs.
     #

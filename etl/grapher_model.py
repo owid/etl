@@ -45,6 +45,7 @@ from sqlalchemy import (
     SmallInteger,
     String,
     and_,
+    delete,
     func,
     or_,
     select,
@@ -61,6 +62,7 @@ from sqlalchemy.dialects.mysql import (
 )
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -113,7 +115,9 @@ class Base(MappedAsDataclass, DeclarativeBase):
         return x
 
     @classmethod
-    def create_table(cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail") -> None:
+    def create_table(
+        cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail"
+    ) -> None:
         if if_exists == "replace":
             # Drop the table if it exists and create a new one
             cls.__table__.drop(engine, checkfirst=True)  # type: ignore
@@ -130,17 +134,24 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
 class Entity(Base):
     __tablename__ = "entities"
-    __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
+    __table_args__ = (
+        Index("code", "code", unique=True),
+        Index("name", "name", unique=True),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
     validated: Mapped[int] = mapped_column(TINYINT(1))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def load_entity_mapping(cls, session: Session, entity_ids: Optional[List[int]] = None) -> Dict[int, str]:
+    def load_entity_mapping(
+        cls, session: Session, entity_ids: Optional[List[int]] = None
+    ) -> Dict[int, str]:
         q = text(
             """
         select
@@ -183,8 +194,12 @@ class Namespace(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
-    isArchived: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    isArchived: Mapped[int] = mapped_column(
+        TINYINT(1), server_default=text("'0'"), default=0
+    )
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     description: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
@@ -212,15 +227,28 @@ class Namespace(Base):
 class Tag(Base):
     __tablename__ = "tags"
     __table_args__ = (
-        ForeignKeyConstraint(["parentId"], ["tags.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="tags_ibfk_1"),
-        Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
+        ForeignKeyConstraint(
+            ["parentId"],
+            ["tags.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="tags_ibfk_1",
+        ),
+        Index(
+            "dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq",
+            "name",
+            "parentId",
+            unique=True,
+        ),
         Index("parentId", "parentId"),
         Index("slug", "slug", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     parentId: Mapped[Optional[int]] = mapped_column(Integer)
     specialType: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
@@ -231,9 +259,11 @@ class Tag(Base):
         return list(session.scalars(select(cls).where(cls.slug.isnot(None))).all())
 
     @classmethod
-    def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
+    async def load_tags_by_names(
+        cls, session: AsyncSession, tag_names: List[str]
+    ) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names))).all()
+        tags = (await session.scalars(select(Tag).where(Tag.name.in_(tag_names)))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -241,7 +271,10 @@ class Tag(Base):
             tag_names = found_tags
             log.warning("create_links.missing_tags", tags=missing_tags)
 
-        tags = [next(tag for tag in tags if tag.name == ordered_name) for ordered_name in tag_names]
+        tags = [
+            next(tag for tag in tags if tag.name == ordered_name)
+            for ordered_name in tag_names
+        ]
         return tags
 
 
@@ -252,7 +285,9 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     isSuperuser: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     email: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
     githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
@@ -263,21 +298,29 @@ class User(Base):
 
     @classmethod
     def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
-        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
+        return session.scalars(
+            select(cls).where(cls.githubUsername == github_username)
+        ).one_or_none()
 
 
 class ChartRevisions(Base):
     __tablename__ = "chart_revisions"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["userId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="chart_revisions_userId"
+            ["userId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="chart_revisions_userId",
         ),
         Index("chartId", "chartId"),
         Index("chart_revisions_userId", "userId"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     chartId: Mapped[Optional[int]] = mapped_column(Integer)
     userId: Mapped[Optional[int]] = mapped_column(Integer)
     config: Mapped[Optional[dict]] = mapped_column(JSON)
@@ -291,9 +334,12 @@ class ChartConfig(Base):
     id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
     patch: Mapped[dict] = mapped_column(JSON, nullable=False)
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
-    fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
+    fullMd5: Mapped[str] = mapped_column(
+        CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True)
+    )
     slug: Mapped[Optional[str]] = mapped_column(
-        String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
+        String(255),
+        Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True),
     )
     chartType: Mapped[Optional[str]] = mapped_column(
         String(255),
@@ -302,17 +348,27 @@ class ChartConfig(Base):
             persisted=True,
         ),
     )
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False
+    )
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, onupdate=func.current_timestamp()
+    )
 
-    chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
+    chartss: Mapped[List["Chart"]] = relationship(
+        "Chart", back_populates="chart_config"
+    )
 
 
 class Chart(Base):
     __tablename__ = "charts"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["configId"], ["chart_configs.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="charts_configId"
+            ["configId"],
+            ["chart_configs.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="charts_configId",
         ),
         ForeignKeyConstraint(
             ["lastEditedByUserId"],
@@ -335,7 +391,9 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
@@ -343,7 +401,9 @@ class Chart(Base):
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
-    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
+    chart_config: Mapped["ChartConfig"] = relationship(
+        "ChartConfig", back_populates="chartss", lazy="joined"
+    )
 
     @hybrid_property
     def updatedAt(self) -> datetime:  # type: ignore
@@ -360,7 +420,11 @@ class Chart(Base):
 
     @config.expression
     def config(cls):
-        return select(ChartConfig.full).where(ChartConfig.id == cls.configId).scalar_subquery()
+        return (
+            select(ChartConfig.full)
+            .where(ChartConfig.id == cls.configId)
+            .scalar_subquery()
+        )
 
     @hybrid_property
     def slug(self) -> Optional[str]:  # type: ignore
@@ -368,10 +432,19 @@ class Chart(Base):
 
     @slug.expression
     def slug(cls):
-        return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
+        return (
+            select(ChartConfig.slug)
+            .where(ChartConfig.id == cls.configId)
+            .scalar_subquery()
+        )
 
     @classmethod
-    def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
+    def load_chart(
+        cls,
+        session: Session,
+        chart_id: Optional[int] = None,
+        slug: Optional[str] = None,
+    ) -> "Chart":
         """Load chart with id `chart_id`."""
         if chart_id:
             cond = cls.id == chart_id
@@ -401,11 +474,17 @@ class Chart(Base):
         return list(charts)
 
     @classmethod
-    def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
+    def load_charts_using_variables(
+        cls, session: Session, variable_ids: List[int]
+    ) -> List["Chart"]:
         """Load charts that use any of the given variables in `variable_ids`."""
         # Find IDs of charts
         chart_ids = (
-            session.scalars(select(ChartDimensions.chartId).where(ChartDimensions.variableId.in_(variable_ids)))
+            session.scalars(
+                select(ChartDimensions.chartId).where(
+                    ChartDimensions.variableId.in_(variable_ids)
+                )
+            )
             .unique()
             .all()
         )
@@ -439,7 +518,9 @@ class Chart(Base):
         return variables
 
     @classmethod
-    def load_variables_checksums(cls, session: Session, chart_ids: List[int]) -> pd.DataFrame:
+    def load_variables_checksums(
+        cls, session: Session, chart_ids: List[int]
+    ) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
         q = """
         select
@@ -451,7 +532,9 @@ class Chart(Base):
         join variables as v on v.id = cd.variableId
         where cd.chartId in %(chart_id)s
         """
-        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "catalogPath"])
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(
+            ["chartId", "catalogPath"]
+        )
 
     def load_variable_checksums(self, session: Session) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
@@ -464,9 +547,13 @@ class Chart(Base):
         join variables as v on v.id = cd.variableId
         where cd.chartId = %(chart_id)s
         """
-        return read_sql(q, session, params={"chart_id": self.id}).set_index("catalogPath")
+        return read_sql(q, session, params={"chart_id": self.id}).set_index(
+            "catalogPath"
+        )
 
-    def migrate_config(self, source_session: Session, target_session: Session) -> Dict[str, Any]:
+    def migrate_config(
+        self, source_session: Session, target_session: Session
+    ) -> Dict[str, Any]:
         """Remap variable ids from source to target session. Variable in source is uniquely identified
         by its catalogPath if available, or by name and datasetId otherwise. It is looked up
         by this identifier in the target session to get the new variable id.
@@ -481,15 +568,20 @@ class Chart(Base):
         for source_var_id, source_var in source_variables.items():
             if source_var.catalogPath:
                 try:
-                    target_var = Variable.from_catalog_path(target_session, source_var.catalogPath)
+                    target_var = Variable.from_catalog_path(
+                        target_session, source_var.catalogPath
+                    )
                 except NoResultFound:
-                    raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
+                    raise ValueError(
+                        f"variables.catalogPath not found in target: {source_var.catalogPath}"
+                    )
             # old style variable, match it on name and dataset id
             else:
                 try:
                     target_var = target_session.scalars(
                         select(Variable).where(
-                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
+                            Variable.name == source_var.name,
+                            Variable.datasetId == source_var.datasetId,
                         )
                     ).one()
 
@@ -509,7 +601,9 @@ class Chart(Base):
             # This should not be happening - it means that there's a chart with a variable that doesn't exist in
             # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
             # only because it is cached.
-            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
+            raise ValueError(
+                f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}"
+            )
 
         return config
 
@@ -572,7 +666,11 @@ class Dataset(Base):
     __tablename__ = "datasets"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["createdByUserId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="datasets_createdByUserId"
+            ["createdByUserId"],
+            ["users.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="datasets_createdByUserId",
         ),
         ForeignKeyConstraint(
             ["dataEditedByUserId"],
@@ -597,20 +695,30 @@ class Dataset(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(512))
     description: Mapped[str] = mapped_column(LONGTEXT)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     namespace: Mapped[str] = mapped_column(VARCHAR(255))
     isPrivate: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdByUserId: Mapped[int] = mapped_column(Integer)
     metadataEditedByUserId: Mapped[int] = mapped_column(Integer)
     dataEditedByUserId: Mapped[int] = mapped_column(Integer)
-    nonRedistributable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    nonRedistributable: Mapped[int] = mapped_column(
+        TINYINT(1), server_default=text("'0'")
+    )
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     version: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     updatePeriodDays: Mapped[Optional[int]] = mapped_column(Integer)
-    dataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
-    metadataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
-    isArchived: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
+    dataEditedAt: Mapped[datetime] = mapped_column(
+        DateTime, default=func.utc_timestamp()
+    )
+    metadataEditedAt: Mapped[datetime] = mapped_column(
+        DateTime, default=func.utc_timestamp()
+    )
+    isArchived: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), server_default=text("'0'"), default=0
+    )
     sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     tables: Mapped[Optional[list]] = mapped_column(JSON, default=None)
@@ -647,7 +755,11 @@ class Dataset(Base):
 
     @classmethod
     def from_dataset_metadata(
-        cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int, table_names: List[str]
+        cls,
+        metadata: catalog.DatasetMeta,
+        namespace: str,
+        user_id: int,
+        table_names: List[str],
     ) -> "Dataset":
         assert metadata.title
         return cls(
@@ -671,14 +783,24 @@ class Dataset(Base):
         return session.scalars(select(cls).where(cls.id == dataset_id)).one()
 
     @classmethod
-    def load_with_path(cls, session: Session, namespace: str, short_name: str, version: str) -> "Dataset":
+    def load_with_path(
+        cls, session: Session, namespace: str, short_name: str, version: str
+    ) -> "Dataset":
         return session.scalars(
-            select(cls).where(cls.namespace == namespace, cls.shortName == short_name, cls.version == version)
+            select(cls).where(
+                cls.namespace == namespace,
+                cls.shortName == short_name,
+                cls.version == version,
+            )
         ).one()
 
     @classmethod
-    def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
-        vars = session.scalars(select(Variable).where(Variable.datasetId == dataset_id)).all()
+    def load_variables_for_dataset(
+        cls, session: Session, dataset_id: int
+    ) -> list["Variable"]:
+        vars = session.scalars(
+            select(Variable).where(Variable.datasetId == dataset_id)
+        ).all()
         assert vars, f"Dataset {dataset_id} has no variables"
         return list(vars)
 
@@ -737,14 +859,20 @@ class Source(Base):
     __tablename__ = "sources"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["datasetId"], ["datasets.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="sources_datasetId"
+            ["datasetId"],
+            ["datasets.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="sources_datasetId",
         ),
         Index("sources_datasetId", "datasetId"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     description: Mapped[SourceDescription] = mapped_column(JSON)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     name: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     datasetId: Mapped[Optional[int]] = mapped_column(Integer, default=None)
@@ -757,13 +885,21 @@ class Source(Base):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
-            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
-            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
+            _json_is(
+                cls.description,
+                "additionalInfo",
+                self.description.get("additionalInfo"),
+            ),
+            _json_is(
+                cls.description,
+                "dataPublishedBy",
+                self.description.get("dataPublishedBy"),
+            ),
         ]
         return select(cls).where(*conds)
 
-    def upsert(self, session: Session) -> "Source":
-        ds = session.scalars(self._upsert_select).one_or_none()
+    async def upsert(self, session: AsyncSession) -> "Source":
+        ds = (await session.scalars(self._upsert_select)).one_or_none()
 
         if not ds:
             ds = self
@@ -772,7 +908,9 @@ class Source(Base):
             ds.description = self.description
 
         session.add(ds)
-        session.flush()  # Ensure the object is written to the database and its ID is generated
+        await (
+            session.flush()
+        )  # Ensure the object is written to the database and its ID is generated
         return ds
 
     @classmethod
@@ -853,16 +991,24 @@ class Dimensions(TypedDict):
 
 class PostsGdocs(Base):
     __tablename__ = "posts_gdocs"
-    __table_args__ = (Index("idx_posts_gdocs_type", "type"), Index("idx_updatedAt", "updatedAt"))
+    __table_args__ = (
+        Index("idx_posts_gdocs_type", "type"),
+        Index("idx_updatedAt", "updatedAt"),
+    )
 
     id: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
     slug: Mapped[str] = mapped_column(VARCHAR(255))
     content: Mapped[dict] = mapped_column(JSON)
     published: Mapped[int] = mapped_column(TINYINT)
     createdAt: Mapped[datetime] = mapped_column(DateTime, init=False)
-    publicationContext: Mapped[str] = mapped_column(ENUM("unlisted", "listed"), server_default=text("'unlisted'"))
+    publicationContext: Mapped[str] = mapped_column(
+        ENUM("unlisted", "listed"), server_default=text("'unlisted'")
+    )
     type: Mapped[Optional[str]] = mapped_column(
-        VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
+        VARCHAR(255),
+        Computed(
+            "(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False
+        ),
     )
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
@@ -874,22 +1020,38 @@ class PostsGdocs(Base):
 class OriginsVariablesLink(Base):
     __tablename__ = "origins_variables"
     __table_args__ = (
-        ForeignKeyConstraint(["originId"], ["origins.id"], name="origins_variables_ibfk_1"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="origins_variables_ibfk_2"),
+        ForeignKeyConstraint(
+            ["originId"], ["origins.id"], name="origins_variables_ibfk_1"
+        ),
+        ForeignKeyConstraint(
+            ["variableId"], ["variables.id"], name="origins_variables_ibfk_2"
+        ),
         Index("variableId", "variableId"),
     )
 
-    originId: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
-    variableId: Mapped[int] = mapped_column(Integer, ForeignKey("variables.id"), primary_key=True)
+    originId: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), primary_key=True
+    )
+    variableId: Mapped[int] = mapped_column(
+        Integer, ForeignKey("variables.id"), primary_key=True
+    )
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
+    async def link_with_variable(
+        cls, session: AsyncSession, variable_id: int, new_origin_ids: List[int]
+    ) -> None:
         """Link the given Variable ID with the given Origin IDs."""
         # Fetch current linked Origins for the given Variable ID
-        existing_links = session.query(cls.originId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+        existing_links = (
+            await session.execute(
+                select(cls.originId, cls.displayOrder).filter_by(variableId=variable_id)
+            )
+        ).all()
 
-        existing_origins = {(link.originId, link.displayOrder) for link in existing_links}
+        existing_origins = {
+            (link.originId, link.displayOrder) for link in existing_links
+        }
         new_origins = {(origin_id, i) for i, origin_id in enumerate(new_origin_ids)}
 
         # Find the Origin IDs to delete and the IDs to add
@@ -898,17 +1060,29 @@ class OriginsVariablesLink(Base):
 
         # Delete the obsolete Origin-Variable links
         for origin_id, display_order in to_delete:
-            session.query(cls).filter(
+            # TODO: test that it works
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.originId == origin_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.originId == origin_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new Origin-Variable links
         if to_add:
             session.add_all(
                 [
-                    cls(originId=origin_id, variableId=variable_id, displayOrder=display_order)
+                    cls(
+                        originId=origin_id,
+                        variableId=variable_id,
+                        displayOrder=display_order,
+                    )
                     for origin_id, display_order in to_add
                 ]
             )
@@ -917,8 +1091,12 @@ class OriginsVariablesLink(Base):
 class PostsGdocsVariablesFaqsLink(Base):
     __tablename__ = "posts_gdocs_variables_faqs"
     __table_args__ = (
-        ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"),
+        ForeignKeyConstraint(
+            ["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"
+        ),
+        ForeignKeyConstraint(
+            ["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"
+        ),
         Index("variableId", "variableId"),
     )
 
@@ -928,32 +1106,55 @@ class PostsGdocsVariablesFaqsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+    async def link_with_variable(
+        cls, session: AsyncSession, variable_id: int, new_faqs: List[catalog.FaqLink]
+    ) -> None:
         """Link the given Variable ID with Faqs"""
         # Fetch current linked Faqs for the given Variable ID
-        existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
+        existing_faqs = (
+            (await session.execute(select(cls).filter_by(variableId=variable_id)))
+            .scalars()
+            .all()
+        )
 
         # Work with tuples instead
-        existing_gdoc_fragment = {(f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs}
-        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id, i) for i, f in enumerate(new_faqs)}
+        existing_gdoc_fragment = {
+            (f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs
+        }
+        new_gdoc_fragment = {
+            (f.gdoc_id, f.fragment_id, i) for i, f in enumerate(new_faqs)
+        }
 
         to_delete = existing_gdoc_fragment - new_gdoc_fragment
         to_add = new_gdoc_fragment - existing_gdoc_fragment
 
         # Delete the obsolete links
         for gdoc_id, fragment_id, display_order in to_delete:
-            session.query(cls).filter(
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.gdocId == gdoc_id,
                 cls.fragmentId == fragment_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.gdocId == gdoc_id,
+            #     cls.fragmentId == fragment_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
             session.add_all(
                 [
-                    cls(gdocId=gdoc_id, fragmentId=fragment_id, displayOrder=display_order, variableId=variable_id)
+                    cls(
+                        gdocId=gdoc_id,
+                        fragmentId=fragment_id,
+                        displayOrder=display_order,
+                        variableId=variable_id,
+                    )
                     for gdoc_id, fragment_id, display_order in to_add
                 ]
             )
@@ -962,8 +1163,12 @@ class PostsGdocsVariablesFaqsLink(Base):
 class TagsVariablesTopicTagsLink(Base):
     __tablename__ = "tags_variables_topic_tags"
     __table_args__ = (
-        ForeignKeyConstraint(["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"),
+        ForeignKeyConstraint(
+            ["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"
+        ),
+        ForeignKeyConstraint(
+            ["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"
+        ),
         Index("variableId", "variableId"),
     )
 
@@ -972,12 +1177,18 @@ class TagsVariablesTopicTagsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[int]) -> None:
+    async def link_with_variable(
+        cls, session: AsyncSession, variable_id: int, new_tag_ids: List[int]
+    ) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         assert len(new_tag_ids) == len(set(new_tag_ids)), "Tag IDs must be unique"
 
         # Fetch current linked tags for the given Variable ID
-        existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+        existing_links = (
+            await session.execute(
+                select(cls.tagId, cls.displayOrder).filter_by(variableId=variable_id)
+            )
+        ).all()
 
         existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
         new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
@@ -988,17 +1199,25 @@ class TagsVariablesTopicTagsLink(Base):
 
         # Delete the obsolete links
         for tag_id, display_order in to_delete:
-            session.query(cls).filter(
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.tagId == tag_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.tagId == tag_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
             session.add_all(
                 [
-                    cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order)
+                    cls(
+                        tagId=tag_id, variableId=variable_id, displayOrder=display_order
+                    )
                     for tag_id, display_order in to_add
                 ]
             )
@@ -1043,22 +1262,32 @@ class Variable(Base):
         ),
         Index("idx_catalogPath", "catalogPath", unique=True),
         Index("unique_short_name_per_dataset", "shortName", "datasetId", unique=True),
-        Index("variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True),
+        Index(
+            "variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True
+        ),
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
-        Index("variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True),
+        Index(
+            "variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True
+        ),
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     description: Mapped[Optional[str]] = mapped_column(LONGTEXT)
     unit: Mapped[str] = mapped_column(VARCHAR(255))
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     coverage: Mapped[str] = mapped_column(VARCHAR(255))
     timespan: Mapped[str] = mapped_column(VARCHAR(255))
     datasetId: Mapped[int] = mapped_column(Integer)
     display: Mapped[dict] = mapped_column(JSON)
-    columnOrder: Mapped[int] = mapped_column(Integer, server_default=text("'0'"), default=0)
-    schemaVersion: Mapped[int] = mapped_column(Integer, server_default=text("'1'"), default=1)
+    columnOrder: Mapped[int] = mapped_column(
+        Integer, server_default=text("'0'"), default=0
+    )
+    schemaVersion: Mapped[int] = mapped_column(
+        Integer, server_default=text("'1'"), default=1
+    )
     name: Mapped[Optional[str]] = mapped_column(VARCHAR(750), default=None)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     code: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
@@ -1068,7 +1297,9 @@ class Variable(Base):
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
-    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(VARCHAR(30), default=None)
+    processingLevel: Mapped[Optional[catalog.meta.PROCESSING_LEVELS]] = mapped_column(
+        VARCHAR(30), default=None
+    )
     processingLog: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     titlePublic: Mapped[Optional[str]] = mapped_column(VARCHAR(512), default=None)
     titleVariant: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
@@ -1082,14 +1313,18 @@ class Variable(Base):
     licenses: Mapped[Optional[list[dict]]] = mapped_column(JSON, default=None)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-    type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
+    type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(
+        ENUM(*get_args(VARIABLE_TYPE)), default=None
+    )
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
-    grapherConfigIdAdmin: Mapped[Optional[str]] = mapped_column(VARCHAR(32), default=None)
+    grapherConfigIdAdmin: Mapped[Optional[str]] = mapped_column(
+        VARCHAR(32), default=None
+    )
     grapherConfigIdETL: Mapped[Optional[bytes]] = mapped_column(CHAR(32), default=None)
     dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
-    def upsert(self, session: Session) -> "Variable":
+    async def upsert(self, session: AsyncSession) -> "Variable":
         assert self.catalogPath
         assert self.shortName
 
@@ -1106,24 +1341,10 @@ class Variable(Base):
 
         # try matching on shortName first
         q = select(cls).where(
-            or_(
-                cls.shortName == self.shortName,
-                # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
-                # this was a bug, we should have kept the double underscore
-                # match even those variables and correct their shortName
-                cls.shortName == self.shortName.replace("__", "_"),
-            ),
+            cls.catalogPath == self.catalogPath,
             cls.datasetId == self.datasetId,
         )
-        ds = session.scalars(q).one_or_none()
-
-        # try matching on name if there was no match on shortName
-        if not ds:
-            q = select(cls).where(
-                cls.name == self.name,
-                cls.datasetId == self.datasetId,
-            )
-            ds = session.scalars(q).one_or_none()
+        ds = (await session.scalars(q)).one_or_none()
 
         # there's a unique index on `name` which can cause conflict if we swap names of two variables
         # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
@@ -1136,12 +1357,12 @@ class Variable(Base):
                 cls.shortName != self.shortName,
                 cls.datasetId == self.datasetId,
             )
-            conflict = session.scalars(q).one_or_none()
+            conflict = (await session.scalars(q)).one_or_none()
             if conflict:
                 # modify the conflicting variable name, it'll be cleaned up later
                 conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
                 session.add(conflict)
-                session.commit()
+                await session.commit()
 
         if not ds:
             ds = self
@@ -1183,7 +1404,9 @@ class Variable(Base):
                 ds.sort = self.sort
 
         session.add(ds)
-        session.flush()  # Ensure the object is written to the database and its ID is generated
+        await (
+            session.flush()
+        )  # Ensure the object is written to the database and its ID is generated
         return ds
 
     @classmethod
@@ -1212,7 +1435,9 @@ class Variable(Base):
         presentation_dict.pop("faqs", None)
 
         if metadata.description_key:
-            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
+            assert isinstance(
+                metadata.description_key, list
+            ), "descriptionKey should be a list of bullet points"
 
         return cls(
             shortName=short_name,
@@ -1233,7 +1458,9 @@ class Variable(Base):
             descriptionFromProducer=metadata.description_from_producer,
             descriptionKey=metadata.description_key,
             descriptionProcessing=metadata.description_processing,
-            licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
+            licenses=[license.to_dict() for license in metadata.licenses]
+            if metadata.licenses
+            else None,
             license=metadata.license.to_dict() if metadata.license else None,
             type=metadata.type,
             sort=metadata.sort,
@@ -1265,19 +1492,27 @@ class Variable(Base):
 
     @classmethod
     @deprecated("Use from_id_or_path instead")
-    def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
+    def load_variables(
+        cls, session: Session, variables_id: List[int]
+    ) -> List["Variable"]:
         return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
     @overload
     @classmethod
     def from_id_or_path(
-        cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
+        cls,
+        session: Session,
+        id_or_path: str | int,
+        columns: Optional[List[str]] = None,
     ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_id_or_path(
-        cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
+        cls,
+        session: Session,
+        id_or_path: List[str | int],
+        columns: Optional[List[str]] = None,
     ) -> List["Variable"]: ...
 
     @classmethod
@@ -1293,7 +1528,9 @@ class Variable(Base):
             return cls.from_id(session=session, variable_id=id_or_path, columns=columns)
         # Single path
         elif isinstance(id_or_path, str):
-            return cls.from_catalog_path(session=session, catalog_path=id_or_path, columns=columns)
+            return cls.from_catalog_path(
+                session=session, catalog_path=id_or_path, columns=columns
+            )
 
         # Multiple path or id
         elif isinstance(id_or_path, list):
@@ -1302,10 +1539,14 @@ class Variable(Base):
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
-                return cls.from_id(session=session, variable_id=int_ids, columns=columns)
+                return cls.from_id(
+                    session=session, variable_id=int_ids, columns=columns
+                )
             # Multiple paths
             elif len(str_ids) == len(id_or_path):
-                return cls.from_catalog_path(session=session, catalog_path=str_ids, columns=columns)
+                return cls.from_catalog_path(
+                    session=session, catalog_path=str_ids, columns=columns
+                )
             else:
                 raise TypeError("All elements in the list must be integers")
 
@@ -1329,42 +1570,75 @@ class Variable(Base):
     @overload
     @classmethod
     def from_catalog_path(
-        cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
+        cls,
+        session: Session,
+        catalog_path: List[str],
+        columns: Optional[List[str]] = None,
     ) -> List["Variable"]: ...
 
     @classmethod
     def from_catalog_path(
-        cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
+        cls,
+        session: Session,
+        catalog_path: str | List[str],
+        columns: Optional[List[str]] = None,
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         if isinstance(catalog_path, str):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
+            return session.scalars(
+                _select_columns(cls, columns).where(cls.catalogPath == catalog_path)
+            ).one()
         elif isinstance(catalog_path, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
-
-    @overload
-    @classmethod
-    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable": ...
+            return session.scalars(
+                _select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))
+            ).all()  # type: ignore
 
     @overload
     @classmethod
     def from_id(
-        cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None
+        cls, session: Session, variable_id: int, columns: Optional[List[str]] = None
+    ) -> "Variable": ...
+
+    @overload
+    @classmethod
+    def from_id(
+        cls,
+        session: Session,
+        variable_id: List[int],
+        columns: Optional[List[str]] = None,
     ) -> List["Variable"]: ...
 
     @classmethod
     def from_id(
-        cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
+        cls,
+        session: Session,
+        variable_id: int | List[int],
+        columns: Optional[List[str]] = None,
     ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
         if isinstance(variable_id, int):
-            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
+            return session.scalars(
+                _select_columns(cls, columns).where(cls.id == variable_id)
+            ).one()
         elif isinstance(variable_id, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return session.scalars(
+                _select_columns(cls, columns).where(cls.id.in_(variable_id))
+            ).all()  # type: ignore
 
     @classmethod
-    def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
+    async def load_from_catalog_path_async(
+        cls, session: AsyncSession, catalog_path: str
+    ) -> "Variable":
+        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        return (
+            await session.scalars(select(cls).where(cls.catalogPath == catalog_path))
+        ).one()
+
+    @classmethod
+    def catalog_paths_to_variable_ids(
+        cls, session: Session, catalog_paths: List[str]
+    ) -> Dict[str, int]:
         """Return a mapping from catalog paths to variable IDs."""
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
         return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
@@ -1374,8 +1648,27 @@ class Variable(Base):
         """Set type and sort fields based on indicator values."""
         return _infer_variable_type(values)
 
-    def update_links(
-        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+    async def _link_faqs(
+        self, session: AsyncSession, faqs: List[catalog.FaqLink]
+    ) -> None:
+        # establish relationships between variables and posts
+        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
+        gdoc_posts = (await session.scalars(query)).all()
+        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+        if missing_gdoc_ids:
+            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+        await PostsGdocsVariablesFaqsLink.link_with_variable(
+            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        )
+
+    async def update_links(
+        self,
+        session: AsyncSession,
+        db_origins: List["Origin"],
+        faqs: List[catalog.FaqLink],
+        tag_names: List[str],
     ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.
@@ -1383,24 +1676,21 @@ class Variable(Base):
         assert self.id
 
         # establish relationships between variables and origins
-        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
-
-        # establish relationships between variables and posts
-        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
-        gdoc_posts = session.scalars(query).all()
-        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
-        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
-        if missing_gdoc_ids:
-            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
-        PostsGdocsVariablesFaqsLink.link_with_variable(
-            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        origins_variables_task = OriginsVariablesLink.link_with_variable(
+            session, self.id, [origin.id for origin in db_origins]
         )
 
-        # establish relationships between variables and tags
-        tags = Tag.load_tags_by_names(session, tag_names)
+        link_faqs_task = self._link_faqs(session, faqs)
 
-        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
+        # establish relationships between variables and tags
+        tags = await Tag.load_tags_by_names(session, tag_names)
+
+        await TagsVariablesTopicTagsLink.link_with_variable(
+            session, self.id, [tag.id for tag in tags]
+        )
+
+        await origins_variables_task
+        await link_faqs_task
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
@@ -1433,7 +1723,9 @@ class Variable(Base):
     def step_path(self) -> Path:
         """Return path to indicator step file."""
         assert self.catalogPath
-        base_path = paths.STEP_DIR / "data" / self.catalogPath.split("#")[0].rsplit("/", 1)[0]
+        base_path = (
+            paths.STEP_DIR / "data" / self.catalogPath.split("#")[0].rsplit("/", 1)[0]
+        )
         return base_path.with_suffix(".py")
 
     @property
@@ -1450,7 +1742,9 @@ class Variable(Base):
         df = pd.DataFrame(data)
 
         if session is not None:
-            df = add_entity_name(session=session, df=df, col_id="entities", col_name="entity")
+            df = add_entity_name(
+                session=session, df=df, col_id="entities", col_name="entity"
+            )
 
         return df
 
@@ -1486,7 +1780,9 @@ class ChartDimensions(Base):
     property: Mapped[str] = mapped_column(VARCHAR(255))
     chartId: Mapped[int] = mapped_column(Integer)
     variableId: Mapped[int] = mapped_column(Integer)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
@@ -1561,7 +1857,7 @@ class Origin(Base):
             cls.dateAccessed == self.dateAccessed,
         )
 
-    def upsert(self, session: Session) -> "Origin":
+    async def upsert(self, session: AsyncSession) -> "Origin":
         """
         # NOTE: this would be an ideal solution if we only stored unique rows in
         # origins table, but there are weird race conditions and we cannot have
@@ -1581,8 +1877,7 @@ class Origin(Base):
         # select added object to get its id
         return session.scalars(self._upsert_select).one()
         """
-
-        origins = session.scalars(self._upsert_select).all()
+        origins = (await session.scalars(self._upsert_select)).all()
         if not origins:
             # create new origin
             origin = self
@@ -1612,7 +1907,11 @@ class ChartDiffApprovals(Base):
     __tablename__ = "chart_diff_approvals"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_approvals_ibfk_1"
+            ["chartId"],
+            ["charts.id"],
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+            name="chart_diff_approvals_ibfk_1",
         ),
         Index("chartId", "chartId"),
     )
@@ -1626,7 +1925,11 @@ class ChartDiffApprovals(Base):
 
     @classmethod
     def latest_chart_approval_batch(
-        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
+        cls,
+        session: Session,
+        chart_ids: list[int],
+        source_updated_ats: list,
+        target_updated_ats: list,
     ) -> List[Optional["ChartDiffApprovals"]]:
         """Load the latest approval of the charts.
 
@@ -1670,7 +1973,9 @@ class ChartDiffApprovals(Base):
                 approval = results[chart_id]
             approvals.append(approval)
 
-        assert len(chart_ids) == len(approvals), "Length of chart_ids and approvals must be the same."
+        assert len(chart_ids) == len(
+            approvals
+        ), "Length of chart_ids and approvals must be the same."
 
         return approvals
 
@@ -1691,7 +1996,11 @@ class ChartDiffConflicts(Base):
     __tablename__ = "chart_diff_conflicts"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_conflicts_ibfk_1"
+            ["chartId"],
+            ["charts.id"],
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+            name="chart_diff_conflicts_ibfk_1",
         ),
         Index("chartId", "chartId"),
     )
@@ -1747,7 +2056,9 @@ class ChartDiffConflicts(Base):
                 conflict = results[chart_id]
             conflicts.append(conflict)
 
-        assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
+        assert len(chart_ids) == len(
+            conflicts
+        ), "Length of chart_ids and conflicts must be the same."
 
         return conflicts
 
@@ -1757,15 +2068,23 @@ class MultiDimDataPage(Base):
 
     slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
     config: Mapped[dict] = mapped_column(JSON)
-    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    published: Mapped[int] = mapped_column(
+        TINYINT, server_default=text("'0'"), init=False
+    )
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     updatedAt: Mapped[datetime] = mapped_column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        init=False,
     )
 
     def upsert(self, session: Session) -> "MultiDimDataPage":
         cls = self.__class__
-        existing = session.scalars(select(cls).where(cls.slug == self.slug)).one_or_none()
+        existing = session.scalars(
+            select(cls).where(cls.slug == self.slug)
+        ).one_or_none()
         if existing:
             existing.config = self.config
             return existing
@@ -1779,16 +2098,24 @@ class Anomaly(Base):
     # __table_args__ = (Index("catalogPath", "catalogPath"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False
+    )
     updatedAt: Mapped[datetime] = mapped_column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        init=False,
     )
     datasetId: Mapped[int] = mapped_column(Integer)
-    datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(
+        VARCHAR(64), default=None
+    )
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
     path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
-    _dfReduced: Mapped[Optional[bytes]] = mapped_column("dfReduced", LONGBLOB, default=None)
+    _dfReduced: Mapped[Optional[bytes]] = mapped_column(
+        "dfReduced", LONGBLOB, default=None
+    )
     # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
     # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
@@ -1807,7 +2134,11 @@ class Anomaly(Base):
 
     @classmethod
     def load(cls, session: Session, dataset_id: int, anomaly_type: str) -> "Anomaly":
-        return session.scalars(select(cls).where(cls.datasetId == dataset_id, cls.anomalyType == anomaly_type)).one()
+        return session.scalars(
+            select(cls).where(
+                cls.datasetId == dataset_id, cls.anomalyType == anomaly_type
+            )
+        ).one()
 
     @hybrid_property
     def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore
@@ -1856,7 +2187,9 @@ def _json_is(json_field: Any, key: str, val: Any) -> Any:
         return json_field[key] == val
 
 
-def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dict[int, int]) -> Any:
+def _remap_variable_ids(
+    config: Union[List, Dict[str, Any], Any], remap_ids: Dict[int, int]
+) -> Any:
     """Replace variableIds from chart config using `remap_ids` mapping."""
     if isinstance(config, dict):
         out = {}
@@ -1932,7 +2265,9 @@ def add_entity_name(
 
     # Get entity names
     unique_entities = df[col_id].unique()
-    entities = _fetch_entities(session, list(unique_entities), col_id, col_name, col_code)
+    entities = _fetch_entities(
+        session, list(unique_entities), col_id, col_name, col_code
+    )
 
     # Sanity check
     if set(unique_entities) - set(entities[col_id]):

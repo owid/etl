@@ -9,31 +9,35 @@ Usage:
     >>> import_dataset.main(dataset_dir, dataset_namespace)
 """
 
+import asyncio
 import datetime
 import json
 import os
 import warnings
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, List, Optional, cast
 
 import pandas as pd
 import structlog
+from aiobotocore.session import get_session
 from owid import catalog
 from owid.catalog import Table, VariableMeta, utils
+from owid.catalog import Table, VariableMeta, s3_utils, utils
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
-from apps.backport.datasync.datasync import upload_gzip_string
+from apps.backport.datasync.datasync import upload_gzip_string_async
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
 from etl.db import get_engine, production_or_master_engine
+from etl.db import get_engine, get_engine_async
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -115,28 +119,29 @@ def upsert_dataset(
             assert source.name
             source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
 
-        session.commit()
-
         return DatasetUpsertResult(ds.id, source_ids)
 
 
-def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: int) -> int:
+async def _upsert_source_to_db(session: AsyncSession, source: catalog.Source, dataset_id: int) -> int:
     """Upsert source and return its id"""
     # NOTE: we need the lock because upserts can happen in multiple threads and `sources` table
     # has no unique constraint on `name`. It can be removed once we switch to variable views
     # and stop using threads
     with source_table_lock:
-        db_source = gm.Source.from_catalog_source(source, dataset_id).upsert(session)
+        db_source = await gm.Source.from_catalog_source(source, dataset_id).upsert(session)
 
         # commit within the lock to make sure other threads get the latest sources
-        session.commit()
+        await session.commit()
 
         assert db_source.id
         return db_source.id
 
 
-def _add_or_update_source(
-    session: Session, variable_meta: catalog.VariableMeta, column_name: str, dataset_upsert_result: DatasetUpsertResult
+async def _add_or_update_source(
+    session: AsyncSession,
+    variable_meta: catalog.VariableMeta,
+    column_name: str,
+    dataset_upsert_result: DatasetUpsertResult,
 ) -> Optional[int]:
     if not variable_meta.sources:
         assert variable_meta.origins, "Variable must have either sources or origins"
@@ -163,11 +168,11 @@ def _add_or_update_source(
     return source_id
 
 
-def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> list[gm.Origin]:
+async def _add_or_update_origins(session: AsyncSession, origins: list[catalog.Origin]) -> list[gm.Origin]:
     out = []
     assert len(origins) == len(set(origins)), "origins must be unique"
     for origin in origins:
-        out.append(gm.Origin.from_origin(origin).upsert(session))
+        out.append(await gm.Origin.from_origin(origin).upsert(session))
     return out
 
 
@@ -225,8 +230,12 @@ def _check_upserted_table(table: Table) -> None:
     assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
 
-def upsert_table(
-    engine: Engine,
+semaphore = asyncio.Semaphore(50)
+
+
+async def upsert_table(
+    engine_async: AsyncEngine,
+    client,
     admin_api: AdminAPI,
     table: Table,
     dataset_upsert_result: DatasetUpsertResult,
@@ -381,25 +390,167 @@ def upsert_metadata(
     )
     session.add(db_variable)
 
+"""
+    # All following functions assume that `value` is string
+    # NOTE: we could make the code more efficient if we didn't convert `value` to string
+    # TODO: can we avoid setting & resetting index back and forth?
+    df = table.reset_index().rename(columns={column_name: "value"})
+    df["value"] = df["value"].astype("string")
+
+    checksum_data = calculate_checksum_data(df)
+    checksum_metadata = calculate_checksum_metadata(variable_meta, df)
+
+    # NOTE: this is useful for debugging, will be removed once it is stable
+    if os.environ.get("SKIP_CHECKSUMS"):
+        import random
+
+        checksum_metadata = str(random.randint(0, 10000))
+        checksum_data = str(random.randint(0, 10000))
+
+    async with semaphore:
+        log.info(
+            "upsert_dataset.upsert_table.start",
+            column_name=column_name,
+        )
+
+        async_session = async_sessionmaker(engine_async, expire_on_commit=False)
+        async with async_session() as session:
+            # compare checksums
+            try:
+                db_variable = await gm.Variable.load_from_catalog_path_async(session, catalog_path)
+            except NoResultFound:
+                db_variable = None
+
+            upsert_metadata_kwargs = dict(
+                session=session,
+                df=df,
+                variable_meta=variable_meta,
+                column_name=column_name,
+                dataset_upsert_result=dataset_upsert_result,
+                catalog_path=catalog_path,
+                dimensions=dimensions,
+                admin_api=admin_api,
+                client=client,
+            )
+
+            # create variable if it doesn't exist
+            if not db_variable:
+                db_variable = await upsert_metadata(**upsert_metadata_kwargs)
+                await upsert_data(df, db_variable.s3_data_path(), client)
+
+            # variable exists
+            else:
+                if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
+                    if verbose:
+                        log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
+                    return
+
+                upsert_data_task = None
+                if db_variable.dataChecksum != checksum_data:
+                    upsert_data_task = upsert_data(df, db_variable.s3_data_path(), client)
+
+                if db_variable.metadataChecksum != checksum_metadata:
+                    db_variable = await upsert_metadata(**upsert_metadata_kwargs)
+
+                if upsert_data_task:
+                    await upsert_data_task
+
+            # Update checksums
+            db_variable.dataChecksum = checksum_data
+            db_variable.metadataChecksum = checksum_metadata
+
+            # Commit new checksums
+            session.add(db_variable)
+            await session.commit()
+
+            if verbose:
+                log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
+
+
+async def upsert_data(df: pd.DataFrame, s3_data_path: str, client) -> None:
+    # upload data to R2
+    var_data = dm.variable_data(df)
+    var_data_str = json.dumps(var_data, default=str)
+    await upload_gzip_string_async(client, var_data_str, s3_data_path)
+
+
+async def upsert_metadata(
+    session: AsyncSession,
+    df: pd.DataFrame,
+    variable_meta: VariableMeta,
+    column_name: str,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: str,
+    dimensions: Optional[gm.Dimensions],
+    admin_api: AdminAPI,
+    client,
+) -> gm.Variable:
+    timespan = _get_timespan(df, variable_meta)
+
+    source_id = await _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
+
+    # with origins_table_lock:
+    db_origins = await _add_or_update_origins(session, variable_meta.origins)
+    # commit within the lock to make sure other threads get the latest sources
+    await session.commit()
+
+    # pop grapher_config from variable metadata, later we send it to Admin API
+    if variable_meta.presentation and variable_meta.presentation.grapher_config:
+        grapher_config = variable_meta.presentation.grapher_config
+        variable_meta.presentation.grapher_config = None
+    else:
+        grapher_config = None
+
+    db_variable = await gm.Variable.from_variable_metadata(
+        variable_meta,
+        short_name=column_name,
+        timespan=timespan,
+        dataset_id=dataset_upsert_result.dataset_id,
+        source_id=source_id,
+        catalog_path=catalog_path,
+        dimensions=dimensions,
+    ).upsert(session)
+    db_variable_id = db_variable.id
+    assert db_variable_id
+
+    # TODO: `type` is part of metadata, but not part of checksum!
+    if not db_variable.type:
+        db_variable.type = db_variable.infer_type(df["value"])
+        session.add(db_variable)
+
+    # update links, we need to do it after we commit deleted relationships above
+    update_links_task = db_variable.update_links(
+        session,
+        db_origins,
+        faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
+        tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
+    )
+"""
     # we need to commit changes because `dm.variable_metadata` pulls all data from MySQL
     # and sends it to R2
     # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects
     #   we have available
-    session.commit()
+    await session.commit()
 
     # grapher_config needs to be sent to Admin API because it has side effects
+    put_grapher_config_task = None
     if grapher_config:
-        admin_api.put_grapher_config(db_variable_id, grapher_config)
+        put_grapher_config_task = admin_api.put_grapher_config(db_variable_id, grapher_config)
     # grapher_config does not exist, but it's still in the database -> delete it
     elif not grapher_config and db_variable.grapherConfigIdETL:
         admin_api.delete_grapher_config(db_variable_id)
 
     # upload metadata to R2
-    var_metadata = dm.variable_metadata(session, db_variable.id, df)
+    var_metadata = await dm.variable_metadata(session, db_variable.id, df)
     var_metadata_str = json.dumps(var_metadata, default=str)
 
     # upload them to R2
-    upload_gzip_string(var_metadata_str, db_variable.s3_metadata_path())
+    await upload_gzip_string_async(client, var_metadata_str, db_variable.s3_metadata_path())
+
+    # await all tasks
+    await update_links_task
+    if put_grapher_config_task:
+        await put_grapher_config_task
 
     return db_variable
 
@@ -627,3 +778,64 @@ def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
             min_year = min(years)
             max_year = max(years)
             return f"{min_year}-{max_year}"
+
+
+async def _upsert_tables_from_dataset_async(step_path, dataset, engine, admin_api, dataset_upsert_results):
+    i = 0
+    catalog_paths = []
+    tasks = []
+    verbose = True
+
+    engine_async = get_engine_async()
+
+    async with get_session().create_client(**s3_utils.r2_config()) as client:
+        # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
+        # is fetching the whole dataset from data-api as they would receive all tables merged in a single
+        # table. This won't be a problem after we introduce the concept of "tables"
+        for table in dataset:
+            assert not table.empty, f"table {table.metadata.short_name} is empty"
+
+            # if GRAPHER_FILTER is set, only upsert matching columns
+            if config.GRAPHER_FILTER:
+                cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                if not cols:
+                    continue
+                cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
+                table = table.loc[:, cols]
+
+            table = gh._adapt_table_for_grapher(table, engine)
+
+            for t in gh._yield_wide_table(table, na_action="drop"):
+                i += 1
+                assert len(t.columns) == 1
+                catalog_path = f"{step_path}/{table.metadata.short_name}#{t.columns[0]}"
+                catalog_paths.append(catalog_path)
+
+                # TODO: switch to asyncio or threads
+                # stop logging to stop cluttering logs
+                # if i > 20 and verbose:
+                #     verbose = False
+                #     thread_pool.submit(
+                #         lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
+                #     )
+
+                # generate table with entity_id, year and value for every column
+                task = upsert_table(
+                    engine_async,
+                    client,
+                    admin_api,
+                    t,
+                    dataset_upsert_results,
+                    catalog_path=catalog_path,
+                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                    verbose=verbose,
+                )
+
+                tasks.append(task)
+
+    await asyncio.gather(*tasks)
+
+    await engine_async.dispose()
+    await client.close()
+
+    return catalog_paths
