@@ -97,7 +97,13 @@ def st_explore_indicator(df, indicator_old, indicator_new, var_id_to_display) ->
                     elif tab_name == "Error distribution":
                         st_show_plot(df_indicators, col_old=name_old, col_new=name_new, is_numeric=is_numeric)
                     elif tab_name == "Country overview":
-                        st_show_country_overview(df_indicators, indicator_old, indicator_new)
+                        try:
+                            st_show_country_overview(df_indicators, indicator_old, indicator_new)
+                        except Exception as e:
+                            st.error(
+                                "Couldn't show country overview. This is experimental. Please report the following error."
+                            )
+                            st.exception(e)
                     elif tab_name == "Confusion Matrix":
                         df_ = df_indicators.copy()
                         df_[indicator_old] = df_[indicator_old].fillna("None")
@@ -504,44 +510,56 @@ def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, in
 
     This is experimental.
     """
-    try:
-        dfg = df_indicators.groupby("entityName")
-        # Build row per country
-        df_countries = []
-        for name, df_ in dfg:
-            df_ = df_.sort_values("year").rename(
-                columns={
-                    indicator_old: "Old",
-                    indicator_new: "New",
-                }
-            )
-            error = df_[COLUMN_RELATIVE_ERROR].dropna()
-            error_max = error.replace([np.inf, -np.inf], np.nan).abs().max()
-            error = error.replace([np.inf], error_max)
-            error = error.replace([-np.inf], -error_max)
-
-            df_countries.append(
-                {
-                    "Country": name,
-                    "error": list(error),
-                    "old": list(df_["Old"].dropna()),
-                    "new": list(df_["New"].dropna()),
-                    "Average error": df_[COLUMN_ABS_RELATIVE_ERROR].mean(),
-                }
-            )
-        df_countries = pd.DataFrame(df_countries).sort_values("Average error", ascending=False)
-    except Exception as e:
-        st.warning("Couldn't show country overview. This is experimental. Please report the following error.")
-        st.exception(e)
-    else:
-        st.dataframe(
-            data=df_countries[["Country", "Average error", "error", "new", "old"]],
-            column_config={
-                "error": st.column_config.LineChartColumn(
-                    "Error(year)", help="Difference between old and new indicator values."
-                ),
-                "old": st.column_config.LineChartColumn("Old"),
-                "new": st.column_config.LineChartColumn("New"),
-            },
-            hide_index=True,
+    dfg = df_indicators.groupby("entityName")
+    # Build row per country
+    df_countries = []
+    for name, df_ in dfg:
+        df_ = df_.sort_values("year").rename(
+            columns={
+                indicator_old: "Old",
+                indicator_new: "New",
+            }
         )
+        error = df_[COLUMN_RELATIVE_ERROR].dropna()
+        error_max = error.replace([np.inf, -np.inf], np.nan).abs().max()
+        error = error.replace([np.inf], error_max)
+        error = error.replace([-np.inf], -error_max)
+
+        df_countries.append(
+            {
+                "Country": name,
+                "error": list(error),
+                "old": list(df_["Old"].dropna()),
+                "new": list(df_["New"].dropna()),
+                "Average error": df_[COLUMN_ABS_RELATIVE_ERROR].mean(),
+            }
+        )
+    df_countries = pd.DataFrame(df_countries).sort_values("Average error", ascending=False).set_index("Country")
+    df_countries = df_countries[["Average error", "error", "new", "old"]]
+
+    st.dataframe(
+        data=df_countries,
+        column_config={
+            "error": st.column_config.LineChartColumn(
+                "Error(year)", help="Difference between old and new indicator values."
+            ),
+            "old": st.column_config.LineChartColumn("Old"),
+            "new": st.column_config.LineChartColumn("New"),
+        },
+        # hide_index=True,
+    )
+
+    # Get value max
+    # y_max = max(df_countries["old"].max(), df_countries["new"].max())
+    # y_min = max(df_countries["old"].min(), df_countries["new"].min())
+    # Pivot
+    # melted_df = df_countries.melt(id_vars=["Country"], var_name="type", value_name="value")
+    # reshaped_df = melted_df.pivot(index="type", columns="Country", values="value")  # .reset_index()
+    # reshaped_df.index.name = None
+    # # Sort
+    # reshaped_df = reshaped_df.T.sort_values("Average error", ascending=False).T
+    # # Show
+    # st.dataframe(
+    #     data=reshaped_df,
+    #     column_config={k: st.column_config.LineChartColumn(str(k)) for k in reshaped_df.columns},
+    # )
