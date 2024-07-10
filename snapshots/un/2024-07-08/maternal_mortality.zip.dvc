@@ -15,6 +15,7 @@ meta:
     producer: UN MMEIG (WHO, UNICEF, UNFPA, World Bank Group and UNDESA/ Population Division)
     citation_full: |-
       Trends in maternal mortality 2000 to 2020: estimates by WHO, UNICEF, UNFPA, World Bank Group and UNDESA/ Population Division. Geneva: World Health Organization; 2023. Licence: CC BY-NC-SA 3.0 IGO.
+    attribution: UN MMEIG (2023) #to shorten source in viz
     attribution_short: UN MMEIG
 
     # Files

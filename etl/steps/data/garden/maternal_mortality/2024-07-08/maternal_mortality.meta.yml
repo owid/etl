@@ -4,6 +4,8 @@ definitions:
     description_processing: |-
       - We combined data from multiple sources (Gapminder, UN MMEIG) to display the historic development of maternal mortality. The years before
         1985 are based on the Gapminder dataset, while the years after 1985 are based on the UN MMEIG dataset.
+      - The UN MMEIG data shown (post 1985) is the point estimate - this means there is a 50% chance that the true measure lies above this point,
+        and a 50% chance that the true value lies below this point.
       - We calculated regional aggregates by summing the maternal deaths and live births
         of all countries in the region and then calculating the MMR based on these figures.
   description_maternal_mortality: |-
@@ -12,8 +14,15 @@ definitions:
     and site of pregnancy, from any cause related or aggravated by the pregnancy
     or its management, but not from accidental or incidental causes.
 
+dataset:
+  title: Maternal mortality (Gapminder/UN MMEIG, long run)
+  description: |-
+    Long run data set constructured from Gapminder and UN MMEIG data. The years before 1985 of 14 countries
+    are based on the Gapminder dataset (recorded data), while the years after 1985 are based on the estimations of the UN MMEIG dataset.
+
 tables:
   maternal_mortality:
+    title: Maternal mortality (Gapminder/UN MMEIG, long run)
     variables:
       mmr:
         title: Maternal mortality ratio
