@@ -2,15 +2,20 @@
 
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import click
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from owid.datautils.io.json import load_json, save_json
+from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.snapshot import Snapshot
+
+# Initialize log.
+log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -155,6 +160,56 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_raw_data(data: Dict[str, Any]):
+    # Initialize a dataframe that will contain all the combined data.
+    df_all = pd.DataFrame(columns=["Country", "Sub-commodity", "Year", "Category", "Note", "Value", "General notes"])
+    # Go through all nests in the fetched data, process and add to the combined dataframe.
+    for data_type in tqdm(list(data), desc="Data type"):
+        for commodity in tqdm(list(data[data_type]), desc="Commodity"):
+            for year_start in map(int, list(data[data_type][commodity])):
+                # log.info(f"Processing {data_type} - {commodity} - {year_start}")
+
+                # Get the content for this iteration.
+                content = data[data_type][commodity][str(year_start)]
+
+                # Initialize a soup with this content.
+                soup = BeautifulSoup(content, "html.parser")
+
+                if "No results" in soup.text:
+                    # log.info(f"No results for {data_type} - {commodity} - {year_start}")
+                    continue
+
+                # Extract notes and footnotes from the soup.
+                notes, footnotes = _extract_notes_and_footnotes_from_soup(soup=soup)
+
+                # Create a raw dataframe with the data extracted from the soup.
+                df_raw = _create_raw_dataframe_from_soup(soup=soup)
+
+                # There are rows with a valid value, but with an empty Sub-commodity, e.g. Imports of cobalt in Argentina 1988. This seems to correspond to the Sub-commodity "aggregates, primary". Add a sanity check to see if it corresponds to the sum of all other.
+                df_raw.loc[df_raw["Sub-commodity"] == "", "Sub-commodity"] = "Total"
+
+                # Process dataframe.
+                df = _clean_raw_dataframe(df_raw=df_raw)
+
+                df["Note"] = [
+                    ". ".join([footnotes[note] for note in str(notes).replace("(", "").replace(")", "")]).replace(
+                        "..", "."
+                    )
+                    for notes in df["Note"].fillna("")
+                ]
+
+                # Add a column specifying the data type.
+                df["Category"] = data_type
+
+                # Add general notes as a new column.
+                df["General notes"] = ". ".join(notes).replace("..", ".")
+
+                # Add current dataframe to the combined dataframe.
+                df_all = pd.concat([df_all, df], ignore_index=True)
+
+    return df_all
+
+
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
@@ -181,62 +236,24 @@ def main(upload: bool) -> None:
     # Example query:
     # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Imports&commodity=29&dateFrom=1970&dateTo=1979&country=&agreeToTsAndCs=agreed
 
-    # First fetch all necessary data, without processing it.
-    data = fetch_raw_data(data_types=data_types, years=years, commodity_to_id=commodity_to_id)
+    if TEMP_FILE.exists():
+        log.warning(f"Loading data from temporary file: {TEMP_FILE}")
+        data = load_json(TEMP_FILE)
+    else:
+        # First fetch all necessary data, without processing it.
+        data = fetch_raw_data(data_types=data_types, years=years, commodity_to_id=commodity_to_id)
+        # Save data to a temporary json file, in case something fails in the processing.
+        save_json(data=data, json_file=TEMP_FILE)
 
-    # For debugging purposes: Temporarily store the dictionary of raw data.
-    # from owid.datautils.io.json import load_json
-    # temp_file = Path(__file__).parent / "temp.json"
-    # save_json(data, temp_file)
-    # data_new = load_json(temp_file)
-
-    # Initialize a dataframe that will contain all the combined data.
-    df_all = pd.DataFrame(columns=["Country", "Sub-commodity", "Year", "Category", "Note", "Value"])
-    # Go through all nests in the fetched data, process and add to the combined dataframe.
-    for data_type in tqdm(list(data_types), desc="Data type"):
-        for commodity in tqdm(list(data[data_type]), desc="Commodity"):
-            for year_start in map(int, list(data[data_type][commodity])):
-                # print(f"Processing {data_type} - {commodity} - {year_start}")
-
-                # Get the content for this iteration.
-                content = data[data_type][commodity][str(year_start)]
-
-                # Initialize a soup with this content.
-                soup = BeautifulSoup(content, "html.parser")
-
-                if "No results" in soup.text:
-                    # print(f"No results for {data_type} - {commodity} - {year_start}")
-                    continue
-
-                # Extract notes and footnotes from the soup.
-                notes, footnotes = _extract_notes_and_footnotes_from_soup(soup=soup)
-
-                # Create a raw dataframe with the data extracted from the soup.
-                df_raw = _create_raw_dataframe_from_soup(soup=soup)
-
-                # There are rows with a valid value, but with an empty Sub-commodity, e.g. Imports of cobalt in Argentina 1988. This seems to correspond to the Sub-commodity "aggregates, primary". Add a sanity check to see if it corresponds to the sum of all other.
-                df_raw.loc[df_raw["Sub-commodity"] == "", "Sub-commodity"] = "Total"
-
-                # TODO: Gather all notes and do something with them.
-
-                # Process dataframe.
-                df = _clean_raw_dataframe(df_raw=df_raw)
-
-                df["Note"] = [
-                    ". ".join([footnotes[note] for note in str(notes).replace("(", "").replace(")", "")]).replace(
-                        "..", "."
-                    )
-                    for notes in df["Note"].fillna("")
-                ]
-
-                # Add a column specifying the data type.
-                df["Category"] = data_type
-
-                # Add current dataframe to the combined dataframe.
-                df_all = pd.concat([df_all, df], ignore_index=True)
+    # Process raw data to create a combined dataframe.
+    df_all = process_raw_data(data=data)
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload, data=df_all)
+
+    # Now that the processing has been successful, remove the temporary file.
+    if TEMP_FILE.exists():
+        TEMP_FILE.unlink()
 
 
 if __name__ == "__main__":
