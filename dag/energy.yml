@@ -207,7 +207,7 @@ steps:
   # BGS - World Mineral Statistics.
   #
   data://meadow/bgs/2024-07-09/world_mineral_statistics:
-    - snapshot://bgs/2024-07-09/world_mineral_statistics.csv
+    - snapshot://bgs/2024-07-09/world_mineral_statistics.zip
   #
   # BGS - World Mineral Statistics.
   #

@@ -28,4 +28,7 @@ meta:
       name: © Natural Environment Research Council (NERC) and/or the authority that commissioned the work
       url: https://www2.bgs.ac.uk/mineralsUk/statistics/termsAndConditions.html
 
-  
+outs:
+  - md5: 3a32e59c37c0c529a3daff68cb8d439a
+    size: 7928364
+    path: world_mineral_statistics.zip
