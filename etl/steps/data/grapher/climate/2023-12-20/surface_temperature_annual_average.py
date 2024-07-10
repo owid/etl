@@ -59,7 +59,6 @@ def run(dest_dir: str) -> None:
     combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
     combined = combined.drop(columns=["decade"])
     # Filter rows where the year is less than or equal to 2024
-    combined = combined[combined["year"] < 2024].reset_index(drop=True)
     combined = combined.set_index(["year", "country"], verify_integrity=True)
 
     # Save outputs.

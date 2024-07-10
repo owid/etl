@@ -23,9 +23,9 @@ meta:
     date_accessed: 2024-06-28
     # License
     license:
-      name: CC BY 4.0
+      name: CC BY-ND 4.0
       url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
-  - md5: b720682a96af499fdaa8a6896dd1f19f
-    size: 64253
+  - md5: 80850d9fe1133d85bbe186af54784d16
+    size: 66720
     path: ai_investment.csv

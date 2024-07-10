@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -12,25 +11,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("ai_robots.csv")
+    snap = paths.load_snapshot("ai_phds.csv")
 
     # Load data from snapshot.
     tb = snap.read()
-
     #
     # Process data.
     #
-    tb = tb.rename(columns={"Geographic area": "country", "Year": "year"})
-
-    # Harmonize the country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    tb["Number of robots (in thousands)"] = tb["Number of robots (in thousands)"] * 1000
-    tb = tb.rename(columns={"Number of robots (in thousands)": "number_of_robots"})
-    tb = tb.pivot(index=["year", "country"], columns="Indicator", values="number_of_robots").reset_index()
-
+    tb["value"] = tb["value"].str.replace("%", "")
+    tb = tb.pivot(index=["Year"], columns="indicator", values="value").reset_index()
+    tb["country"] = "United States and Canada"
     tb = tb.format(["country", "year"])
-
     #
     # Save outputs.
     #
