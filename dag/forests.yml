@@ -12,3 +12,7 @@ steps:
   data://meadow/forests/2024-07-10/dominant_driver:
     - snapshot://forests/2024-07-10/dominant_driver.tif
     - snapshot://countries/2023-12-27/world_bank.zip
+  data://garden/aviation_safety_network/2024-07-10/dominant_driver:
+    - data://meadow/aviation_safety_network/2024-07-10/dominant_driver
+  data://garden/forests/2024-07-10/dominant_driver:
+    - data://meadow/forests/2024-07-10/dominant_driver
