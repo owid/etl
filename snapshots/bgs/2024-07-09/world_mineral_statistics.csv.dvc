@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Mineral Statistics
+    description: |-
+      The World Mineral Statistics dataset is a compilation of production and trade statistics on a wide range of mineral commodities since 1913.
+      However, data prior to 1960 is only available a scanned PDF books, whose content, currently, cannot successfully be extracted programmatically.
+    date_published: "2023-01-01"
+    title_snapshot: World Mineral Statistics - 1970 onwards
+    description_snapshot: |-
+      This is a compilation of all the data that is accessible via the BGS web interface, containing imports, exports and production of minerals by country from 1970 onwards.
+
+    # Citation
+    producer: British Geological Survey
+    citation_full: |-
+      World Mineral Statistics, contributed by permission of the British Geological Survey (BGS). The copyright of all materials derived from the BGS's work is vested in the Natural Environment Research Council (NERC) and/or the authority that commissioned the work.
+    attribution: British Geological Survey - World Mineral Statistics (2023)
+    attribution_short: BGS
+
+    # Files
+    url_main: https://www2.bgs.ac.uk/mineralsuk/statistics/worldStatistics.html
+    date_accessed: 2024-07-09
+
+    # License
+    license:
+      name: © Natural Environment Research Council (NERC) and/or the authority that commissioned the work
+      url: https://www2.bgs.ac.uk/mineralsUk/statistics/termsAndConditions.html
+
+  
