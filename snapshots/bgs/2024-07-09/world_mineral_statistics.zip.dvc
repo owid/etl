@@ -29,6 +29,6 @@ meta:
       url: https://www2.bgs.ac.uk/mineralsUk/statistics/termsAndConditions.html
 
 outs:
-  - md5: 3a32e59c37c0c529a3daff68cb8d439a
-    size: 7928364
+  - md5: e73b1fb2d1977c1398de343bd58f0c82
+    size: 7265665
     path: world_mineral_statistics.zip

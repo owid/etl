@@ -1,4 +1,9 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot with all data from BGS' World Mineral Statistics.
+
+It may take about 20 minutes to fetch all data.
+The result will be a zip folder containing a big json file, adapted to the limitations of the BGS' system.
+
+"""
 
 import json
 import time
@@ -36,7 +41,7 @@ def fetch_raw_data(data_types: List[str], years: List[int], commodity_to_id: Dic
     # Split years in groups of 9 years.
     years_start = [years[0]]
     for year in years[1:]:
-        if year >= years_start[-1] + 9:
+        if year > years_start[-1] + 9:
             years_start.append(year)
 
     # Calculate the total number of queries required.
