@@ -318,10 +318,10 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
         strict=False,
     )
 
-    # Add 10-year age groups from 20 to 100
+    # Add 10-year age groups from 10 to 100
     age_group_mapping = {
         key: value
-        for i in range(20, 100, 10)
+        for i in range(10, 100, 10)
         for key, value in {f"{i}-{i+4}": f"{i}-{i+9}", f"{i+5}-{i+9}": f"{i}-{i+9}"}.items()
     }
     tb_10 = tb.copy()
