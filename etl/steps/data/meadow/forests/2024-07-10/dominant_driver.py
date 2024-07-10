@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
                 results.append({"country": country_name, "category": value, "area_hectares": area})
 
     tb = Table(results)
-    tb["area_hectares"].metadata.origins = snap.metadata.origin
+    # tb["area_hectares"].metadata.origins = snap.metadata.origin
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "category"], short_name=paths.short_name)
