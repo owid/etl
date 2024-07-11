@@ -203,3 +203,13 @@ steps:
   #
   data://grapher/energy/2024-06-20/uk_historical_electricity:
     - data://garden/energy/2024-06-20/uk_historical_electricity
+  #
+  # IEA - Critical minerals.
+  #
+  data://meadow/iea/2024-07-04/critical_minerals:
+    - snapshot://iea/2024-07-04/critical_minerals.xlsx
+  #
+  # IEA - Critical minerals.
+  #
+  data://garden/iea/2024-07-04/critical_minerals:
+    - data://meadow/iea/2024-07-04/critical_minerals
