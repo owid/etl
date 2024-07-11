@@ -294,9 +294,9 @@ tables:
           <% endif %>
 
           <% if age == 0 %>
-          Life expectancy for << individuals >> at birth.
+          Period life expectancy for << individuals >> at birth.
           <% else %>
-          Life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
+          Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
           <% endif %> {definitions.global.projections}
         presentation:
           title_public: |-
