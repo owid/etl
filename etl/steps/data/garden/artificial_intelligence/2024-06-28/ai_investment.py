@@ -30,7 +30,9 @@ def run(dest_dir: str) -> None:
 
     tb = tb.pivot(index=["Year", "Geographic area"], columns="Investment type", values="value").reset_index()
     tb = tb.rename(columns={"Geographic area": "country", "Year": "year"})
-
+    tb["Total corporate investment"] = (
+        tb["Merger/Acquisition"] + tb["Minority Stake"] + tb["Private Investment"] + tb["Public Offering"]
+    )
     cols_to_adjust_for_infaltion = [
         "AI infrastructure/research/governance",
         "AR/VR",
@@ -62,6 +64,7 @@ def run(dest_dir: str) -> None:
         "Retail",
         "Semiconductor",
         "VC",
+        "Total corporate investment",
     ]
 
     tb.loc[:, tb.columns.isin(cols_to_adjust_for_infaltion)] *= 1e9

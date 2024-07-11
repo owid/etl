@@ -23,7 +23,7 @@ meta:
 
     # License
     license:
-      name: CC BY 4.0
+      name: CC BY-ND 4.0
       url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
   - md5: 197c39c01f894daa8f6bf5aa630e08e2

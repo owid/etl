@@ -1,0 +1,75 @@
+steps:
+  # STEPS FOR THE CHARTBOOK OF ECONOMIC INEQUALITY
+  # Some of the steps for the chartbook are also in poverty_inequality, but at the same time they are used in OWID.
+
+  ################################################################################################
+  # ARGENTINA
+  ################################################################################################
+  # Altimir (1986) - Income distribution estimates in Argentina (1953-1980)
+  data://meadow/chartbook/2024-03-21/altimir_1986:
+    - snapshot://chartbook/2024-03-21/altimir_1986.csv
+  data://garden/chartbook/2024-03-21/altimir_1986:
+    - data://meadow/chartbook/2024-03-21/altimir_1986
+
+  ################################################################################################
+  # FRANCE
+  ################################################################################################
+  # Inequality data from France (INSEE)
+  # 1999 report
+  data://meadow/insee/2024-03-21/inequality_france_1999:
+    - snapshot://insee/2024-03-21/inequality_france_1999.csv
+  data://garden/insee/2024-03-21/inequality_france_1999:
+    - data://meadow/insee/2024-03-21/inequality_france_1999
+  # 2021 report
+  data://meadow/insee/2024-04-25/insee_premiere_1875:
+    - snapshot://insee/2024-04-25/insee_premiere_1875.xlsx
+  data://garden/insee/2024-04-25/insee_premiere_1875:
+    - data://meadow/insee/2024-04-25/insee_premiere_1875
+  # Key figures (inequality) - live version
+  data://meadow/insee/2024-04-05/inequality_france:
+    - snapshot://insee/2024-04-05/inequality_france.xlsx
+  data://garden/insee/2024-04-05/inequality_france:
+    - data://meadow/insee/2024-04-05/inequality_france
+  # Key figures (relative poverty) - live version
+  data://meadow/insee/2024-04-26/relative_poverty_france:
+    - snapshot://insee/2024-04-26/relative_poverty_france.xlsx
+  data://garden/insee/2024-04-26/relative_poverty_france:
+    - data://meadow/insee/2024-04-26/relative_poverty_france
+  # Interdecile ratio for net salary (version 2022)
+  data://meadow/insee/2024-05-23/interdecile_ratio_2022:
+    - snapshot://insee/2024-05-23/interdecile_ratio_2022.csv
+  data://garden/insee/2024-05-23/interdecile_ratio_2022:
+    - data://meadow/insee/2024-05-23/interdecile_ratio_2022
+  # Interdecile ratio for net salary (live version)
+  data://meadow/insee/2024-05-23/interdecile_ratio:
+    - snapshot://insee/2024-05-23/interdecile_ratio.csv
+  data://garden/insee/2024-05-23/interdecile_ratio:
+    - data://meadow/insee/2024-05-23/interdecile_ratio
+
+  # France historical Ginis (Concialdi, 1997)
+  data://meadow/chartbook/2024-04-22/concialdi:
+    - snapshot://chartbook/2024-04-22/concialdi.csv
+  data://garden/chartbook/2024-04-22/concialdi:
+    - data://meadow/chartbook/2024-04-22/concialdi
+
+  # UNU-WIDER World Income Inequality Database (WIID)
+  data://meadow/unu_wider/2024-04-22/world_income_inequality_database:
+    - snapshot://unu_wider/2024-04-22/world_income_inequality_database.xlsx
+  data://garden/unu_wider/2024-04-22/world_income_inequality_database:
+    - data://meadow/unu_wider/2024-04-22/world_income_inequality_database
+
+  # Wealth inequality in France (Piketty et al. 2006)
+  data://meadow/chartbook/2024-05-23/wealth_france:
+    - snapshot://chartbook/2024-05-23/wealth_france.csv
+  data://garden/chartbook/2024-05-23/wealth_france:
+    - data://meadow/chartbook/2024-05-23/wealth_france
+
+  ################################################################################################
+  # UNITED KINGDOM
+  ################################################################################################
+
+  # Annual Survey of Hours and Earnings time series of selected estimates - UK's Office for National Statistics
+  data://meadow/ons/2024-03-20/hours_and_earnings_uk:
+    - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
+  data://garden/ons/2024-03-20/hours_and_earnings_uk:
+    - data://meadow/ons/2024-03-20/hours_and_earnings_uk
