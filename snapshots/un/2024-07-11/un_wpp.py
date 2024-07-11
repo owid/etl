@@ -70,7 +70,7 @@ Files needed:
         Filename:               WPP2024 Crude Net Migration Rate.xlsx
         Alias:                  migrate.xlsx
     - Deaths (total)
-        Title (page):           https://www.dropbox.com/scl/fo/m5ubnjq0j0542px0vowpu/AJbGz8qywO0ZtsrIt4HmVJA/WPP2024_Total_deaths_by_sex_%28in_thousands%29.xlsx?rlkey=jgttagxx80mosd66yi4o61wjh&dl=0
+        Title (page):           WPP2024_Total_deaths_by_sex_%28in_thousands%29.xlsx
         Filename:               WPP2024 Total Deaths by Sex.xlsx
         Alias:                  deaths.xlsx
     - Deaths (age)
@@ -117,10 +117,14 @@ Files needed:
         Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Total.xlsx
         Filename:               Life Expectancy Indicators.xlsx
         Alias:                  le.xlsx
-    - Life expectancy (fem)
+    - Life expectancy (f)
         Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Female.xlsx
         Filename:               Life expectancy female.xlsx
-        Alias:                  le_fem.xlsx
+        Alias:                  le_f.xlsx
+    - Life expectancy (m)
+        Title (page):           WPP2024_Life_expectancy_at_exact_ages_%28ex%29_in_years_Abridged_Ages_Male.xlsx
+        Filename:               Life expectancy male.xlsx
+        Alias:                  le_m.xlsx
     - Mean age of childbearing
         Title (page):           WPP2024_Mean_age_of_childbearing_%28MAC%29_in_years.xlsx
         Filename:               Mean Age of Childbearing 2024.xlsx
