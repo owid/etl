@@ -66,6 +66,13 @@ def run(dest_dir: str) -> None:
             "North America",
             "South America",
             "Oceania",
+            "North America (WB)",
+            "Latin America and Caribbean (WB)",
+            "Middle East and North Africa (WB)",
+            "Sub-Saharan Africa (WB)",
+            "Europe and Central Asia (WB)",
+            "South Asia (WB)",
+            "East Asia and Pacific (WB)",
         ],
     )
 
@@ -99,6 +106,7 @@ def run(dest_dir: str) -> None:
         tb,
         tb_10y_avg,
     ]
+
     #
     # Save outputs.
     #
