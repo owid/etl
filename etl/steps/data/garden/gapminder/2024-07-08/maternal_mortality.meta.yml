@@ -44,7 +44,7 @@ tables:
       number_of_women_between_15_49_years:
         title: Number of women of reproductive age (15-49 years)
         description_short: The number of women and girls aged 15-49 years in a given year.
-        unit: women
+        unit: women of reproductive age
         short_unit: ""
         display:
           numDecimalPlaces: 0
