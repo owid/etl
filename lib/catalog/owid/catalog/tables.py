@@ -32,6 +32,7 @@ import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 
+from owid.datautils import dataframes
 from owid.repack import repack_frame
 
 from . import processing_log as pl
@@ -46,6 +47,7 @@ from .meta import (
     VariableMeta,
 )
 from .utils import underscore
+from .variables import Variable
 
 log = structlog.get_logger()
 
@@ -54,6 +56,9 @@ METADATA_FIELDS = list(SCHEMA["properties"])
 
 # New type required for pandas reading functions.
 AnyStr = TypeVar("AnyStr", str, bytes)
+
+# pd.Series or Variable
+SeriesOrVariable = TypeVar("SeriesOrVariable", pd.Series, Variable)
 
 
 class Table(pd.DataFrame):
@@ -161,18 +166,18 @@ class Table(pd.DataFrame):
             raise ValueError(f"could not detect a suitable format to save to: {path}")
 
     @classmethod
-    def read(cls, path: Union[str, Path]) -> "Table":
+    def read(cls, path: Union[str, Path], **kwargs) -> "Table":
         if isinstance(path, Path):
             path = path.as_posix()
 
         if path.endswith(".csv"):
-            table = cls.read_csv(path)
+            table = cls.read_csv(path, **kwargs)
 
         elif path.endswith(".feather"):
-            table = cls.read_feather(path)
+            table = cls.read_feather(path, **kwargs)
 
         elif path.endswith(".parquet"):
-            table = cls.read_parquet(path)
+            table = cls.read_parquet(path, **kwargs)
         else:
             raise ValueError(f"could not detect a suitable format to read from: {path}")
 
@@ -288,7 +293,7 @@ class Table(pd.DataFrame):
             json.dump(metadata, ostream, indent=2, default=str)
 
     @classmethod
-    def read_csv(cls, path: Union[str, Path]) -> "Table":
+    def read_csv(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from csv plus accompanying JSON sidecar.
         """
@@ -298,21 +303,9 @@ class Table(pd.DataFrame):
         if not path.endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
-        # load the data
+        # load the data and add metadata
         df = Table(pd.read_csv(path, index_col=False, na_values=[""], keep_default_na=False))
-
-        # load the metadata
-        metadata = cls._read_metadata(path)
-
-        primary_key = metadata.pop("primary_key") if "primary_key" in metadata else []
-        fields = metadata.pop("fields") if "fields" in metadata else {}
-
-        df.metadata = TableMeta(**metadata)
-        df._fields = defaultdict(VariableMeta, {k: VariableMeta.from_dict(v) for k, v in fields.items()})
-
-        if primary_key:
-            df.set_index(primary_key, inplace=True)
-
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     def update_metadata(self, **kwargs) -> "Table":
@@ -323,11 +316,12 @@ class Table(pd.DataFrame):
         return self
 
     @classmethod
-    def _add_metadata(cls, df: pd.DataFrame, path: str) -> None:
+    def _add_metadata(cls, df: pd.DataFrame, path: str, primary_key: Optional[list[str]] = None) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
         metadata = cls._read_metadata(path)
 
-        primary_key = metadata.get("primary_key", [])
+        if primary_key is None:
+            primary_key = metadata.get("primary_key", [])
         fields = metadata.pop("fields") if "fields" in metadata else {}
 
         df.metadata = TableMeta.from_dict(metadata)
@@ -338,7 +332,7 @@ class Table(pd.DataFrame):
             df.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: Union[str, Path]) -> "Table":
+    def read_feather(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from feather plus accompanying JSON sidecar.
 
@@ -352,11 +346,11 @@ class Table(pd.DataFrame):
 
         # load the data and add metadata
         df = Table(pd.read_feather(path))
-        cls._add_metadata(df, path)
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     @classmethod
-    def read_parquet(cls, path: Union[str, Path]) -> "Table":
+    def read_parquet(cls, path: Union[str, Path], **kwargs) -> "Table":
         """
         Read the table from a parquet file plus accompanying JSON sidecar.
 
@@ -370,7 +364,7 @@ class Table(pd.DataFrame):
 
         # load the data and add metadata
         df = Table(pd.read_parquet(path))
-        cls._add_metadata(df, path)
+        cls._add_metadata(df, path, **kwargs)
         return df
 
     def _get_fields_as_dict(self) -> Dict[str, Any]:
@@ -527,6 +521,9 @@ class Table(pd.DataFrame):
 
     def copy(self, deep: bool = True) -> "Table":
         """Copy table together with all its metadata."""
+        # This could be causing this warning:
+        #   Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+        # but I'm not sure how to fix it
         tab = super().copy(deep=deep)
         return tab.copy_metadata(self)
 
@@ -593,6 +590,21 @@ class Table(pd.DataFrame):
 
     def astype(self, *args, **kwargs) -> "Table":
         return super().astype(*args, **kwargs)  # type: ignore
+
+    @overload
+    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
+        ...
+
+    @overload
+    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table":
+        ...
+
+    @overload
+    def drop_duplicates(self, **kwargs) -> "Table":
+        ...
+
+    def drop_duplicates(self, *args, **kwargs) -> Optional["Table"]:
+        return super().drop_duplicates(*args, **kwargs)
 
     def join(self, other: Union[pd.DataFrame, "Table"], *args, **kwargs) -> "Table":
         """Fix type signature of join."""
@@ -720,6 +732,8 @@ class Table(pd.DataFrame):
 
         This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
 
+        Underscoring is the first step, so make sure to use correct values in `keys` (e.g. use 'country' if original table had 'Country').
+
         ```
         tb.format(["country", "year"])
         ```
@@ -756,7 +770,16 @@ class Table(pd.DataFrame):
         # Set index
         if keys is None:
             keys = ["country", "year"]
-        t = t.set_index(keys, verify_integrity=verify_integrity)
+        ## Sanity check
+        try:
+            t = t.set_index(keys, verify_integrity=verify_integrity)
+        except KeyError as e:
+            if underscore:
+                raise KeyError(
+                    f"Make sure that you are using valid column names! Note that the column names have been underscored! Available column names are: {t.columns}. You used {keys}."
+                )
+            else:
+                raise e
         if sort_columns:
             t = t.sort_index(axis=1)
         # Sort rows
@@ -767,6 +790,18 @@ class Table(pd.DataFrame):
             t.metadata.short_name = short_name
 
         return t
+
+    @overload
+    def dropna(self, *, inplace: Literal[True], **kwargs) -> None:
+        ...
+
+    @overload
+    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table":
+        ...
+
+    @overload
+    def dropna(self, **kwargs) -> "Table":
+        ...
 
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
@@ -785,6 +820,9 @@ class Table(pd.DataFrame):
 
     def drop(self, *args, **kwargs) -> "Table":
         return cast(Table, super().drop(*args, **kwargs))
+
+    def filter(self, *args, **kwargs) -> "Table":
+        return super().filter(*args, **kwargs)  # type: ignore
 
     def update_log(
         self,
@@ -1109,6 +1147,27 @@ class VariableGroupBy:
         return func  # type: ignore
 
 
+def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> Tuple[SeriesOrVariable, SeriesOrVariable]:
+    """Align categorical columns if possible. If not, return originals. This is necessary for
+    efficient merging."""
+    if left.dtype.name == "category" and right.dtype.name == "category":
+        common_categories = left.cat.categories.union(right.cat.categories)
+
+        if isinstance(left, Variable):
+            left = left.set_categories(common_categories)
+        else:
+            left = left.cat.set_categories(common_categories)
+
+        if isinstance(right, Variable):
+            right = right.set_categories(common_categories)
+        else:
+            right = right.cat.set_categories(common_categories)
+
+        return left, right
+    else:
+        return left, right
+
+
 def merge(
     left,
     right,
@@ -1125,6 +1184,26 @@ def merge(
         raise NotImplementedError(
             "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
         )
+
+    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
+    if isinstance(on, str):
+        on = [on]
+    if isinstance(left_on, str):
+        left_on = [left_on]
+    if isinstance(right_on, str):
+        right_on = [right_on]
+
+    # Align categorical columns to make them survive pd.merge.
+    if left_on and right_on:
+        lefts_rights = zip(left_on, right_on)
+    elif on:
+        lefts_rights = zip(on, on)
+    else:
+        lefts_rights = []
+
+    for left_col, right_col in lefts_rights:
+        left[left_col], right[right_col] = align_categoricals(left[left_col], right[right_col])
+
     # Create merged table.
     tb = Table(
         pd.merge(
@@ -1140,14 +1219,6 @@ def merge(
             **kwargs,
         )
     )
-
-    # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
-    if isinstance(on, str):
-        on = [on]
-    if isinstance(left_on, str):
-        left_on = [left_on]
-    if isinstance(right_on, str):
-        right_on = [right_on]
 
     if (on is None) and (left_on is None):
         # By construction, either "on" is passed, or both "left_on" and "right_on".
@@ -1211,7 +1282,8 @@ def concat(
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
         table = Table(
-            pd.concat(
+            # use our concatenate that gracefully handles categoricals
+            dataframes.concatenate(
                 objs=objs,
                 axis=axis,  # type: ignore
                 join=join,
@@ -1232,7 +1304,8 @@ def concat(
             if pd.__version__ != "2.2.1":
                 # Check if patch is no longer needed.
                 df_0 = pd.DataFrame({"a": ["original value"]})
-                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                # use our concatenate that gracefully handles categoricals
+                df_1 = dataframes.concatenate([pd.DataFrame(), df_0], ignore_index=True)
                 df_0.loc[:, "a"] = "new value"
                 if df_1["a"].item() != "new value":
                     log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")

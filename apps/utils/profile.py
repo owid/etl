@@ -11,6 +11,11 @@ Usage:
     ```
     etl d profile --mem garden/biodiversity/2024-01-25/cherry_blossom -f calculate_multiple_year_average
     ```
+
+To profile grapher upserts, it is better to use cProfile and run something like this:
+```
+ssh owid@staging-site-my-branch "cd etl && poetry run python -m cProfile -s cumtime etl/command.py grapher://grapher/biodiversity/2024-01-25/cherry_blossom --grapher --only --force --workers 1" | head -n 100
+```
 """
 
 import importlib.util
@@ -71,11 +76,11 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
         lp_wrapper = module.run
 
     for f in functions:
-        func = getattr(module, f)
+        func = _nested_getattr(module, f)
         if cpu:
             lp.add_function(func)  # type: ignore
         if mem:
-            setattr(module, f, mem_profile(func))
+            _nested_setattr(module, f, mem_profile(func))
 
     dest_dir = paths.DATA_DIR / step
 
@@ -89,10 +94,26 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
         lp.print_stats()  # type: ignore
 
 
+def _nested_getattr(o, name):
+    for n in name.split("."):
+        o = getattr(o, n)
+    return o
+
+
+def _nested_setattr(o, name, value):
+    names = name.split(".")
+    for n in names[:-1]:
+        o = getattr(o, n)
+    setattr(o, names[-1], value)
+
+
 def _import_module(module_path: Path) -> Any:
     """Import module from given path. This is useful if your module cannot be imported
     with standard `import ...` due to special characters in its path (like date)."""
     module_name = module_path.stem
+
+    # Add module folder to sys.path (module is typically importing from shared.py)
+    sys.path.append(str(module_path.parent))
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)  # type: ignore

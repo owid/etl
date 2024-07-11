@@ -1,22 +1,17 @@
 import copy
-import datetime as dt
 import re
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import click
-import pandas as pd
-import pytz
 import requests
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
 from slack_sdk import WebClient
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, modified_charts_by_admin
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl import grapher_model as gm
@@ -35,20 +30,6 @@ log = structlog.get_logger()
     help="Sync **_only_** the chart with this id.",
 )
 @click.option(
-    "--approve-revisions/--keep-revisions",
-    default=False,
-    type=bool,
-    help="""Directly update existing charts with approved revisions (i.e. skip chart revision). Useful for large updates. This still
-    creates a chart revision if the target chart has been modified.""",
-)
-@click.option(
-    "--staging-created-at",
-    default=None,
-    type=str,
-    help="""Staging server UTC creation date. It is used to warn about charts that have been
-    updated in production. Default is branch creation date.""",
-)
-@click.option(
     "--include",
     default=None,
     type=str,
@@ -61,12 +42,6 @@ log = structlog.get_logger()
     help="""Exclude charts with variables whose catalogPath matches the provided string.""",
 )
 @click.option(
-    "--chartdiff/--no-chartdiff",
-    default=False,
-    type=bool,
-    help="""Use approvals from chart-diff for syncing charts.""",
-)
-@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     type=bool,
@@ -76,11 +51,8 @@ def cli(
     source: str,
     target: str,
     chart_id: Optional[int],
-    approve_revisions: bool,
-    staging_created_at: Optional[dt.datetime],
     include: Optional[str],
     exclude: Optional[str],
-    chartdiff: bool,
     dry_run: bool,
 ) -> None:
     """Sync Grapher charts and revisions from an environment to the main environment.
@@ -92,19 +64,11 @@ def cli(
 
     - **Note 1:** The dataset (with the new chart's underlying indicators) from `SOURCE` must exist in `TARGET`. This means that you have to merge your work to master and wait for the ETL to finish running all steps.
 
-    - **Note 2:** Staging servers are destroyed after 7 days of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
-
     **Considerations on charts:**
 
-    - Both published charts and drafts from staging are synced.
-    - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with `--approve-revisions` flag)
-    - You get a warning if the chart **_has been modified on live_** after staging server was created.
+    - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
-
-    **Considerations on chart revisions:**
-
-    - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
 
     **Considerations on tags:**
 
@@ -127,12 +91,6 @@ def cli(
     ```
     etl chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
     ```
-
-    **Example 4:** Update charts directly without creating chart revisions (useful for large datasets updates like population)
-
-    ```
-    etl chart-sync staging-site-my-branch .env.prod.write --approve-revisions
-    ```
     """
     if _is_commit_sha(source):
         source = _get_git_branch_from_commit_sha(source)
@@ -141,36 +99,31 @@ def cli(
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
     target_engine = OWIDEnv.from_staging_or_env_file(target).get_engine()
 
-    staging_created_at = _get_staging_created_at(source, staging_created_at)  # type: ignore
-
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
     target_api: AdminAPI = AdminAPI(target_engine) if not dry_run else None  # type: ignore
+
+    # Get all chart diffs between source and target
+    cd_loader = ChartDiffsLoader(source_engine, target_engine)
+    chart_diffs = cd_loader.get_diffs(config=True, metadata=False, data=False)
+
+    if chart_id:
+        chart_diffs = [cd for cd in chart_diffs if cd.source_chart.id == chart_id]
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
             # Get staging server creation time
             SERVER_CREATION_TIME = get_staging_creation_time(source_session)
 
-            if chart_id:
-                chart_ids = {chart_id}
-            else:
-                diffs = modified_charts_by_admin(source_session, target_session)
-                chart_ids = set(diffs.index[diffs.configEdited])
-
-            log.info("chart_sync.start", n=len(chart_ids), chart_ids=chart_ids)
+            chart_ids = [cd.source_chart.id for cd in chart_diffs]
+            log.info("chart_sync.start", n=len(chart_diffs), chart_ids=chart_ids)
 
             charts_synced = 0
 
-            for chart_id in chart_ids:
-                diff = ChartDiff.from_chart_id(
-                    chart_id=chart_id,
-                    server_creation_time=SERVER_CREATION_TIME,
-                    source_session=source_session,
-                    target_session=target_session,
-                )
-
-                chart_slug = diff.source_chart.config["slug"]
+            # Iterate over all chart diffs
+            for diff in chart_diffs:
+                chart_slug = diff.slug
+                chart_id = diff.source_chart.id
 
                 # Fix charts with non-existing map column slugs. We should ideally fix this
                 # for all charts and make sure it doesn't happen.
@@ -196,7 +149,7 @@ def cli(
                     continue
 
                 # Map variable IDs from source to target
-                diff.source_chart = diff.source_chart.migrate_to_db(source_session, target_session)
+                migrated_chart = diff.source_chart.migrate_to_db(source_session, target_session)
 
                 # Chart in target exists, update it
                 if diff.target_chart:
@@ -210,167 +163,69 @@ def cli(
                         )
                         continue
 
-                    ### New chart-diff workflow ###
-                    if chartdiff:
-                        # Change has been approved, update the chart
-                        if diff.is_approved:
-                            log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
-                            charts_synced += 1
-                            if not dry_run:
-                                target_api.update_chart(chart_id, diff.source_chart.config)
+                    # Change has been approved, update the chart
+                    if diff.is_approved:
+                        log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                        charts_synced += 1
+                        if not dry_run:
+                            target_api.update_chart(chart_id, migrated_chart.config)
 
-                        # Rejected chart diff
-                        elif diff.is_rejected:
-                            raise ValueError("Rejected chart diff should have been skipped")
+                    # Rejected chart diff
+                    elif diff.is_rejected:
+                        raise ValueError("Rejected chart diff should have been skipped")
 
-                        # Pending chart, notify us about it
-                        elif diff.is_pending:
-                            log.warning(
-                                "chart_sync.pending_chart",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                                source_updatedAt=str(diff.source_chart.updatedAt),
-                                target_updatedAt=str(diff.target_chart.updatedAt),
-                                staging_created_at=str(staging_created_at),
-                            )
-                            _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
-                        else:
-                            raise ValueError("Invalid chart diff state")
-
-                    ### Old workflow ###
+                    # Pending chart, notify us about it
+                    elif diff.is_pending:
+                        log.warning(
+                            "chart_sync.pending_chart",
+                            slug=chart_slug,
+                            chart_id=chart_id,
+                            source_updatedAt=str(diff.source_chart.updatedAt),
+                            target_updatedAt=str(diff.target_chart.updatedAt),
+                            staging_created_at=SERVER_CREATION_TIME,
+                        )
+                        _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
                     else:
-                        # warn if chart has been updated in production after the staging server got created
-                        if diff.target_chart.updatedAt > min(staging_created_at, diff.source_chart.updatedAt):
-                            log.warning(
-                                "chart_sync.chart_modified_in_target",
-                                slug=chart_slug,
-                                target_updatedAt=str(diff.target_chart.updatedAt),
-                                source_updatedAt=str(diff.source_chart.updatedAt),
-                                staging_created_at=str(staging_created_at),
-                                chart_id=chart_id,
-                            )
-                            print(
-                                f"[bold red]WARNING[/bold red]: [bright_cyan]Chart [bold]{chart_slug}[/bold] has been modified in target[/bright_cyan]"
-                            )
-                            print("[yellow]\tDifferences between SOURCE (-) and TARGET (+) chart[/yellow]")
-                            print(_chart_config_diff(diff.source_chart.config, diff.target_chart.config))
-
-                        # if the chart has gone through a revision, update it directly
-                        revs = _load_revisions(source_session, chart_id, diff)
-
-                        # if chart has gone through revision in source and --approve-revisions is set and
-                        # chart hasn't been updated in production, update it directly
-                        if approve_revisions and revs and staging_created_at > diff.target_chart.updatedAt:
-                            log.info(
-                                "chart_sync.update_chart",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            charts_synced += 1
-                            if not dry_run:
-                                target_api.update_chart(chart_id, diff.source_chart.config)
-                        else:
-                            assert config.GRAPHER_USER_ID
-                            GRAPHER_USER_ID = int(config.GRAPHER_USER_ID)
-
-                            # there's already a chart with the same slug, create a new revision
-                            chart_revision = gm.SuggestedChartRevisions(
-                                chartId=chart_id,
-                                createdBy=GRAPHER_USER_ID,
-                                updatedBy=GRAPHER_USER_ID,
-                                originalConfig=diff.target_chart.config,
-                                suggestedConfig=diff.source_chart.config,
-                                status="pending",
-                                createdAt=dt.datetime.utcnow(),
-                                updatedAt=dt.datetime.utcnow(),
-                            )
-                            charts_synced += 1
-                            if not dry_run:
-                                # delete previously submitted revisions
-                                (
-                                    target_session.query(gm.SuggestedChartRevisions)
-                                    .filter_by(
-                                        chartId=chart_id,
-                                        status="pending",
-                                        createdBy=GRAPHER_USER_ID,
-                                    )
-                                    .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)
-                                    .delete()
-                                )
-
-                                try:
-                                    target_session.add(chart_revision)
-                                    target_session.commit()
-                                except IntegrityError:
-                                    # chart revision already exists
-                                    target_session.rollback()
-                                    log.info(
-                                        "chart_sync.skip",
-                                        reason="revision already exists",
-                                        slug=chart_slug,
-                                        chart_id=chart_id,
-                                    )
-                                    continue
-
-                            log.info("chart_sync.create_chart_revision", slug=chart_slug, chart_id=chart_id)
+                        raise ValueError("Invalid chart diff state")
 
                 # Chart is new, create it
                 else:
                     chart_tags = diff.source_chart.tags(source_session)
 
-                    if chartdiff:
-                        # New chart has been approved
-                        if diff.is_approved:
-                            charts_synced += 1
-                            if not dry_run:
-                                resp = target_api.create_chart(diff.source_chart.config)
-                                target_api.set_tags(resp["chartId"], chart_tags)
-                            else:
-                                resp = {"chartId": None}
-                            log.info(
-                                "chart_sync.create_chart",
-                                published=diff.source_chart.config.get("isPublished"),
-                                slug=chart_slug,
-                                new_chart_id=resp["chartId"],
-                            )
-                        # Rejected chart diff
-                        elif diff.is_rejected:
-                            raise ValueError("Rejected chart diff should have been skipped")
-
-                        # Not approved, create the chart, but notify us about it
-                        elif diff.is_pending:
-                            log.warning(
-                                "chart_sync.new_unapproved_chart",
-                                slug=chart_slug,
-                                chart_id=chart_id,
-                            )
-                            _notify_slack_chart_create(chart_id, str(source), dry_run)
-
-                        else:
-                            raise ValueError("Invalid chart diff state")
-                    else:
+                    # New chart has been approved
+                    if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
-                            resp = target_api.create_chart(diff.source_chart.config)
+                            resp = target_api.create_chart(migrated_chart.config)
                             target_api.set_tags(resp["chartId"], chart_tags)
                         else:
                             resp = {"chartId": None}
-
                         log.info(
                             "chart_sync.create_chart",
-                            published=diff.source_chart.config.get("isPublished"),
+                            published=migrated_chart.config.get("isPublished"),
                             slug=chart_slug,
                             new_chart_id=resp["chartId"],
                         )
+                    # Rejected chart diff
+                    elif diff.is_rejected:
+                        raise ValueError("Rejected chart diff should have been skipped")
+
+                    # Not approved, create the chart, but notify us about it
+                    elif diff.is_pending:
+                        log.warning(
+                            "chart_sync.new_unapproved_chart",
+                            slug=chart_slug,
+                            chart_id=chart_id,
+                        )
+                        _notify_slack_chart_create(chart_id, str(source), dry_run)
+
+                    else:
+                        raise ValueError("Invalid chart diff state")
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
     else:
         print("\n[bold green]No charts synced[/bold green]")
-
-    if not chartdiff:
-        print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
-        print("[green]1.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -390,24 +245,6 @@ def _get_git_branch_from_commit_sha(commit_sha: str) -> str:
         return closed_pull_requests[0]["head"]["ref"]
     else:
         raise ValueError(f"No closed pull requests found for commit {commit_sha}")
-
-
-def _load_revisions(source_session: Session, chart_id: int, diff: ChartDiff) -> List[gm.SuggestedChartRevisions]:
-    assert diff.target_chart
-
-    revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
-
-    # revision must be approved and be created after chart latest edit
-    revs = [
-        rev
-        for rev in revs
-        if rev.status == "approved"
-        and rev.updatedBy == 1
-        # min(rev.createdAt, rev.updatedAt) is needed because of a bug in chart revisions, it should be fixed soon
-        and min(rev.createdAt, rev.updatedAt) > diff.target_chart.updatedAt
-    ]
-
-    return revs
 
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
@@ -465,20 +302,6 @@ def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optiona
     return True
 
 
-def _get_staging_created_at(source: str, staging_created_at: Optional[str]) -> dt.datetime:
-    if staging_created_at is None:
-        if not Path(source).exists():
-            return _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
-        else:
-            log.warning(
-                "--staging-created-at is not provided while using the local environment, it's assumed that you began working less than one week ago."
-            )
-            return dt.datetime.now() - dt.timedelta(weeks=1)
-            # raise click.BadParameter("staging-created-at is required when source is not a staging server name")
-    else:
-        return pd.to_datetime(staging_created_at)
-
-
 def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
     config = copy.deepcopy(config)
     config = {k: v for k, v in config.items() if k not in ("version",)}
@@ -493,17 +316,6 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
-
-
-def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
-    js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
-    assert len(js) > 0, f"Branch {branch_name} not found in owid/etl repository"
-
-    # There could be multiple old branches from the past, pick the most recent one
-    created_ats = [
-        dt.datetime.fromisoformat(pr["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None) for pr in js
-    ]
-    return max(created_ats)
 
 
 if __name__ == "__main__":

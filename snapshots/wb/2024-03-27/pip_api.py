@@ -16,9 +16,11 @@ To run this code from scratch,
         - Type in owid@staging-site-{branch_name}
     - Delete the files in the cache folder:
         rm -rf .cache/*
-    - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`. Run
-        - https://api.worldbank.org/pip/v1/pip?country=CHN&year=all&povline=80&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&identity=PROD&format=csv
-        - https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&format=csv
+    - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
+        - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
+        - Open
+            https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&identity=PROD&format=csv
+            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
@@ -48,7 +50,7 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
-from owid.catalog import connect_r2_cached
+from owid.catalog.s3_utils import connect_r2_cached
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
@@ -79,7 +81,7 @@ LIVE_API = 1
 def poverty_lines_countries():
     """
     These poverty lines are used to calculate percentiles for countries that are not in the percentile file.
-    # We only extract to $80 because the highest P99 not available is China, with $64.5
+    # We only extract to $150 because the highest P99 not available is St. Lucia
     # NOTE: In future updates, check if these poverty lines are enough for the extraction
     """
     # Define poverty lines and their increase
@@ -292,7 +294,13 @@ def _fetch_percentiles(version: int) -> pd.DataFrame:
         url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv"
     else:
         raise ValueError(f"Version {version} is not supported")
-    return pd.read_csv(url)
+
+    _df_percentiles = pd.read_csv(url)
+
+    # Drop  Unnamed: 0 column (it sometimes appears in the files)
+    _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])
+
+    return _df_percentiles
 
 
 ############################################################################################################

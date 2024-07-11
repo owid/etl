@@ -38,6 +38,7 @@ There are different ways you can add data to the catalog, depending on your tech
 ## Using Wizard (recommended)
 
 !!! info
+
     Learn more about Wizard in [this dedicated guideline](wizard.md).
 
 
@@ -74,6 +75,7 @@ etl run <short_name> --grapher
 
 
 !!! info "Report issues with Wizard"
+
     Minor issues with wizard<br>
     [Add a comment to this central issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/1563)<br>
 
@@ -89,6 +91,7 @@ etl run <short_name> --grapher
 ## Using the Fast-Track
 
 !!! warning "You need Tailscale to access fast-track"
+
     Alternatively, run fast-track locally with `etl fasttrack --no-commit`
 
 While the ETL is excellent for making data reproducible, it is still slower than manual CSV uploads for small datasets. For this reason, we provide an alternative path for small datasets. Fast-track is a tool for importing datasets from Google Sheets. The idea is to keep all data and metadata there and use this interface to import or update the data in the Grapher database, where it can be used to create charts. Fast-track also commits your work to the ETL repository, where you can further process your data with Python.
@@ -216,6 +219,7 @@ git checkout -b data/new-dataset
     [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 
     !!! warning "The `grapher` step to import the dataset to Grapher is now automatic"
+
         We have automatic deploys to grapher database from ETL. This means that whenever we push to master, `etl --grapher` is automatically run and pushes your data to MySQL. This means:
 
         - **You don't have to manually push to grapher**. Just merge and wait for CI status on master to turn green.

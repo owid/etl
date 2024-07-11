@@ -86,27 +86,12 @@ steps:
 
   # AI Index report
 
-  # Artificial Intelligence Conference Attendance
-  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
-    - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
-  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
-    - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
-
   # DeepFakes
   data://garden/artificial_intelligence/2023-06-14/ai_deepfakes:
     - snapshot://artificial_intelligence/2023-06-14/ai_deepfakes.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_deepfakes:
     - data://garden/artificial_intelligence/2023-06-14/ai_deepfakes
 
-  # AI companies
-  data://garden/artificial_intelligence/2023-06-14/ai_companies:
-    - snapshot://artificial_intelligence/2023-06-14/ai_companies.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_companies_total.csv
-
-  data://grapher/artificial_intelligence/2023-06-14/ai_companies:
-    - data://garden/artificial_intelligence/2023-06-14/ai_companies
 
   # AI adoption by organisations
   data://garden/artificial_intelligence/2023-06-14/ai_adoption:
@@ -114,28 +99,6 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_adoption:
     - data://garden/artificial_intelligence/2023-06-14/ai_adoption
 
-  # AI job postings
-  data://garden/artificial_intelligence/2023-06-14/ai_job_postings:
-    - snapshot://artificial_intelligence/2023-06-14/ai_job_postings.csv
-  data://grapher/artificial_intelligence/2023-06-14/ai_job_postings:
-    - data://garden/artificial_intelligence/2023-06-14/ai_job_postings
-
-  # AI corporate investment
-  data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment:
-    - snapshot://artificial_intelligence/2023-06-14/ai_corporate_investment.csv
-    - snapshot://wb/2023-09-19/us_cpi.csv
-
-  data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
-    - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
-
-  # AI private investment
-  data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
-    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
-    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment_total.csv
-    - snapshot://wb/2023-09-19/us_cpi.csv
-
-  data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
-    - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
 
   # AI bills passed into law
   data://garden/artificial_intelligence/2023-06-14/ai_bills:
@@ -154,20 +117,6 @@ steps:
     - snapshot://artificial_intelligence/2023-06-14/ai_github.csv
   data://grapher/artificial_intelligence/2023-06-14/ai_github:
     - data://garden/artificial_intelligence/2023-06-14/ai_github
-
-  # AI Incidents
-  data://garden/artificial_intelligence/2023-06-14/ai_incidents:
-    - snapshot://artificial_intelligence/2023-06-14/ai_incidents.csv
-  data://grapher/artificial_intelligence/2023-06-14/ai_incidents:
-    - data://garden/artificial_intelligence/2023-06-14/ai_incidents
-
-  # AI Robots
-  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
-    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
-  data://garden/artificial_intelligence/2023-06-14/ai_robots:
-    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
-  data://grapher/artificial_intelligence/2023-06-14/ai_robots:
-    - data://garden/artificial_intelligence/2023-06-14/ai_robots
 
   # AI gender representation
   data://garden/artificial_intelligence/2023-06-14/ai_gender_representation:
@@ -292,3 +241,63 @@ steps:
     - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
   data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
     - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
+
+  # AI Index Report 2024 - Conference Attendance
+  data://garden/artificial_intelligence/2024-06-28/ai_conferences:
+     - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_conferences:
+    - data://garden/artificial_intelligence/2024-06-28/ai_conferences
+
+  # AI Index Report 2024 - Incidents
+  data://garden/artificial_intelligence/2024-06-28/ai_incidents:
+     - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_incidents:
+    - data://garden/artificial_intelligence/2024-06-28/ai_incidents
+
+  # AI Index Report 2024 - AI job postings
+  data://garden/artificial_intelligence/2024-06-28/ai_jobs:
+     - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_jobs:
+    - data://garden/artificial_intelligence/2024-06-28/ai_jobs
+
+  # AI Index Report 2024 - AI investment trends
+  data://garden/artificial_intelligence/2024-06-28/ai_investment:
+     - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
+     - data://garden/bls/2024-05-16/us_consumer_prices
+
+  # Grapher dataset for private investment in AI
+  data://grapher/artificial_intelligence/2024-06-28/ai_private_investment:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # Grapher dataset for corporate investment in AI
+  data://grapher/artificial_intelligence/2024-06-28/ai_corporate_investment:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # Grapher dataset for generative investment in AI and number of companies
+  data://grapher/artificial_intelligence/2024-06-28/ai_investment_generative_companies:
+    - data://garden/artificial_intelligence/2024-06-28/ai_investment
+
+  # AI Index Report 2024 - AI robots
+  data://garden/artificial_intelligence/2024-06-28/ai_robots:
+     - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_robots:
+    - data://garden/artificial_intelligence/2024-06-28/ai_robots
+
+  # AI Index Report 2024 - AI bills
+  data://garden/artificial_intelligence/2024-06-28/ai_bills:
+    - snapshot://artificial_intelligence/2024-06-28/ai_bills.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_bills:
+    - data://garden/artificial_intelligence/2024-06-28/ai_bills
+
+  # AI Index Report 2024 - AI strategies
+  data://garden/artificial_intelligence/2024-06-28/ai_strategies:
+    - snapshot://artificial_intelligence/2024-06-28/ai_strategies.csv
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/artificial_intelligence/2024-06-28/ai_strategies:
+    - data://garden/artificial_intelligence/2024-06-28/ai_strategies
+
+  # AI Index Report 2024 - AI PhDs
+  data://garden/artificial_intelligence/2024-06-28/ai_phds:
+    - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_phds:
+    - data://garden/artificial_intelligence/2024-06-28/ai_phds

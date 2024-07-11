@@ -1,0 +1,57 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    description_key:
+      - Data is estimated from wealth concentration at death, based on estate tax returns.
+      - Data before 1902 has been estimated by sampling decedents in the Paris region.
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  wealth_france:
+    variables:
+      p90p100_share:
+        title: Richest decile - Wealth share
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of wealth owned by the richest decile (tenth of the population).
+        presentation:
+          title_public: Wealth share of the richest 10%
+        display:
+          name: Wealth share of the richest 10%
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      p99p100_share:
+        title: Top 1% - Wealth share
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of wealth owned by the richest 1%.
+        presentation:
+          title_public: Wealth share of the richest 1%
+        display:
+          name: Wealth share of the richest 1%
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      p99_9p100_share:
+        title: Top 0.1% - Wealth share
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of wealth owned by the richest 0.1%.
+        presentation:
+          title_public: Wealth share of the richest 0.1%
+        display:
+          name: Wealth share of the richest 0.1%
+          numDecimalPlaces: 1
+          tolerance: 5
+

@@ -51,6 +51,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     # Create a column to display the dataset by its dataset id followed by its title.
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
+    version = df["step"].str.split("/").str[-2]
+    df["display_name"] = df["display_name"] + " [" + version + "]"
     # Create a dictionary mapping from that display to dataset id.
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
     # Create a column to display the dataset by its dataset id followed by its ETL step.
@@ -195,6 +197,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             logging=True,
         )
         reset_indicator_form()
+        st.session_state["not-ignore-all"] = True
+        st.session_state["pagination_indicator_mapping"] = 1
 
     # Get IDs of the chosen old and new datasets.
     dataset_old_id = display_name_to_id_mapping.get(dataset_old) or display_step_to_id_mapping.get(dataset_old)

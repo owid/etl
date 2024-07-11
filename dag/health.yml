@@ -39,37 +39,6 @@ steps:
   data://grapher/who/2023-03-09/gho_suicides:
     - data://garden/who/2023-03-09/gho_suicides
 
-  # IHME Global Burden of Disease - Child mortality long run
-  data://meadow/ihme_gbd/2020-12-19/child_mortality:
-    - walden://ihme_gbd/2020-12-19/child_mortality
-  data://garden/ihme_gbd/2020-12-19/child_mortality:
-    - data://meadow/ihme_gbd/2020-12-19/child_mortality
-  data://grapher/ihme_gbd/2020-12-19/child_mortality:
-    - data://garden/ihme_gbd/2020-12-19/child_mortality
-
-  # IHME Global Burden of Disease - Deaths and DALYs
-  data://meadow/ihme_gbd/2019/gbd_cause:
-    - walden://ihme_gbd/2019/gbd_cause
-  data://garden/ihme_gbd/2019/gbd_cause:
-    - data://meadow/ihme_gbd/2019/gbd_cause
-  data://grapher/ihme_gbd/2019/gbd_cause:
-    - data://garden/ihme_gbd/2019/gbd_cause
-
-  # IHME Global Burden of Disease - Child mortality
-  data://meadow/ihme_gbd/2019/gbd_child_mortality:
-    - walden://ihme_gbd/2019/gbd_child_mortality
-  data://garden/ihme_gbd/2019/gbd_child_mortality:
-    - data://meadow/ihme_gbd/2019/gbd_child_mortality
-  data://grapher/ihme_gbd/2019/gbd_child_mortality:
-    - data://garden/ihme_gbd/2019/gbd_child_mortality
-
-  # IHME Global Burden of Disease - Mental health
-  data://meadow/ihme_gbd/2019/gbd_mental_health:
-    - walden://ihme_gbd/2019/gbd_mental_health
-  data://garden/ihme_gbd/2019/gbd_mental_health:
-    - data://meadow/ihme_gbd/2019/gbd_mental_health
-  data://grapher/ihme_gbd/2019/gbd_mental_health:
-    - data://garden/ihme_gbd/2019/gbd_mental_health
 
   # IHME Global Burden of Disease - Risk factors
   data://meadow/ihme_gbd/2019/gbd_risk:
@@ -79,37 +48,8 @@ steps:
   data://grapher/ihme_gbd/2019/gbd_risk:
     - data://garden/ihme_gbd/2019/gbd_risk
 
-  # IHME Global Burden of Disease - Prevalence and incidence
-  data://meadow/ihme_gbd/2019/gbd_prevalence:
-    - walden://ihme_gbd/2019/gbd_prevalence
-  data://garden/ihme_gbd/2019/gbd_prevalence:
-    - data://meadow/ihme_gbd/2019/gbd_prevalence
-  data://grapher/ihme_gbd/2019/gbd_prevalence:
-    - data://garden/ihme_gbd/2019/gbd_prevalence
 
-  # IHME GBD Mental Health Prevalence
-  data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
-    - snapshot://ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate.zip
-  data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
-    - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
-  data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
-    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
 
-  # IHME GBD Mental Health DALYs vs Prevalence
-  data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
-    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
-    - data://garden/ihme_gbd/2019/gbd_cause
-  data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
-    - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
-
-  # IHME GBD Leading cause of deaths - to archive
-  data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
-    - snapshot://ihme_gbd/2023-10-04/cause_hierarchy.csv
-  data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths:
-    - data://garden/ihme_gbd/2019/gbd_cause
-    - data://meadow/ihme_gbd/2023-10-04/cause_hierarchy
-  data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
-    - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
 
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
@@ -225,6 +165,12 @@ steps:
   data://grapher/who/2023-06-30/guinea_worm:
     - data://garden/who/2023-06-29/guinea_worm
 
+  data://garden/who/2024-06-17/guinea_worm:
+    - data://garden/who/2023-06-29/guinea_worm
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/who/2024-06-17/guinea_worm:
+    - data://garden/who/2024-06-17/guinea_worm
+
   # Autopsies WHO-Europe
   data://meadow/who/2023-07-13/autopsy:
     - snapshot://who/2022-09-01/autopsy.csv
@@ -287,14 +233,21 @@ steps:
   data://grapher/health/2023-08-09/unaids:
     - data://garden/health/2023-08-09/unaids
 
-  # OECD Road accidents
-  data://meadow/oecd/2023-08-11/road_accidents:
-    - snapshot://oecd/2023-08-11/road_accidents.csv
-  data://garden/oecd/2023-08-11/road_accidents:
-    - data://meadow/oecd/2023-08-11/road_accidents
+  # OECD Road accidents & passenger travel
+  data://meadow/oecd/2024-07-01/road_accidents:
+    - snapshot://oecd/2024-07-01/road_accidents.csv
+  data://meadow/oecd/2024-07-01/passenger_travel:
+    - snapshot://oecd/2024-07-01/passenger_travel.csv
+
+  data://garden/oecd/2024-07-01/road_accidents:
+    - data://meadow/oecd/2024-07-01/road_accidents
     - data://garden/oecd/2018-03-11/road_deaths_and_injuries
-  data://grapher/oecd/2023-08-11/road_accidents:
-    - data://garden/oecd/2023-08-11/road_accidents
+    - data://meadow/oecd/2024-07-01/passenger_travel
+    - data://garden/demography/2023-03-31/population
+  data://grapher/oecd/2024-07-01/road_accidents:
+    - data://garden/oecd/2024-07-01/road_accidents
+
+
   # Kucharski
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
@@ -586,11 +539,6 @@ steps:
     # Soil-transmitted helminthiases
   data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
     - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
-  data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - data://garden/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases
 
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2024-05-18/funding:
@@ -631,6 +579,50 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health
 
+    # GBD 2021 - GBD Mental Health Burden
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health_burden:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_mental_health_burden.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_mental_health_burden
+    - data://garden/un/2022-07-11/un_wpp
+  #data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health_burden_entities:
+  #  - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_mental_health_burden_dalys:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_mental_health_burden
+
+
+  # GBD 2021 - GBD Risk Factors
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_risk:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_risk.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_risk:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_risk
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_risk:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_risk
+
+  # GBD 2021 - GBD Child Mortality
+  data-private://meadow/ihme_gbd/2024-05-20/gbd_child_mortality:
+    - snapshot-private://ihme_gbd/2024-05-20/gbd_child_mortality.feather
+  data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality:
+    - data-private://meadow/ihme_gbd/2024-05-20/gbd_child_mortality
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
+  data-private://grapher/ihme_gbd/2024-05-20/gbd_child_mortality:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
+
+
+  # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
+  data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
+    - snapshot-private://ihme_gbd/2024-07-02/gbd_life_expectancy.zip
+  data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
+    - snapshot-private://ihme_gbd/2024-07-02/gbd_healthy_life_expectancy.zip
+  data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
+    - data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy
+    - data-private://meadow/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
+  data-private://grapher/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy:
+    - data-private://garden/ihme_gbd/2024-07-02/gbd_healthy_life_expectancy
+
   # WHO Avian Influenza H5N1
   data://meadow/who/latest/avian_influenza_ah5n1:
     - snapshot://who/latest/avian_influenza_ah5n1.csv
@@ -656,3 +648,4 @@ steps:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
+

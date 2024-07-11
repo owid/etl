@@ -108,8 +108,8 @@ log = structlog.get_logger()
     "--workers",
     "-w",
     type=int,
-    help=f"Parallelize execution of steps. [{config.RUN_STEPS_WORKERS}]",
-    default=config.RUN_STEPS_WORKERS,
+    help="Parallelize execution of steps.",
+    default=1,
 )
 @click.option(
     "--use-threads/--no-threads",
@@ -148,7 +148,7 @@ def main_cli(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     use_threads: bool = True,
     strict: Optional[bool] = None,
     watch: bool = False,
@@ -181,8 +181,11 @@ def main_cli(
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
         config.DIRTY_STEPS_WORKERS = 1
-        config.RUN_STEPS_WORKERS = 1
         workers = 1
+
+    # GRAPHER_INSERT_WORKERS should be split among workers
+    if workers > 1:
+        config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
 
     kwargs = dict(
         steps=steps,
@@ -209,7 +212,6 @@ def main_cli(
             config.IPDB_ENABLED = True
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
-            config.RUN_STEPS_WORKERS = 1
             kwargs["workers"] = 1
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
@@ -228,7 +230,7 @@ def main(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -299,7 +301,7 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -361,7 +363,9 @@ def run_dag(
         )
         return exec_steps(steps, strict=strict)
     else:
-        print(f"--- Running {len(steps)} steps with {workers} processes:")
+        print(
+            f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
+        )
         return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
 
 

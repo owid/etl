@@ -29,3 +29,77 @@ steps:
     - data://meadow/who/2024-04-26/avian_influenza_ah5n1
   data://grapher/who/2024-04-26/avian_influenza_ah5n1:
     - data://garden/who/2024-04-26/avian_influenza_ah5n1
+  # OECD Road Accidents
+  data://grapher/oecd/2023-08-11/road_accidents:
+    - data://garden/oecd/2023-08-11/road_accidents
+  data://meadow/oecd/2023-08-11/road_accidents:
+    - snapshot://oecd/2023-08-11/road_accidents.csv
+  data://garden/oecd/2023-08-11/road_accidents:
+    - data://meadow/oecd/2023-08-11/road_accidents
+    - data://garden/oecd/2018-03-11/road_deaths_and_injuries
+
+# GBD 2019
+
+  # IHME GBD Leading cause of deaths - to archive
+  data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
+    - snapshot://ihme_gbd/2023-10-04/cause_hierarchy.csv
+  data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths:
+    - data://garden/ihme_gbd/2019/gbd_cause
+    - data://meadow/ihme_gbd/2023-10-04/cause_hierarchy
+  data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
+    - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
+
+# IHME Global Burden of Disease - Prevalence and incidence
+  data://meadow/ihme_gbd/2019/gbd_prevalence:
+    - walden://ihme_gbd/2019/gbd_prevalence
+  data://garden/ihme_gbd/2019/gbd_prevalence:
+    - data://meadow/ihme_gbd/2019/gbd_prevalence
+  data://grapher/ihme_gbd/2019/gbd_prevalence:
+    - data://garden/ihme_gbd/2019/gbd_prevalence
+
+  # IHME GBD Mental Health Prevalence
+  data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - snapshot://ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate.zip
+  data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+  data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+
+  # IHME GBD Mental Health DALYs vs Prevalence
+  data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
+    - data://garden/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
+    - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
+
+  # IHME Global Burden of Disease - Child mortality long run
+  data://meadow/ihme_gbd/2020-12-19/child_mortality:
+    - walden://ihme_gbd/2020-12-19/child_mortality
+  data://garden/ihme_gbd/2020-12-19/child_mortality:
+    - data://meadow/ihme_gbd/2020-12-19/child_mortality
+  data://grapher/ihme_gbd/2020-12-19/child_mortality:
+    - data://garden/ihme_gbd/2020-12-19/child_mortality
+
+  # IHME Global Burden of Disease - Deaths and DALYs
+  data://meadow/ihme_gbd/2019/gbd_cause:
+    - walden://ihme_gbd/2019/gbd_cause
+  data://garden/ihme_gbd/2019/gbd_cause:
+    - data://meadow/ihme_gbd/2019/gbd_cause
+  data://grapher/ihme_gbd/2019/gbd_cause:
+    - data://garden/ihme_gbd/2019/gbd_cause
+
+  # IHME Global Burden of Disease - Child mortality
+  data://meadow/ihme_gbd/2019/gbd_child_mortality:
+    - walden://ihme_gbd/2019/gbd_child_mortality
+  data://garden/ihme_gbd/2019/gbd_child_mortality:
+    - data://meadow/ihme_gbd/2019/gbd_child_mortality
+  data://grapher/ihme_gbd/2019/gbd_child_mortality:
+    - data://garden/ihme_gbd/2019/gbd_child_mortality
+
+  # IHME Global Burden of Disease - Mental health
+  data://meadow/ihme_gbd/2019/gbd_mental_health:
+    - walden://ihme_gbd/2019/gbd_mental_health
+  data://garden/ihme_gbd/2019/gbd_mental_health:
+    - data://meadow/ihme_gbd/2019/gbd_mental_health
+  data://grapher/ihme_gbd/2019/gbd_mental_health:
+    - data://garden/ihme_gbd/2019/gbd_mental_health

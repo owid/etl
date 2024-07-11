@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note:  For example, the [Identifying Outputs of Generative Adversarial Networks Act](https://www.govinfo.gov/content/pkg/PLAW-116publ258/pdf/PLAW-116publ258.pdf) passed into law by the US Congress.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_bills:
+    variables:
+      number_of_ai_related_bills_passed_into_law:
+        title: Cumulative AI-related bills passed into law since 2016, as of 2023
+        unit: 'bills'
+        short_unit: ''
+        description_short: Bills passed into law by national legislative bodies (e.g., congress, parliament) with the keyword “artificial intelligence” (translated to the respective languages) in the title or body of the bill.
+
+
+

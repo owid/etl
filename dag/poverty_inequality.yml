@@ -9,7 +9,7 @@ steps:
   data://explorers/poverty_inequality/latest/poverty_inequality_export:
     - data://garden/wb/2024-03-27/world_bank_pip
     - data://garden/wid/2024-05-24/world_inequality_database
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/lis/2024-06-13/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
@@ -42,22 +42,22 @@ steps:
     - data://garden/wid/2024-05-24/world_inequality_database
 
   # Luxembourg Income Study
-  data://meadow/lis/2023-08-30/luxembourg_income_study:
-    - snapshot://lis/2023-08-30/lis_keyvars.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty.csv
-    - snapshot://lis/2023-08-30/lis_distribution.csv
-    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
-    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
-    - snapshot://lis/2023-08-30/lis_percentiles.csv
-    - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
+  data://meadow/lis/2024-06-13/luxembourg_income_study:
+    - snapshot://lis/2024-06-13/lis_keyvars.csv
+    - snapshot://lis/2024-06-13/lis_distribution_adults.csv
+    - snapshot://lis/2024-06-13/lis_keyvars_adults.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty.csv
+    - snapshot://lis/2024-06-13/lis_distribution.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
+    - snapshot://lis/2024-06-13/lis_percentiles.csv
+    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2023-08-30/luxembourg_income_study:
-    - data://meadow/lis/2023-08-30/luxembourg_income_study
-  data://grapher/lis/2023-08-30/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+  data://garden/lis/2024-06-13/luxembourg_income_study:
+    - data://meadow/lis/2024-06-13/luxembourg_income_study
+  data://grapher/lis/2024-06-13/luxembourg_income_study:
+    - data://garden/lis/2024-06-13/luxembourg_income_study
   data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/lis/2024-06-13/luxembourg_income_study
 
   # Multidimensional Poverty Index
   data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
@@ -104,12 +104,6 @@ steps:
   data://grapher/cedlas/2024-03-08/sedlac:
     - data://garden/cedlas/2024-03-08/sedlac
 
-  # Annual Survey of Hours and Earnings time series of selected estimates - UK's Office for National Statistics
-  data://meadow/ons/2024-03-20/hours_and_earnings_uk:
-    - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
-  data://garden/ons/2024-03-20/hours_and_earnings_uk:
-    - data://meadow/ons/2024-03-20/hours_and_earnings_uk
-
   # OECD Affordable Housing Database - Homelessness
   data://meadow/oecd/2024-04-30/affordable_housing_database:
     - snapshot://oecd/2024-04-30/affordable_housing_database_homelessness.xlsx
@@ -117,3 +111,20 @@ steps:
     - data://meadow/oecd/2024-04-30/affordable_housing_database
   data://grapher/oecd/2024-04-30/affordable_housing_database:
     - data://garden/oecd/2024-04-30/affordable_housing_database
+
+  # Poverty projections from the World Bank
+  data://meadow/wb/2024-06-26/poverty_projections:
+    - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
+    - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
+  data://garden/wb/2024-06-26/poverty_projections:
+    - data://meadow/wb/2024-06-26/poverty_projections
+  data://grapher/wb/2024-06-26/poverty_projections:
+    - data://garden/wb/2024-06-26/poverty_projections
+
+  # Institute of Global Homelessness - Better Data Project
+  data://meadow/igh/2024-07-05/better_data_homelessness:
+    - snapshot://igh/2024-07-05/better_data_homelessness.xlsx
+  data://garden/igh/2024-07-05/better_data_homelessness:
+    - data://meadow/igh/2024-07-05/better_data_homelessness
+  data://grapher/igh/2024-07-05/better_data_homelessness:
+    - data://garden/igh/2024-07-05/better_data_homelessness

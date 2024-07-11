@@ -163,3 +163,20 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/emissions/2023-11-23/national_contributions:
     - data://garden/emissions/2023-11-23/national_contributions
+  data://garden/gcp/2023-12-12/global_carbon_budget:
+    - data://meadow/gcp/2023-12-12/global_carbon_budget
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/energy/2024-05-08/primary_energy_consumption
+    - data://garden/demography/2023-03-31/population
+  data://grapher/gcp/2023-12-12/global_carbon_budget:
+    - data://garden/gcp/2023-12-12/global_carbon_budget
+  #
+  # Decoupling of GDP and CO2 (2023).
+  #
+  # The data from the following step will be used in this static chart:
+  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+  data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/gcp/2023-12-12/global_carbon_budget
