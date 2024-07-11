@@ -9,17 +9,17 @@ definitions:
         <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
         total
         <% else %>
-          <%- if sex != 'all' %>
-            << sex >><%- if age != 'all' or variant != 'estimates' %>, <% endif %>
-          <%- endif %>
-          <%- if age == '0' %>
-            at birth<%- if variant != 'estimates' %>, <% endif %>
-          <%- elif age != 'all' %>
-            aged << age >><%- if variant != 'estimates' %>, <% endif %>
-          <%- endif %>
-          <%- if variant != 'estimates' %>
-            << variant >> projection
-          <%- endif %>
+        <%- if sex != 'all' %>
+        << sex >><%- if age != 'all' or variant != 'estimates' %>, <% endif %>
+        <%- endif %>
+        <%- if age == '0' %>
+        at birth<%- if variant != 'estimates' %>, <% endif %>
+        <%- elif age != 'all' %>
+        aged << age >><%- if variant != 'estimates' %>, <% endif %>
+        <%- endif %>
+        <%- if variant != 'estimates' %>
+        << variant >> projection
+        <%- endif %>
         <% endif %>
       description_short: |-
         <% if not (sex == 'all' and age == 'all') %>
