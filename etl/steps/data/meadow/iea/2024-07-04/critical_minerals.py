@@ -1,4 +1,17 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load data from the individual sheets of IEA's Critical Minerals spreadsheet.
+
+Sheets have different formats, but there are some common elements.
+
+There are four scenarios adopted for projections:
+* Stated Policies.
+* Announced Pledges.
+* Net Zero Emissions by 2050.
+
+Additionally, we assign a scenario "Current" to data that is not based on projections.
+
+Some of the sheets also contain "cases", which are things like "Base case" (the default), "Constrained rare earth elements supply", "Wider use of silicon-rich anodes"...
+
+"""
 
 from typing import Optional
 
@@ -64,6 +77,7 @@ def process_demand_for_key_minerals(
     tb = tb.drop(columns=[column for column in tb.columns if column.endswith("__")])
 
     # Drop initial rows that corresponded to titles.
+    assert tb.loc[4].isnull().all(), "Sheet format may have changed."
     tb = tb.drop([0, 1, 2, 3, 4]).reset_index(drop=True)
 
     # Drop empty columns and rows.
@@ -98,8 +112,7 @@ def process_demand_for_key_minerals(
     return tb
 
 
-def process_supply_for_key_minerals(data: pr.ExcelFile) -> Table:
-    sheet_name = "2 Total supply for key minerals"
+def process_supply_for_key_minerals(data: pr.ExcelFile, sheet_name: str) -> Table:
     # Read the sheet, and let all columns be "Unnamed: X" (with X from 0 to the number of columns).
     tb = data.parse(sheet_name)
 
@@ -112,6 +125,7 @@ def process_supply_for_key_minerals(data: pr.ExcelFile) -> Table:
         new_columns = _tb.iloc[2].astype("Int64").astype(object).fillna("").astype(str).values
         new_columns[0] = "country"
         _tb = _tb.rename(columns={_tb.columns[i]: column for i, column in enumerate(new_columns)}, errors="raise")
+        assert _tb.loc[3].isnull().all(), "Sheet format may have changed."
         _tb = _tb.drop([0, 1, 2, 3]).reset_index(drop=True)
         _tb = drop_all_rows_of_notes(tb=_tb)
 
@@ -165,7 +179,7 @@ def run(dest_dir: str) -> None:
         normal_row_name="technology",
         tb_short_name="demand_for_key_minerals",
     )
-    tb_supply = process_supply_for_key_minerals(data=data)
+    tb_supply = process_supply_for_key_minerals(data=data, sheet_name="2 Total supply for key minerals")
     tb_demand_for_clean_energy_technologies = process_demand_for_key_minerals(
         data=data,
         sheet_name="3.1 Cleantech demand by tech",

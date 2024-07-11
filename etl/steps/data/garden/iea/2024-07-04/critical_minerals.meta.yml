@@ -1,6 +1,8 @@
 definitions:
   common:
     processing_level: major
+    unit: tonnes
+    short_unit: t
     presentation:
       topic_tags:
         - Energy
@@ -16,8 +18,6 @@ tables:
     variables:
       demand:
          title: Projected demand for critical minerals
-         unit: tonnes
-         short_unit: t
          description_key:
           - Lithium demand is given in lithium content (not carbonate equivalent).
           - Demand for magnet rare earth elements covers praseodymium (Pr), neodymium (Nd), terbium (Tb) and dysprosium (Dy).
@@ -27,8 +27,6 @@ tables:
     variables:
       supply:
          title: Projected supply of critical minerals
-         unit: tonnes
-         short_unit: t
          description_key:
           - Supply projections are built using the data for the pipeline of operating and announced mining and refining projects by country.
           - *base-case-definition

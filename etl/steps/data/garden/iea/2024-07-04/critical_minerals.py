@@ -59,6 +59,9 @@ RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
 # Name of all graphite uses, listed in sheet 1 (of total demand including uses outside of clean tech).
 GRAPHITE_ALL_LABEL = "Graphite (all grades: natural and synthetic)"
 
+# Name of battery-grade graphite.
+GRAPHITE_BATTERY_GRADE_LABEL = "Battery-grade graphite"
+
 # Name of a new mineral category, which encompasses the difference in demand between sheet 1 and the combined 4.x sheets.
 OTHER_GRAPHITE_LABEL = "Graphite, other than battery-grade"
 
@@ -67,6 +70,9 @@ OTHER_LOW_LABEL = "Other low emissions power generation"
 
 # Name of other uses (in sheet 1).
 OTHER_LABEL = "Other uses"
+
+# Name of total demand from clean technologies.
+TOTAL_CLEAN_LABEL = "Total clean technologies"
 
 # Name of total demand (in sheet 1).
 TOTAL_DEMAND_LABEL = "Total demand"
@@ -183,7 +189,7 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
     # Calculate "Graphite, other uses", which should be the total from sheet 1 minus the total from sheets 4.x for each mineral. Add those other uses to the demand table.
 
     # List all graphite-related minerals listed in the 4.x sheets.
-    graphite_uses = ["Battery-grade graphite"]
+    graphite_uses = [GRAPHITE_BATTERY_GRADE_LABEL]
 
     # Sanity checks.
     error = "There are new unexpected uses of graphite in the 4.x sheets."
@@ -240,15 +246,14 @@ def prepare_total_demand_table(ds_meadow: Dataset) -> Table:
     tb_total = ds_meadow["demand_for_key_minerals"].reset_index()
 
     # Sanity checks.
-    total_clean_label = "Total clean technologies"
-    assert total_clean_label in set(tb_total["technology"]), f"'{total_clean_label}' not found in sheet 1."
+    assert TOTAL_CLEAN_LABEL in set(tb_total["technology"]), f"'{TOTAL_CLEAN_LABEL}' not found in sheet 1."
     assert not tb_total[
         (tb_total["technology"].str.startswith("Share of"))
     ].empty, "Rows for 'Share of...' not found in sheet 1."
 
     # Remove rows of shares and total clean technology demand (but keep grand total).
     tb_total = tb_total[
-        (tb_total["technology"] != total_clean_label) & (~tb_total["technology"].str.startswith("Share of"))
+        (tb_total["technology"] != TOTAL_CLEAN_LABEL) & (~tb_total["technology"].str.startswith("Share of"))
     ].reset_index(drop=True)
 
     # Even if not explicitly mentioned, it seems that "Base case" is assumed in this sheet.
