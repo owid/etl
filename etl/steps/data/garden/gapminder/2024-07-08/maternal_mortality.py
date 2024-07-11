@@ -1,5 +1,3 @@
-"""Load a meadow dataset and create a garden dataset."""
-
 import numpy as np
 
 from etl.data_helpers import geo

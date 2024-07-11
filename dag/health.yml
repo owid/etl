@@ -726,5 +726,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/un/2022-07-11/un_wpp
+    - data://garden/demography/2023-03-31/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality

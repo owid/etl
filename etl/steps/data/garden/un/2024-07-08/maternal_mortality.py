@@ -43,6 +43,10 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # The MM rate is given by the UN as deaths per person-years lived by females aged 15-49 in that period
+    # To make it comparable with other sources, we multiply it by 100,000 to get deaths per 100,000 person-years (roughly per 100,000 women)
+    tb["mmr_rate"] = tb["mmr_rate"] * 100_000
+
     # Add origins to columns.
     tb = add_origins(tb, DATA_COLS)
     tb = tb.rename(columns={"mmr_rate": "mm_rate"})

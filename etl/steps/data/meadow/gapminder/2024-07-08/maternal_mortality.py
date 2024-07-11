@@ -77,6 +77,10 @@ def run(dest_dir: str) -> None:
     # duplicate entry for New Zealand (1950, drop Loudon data)
     tb = tb.drop(tb[(tb["year"] == "1950") & (tb["Country"] == "New Zealand") & (tb["MMR"] == 90)].index)
 
+    # remove zeros from data (these are artifacts)
+    # check with - print(tb.loc[tb[tb==0].dropna(how="all").index])
+    tb = tb.replace(0, pd.NA)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 
