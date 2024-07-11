@@ -23,6 +23,22 @@ steps:
     - data://garden/demography/2023-03-31/population
 
   # WPP (2024)
+  data://meadow/un/2024-07-12/un_wpp:
+    # Main indicators
+    - snapshot://un/2024-07-12/un_wpp_demographic_indicators.xlsx
+    # Population
+    - snapshot://un/2024-07-12/un_wpp_population_estimates.csv
+    - snapshot://un/2024-07-12/un_wpp_population_low.csv
+    - snapshot://un/2024-07-12/un_wpp_population_medium.csv
+    - snapshot://un/2024-07-12/un_wpp_population_high.csv
+    - snapshot://un/2024-07-12/un_wpp_population_constant_fertility.csv
+    # Fertility
+    - snapshot://un/2024-07-12/un_wpp_fertility.csv
+    # Deaths
+    - snapshot://un/2024-07-12/un_wpp_deaths_estimates.csv
+    - snapshot://un/2024-07-12/un_wpp_deaths_medium.csv
+
+  # WPP (2024)
   data-private://meadow/un/2024-07-11/un_wpp:
     ## Population
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
