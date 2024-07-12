@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trends in Machine Learning Hardware
+    description: |-
+      This dataset contains performance data for 1,995 GPUs and AI chips used in machine learning experiments from 2006 to 2023. It includes details on computational performance, memory capacities and bandwidths, and interconnect bandwidths. The dataset comprises 47 ML accelerators from 2010-2023 and 1,948 additional GPUs from 2006-2021. This data aids in comparative analysis, trend identification, and optimization of ML performance across various hardware configurations.
+    date_published: "2024-04-05"
+
+    # Citation
+    producer: Epoch
+    citation_full: |-
+      Marius Hobbhahn, Lennart Heim and Gökçe Aydos (2023), "Trends in Machine Learning Hardware". Published online at epochai.org. Retrieved from: 'https://epochai.org/blog/trends-in-machine-learning-hardware' [online resource]
+
+    # Files
+    url_main: https://epochai.org/blog/trends-in-machine-learning-hardware
+    url_download: https://docs.google.com/spreadsheets/d/1NoUOfzmnepzuysr9FFVfF7dp-67OcnUzJO-LxqIPwD0/export?format=csv&id=1NoUOfzmnepzuysr9FFVfF7dp-67OcnUzJO-LxqIPwD0&gid=1503579905
+    date_accessed: 2023-11-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models
+
+
+outs:
+  - md5: af2969fefec920504fe0bdffb8d7a6c7
+    size: 15587
+    path: epoch_gpus.csv

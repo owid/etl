@@ -1,0 +1,46 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    display:
+      zeroDay: '2000-01-01'
+      yearIsDay: true
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
+tables:
+  epoch_gpus:
+    variables:
+
+      manufacturer:
+        title: Manufacturer
+        unit: ''
+        short_unit: ''
+        description_short: The company that produced the GPU.
+
+      fp32_performance__flop_s:
+        title: FP32 performance
+        unit: FLOP/s
+        description_short: The number of floating-point operations per second that can be performed by the GPU. FLOP/s values refer to 32-bit (full) precision.
+
+      release_price__usd:
+        title: Release price
+        unit: US$
+        short_unit: $
+        description_short: The price of the GPU at the time of its release.
+        description_from_producer: Whenever available, the producer uses the release price of the hardware, adjust it for inflation and assume a two-year amortization time as detailed in Cotra (2020).
+
+      comp_performance_per_dollar:
+        title: GPU computational performance per dollar
+        unit: FLOP/s/$
+        description_short: The number of floating-point operations per second that can be performed for every US dollar spent on the GPU.
+        presentation:
+          grapher_config:
+            note: FLOP/s values refer to 32-bit (full) precision.
+
+
