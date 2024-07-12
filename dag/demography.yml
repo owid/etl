@@ -44,6 +44,16 @@ steps:
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
 
+  # WPP Historical comparison
+  data://garden/demography/2024-07-12/un_wpp_historical:
+    - snapshot://fasttrack/latest/un_wpp_historical.csv
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2024-07-12/un_wpp_historical:
+    - data://garden/demography/2024-07-12/un_wpp_historical
+
+
+
   # WPP (2024) [under embargo]
   data-private://meadow/un/2024-07-11/un_wpp:
     ## Population
