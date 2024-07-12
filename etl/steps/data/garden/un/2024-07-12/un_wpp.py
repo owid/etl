@@ -318,17 +318,35 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
         strict=False,
     )
 
-    # Add 10-year age groups from 0 to 100
-    age_group_mapping = {
-        key: value
-        for i in range(0, 100, 10)
-        for key, value in {f"{i}-{i+4}": f"{i}-{i+9}", f"{i+5}-{i+9}": f"{i}-{i+9}"}.items()
-    }
+    # Get 5-year age groups from 0 to 100
+    age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
+    tb_5 = tb.copy()
+    tb_5["age"] = tb_5["age"].map(age_group_mapping)
+    tb_5 = cast(Table, tb_5.dropna(subset=["age"]))
+    tb_5 = tb_5.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
+
+    # Get 10-year age groups from 0 to 100
+    age_group_mapping = {str(i): f"{i//10 * 10}-{i//10 * 10 + 9}" for i in range(0, 100, 1)}
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
     tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
     tb_10 = tb_10.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
-    tb = pr.concat([tb, tb_10], ignore_index=True)
+
+    # Special groups
+    age_group_mapping = {
+        "1": "1-4",
+        "2": "1-4",
+        "3": "1-4",
+        "4": "1-4",
+    }
+    tb_x = tb.copy()
+    tb_x["age"] = tb_x["age"].map(age_group_mapping)
+    tb_x = cast(Table, tb_x.dropna(subset=["age"]))
+    tb_x = tb_x.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
+    tb_limits = tb.loc[tb["age"].isin(["0", "100+"])].copy()
+
+    # Combine
+    tb = pr.concat([tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
 
     # Scale
     tb["deaths"] *= 1000

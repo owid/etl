@@ -43,7 +43,14 @@ COLUMNS_INDEX_FORMAT = [
     "age",
 ]
 SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates"]
-LOCATION_TYPES = [
+LOCATION_TYPES_CSV = [
+    "Country/Area",
+    "Geographic region",
+    "Income group",
+    "Development group",
+    "World",
+]
+LOCATION_TYPES_XLSX = [
     "Country/Area",
     "Region",
     "Income Group",
@@ -362,7 +369,7 @@ def read_from_xlsx(short_name: str) -> Table:
     # Rename columns
     tb = tb.rename(columns=COLUMNS_RENAME_XLSX)
     # Keep relevant rows, drop location_type column
-    tb = tb.loc[tb["Type"].isin(LOCATION_TYPES)]
+    tb = tb.loc[tb["Type"].isin(LOCATION_TYPES_XLSX)]
 
     return tb
 
@@ -391,7 +398,7 @@ def clean_table_standard_csv(
     tb = tb.rename(columns=COLUMNS_RENAME_CSV)
     # Remove NaNs in location type
     tb = tb.dropna(subset=["LocTypeName"])
-    tb = tb.loc[tb["LocTypeName"].isin(LOCATION_TYPES)]
+    tb = tb.loc[tb["LocTypeName"].isin(LOCATION_TYPES_CSV)]
     # Keep relevant columns
     tb = tb.loc[:, COLUMNS_INDEX_CSV + metrics]
     return tb
