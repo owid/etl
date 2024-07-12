@@ -49,8 +49,7 @@ tables:
       mm_rate:
         title: Maternal mortality rate
         description_short: |-
-          The maternal mortality rate is the number of maternal deaths
-          per 100,000 women of reproductive age (15-49 years).
+          The maternal mortality rate is the number of maternal deaths per 100,000 women of reproductive age (15-49 years).
         unit: deaths per 100k women
         short_unit: ""
         display:

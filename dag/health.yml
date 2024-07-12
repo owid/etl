@@ -718,7 +718,7 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
 
 
-  # Maternal Mortality long run data set (Gapminder and UN)
+  # Maternal Mortality long run data set (OWID OMM)
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
     - data://garden/un/2024-07-08/maternal_mortality

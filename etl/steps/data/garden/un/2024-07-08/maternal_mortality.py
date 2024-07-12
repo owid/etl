@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -33,7 +35,7 @@ def run(dest_dir: str) -> None:
 
     # drop rows where parameter is mmr_mean or pm_mean
     tb = tb[~tb["parameter"].str.contains("mean")]
-    # drop uncertainty intervals (thresholds 10% and 90%)
+    # include only point estimate (estimation midpoint), drop uncertainty intervals (thresholds 10% and 90%)
     tb = tb.drop(columns=["_0_1", "_0_9"])
 
     tb = tb.pivot_table(index=["country", "year"], columns=["parameter"], values="_0_5").reset_index()
@@ -65,7 +67,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_origins(tb, cols):
+def add_origins(tb: Table, cols: list) -> Table:
     for col in cols:
         tb[col] = tb[col].copy_metadata(tb["country"])
     return tb
