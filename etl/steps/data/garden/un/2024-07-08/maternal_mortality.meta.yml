@@ -9,15 +9,10 @@ definitions:
       - The data shown is the UN MMEIG point estimate - this means there is a 50% chance that the true measure lies above this point,
         and a 50% chance that the true value lies below this point.
   description_hiv: |-
-    For countries with generalized HIV epidemics and high HIV prevalence, HIV/AIDS is a leading
-    cause of death during pregnancy and after delivery. Furthermore, evidence suggests
-    that women with HIV infection have an eight times higher risk of pregnancy-related death
-    compared with non-HIV infected women.
+    For countries with generalized HIV epidemics and high HIV prevalence, HIV/AIDS is a leading cause of death during pregnancy and after delivery.
+    Furthermore, evidence suggests that women with HIV infection have an eight times higher risk of pregnancy-related death compared with non-HIV infected women.
 
-    When estimating maternal mortality in these countries,
-    it is, thus, important to differentiate between incidental HIV deaths (non-maternal deaths)
-    and HIV-related indirect maternal deaths (maternal deaths caused by the aggravating effects of
-    pregnancy on HIV) among HIV-positive pregnant and postpartum women who have died.
+    When estimating maternal mortality in these countries, it is, thus, important to differentiate between incidental HIV deaths (non-maternal deaths) and HIV-related indirect maternal deaths (maternal deaths caused by the aggravating effects of pregnancy on HIV) among HIV-positive pregnant and postpartum women who have died.
   description_methodology: |-
     Data on maternal mortality and other relevant variables are obtained through databases maintained by WHO, UNPD, UNICEF, and the World Bank Group. Data available from countries varies in terms of the source and methods.
 

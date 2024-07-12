@@ -37,10 +37,8 @@ tables:
         display:
           numDecimalPlaces: 0
         description_from_producer: |-
-          Maternal deaths are defined as a death of a woman while pregnant or within 42
-          days of termination of pregnancy, irrespective of the duration and site of pregnancy, from
-          any cause related or aggravated by the pregnancy or its management, but not from
-          accidental or incidental causes.
+          Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy,
+          from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.
       number_of_women_between_15_49_years:
         title: Number of women of reproductive age (15-49 years)
         description_short: The number of women and girls aged 15-49 years in a given year.

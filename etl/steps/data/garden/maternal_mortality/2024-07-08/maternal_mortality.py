@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Origin, Table
 from owid.catalog import processing as pr
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     - death from maternal conditions (all sexes, all ages) from WHO mortality database
     - births and female population aged 14-49 from UN WPP
 
-    We also create regional aggregates if a region is more than 70% covered by our data for a given year"""
+    We also create regional aggregates if a region is more than 90% covered by our data for a given year"""
 
     #
     # Load inputs.
@@ -41,6 +41,9 @@ def run(dest_dir: str) -> None:
     ds_who_mortality = paths.load_dataset("mortality_database")
     ds_wpp = paths.load_dataset("un_wpp")
     ds_pop = paths.load_dataset("population")
+
+    # save origins for later:
+    who_origins = sources_to_origins_who(ds_who_mortality)
 
     # Read table from meadow dataset.
     tb_gm = ds_gm["maternal_mortality"].reset_index()
@@ -141,6 +144,9 @@ def run(dest_dir: str) -> None:
     # index and format columns
     tb = tb.format(["country", "year"])
 
+    # add who origins to the table
+    tb = add_origins(tb, who_origins, ["maternal_deaths", "mmr", "mm_rate"])
+
     #
     # Save outputs.
     #
@@ -178,4 +184,30 @@ def check_region_share_population(tb: Table, regions: list, ds_population: Datas
 
     tb_region = tb_region.drop(columns=["total_population", "share_population"])
     tb = pr.concat([tb_region, tb_no_regions])
+    return tb
+
+
+def sources_to_origins_who(ds: Dataset) -> list[Origin]:
+    """Create an origin from the sources of the who dataset."""
+    origins = []
+    for source in ds.metadata.sources:
+        origin_ds = Origin(
+            producer="WHO Mortality Database",
+            title=source.name,
+            date_published=source.publication_date,
+            url_main=source.url,
+            citation_full="World Health Organization. 'WHO Mortality Database.' 2022, https://www.who.int/data/data-collection-tools/who-mortality-database.",
+            license=ds.licenses[0],
+            date_accessed=source.date_accessed,
+        )
+        origins.append(origin_ds)
+    return origins
+
+
+def add_origins(tb, origins, cols=None):
+    if cols is None:
+        cols = tb.columns
+    for origin in origins:
+        for col in cols:
+            tb[col].metadata.origins = tb[col].metadata.origins + [origin]
     return tb
