@@ -13,7 +13,6 @@ import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.tables import concat
-from owid.repack import repack_frame
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -43,7 +42,7 @@ COLUMNS_INDEX_FORMAT = [
     "sex",
     "age",
 ]
-SCENARIOS = ["Medium", "Low", "High", "Constant Fertility", "Estimates"]
+SCENARIOS = ["Medium", "Low", "High", "Constant fertility", "Estimates"]
 LOCATION_TYPES = [
     "Country/Area",
     "Region",
@@ -80,11 +79,11 @@ def run(dest_dir: str) -> None:
     tb_mortality = make_tb_mortality(tb_main)
     tb_le = make_tb_life_expectancy(tb_main)
 
-    # Population
+    # # Population
     paths.log.info("reading population...")
     tb_population = make_tb_population()
 
-    # Fertility rate
+    # # Fertility rate
     tb_fertility, tb_births = make_tb_fertility_births(tb_main)
 
     # Deaths
@@ -135,26 +134,36 @@ def make_tb_population() -> Table:
         ]
     )
     del tb_population_l, tb_population_m, tb_population_h, tb_population_c
+    tb_population = tb_population.format(COLUMNS_INDEX_FORMAT, short_name="population")
     return tb_population
 
 
 def make_tb_mortality(tb_main: Table) -> Table:
     """Make mortality table: includes child and infant mortality rates."""
+    paths.log.info("reading mortality data...")
     tb_child_mort = clean_table_standard_xlsx(
         tb_main,
         "Under-Five Mortality (deaths under age 5 per 1,000 live births)",
-        "tmp",
+        "mortality_rate",
         age="0-4",
         format_table=False,
+        log=False,
     )
     tb_infant_mort = clean_table_standard_xlsx(
         tb_main,
         "Infant Mortality Rate (infant deaths per 1,000 live births)",
-        "tmp",
+        "mortality_rate",
         age="0",
         format_table=False,
+        log=False,
     )
-    tb = pr.concat([tb_child_mort, tb_infant_mort]).format(COLUMNS_INDEX_FORMAT, short_name="mortality_rate")
+    # Combine tables
+    tb = pr.concat([tb_child_mort, tb_infant_mort])
+    # Reduce size
+    tb = tb.astype({"age": "string"})
+    # Format
+    tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="mortality_rate")
+
     return tb
 
 
@@ -233,9 +242,6 @@ def make_tb_life_expectancy(tb_main: Table) -> Table:
 
     # Set year to int
     tb["year"] = tb["year"].astype(int)
-
-    # Reduce size
-    tb = cast(Table, repack_frame(tb))
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="life_expectancy")
@@ -356,7 +362,7 @@ def read_from_xlsx(short_name: str) -> Table:
     # Rename columns
     tb = tb.rename(columns=COLUMNS_RENAME_XLSX)
     # Keep relevant rows, drop location_type column
-    tb = tb.loc[tb["Location code"].isin(LOCATION_TYPES)]
+    tb = tb.loc[tb["Type"].isin(LOCATION_TYPES)]
 
     return tb
 
@@ -370,7 +376,6 @@ def read_from_csv(short_name: str) -> Table:
     # Filter relevant variants
     tb = tb.loc[tb["Variant"].isin(SCENARIOS)]
     # Optimize memory
-    tb = cast(Table, repack_frame(tb))
     return tb
 
 
@@ -419,14 +424,20 @@ def combine_population(tbs: List[Table]) -> Table:
 
 
 def clean_table_standard_xlsx(
-    tb: Table, colname: str, new_name: str, sex: str = "all", age: str = "all", format_table: bool = True
+    tb: Table,
+    colname: str,
+    new_name: str,
+    sex: str = "all",
+    age: str = "all",
+    format_table: bool = True,
+    log: bool = True,
 ) -> Table:
     """Process growth rate data.
 
     From snapshot table to ETL-ready-cleaned table.
     """
-
-    paths.log.info(f"processing {new_name} data...")
+    if log:
+        paths.log.info(f"processing {new_name} data...")
 
     # Rename columns
     tb = tb.rename(columns={colname: new_name})
@@ -442,7 +453,7 @@ def clean_table_standard_xlsx(
     tb["year"] = tb["year"].astype(int)
 
     # Reduce size
-    tb = cast(Table, repack_frame(tb))
+    # tb = cast(Table, repack_frame(tb))
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     if format_table:
