@@ -193,6 +193,8 @@ def sources_to_origins_who(ds: Dataset) -> list[Origin]:
     for source in ds.metadata.sources:
         origin_ds = Origin(
             producer="WHO Mortality Database",
+            description=source.description,
+            attribution_short="WHO",
             title=source.name,
             date_published=source.publication_date,
             url_main=source.url,
