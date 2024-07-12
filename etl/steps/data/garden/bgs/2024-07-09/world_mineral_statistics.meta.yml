@@ -1,0 +1,14 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  world_mineral_statistics:
+    variables:
+      {}
