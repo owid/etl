@@ -1,0 +1,26 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 740
+  title: Historical World Population Prospects
+
+
+tables:
+  un_wpp_historical:
+    variables:
+      population:
+        title: Population, UN <<revision>> Revision
+        description_short: |-
+          De facto population in a country, area or region as of July 1 of the year indicated and UN WPP <<revision>> revision.
+        unit: people
+        presentation:
+          title_public: Population, UN <<revision>> revision.
+          attribution: UN, World Population Prospects (1968 - 2024)
