@@ -1,0 +1,30 @@
+meta:
+  is_public: false
+
+  origin:
+    # Data product / Snapshot
+    title: World Population Prospects
+    description: |-
+      World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.
+    date_published: '2024-07-11'
+    title_snapshot: World Population Prospects, Infant mortality rates
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.
+    attribution: UN, World Population Prospects (2024)
+    attribution_short: UN WPP
+
+    # Files
+    url_main: https://population.un.org/wpp/Download/
+    date_accessed: '2024-07-11'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://population.un.org/wpp/Download/Standard/MostUsed/
+outs:
+  - md5: 1fd84b29aef38c75a5c228ff483e7c93
+    size: 2868162
+    path: un_wpp_infant_mortality.xlsx

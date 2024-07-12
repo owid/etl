@@ -520,7 +520,8 @@ def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, in
                 indicator_new: "New",
             }
         )
-        error = df_[COLUMN_RELATIVE_ERROR].dropna()
+
+        error = df_[COLUMN_ABS_RELATIVE_ERROR].dropna()
         error_max = error.replace([np.inf, -np.inf], np.nan).abs().max()
         error = error.replace([np.inf], error_max)
         error = error.replace([-np.inf], -error_max)
@@ -541,7 +542,9 @@ def st_show_country_overview(df_indicators: pd.DataFrame, indicator_old: str, in
         data=df_countries,
         column_config={
             "error": st.column_config.LineChartColumn(
-                "Error(year)", help="Difference between old and new indicator values."
+                "Error(year)",
+                help="Difference between old and new indicator values.",
+                y_min=0,
             ),
             "old": st.column_config.LineChartColumn("Old"),
             "new": st.column_config.LineChartColumn("New"),
