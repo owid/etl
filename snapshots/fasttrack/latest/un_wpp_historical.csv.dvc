@@ -12,7 +12,6 @@ meta:
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTrmu10dRJqFyl6fP95CLFfhJbm4yut09HXIin1Eg66WFVHoq1eNEdsmRL626V8TZONCtjt7Z4vC0RJ/pub?output=csv
     date_accessed: '2024-07-12'
-    date_published: 2019-07-11
     license:
       name: CC BY 3.0 IGO
       url: http://creativecommons.org/licenses/by/3.0/igo/
@@ -20,6 +19,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: 7b70e0c391304ec50b0c2f6a578f5820
+  - md5: ba29a58ec015fd3048b4a4ecf57033e5
     size: 2536
     path: un_wpp_historical.csv
