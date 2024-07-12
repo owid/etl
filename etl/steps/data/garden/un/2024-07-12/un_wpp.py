@@ -318,6 +318,10 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
         strict=False,
     )
 
+    # Total
+    tb_total = tb.groupby(["country", "year", "sex", "variant"], as_index=False, observed=True)["deaths"].sum()
+    tb_total = tb_total.assign(age="all")
+
     # Get 5-year age groups from 0 to 100
     age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
     tb_5 = tb.copy()
@@ -346,7 +350,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_limits = tb.loc[tb["age"].isin(["0", "100+"])].copy()
 
     # Combine
-    tb = pr.concat([tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
+    tb = pr.concat([tb_total, tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
 
     # Scale
     tb["deaths"] *= 1000
