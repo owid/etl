@@ -1,0 +1,423 @@
+definitions:
+  global:
+    projections:
+      <%- if variant != 'estimates' %>
+        Projections from 2024 onwards are based on the UN's << variant >> scenario.
+      <%- endif %>
+    dimensions:
+      title: |-
+        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
+        total
+        <% else %>
+        <%- if sex != 'all' %>
+        << sex >><%- if age != 'all' or variant != 'estimates' %>, <% endif %>
+        <%- endif %>
+        <%- if age == '0' %>
+        at birth<%- if variant != 'estimates' %>, <% endif %>
+        <%- elif age != 'all' %>
+        aged << age >><%- if variant != 'estimates' %>, <% endif %>
+        <%- endif %>
+        <%- if variant != 'estimates' %>
+        << variant >> projection
+        <%- endif %>
+        <% endif %>
+      description_short: |-
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex != 'all' %>
+          << sex >>s
+        <%- elif sex != 'all' %>
+          individuals
+        <%- endif %>
+        <%- if age == '0' %>
+          at birth
+        <%- elif age != 'all' %>
+          aged << age >>
+        <%- endif %>.
+        <% endif %>
+
+        {definitions.global.projections}
+
+      description_short_births: |-
+        <% if not (sex == 'all' and age == 'all') %>
+        This only includes
+        <%- if sex != 'all' %>
+          << sex >> babies<%- if variant != 'estimates' %>, and <% endif %>
+        <%- endif %>
+        <%- if age != 'all' %>
+          mothers aged << age >>
+        <%- endif %>.
+        <% endif %>
+
+        {definitions.global.projections}
+
+  common:
+    presentation:
+      attribution_short: UN WPP
+      # title_variant: "{definitions.global.dimensions}"
+      grapher_config:
+        subtitle: "{definitions.global.projections}"
+        originUrl: "https://ourworldindata.org/population-growth"
+
+
+# this metadata file is not used in garden step, but in grapher step
+tables:
+  population:
+
+    variables:
+
+      population:
+        title: Population
+        unit: people
+        description_short: |-
+          De facto total population in a country, area or region as of 1 July of the year indicated. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population, {definitions.global.dimensions.title}
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
+
+
+      population_change:
+        title: Population change
+        unit: people
+        description_short: |-
+          Population yearly increment, estimated as the difference between the population on 1st of July of the year indicated and the population a year before. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population change, {definitions.global.dimensions.title}
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
+
+      population_density:
+        title: Population density
+        unit: people per square kilometer
+        short_unit: people/km²
+        description_short: |-
+          Population density in a country, area or region. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Population density, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The number of people per km² of land area. {definitions.global.projections}
+
+      # population_doubling_time:
+      #   title: Population doubling time
+      #   unit: years
+      #   short_unit: years
+      #   description_short: &pop2_description_short |-
+      #     Years required for the population to double if the current growth rate continues. When population is declining, negative values indicate years needed for the population to halve if it is declining. {definitions.global.dimensions.description_short}
+      #   description_key:
+      #     - It is calculated as ln(2)/r where r is the annual population growth rate.
+      #     - Doubling time is computed only for fast growing populations with growth rates exceeding 0.5 per cent.
+      #   presentation:
+      #     title_public: |-
+      #       Population doubling time, {definitions.global.dimensions.title}
+      #     grapher_config:
+      #       subtitle: *pop2_description_short
+
+  growth_rate:
+    variables:
+      growth_rate:
+        title: Population growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on 1 January of subsequent years. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Growth rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The growth rate is the population change determined by births, deaths, and migration flows. {definitions.global.projections}
+
+  natural_change_rate:
+    variables:
+      natural_change_rate:
+        title: Natural population growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Natural growth rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The natural growth rate is the population change determined by births and deaths. Migration flows are not taken into account. {definitions.global.projections}
+
+
+  fertility_rate:
+    variables:
+      fertility_rate:
+        title: Fertility rate
+        unit: |-
+          <% if age == 'all' %>
+          live births per woman
+          <% else %>
+          live births per 1,000 mothers aged << age >>
+          <% endif %>
+        description_short: |-
+          <% if age == 'all' %>
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. {definitions.global.dimensions.description_short}
+          <% else %>
+          The annual number of live births from mothers aged << age >> years. {definitions.global.dimensions.description_short}
+          <% endif %>
+        description_key:
+          - |-
+            It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
+        presentation:
+          title_public: |-
+            Fertility rate, {definitions.global.dimensions.title}
+          grapher_config:
+            note: |-
+              <% if age == 'all' %>
+              The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
+              <% endif %>
+
+  migration:
+    variables:
+      net_migration:
+        title: Net migration
+        unit: migrants
+        description_short: |-
+          Net number of migrants, that is, the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country). {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Net migration, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              <% if sex == "all" %>
+              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+              <% else %>
+              The total number of << sex >> immigrants (people moving into a given country) minus the number of << sex >> emigrants (people moving out of the country).
+              <% endif %> {definitions.global.projections}
+
+      net_migration_rate:
+        title: Net migration rate
+        unit: migrants per 1,000 people
+        description_short: |-
+          Net number of immigrants minus the number of emigrants, divided by the population of the receiving country over a year. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Net migration, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population. {definitions.global.dimensions.description_short}
+
+  deaths:
+    variables:
+      deaths:
+        title: Deaths
+        unit: deaths
+        description_short: |-
+          Number of deaths recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Death rate, {definitions.global.dimensions.title}
+
+      death_rate:
+        title: Death rate
+        unit: deaths per 1,000 people
+        description_short: |-
+          Number of deaths recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Death rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle:
+              The number of deaths occurring during the year, per 1,000 people. {definitions.global.projections}
+
+  births:
+    variables:
+      births:
+        title: Births
+        unit: births
+        description_short: |-
+          Number of births recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short_births}
+        presentation:
+          title_public: |-
+            Births, {definitions.global.dimensions.title}
+
+      birth_rate:
+        title: Birth rate
+        unit: births per 1,000 people
+        description_short: |-
+          Number of births recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Birth rate, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: The number of live births occurring during the year, per 1,000 people. {definitions.global.projections}
+
+  median_age:
+    variables:
+      median_age:
+        title: Median age
+        unit: years
+        description_short: |-
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.global.dimensions.description_short}
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          title_public: |-
+            Median age, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The median age divides the population into two parts of equal size; that is, there are as many people with ages above the median age as there are with ages below. {definitions.global.projections}
+
+  # childbearing_age:
+  #   variables:
+  #     childbearing_age:
+  #       title: Mean age at childbearing
+  #       unit: years
+  #       description_short: &cb_description_short |-
+  #         Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. {definitions.global.dimensions.description_short}
+  #       presentation:
+  #         title_public: |-
+  #           Mean age at childbearing, {definitions.global.dimensions.title}
+  #         grapher_config:
+  #           subtitle: *cb_description_short
+
+  life_expectancy:
+    variables:
+      life_expectancy:
+        title: Life expectancy
+        unit: years
+        short_unit: years
+        description_short: |-
+          <% if sex == 'all' %>
+          <% set individuals='individuals' %>
+          <% else %>
+          <% set individuals=sex+' individuals' %>
+          <% endif %>
+
+          <% if age == '0' %>
+          Period life expectancy for << individuals >> at birth.
+          <% else %>
+          Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
+          <% endif %> {definitions.global.projections}
+        presentation:
+          title_public: |-
+            Life Expectancy, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              {tables.life_expectancy.variables.life_expectancy.description_short}
+
+            note: |-
+              <% if sex == 'all' %>
+              <% set sex_name='' %>
+              <% else %>
+              <% set sex_name=' for ' + sex+'s' %>
+              <% endif %>
+              <%- if age == '0' -%>
+              Shown is the 'period life expectancy'<< sex_name >> at birth<< sex_name >>. This is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+              <% else %>
+              Shown is the 'period life expectancy'<< sex_name >> at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
+              <%- endif %>
+
+  sex_ratio:
+    variables:
+      sex_ratio:
+        title: Sex ratio
+        unit: "males per 100 females"
+        description_short: |-
+          <% if age == '0' %>
+          The number of male births per 100 female births. Biological birth ratios are slightly male-biased, with an expected ratio of 105 male births per 100 female births.
+          <% elif age == 'all' %>
+          ​​The number of male population per 100 female population.
+          <% else %>
+          The number of male individuals per 100 female individuals, at age << age >>.
+          <% endif %> {definitions.global.projections}
+        presentation:
+          title_public: |-
+            Sex ratio, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              <% if age == 'all' %>
+              ​​The number of male population per 100 female population.
+              <% elif age == '0' %>
+              The number of male births per 100 female births. Biological birth ratios are slightly male biased, with an expected ratio of 105 male births per 100 female births.
+              <% else %>
+              The number of male individuals per 100 female individuals, at age << age >>.
+              <% endif %> {definitions.global.projections}
+
+  dependency_ratio:
+    variables:
+      dependency_ratio:
+        title: |-
+          <% if age == "total" %>
+          Total dependency ratio - Sex: << sex >> - Variant: << variant >>
+          <% elif age == "youth" %>
+          Child dependency ratio - Sex: << sex >> - Variant: << variant >>
+          <% else %>
+          Old-age dependency ratio - Sex: << sex >> - Variant: << variant >>
+          <% endif %>
+        unit: "%"
+        description_short: |-
+          <% if sex != "all" %>
+          <% set individuals = 'population'%>
+          <% else %>
+          <% set individuals = sex + ' population'%>
+          <% endif %>
+          <% if age == "total" %>
+          The ratio of the young << individuals >> (under age 15) and elderly << individuals >> (aged 65 and over) to the working-age population (aged 15 to 64).
+          <% elif age == "youth" %>
+          The ratio of the young << individuals >> (under age 15) to the working-age << individuals >> (aged 15 to 64).
+          <% else %>
+          The ratio of the elderly << individuals >> (aged 65 and over) to the working-age << individuals >> (aged 15 to 64).
+          <% endif %>
+        presentation:
+          title_public: |-
+            <% if age == "total" -%>
+            Total dependency ratio
+            <% elif age == "youth" -%>
+            Youth dependency ratio
+            <% else -%>
+            Old-age dependency ratio
+            <% endif -%>, {definitions.global.dimensions.title}
+
+
+  mortality_rate:
+    variables:
+      mortality_rate:
+        title: |-
+          <% if age == '0' %>
+          Infant mortality rate - Sex: << sex >> - Variant: << variant >>
+          <% else %>
+          Child mortality rate - Sex: << sex >> - Variant: << variant >>
+          <% endif %>
+        unit: |-
+          <% if age == '0' %>
+          % of infants
+          <% else %>
+          % of children
+          <% endif %>
+        description_short: |-
+          <% if age == '0' %>
+          The share of newborns who die before reaching the age of one.
+          <% else %>
+          The share of children who die before reaching the age of 5.
+          <% endif %> {definitions.global.projections}
+        presentation:
+          title_public: |-
+            <% if age == '0' %>
+            Infant mortality rate
+            <% else %>
+            Child mortality rate
+            <% endif %>, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: |-
+              The share of <% if sex != 'all' %><< sex >><% endif %>
+              <% if age == '0' %>
+               children who die before reaching the age of one.
+              <% else %>
+               newborns who die before reaching the age of 5.
+              <%- endif -%> {definitions.global.projections}
+            note: |-
+              <% if age == '0' %>
+              This is the probability of a child born in a specific year or period dying before reaching the age of one, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+              <% else %>
+              This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
+              <%- endif -%> {definitions.global.projections}

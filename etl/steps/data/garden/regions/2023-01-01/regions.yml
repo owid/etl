@@ -282,6 +282,7 @@
   aliases:
     - "Bosnia Herzegovina"
     - "Bsnia.&Hrzgvna."
+    - "Bosnia & Herzegovina"
 
 - code: "BWA"
   name: "Botswana"
@@ -452,6 +453,7 @@
     - "D.R. of the Congo"
     - "Democratic Republic of the Congo"
     - "Zaire/ Congo , Dem. Rep."
+    - "Congo, Democratic Republic"
 
 - code: "DNK"
   name: "Denmark"
@@ -479,6 +481,7 @@
   aliases:
     - "Germany, East"
     - "German Democratic Republic"
+    - "German Democratic Rep"
   end_year: 1990
   successors:
     - "DEU"
@@ -525,6 +528,7 @@
   name: "Eswatini"
   aliases:
     - "Swaziland"
+    - "Eswatini (Swaziland)"
 
 - code: "ETH"
   name: "Ethiopia"
@@ -680,6 +684,7 @@
   name: "French Guiana"
   aliases:
     - "French Guyana"
+    - "France (French Guiana)"
 
 - code: "PYF"
   name: "French Polynesia"
@@ -795,6 +800,8 @@
 
 - code: "IRL"
   name: "Ireland"
+  aliases:
+    - "Ireland, Republic of"
 
 - code: "IMN"
   name: "Isle of Man"
@@ -1089,6 +1096,7 @@
     - "Democratic People's Republic of Korea"
     - "Korea (the Democratic People's Republic of)"
     - "Korea, Dem. People's Rep."
+    - "Korea, Dem. P.R. of"
 
 - code: "MKD"
   name: "North Macedonia"
@@ -1275,6 +1283,7 @@
   aliases:
     - "St. Kitts and Nevis"
     - "St.Kitts & Nevis"
+    - "St. Kitts - Nevis"
 
 - code: "LCA"
   name: "Saint Lucia"
@@ -1292,6 +1301,7 @@
   aliases:
     - "St.Pierre & Miq."
     - "St.Pierre e Michelon"
+    - "St. Pierre & Miquelon"
 
 - code: "VCT"
   name: "Saint Vincent and the Grenadines"
@@ -1299,9 +1309,12 @@
     - "Saint Vincent/Grenadines"
     - "St. Vincent and the Grenadines"
     - "St.Vin. & Gren."
+    - "St. Vincent & Grenadines"
 
 - code: "WSM"
   name: "Samoa"
+  aliases:
+    - "Western Samoa"
 
 - code: "SMR"
   name: "San Marino"
@@ -1400,6 +1413,7 @@
     - "Korea, Rep."
     - "Korea, Republic Of"
     - "Republic of Korea"
+    - "Korea (Rep. of)"
 
 - code: "OWID_SOS"
   name: "South Ossetia"

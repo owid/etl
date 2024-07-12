@@ -54,7 +54,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     else:
         with st.container(border=True):
             # 1/ Title, description, options
-            st_show_header()
+            st_show_header(search_form)
 
             # 2/ Map indicators
             # Show columns with indicators that were automatically (and manually) mapped
@@ -91,6 +91,7 @@ def _get_params_cached(
     map_identical_indicators,
     similarity_function_name,
     enable_bulk_explore,
+    complete_suggestions: bool = True,
 ):
     """Cached version of `get_params`.
 
@@ -120,6 +121,14 @@ def _get_params_cached(
 
     # 1.4/ Get remaining mapping suggestions
     # This is for those indicators which couldn't be automatically mapped
+    if complete_suggestions:
+        missing_new = new_indicators.rename(
+            columns={
+                "id": "id_new",
+                "name": "name_new",
+            }
+        )
+
     suggestions = find_mapping_suggestions_cached(
         missing_old=missing_old,
         missing_new=missing_new,
@@ -168,6 +177,7 @@ def get_params(search_form):
         search_form.map_identical_indicators,
         search_form.similarity_function_name,
         search_form.enable_bulk_explore,
+        search_form.complete_suggestions,
     )
 
     # Set states
@@ -176,12 +186,12 @@ def get_params(search_form):
     return iu, indicator_id_to_display, df_data
 
 
-def st_show_header():
+def st_show_header(search_form):
     """Show title, description, etc."""
     # Title
     st.header("Map indicators")
     st.markdown(
-        "Map indicators from the [Old dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}) to the [New dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}). The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
+        f"Map indicators from the [Old dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}) to the [New dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}). The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
     )
 
     # Row 1
