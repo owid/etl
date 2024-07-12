@@ -80,7 +80,6 @@ def run(dest_dir: str) -> None:
     ## Deaths
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
     del tb_death_rate
-    tb_deaths = set_variant_to_estimates(tb_deaths)
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
 
     ## Births
@@ -297,6 +296,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     """
     # Basic processing
     tb = process_standard(tb)
+    tb = set_variant_to_estimates(tb)
     tb_rate = process_standard(tb_rate)
 
     # Standardise sex dimension values
