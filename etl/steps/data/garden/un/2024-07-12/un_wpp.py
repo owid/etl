@@ -356,7 +356,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb["deaths"] *= 1000
 
     # Merge
-    tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="left")
+    tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="outer")
 
     # Age as string
     tb["age"] = tb["age"].astype("string")
