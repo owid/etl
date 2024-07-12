@@ -37,8 +37,14 @@ steps:
     # Deaths
     - snapshot://un/2024-07-12/un_wpp_deaths_estimates.csv
     - snapshot://un/2024-07-12/un_wpp_deaths_medium.csv
+  data://garden/un/2024-07-12/un_wpp:
+    - data://meadow/un/2024-07-12/un_wpp
+  data://grapher/un/2024-07-12/un_wpp:
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/un/2024-07-12/un_wpp_full:
+    - data://garden/un/2024-07-12/un_wpp
 
-  # WPP (2024)
+  # WPP (2024) [under embargo]
   data-private://meadow/un/2024-07-11/un_wpp:
     ## Population
     - snapshot-private://un/2024-07-11/un_wpp_population.csv
