@@ -89,7 +89,7 @@ def run(dest_dir: str) -> None:
     tb_gm["maternal_deaths"] = tb_gm["maternal_deaths"].round().astype("UInt32")
     tb_who_gm = combine_two_overlapping_dataframes(tb_calc_mm, tb_gm, index_columns=["country", "year"])
 
-    # calculate mmr and mm rate from if NA from Gapminder deaths with UN WPP data
+    # calculate mmr and mm rate if NA from Gapminder deaths with UN WPP data
     tb_who_gm["mmr"] = tb_who_gm["mmr"].combine_first(tb_who_gm["maternal_deaths"] / tb_who_gm["live_births"] * 100_000)
     tb_who_gm["mm_rate"] = tb_who_gm["mm_rate"].combine_first(
         tb_who_gm["maternal_deaths"] / tb_who_gm["female_population"] * 100_000
@@ -206,7 +206,7 @@ def sources_to_origins_who(ds: Dataset) -> list[Origin]:
     return origins
 
 
-def add_origins(tb, origins, cols=None):
+def add_origins(tb: Table, origins: list[Origin], cols=None):
     if cols is None:
         cols = tb.columns
     for origin in origins:
