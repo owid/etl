@@ -12,6 +12,10 @@ steps:
   data://grapher/demography/2023-09-29/gini_le:
     - data://garden/demography/2023-09-29/gini_le
 
+  # Population OMM
+  data://grapher/demography/2023-03-30/population:
+    - data://garden/demography/2022-12-08/population
+
   # WPP (2024) [under embargo]
   data-private://meadow/un/2024-07-11/un_wpp:
     ## Population
