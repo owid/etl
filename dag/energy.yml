@@ -223,3 +223,13 @@ steps:
   #
   data://garden/bgs/2024-07-09/world_mineral_statistics:
     - data://meadow/bgs/2024-07-09/world_mineral_statistics
+  #
+  # USGS - Historical statistics for mineral and material commodities.
+  #
+  data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
+    - snapshot://usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities.zip
+  #
+  # USGS - Historical statistics for mineral and material commodities.
+  #
+  data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
+    - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities

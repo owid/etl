@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical Statistics for Mineral and Material Commodities
+    description: |-
+      Information on approximately 90 mineral commodities, including production, imports, exports, and stocks; reported and apparent consumption; and unit value (the real and nominal price in U.S. dollars of a metric ton of apparent consumption). For many of the commodities, data are reported as far back as 1900.
+    date_published: "2016-01-01"
+
+    # Citation
+    producer: United States Geological Survey Data
+    citation_full: |-
+      Kelly, T.D., and Matos, G.R., comps., 2014, Historical statistics for mineral and material commodities in the United States (2016 version): U.S. Geological Survey Data Series 140.
+    attribution_short: USGS
+
+    # Files
+    url_main: https://www.usgs.gov/centers/national-minerals-information-center/historical-statistics-mineral-and-material-commodities
+    date_accessed: 2024-07-15
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.usgs.gov/centers/national-minerals-information-center/historical-statistics-mineral-and-material-commodities
+
+outs:
+  - md5: bae42fc20438313cb7dd37a93682f6e6
+    size: 7838597
+    path: historical_statistics_for_mineral_and_material_commodities.zip
