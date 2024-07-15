@@ -15,6 +15,8 @@ REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"] + 
 
 LATEST_YEAR = 2020  # latest year for which data is available - to not include predictions from UN WPP
 
+REPRODUCTIVE_AGES = ["15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"]
+
 
 def run(dest_dir: str) -> None:
     """Creates long running data set on maternal mortality combining following sources (in brackets - timeframes available for each source):
@@ -49,7 +51,8 @@ def run(dest_dir: str) -> None:
     tb_gm = ds_gm["maternal_mortality"].reset_index()
     tb_un = ds_un["maternal_mortality"].reset_index()
     tb_who_mortality = ds_who_mortality["maternal_conditions__both_sexes__all_ages"].reset_index()
-    tb_wpp = ds_wpp["un_wpp"].reset_index()
+    tb_wpp_pop = ds_wpp["population"].reset_index()
+    tb_wpp_births = ds_wpp["births"].reset_index()
 
     # calculate maternal mortality ratio/ rate out of WHO mortality database and UN WPP
     tb_who_mortality = tb_who_mortality.rename(
@@ -60,19 +63,21 @@ def run(dest_dir: str) -> None:
     tb_who_mortality["maternal_deaths"] = tb_who_mortality["maternal_deaths"].replace(0, pd.NA)
 
     # we need births from WPP
-    tb_wpp_births = tb_wpp[(tb_wpp["metric"] == "births") & (tb_wpp["year"] <= LATEST_YEAR) & (tb_wpp["age"] == "all")]
-    tb_wpp_births = tb_wpp_births.rename(columns={"location": "country", "value": "live_births"})[
-        ["country", "year", "live_births"]
+    tb_wpp_births = tb_wpp_births[
+        (tb_wpp_births["variant"] == "estimates")
+        & (tb_wpp_births["year"] <= LATEST_YEAR)
+        & (tb_wpp_births["age"] == "all")
     ]
+    tb_wpp_births = tb_wpp_births.rename(columns={"births": "live_births"})[["country", "year", "live_births"]]
+
     # we need female population of reproductive age from WPP
-    reproductive_ages = ["15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"]
-    tb_wpp_fm_pop = tb_wpp[
-        (tb_wpp["metric"] == "population")
-        & (tb_wpp["year"] <= LATEST_YEAR)
-        & (tb_wpp["age"].isin(reproductive_ages))
-        & (tb_wpp["sex"] == "female")
+    tb_wpp_fm_pop = tb_wpp_pop[
+        (tb_wpp_pop["variant"] == "estimates")
+        & (tb_wpp_pop["year"] <= LATEST_YEAR)
+        & (tb_wpp_pop["age"].isin(REPRODUCTIVE_AGES))
+        & (tb_wpp_pop["sex"] == "female")
     ]
-    tb_wpp_fm_pop = tb_wpp_fm_pop.rename(columns={"location": "country", "value": "female_population"})
+    tb_wpp_fm_pop = tb_wpp_fm_pop.rename(columns={"population": "female_population"})
     tb_wpp_fm_pop = (
         tb_wpp_fm_pop[["country", "year", "female_population"]].groupby(by=["country", "year"]).sum().reset_index()
     )
