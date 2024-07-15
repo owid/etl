@@ -1,12 +1,13 @@
 ### To run this script you need to set up a Google Earth Engine account and authenticate it.
 ### The required data is available in the Earth Engine Data Catalog, with the exception of the dominant driver data which there is a separate snapshot for, this must be reprojected into EPSG:4326 and added to the projects Earth Engine assets.
 ### The script will calculate the area of tree cover in each driver for each year for a subset of countries and export the results to a CSV file in Google Drive.
+### Once it has completed, you can run the XXXX step to load the data to Snapshot.
 
 import ee
 
 # Set the tree cover threshold - this is the default on global forest watch
 TREE_COVER_THRESHOLD = 30
-
+DEBUG = False
 # Authenticate to Earth Engine - may require a code to be entered in the terminal
 ee.Authenticate()
 # Initialize the Earth Engine module.
@@ -16,7 +17,8 @@ ee.Initialize(project="ee-fiona-forest")
 countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
 
 # Select a subset of five countries for debugging purposes
-countries = countries.limit(5)
+if DEBUG:
+    countries = countries.limit(5)
 
 # Country boundaries
 gfc2023 = ee.Image("UMD/hansen/global_forest_change_2023_v1_11")
