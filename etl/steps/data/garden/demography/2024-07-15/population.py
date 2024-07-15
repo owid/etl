@@ -97,11 +97,12 @@ def run(dest_dir: str) -> None:
         .pipe(add_world_population_share)
     )
 
-    # Set index
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
-
     # Create auxiliary table
     tb_auxiliary = generate_auxiliary_table(tb)
+
+    # Format tables
+    tb = tb.format(["country", "year"])
+    tb_auxiliary = tb_auxiliary.format(["country", "year"])
 
     #
     # Save outputs.
@@ -337,13 +338,15 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
 
     # keep sources per countries, remove from tb
     # remove from tb: otherwsie geo.add_region_aggregates will add this column too
-    sources = tb[["country", "year", "source"]].copy()
+    sources = tb.loc[:, ["country", "year", "source"]].copy()
     tb = tb.drop(columns=["source"])
 
     # re-estimate region aggregates
+    aggregations = {"population": "sum"}
     tb = geo.add_regions_to_table(
         tb=tb,
         regions=regions,
+        aggregations=aggregations,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         num_allowed_nans_per_year=None,
@@ -357,7 +360,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     # add sources for region aggregates
     # this is done by taking the union of all sources for countries in the region
     for region in regions:
-        members = geo.list_countries_in_region(region)
+        members = geo.list_members_of_region(region, ds_regions, ds_income_groups)
         s = tb.loc[tb["country"].isin(members), "source"].unique()
         sources_region = sorted(s)
         tb.loc[tb["country"] == region, "source"] = "; ".join(sources_region)
