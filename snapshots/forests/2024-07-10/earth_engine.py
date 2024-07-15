@@ -1,15 +1,18 @@
 """
-# Scripts in this folder must be run in this order:
-# 1. snapshots/forests/2024-07-10/dominant_driver.py
-# 2. snapshots/forests/2024-07-10/reproject_raster.py
-# 3. Manual upload of the reprojected raster to Earth Engine assets
-# 4. snapshots/forests/2024-07-10/earth_engine.py
-#
-#
-# To run this script you need to set up a Google Earth Engine account and authenticate it.
-# The required data is available in the Earth Engine Data Catalog, with the exception of the dominant driver data which there is a separate snapshot for, this must be reprojected into EPSG:4326 and added to the projects Earth Engine assets.
-# The script will calculate the area of tree cover in each driver for each year for a subset of countries and export the results to a CSV file in Google Drive.
-# Once it has completed, you can run the XXXX step to load the data to Snapshot.
+Scripts in this folder must be run in this order:
+ 1. snapshots/forests/2024-07-10/dominant_driver.py
+ 2. snapshots/forests/2024-07-10/reproject_raster.py
+ 3. Manual upload of the reprojected raster to Earth Engine assets
+ 4. snapshots/forests/2024-07-10/earth_engine.py
+
+
+To run this script you need to set up a Google Earth Engine account and authenticate it - visit here to set up an account: https://code.earthengine.google.com/ and to start a new project.
+
+Much of the required data is available in the Earth Engine Data Catalog, with the exception of the dominant driver data which there is a separate snapshot for, this must be reprojected into EPSG:4326 and added to the projects Earth Engine assets.
+
+The script will calculate the area of tree cover in each driver of loss (according to Curtis et al. (2018)) for each year for a subset of countries and export the results to a CSV file in Google Drive.
+
+Once it has completed, you can run the XXXX step to load the data to Snapshot.
 """
 import ee
 
