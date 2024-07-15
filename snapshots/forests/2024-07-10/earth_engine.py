@@ -1,13 +1,21 @@
-### To run this script you need to set up a Google Earth Engine account and authenticate it.
-### The required data is available in the Earth Engine Data Catalog, with the exception of the dominant driver data which there is a separate snapshot for, this must be reprojected into EPSG:4326 and added to the projects Earth Engine assets.
-### The script will calculate the area of tree cover in each driver for each year for a subset of countries and export the results to a CSV file in Google Drive.
-### Once it has completed, you can run the XXXX step to load the data to Snapshot.
+# Scripts in this folder must be run in this order:
+# 1. snapshots/forests/2024-07-10/dominant_driver.py
+# 2. snapshots/forests/2024-07-10/reproject_raster.py
+# 3. Manual upload of the reprojected raster to Earth Engine assets
+# 4. snapshots/forests/2024-07-10/earth_engine.py
+#
+#
+# To run this script you need to set up a Google Earth Engine account and authenticate it.
+# The required data is available in the Earth Engine Data Catalog, with the exception of the dominant driver data which there is a separate snapshot for, this must be reprojected into EPSG:4326 and added to the projects Earth Engine assets.
+# The script will calculate the area of tree cover in each driver for each year for a subset of countries and export the results to a CSV file in Google Drive.
+# Once it has completed, you can run the XXXX step to load the data to Snapshot.
 
 import ee
 
 # Set the tree cover threshold - this is the default on global forest watch
 TREE_COVER_THRESHOLD = 30
 DEBUG = False
+
 # Authenticate to Earth Engine - may require a code to be entered in the terminal
 ee.Authenticate()
 # Initialize the Earth Engine module.
@@ -34,7 +42,7 @@ treecover = gfc2023.select(["treecover2000"])
 treeCoverMask = treecover.gt(TREE_COVER_THRESHOLD)
 maskedLossAreaImage = lossAreaImage.updateMask(treeCoverMask)
 
-# Get the dominant driver data - which I reprojected to 4326 elsewhere
+# Get the dominant driver data - which I reprojected to EPSG:4326 in reprojection_raster.py
 dominant = ee.Image("projects/ee-fiona-forest/assets/reprojected_dominant_driver")
 driverCat = dominant.select(["b1"])
 
@@ -59,7 +67,7 @@ def calculateLossByYearAndCategory(feature):
         ),
         geometry=geometry,
         scale=30,
-        maxPixels=2.5e12,  # Adjust maxPixels if necessary
+        maxPixels=2.5e12,
     )
 
     return ee.Feature(None, {"country": countryName, "groups": result.get("groups")})
@@ -94,11 +102,13 @@ def flattenResults(feature):
 formattedResults = results.map(flattenResults).flatten()
 
 # Export the result to a CSV file in Google Drive - the 'forests' folder must exist in your Google Drive, if not it will be saved in root.
+# This step will take >6 hours to complete
+# Current folder is here: https://drive.google.com/drive/folders/1U5xylX1uqljdQ8OzPDJrsQFfdDHPQCbJ
 export_task = ee.batch.Export.table.toDrive(
     collection=formattedResults,
     description="Forest_Loss_By_Year_And_Driver_Per_Country",
     folder="forests",
-    fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Country",
+    fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Country_ETL_2024-07-10",
     fileFormat="CSV",
 )
 export_task.start()
