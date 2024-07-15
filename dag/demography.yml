@@ -22,14 +22,21 @@ steps:
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
 
-  # 2024-07-15: HYDE 3.3 + Gapminder + UN WPP 2022
-  # data://garden/demography/2024-01-05/population:
-  #   - data://garden/hyde/2024-01-02/all_indicators
-  #   - data://garden/gapminder/2023-03-31/population
-  #   - data://garden/un/2022-07-11/un_wpp
-  #   - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-  #   - data://garden/regions/2023-01-01/regions
-  #   - data://garden/wb/2021-07-01/wb_income
+  # 2024-07-15: HYDE 3.3 + Gapminder + UN WPP 2024
+  data://garden/demography/2024-07-15/population:
+    # HYDE 3.3
+    - data://garden/hyde/2024-01-02/all_indicators
+    # Gapminder v7
+    - data://garden/gapminder/2023-03-31/population
+    # Gapminder Systema Globalis
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    # UN WPP (2024)
+    - data://garden/un/2024-07-12/un_wpp
+    # Auxiliary
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+  # data://grapher/demography/2024-07-15/population:
+    # - data://garden/demography/2024-07-15/population
 
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
@@ -217,13 +224,3 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
-  # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
-  data://garden/demography/2024-07-15/population:
-    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-    - data://garden/un/2024-07-12/un_wpp
-    - data://garden/gapminder/2023-03-31/population
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/hyde/2017/baseline
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/demography/2024-07-15/population:
-    - data://garden/demography/2024-07-15/population
