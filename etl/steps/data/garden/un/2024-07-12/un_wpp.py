@@ -49,7 +49,6 @@ def run(dest_dir: str) -> None:
 
     ## Population, Sex ratio
     tb_population, tb_sex_ratio = process_population_sex_ratio(tb_population, tb_population_density)
-    tb_population = set_variant_to_estimates(tb_population)
     tb_population = tb_population.format(COLUMNS_INDEX)
 
     ## Sex ratio
@@ -206,6 +205,9 @@ def process_population_sex_ratio(tb: Table, tb_density: Table) -> Tuple[Table, T
     tb_sex["sex_ratio"] *= 100
     # Ensure no infinit values
     tb_sex["sex_ratio"] = tb_sex["sex_ratio"].replace([float("inf"), float("-inf")], np.nan)
+
+    # Set variants
+    tb = set_variant_to_estimates(tb)
 
     # Add population density
     tb_density = process_standard(tb_density)
