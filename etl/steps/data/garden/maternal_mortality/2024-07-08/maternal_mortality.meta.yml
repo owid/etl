@@ -16,7 +16,7 @@ definitions:
     from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.
 
 dataset:
-  title: Maternal mortality (OWID based on Gapminder/ WHO MDB/ UN WPP/ UN MMEIG) (1751-2020)
+  title: Maternal mortality (OWID based on UN MMEIG & other sources) (1751-2020)
   description: |-
     Long run data set constructured from Gapminder, the WHO mortality database, the UN WPP and UN MMEIG data. The years between 1950 - 1985 are based on the WHO mortality data set (recorded deaths) and the UN WPP, where available,
     and the Gapminder data set (recorded data) otherwise. All data points before 1950 are based on the Gapminder data set. The years after 1985 are based on the estimations of the UN MMEIG.

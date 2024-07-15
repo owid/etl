@@ -134,10 +134,15 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["maternal_deaths", "mmr", "mm_rate"], how="all")
 
     # fix dtypes (coerce errors since NAs are not accepted otherwise)
-    tb["maternal_deaths"] = pd.to_numeric(tb["maternal_deaths"].round(), errors="coerce").copy_metadata(
-        tb["maternal_deaths"]
+    tb["maternal_deaths"] = (
+        pd.to_numeric(tb["maternal_deaths"], errors="coerce")
+        .round()
+        .astype("Int64")
+        .copy_metadata(tb["maternal_deaths"])
     )
-    tb["live_births"] = pd.to_numeric(tb["live_births"].round(), errors="coerce").copy_metadata(tb["live_births"])
+    tb["live_births"] = (
+        pd.to_numeric(tb["live_births"], errors="coerce").round().astype("Int64").copy_metadata(tb["live_births"])
+    )
     tb["mmr"] = pd.to_numeric(tb["mmr"], errors="coerce").copy_metadata(tb["mmr"])
     tb["mm_rate"] = pd.to_numeric(tb["mm_rate"], errors="coerce").copy_metadata(tb["mm_rate"])
 
