@@ -172,6 +172,12 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 value=False,
                 on_change=set_states_if_form_is_modified,
             )
+            reduced_suggestions = st.toggle(
+                "Reduced list of suggestions",
+                help="",
+                value=False,
+                on_change=set_states_if_form_is_modified,
+            )
             similarity_name = st.selectbox(
                 label="Similarity matching function",
                 options=similarity_names,
@@ -210,6 +216,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         map_identical_indicators=map_identical,
         similarity_function_name=similarity_name,
         enable_bulk_explore=enable_bulk_explore,
+        complete_suggestions=not reduced_suggestions,
     )
 
 
@@ -232,6 +239,7 @@ class SearchConfigForm(BaseModel):
     map_identical_indicators: bool
     similarity_function_name: str
     enable_bulk_explore: bool
+    complete_suggestions: bool
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""
