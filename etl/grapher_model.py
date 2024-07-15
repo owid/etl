@@ -99,7 +99,6 @@ class Entity(Base):
     name: Mapped[str] = mapped_column(VARCHAR(255))
     validated: Mapped[int] = mapped_column(TINYINT(1))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    displayName: Mapped[str] = mapped_column(VARCHAR(255))
     code: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
@@ -408,6 +407,7 @@ class Chart(Base):
 
     def tags(self, session: Session) -> List[Dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
+        assert self.id, "Chart must come from a database"
         q = text(
             """
         select

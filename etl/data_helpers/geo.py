@@ -600,7 +600,7 @@ def add_population_to_dataframe(
 
     # Load population data.
     if ds_population is not None:
-        population = ds_population["population"].reset_index()
+        population = ds_population.read_table("population")
     else:
         population = _load_population()
     population = population.rename(

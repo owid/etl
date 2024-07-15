@@ -1,0 +1,32 @@
+definitions:
+  common:
+    processing_level: major
+    unit: tonnes
+    short_unit: t
+    presentation:
+      topic_tags:
+        - Energy
+      attribution_short: IEA
+  base_case: &base-case-definition |-
+    'Base case' is assessed through their probability of coming online based on various factors such as the status of financing, permitting and feasibility studies.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  demand_for_key_minerals:
+    variables:
+      demand:
+         title: Projected demand for critical minerals
+         description_key:
+          - Lithium demand is given in lithium content (not carbonate equivalent).
+          - Demand for magnet rare earth elements covers praseodymium (Pr), neodymium (Nd), terbium (Tb) and dysprosium (Dy).
+          - Graphite demand includes all grades of mined and synthetic graphite.
+          - *base-case-definition
+  supply_for_key_minerals:
+    variables:
+      supply:
+         title: Projected supply of critical minerals
+         description_key:
+          - Supply projections are built using the data for the pipeline of operating and announced mining and refining projects by country.
+          - *base-case-definition

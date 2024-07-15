@@ -71,7 +71,15 @@ watch: .venv
 	fi
 	touch .sanity-check
 
+unittest: .venv
+	@echo '==> Running unit tests'
+	poetry run pytest -m "not integration" $(SRC)
+
 test: check-formatting check-linting check-typing unittest version-tracker
+
+test-integration: .venv
+	@echo '==> Running integration tests'
+	poetry run pytest -m integration $(SRC)
 
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'

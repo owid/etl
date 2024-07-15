@@ -338,9 +338,9 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     text(
                         """
                     INSERT INTO entities
-                        (name, displayName, validated, createdAt, updatedAt)
+                        (name, validated, createdAt, updatedAt)
                     VALUES
-                        (:name, '', FALSE, NOW(), NOW())
+                        (:name, FALSE, NOW(), NOW())
                 """
                     ),
                     {"name": name},

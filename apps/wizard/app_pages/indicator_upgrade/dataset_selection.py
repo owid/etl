@@ -51,6 +51,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
 
     # Create a column to display the dataset by its dataset id followed by its title.
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
+    version = df["step"].str.split("/").str[-2]
+    df["display_name"] = df["display_name"] + " [" + version + "]"
     # Create a dictionary mapping from that display to dataset id.
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
     # Create a column to display the dataset by its dataset id followed by its ETL step.
@@ -170,6 +172,12 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
                 value=False,
                 on_change=set_states_if_form_is_modified,
             )
+            reduced_suggestions = st.toggle(
+                "Reduced list of suggestions",
+                help="",
+                value=False,
+                on_change=set_states_if_form_is_modified,
+            )
             similarity_name = st.selectbox(
                 label="Similarity matching function",
                 options=similarity_names,
@@ -208,6 +216,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         map_identical_indicators=map_identical,
         similarity_function_name=similarity_name,
         enable_bulk_explore=enable_bulk_explore,
+        complete_suggestions=not reduced_suggestions,
     )
 
 
@@ -230,6 +239,7 @@ class SearchConfigForm(BaseModel):
     map_identical_indicators: bool
     similarity_function_name: str
     enable_bulk_explore: bool
+    complete_suggestions: bool
 
     def __init__(self, **data: Any) -> None:
         """Constructor."""

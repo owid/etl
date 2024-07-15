@@ -302,7 +302,6 @@ The schema is provided in yaml below. The top level array represents the tables,
       - name: validated
       - name: createdAt
       - name: updatedAt
-      - name: displayName
 - name: explorer_charts
   columns:
       - name: id

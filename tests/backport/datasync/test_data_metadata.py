@@ -243,11 +243,11 @@ def test_convert_strings_to_numeric():
 
 def test_checksum_metadata():
     meta = _variable_meta()
-    assert checksum_metadata(meta) == "76dc6be6b7509058c7b3d1a8e75704ec"
+    assert checksum_metadata(meta) == "3123b1b4a25809c199e19e8203507a77"
 
     # change id, checksums or updatedAt shouldn't change it
     meta = _variable_meta()
     meta["id"] = 999
     meta["dataChecksum"] = 999
     meta["updatedAt"] = dt.datetime.now()
-    assert checksum_metadata(meta) == "76dc6be6b7509058c7b3d1a8e75704ec"
+    assert checksum_metadata(meta) == "3123b1b4a25809c199e19e8203507a77"
