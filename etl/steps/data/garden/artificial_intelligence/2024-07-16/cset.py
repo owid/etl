@@ -28,6 +28,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
         "NATO",
         "Quad (Australia, India, Japan and the US)",
         "ASEAN (Association of Southeast Asian Nations)",
+        "European Union (27)",
     ]
 
     df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
