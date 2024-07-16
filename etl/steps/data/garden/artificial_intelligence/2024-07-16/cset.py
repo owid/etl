@@ -15,23 +15,10 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
 
     # List of members representing different regions CSET
-    members = [
-        "Quad (Australia, India, Japan and the US)",
-        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
-        "Global Partnership on Artificial Intelligence",
-        "European Union (27)",
-        "ASEAN (Association of Southeast Asian Nations)",
-        "North America",
-        "Europe",
-        "Asia Pacific",
-        "Africa",
-        "Latin America and the Caribbean",
-        "Oceania",
-        "NATO",
-    ]
+    members = ["North America", "Europe", "Asia Pacific", "Africa", "Latin America and the Caribbean", "Oceania"]
 
     # Filter the table to only include rows corresponding to the countries and not regions
-    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)]
+    df_regions = tb_with_regions[tb_with_regions["country"].isin(members)]
 
     # Reset the index of the filtered data
     df_regions = df_regions.reset_index(drop=True)
