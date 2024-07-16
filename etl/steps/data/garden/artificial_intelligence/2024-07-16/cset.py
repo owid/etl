@@ -15,16 +15,22 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
 
     # List of members representing different regions CSET
     members = [
+        "Quad (Australia, India, Japan and the US)",
+        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
+        "Global Partnership on Artificial Intelligence",
+        "European Union (27)",
+        "ASEAN (Association of Southeast Asian Nations)",
         "North America",
         "Europe",
         "Asia Pacific",
         "Africa",
         "Latin America and the Caribbean",
         "Oceania",
+        "NATO",
     ]
 
     # Filter the table to only include rows corresponding to the countries and not regions
-    df_regions = tb_with_regions[tb_with_regions["country"].isin(members)]
+    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)]
 
     # Reset the index of the filtered data
     df_regions = df_regions.reset_index(drop=True)
@@ -97,7 +103,6 @@ def run(dest_dir: str) -> None:
     tb.loc[condition, "citations_per_article"] = pd.NA
 
     tb = tb.format(["country", "year", "field"])
-    print(tb.columns)
 
     ds_garden = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
