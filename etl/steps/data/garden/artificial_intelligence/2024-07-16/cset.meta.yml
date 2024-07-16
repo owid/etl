@@ -42,6 +42,8 @@ tables:
         title: Disclosed investment
         unit: US dollars
         short_unit: $
+        description_short: |-
+          {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
         presentation:
@@ -53,6 +55,8 @@ tables:
         title: Estimated investment
         unit: US dollars
         short_unit: $
+        description_short: |-
+          {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
         presentation:
@@ -64,7 +68,7 @@ tables:
         title: Total disclosed investment
         unit: US dollars
         short_unit: $
-        description_short: Total disclosed investment between 2013-2023.
+        description_short: Total disclosed investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
         presentation:
@@ -76,7 +80,7 @@ tables:
         title: Total estimated investment
         unit: US dollars
         short_unit: $
-        description_short: Total estimated investment between 2013-2023.
+        description_short: Total estimated investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
         presentation:
