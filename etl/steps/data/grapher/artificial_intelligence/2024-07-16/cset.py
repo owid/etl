@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl import grapher_helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
