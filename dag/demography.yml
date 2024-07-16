@@ -254,3 +254,9 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
+
+  # Migration UN DESA
+  data://meadow/migration/2024-07-16/un_migrant_stock:
+    - snapshot://migration/2024-07-16/un_migrant_stock_dest_origin.xlsx
+  data://garden/migration/2024-07-16/un_migrant_stock:
+    - data://meadow/migration/2024-07-16/un_migrant_stock

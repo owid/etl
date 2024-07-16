@@ -104,6 +104,8 @@
 
 - code: "ASM"
   name: "American Samoa"
+  aliases:
+    - "American Samoa*"
 
 - code: "AND"
   name: "Andorra"
@@ -663,6 +665,8 @@
   name: "Finland"
   related:
     - "ALA"
+  aliases:
+    - "Finland*"
 
 - code: "FRA"
   name: "France"
@@ -1497,6 +1501,8 @@
 
 - code: "TKL"
   name: "Tokelau"
+  aliases:
+    - "Tokelau*"
 
 - code: "TON"
   name: "Tonga"
@@ -1528,6 +1534,7 @@
     - "Turks & Caicos"
     - "Turks and Caicos Islands (the)"
     - "Turk Island"
+    - "Turks and Caicos Islands*"
 
 - code: "TUV"
   name: "Tuvalu"
