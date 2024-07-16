@@ -5,14 +5,30 @@ definitions:
       topic_tags:
         - Artificial Intelligence
 
-    description_processing: |-
-          - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
-          - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
-          - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
-          - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
-          - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
     display:
       numDecimalPlaces: 0
+
+  description_processing_investment: |-
+      - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+      - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+      - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+      - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+      - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+  description_short_investment: Only includes private-market investment flows, such as venture capital; excludes all investment in publicly traded companies, such as the "Big Tech" firms. This data is expressed in US dollars, adjusted for inflation.
+
+  description_short_articles: English- and Chinese-language scholarly publications related to the development and application of AI. This includes journal articles, conference papers, repository publications (such as arXiv), books, and theses.
+
+  description_short_patents: Patents related to artificial intelligence first submitted in the selected country's patent office. Subsequent granting of that patent could be by any country's patent office.
+
+  descroption_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
+
+  note_article_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years.
+
+  note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+
+  note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -22,103 +38,159 @@ dataset:
 tables:
   cset:
     variables:
-
       disclosed_investment:
         title: Disclosed investment
         unit: US dollars
         short_unit: $
-        display:
-          numDecimalPlaces: 0
+        description_processing: |-
+          {definitions.description_processing_investment}
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_investment}
 
       investment_estimated:
         title: Estimated investment
         unit: US dollars
         short_unit: $
-
+        description_processing: |-
+          {definitions.description_processing_investment}
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_investment}
 
       disclosed_investment_summary:
         title: Total disclosed investment
         unit: US dollars
         short_unit: $
+        description_short: Total disclosed investment between 2013-2023.
+        description_processing: |-
+          {definitions.description_processing_investment}
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_investment}
 
       estimated_investment_summary:
         title: Total estimated investment
         unit: US dollars
         short_unit: $
+        description_short: Total estimated investment between 2013-2023.
+        description_processing: |-
+          {definitions.description_processing_investment}
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_investment}
 
       num_patent_applications:
         title: Patent applications
-        description_short: Yearly total number of patent applications.
+        description_short: |-
+          {definitions.description_short_patents}
         unit: applications
-
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_patent_granted:
         title: Patent applications granted
-        description_short: Yearly total number of patents granted.
+        description_short: |-
+          {definitions.description_short_patents}
         unit: granted applications
-
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_patent_applications_summary:
         title: Total patent applications
-        description_short: Total number of patent applications between 2010-2020.
+        description_short: Total number of patent applications between 2013-2023. {definitions.description_short_patents}
         unit: applications
-
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_patent_granted_summary:
         title: Total patent applications granted
-        description_short: Total number of patents granted between 2010-2020.
+        description_short: Total number of patents granted between 2013-2020. {definitions.description_short_patents}
         unit: granted applications
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_articles:
         title: Number of articles
-        description_short: Yearly number of articles published in AI fields.
+        description_short: |-
+          {definitions.description_short_articles}
         unit: articles
-
 
       num_citations:
         title: Number of citations
-        description_short: Yearly number of citations in the AI field.
+        description_short: |-
+          {definitions.description_short_articles}
         unit: citations
-
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_article_citations}
 
       num_articles_summary:
         title: Total number of articles
-        description_short: Yearly total number of articles in the AI field between 2010-2022
+        description_short: Total number of articles in the AI field between 2013-2023. {definitions.description_short_articles}
         unit: articles
 
       num_citations_summary:
         title: Total number of citations
-        description_short: The total number of citations in the AI field between 2010-2022
+        description_short: Total number of citations in the AI field between 2013-2023. {definitions.description_short_articles}
         unit: citations
-
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_article_citations}
 
       proportion_patents_granted:
         title: Share of patents granted
-        description_short: Yearly share of patent applications that have been granted.
+        description_short: Yearly share of patent applications that have been granted. {definitions.description_short_patents}
         unit: '%'
         short_unit: '%'
-
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       citations_per_article:
-        title: Citations per article, 2010-2022
-        description_short: The total number of citations per article in the AI field between 2010-2022. Citations take time to accumulate so recent years  may have fewer citations, and the measure for these years may not completely reflective of their eventual total
+        title: Citations per article, 2013-2023
+        description_short: The total number of citations per article in the AI field between 2013-2023. {definitions.description_short_citations}
         unit: 'citations per article'
-        short_unit: ''
-
+        presentation:
+          grapher_config:
+              note: Countries that have published fewer than 1,000 articles on AI between 2013-2023 are excluded to prevent distortion in the "citations per publication" metric, which can occur when dividing by a small sample size.
 
       num_patent_applications_per_mil:
         title: Patent applications per 1 million people
-        description_short: Yearly total number of patent applications per 1 million people.
-        unit: applications
-
+        description_short: Yearly total number of patent applications per 1 million people. {definitions.description_short_patents}
+        unit: applications per 1 million people
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_patent_granted_per_mil:
         title: Patent applications granted per 1 million people
-        description_short: Yearly total number of patents granted per 1 million people.
-        unit: granted applications
-
+        description_short: Yearly total number of patents granted per 1 million people. {definitions.description_short_patents}
+        unit: granted applications per 1 million people
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_patents}
 
       num_articles_per_mil:
         title: Number of articles per 1 million people
-        description_short: Yearly number of articles published in AI fields per 1 million people
-        unit: articles
+        description_short: Yearly number of articles published in AI fields per 1 million people. {definitions.description_short_articles}
+        unit: articles per 1 million people
