@@ -23,9 +23,8 @@ tables:
         unit: kilograms per GWh
         short_unit: kg
         description: Amount of waste rock produced for electricity sources, measured in kilograms per gigawatt-hour (GWh).
-      fossil_fuel:
-        title: Fossil fuel
+      gas_extracted:
+        title: Gas extracted
         unit: kilograms per GWh
         short_unit: kg
-        description: |-
-          The amount of fossil fuel that has to be extracted, measured in kilograms per gigawatt-hour (GWh). For coal, this includes waste rock from mining too.
+        description: The amount of gas that has to be extracted, measured in kilograms per gigawatt-hour (GWh).
