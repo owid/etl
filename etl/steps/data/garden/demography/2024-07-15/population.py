@@ -351,7 +351,59 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         ds_income_groups=ds_income_groups,
         num_allowed_nans_per_year=None,
         frac_allowed_nans_per_year=0.2,
+        countries_that_must_have_data={
+            # Continents
+            "Asia": ["China", "India", "Indonesia", "Pakistan", "Bangladesh"],
+            "Africa": ["Nigeria", "Ethiopia", "Egypt"],
+            "North America": ["United States", "Canada", "Mexico"],
+            "South America": ["Brazil", "Argentina", "Colombia", "Peru"],
+            "Oceania": ["Australia", "New Zealand"],
+            "Europe": ["Russia", "Germany", "France", "United Kingdom", "Italy", "Spain"],
+            # Income groups
+            "High-income countries": [
+                "United States",
+                "Japan",
+                "Germany",
+                "France",
+                "United Kingdom",
+                "Italy",
+                "South Korea",
+            ],
+            "Upper-middle-income countries": [
+                "China",
+                "Brazil",
+                "Indonesia",
+                "Russia",
+                "Mexico",
+                "Vietnam",
+                "Philippines",
+                "Iran",
+            ],
+            "Lower-middle-income countries": [
+                "India",
+                "Pakistan",
+                "Nigeria",
+                "Bangladesh",
+                "Philippines",
+                "Egypt",
+                "Kenya",
+            ],
+            "Low-income countries": [
+                "Ethiopia",
+                "Democratic Republic of Congo",
+                "Congo",
+                "Uganda",
+            ],
+        },
     )
+
+    # tb = tb.loc[
+    #     (
+    #         (tb["country"].isin(regions) & (tb["year"] < 1800) & (tb["year"] % 100 != 0))
+    #         | (tb["country"].isin(regions) & (tb["year"] < 1800) & (tb["year"] % 10 != 0))
+    #     )
+
+    # ]
 
     # add sources back
     # these are only added to countries, not aggregates
