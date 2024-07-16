@@ -31,6 +31,11 @@ definitions:
 
   note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.  Data for 2020-2023 is incomplete.
 
+  description_key_patents: &description_key_patents |-
+    World aggregate does not include data for Micronesia, Tonga, Samoa, Kiribati, Fiji, Papua New Guinea, Palau, Tuvalu, Bermuda, Armenia, Belarus, Georgia, Gibraltar, Jersey, Kosovo, Moldova, Isle of Man, Iceland, Albania, Andorra, Bosnia and Herzegovina, Malta, Montenegro, San Marino, North Macedonia, Liechtenstein, Monaco, Vatican City, Guernsey, Afghanistan, Kyrgyzstan, Bahrain, Laos, Bangladesh, Lebanon, Bhutan, Maldives, Cambodia, Syria, Tajikistan, Cyprus, Mongolia, North Korea, Myanmar, Timor-Leste, Nepal, Turkmenistan, Pakistan, Palestine, Iraq, United Arab Emirates, Uzbekistan, Kazakhstan, Qatar, Vietnam, Yemen, Kuwait, Algeria, Cape Verde, Equatorial Guinea, Swaziland, Namibia, Central African Republic (the), Angola, Ethiopia, Niger, Benin, Gabon, Nigeria, Botswana, Gambia, Rwanda, Burkina Faso, Ghana, São Tomé and Príncipe, Burundi, Guinea, Senegal, Guinea-Bissau, Seychelles, Cameroon, Sierra Leone, Lesotho, Somalia, Chad, Liberia, Libya, South Sudan, Congo, Madagascar, Sudan, Côte d'Ivoire, Malawi, Togo, Mali, Djibouti, Mauritania, Uganda, Egypt, Mauritius, Tanzania, Zambia, Eritrea, Mozambique, Zimbabwe, Comoros, Antigua and Barbuda, Bolivia, Suriname, Nicaragua, Dominican Republic, Bahamas, Ecuador, Paraguay, Barbados, Saint Vincent and the Grenadines, El Salvador, Belize, Grenada, Saint Kitts and Nevis, Guatemala, Guyana, Haiti, Honduras, Trinidad and Tobago, Jamaica, Venezuela, Puerto Rico, Cayman Islands (the), Turks and Caicos Islands, Saint Lucia, and Dominica.
+
+  description_key_investment: &description_key_investment |-
+    World aggregate does not include data for Micronesia, Tonga, Samoa, Kiribati, Fiji, Papua New Guinea, Palau, Tuvalu, Gibraltar, Jersey, Kosovo, Moldova, Isle of Man, Andorra, Montenegro, San Marino, Liechtenstein, Monaco, Vatican City, Afghanistan, Kyrgyzstan, Laos, Hong Kong, Bhutan, Brunei Darussalam, Maldives, Syria, North Korea, Myanmar, Timor-Leste, Nepal, Turkmenistan, Palestine, Yemen, Kuwait, Cape Verde, Equatorial Guinea, Swaziland, Namibia, Central African Republic (the), Angola, Ethiopia, Niger, Benin, Gabon, Gambia, Rwanda, Burkina Faso, São Tomé and Príncipe, Burundi, Guinea, Guinea-Bissau, Cameroon, Sierra Leone, Lesotho, Somalia, Chad, Liberia, Libya, South Sudan, Congo, Sudan, Malawi, Togo, Mali, Djibouti, Mauritania, Eritrea, Mozambique, Comoros, Antigua and Barbuda, Bolivia, Suriname, Nicaragua, Bahamas, Saint Vincent and the Grenadines, Grenada, Guyana, Haiti, Honduras, Cuba, Turks and Caicos Islands, Saint Lucia, and Dominica.
 
 
 # Learn more about the available fields:
@@ -50,6 +55,8 @@ tables:
           {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
+        description_key:
+          - *definitions.description_key_investment
         presentation:
           grapher_config:
               note: |-
@@ -63,6 +70,9 @@ tables:
           {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
+        description_key:
+          - *definitions.description_key_investment
+
         presentation:
           grapher_config:
               note: |-
@@ -75,6 +85,8 @@ tables:
         description_short: Total disclosed investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
+        description_key:
+          - *definitions.description_key_investment
         presentation:
           grapher_config:
               note: |-
@@ -87,6 +99,8 @@ tables:
         description_short: Total estimated investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-
           {definitions.description_processing_investment}
+        description_key:
+          - *definitions.description_key_investment
         presentation:
           grapher_config:
               note: |-
@@ -94,9 +108,11 @@ tables:
 
       num_patent_applications:
         title: Patent applications
+        unit: applications
         description_short: |-
           {definitions.description_short_patents}
-        unit: applications
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -104,9 +120,11 @@ tables:
 
       num_patent_granted:
         title: Patent applications granted
+        unit: granted applications
         description_short: |-
           {definitions.description_short_patents}
-        unit: granted applications
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -114,8 +132,10 @@ tables:
 
       num_patent_applications_summary:
         title: Total patent applications
-        description_short: Total number of patent applications between 2013-2023. {definitions.description_short_patents}
         unit: applications
+        description_short: Total number of patent applications between 2013-2023. {definitions.description_short_patents}
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -123,8 +143,10 @@ tables:
 
       num_patent_granted_summary:
         title: Total patent applications granted
-        description_short: Total number of patents granted between 2013-2020. {definitions.description_short_patents}
         unit: granted applications
+        description_short: Total number of patents granted between 2013-2020. {definitions.description_short_patents}
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -132,18 +154,19 @@ tables:
 
       num_articles:
         title: Number of articles
+        unit: articles
         description_short: |-
           {definitions.description_short_articles}
-        unit: articles
-        grapher_config:
-          note: |-
-            {definitions.note_articles}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.note_articles}
 
       num_citations:
         title: Number of citations
+        unit: citations
         description_short: |-
           {definitions.description_short_citations}
-        unit: citations
         presentation:
           grapher_config:
               note: |-
@@ -151,8 +174,8 @@ tables:
 
       num_articles_summary:
         title: Total number of articles
-        description_short: Total number of articles in the AI field between 2013-2023. {definitions.description_short_articles}
         unit: articles
+        description_short: Total number of articles in the AI field between 2013-2023. {definitions.description_short_articles}
         presentation:
           grapher_config:
               note: |-
@@ -179,8 +202,10 @@ tables:
 
       num_patent_applications_per_mil:
         title: Patent applications per 1 million people
-        description_short: Yearly total number of patent applications per 1 million people. {definitions.description_short_patents}
         unit: applications per 1 million people
+        description_short: Yearly total number of patent applications per 1 million people. {definitions.description_short_patents}
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -188,8 +213,10 @@ tables:
 
       num_patent_granted_per_mil:
         title: Patent applications granted per 1 million people
-        description_short: Yearly total number of patents granted per 1 million people. {definitions.description_short_patents}
         unit: granted applications per 1 million people
+        description_short: Yearly total number of patents granted per 1 million people. {definitions.description_short_patents}
+        description_key:
+          - *definitions.description_key_patents
         presentation:
           grapher_config:
               note: |-
@@ -197,8 +224,8 @@ tables:
 
       num_articles_per_mil:
         title: Number of articles per 1 million people
-        description_short: Yearly number of articles published in AI fields per 1 million people. {definitions.description_short_articles}
         unit: articles per 1 million people
+        description_short: Yearly number of articles published in AI fields per 1 million people. {definitions.description_short_articles}
         presentation:
           grapher_config:
               note: |-
