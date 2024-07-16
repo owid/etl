@@ -248,26 +248,26 @@ steps:
 
   # AI Index Report 2024 - Conference Attendance
   data://garden/artificial_intelligence/2024-06-28/ai_conferences:
-     - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_conferences:
     - data://garden/artificial_intelligence/2024-06-28/ai_conferences
 
   # AI Index Report 2024 - Incidents
   data://garden/artificial_intelligence/2024-06-28/ai_incidents:
-     - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_incidents:
     - data://garden/artificial_intelligence/2024-06-28/ai_incidents
 
   # AI Index Report 2024 - AI job postings
   data://garden/artificial_intelligence/2024-06-28/ai_jobs:
-     - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_jobs:
     - data://garden/artificial_intelligence/2024-06-28/ai_jobs
 
   # AI Index Report 2024 - AI investment trends
   data://garden/artificial_intelligence/2024-06-28/ai_investment:
-     - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
-     - data://garden/bls/2024-05-16/us_consumer_prices
+    - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
+    - data://garden/bls/2024-05-16/us_consumer_prices
 
   # Grapher dataset for private investment in AI
   data://grapher/artificial_intelligence/2024-06-28/ai_private_investment:
@@ -283,7 +283,7 @@ steps:
 
   # AI Index Report 2024 - AI robots
   data://garden/artificial_intelligence/2024-06-28/ai_robots:
-     - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
 
@@ -305,3 +305,15 @@ steps:
     - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_phds:
     - data://garden/artificial_intelligence/2024-06-28/ai_phds
+
+  # CSET data on articles, patents and investment
+  data://meadow/artificial_intelligence/2024-07-16/cset:
+    - snapshot://artificial_intelligence/2024-07-16/cset.csv
+  data://garden/artificial_intelligence/2024-07-16/cset:
+    - data://meadow/artificial_intelligence/2024-07-16/cset
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/bls/2024-05-16/us_consumer_prices
+
+  data://grapher/artificial_intelligence/2024-07-16/cset:
+    - data://garden/artificial_intelligence/2024-07-16/cset

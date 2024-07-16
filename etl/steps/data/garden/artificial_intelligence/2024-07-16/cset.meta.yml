@@ -1,0 +1,124 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+    description_processing: |-
+          - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+          - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+          - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+          - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+          - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+    display:
+      numDecimalPlaces: 0
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  cset:
+    variables:
+
+      disclosed_investment:
+        title: Disclosed investment
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+
+      investment_estimated:
+        title: Estimated investment
+        unit: US dollars
+        short_unit: $
+
+
+      disclosed_investment_summary:
+        title: Total disclosed investment
+        unit: US dollars
+        short_unit: $
+
+      estimated_investment_summary:
+        title: Total estimated investment
+        unit: US dollars
+        short_unit: $
+
+      num_patent_applications:
+        title: Patent applications
+        description_short: Yearly total number of patent applications.
+        unit: applications
+
+
+      num_patent_granted:
+        title: Patent applications granted
+        description_short: Yearly total number of patents granted.
+        unit: granted applications
+
+
+      num_patent_applications_summary:
+        title: Total patent applications
+        description_short: Total number of patent applications between 2010-2020.
+        unit: applications
+
+
+      num_patent_granted_summary:
+        title: Total patent applications granted
+        description_short: Total number of patents granted between 2010-2020.
+        unit: granted applications
+
+      num_articles:
+        title: Number of articles
+        description_short: Yearly number of articles published in AI fields.
+        unit: articles
+
+
+      num_citations:
+        title: Number of citations
+        description_short: Yearly number of citations in the AI field.
+        unit: citations
+
+
+      num_articles_summary:
+        title: Total number of articles
+        description_short: Yearly total number of articles in the AI field between 2010-2022
+        unit: articles
+
+      num_citations_summary:
+        title: Total number of citations
+        description_short: The total number of citations in the AI field between 2010-2022
+        unit: citations
+
+
+      proportion_patents_granted:
+        title: Share of patents granted
+        description_short: Yearly share of patent applications that have been granted.
+        unit: '%'
+        short_unit: '%'
+
+
+      citations_per_article:
+        title: Citations per article, 2010-2022
+        description_short: The total number of citations per article in the AI field between 2010-2022. Citations take time to accumulate so recent years  may have fewer citations, and the measure for these years may not completely reflective of their eventual total
+        unit: 'citations per article'
+        short_unit: ''
+
+
+      num_patent_applications_per_mil:
+        title: Patent applications per 1 million people
+        description_short: Yearly total number of patent applications per 1 million people.
+        unit: applications
+
+
+      num_patent_granted_per_mil:
+        title: Patent applications granted per 1 million people
+        description_short: Yearly total number of patents granted per 1 million people.
+        unit: granted applications
+
+
+      num_articles_per_mil:
+        title: Number of articles per 1 million people
+        description_short: Yearly number of articles published in AI fields per 1 million people
+        unit: articles
