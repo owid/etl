@@ -42,7 +42,10 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
 
 
 def run(dest_dir: str) -> None:
+    #
     # Load inputs.
+    #
+
     ds_meadow = paths.load_dataset("cset")
     tb = ds_meadow["cset"].reset_index()
 
@@ -53,8 +56,9 @@ def run(dest_dir: str) -> None:
     tb_population = ds_population["population"].reset_index()
 
     ds_regions = paths.load_dataset("regions")
-
+    #
     # Process data.
+    #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = add_world(tb=tb, ds_regions=ds_regions)
 
@@ -84,14 +88,16 @@ def run(dest_dir: str) -> None:
 
     tb = tb.drop("population", axis=1)
 
-    tb["proportion_patents_granted"] = ((tb["num_patent_granted"] / tb["num_patent_applications"]) * 100).astype(float)
     tb["citations_per_article"] = (tb["num_citations_summary"] / tb["num_articles_summary"]).astype(float)
 
     condition = (tb["num_articles_summary"] < 1000) & pd.notna(tb["num_articles_summary"])
     tb.loc[condition, "citations_per_article"] = pd.NA
 
     tb = tb.format(["country", "year", "field"])
-
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )

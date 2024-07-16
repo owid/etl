@@ -23,7 +23,7 @@ definitions:
 
   description_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
 
-  note_article_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years.
+  note_article_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years. Data for the most recent years is therefore incomplete.
 
   note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
 
@@ -155,18 +155,6 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_article_citations}
-
-      proportion_patents_granted:
-        title: Share of patents granted
-        description_short: Yearly share of patent applications that have been granted. {definitions.description_short_patents}
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 2
-        presentation:
-          grapher_config:
-              note: |-
-                {definitions.note_patents}
 
       citations_per_article:
         title: Citations per article, 2013-2023
