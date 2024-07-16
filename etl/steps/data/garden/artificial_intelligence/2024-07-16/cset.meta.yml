@@ -135,7 +135,7 @@ tables:
       num_citations:
         title: Number of citations
         description_short: |-
-          {definitions.description_short_articles}
+          {definitions.description_short_citations}
         unit: citations
         presentation:
           grapher_config:
