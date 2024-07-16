@@ -1,3 +1,4 @@
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -39,7 +40,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
 
     # Group the filtered data by "year" and "field" and aggregate the data based on the defined rules
-    result = df_regions.groupby(["year", "field"], observed=True)[numeric_cols].sum().reset_index()
+    result = df_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
 
     # Assign the aggregated data to a new country named "World"
     result["country"] = "World"
@@ -108,3 +109,11 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
     ds_garden.save()
+
+
+# Define a custom aggregation function that returns NaN if all values are NaN, else returns the sum
+def sum_with_nan(values):
+    if values.isnull().all():
+        return np.nan
+    else:
+        return values.sum()
