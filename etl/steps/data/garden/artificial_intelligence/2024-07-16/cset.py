@@ -15,9 +15,22 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     tb_with_regions = tb.copy()
 
     # List of members representing different regions CSET and use these for World aggregation
-    members = ["North America", "Europe", "Asia Pacific", "Africa", "Latin America and the Caribbean", "Oceania"]
+    members = [
+        "North America",
+        "Europe",
+        "Asia Pacific",
+        "Africa",
+        "Latin America and the Caribbean",
+        "Oceania",
+        "OECD",
+        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
+        "Global Partnership on Artificial Intelligence",
+        "NATO",
+        "Quad (Australia, India, Japan and the US)",
+        "ASEAN (Association of Southeast Asian Nations)",
+    ]
 
-    df_regions = tb_with_regions[tb_with_regions["country"].isin(members)].reset_index(drop=True)
+    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
     numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
 
     result = df_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
