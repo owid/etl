@@ -31,10 +31,10 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
         "European Union (27)",
     ]
 
-    df_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
-    numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
+    tb_with_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
+    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field"]]
 
-    result = df_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
+    result = tb_with_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
     result["country"] = "World"
 
     tb = pr.concat([tb_with_regions, result])
