@@ -98,8 +98,8 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-# Define a custom aggregation function that returns NaN if all values are NaN, else returns the sum
 def sum_with_nan(values):
+    # Define a custom aggregation function that returns NaN if all values are NaN, else returns the sum
     if values.isnull().all():
         return np.nan
     else:

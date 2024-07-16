@@ -21,7 +21,7 @@ definitions:
 
   description_short_patents: Patents related to artificial intelligence first submitted in the selected country's patent office. Subsequent granting of that patent could be by any country's patent office.
 
-  descroption_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
+  description_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
 
   note_article_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years.
 
