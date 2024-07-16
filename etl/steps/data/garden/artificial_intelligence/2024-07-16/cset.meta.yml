@@ -172,9 +172,7 @@ tables:
         title: Citations per article, 2013-2023
         description_short: The total number of citations per article in the AI field between 2013-2023. {definitions.description_short_citations}
         unit: 'citations per article'
-        presentation:
-          grapher_config:
-              note: Countries that have published fewer than 1,000 articles on AI between 2013-2023 are excluded to prevent distortion in the "citations per publication" metric, which can occur when dividing by a small sample size.
+        description_processing: Countries that have published fewer than 1,000 articles on AI between 2010-2022 are excluded to prevent distortion in the "citations per publication" metric, which can occur when dividing by a small sample size.
 
       num_patent_applications_per_mil:
         title: Patent applications per 1 million people
