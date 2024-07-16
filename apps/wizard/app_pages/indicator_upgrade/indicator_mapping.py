@@ -191,7 +191,7 @@ def st_show_header(search_form):
     # Title
     st.header("Map indicators")
     st.markdown(
-        f"Map indicators from the [Old dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}) to the [New dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}). The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
+        f"Map indicators from the [Old dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_old_id)}) to the [New dataset]({OWID_ENV.dataset_admin_site(search_form.dataset_new_id)}). The idea is that the indicators in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some indicators if you want to.",
     )
 
     # Row 1
