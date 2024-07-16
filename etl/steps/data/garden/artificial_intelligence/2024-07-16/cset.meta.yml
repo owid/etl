@@ -23,11 +23,15 @@ definitions:
 
   description_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
 
-  note_article_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years. Data for the most recent years is therefore incomplete.
+  note_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years. Data for 2021-2023 is therefore incomplete.
 
-  note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+  note_articles:  Data for 2021-2023 is therefore incomplete.
 
-  note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.
+  note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI). Data for 2021-2023 is incomplete.
+
+  note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.  Data for 2020-2023 is incomplete.
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -131,6 +135,9 @@ tables:
         description_short: |-
           {definitions.description_short_articles}
         unit: articles
+        grapher_config:
+          note: |-
+            {definitions.note_articles}
 
       num_citations:
         title: Number of citations
@@ -140,12 +147,16 @@ tables:
         presentation:
           grapher_config:
               note: |-
-                {definitions.note_article_citations}
+                {definitions.note_citations}
 
       num_articles_summary:
         title: Total number of articles
         description_short: Total number of articles in the AI field between 2013-2023. {definitions.description_short_articles}
         unit: articles
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_articles}
 
       num_citations_summary:
         title: Total number of citations
@@ -154,13 +165,17 @@ tables:
         presentation:
           grapher_config:
               note: |-
-                {definitions.note_article_citations}
+                {definitions.note_citations}
 
       citations_per_article:
         title: Citations per article, 2013-2023
         description_short: The total number of citations per article in the AI field between 2013-2023. {definitions.description_short_citations}
         unit: 'citations per article'
         description_processing: Countries that have published fewer than 1,000 articles on AI between 2010-2023 are excluded to prevent distortion in the "citations per publication" metric, which can occur when dividing by a small sample size.
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_citations}
 
       num_patent_applications_per_mil:
         title: Patent applications per 1 million people
@@ -184,3 +199,7 @@ tables:
         title: Number of articles per 1 million people
         description_short: Yearly number of articles published in AI fields per 1 million people. {definitions.description_short_articles}
         unit: articles per 1 million people
+        presentation:
+          grapher_config:
+              note: |-
+                {definitions.note_articles}s
