@@ -210,3 +210,5 @@ steps:
     - snapshot://fasttrack/latest/electricity_material_footprint_wang.csv
   data://grapher/fasttrack/latest/breakdown_material_footprint_wang:
     - snapshot://fasttrack/latest/breakdown_material_footprint_wang.csv
+  data://grapher/fasttrack/latest/rock_metal_ratio_nassar_wang:
+    - snapshot://fasttrack/latest/rock_metal_ratio_nassar_wang.csv
