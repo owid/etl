@@ -657,7 +657,7 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     tb = tb.loc[tb["num_years_previous_observation"] <= 10]
 
     # Estimate population growth rate
-    tb["growth_rate"] = (tb["population"] / tb["previous_population"]).pow(1 / tb["num_years_previous_observation"]) - 1
+    tb["growth_rate"] = (tb["population"] / tb["previous_population"]) ** (1 / tb["num_years_previous_observation"]) - 1
     tb["growth_rate"] *= 100
 
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
