@@ -2,7 +2,7 @@ import ee
 
 # Set the tree cover threshold - this is the default on global forest watch
 TREE_COVER_THRESHOLD = 30
-DEBUG = False
+CHUNK_SIZE = 20
 
 
 def main():
@@ -13,10 +13,19 @@ def main():
 
     # Load country boundaries from LSIB - a standard dataset in Earth Engine
     countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
+    countries = countries.limit(100)
 
-    # Select a subset of five countries for debugging purposes
-    if DEBUG:
-        countries = countries.limit(5)
+    # Function to get countries in chunks of specified size
+    def get_chunks(fc, chunk_size):
+        size = fc.size().getInfo()
+        chunks = []
+        for i in range(0, size, chunk_size):
+            chunk = fc.toList(chunk_size, i)
+            chunks.append(ee.FeatureCollection(chunk))
+        return chunks
+
+    # Get the countries in chunks of 20
+    chunks = get_chunks(countries, CHUNK_SIZE)
 
     # Country boundaries
     gfc2023 = ee.Image("UMD/hansen/global_forest_change_2023_v1_11")
@@ -39,7 +48,7 @@ def main():
     # Combine the masked loss area, loss year, and driver categories into one image.
     combinedImage = maskedLossAreaImage.addBands([lossYear, driverCat])
 
-    # Define a function to calculate the area lost in each category for each year.
+    # Define a function to calculate the area lost in each category for each year
     def calculateLossByYearAndCategory(feature):
         geometry = feature.geometry()
         countryName = feature.get("country_na")  # Assuming 'country_na' is the country name property
@@ -55,15 +64,24 @@ def main():
                 groupName="category",
             ),
             geometry=geometry,
-            scale=100,  # Increase scale to reduce computation time
-            maxPixels=2.5e12,
-            bestEffort=True,  # Use best effort to ensure completion
-            tileScale=16,  # Adjust tileScale to manage memory usage
+            scale=30,
+            maxPixels=2.5e10,
+            bestEffort=True,
         )
 
         return ee.Feature(None, {"country": countryName, "groups": result.get("groups")})
 
-    # Function to flatten and format the results
+    # Loop through each chunk and process them
+    all_results = []
+    for index, chunk in enumerate(chunks):
+        print(f"Processing chunk {index + 1} with up to {CHUNK_SIZE} countries")
+        results = chunk.map(calculateLossByYearAndCategory)
+        all_results.append(results)
+
+    # Combine results from all chunks
+    combined_results = ee.FeatureCollection(all_results).flatten()
+
+    # Flatten and format the results
     def flattenResults(feature):
         groups = ee.List(feature.get("groups"))
         country = feature.get("country")
@@ -84,27 +102,20 @@ def main():
 
         return ee.FeatureCollection(formatted)
 
-    # Process and export each country separately
-    country_list = countries.toList(countries.size())
-    num_countries = country_list.size().getInfo()
+    formattedResults = combined_results.map(flattenResults).flatten()
 
-    for i in range(num_countries):
-        country = ee.Feature(country_list.get(i))
-        country_name = country.get("country_na").getInfo()
-        country_results = calculateLossByYearAndCategory(country)
-        formatted_country_results = flattenResults(country_results)
+    # Export the result to a CSV file in Google Drive
+    export_task = ee.batch.Export.table.toDrive(
+        collection=formattedResults,
+        description="Forest_Loss_By_Year_And_Driver_Per_Chunk",
+        folder="forests",
+        fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Country_ETL_2024-07-10_Chunks",
+        fileFormat="CSV",
+    )
+    export_task.start()
 
-        export_task = ee.batch.Export.table.toDrive(
-            collection=formatted_country_results,
-            description=f"Forest_Loss_By_Year_And_Driver_{country_name}",
-            folder="forests",
-            fileNamePrefix=f"Forest_Loss_By_Year_And_Driver_{country_name}_ETL_2024-07-10",
-            fileFormat="CSV",
-        )
-        export_task.start()
-
-        # Print task status
-        print(f"Export task for {country_name} started. Check the Earth Engine Tasks tab for progress.")
+    # Print task status
+    print("Export task started. Check the Earth Engine Tasks tab for progress.")
 
 
 if __name__ == "__main__":

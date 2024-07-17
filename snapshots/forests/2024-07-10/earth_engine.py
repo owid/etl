@@ -29,10 +29,13 @@ def main():
 
     # Load country boundaries from LSIB - a standard dataset in Earth Engine
     countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
-
     # Select a subset of five countries for debugging purposes
-    if DEBUG:
-        countries = countries.limit(10)
+    # if DEBUG:
+    #    countries = countries.limit(100)# Select countries 1-100
+    # countries1_100 = countries.toList(100, 0)
+    # countries = ee.FeatureCollection(countries.toList(100, 100))
+    # Select countries 201-300
+    countries = countries.toList(100, 200)
 
     # Country boundaries
     gfc2023 = ee.Image("UMD/hansen/global_forest_change_2023_v1_11")
@@ -109,9 +112,9 @@ def main():
     # Current folder is here: https://drive.google.com/drive/folders/1U5xylX1uqljdQ8OzPDJrsQFfdDHPQCbJ
     export_task = ee.batch.Export.table.toDrive(
         collection=formattedResults,
-        description="Forest_Loss_By_Year_And_Driver_Per_Country",
+        description="Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_201_300",
         folder="forests",
-        fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Country_ETL_2024-07-10_Best_Effort",
+        fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_201_300",
         fileFormat="CSV",
     )
     export_task.start()
