@@ -7,8 +7,8 @@ definitions:
         - Population Growth
 
 dataset:
-  title: Population density (various sources, 2023.2)
   description: Population density is obtained by dividing population by land area.
+
 tables:
   population_density:
     variables:
