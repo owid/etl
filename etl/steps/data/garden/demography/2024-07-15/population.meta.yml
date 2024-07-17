@@ -82,12 +82,6 @@ tables:
 
           We obtain it by dividing the population estimates by the land area estimates.
         unit: people per km²
-      source_population:
-        title: Source (population)
-        description_short: |
-          Name of the source of the population estimate for a specific data point (country-year). The name includes a short name of the source and a link.
-        unit: ""
-
 
 dataset:
   title: Population

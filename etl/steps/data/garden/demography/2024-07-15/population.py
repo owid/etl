@@ -74,7 +74,8 @@ def run(dest_dir: str) -> None:
 
     # Concat tables
     tb = pr.concat(
-        [tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg], ignore_index=True, short_name=f"{paths.short_name}_original"
+        [tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg],
+        ignore_index=True,
     )
 
     # Make table
@@ -111,9 +112,9 @@ def run(dest_dir: str) -> None:
     tb_auxiliary = generate_auxiliary_table(tb)
 
     # Format tables
-    tb = tb.format(["country", "year"])
-    tb_auxiliary = tb_auxiliary.format(["country", "year"])
-    tb_density = tb_density.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="population_original")
+    tb_auxiliary = tb_auxiliary.format(["country", "year"], short_name="population")
+    tb_density = tb_density.format(["country", "year"], short_name="population_density")
 
     #
     # Save outputs.
