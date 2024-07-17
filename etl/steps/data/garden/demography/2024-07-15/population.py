@@ -643,6 +643,8 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     # Creating the 'previous_population' and 'previous_year' columns
     tb["previous_population"] = tb.groupby("country")["population"].shift(1)
     tb["previous_year"] = tb.groupby("country")["year"].shift(1)
+    tb["next_population"] = tb.groupby("country")["population"].shift(-1)
+    tb["next_year"] = tb.groupby("country")["year"].shift(-1)
 
     # Only since 1700
     tb = tb.loc[tb["year"] > 1700]
@@ -650,15 +652,27 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     # Drop rows without previous year
     tb = tb.dropna(subset=["previous_year"])
 
-    # Estimate number of years since last observation
-    tb["num_years_previous_observation"] = tb["year"] - tb["previous_year"]
-
     # Only estimate popultion growth rate if distance to latest datapoint is lower than 10 years
-    tb = tb.loc[tb["num_years_previous_observation"] <= 10]
+    tb = tb.loc[tb["year"] - tb["previous_year"] <= 10]
 
     # Estimate population growth rate
-    tb["growth_rate"] = (tb["population"] / tb["previous_population"]) ** (1 / tb["num_years_previous_observation"]) - 1
-    tb["growth_rate"] *= 100
+    tb["growth_rate"] = 100 * (
+        (tb["population"] / tb["previous_population"]) ** (1 / (tb["year"] - tb["previous_year"])) - 1
+    )
 
+    # Fix 1950 and 1800
+    tb["previous_growth_rate"] = tb.groupby("country")["growth_rate"].shift(1)
+    tb["next_growth_rate"] = tb.groupby("country")["growth_rate"].shift(-1)
+
+    mask_1800 = tb["year"] == 1800
+    mask_1950 = tb["year"] == 1950
+    tb.loc[mask_1800, "growth_rate"] = (
+        tb.loc[mask_1800, "previous_growth_rate"] + tb.loc[mask_1800, "next_growth_rate"]
+    ) / 2
+    tb.loc[mask_1950, "growth_rate"] = (
+        tb.loc[mask_1950, "previous_growth_rate"] + tb.loc[mask_1950, "next_growth_rate"]
+    ) / 2
+
+    # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
     return tb
