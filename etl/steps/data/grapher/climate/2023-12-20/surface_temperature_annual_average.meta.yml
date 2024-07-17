@@ -18,11 +18,12 @@ definitions:
 
     - The derived 2-meter temperature readings for each country are calculated based on administrative borders, encompassing all land surface types within these defined areas. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
 
-    - Global temperature averages are calculated over all land and ocean surfaces.
+    - Global temperature averages and anomalies are calculated over all land and ocean surfaces.
   temperature_anomaly: |-
     - The temperature anomaly is calculated by comparing the average surface temperature of a specific time period (e.g., a particular year or month) to the mean surface temperature of the same period from 1991 to 2020.
+
     - When calculating anomalies for each country, the average surface temperature of a given year or month is compared to the 1991-2020 mean temperature for that specific country.
-    - When calculating the global temperature anomaly, the averages are computed over all land and ocean surfaces.
+
     - The reason for using the 1991-2020 period as the reference mean is that it is the standard reference period used by our data source, the Copernicus Climate Change Service. This period is also adopted by the UK Met Office. This approach ensures consistency in identifying climate variations over time.
 
   temperature_anomaly_above: Calculated when the average surface temperature for a year is higher than the 1991-2020 average, this anomaly indicates a hotter-than-average temperature for that year.
@@ -51,7 +52,7 @@ tables:
           The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
-            - {definitions.temperature_anomaly}
+            {definitions.temperature_anomaly}
 
       anomaly_below_0:
         title: Anomaly below 0
@@ -59,7 +60,7 @@ tables:
           The deviation of a specific year's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
-            - {definitions.temperature_anomaly}
+            {definitions.temperature_anomaly}
             - {definitions.temperature_anomaly_below}
 
       anomaly_above_0:
@@ -68,7 +69,7 @@ tables:
           The deviation of a specific year's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
-            - {definitions.temperature_anomaly}
+            {definitions.temperature_anomaly}
             - {definitions.temperature_anomaly_above}
 
       temperature_anomaly_decadal:
@@ -77,7 +78,7 @@ tables:
           The deviation of a specific decade's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
-            - {definitions.temperature_anomaly}
+            {definitions.temperature_anomaly}
             - Decadal average temperature anomaly is calculated by averaging the annual temperature anomaly values for each decade.
       temperature_2m_decadal:
         title: Decadal average surface temperature
