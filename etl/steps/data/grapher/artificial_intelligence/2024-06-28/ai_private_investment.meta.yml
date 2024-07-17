@@ -17,7 +17,8 @@ definitions:
     description_short: Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
 
     description_key:
-        - It is highly likely that these investments are allocated towards the necessary infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications. However, for investments specifically used to build new data centers, these facilities may serve broader purposes beyond AI, and detailed data on this specific allocation is not available. For more information on how the costs to train frontier AI models are distributed see [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) from EPOCH.
+        - It is highly likely that these investments are allocated towards the necessary infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications. However, for investments specifically used to build new data centers, these facilities may serve broader purposes beyond AI, and detailed data on this specific allocation is not available.
+        - For more information on how the costs to train frontier AI models are distributed see [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) from EPOCH.
     unit: 'constant 2021 US$'
     short_unit: '$'
     display:
