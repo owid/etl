@@ -74,14 +74,14 @@ tables:
     variables:
       population_density:
         title: Population density
+        unit: people per km²
         description_short: |
-          Population per unit of area.
+          Population per square Kilometer.
         description_processing: |-
           We have estimated the population density by using population estimates from multiple sources
           and land area estimates by the Food and Agriculture Organization of the United Nations.
 
           We obtain it by dividing the population estimates by the land area estimates.
-        unit: people per km²
 
 dataset:
   title: Population
