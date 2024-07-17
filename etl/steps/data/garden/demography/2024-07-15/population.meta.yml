@@ -65,6 +65,23 @@ tables:
         description_short: *population-source-description
         unit: ""
 
+  # Population density
+  population_density:
+    common:
+      presentation:
+        attribution: |-
+          HYDE (2023); Gapminder (2022); UN WPP (2024); UN FAO (2024)
+    variables:
+      population_density:
+        title: Population density
+        unit: people per km²
+        description_short: |
+          Population per square Kilometer.
+        description_processing: |-
+          We have estimated the population density by using population estimates from multiple sources
+          and land area estimates by the Food and Agriculture Organization of the United Nations.
+
+          We obtain it by dividing the population estimates by the land area estimates.
 
 dataset:
   title: Population
