@@ -35,6 +35,7 @@ steps:
     # Auxiliary
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
@@ -108,13 +109,6 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison
-
-  # Population density
-  data://garden/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/faostat/2024-03-14/faostat_rl
-  data://grapher/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-06-12/population_density
 
   ####################################
   # Life expectancy ##################
