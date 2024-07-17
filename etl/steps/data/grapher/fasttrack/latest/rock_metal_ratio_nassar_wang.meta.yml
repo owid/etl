@@ -1,0 +1,13 @@
+dataset:
+  title: Rock-to-metal mining ratio (Nassar et al. 2022 and Wang et al. 2024)
+  description: The amount of rock that has to be mined to produce one unit of metal.
+  licenses:
+    - {}
+tables:
+  rock_metal_ratio_nassar_wang:
+    variables:
+      rock_to_metal_ratio:
+        title: Rock-to-metal ratio
+        unit: ''
+        description: |-
+          The amount of rock that has to be mined to produce one unit of metal. For example, a ratio of 10 means 10 kilograms of rock has to be mined to get 1 kilogram of metal.
