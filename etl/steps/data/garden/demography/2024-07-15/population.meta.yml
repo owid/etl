@@ -90,7 +90,7 @@ tables:
         attribution: |-
           HYDE (2023); Gapminder (2022); UN WPP (2024)
     variables:
-      population_growth_rate:
+      growth_rate:
         title: Population growth rate
         description_short: |
           Population growth rate.
