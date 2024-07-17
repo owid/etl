@@ -1,0 +1,77 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+      attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
+    processing_level: major
+    description_processing: |-
+      The population time series is constructed by combining data from multiple sources:
+
+      - 10,000 BCE - 1799: Historical estimates by HYDE (v3.3).
+
+      - 1800 - 1949: Historical estimates by Gapminder (v7).
+
+      - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+      - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+
+
+tables:
+
+  # Table with reduced metadata (to be used when estimating per-capita or other derived indicators)
+  # We do this to avoid showing complete source information in the chart footers.
+  population:
+    title: Population
+    variables:
+      population:
+        title: Population
+        description_short: &population-description |-
+          Population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources.
+        unit: people
+        display:
+          numDecimalPlaces: 0
+
+      world_pop_share:
+        title: Share of world population
+        description_short: &population-share-description |-
+          Share of the world's population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources.
+        unit: "%"
+        short_unit: "%"
+
+      source:
+        title: Source
+        description_short: &population-source-description |-
+          Name of the source for a specific data point. The name includes a short name for the source and a link.
+        unit: ""
+
+  # Table with full metadata (to be used when showing the population time series, e.g. the data page for the population indicator)
+  population_original:
+    title: Population
+    variables:
+      population:
+        title: Population
+        description_short: *population-description
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      world_pop_share:
+        title: Share of world population
+        description_short: *population-share-description
+        unit: "%"
+        short_unit: "%"
+      source:
+        title: Source
+        description_short: *population-source-description
+        unit: ""
+
+
+dataset:
+  title: Population
+  update_period_days: 730
+  description: |-
+    Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
+
+    You can find more information on these sources and how our time series is constructed on this page: https://ourworldindata.org/population-sources
+
+
