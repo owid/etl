@@ -35,6 +35,7 @@ steps:
     # Auxiliary
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 

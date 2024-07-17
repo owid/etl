@@ -59,6 +59,9 @@ def run(dest_dir: str) -> None:
     tb_regions = ds_regions["regions"]
     # Load income groups table
     ds_income_groups = paths.load_dataset("income_groups")
+    # Load FAO
+    ds_land_area = paths.load_dataset("faostat_rl")
+    tb_land_area = ds_land_area["faostat_rl_flat"].reset_index()
 
     #
     # Process data.
@@ -97,12 +100,20 @@ def run(dest_dir: str) -> None:
         .pipe(add_world_population_share)
     )
 
+    # Add population growth rate
+    # Add population density
+    tb_density = make_table_density(
+        tb_population=tb,
+        tb_land_area=tb_land_area,
+    )
+
     # Create auxiliary table
     tb_auxiliary = generate_auxiliary_table(tb)
 
     # Format tables
     tb = tb.format(["country", "year"])
     tb_auxiliary = tb_auxiliary.format(["country", "year"])
+    tb_density = tb_density.format(["country", "year"])
 
     #
     # Save outputs.
@@ -110,7 +121,9 @@ def run(dest_dir: str) -> None:
     tables = [
         tb,
         tb_auxiliary,
+        tb_density,
     ]
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
@@ -580,3 +593,31 @@ def generate_auxiliary_table(tb: Table) -> Table:
         tb_auxiliary[col].origins = origins
 
     return tb_auxiliary
+
+
+######################
+# Population density
+######################
+def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
+    """Create a table with population density data."""
+    # We use land area of countries as they are defined today (latest reported value)
+    paths.log.info("population_density: process land area table")
+    column_area = "land_area__00006601__area__005110__hectares"
+    tb_land_area = (
+        tb_land_area.loc[:, [column_area, "country", "year"]]
+        .rename(columns={column_area: "area"})
+        .sort_values(["country", "year"])
+        .drop_duplicates(subset=["country"], keep="last")
+        .drop(columns=["year"])
+    )
+
+    # Merge tables
+    paths.log.info("population_density: merge tables")
+    tb = tb_population.merge(tb_land_area, on="country", how="inner")
+    # Drop NaN (no data for area)
+    tb = tb.dropna(subset=["area"])
+    # Estimate population density as population / land_area(in km2)
+    tb["population_density"] = tb["population"] / (0.01 * tb["area"])  # 0.01 to convert from hectares to km2
+    # Select relevant columns, order them, set index
+    tb = tb.loc[:, ["country", "year", "population_density"]]
+    return tb
