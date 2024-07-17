@@ -26,6 +26,10 @@ tables:
           - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
           - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
           - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+        description_key:
+          - It is highly likely that these investments are allocated towards the necessary infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications. However, for investments specifically used to build new data centers, these facilities may serve broader purposes beyond AI, and detailed data on this specific allocation is not available.
+          - For more information on how the costs to train frontier AI models are distributed see [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) from EPOCH.
+
         presentation:
           grapher_config:
             note: This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
