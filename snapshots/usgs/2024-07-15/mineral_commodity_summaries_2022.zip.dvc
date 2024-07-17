@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Mineral Commodity Summaries
+    title_snapshot: Mineral Commodity Summaries 2022
+    description: |-
+      This dataset contains world production statistics for over 88 nonfuel mineral commodities.
+    date_published: "2022-01-31"
+
+    # Citation
+    producer: United States Geological Survey Data
+    citation_full: |-
+      National Minerals Information Center, 2022, Mineral commodity summaries 2022 data release: U.S. Geological Survey data release, https://doi.org/10.5066/P9KKMCP4.
+    attribution: United States Geological Survey Data - Mineral Commodity Summaries (2022)
+    attribution_short: USGS
+
+    # Files
+    url_main: https://doi.org/10.5066/P9KKMCP4
+    url_download: https://www.sciencebase.gov/catalog/file/get/6197ccbed34eb622f692ee1c?f=__disk__ef%2Fa8%2F27%2Fefa827f9cad2012de291a711b2a073b0a7cd4aa5
+    date_accessed: 2024-07-17
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.usgs.gov/faqs/what-usgs-products-are-already-publicly-available
+
+outs:
+  - md5: bc99eea307ef640892a1f6205beaaa4a
+    size: 365258
+    path: mineral_commodity_summaries_2022.zip

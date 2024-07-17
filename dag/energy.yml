@@ -234,3 +234,15 @@ steps:
   data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
     - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
     - data://garden/bls/2024-05-16/us_consumer_prices
+  #
+  # USGS - Mineral commodity summaries.
+  #
+  data://meadow/usgs/2024-07-15/mineral_commodity_summaries:
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2022.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
+  #
+  # USGS - Mineral commodity summaries.
+  #
+  data://garden/usgs/2024-07-15/mineral_commodity_summaries:
+    - data://meadow/usgs/2024-07-15/mineral_commodity_summaries
