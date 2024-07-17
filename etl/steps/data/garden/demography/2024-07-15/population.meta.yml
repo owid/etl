@@ -94,7 +94,8 @@ tables:
         title: Population growth rate
         description_short: |
           Population growth rate.
-        unit: ""
+        unit: "%"
+        short_unit: "%"
 
 dataset:
   title: Population
