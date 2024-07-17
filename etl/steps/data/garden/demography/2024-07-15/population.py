@@ -8,7 +8,6 @@ Notes:
 import json
 from typing import Dict, Tuple
 
-import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
@@ -634,6 +633,10 @@ def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
 # Population growth rate
 #########################
 def make_table_growth_rate(tb_population: Table) -> Table:
+    """Estimate population growth rate as:
+
+    growth_rate = (population[year]/population[previous_year])^(1 / (year-previous_year)) - 1
+    """
     # Sorting the DataFrame by country and year to ensure the calculations are accurate
     tb = tb_population.sort_values(by=["country", "year"]).copy()
 
