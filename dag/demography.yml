@@ -258,5 +258,8 @@ steps:
   # Migration UN DESA
   data://meadow/migration/2024-07-16/un_migrant_stock:
     - snapshot://migration/2024-07-16/un_migrant_stock_dest_origin.xlsx
+    - snapshot://migration/2024-07-16/un_migrant_stock_origin.xlsx
+    - snapshot://migration/2024-07-16/un_migrant_stock_des.xlsx
+    - snapshot://migration/2024-07-16/un_migrant_stock_age_sex.xlsx
   data://garden/migration/2024-07-16/un_migrant_stock:
     - data://meadow/migration/2024-07-16/un_migrant_stock

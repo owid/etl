@@ -29,6 +29,6 @@ meta:
       url: https://www.un.org/development/desa/pd/content/international-migrant-stock
 
 outs:
-  - md5: 7277a8374e9dbdc4ee905e51fdd5fbc5
-    size: 551154
-    path: un_migrant_stock_des.xlsx
+  - md5: 081275def8f4a546da4a494d35573317
+    size: 212744
+    path: un_migrant_stock_origin.xlsx
