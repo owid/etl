@@ -110,13 +110,6 @@ steps:
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison
 
-  # Population density
-  data://garden/demography/2024-07-17/population_density:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/faostat/2024-03-14/faostat_rl
-  data://grapher/demography/2024-07-17/population_density:
-    - data://garden/demography/2024-07-17/population_density
-
   ####################################
   # Life expectancy ##################
   ####################################
