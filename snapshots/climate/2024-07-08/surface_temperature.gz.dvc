@@ -10,7 +10,7 @@ meta:
       ERA5 is available from 1940 and continues to be extended forward in time, with daily updates being made available 5 days behind real time
 
       Initial release data, i.e., data no more than three months behind real time, are called ERA5T.
-    producer: Copernicus Climate Change Service
+    producer: Contains modified Copernicus Climate Change Service information
     version_producer: 2
     citation_full: |-
       Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023): ERA5 monthly averaged data on single levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), DOI: 10.24381/cds.f17050d7 (Accessed on 08-July-2024)
