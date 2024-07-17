@@ -102,6 +102,10 @@ def run(dest_dir: str) -> None:
     )
 
     # Add population growth rate
+    tb_growth_rate = make_table_growth_rate(
+        tb_population=tb,
+    )
+
     # Add population density
     tb_density = make_table_density(
         tb_population=tb,
@@ -115,6 +119,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["country", "year"], short_name="population_original")
     tb_auxiliary = tb_auxiliary.format(["country", "year"], short_name="population")
     tb_density = tb_density.format(["country", "year"], short_name="population_density")
+    tb_growth_rate = tb_growth_rate.format(["country", "year"], short_name="population_growth_rate")
 
     #
     # Save outputs.
@@ -123,6 +128,7 @@ def run(dest_dir: str) -> None:
         tb,
         tb_auxiliary,
         tb_density,
+        tb_growth_rate,
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -620,4 +626,32 @@ def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
     tb["population_density"] = tb["population"] / (0.01 * tb["area"])  # 0.01 to convert from hectares to km2
     # Select relevant columns, order them, set index
     tb = tb.loc[:, ["country", "year", "population_density"]]
+    return tb
+
+
+#########################
+# Population growth rate
+#########################
+def make_table_growth_rate(tb_population: Table) -> Table:
+    # Sorting the DataFrame by country and year to ensure the calculations are accurate
+    tb = tb_population.sort_values(by=["country", "year"]).copy()
+
+    # Creating the 'previous_population' and 'previous_year' columns
+    tb["previous_population"] = tb.groupby("country")["population"].shift(1)
+    tb["previous_year"] = tb.groupby("country")["year"].shift(1)
+
+    # Only since 1700
+    tb = tb.loc[tb["year"] > 1700]
+
+    # Drop rows without previous year
+    tb = tb.dropna(subset=["previous_year"])
+
+    # Estimate number of years since last observation
+    tb["num_years_previous_observation"] = tb["year"] - tb["previous_year"]
+
+    # Only estimate popultion growth rate if distance to latest datapoint is lower than 10 years
+    tb = tb.loc[tb["num_years_previous_observation"] > 10]
+
+    # Estimate population growth rate
+    tb["population_growth_rate"] = tb["population"] / tb["previous_population"] - 1
     return tb

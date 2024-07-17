@@ -83,6 +83,20 @@ tables:
           We obtain it by dividing the population estimates by the land area estimates.
         unit: people per km²
 
+  # Population density
+  population_growth_rate:
+    common:
+      presentation:
+        attribution: |-
+          HYDE (2023); Gapminder (2022); UN WPP (2024); UN FAO (2024)
+    variables:
+      population_growth_rate:
+        title: Population growth rate
+        description_short: |
+          Population growth rate.
+        unit: ""
+
+
 dataset:
   title: Population
   update_period_days: 730

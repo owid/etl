@@ -28,6 +28,7 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb_original = ds_garden["population_original"].update_metadata(short_name="population")
     tb_density = ds_garden["population_density"]
+    tb_growth_rate = ds_garden["population_growth_rate"]
 
     # Set origins on `source`
     tb_original.source.m.origins = tb_original.population.m.origins
@@ -43,6 +44,7 @@ def run(dest_dir: str) -> None:
     tables = [
         tb_original,
         tb_density,
+        tb_growth_rate,
     ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=tables, default_metadata=ds_garden.metadata)
