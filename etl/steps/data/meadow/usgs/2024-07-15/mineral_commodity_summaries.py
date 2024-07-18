@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict
 from zipfile import ZipFile
 
+import owid.catalog.processing as pr
 import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
@@ -16,7 +17,7 @@ paths = PathFinder(__file__)
 YEARS_TO_PROCESS = [2022, 2023, 2024]
 
 # List all spurious values that appear in the data (after being stripped of empty spaces) and should be replaced by nan.
-NA_VALUES = ["", "NA", "XX", "Large", 'Categorized as "large"', "Very small"]
+NA_VALUES = ["", "NA", "XX", "Large", 'Categorized as "large"', "Very small", "W", "—"]
 
 # Define common columns.
 # NOTE: Column "Mineral" will be added in processing. It corresponds to the name of the commodity (and it will often be similar to "Type", but less specific).
@@ -170,10 +171,38 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
     assert "Country" in d.columns
     assert "Type" in d.columns
 
+    # Sometimes there is a "Prod_notes" and sometimes a "Prod_note" column.
+    # For consistency, rename the latter to "Production_notes".
+    d = d.rename(columns={"Prod_note": "Production_notes", "Prod_notes": "Production_notes"}, errors="ignore")
+
     # Add a column for the mineral name (although it will usually be very similar to "Type").
     d["Mineral"] = mineral.capitalize()
 
     return d
+
+
+def clean_spurious_values(series: pd.Series) -> pd.Series:
+    series = series.copy()
+    # Remove spurious spaces like "   NA".
+    series = series.fillna("").astype(str).str.strip()
+    for na_value in NA_VALUES:
+        series = series.replace(na_value, pd.NA)
+    # Remove spurious commas from numbers, like "7,200,000".
+    series = series.str.replace(",", "", regex=False)
+    # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
+    series = series.str.replace(">", "", regex=False)
+    # There is also at least one case (2022 Helium) of "<1". Remove the "<".
+    series = series.str.replace("<", "", regex=False)
+    # There is also at least one case (2022 Vermiculite) of 'Less than ½ unit.'. Replace it by "0.5".
+    series = series.str.replace("Less than ½ unit.", "0.5", regex=False)
+    # There is also at least one case (2024 Sand and gravel (industrial)) of numbers starting with "e", e.g. "4200".
+    # I suppose that probably means "estimated" (and the corresponding notes mention the word "estimated").
+    # Remove those "e".
+    series = series.str.replace("e", "", regex=False)
+    # Convert to float.
+    series = series.astype("Float64")
+
+    return series
 
 
 def prepare_reserves_data(d: pd.DataFrame):
@@ -193,27 +222,18 @@ def prepare_reserves_data(d: pd.DataFrame):
         unit_reserves = "_".join(column_reserves.split("_")[1:])
 
         # Clean reserves data.
-        # Remove spurious spaces like "   NA".
-        d[column_reserves] = d[column_reserves].fillna("").astype(str).str.strip()
-        for na_value in NA_VALUES:
-            d[column_reserves] = d[column_reserves].replace(na_value, pd.NA)
-        # Remove spurious commas from numbers, like "7,200,000".
-        d[column_reserves] = d[column_reserves].str.replace(",", "", regex=False)
-        # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
-        d[column_reserves] = d[column_reserves].str.replace(">", "", regex=False)
-        # Convert to float.
-        d[column_reserves] = d[column_reserves].astype("Float64")
+        d[column_reserves] = clean_spurious_values(series=d[column_reserves])
 
         # Fix units.
         assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
         if unit_reserves == "mct":
-            d["Reserves_mct"] = MILLION_CARATS_TO_TONNES * d["Reserves_mct"].astype("Float64")
+            d["Reserves_mct"] *= MILLION_CARATS_TO_TONNES
             d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
         elif unit_reserves == "kt":
-            d["Reserves_kt"] = 1e3 * d["Reserves_kt"].astype("Float64")
+            d["Reserves_kt"] *= 1e3
             d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
         elif unit_reserves == "ore_kt":
-            d["Reserves_ore_kt"] = 1e3 * d["Reserves_ore_kt"].astype("Float64")
+            d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
             # Add a note explaining that the data is for ore.
             note = "Reserves refer to ore."
@@ -228,13 +248,13 @@ def prepare_reserves_data(d: pd.DataFrame):
                 ] += ". " + note
                 d.loc[d["Reserves_notes"] == "", "Reserves_notes"] = note
         elif unit_reserves in ["Mt", "mt"]:
-            d[f"Reserves_{unit_reserves}"] = 1e6 * d[f"Reserves_{unit_reserves}"].astype("Float64")
+            d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):
-            d["Reserves_mcm"] = MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES * d["Reserves_mcm"].astype("Float64")
+        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+            d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
             d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
         elif unit_reserves == "kg":
-            d["Reserves_kg"] = 1e-3 * d["Reserves_kg"].astype("Float64")
+            d["Reserves_kg"] *= 1e-3
             d = d.rename(columns={"Reserves_kg": "Reserves_t"}, errors="raise")
 
         # Define the columns for the dataframe of reserves data for the current year and mineral.
@@ -244,10 +264,86 @@ def prepare_reserves_data(d: pd.DataFrame):
 
         # While production is usually given for an explicit year (actually, usually two years), reserves
         # does not have a year. I will assume that the reserves correspond to the latest informed year.
-        year_reserves = int(d["Source"].unique().item()[-4:]) - 1
+        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # type: ignore
         df_reserves = d[columns].assign(**{"Year": year_reserves})
 
+        # Remove rows without data.
+        df_reserves = df_reserves.dropna(subset=["Reserves_t"], how="all").reset_index(drop=True)
+
         return df_reserves
+
+
+def prepare_production_data(d: pd.DataFrame):
+    d = d.copy()
+
+    # Select columns related to production data.
+    columns_production = [
+        column for column in d.columns if column.lower().startswith("prod_") and column != "Production_notes"
+    ]
+    if not any(columns_production):
+        # This happens to "ABRASIVES (MANUFACTURED)".
+        return None
+    else:
+        # There are always two columns for production, corresponding to the last two informed years.
+        assert len(columns_production) == 2
+
+        # Clean production data.
+        for column in columns_production:
+            d[column] = clean_spurious_values(series=d[column])
+
+        # The year can be extracted from the last character of the column name.
+        years_production = [int(column[-4:]) for column in columns_production]
+        # Sanity check.
+        # NOTE: If data changes in a future update, the following can be relaxed.
+        assert all(
+            [
+                (str(year).isdigit()) and (year < max(YEARS_TO_PROCESS)) and (year >= min(YEARS_TO_PROCESS) - 2)
+                for year in years_production
+            ]
+        )
+
+        # Extract the unit.
+        # NOTE: Often (possibly always) one of the columns has "_est_" (or "_Est_"), I suppose to signal that it is estimated data.
+        _units_production = sorted(
+            set(
+                [
+                    column[:-4].replace("Prod_", "").replace("_est_", "").replace("_Est_", "").rstrip("_")
+                    for column in columns_production
+                ]
+            )
+        )
+        assert len(_units_production) == 1
+        unit_production = _units_production[0]
+
+        # Create a Year column.
+        columns_to_keep = COMMON_COLUMNS
+        if "Prod_notes" in d.columns:
+            columns_to_keep += ["Prod_notes"]
+        df_production = pd.DataFrame()
+        for year in years_production:
+            _column_production = [column for column in columns_production if str(year) in column][0]
+            _df_for_year = (
+                d[columns_to_keep + [_column_production]]
+                .rename(columns={_column_production: "Production_t"}, errors="raise")
+                .assign(**{"Year": year})
+            )
+            df_production = pd.concat([df_production, _df_for_year], ignore_index=True)
+
+        # Fix units.
+        if unit_production not in ["kt", "t", "kg"]:
+            # TODO: Handle special cases.
+            # mcm (Hellium), kct (Gemstones), Mt (Iron and steel), mmt (Iron and steel), mct (Diamond (industrial)), Sponge_t (Titanium and titanium dioxide).
+            return None
+
+        if unit_production == "kt":
+            df_production["Production_t"] *= 1e3
+
+        # Remove rows without data.
+        df_production = df_production.dropna(subset=["Production_t"], how="all").reset_index(drop=True)
+
+        # TODO: Production notes are missing. Fix it.
+
+        return df_production
 
 
 def run(dest_dir: str) -> None:
@@ -263,8 +359,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Initialize an empty dataframe that will gather all data.
-    df = pd.DataFrame()
+    # Initialize empty dataframes that will gather all data for reserves and production.
+    df_reserves = pd.DataFrame()
+    df_production = pd.DataFrame()
 
     # Go year by year and mineral by mineral, handle special cases, homogenize units, and combine data.
     for year in YEARS_TO_PROCESS:
@@ -273,24 +370,51 @@ def run(dest_dir: str) -> None:
             d = extract_and_clean_data_for_year_and_mineral(data=data, year=year, mineral=mineral)
 
             # Prepare reserves data.
-            df_reserves = prepare_reserves_data(d=d)
+            _df_reserves = prepare_reserves_data(d=d)
 
-            # TODO: Handle capacity and production data.
-            columns_capacity = [column for column in d.columns if column.lower().startswith("cap_")]
-            columns_production = [column for column in d.columns if column.lower().startswith("prod_")]
+            # For now, ignore capacity data (which appears in a few commodities).
+            # columns_capacity = [column for column in d.columns if column.lower().startswith("cap_")]
+
+            # Prepare production data.
+            _df_production = prepare_production_data(d=d)
 
             # Append the new data to the main dataframe.
-            if df_reserves is not None:
-                df = pd.concat([df, df_reserves], ignore_index=True)
+            if _df_reserves is not None:
+                df_reserves = pd.concat([df_reserves, _df_reserves], ignore_index=True)
+            if _df_production is not None:
+                df_production = pd.concat([df_production, _df_production], ignore_index=True)
+
+    # For each year, there is production data for two years.
+    # So, there are multiple values of production data for the same year.
+    # Assume that the latest is the most accurate (usually, the previous value was an estimate).
+    df_production = df_production.sort_values(
+        ["Source", "Country", "Mineral", "Type", "Year"], ascending=True
+    ).reset_index(drop=True)
+    df_production = df_production.drop_duplicates(
+        subset=["Country", "Mineral", "Type", "Year"], keep="last"
+    ).reset_index(drop=True)
+
+    # Combine reserves and production data.
+    # NOTE: Here, do not merge on "Source". It can happen that we have reserves for one year in one source, but not in the other.
+    #  Merging on source would therefore leave spurious nans in the data.
+    #  Therefore, remove the "Source" columns.
+    df = df_reserves.drop(columns=["Source"]).merge(
+        df_production.drop(columns=["Source"]), on=["Country", "Mineral", "Type"] + ["Year"], how="outer"
+    )
+
+    # TODO: Consider if using the original metadata from xml files.
+
+    # Create a table with metadata.
+    tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year", "mineral", "type"])
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
