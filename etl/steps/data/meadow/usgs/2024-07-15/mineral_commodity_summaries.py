@@ -2,6 +2,7 @@
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Any, Dict
 from zipfile import ZipFile
 
 import pandas as pd
@@ -16,6 +17,15 @@ YEARS_TO_PROCESS = [2022, 2023, 2024]
 
 # List all spurious values that appear in the data (after being stripped of empty spaces) and should be replaced by nan.
 NA_VALUES = ["", "NA", "XX", "Large", 'Categorized as "large"', "Very small"]
+
+# Define common columns.
+# NOTE: Column "Mineral" will be added in processing. It corresponds to the name of the commodity (and it will often be similar to "Type", but less specific).
+COMMON_COLUMNS = ["Source", "Country", "Mineral", "Type"]
+
+# Convert million carats to metric tonnes.
+MILLION_CARATS_TO_TONNES = 0.2
+# Convert million cubic meters of helium to metric tonnes.
+MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 
 
 def extract_metadata_from_xml(file_path):
@@ -84,6 +94,162 @@ def extract_data_and_metadata_from_compressed_file(zip_file_path: Path):
     return data_for_year
 
 
+def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int, mineral: str) -> pd.DataFrame:
+    d = data[year][mineral]["data"].copy()
+    # Remove empty rows and columns.
+    d = d.dropna(axis=1, how="all")
+    d = d.dropna(how="all").reset_index(drop=True)
+
+    ############################################################################################################
+    # Handle special cases.
+    if (year == 2022) & (mineral == "CADMIUM"):
+        # Instead of "Type", there is a "Form" column.
+        d = d.rename(columns={"Form": "Type"}, errors="raise")
+    if (year == 2024) & (mineral == "IRON OXIDE PIGMENTS"):
+        # Column "Type" is simply missing, and there is no replacement.
+        # Create a column with the mineral name instead.
+        d["Type"] = mineral.capitalize()
+    if (year == 2024) & (mineral == "FLUORSPAR"):
+        d = d.rename(columns={"Mine production, fluorspar": "Type"}, errors="raise")
+    if mineral == "ABRASIVES (MANUFACTURED)":
+        # There is no "Source" column.
+        d["Source"] = f"MCS{year}"
+    if (year == 2024) & (
+        mineral in ["ALUMINUM", "IRON OXIDE PIGMENTS", "GARNET", "ZEOLITES (NATURAL)", "IRON OXIDE PIGMENTS"]
+    ):
+        # Same (minor) issue: missing source column, or source is spelled differently (namely "MCS 2024").
+        # Fix it for consistency (so other assertions don't fail).
+        d["Source"] = f"MCS{year}"
+    if (year == 2024) & (mineral == "BARITE"):
+        # There is an extra column "Unnamed: 8" that has data, which seems to be the same as "Reserves_kt".
+        d = d.drop(columns=["Unnamed: 8"])
+    if (year == 2024) & (mineral == "VERMICULITE"):
+        # There is a "Reserves_kt" column with 7 missing values, and then a "Reserves_notes" with no notes, but,
+        # coincidentally or not, 7 numerical values. Then, there is a "Unnamed: 8" with notes about reserves.
+        # So, it seems that these columns were not properly constructed, so I'll remove them.
+        d = d.drop(columns=["Reserves_kt", "Reserves_notes", "Unnamed: 8"])
+    if (year == 2024) & (mineral == "ZIRCONIUM AND HAFNIUM"):
+        # The reserves column usually does not include a year, but in this case it does.
+        # For consistency, remove it from the column name.
+        d = d.rename(columns={"Reserves_kt_2023": "Reserves_kt"}, errors="raise")
+    if mineral == "POTASH":
+        # Reserves are given as "Reserves_ore_kt" and "Reserves_ore_K2O_equiv_kt".
+        # For consistency with other minerals, keep only the former.
+        # NOTE: This happens for 2023 and 2024, not 2022.
+        d = d.drop(columns=["Reserves_ore_K2O_equiv_kt"], errors="ignore")
+    if (year == 2023) & (mineral == "PEAT"):
+        # There are spurious notes in "Reserves_kt", and no column for "Reserves_notes".
+        # Fix this.
+        index_issue = d[d["Reserves_kt"] == "Included with “Other countries.”"].index
+        d.loc[index_issue, "Reserves_kt"] = pd.NA
+        assert "Reserves_notes" not in d.columns
+        d["Reserves_notes"] = pd.NA
+        d.loc[index_issue, "Reserves_notes"] = "Included with “Other countries.”"
+    if (year in [2023, 2024]) & (mineral == "GRAPHITE (NATURAL)"):
+        # Column "Reserves_t" contains rows that say 'Included in World total.' (and again, it has no notes).
+        # Make them nan and include them in notes.
+        index_issue = d[d["Reserves_t"] == "Included in World total."].index
+        d.loc[index_issue, "Reserves_t"] = pd.NA
+        assert "Reserves_notes" not in d.columns
+        d["Reserves_notes"] = pd.NA
+        d.loc[index_issue, "Reserves_notes"] = "Included in World total."
+    if (year in [2023, 2024]) & (mineral == "TITANIUM MINERAL CONCENTRATES"):
+        # One row contains "Included with ilmenite" (and 'included with ilmenite') in all data columns (but for
+        # whatever reason not in any of the "notes" columns).
+        # For simplicity, simply remove this row.
+        d = d[d["Reserves_kt"].str.lower() != "included with ilmenite"].reset_index(drop=True)
+
+    ############################################################################################################
+
+    # Check that all columns are either source, country, type, production, reserves, or capacity.
+    assert all(
+        [column.lower().startswith(("source", "country", "type", "prod_", "reserves_", "cap_")) for column in d.columns]
+    )
+    # Sanity checks.
+    assert d["Source"].unique().item() == f"MCS{year}"
+    assert "Country" in d.columns
+    assert "Type" in d.columns
+
+    # Add a column for the mineral name (although it will usually be very similar to "Type").
+    d["Mineral"] = mineral.capitalize()
+
+    return d
+
+
+def prepare_reserves_data(d: pd.DataFrame):
+    d = d.copy()
+    # Select columns related to reserves data.
+    columns_reserves = [
+        column for column in d.columns if column.lower().startswith("reserves_") and column != "Reserves_notes"
+    ]
+    if not any(columns_reserves):
+        return None
+    else:
+        _column_reserves = [column for column in columns_reserves if column != "Reserves_notes"]
+        # There is usually either zero or one column for reserves (and usually 2 for production).
+        # I have not found any case with more than one column for reserves.
+        assert len(_column_reserves) == 1
+        column_reserves = _column_reserves[0]
+        unit_reserves = "_".join(column_reserves.split("_")[1:])
+
+        # Clean reserves data.
+        # Remove spurious spaces like "   NA".
+        d[column_reserves] = d[column_reserves].fillna("").astype(str).str.strip()
+        for na_value in NA_VALUES:
+            d[column_reserves] = d[column_reserves].replace(na_value, pd.NA)
+        # Remove spurious commas from numbers, like "7,200,000".
+        d[column_reserves] = d[column_reserves].str.replace(",", "", regex=False)
+        # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
+        d[column_reserves] = d[column_reserves].str.replace(">", "", regex=False)
+        # Convert to float.
+        d[column_reserves] = d[column_reserves].astype("Float64")
+
+        # Fix units.
+        assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
+        if unit_reserves == "mct":
+            d["Reserves_mct"] = MILLION_CARATS_TO_TONNES * d["Reserves_mct"].astype("Float64")
+            d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
+        elif unit_reserves == "kt":
+            d["Reserves_kt"] = 1e3 * d["Reserves_kt"].astype("Float64")
+            d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
+        elif unit_reserves == "ore_kt":
+            d["Reserves_ore_kt"] = 1e3 * d["Reserves_ore_kt"].astype("Float64")
+            d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
+            # Add a note explaining that the data is for ore.
+            note = "Reserves refer to ore."
+            if "Reserves_notes" not in d.columns:
+                d["Reserves_notes"] = note
+            else:
+                d["Reserves_notes"] = d["Reserves_notes"].fillna("")
+                d.loc[d["Reserves_notes"].str.endswith("."), "Reserves_notes"] += " " + note
+                d.loc[
+                    (d["Reserves_notes"].str.strip().apply(len) > 0) & ~(d["Reserves_notes"].str.endswith(".")),
+                    "Reserves_notes",
+                ] += ". " + note
+                d.loc[d["Reserves_notes"] == "", "Reserves_notes"] = note
+        elif unit_reserves in ["Mt", "mt"]:
+            d[f"Reserves_{unit_reserves}"] = 1e6 * d[f"Reserves_{unit_reserves}"].astype("Float64")
+            d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
+        elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):
+            d["Reserves_mcm"] = MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES * d["Reserves_mcm"].astype("Float64")
+            d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
+        elif unit_reserves == "kg":
+            d["Reserves_kg"] = 1e-3 * d["Reserves_kg"].astype("Float64")
+            d = d.rename(columns={"Reserves_kg": "Reserves_t"}, errors="raise")
+
+        # Define the columns for the dataframe of reserves data for the current year and mineral.
+        columns = COMMON_COLUMNS + ["Reserves_t"]
+        if "Reserves_notes" in d.columns:
+            columns += ["Reserves_notes"]
+
+        # While production is usually given for an explicit year (actually, usually two years), reserves
+        # does not have a year. I will assume that the reserves correspond to the latest informed year.
+        year_reserves = int(d["Source"].unique().item()[-4:]) - 1
+        df_reserves = d[columns].assign(**{"Year": year_reserves})
+
+        return df_reserves
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -94,137 +260,28 @@ def run(dest_dir: str) -> None:
         snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
         data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
-    # TODO: Move up.
-    # Convert million carats to metric tonnes.
-    MILLION_CARATS_TO_TONNES = 0.2
-    # Convert million cubic meters of helium to metric tonnes.
-    MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
     #
     # Process data.
     #
+    # Initialize an empty dataframe that will gather all data.
+    df = pd.DataFrame()
+
+    # Go year by year and mineral by mineral, handle special cases, homogenize units, and combine data.
     for year in YEARS_TO_PROCESS:
         for mineral in data[year]:
-            d = data[year][mineral]["data"]
-            # Remove empty rows and columns.
-            d = d.dropna(axis=1, how="all")
-            d = d.dropna(how="all").reset_index(drop=True)
+            # Clean data.
+            d = extract_and_clean_data_for_year_and_mineral(data=data, year=year, mineral=mineral)
 
-            ############################################################################################################
-            # Handle special cases.
-            if (year == 2022) & (mineral == "CADMIUM"):
-                # Instead of "Type", there is a "Form" column.
-                d = d.rename(columns={"Form": "Type"}, errors="raise")
-            if (year == 2024) & (mineral == "IRON OXIDE PIGMENTS"):
-                # Column "Type" is simply missing, and there is no replacement.
-                # Create a column with the mineral name instead.
-                d["Type"] = mineral.capitalize()
-            if (year == 2024) & (mineral == "FLUORSPAR"):
-                d = d.rename(columns={"Mine production, fluorspar": "Type"}, errors="raise")
-            if mineral == "ABRASIVES (MANUFACTURED)":
-                # There is no "Source" column.
-                d["Source"] = f"MCS{year}"
-            if (year == 2024) & (
-                mineral in ["ALUMINUM", "IRON OXIDE PIGMENTS", "GARNET", "ZEOLITES (NATURAL)", "IRON OXIDE PIGMENTS"]
-            ):
-                # Same (minor) issue: missing source column, or source is spelled differently (namely "MCS 2024").
-                # Fix it for consistency (so other assertions don't fail).
-                d["Source"] = f"MCS{year}"
-            if (year == 2024) & (mineral == "BARITE"):
-                # There is an extra column "Unnamed: 8" that has data, which seems to be the same as "Reserves_kt".
-                d = d.drop(columns=["Unnamed: 8"])
-            if (year == 2024) & (mineral == "VERMICULITE"):
-                # There is a "Reserves_kt" column with 7 missing values, and then a "Reserves_notes" with no notes, but,
-                # coincidentally or not, 7 numerical values. Then, there is a "Unnamed: 8" with notes about reserves.
-                # So, it seems that these columns were not properly constructed, so I'll remove them.
-                d = d.drop(columns=["Reserves_kt", "Reserves_notes", "Unnamed: 8"])
-            if (year == 2024) & (mineral == "ZIRCONIUM AND HAFNIUM"):
-                # The reserves column usually does not include a year, but in this case it does.
-                # For consistency, remove it from the column name.
-                d = d.rename(columns={"Reserves_kt_2023": "Reserves_kt"}, errors="raise")
-            if mineral == "POTASH":
-                # Reserves are given as "Reserves_ore_kt" and "Reserves_ore_K2O_equiv_kt".
-                # For consistency with other minerals, keep only the former.
-                # NOTE: This happens for 2023 and 2024, not 2022.
-                d = d.drop(columns=["Reserves_ore_K2O_equiv_kt"], errors="ignore")
-            if (year == 2023) & (mineral == "PEAT"):
-                # There are spurious notes in "Reserves_kt", and no column for "Reserves_notes".
-                # Fix this.
-                index_issue = d[d["Reserves_kt"] == "Included with “Other countries.”"].index
-                d.loc[index_issue, "Reserves_kt"] = pd.NA
-                assert "Reserves_notes" not in d.columns
-                d["Reserves_notes"] = pd.NA
-                d.loc[index_issue, "Reserves_notes"] = "Included with “Other countries.”"
-            if (year in [2023, 2024]) & (mineral == "GRAPHITE (NATURAL)"):
-                # Column "Reserves_t" contains rows that say 'Included in World total.' (and again, it has no notes).
-                # Make them nan and include them in notes.
-                index_issue = d[d["Reserves_t"] == "Included in World total."].index
-                d.loc[index_issue, "Reserves_t"] = pd.NA
-                assert "Reserves_notes" not in d.columns
-                d["Reserves_notes"] = pd.NA
-                d.loc[index_issue, "Reserves_notes"] = "Included in World total."
-            if (year in [2023, 2024]) & (mineral == "TITANIUM MINERAL CONCENTRATES"):
-                # One row contains "Included with ilmenite" (and 'included with ilmenite') in all data columns (but for
-                # whatever reason not in any of the "notes" columns).
-                # For simplicity, simply remove this row.
-                d = d[d["Reserves_kt"].str.lower() != "included with ilmenite"].reset_index(drop=True)
+            # Prepare reserves data.
+            df_reserves = prepare_reserves_data(d=d)
 
-            ############################################################################################################
-
-            # Check that all columns are either source, country, type, production, reserves, or capacity.
-            assert all(
-                [
-                    column.lower().startswith(("source", "country", "type", "prod_", "reserves_", "cap_"))
-                    for column in d.columns
-                ]
-            )
-
-            # Add a column for the mineral name.
-            d["Mineral"] = mineral.capitalize()
-
-            columns_production = [column for column in d.columns if column.lower().startswith("prod_")]
+            # TODO: Handle capacity and production data.
             columns_capacity = [column for column in d.columns if column.lower().startswith("cap_")]
-            columns_reserves = [
-                column for column in d.columns if column.lower().startswith("reserves_") and column != "Reserves_notes"
-            ]
-            if any(columns_reserves):
-                _column_reserves = [column for column in columns_reserves if column != "Reserves_notes"]
-                assert len(_column_reserves) == 1
-                column_reserves = _column_reserves[0]
-                unit_reserves = "_".join(column_reserves.split("_")[1:])
+            columns_production = [column for column in d.columns if column.lower().startswith("prod_")]
 
-                # Clean reserves data.
-                # Remove spurious spaces like "   NA".
-                d[column_reserves] = d[column_reserves].fillna("").astype(str).str.strip()
-                for na_value in NA_VALUES:
-                    d[column_reserves] = d[column_reserves].replace(na_value, pd.NA)
-                # Remove spurious commas from numbers, like "7,200,000".
-                d[column_reserves] = d[column_reserves].str.replace(",", "", regex=False)
-                # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
-                d[column_reserves] = d[column_reserves].str.replace(">", "", regex=False)
-                # Convert to float.
-                d[column_reserves] = d[column_reserves].astype("Float64")
-
-                # Fix units.
-                assert unit_reserves in ["kt", "t", "mct", "Mt", "mt", "mcm", "kg", "ore_kt"]
-                if unit_reserves == "mct":
-                    d["Reserves_mct"] = MILLION_CARATS_TO_TONNES * d["Reserves_mct"].astype("Float64")
-                    d = d.rename(columns={"Reserves_mct": "Reserves_t"}, errors="raise")
-                elif unit_reserves == "kt":
-                    d["Reserves_kt"] = 1e3 * d["Reserves_kt"].astype("Float64")
-                    d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
-                elif unit_reserves in ["Mt", "mt"]:
-                    d[f"Reserves_{unit_reserves}"] = 1e6 * d[f"Reserves_{unit_reserves}"].astype("Float64")
-                    d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-                elif (unit_reserves == "mcm") & (mineral == "HELIUM"):
-                    d["Reserves_mcm"] = MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES * d["Reserves_mcm"].astype("Float64")
-                    d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
-                elif unit_reserves == "kg":
-                    d["Reserves_kg"] = 1e-3 * d["Reserves_kg"].astype("Float64")
-                    d = d.rename(columns={"Reserves_kg": "Reserves_t"}, errors="raise")
-            # Sanity checks.
-            assert d["Source"].unique().item() == f"MCS{year}"
-            assert "Country" in d.columns
-            assert "Type" in d.columns
+            # Append the new data to the main dataframe.
+            if df_reserves is not None:
+                df = pd.concat([df, df_reserves], ignore_index=True)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
