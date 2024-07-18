@@ -125,7 +125,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("un_migrant_stock")
+    ds_meadow = paths.load_dataset("migrant_stock")
 
     # Read tables from meadow dataset.
     tb_do = ds_meadow["migrant_stock_dest_origin"].reset_index()

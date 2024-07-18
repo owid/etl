@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap_dest_origin = paths.load_snapshot("un_migrant_stock_dest_origin.xlsx")
-    snap_origin = paths.load_snapshot("un_migrant_stock_origin.xlsx")
-    snap_destination = paths.load_snapshot("un_migrant_stock_des.xlsx")
-    snap_sex_age = paths.load_snapshot("un_migrant_stock_age_sex.xlsx")
+    snap_dest_origin = paths.load_snapshot("migrant_stock_dest_origin.xlsx")
+    snap_origin = paths.load_snapshot("migrant_stock_origin.xlsx")
+    snap_destination = paths.load_snapshot("migrant_stock_dest.xlsx")
+    snap_sex_age = paths.load_snapshot("migrant_stock_age_sex.xlsx")
 
     # read and format tables one by one
     # data on destination and origin - table 1
