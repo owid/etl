@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Migration
+    processing_level: minor #minor for most indicators, major for data that has been manipulated (e.g. 5 year change, share of child migrants)
 
 
 # Learn more about the available fields:
@@ -15,6 +16,51 @@ dataset:
 tables:
   un_migrant_stock:
     variables:
+      immigrants_all:
+        title: Total number of international immigrants
+        unit: ""
+        short_unit: ""
+        description_short: The total number of people living in a given country that were born in another country. This measures the cumulative migrant stock.
+      immigrants_female:
+        title: Total number of international immigrants - female
+        unit: ""
+        short_unit: ""
+        description_short: The total number of female people living in a given country that were born in another country. This measures the cumulative migrant stock.
+      immigrants_male:
+        title: Total number of international immigrants - male
+        unit: ""
+        short_unit: ""
+        description_short: The total number of male people living in a given country that were born in another country. This measures the cumulative migrant stock.
+      immigrant_share_of_dest_population_all:
+        title: Share of the population that were born in another country
+        unit: "%"
+        short_unit: "%"
+        description_short: Total number of immigrants as a share of the total population. This measures the cumulative migrant stock.
+      immigrant_share_of_dest_population_female:
+        title: Share of the population that were born in another country - female
+        unit: "%"
+        short_unit: "%"
+        description_short: Total number of female immigrants as a share of the total (female) population. This measures the cumulative migrant stock.
+      immigrant_share_of_dest_population_male:
+        title: Share of the population that were born in another country - male
+        unit: "%"
+        short_unit: "%"
+        description_short: Total number of male immigrants as a share of the total (male) population. This measures the cumulative migrant stock.
+      emigrants_all:
+        title: Total number of emigrants
+        unit: ""
+        short_unit: ""
+        description_short: The total number of people that have left the country
+      emigrants_female:
+        title: Total number of emigrants - female
+        unit: ""
+        short_unit: ""
+        description_short: The total number of female people that have left the country
+      emigrants_male:
+        title: Total number of emigrants - male
+        unit: ""
+        short_unit: ""
+        description_short: The total number of male people that have left the country
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
@@ -56,3 +102,155 @@ tables:
       #
       {}
 
+#immigrants_all
+immigrants_female
+immigrants_male
+immigrant_share_of_dest_population_all
+immigrant_share_of_dest_population_female
+immigrant_share_of_dest_population_male
+emigrants_all
+emigrants_female
+emigrants_male
+all_immigrants_aged_0_to_4
+all_immigrants_aged_5_to_9
+all_immigrants_aged_10_to_14
+all_immigrants_aged_15_to_19
+all_immigrants_aged_20_to_24
+all_immigrants_aged_25_to_29
+all_immigrants_aged_30_to_34
+all_immigrants_aged_35_to_39
+all_immigrants_aged_40_to_44
+all_immigrants_aged_45_to_49
+all_immigrants_aged_50_to_54
+all_immigrants_aged_55_to_59
+all_immigrants_aged_60_to_64
+all_immigrants_aged_65_to_69
+all_immigrants_aged_70_to_74
+all_immigrants_aged_75_plus
+male_immigrants_aged_0_to_4
+male_immigrants_aged_5_to_9
+male_immigrants_aged_10_to_14
+male_immigrants_aged_15_to_19
+male_immigrants_aged_20_to_24
+male_immigrants_aged_25_to_29
+male_immigrants_aged_30_to_34
+male_immigrants_aged_35_to_39
+male_immigrants_aged_40_to_44
+male_immigrants_aged_45_to_49
+male_immigrants_aged_50_to_54
+male_immigrants_aged_55_to_59
+male_immigrants_aged_60_to_64
+male_immigrants_aged_65_to_69
+male_immigrants_aged_70_to_74
+male_immigrants_aged_75_plus
+female_immigrants_aged_0_to_4
+female_immigrants_aged_5_to_9
+female_immigrants_aged_10_to_14
+female_immigrants_aged_15_to_19
+female_immigrants_aged_20_to_24
+female_immigrants_aged_25_to_29
+female_immigrants_aged_30_to_34
+female_immigrants_aged_35_to_39
+female_immigrants_aged_40_to_44
+female_immigrants_aged_45_to_49
+female_immigrants_aged_50_to_54
+female_immigrants_aged_55_to_59
+female_immigrants_aged_60_to_64
+female_immigrants_aged_65_to_69
+female_immigrants_aged_70_to_74
+female_immigrants_aged_75_plus
+share_of_all_immigrants_aged_0_to_4
+share_of_all_immigrants_aged_5_to_9
+share_of_all_immigrants_aged_10_to_14
+share_of_all_immigrants_aged_15_to_19
+share_of_all_immigrants_aged_20_to_24
+share_of_all_immigrants_aged_25_to_29
+share_of_all_immigrants_aged_30_to_34
+share_of_all_immigrants_aged_35_to_39
+share_of_all_immigrants_aged_40_to_44
+share_of_all_immigrants_aged_45_to_49
+share_of_all_immigrants_aged_50_to_54
+share_of_all_immigrants_aged_55_to_59
+share_of_all_immigrants_aged_60_to_64
+share_of_all_immigrants_aged_65_to_69
+share_of_all_immigrants_aged_70_to_74
+share_of_all_immigrants_aged_75_plus
+share_of_male_immigrants_aged_0_to_4
+share_of_male_immigrants_aged_5_to_9
+share_of_male_immigrants_aged_10_to_14
+share_of_male_immigrants_aged_15_to_19
+share_of_male_immigrants_aged_20_to_24
+share_of_male_immigrants_aged_25_to_29
+share_of_male_immigrants_aged_30_to_34
+share_of_male_immigrants_aged_35_to_39
+share_of_male_immigrants_aged_40_to_44
+share_of_male_immigrants_aged_45_to_49
+share_of_male_immigrants_aged_50_to_54
+share_of_male_immigrants_aged_55_to_59
+share_of_male_immigrants_aged_60_to_64
+share_of_male_immigrants_aged_65_to_69
+share_of_male_immigrants_aged_70_to_74
+share_of_male_immigrants_aged_75_plus
+share_of_female_immigrants_aged_0_to_4
+share_of_female_immigrants_aged_5_to_9
+share_of_female_immigrants_aged_10_to_14
+share_of_female_immigrants_aged_15_to_19
+share_of_female_immigrants_aged_20_to_24
+share_of_female_immigrants_aged_25_to_29
+share_of_female_immigrants_aged_30_to_34
+share_of_female_immigrants_aged_35_to_39
+share_of_female_immigrants_aged_40_to_44
+share_of_female_immigrants_aged_45_to_49
+share_of_female_immigrants_aged_50_to_54
+share_of_female_immigrants_aged_55_to_59
+share_of_female_immigrants_aged_60_to_64
+share_of_female_immigrants_aged_65_to_69
+share_of_female_immigrants_aged_70_to_74
+share_of_female_immigrants_aged_75_plus
+immigrants_under_15
+immigrants_under_20
+share_of_immigrants_under_15
+share_of_immigrants_under_20
+immigrants_change_5_years
+emigrants_change_5_years
+immigrants_change_5_years_per_1000
+emigrants_change_5_years_per_1000
+emigrants_share_of_total_population
+
+#The total number of people living in a given country that were born in another country. This measures the cumulative migrant stock.
+
+The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer.
+The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer.
+Total number of people that have left the country.
+The total number of people that have left the country, as a share of the current population.
+The total number of people born in that country that are now living in another country, compared to five years ago. A positive number indicates there are now more emigrants living in a given country; a negative number means there are fewer.
+The total number of people born in that country that are now living in another country, compared to five years ago. A positive number indicates there are now more emigrants living in a given country; a negative number means there are fewer.
+Net migration is the total the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country) over the previous five years. It is expressed as average annual net number of migrants.
+Net migration rate is the number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country) in the previous five years, divided by the person-years lived by the population of the receiving country over that period. It is expressed as average annual net number of migrants per 1,000 population.
+The total number of children under 18 years old that were born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+The total number of children under 18 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+The total number of children under 15 years old that were born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+The total number of children under 15 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
+Total number of refugees living in the host country, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number of arrivals per year.
+Total number of refugees living in the host country, shown as the 5-year rolling average, measured per 1,000 people. This measures the total number of refugees living in the country; not the number of arrivals per year.
+Total number of refugees by country of origin, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.
+Total number of refugees by country of origin, shown as the 5-year rolling average, measured per 1,000 people. This measures the total number of refugees from the country; not the number per year.
+The total number of people in the country whose application for asylum or refugee status is pending at any stage in the asylum procedure.
+The number of people in the country whose application for asylum or refugee status is pending at any stage in the asylum procedure, expressed per 100,000 people in the host country.
+The total number of people from a given country who has a pending application for asylum or refugee status in any other country.
+The number of people from a given country who has a pending application for asylum or refugee status in any other country, expressed per 100,000 people in the origin country.
+The number of refugees that were resettled in the country per year. Resettlement is the change in status of a refugee when they go from an asylum country/state to another territory that has agreed to admit them and ultimately grant them permanent residence.
+The number of refugees that were resettled in the country per year. This is measured per 100,000 people in the host country. Resettlement is the change in status of a refugee when they go from an asylum country/state to another territory that has agreed to admit them and ultimately grant them permanent residence.
+The number of refugees from the country that were resettled in another country per year. Resettlement is the change in status of a refugee when they go from an asylum country/state to another territory that has agreed to admit them and ultimately grant them permanent residence.
+The number of refugees from the country that were resettled in another country per year. This is measured per 100,000 people of the origin country. Resettlement is the change in status of a refugee when they go from an asylum country/state to another territory that has agreed to admit them and ultimately grant them permanent residence.
+The number of new displacements within a given country as a result of conflict and violence. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of armed conflict, situations of generalized violence, or violations of human rights and have not crossed an internationally-recognized state border.
+The number of new displacements within a given country as a result of conflict and violence, measured per 100 people. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of armed conflict, situations of generalized violence, or violations of human rights and have not crossed an internationally-recognized state border.
+The number of new displacements within a given country as a result of disasters. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of a natural or human-made disaster.
+The number of new displacements within a given country as a result of disasters, measured per 100 people. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of a natural or human-made disaster.
+This is the number of current internal displacements: it is the cumulative sum of new displacement minus people who have returned to their homes, or have been resettled. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of armed conflict, situations of generalized violence, or violations of human rights and have not crossed an internationally-recognized state border.
+This is the number of current internal displacements: it is the cumulative sum of new displacement minus people who have returned to their homes, or have been resettled, measured per 100 people. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of armed conflict, situations of generalized violence, or violations of human rights and have not crossed an internationally-recognized state border.
+This is the number of current internal displacements: it is the cumulative sum of new displacement minus people who have returned to their homes, or have been resettled. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of a natural or human-made disaster.
+This is the number of current internal displacements: it is the cumulative sum of new displacement minus people who have returned to their homes, or have been resettled, measured per 100 people. A person is defined as internally displaced if they have been forced or obliged to leave their homes as a result of a natural or human-made disaster.
+Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country.
+Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. Transferring this money usually comes with a cost – this cost is called the remittance cost. This measures the average remittance costs of the country where immigrants are sending this money from. It is expressed as a percentage of total remittances.
+Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. Transferring this money usually comes with a cost – this cost is called the remittance cost. This measures the average remittance costs of the country where immigrants are sending this money to. It is expressed as a percentage of total remittances.
