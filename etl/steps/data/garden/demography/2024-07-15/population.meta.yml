@@ -126,7 +126,8 @@ tables:
         description_short: |-
           Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
         unit: "{tables.population.variables.population.unit}"
-        display: {tables.population.variables.population.display}
+        display:
+          numDecimalPlaces: 0
 
       world_pop_share_historical:
         title: |-
@@ -172,7 +173,8 @@ tables:
         description_short: |-
           Population by country, available from 10,000 BCE to 2023, based on data and estimates from different sources.
         unit: "{tables.population.variables.population.unit}"
-        display: {tables.population.variables.population.display}
+        display:
+          numDecimalPlaces: 0
       world_pop_share_projection:
         title: |-
           {tables.population.variables.world_pop_share.title} (projections)
