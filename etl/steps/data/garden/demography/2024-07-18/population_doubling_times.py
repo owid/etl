@@ -60,9 +60,7 @@ def run(dest_dir: str) -> None:
 
     # Estimate doubling time (in years)
     tb["previous_population_target"] = tb["population_target"] // 2
-    tb = tb.merge(
-        tb, left_on="previous_population_target", right_on="population_target", suffixes=("", "_previous")
-    )
+    tb = tb.merge(tb, left_on="previous_population_target", right_on="population_target", suffixes=("", "_previous"))
     tb["num_years_to_double"] = tb["year"] - tb["year_previous"]
     tb = tb.loc[:, ["year", "population_target", "num_years_to_double"]]
 
