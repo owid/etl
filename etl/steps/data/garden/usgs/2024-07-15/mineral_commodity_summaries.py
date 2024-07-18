@@ -6,7 +6,7 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -385,7 +385,7 @@ def harmonize(df):
     # "World total (rutile, rounded)" has type "World total mine production: rutile (rounded)..."; and then
     # "World total (ilmenite and rutile, rounded)" has type "World total mine production: ilmentite and rutile (rounded)...".
     #
-    # But unfortunately, sometimes the info in the country name is nowhere else.
+    # But unfortunately, sometimes the info in the country name is nowhere else.
     # For example, "Japan (quicklime only)"; this nuance does not even appear in the metadata xml file.
     #
     # Luckily, it does not happen often that, for the same country-year-mineral-type, there are multiple rows for the same country (with different annotations).
@@ -398,6 +398,7 @@ def harmonize(df):
     #
     # So, given that we need to remove duplicates in production data (because each year appears in two consecutive data files),
     # we need to harmonize before dropping duplicates.
+    #
 
     # Many countries have a number at the end (e.g., "United States1").
     # Remove all digits from country names.
@@ -409,15 +410,22 @@ def harmonize(df):
     # Remove spurious spaces.
     df["Country"] = df["Country"].str.strip()
 
-    # TODO: Inspect cases where there is World excluding US.
+    # Harmonize country names.
+    # NOTE: For some reason, sometimes "World" excludes the US.
+    # For now, we excluded those aggregates from the data.
+    # If needed, we can construct proper aggregates in the future.
     df = geo.harmonize_countries(
-        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path, country_col="Country", warn_on_unused_countries=False
+        df=df,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        country_col="Country",
+        warn_on_unused_countries=False,
     )
 
     return df
 
 
-def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> pd.DataFrame:
+def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # After harmonization, some countries that appeared with an annotation become the same.
     # However, there is only one case where this creates ambiguity within the same country-year-mineral-type.
     # That's Helium. Check that this is the case, and remove this commodity.
@@ -428,20 +436,22 @@ def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> 
 
     # As a simple solution, sum the values of the repeated instances.
     index_issue = df_reserves[(df_reserves["Mineral"] == "Helium") & (df_reserves["Country"] == "United States")].index
-    _df_reserves = df_reserves.loc[index_issue].groupby(["Source", 'Year', 'Country', 'Mineral', 'Type'], as_index=False).agg({
-        'Reserves_t': 'sum',
-        'Source': 'last',
-        'Reserves_notes': 'last'
-    })
+    _df_reserves = (
+        df_reserves.loc[index_issue]
+        .groupby(["Source", "Year", "Country", "Mineral", "Type"], as_index=False)
+        .agg({"Reserves_t": "sum", "Source": "last", "Reserves_notes": "last"})
+    )
     df_reserves = pd.concat([df_reserves.drop(index_issue), _df_reserves], ignore_index=True)
 
     # Idem for production.
-    index_issue = df_production[(df_production["Mineral"] == "Helium") & (df_production["Country"] == "United States")].index
-    _df_production = df_production.loc[index_issue].groupby(["Source", 'Year', 'Country', 'Mineral', 'Type'], as_index=False).agg({
-        'Production_t': 'sum',
-        'Source': 'last',
-        'Production_notes': 'last'
-    })
+    index_issue = df_production[
+        (df_production["Mineral"] == "Helium") & (df_production["Country"] == "United States")
+    ].index
+    _df_production = (
+        df_production.loc[index_issue]
+        .groupby(["Source", "Year", "Country", "Mineral", "Type"], as_index=False)
+        .agg({"Production_t": "sum", "Source": "last", "Production_notes": "last"})
+    )
     df_production = pd.concat([df_production.drop(index_issue), _df_production], ignore_index=True)
 
     return df_reserves, df_production
@@ -476,8 +486,18 @@ def gather_and_process_data(data) -> pd.DataFrame:
     # Check that, before harmonization, there is only 1 instance for each country-year-mineral-type for reserves,
     # and 2 for production. The latter happens because each year is given in two consecutive data files (the first time,
     # as an estimate).
-    assert df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Reserves_t"].max() == 1
-    assert df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Production_t"].max() == 2
+    assert (
+        df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False)
+        .count()["Reserves_t"]
+        .max()
+        == 1
+    )
+    assert (
+        df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False)
+        .count()["Production_t"]
+        .max()
+        == 2
+    )
 
     # Harmonize country names.
     df_reserves = harmonize(df_reserves)
@@ -487,8 +507,18 @@ def gather_and_process_data(data) -> pd.DataFrame:
     df_reserves, df_production = fix_helium_issue(df_reserves=df_reserves, df_production=df_production)
 
     # Check that the issue is solved.
-    assert df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Reserves_t"].max() == 1
-    assert df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Production_t"].max() == 2
+    assert (
+        df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False)
+        .count()["Reserves_t"]
+        .max()
+        == 1
+    )
+    assert (
+        df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False)
+        .count()["Production_t"]
+        .max()
+        == 2
+    )
 
     # For each year, there is production data for two years.
     # So, there are multiple values of production data for the same year.
