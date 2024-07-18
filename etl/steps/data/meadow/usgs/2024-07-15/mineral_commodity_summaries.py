@@ -25,6 +25,8 @@ COMMON_COLUMNS = ["Source", "Country", "Mineral", "Type"]
 
 # Convert million carats to metric tonnes.
 MILLION_CARATS_TO_TONNES = 0.2
+# Convert thousand carats to metric tonnes.
+THOUSAND_CARATS_TO_TONNES = 0.2e-3
 # Convert million cubic meters of helium to metric tonnes.
 MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 
@@ -205,6 +207,22 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     return series
 
 
+def _include_note(d: pd.DataFrame, column: str, note: str) -> pd.Series:
+    # Include a note in "column" (which is the column devoted for notes).
+    d = d.copy()
+    if column not in d.columns:
+        d[column] = note
+    else:
+        d[column] = d[column].fillna("")
+        d.loc[d[column].str.endswith("."), column] += " " + note
+        d.loc[
+            (d[column].str.strip().apply(len) > 0) & ~(d[column].str.endswith(".")),
+            column,
+        ] += ". " + note
+        d.loc[d[column] == "", column] = note
+    return d[column]
+
+
 def prepare_reserves_data(d: pd.DataFrame):
     d = d.copy()
     # Select columns related to reserves data.
@@ -236,17 +254,7 @@ def prepare_reserves_data(d: pd.DataFrame):
             d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
             # Add a note explaining that the data is for ore.
-            note = "Reserves refer to ore."
-            if "Reserves_notes" not in d.columns:
-                d["Reserves_notes"] = note
-            else:
-                d["Reserves_notes"] = d["Reserves_notes"].fillna("")
-                d.loc[d["Reserves_notes"].str.endswith("."), "Reserves_notes"] += " " + note
-                d.loc[
-                    (d["Reserves_notes"].str.strip().apply(len) > 0) & ~(d["Reserves_notes"].str.endswith(".")),
-                    "Reserves_notes",
-                ] += ". " + note
-                d.loc[d["Reserves_notes"] == "", "Reserves_notes"] = note
+            d["Reserves_notes"] = _include_note(d=d, column="Reserves_notes", note="Reserves refer to ore.")
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
@@ -315,6 +323,14 @@ def prepare_production_data(d: pd.DataFrame):
         assert len(_units_production) == 1
         unit_production = _units_production[0]
 
+        # Handle special case.
+        if unit_production == "Sponge_t":
+            unit_production = "t"
+            # Add a note explaining that the data is for ore.
+            d["Production_notes"] = _include_note(
+                d=d, column="Production_notes", note="Production refers to titanium sponge."
+            )
+
         # Create a Year column.
         columns_to_keep = COMMON_COLUMNS
         if "Prod_notes" in d.columns:
@@ -330,13 +346,19 @@ def prepare_production_data(d: pd.DataFrame):
             df_production = pd.concat([df_production, _df_for_year], ignore_index=True)
 
         # Fix units.
-        if unit_production not in ["kt", "t", "kg"]:
-            # TODO: Handle special cases.
-            # mcm (Hellium), kct (Gemstones), Mt (Iron and steel), mmt (Iron and steel), mct (Diamond (industrial)), Sponge_t (Titanium and titanium dioxide).
-            return None
-
-        if unit_production == "kt":
+        assert unit_production in ["t", "kg", "kt", "Mt", "mmt", "mcm", "kct", "mct"]
+        if unit_production == "kg":
+            df_production["Production_t"] *= 1e-3
+        elif unit_production == "kt":
             df_production["Production_t"] *= 1e3
+        elif unit_production in ["Mt", "mmt"]:
+            df_production["Production_t"] *= 1e6
+        elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # type: ignore
+            df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+        elif unit_production == "kct":
+            df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES
+        elif unit_production == "mct":
+            df_production["Production_t"] *= MILLION_CARATS_TO_TONNES
 
         # Remove rows without data.
         df_production = df_production.dropna(subset=["Production_t"], how="all").reset_index(drop=True)
