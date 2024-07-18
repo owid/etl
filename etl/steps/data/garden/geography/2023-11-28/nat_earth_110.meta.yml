@@ -20,13 +20,19 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       latitude_centroid:
-        title: Central latitude
-        description_short: The latitude of the centroid of the country
+        title: Latitude
+        description_short: The latitude of the centroid of the country.
         unit: degrees
         short_unit: °
+        display:
+          numDecimalPlaces: 2
+          tolerance: 20
       absolute_latitude:
         title: Absolute latitude
-        description_short: The absolute value of the latitude of the centroid of the country
+        description_short: The absolute value of the latitude of the centroid of the country.
         unit: degrees from the equator
         short_unit: °
+        display:
+          numDecimalPlaces: 2
+          tolerance: 20
 
