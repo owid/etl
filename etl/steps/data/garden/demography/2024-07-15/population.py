@@ -6,8 +6,9 @@ Notes:
 """
 
 import json
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
@@ -29,10 +30,14 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Coluns relevant
-COLUMS_RELEVANT = [
+COLUMS_RELEVANT_POP = [
     "country",
     "year",
     "population",
+]
+COLUMNS_INDEX = [
+    "country",
+    "year",
 ]
 
 
@@ -115,11 +120,22 @@ def run(dest_dir: str) -> None:
     # Create auxiliary table
     tb_auxiliary = generate_auxiliary_table(tb)
 
+    # Create table with historical & projection data
+    tbs = [
+        tb.drop(columns=["source"]),
+        tb_density,
+        tb_growth_rate,
+    ]
+    tb_historical = make_table_historical(tbs)
+    tb_projection = make_table_projection(tbs)
+
     # Format tables
-    tb = tb.format(["country", "year"], short_name="population_original")
-    tb_auxiliary = tb_auxiliary.format(["country", "year"], short_name="population")
-    tb_density = tb_density.format(["country", "year"], short_name="population_density")
-    tb_growth_rate = tb_growth_rate.format(["country", "year"], short_name="population_growth_rate")
+    tb = tb.format(COLUMNS_INDEX, short_name="population_original")
+    tb_auxiliary = tb_auxiliary.format(COLUMNS_INDEX, short_name="population")
+    tb_density = tb_density.format(COLUMNS_INDEX, short_name="population_density")
+    tb_growth_rate = tb_growth_rate.format(COLUMNS_INDEX, short_name="population_growth_rate")
+    tb_historical = tb_historical.format(COLUMNS_INDEX, short_name="historical")
+    tb_projection = tb_projection.format(COLUMNS_INDEX, short_name="projections")
 
     #
     # Save outputs.
@@ -129,6 +145,8 @@ def run(dest_dir: str) -> None:
         tb_auxiliary,
         tb_density,
         tb_growth_rate,
+        tb_historical,
+        tb_projection,
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -159,7 +177,7 @@ def format_hyde(tb: Table) -> Table:
         "popc_c": "population",
     }
     # Rename columns
-    tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT]
+    tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT_POP]
     # Set source identifier
     tb["source"] = "hyde"
     return tb
@@ -171,7 +189,7 @@ def format_hyde(tb: Table) -> Table:
 def format_gapminder(tb: Table) -> Table:
     """Format Gapminder table."""
     # Select relevant columns
-    tb = tb.loc[:, COLUMS_RELEVANT]
+    tb = tb.loc[:, COLUMS_RELEVANT_POP]
     # Set source identifier
     tb["source"] = "gapminder"
     return tb
@@ -258,7 +276,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
         ## rename countries
         tb["country"] = tb["geo"].map(country_rename)
         ## rename columns
-        tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT]
+        tb = tb.rename(columns=columns_rename, errors="raise").loc[:, COLUMS_RELEVANT_POP]
         # Set source identifier
         tb["source"] = "gapminder_sg"
         # add origins
@@ -635,7 +653,7 @@ def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
 def make_table_growth_rate(tb_population: Table) -> Table:
     """Estimate population growth rate as:
 
-    growth_rate = (population[year]/population[previous_year])^(1 / (year-previous_year)) - 1
+    growth_rate = log(population[year]/population[previous_year]) / (year-previous_year)
     """
     # Sorting the DataFrame by country and year to ensure the calculations are accurate
     tb = tb_population.sort_values(by=["country", "year"]).copy()
@@ -657,7 +675,7 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 
     # Estimate population growth rate
     tb["growth_rate"] = 100 * (
-        (tb["population"] / tb["previous_population"]) ** (1 / (tb["year"] - tb["previous_year"])) - 1
+        np.log(tb["population"] / tb["previous_population"]) / (tb["year"] - tb["previous_year"])
     )
 
     # Fix 1950 and 1800
@@ -675,4 +693,31 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
+    return tb
+
+
+##########################
+# Historical & Projections
+##########################
+def make_table_historical(tbs: List[Table]) -> Table:
+    """Create a table with historical data."""
+    tbs_ = []
+    for tb in tbs:
+        tb_ = tb.loc[tb["year"] < YEAR_START_WPP_PROJ].copy()
+        tbs_.append(tb_)
+    tb = pr.multi_merge(tbs, on=COLUMNS_INDEX, how="outer")
+
+    tb.columns = [f"{col}_historical" if col not in COLUMNS_INDEX else col for col in tb.columns]
+    return tb
+
+
+def make_table_projection(tbs: List[Table]) -> Table:
+    """Create a table with projection data."""
+    tbs_ = []
+    for tb in tbs:
+        tb_ = tb.loc[tb["year"] >= YEAR_START_WPP_PROJ].copy()
+        tbs_.append(tb_)
+    tb = pr.multi_merge(tbs, on=COLUMNS_INDEX, how="outer")
+
+    tb.columns = [f"{col}_projection" if col not in COLUMNS_INDEX else col for col in tb.columns]
     return tb
