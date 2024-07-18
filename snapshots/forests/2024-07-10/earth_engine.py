@@ -14,29 +14,43 @@ The script will calculate the area of tree cover in each driver of loss (accordi
 
 Once it has completed, you can run the XXXX step to load the data to Snapshot.
 """
+import click
 import ee
 
 # Set the tree cover threshold - this is the default on global forest watch
 TREE_COVER_THRESHOLD = 30
-DEBUG = True
+DEBUG = False
 
 
-def main():
+@click.command()
+@click.option(
+    "--chunk_size",
+    prompt="Please enter the chunk size",
+    type=int,
+    default=100,
+    show_default=True,
+    help="The number of countries included in the chunk",
+)
+@click.option(
+    "--starting_point",
+    prompt="Please enter the starting point",
+    type=int,
+    default=1,
+    show_default=True,
+    help="The starting point of the chunk",
+)
+def main(chunk_size: int, starting_point: int):
     # Authenticate to Earth Engine - may require a code to be entered in the terminal
     ee.Authenticate()
     # Initialize the Earth Engine module.
     ee.Initialize(project="ee-fiona-forest")
-
     # Load country boundaries from LSIB - a standard dataset in Earth Engine
     countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")
     # Select a subset of five countries for debugging purposes
-    # if DEBUG:
-    #    countries = countries.limit(100)# Select countries 1-100
-    # countries1_100 = countries.toList(100, 0)
-    # countries = ee.FeatureCollection(countries.toList(100, 100))
-    # Select countries 201-300
-    countries = countries.toList(100, 200)
-
+    if DEBUG:
+        countries = countries.limit(10)  # Select countries 1-10 to debug
+    country_list = countries.toList(chunk_size, starting_point)
+    countries = ee.FeatureCollection(country_list)
     # Country boundaries
     gfc2023 = ee.Image("UMD/hansen/global_forest_change_2023_v1_11")
     # Get the loss image.
@@ -112,9 +126,9 @@ def main():
     # Current folder is here: https://drive.google.com/drive/folders/1U5xylX1uqljdQ8OzPDJrsQFfdDHPQCbJ
     export_task = ee.batch.Export.table.toDrive(
         collection=formattedResults,
-        description="Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_201_300",
+        description=f"Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_{starting_point}_{starting_point + chunk_size - 1}",
         folder="forests",
-        fileNamePrefix="Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_201_300",
+        fileNamePrefix=f"Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_{starting_point}_{starting_point + chunk_size - 1}",
         fileFormat="CSV",
     )
     export_task.start()
