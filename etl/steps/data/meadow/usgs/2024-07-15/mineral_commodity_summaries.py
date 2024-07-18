@@ -331,12 +331,13 @@ def prepare_production_data(d: pd.DataFrame):
                 d=d, column="Production_notes", note="Production refers to titanium sponge."
             )
 
-        # Create a Year column.
-        columns_to_keep = COMMON_COLUMNS
-        if "Prod_notes" in d.columns:
-            columns_to_keep += ["Prod_notes"]
+        # Create a Year column and a single column for production.
         df_production = pd.DataFrame()
         for year in years_production:
+            columns_to_keep = COMMON_COLUMNS.copy()
+            if ("Production_notes" in d.columns) and (year == years_production[-1]):
+                # Include the column of production notes only once (for example, when adding data for the last year).
+                columns_to_keep += ["Production_notes"]
             _column_production = [column for column in columns_production if str(year) in column][0]
             _df_for_year = (
                 d[columns_to_keep + [_column_production]]
@@ -368,19 +369,7 @@ def prepare_production_data(d: pd.DataFrame):
         return df_production
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshots and gather all their contents.
-    data = {}
-    for year in YEARS_TO_PROCESS:
-        snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
-        data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
-
-    #
-    # Process data.
-    #
+def gather_and_process_data(data) -> pd.DataFrame:
     # Initialize empty dataframes that will gather all data for reserves and production.
     df_reserves = pd.DataFrame()
     df_production = pd.DataFrame()
@@ -424,10 +413,29 @@ def run(dest_dir: str) -> None:
         df_production.drop(columns=["Source"]), on=["Country", "Mineral", "Type"] + ["Year"], how="outer"
     )
 
-    # TODO: Consider if using the original metadata from xml files.
+    return df
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshots and gather all their contents.
+    data = {}
+    for year in YEARS_TO_PROCESS:
+        snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
+        data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
+
+    #
+    # Process data.
+    #
+    # Gather and process all reserves and production data.
+    df = gather_and_process_data(data=data)
 
     # Create a table with metadata.
     tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
+
+    # TODO: Consider if using the original metadata from xml files.
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "mineral", "type"])
