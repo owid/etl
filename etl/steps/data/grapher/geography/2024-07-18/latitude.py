@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     tb = tb[["name", "latitude_centroid", "absolute_latitude"]]
     tb["year"] = 2024
     tb = tb.rename(columns={"name": "country"})
-
+    # Remove entities that are not in the DB - they are needed for another use of this dataset, so I didn't want to remove them in garden
     entities_to_remove = [
         "Southern Patagonian Ice Field",
         "Serranilla Bank",
