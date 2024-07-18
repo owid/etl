@@ -8,7 +8,7 @@ NOTE 1: For now, this step and its Grapher counterpart are only capturing this d
 NOTE 2: In the future, we might want to have other countries and regions in this dataset. In that scenario, please review all the code below and Grapher's.
 
 """
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -21,7 +21,7 @@ paths = PathFinder(__file__)
 
 # Population values for which we want to track doubling times
 ## If '0.5' appears, it means we are interested in the number of years it took to go from 0.25 -> 0.5
-POPULATION_TARGETS = [0.25, 0.5, 1, 2, 3, 4, 5, 8, 10, 10.2]
+POPULATION_TARGETS = [0.25, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 8, 10]
 POPULATION_TARGETS = [x * 1e9 for x in POPULATION_TARGETS]
 
 
@@ -59,16 +59,16 @@ def run(dest_dir: str) -> None:
     tb = get_target_years(tb)
 
     # Estimate doubling time (in years)
-    tb = tb.sort_values("year")
-    tb["num_years_to_double"] = tb["year"] - tb["year"].shift(1)
-    tb = tb.dropna(subset=["num_years_to_double"])
+    tb["previous_population_target"] = tb["population_target"] // 2
+    tb = tb.merge(
+        tb, left_on="previous_population_target", right_on="population_target", suffixes=("", "_previous")
+    )
+    tb["num_years_to_double"] = tb["year"] - tb["year_previous"]
+    tb = tb.loc[:, ["year", "population_target", "num_years_to_double"]]
 
     # Add country
     paths.log.info("Add entity 'World'")
     tb["country"] = "World"
-
-    # Drop columns
-    tb = tb.drop(columns=["population"])
 
     # Set index
     tb = tb.format(["country", "year"], short_name="population_doubling_times")
@@ -135,6 +135,14 @@ def get_target_years(tb: Table) -> Table:
     tb["target_crossing"] = np.sign(tb["population_error"]).diff() > 0
     tb["target_crossing"] = np.where(tb["target_crossing"], tb["target_crossing"].cumsum(), 0)
     tb["target_crossing"] = tb["target_crossing"] + tb["target_crossing"].shift(-1).fillna(0)
+
+    ## 2b. Sometimes there is no 'crossing' due to resolution
+    x = tb["population_target"].value_counts()
+    target_no_crossing = x[x == 1].index
+    assert len(target_no_crossing) == 1, f"Population targets with no crossing: {target_no_crossing}"
+    mask = tb["population_target"].isin(target_no_crossing)
+    tb.loc[mask, "target_crossing"] = tb.loc[mask].index
+
     tb = tb[tb["target_crossing"] > 0]
 
     ## 3. Keep start OR end year of target-crossing, based on which is closed to target
