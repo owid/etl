@@ -18,7 +18,30 @@ def run(dest_dir: str) -> None:
     tb = tb[["name", "latitude_centroid", "absolute_latitude"]]
     tb["year"] = 2024
     tb = tb.rename(columns={"name": "country"})
-    #
+
+    entities_to_remove = [
+        "Southern Patagonian Ice Field",
+        "Serranilla Bank",
+        "Akrotiri",
+        "Fr. S. Antarctic Lands",
+        "S. Geo. and the Is.",
+        "Clipperton I.",
+        "Coral Sea Is.",
+        "USNB Guantanamo Bay",
+        "U.S. Minor Outlying Is.",
+        "Cyprus U.N. Buffer Zone",
+        "Scarborough Reef",
+        "Dhekelia",
+        "Brazilian I.",
+        "Baikonur",
+        "Ashmore and Cartier Is.",
+        "Bir Tawil",
+        "Indian Ocean Ter.",
+        "Bajo Nuevo Bank",
+        "Siachen Glacier",
+        "Spratly Is.",
+    ]
+    tb = tb[~tb["country"].isin(entities_to_remove)]
     # Process data.
     #
     tb = tb.format(["country", "year"])

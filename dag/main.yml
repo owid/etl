@@ -680,6 +680,10 @@ steps:
 
   ######################################################################################################################
 
+  #Latitude
+  data://grapher/geography/2024-07-18/latitude:
+  - data://garden/geography/2023-11-28/nat_earth_110
+
   # WB income groups
   data://meadow/wb/2024-03-11/income_groups:
     - snapshot://wb/2024-03-11/income_groups.xlsx
