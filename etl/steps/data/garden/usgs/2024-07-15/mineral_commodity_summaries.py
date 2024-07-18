@@ -1,4 +1,8 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load, process snapshots, and harmonize.
+
+All these things are done in a single script because the processes are intertwined.
+
+"""
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -8,6 +12,7 @@ from zipfile import ZipFile
 import owid.catalog.processing as pr
 import pandas as pd
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -367,6 +372,81 @@ def prepare_production_data(d: pd.DataFrame):
         return df_production
 
 
+def harmonize(df):
+    # Many country names come with an annotation. For example, specifying a subtype of commodity, or a nuance.
+    # Ideally, they could have used a separate column for this, like the one dedicated to notes.
+    # But unfortunately, that is not the case.
+    #
+    # Sometimes, the additional information in the country name is irrelevant.
+    # For example, when they mention that the values are rounded.
+    #
+    # And sometimes, the additional info is also mentioned in the "type" column.
+    # For example,
+    # "World total (rutile, rounded)" has type "World total mine production: rutile (rounded)..."; and then
+    # "World total (ilmenite and rutile, rounded)" has type "World total mine production: ilmentite and rutile (rounded)...".
+    #
+    # But unfortunately, sometimes the info in the country name is nowhere else.
+    # For example, "Japan (quicklime only)"; this nuance does not even appear in the metadata xml file.
+    #
+    # Luckily, it does not happen often that, for the same country-year-mineral-type, there are multiple rows for the same country (with different annotations).
+    # This does happen, however, at least in some cases.
+    # For example, for Helium, there is "United States (extracted from natural gas)", and
+    # "United States (from Cliffside Field)", both with type "Mine production".
+    #
+    # To make things worse, countries are often spelled differently (and there is often a spurious "e" at the end).
+    # For example, in the files for Perlite 2022 and 2023, there is "Argentina", but for the same commodity in the 2024 file, there is "Argentinae".
+    #
+    # So, given that we need to remove duplicates in production data (because each year appears in two consecutive data files),
+    # we need to harmonize before dropping duplicates.
+
+    # Many countries have a number at the end (e.g., "United States1").
+    # Remove all digits from country names.
+    df["Country"] = df["Country"].str.replace(r"\d+", "", regex=True)
+    # Often, "(rounded)" appears. Remove it.
+    df["Country"] = df["Country"].str.replace(r"\(rounded\)", "", regex=True)
+    # Often, "\xa0" appears. Remove it.
+    df["Country"] = df["Country"].str.replace(r"\xa0", "", regex=True)
+    # Remove spurious spaces.
+    df["Country"] = df["Country"].str.strip()
+
+    # TODO: Inspect cases where there is World excluding US.
+    df = geo.harmonize_countries(
+        df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path, country_col="Country", warn_on_unused_countries=False
+    )
+
+    return df
+
+
+def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> pd.DataFrame:
+    # After harmonization, some countries that appeared with an annotation become the same.
+    # However, there is only one case where this creates ambiguity within the same country-year-mineral-type.
+    # That's Helium. Check that this is the case, and remove this commodity.
+    counts = df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()
+    assert set(counts[counts["Reserves_t"] > 1]["Mineral"]) == set(["Helium"])
+    counts = df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()
+    assert set(counts[counts["Production_t"] > 2]["Mineral"]) == set(["Helium"])
+
+    # As a simple solution, sum the values of the repeated instances.
+    index_issue = df_reserves[(df_reserves["Mineral"] == "Helium") & (df_reserves["Country"] == "United States")].index
+    _df_reserves = df_reserves.loc[index_issue].groupby(["Source", 'Year', 'Country', 'Mineral', 'Type'], as_index=False).agg({
+        'Reserves_t': 'sum',
+        'Source': 'last',
+        'Reserves_notes': 'last'
+    })
+    df_reserves = pd.concat([df_reserves.drop(index_issue), _df_reserves], ignore_index=True)
+
+    # Idem for production.
+    index_issue = df_production[(df_production["Mineral"] == "Helium") & (df_production["Country"] == "United States")].index
+    _df_production = df_production.loc[index_issue].groupby(["Source", 'Year', 'Country', 'Mineral', 'Type'], as_index=False).agg({
+        'Production_t': 'sum',
+        'Source': 'last',
+        'Production_notes': 'last'
+    })
+    df_production = pd.concat([df_production.drop(index_issue), _df_production], ignore_index=True)
+
+    return df_reserves, df_production
+
+
 def gather_and_process_data(data) -> pd.DataFrame:
     # Initialize empty dataframes that will gather all data for reserves and production.
     df_reserves = pd.DataFrame()
@@ -392,6 +472,23 @@ def gather_and_process_data(data) -> pd.DataFrame:
                 df_reserves = pd.concat([df_reserves, _df_reserves], ignore_index=True)
             if _df_production is not None:
                 df_production = pd.concat([df_production, _df_production], ignore_index=True)
+
+    # Check that, before harmonization, there is only 1 instance for each country-year-mineral-type for reserves,
+    # and 2 for production. The latter happens because each year is given in two consecutive data files (the first time,
+    # as an estimate).
+    assert df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Reserves_t"].max() == 1
+    assert df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Production_t"].max() == 2
+
+    # Harmonize country names.
+    df_reserves = harmonize(df_reserves)
+    df_production = harmonize(df_production)
+
+    # Fix Helium issue (see function for an explanation).
+    df_reserves, df_production = fix_helium_issue(df_reserves=df_reserves, df_production=df_production)
+
+    # Check that the issue is solved.
+    assert df_reserves.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Reserves_t"].max() == 1
+    assert df_production.groupby(["Country", "Year", "Mineral", "Type"], observed=True, as_index=False).count()["Production_t"].max() == 2
 
     # For each year, there is production data for two years.
     # So, there are multiple values of production data for the same year.
@@ -434,13 +531,11 @@ def run(dest_dir: str) -> None:
     tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "mineral", "type"])
+    tb = tb.format(["country", "year", "mineral", "type"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
-
-    # Save changes in the new meadow dataset.
-    ds_meadow.save()
+    # Create a new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden.save()

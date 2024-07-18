@@ -237,12 +237,8 @@ steps:
   #
   # USGS - Mineral commodity summaries.
   #
-  data://meadow/usgs/2024-07-15/mineral_commodity_summaries:
+  # NOTE: There is no meadow step, as processing and harmonization are tightly coupled.
+  data://garden/usgs/2024-07-15/mineral_commodity_summaries:
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2022.zip
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
-  #
-  # USGS - Mineral commodity summaries.
-  #
-  data://garden/usgs/2024-07-15/mineral_commodity_summaries:
-    - data://meadow/usgs/2024-07-15/mineral_commodity_summaries
