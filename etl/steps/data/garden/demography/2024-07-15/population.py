@@ -705,7 +705,7 @@ def make_table_historical(tbs: List[Table]) -> Table:
     for tb in tbs:
         tb_ = tb.loc[tb["year"] < YEAR_START_WPP_PROJ].copy()
         tbs_.append(tb_)
-    tb = pr.multi_merge(tbs, on=COLUMNS_INDEX, how="outer")
+    tb = pr.multi_merge(tbs_, on=COLUMNS_INDEX, how="outer")
 
     tb.columns = [f"{col}_historical" if col not in COLUMNS_INDEX else col for col in tb.columns]
     return tb
@@ -717,7 +717,7 @@ def make_table_projection(tbs: List[Table]) -> Table:
     for tb in tbs:
         tb_ = tb.loc[tb["year"] >= YEAR_START_WPP_PROJ].copy()
         tbs_.append(tb_)
-    tb = pr.multi_merge(tbs, on=COLUMNS_INDEX, how="outer")
+    tb = pr.multi_merge(tbs_, on=COLUMNS_INDEX, how="outer")
 
     tb.columns = [f"{col}_projection" if col not in COLUMNS_INDEX else col for col in tb.columns]
     return tb
