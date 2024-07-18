@@ -364,8 +364,6 @@ def prepare_production_data(d: pd.DataFrame):
         # Remove rows without data.
         df_production = df_production.dropna(subset=["Production_t"], how="all").reset_index(drop=True)
 
-        # TODO: Production notes are missing. Fix it.
-
         return df_production
 
 
@@ -434,8 +432,6 @@ def run(dest_dir: str) -> None:
 
     # Create a table with metadata.
     tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
-
-    # TODO: Consider if using the original metadata from xml files.
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "mineral", "type"])
