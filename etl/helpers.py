@@ -14,6 +14,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union
 from urllib.parse import urljoin
 
 import jsonref
+import pandas as pd
 import structlog
 import yaml
 from owid import catalog
@@ -32,6 +33,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.explorer_helpers import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
 
@@ -1048,3 +1050,43 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
     dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
     with open(paths.DAG_ARCHIVE_FILE, "a") as file:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
+
+
+class DatasetAndExplorer:
+    def __init__(self, dataset, explorer):
+        self.dataset = dataset
+        self.explorer = explorer
+
+    def save(self):
+        # Save ETL dataset to disk.
+        self.dataset.save()
+        # Write explorer tsv file to disk.
+        self.explorer.write()
+
+
+def create_explorer(
+    dest_dir: Union[str, Path],
+    config: Dict[str, Any],
+    df_graphers: pd.DataFrame,
+    df_columns: Optional[pd.DataFrame] = None,
+) -> DatasetAndExplorer:
+    # Extract information about this step from dest_dir.
+    channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
+
+    # Initialize explorer.
+    explorer = Explorer(short_name)
+    # Update its config.
+    explorer.config = config
+    # Update its graphers and columns tables.
+    explorer.df_graphers = df_graphers
+    if df_columns is not None:
+        explorer.df_columns = df_columns
+
+    # Just so that ETL doesn't break, create an empty dataset with basic metadata.
+    metadata = DatasetMeta(channel=channel, namespace=namespace, version=version, short_name=short_name)
+    dataset = catalog.Dataset.create_empty(dest_dir, metadata=metadata)
+
+    # Create a "dataset and explorer object".
+    ds_explorer = DatasetAndExplorer(dataset=dataset, explorer=explorer)
+
+    return ds_explorer
