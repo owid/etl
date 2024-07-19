@@ -5,6 +5,8 @@ from owid.catalog import Table
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"] + ["World"]
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
@@ -29,6 +31,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("maternal_mortality")
+    ds_regions = paths.load_dataset("regions")
+    ds_income = paths.load_dataset("income_groups")
+    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["maternal_mortality"].reset_index()

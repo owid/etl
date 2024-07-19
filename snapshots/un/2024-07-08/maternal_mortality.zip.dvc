@@ -5,9 +5,7 @@ meta:
     # Data product / Snapshot
     title: Trends in maternal mortality
     description: |-
-      The United Nations Maternal Mortality Estimation Inter-Agency Group (MMEIG) – comprising WHO, the United Nations Children’s Fund (UNICEF), the United Nations Population Fund (UNFPA), the World Bank Group and the United Nations Department of Economic and Social Affairs, Population Division (UNDESA/Population Division) has collaborated with external technical experts on a new round of estimates covering 2000 to 2020. The estimates represent the most up to date, internationally-comparable MMEIG estimates of maternal mortality, using refined input data and methods from previous rounds.
-
-      The report presents internationally comparable global, regional and country-level estimates and trends for maternal mortality between 2000 and 2020.
+      The United Nations Maternal Mortality Estimation Inter-Agency Group (MMEIG) – comprising WHO, the United Nations Children’s Fund (UNICEF), the United Nations Population Fund (UNFPA), the World Bank Group and the United Nations Department of Economic and Social Affairs, Population Division (UNDESA/Population Division) has collaborated with external technical experts on a new round of estimates covering 2000 to 2020, in addition to the previous data covering 1985 to 2000. The estimates represent the most up to date, internationally-comparable MMEIG estimates of maternal mortality, using refined input data and methods from previous rounds.
     date_published: "2023-02-23"
     version_producer: 2020
 

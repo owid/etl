@@ -29,7 +29,7 @@ tables:
         title: Maternal mortality ratio
         description_short: |-
           The estimated number of women who die from [maternal conditions](#dod:maternal-mortality) per 100,000 live births, based on data from death certificates, large-scale surveys, and statistical modeling.
-        unit: deaths per 100k live births
+        unit: deaths per 100,000 live births
         short_unit: ""
         display:
           numDecimalPlaces: 1
@@ -39,7 +39,7 @@ tables:
         title: Maternal mortality rate
         description_short: |-
           The estimated number of women who die from [maternal conditions](#dod:maternal-mortality) per 100,000 women of reproductive age (15-49), based on data from death certificates, large-scale surveys, and statistical modeling.
-        unit: deaths per 100k women
+        unit: deaths per 100,000 women
         short_unit: ""
         display:
           numDecimalPlaces: 1

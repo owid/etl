@@ -56,7 +56,7 @@ tables:
         title: Estimated maternal mortality ratio
         description_short: |-
           The maternal mortality ratio (MMR) is the number of maternal deaths per 100,000 live births.
-        unit: deaths per 100k live births
+        unit: deaths per 100,000 live births
         short_unit: ""
         display:
           numDecimalPlaces: 1
@@ -65,13 +65,14 @@ tables:
       mm_rate:
         title: Estimated maternal mortality rate
         description_short: |-
-          The maternal mortality rate is the number of maternal deaths per 100,000 women of reproductive age.
-        unit: deaths per 100k women
+          The maternal mortality rate is the number of maternal deaths per 100,000 women of reproductive age (15-49 years old).
+        unit: deaths per 100,000 women
         short_unit: ""
         display:
           numDecimalPlaces: 1
         description_from_producer: |-
           {definitions.description_methodology}
+        description_processing: The data is originally given in deaths per person-years for women of reproductive age. To make the figures comparable with other sources, we multiply it by 100,000 to get deaths per 100,000 person-years (corresponding roughly to 100,000 women of reproductive age).
       lifetime_risk:
         title: Lifetime risk of maternal death
         description_short: |-
@@ -95,8 +96,8 @@ tables:
       pm:
         title: Proportion of deaths due to maternal causes
         description_short: |-
-          The proportion of deaths among women of reproductive age that are due to maternal causes.
-        unit: percent
+          The proportion of deaths among women of reproductive age (15-49 years old) that are due to maternal causes.
+        unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
@@ -117,7 +118,7 @@ tables:
         title: Estimated HIV-related indirect maternal mortality ratio
         description_short: |-
           The maternal mortality ratio (MMR) of maternal deaths caused by the aggravating effects of pregnancy on HIV.
-        unit: deaths per 100k live births
+        unit: deaths per 100,000 live births
         short_unit: ""
         display:
           numDecimalPlaces: 1
@@ -128,7 +129,7 @@ tables:
         title: Estimated proportion of HIV-related maternal deaths
         description_short: |-
           The proportion of maternal deaths caused by the aggravating effects of pregnancy on HIV.
-        unit: percent
+        unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1

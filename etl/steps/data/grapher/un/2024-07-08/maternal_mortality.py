@@ -16,18 +16,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["maternal_mortality"]
 
-    # only include columns not in long run dataset data://garden/maternal_mortality/2024-07-08/maternal_mortality.py
-    cols_to_keep = [
-        "hiv_related_indirect_maternal_deaths",
-        "hiv_related_indirect_mmr",
-        "hiv_related_indirect_percentage",
-        "lifetime_risk",
-        "lifetime_risk_1_in",
-        "pm",
-    ]
-
-    tb = tb[cols_to_keep]
-
     #
     # Save outputs.
     #
