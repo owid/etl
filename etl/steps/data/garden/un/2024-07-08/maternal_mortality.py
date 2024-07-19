@@ -33,7 +33,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("maternal_mortality")
     ds_regions = paths.load_dataset("regions")
     ds_income = paths.load_dataset("income_groups")
-    ds_pop = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["maternal_mortality"].reset_index()
@@ -58,6 +57,43 @@ def run(dest_dir: str) -> None:
     tb = add_origins(tb, DATA_COLS)
     tb = tb.rename(columns={"mmr_rate": "mm_rate"})
 
+    aggr = {"maternal_deaths": "sum", "births": "sum", "hiv_related_indirect_maternal_deaths": "sum"}
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income,
+        aggregations=aggr,
+        num_allowed_nans_per_year=0,
+    )
+
+    tb["mmr"] = tb.apply(
+        lambda x: calc_for_reg(
+            x, nominator="maternal_deaths", denominator="births", original_col="mmr", factor=100_000
+        ),
+        axis=1,
+    )
+    tb["hiv_related_indirect_mmr"] = tb.apply(
+        lambda x: calc_for_reg(
+            x,
+            "hiv_related_indirect_maternal_deaths",
+            denominator="births",
+            original_col="hiv_related_indirect_mmr",
+            factor=100_000,
+        ),
+        axis=1,
+    )
+    tb["hiv_related_indirect_percentage"] = tb.apply(
+        lambda x: calc_for_reg(
+            x,
+            "hiv_related_indirect_maternal_deaths",
+            denominator="maternal_deaths",
+            original_col="hiv_related_indirect_percentage",
+            factor=100,
+        ),
+        axis=1,
+    )
+
     tb = tb.format(["country", "year"])
 
     #
@@ -76,3 +112,10 @@ def add_origins(tb: Table, cols: list) -> Table:
     for col in cols:
         tb[col] = tb[col].copy_metadata(tb["country"])
     return tb
+
+
+def calc_for_reg(tb_row, nominator, denominator, original_col, factor=1):
+    """If country is a region, calculate the maternal mortality ratio or hiv_related_indirect_mmr, else return MMR"""
+    if tb_row["country"] in REGIONS:
+        return (tb_row[nominator] / tb_row[denominator]) * factor
+    return tb_row[original_col]
