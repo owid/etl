@@ -9,11 +9,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("migration_stock")
+    ds_garden = paths.load_dataset("migrant_stock")
 
     # Read table from garden dataset.
-    # only table with migrant_stock for now - migration flows will be added later
-    tb = ds_garden["migration_stock"]
+    # only table with migrant_stock
+    tb = ds_garden["migrant_stock"]
 
     # Save outputs.
     #

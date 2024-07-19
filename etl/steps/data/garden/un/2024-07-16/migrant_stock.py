@@ -8,7 +8,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
+# List of regions (in opposition to countries) in the data set
 REGIONS = [
     "WORLD",
     "Sub-Saharan Africa",
@@ -60,12 +60,14 @@ REGIONS = [
     "Polynesia*",
 ]
 
+# Column names for the years are different by sex
 BOTH_SEXES = ["_1990", "_1995", "_2000", "_2005", "_2010", "_2015", "_2020"]
 MALES = ["_1990_1", "_1995_1", "_2000_1", "_2005_1", "_2010_1", "_2015_1", "_2020_1"]
 FEMALES = ["_1990_2", "_1995_2", "_2000_2", "_2005_2", "_2010_2", "_2015_2", "_2020_2"]
 
 ALL_YEARS = BOTH_SEXES + MALES + FEMALES
 
+# dict to rename columns for migrant numbers by sex and age
 SA_COLS_RENAME = {
     "_0_4": "all_immigrants_aged_0_to_4",
     "_5_9": "all_immigrants_aged_5_to_9",
@@ -124,14 +126,18 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("migrant_stock")
-
     # Read tables from meadow dataset.
+    # destination and origin table
     tb_do = ds_meadow["migrant_stock_dest_origin"].reset_index()
+    # destination table, total numbers and shares
     tb_d_total = ds_meadow["migrant_stock_dest_total"].reset_index()
     tb_d_share = ds_meadow["migrant_stock_dest_share"].reset_index()
+    # origin table
     tb_o = ds_meadow["migrant_stock_origin"].reset_index()
+    # table for data by sex and age
     tb_sa_total = ds_meadow["migrant_stock_sex_age_total"].reset_index()
     tb_sa_share = ds_meadow["migrant_stock_sex_age_share"].reset_index()
+    # population data
     tb_pop = ds_meadow["total_population"].reset_index()
 
     ## data on destination and origin
@@ -139,12 +145,12 @@ def run(dest_dir: str) -> None:
     tb_do = tb_do[~tb_do["country_destination"].isin(REGIONS)]
     tb_do = tb_do[~tb_do["country_origin"].isin(REGIONS)]
 
-    tb_do = format_table(tb_do, ["country_destination", "country_origin"], "migrants", value_factor=1000)
+    tb_do = format_table(tb_do, ["country_destination", "country_origin"], "migrants")
 
     tb_do = tb_do.format(["country_destination", "country_origin", "year"])
 
     ## data on destination
-    tb_d_total = format_table(tb_d_total, ["country"], "migrants", value_factor=1000)
+    tb_d_total = format_table(tb_d_total, ["country"], "migrants")
     tb_d_share = format_table(tb_d_share, ["country"], "migrant_share")
 
     ## data on origin
@@ -153,18 +159,21 @@ def run(dest_dir: str) -> None:
     ## data on sex and age
     sa_share_cols_rename = {key: "share_of_" + value for key, value in SA_COLS_RENAME.items()}
 
+    # rename columns
     tb_sa_total = tb_sa_total.rename(columns=SA_COLS_RENAME)
     tb_sa_share = tb_sa_share.rename(columns=sa_share_cols_rename)
 
+    # change dtype to numeric
     for col in SA_COLS_RENAME.values():
         tb_sa_total[col] = pd.to_numeric(tb_sa_total[col], errors="coerce")
-        tb_sa_total[col] = tb_sa_total[col] * 1000
 
     tb_sa_total = add_metadata(tb_sa_total, list(SA_COLS_RENAME.values()), "year")
 
+    # drop total columns (they add up to 100)
     tb_sa_total = tb_sa_total.drop(columns=["total", "total_1", "total_2"])
     tb_sa_share = tb_sa_share.drop(columns=["total", "total_1", "total_2"])
 
+    # harmonize country names
     tb_sa_total = geo.harmonize_countries(
         df=tb_sa_total, countries_file=paths.country_mapping_path, country_col="country", warn_on_unused_countries=False
     )
@@ -172,6 +181,7 @@ def run(dest_dir: str) -> None:
         df=tb_sa_share, countries_file=paths.country_mapping_path, country_col="country", warn_on_unused_countries=False
     )
 
+    # remove duplicate data
     tb_sa_total = tb_sa_total.drop_duplicates()
     tb_sa_share = tb_sa_share.drop_duplicates()
 
@@ -184,7 +194,8 @@ def run(dest_dir: str) -> None:
     )
     tb_pop = tb_pop.drop_duplicates()
 
-    # combine tables except for destination and origin table
+    ## combine tables except for destination and origin table
+    # rename columns to differentiate between values
     tb_d_total = tb_d_total.rename(
         columns={
             "migrants_all_sexes": "immigrants_all",
@@ -214,23 +225,29 @@ def run(dest_dir: str) -> None:
     )
     tb.metadata.short_name = "migrant_stock"
 
-    # Calculate missing values: under 15 y/o migrants, under 20 y/o migrants, share of these in total population, 5 year change in migrants, share of total population
+    ## Calculate missing values:
+    # under 15 y/o migrants, under 20 y/o migrants
     tb["immigrants_under_15"] = (
         tb["all_immigrants_aged_0_to_4"] + tb["all_immigrants_aged_5_to_9"] + tb["all_immigrants_aged_10_to_14"]
     )
     tb["immigrants_under_20"] = tb["immigrants_under_15"] + tb["all_immigrants_aged_15_to_19"]
 
+    # share of migrants under 15 and 20 in total population
     tb["share_of_immigrants_under_15"] = tb["immigrants_under_15"] / (tb["total_population"] / 1000)
     tb["share_of_immigrants_under_20"] = tb["immigrants_under_20"] / (tb["total_population"] / 1000)
 
+    # total change in migrants over 5 years
     tb["immigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "immigrants_all"), axis=1)
     tb["emigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "emigrants_all"), axis=1)
 
+    # change in migrants over 5 years per 1000 people
     tb["immigrants_change_5_years_per_1000"] = tb["immigrants_change_5_years"] / (tb["total_population"] / 1000)
     tb["emigrants_change_5_years_per_1000"] = tb["emigrants_change_5_years"] / (tb["total_population"] / 1000)
 
+    # share of emigrants in total population in home country
     tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
 
+    # adjust dtype for change columns and add back metadata
     change_cols = [
         "immigrants_change_5_years",
         "emigrants_change_5_years",
@@ -243,6 +260,7 @@ def run(dest_dir: str) -> None:
 
     tb = add_metadata(tb, change_cols, "year")
 
+    # drop total population columns
     tb = tb.drop(columns=["total_population", "male_population", "female_population"])
 
     tb = tb.format(["country", "year"])
@@ -271,7 +289,7 @@ def migrant_change_5_years(tb, tb_row, col_name):
             return float(tb_row[col_name] - tb_prev[col_name])
 
 
-def format_table(tb, country_cols, value_name, value_factor=1):
+def format_table(tb, country_cols, value_name):
     """Formats tables from UN DESA data to have consistent country, year, and value columns by:
     - Melting the table to have a year column
     - Cleaning year & country column to have consistent values
@@ -280,6 +298,7 @@ def format_table(tb, country_cols, value_name, value_factor=1):
     - Adding metadata to the table
     - Harmonizing column and country names
     """
+    # melt table to remove all extra year columns for different sexes
     tb = tb.melt(
         id_vars=country_cols,
         value_vars=ALL_YEARS,
@@ -297,16 +316,16 @@ def format_table(tb, country_cols, value_name, value_factor=1):
     for col in country_cols:
         tb[col] = tb[col].str.strip()
 
+    # change dtype to numeric
     tb[value_name] = pd.to_numeric(tb[value_name], errors="coerce")
-    tb = tb.pivot_table(index=country_cols + ["year"], columns="sex", values=value_name).reset_index()
 
-    # scale values where necessary
-    for col in ["all sexes", "females", "males"]:
-        tb[col] = tb[col] * value_factor
+    # pivot table to have one row per country and year and have values for sexes in extra columns
+    tb = tb.pivot_table(index=country_cols + ["year"], columns="sex", values=value_name).reset_index()
 
     # add metadata
     tb = add_metadata(tb, ["all sexes", "females", "males"], "year")
 
+    # rename columns
     tb = tb.rename(
         columns={
             "all sexes": f"{value_name}_all_sexes",
@@ -314,7 +333,7 @@ def format_table(tb, country_cols, value_name, value_factor=1):
             "males": f"{value_name}_male",
         }
     )
-
+    # harmonize country names
     for cnt in country_cols:
         tb = geo.harmonize_countries(
             df=tb, countries_file=paths.country_mapping_path, country_col=cnt, warn_on_unused_countries=False
@@ -326,12 +345,14 @@ def format_table(tb, country_cols, value_name, value_factor=1):
     return tb
 
 
+# Add metadata to columns after e.g. pivoting or changing dtype
 def add_metadata(tb: Table, cols_wo_metadata: list, col_with_metadata: str):
     for col in cols_wo_metadata:
         tb[col] = tb[col].copy_metadata(tb[col_with_metadata])
     return tb
 
 
+# Deduce sex for year column name
 def year_to_sex(year):
     if year in BOTH_SEXES:
         return "all sexes"

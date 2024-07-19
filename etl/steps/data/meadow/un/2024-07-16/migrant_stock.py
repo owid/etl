@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap_destination = paths.load_snapshot("migrant_stock_dest.xlsx")
     snap_sex_age = paths.load_snapshot("migrant_stock_age_sex.xlsx")
 
-    # read and format tables one by one
+    ## read and format tables one by one
     # data on destination and origin - table 1
     tb_do = snap_dest_origin.read_excel(sheet_name="Table 1", header=10)
 
@@ -31,11 +31,12 @@ def run(dest_dir: str) -> None:
         "Region, development group, country or area of origin": "country_origin",
     }
 
+    # drop columns and rename them
     tb_do = drop_and_rename_columns(tb_do, do_cols_to_drop, do_cols_rename)
     tb_do = tb_do.format("index")
     tb_do.metadata.short_name = "migrant_stock_dest_origin"
 
-    # data on destination - table 1 (and table 3
+    # data on destination - table 1 (total number of migrants) and table 3 (share of migrants)
     des_cols_to_drop = ["Notes", "Location code", "Unnamed: 0", "Type of data"]
     cols_rename = {
         "Region, development group, country or area": "country",
@@ -67,7 +68,7 @@ def run(dest_dir: str) -> None:
 
     tb_o.metadata.short_name = "migrant_stock_origin"
 
-    # data on age and sex - table 1 (total), table 2 (population per age) and table 4 (share per age group)
+    # data on age and sex - table 1 (total), table 2 (total population) and table 4 (share per age group)
     tb_sa_total = snap_sex_age.read_excel(sheet_name="Table 1", header=10)
     tb_pop = snap_sex_age.read_excel(sheet_name="Table 2", header=10)
     tb_sa_share = snap_sex_age.read_excel(sheet_name="Table 4", header=10)
@@ -110,6 +111,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
+# helper function to drop and rename columns, including converting to string and cleaning column names
 def drop_and_rename_columns(tb, cols_to_drop, cols_rename):
     tb = tb.drop(columns=cols_to_drop)
     tb = tb.rename(columns=cols_rename)
