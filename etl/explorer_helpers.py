@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 import pandas as pd
 from structlog import get_logger
 
+from etl.db import get_variables_data
 from etl.paths import BASE_DIR
 
 # Initialize logger.
@@ -123,7 +124,7 @@ class Explorer:
 
         if "variableId" in df.columns:
             # Convert string variable ids to integers.
-            df["variableId"] = df["variableId"].astype(int)
+            df["variableId"] = df["variableId"].astype("Int64")
 
         if "yVariableIds" in df.columns:
             # Convert "yVariableIds" into a list of integers.
@@ -165,7 +166,7 @@ class Explorer:
             ]
 
         if "variableId" in df.columns:
-            df["variableId"] = df["variableId"].astype(int)
+            df["variableId"] = df["variableId"].astype("Int64")
 
         # Convert boolean columns to strings of true, false.
         for column in df.select_dtypes(include="bool").columns:
@@ -237,3 +238,69 @@ class Explorer:
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {variable_id}")
 
         return variable_config
+
+    def check(self) -> None:
+        # TODO: Create checks that raise warnings and errors if the explorer has formatting issue.
+        log.warning("Function not yet implemented!")
+        pass
+
+    def convert_ids_to_etl_paths(self) -> None:
+        # Gather all variable ids from the graphers and columns tables.
+        variable_ids_from_graphers = sorted(
+            [
+                variable_id
+                for variable_id in set(sum(self.df_graphers["yVariableIds"].tolist(), []))
+                if str(variable_id).isnumeric()
+            ]
+        )
+        variable_ids = variable_ids_from_graphers
+        if "variableId" in self.df_columns:
+            variable_ids_from_columns = sorted(
+                [
+                    variable_id
+                    for variable_id in set(self.df_columns["variableId"].tolist())
+                    if str(variable_id).isnumeric()
+                ]
+            )
+            variable_ids = sorted(set(variable_ids + variable_ids_from_columns))
+
+        if len(variable_ids) == 0:
+            log.warning("No variable ids found.")
+        else:
+            # Fetch the catalog paths for all required variables from database.
+            df_from_db = get_variables_data(filter={"id": variable_ids})[["id", "catalogPath"]]
+            # Warn if any variable id has no catalog path.
+            variable_ids_missing = df_from_db[df_from_db["catalogPath"].isna()]["id"].to_list()
+            if any(variable_ids_missing):
+                log.warning(f"Missing catalog paths for {len(variable_ids_missing)} variables: {variable_ids_missing}")
+                df_from_db = df_from_db.dropna(subset=["catalogPath"])
+            # Create a dictionary that maps variable ids (for all required variables) to etl paths.
+            id_to_etl_path = df_from_db.set_index("id").to_dict()["catalogPath"]
+
+        # Map variable ids to etl paths in the graphers table, whenever possible.
+        self.df_graphers["yVariableIds"] = self.df_graphers["yVariableIds"].apply(
+            lambda x: [
+                id_to_etl_path.get(variable_id) if variable_id in id_to_etl_path else variable_id for variable_id in x
+            ]
+        )
+
+        # Map variable ids to etl paths in the columns table, whenever possible.
+        # Here, I assume that, if there is a catalog path, then add it to the catalogPath column, and make the value in variableId None.
+        # And, if there is no catalog path, then keep the variableId as it is, and make catalogPath None.
+        self.df_columns["catalogPath"] = self.df_columns["variableId"].apply(
+            lambda x: id_to_etl_path.get(x) if x in id_to_etl_path else None
+        )
+        self.df_columns["variableId"] = self.df_columns["variableId"].apply(
+            lambda x: None if x in id_to_etl_path else x
+        )
+        # For convenienve, ensure the first columns are variableId and catalogPath.
+        self.df_columns = self.df_columns[
+            ["variableId", "catalogPath"]
+            + [col for col in self.df_columns.columns if col not in ["variableId", "catalogPath"]]
+        ]
+        # If there is no catalog path, remove the column.
+        if self.df_columns["catalogPath"].isna().all():
+            self.df_columns = self.df_columns.drop(columns=["catalogPath"])
+        # If there is no variableId, remove the column.
+        if self.df_columns["variableId"].isna().all():
+            self.df_columns = self.df_columns.drop(columns=["variableId"])
