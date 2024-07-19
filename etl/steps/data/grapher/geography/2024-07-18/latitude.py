@@ -1,5 +1,8 @@
 """Load a garden dataset and create a grapher dataset."""
 
+from owid.catalog import Table
+from owid.catalog import processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,7 +19,7 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["nat_earth_110"].reset_index()
     tb = tb[["name", "latitude_centroid", "absolute_latitude"]]
-    tb["year"] = 2024
+    # tb["year"] = 2024
     tb = tb.rename(columns={"name": "country"})
     # Remove entities that are not in the DB - they are needed for another use of this dataset, so I didn't want to remove them in garden
     entities_to_remove = [
@@ -43,6 +46,7 @@ def run(dest_dir: str) -> None:
     ]
     tb = tb[~tb["country"].isin(entities_to_remove)]
     # Process data.
+    tb = add_each_year(tb)
     #
     tb = tb.format(["country", "year"])
     #
@@ -55,3 +59,17 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
+
+
+def add_each_year(tb: Table) -> Table:
+    """
+    Duplicate the data for each year between 1900 and 2100.
+    """
+    years = range(1900, 2101)
+    tables = []
+    for year in years:
+        tb_copy = tb.copy()  # Create a copy of the DataFrame to avoid modifying the original
+        tb_copy["year"] = year  # Add the year as a new column
+        tables.append(tb_copy)
+    tb = pr.concat(tables)
+    return tables
