@@ -4,14 +4,11 @@ from typing import Any, Dict, List, Optional, Union
 import pandas as pd
 from structlog import get_logger
 
+from etl.config import EXPLORERS_DIR
 from etl.db import get_variables_data
-from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
-
-# Default path to the explorers folder.
-EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 
 
 class Explorer:
@@ -26,7 +23,7 @@ class Explorer:
 
     def __init__(self, name: str):
         self.name = name
-        self.path = (EXPLORERS_DIR / name).with_suffix(".explorer.tsv")
+        self.path = (Path(EXPLORERS_DIR) / name).with_suffix(".explorer.tsv")
 
         # Initialize all required internal attributes.
         # Text content of an explorer file.

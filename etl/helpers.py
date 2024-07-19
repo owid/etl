@@ -33,6 +33,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.config import EXPLORERS
 from etl.explorer_helpers import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
@@ -1060,8 +1061,9 @@ class DatasetAndExplorer:
     def save(self):
         # Save ETL dataset to disk.
         self.dataset.save()
-        # Write explorer tsv file to disk.
-        self.explorer.write()
+        if EXPLORERS:
+            # Write explorer tsv file to disk.
+            self.explorer.write()
 
 
 def create_explorer(
