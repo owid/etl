@@ -1,0 +1,58 @@
+steps:
+  #
+  # IEA - Critical minerals.
+  #
+  data://meadow/iea/2024-07-04/critical_minerals:
+    - snapshot://iea/2024-07-04/critical_minerals.xlsx
+  #
+  # IEA - Critical minerals.
+  #
+  data://garden/iea/2024-07-04/critical_minerals:
+    - data://meadow/iea/2024-07-04/critical_minerals
+  #
+  # BGS - World Mineral Statistics.
+  #
+  data://meadow/bgs/2024-07-09/world_mineral_statistics:
+    - snapshot://bgs/2024-07-09/world_mineral_statistics.zip
+  #
+  # BGS - World Mineral Statistics.
+  #
+  data://garden/bgs/2024-07-09/world_mineral_statistics:
+    - data://meadow/bgs/2024-07-09/world_mineral_statistics
+  #
+  # USGS - Historical statistics for mineral and material commodities.
+  #
+  data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
+    - snapshot://usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities.zip
+  #
+  # USGS - Historical statistics for mineral and material commodities.
+  #
+  data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
+    - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
+    - data://garden/bls/2024-05-16/us_consumer_prices
+  #
+  # USGS - Mineral commodity summaries.
+  #
+  # NOTE: There is no meadow step, as processing and harmonization are tightly coupled.
+  data://garden/usgs/2024-07-15/mineral_commodity_summaries:
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2022.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
+    - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
+  #
+  # Minerals - Minerals.
+  #
+  # Compilation of minerals data from different origins.
+  data://garden/minerals/2024-07-15/minerals:
+    - data://garden/bgs/2024-07-09/world_mineral_statistics
+    - data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
+    - data://garden/usgs/2024-07-15/mineral_commodity_summaries
+  #
+  # Minerals - Minerals.
+  #
+  data://grapher/minerals/2024-07-15/minerals:
+    - data://garden/minerals/2024-07-15/minerals
+  #
+  # Minerals - Minerals explorer.
+  #
+  data://explorers/minerals/latest/minerals:
+    - data://grapher/minerals/2024-07-15/minerals
