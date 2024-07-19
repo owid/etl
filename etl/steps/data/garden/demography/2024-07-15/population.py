@@ -379,6 +379,13 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     sources = tb.loc[:, ["country", "year", "source"]].copy()
     tb = tb.drop(columns=["source"])
 
+    # Split historical vs current countries
+    ## This is because it looks like historical countries are being considered when estimating values for regions.
+    tb_regions = ds_regions["regions"]
+    historical_regions = set(tb_regions.loc[tb_regions["is_historical"], "name"])
+    tb_historical = tb.loc[tb["country"].isin(historical_regions)]
+    tb = tb.loc[~tb["country"].isin(historical_regions)]
+
     # re-estimate region aggregates
     aggregations = {"population": "sum"}
     tb = geo.add_regions_to_table(
@@ -434,6 +441,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
             ],
         },
     )
+
+    # Add historical countries back
+    tb = pr.concat([tb, tb_historical], ignore_index=True)
 
     # tb = tb.loc[
     #     (
