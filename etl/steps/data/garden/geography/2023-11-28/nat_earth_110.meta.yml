@@ -27,6 +27,10 @@ tables:
         display:
           numDecimalPlaces: 2
           tolerance: 20
+        presentation:
+          grapher_config:
+            note: |-
+              The latitude is given of the [centroid](#dod:centroid) of the country.
       absolute_latitude:
         title: Absolute latitude
         description_short: The absolute value of the latitude of the centroid of the country.
@@ -35,4 +39,8 @@ tables:
         display:
           numDecimalPlaces: 2
           tolerance: 20
+        presentation:
+          grapher_config:
+            note: |-
+              The latitude is given of the [centroid](#dod:centroid) of the country.
 
