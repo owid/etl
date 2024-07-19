@@ -1,5 +1,3 @@
-"""Load a meadow dataset and create a garden dataset."""
-
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -214,7 +212,7 @@ def run(dest_dir: str) -> None:
     tb = pr.multi_merge(
         [tb_d_total, tb_d_share, tb_o, tb_sa_total, tb_sa_share, tb_pop], on=["country", "year"], how="outer"
     )
-    tb.metadata.short_name = "un_migrant_stock"
+    tb.metadata.short_name = "migrant_stock"
 
     # Calculate missing values: under 15 y/o migrants, under 20 y/o migrants, share of these in total population, 5 year change in migrants, share of total population
     tb["immigrants_under_15"] = (
@@ -231,7 +229,7 @@ def run(dest_dir: str) -> None:
     tb["immigrants_change_5_years_per_1000"] = tb["immigrants_change_5_years"] / (tb["total_population"] / 1000)
     tb["emigrants_change_5_years_per_1000"] = tb["emigrants_change_5_years"] / (tb["total_population"] / 1000)
 
-    tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"] / 1000)
+    tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
 
     change_cols = [
         "immigrants_change_5_years",

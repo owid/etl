@@ -263,3 +263,5 @@ steps:
     - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
   data://garden/un/2024-07-16/migrant_stock:
     - data://meadow/un/2024-07-16/migrant_stock
+  data://grapher/un/2024-07-16/migration_stock:
+    - data://garden/un/2024-07-16/migration_stock
