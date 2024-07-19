@@ -72,4 +72,4 @@ def add_each_year(tb: Table) -> Table:
         tb_copy["year"] = year  # Add the year as a new column
         tables.append(tb_copy)
     tb = pr.concat(tables)
-    return tables
+    return tb
