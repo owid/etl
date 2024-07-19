@@ -147,7 +147,7 @@ class Explorer:
 
         if "colorScaleNumericMinValue" in df.columns:
             # Convert strings of numbers to floats.
-            df["colorScaleNumericMinValue"] = df["colorScaleNumericMinValue"].astype(float)
+            df["colorScaleNumericMinValue"] = df["colorScaleNumericMinValue"].replace("", None).astype(float)
 
         return df
 
