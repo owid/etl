@@ -3,7 +3,7 @@ Scripts in this folder must be run in this order:
  1. snapshots/forests/2024-07-10/dominant_driver.py
  2. snapshots/forests/2024-07-10/reproject_raster.py
  3. Manual upload of the reprojected raster to Earth Engine assets
- 4. snapshots/forests/2024-07-10/earth_engine.py
+ 4. python snapshots/forests/2024-07-10/earth_engine.py
 
 
 To run this script you need to set up a Google Earth Engine account and authenticate it - visit here to set up an account: https://code.earthengine.google.com/ and to start a new project.
@@ -25,7 +25,6 @@ DEBUG = False
 @click.command()
 @click.option(
     "--chunk_size",
-    prompt="Please enter the chunk size",
     type=int,
     default=100,
     show_default=True,
@@ -33,7 +32,6 @@ DEBUG = False
 )
 @click.option(
     "--starting_point",
-    prompt="Please enter the starting point",
     type=int,
     default=1,
     show_default=True,
