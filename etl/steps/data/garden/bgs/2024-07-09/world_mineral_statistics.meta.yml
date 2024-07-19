@@ -1,14 +1,19 @@
 definitions:
   common:
     presentation:
+      attribution_short: BGS
       topic_tags:
         - Energy
 
 dataset:
   update_period_days: 365
 
-
 tables:
   world_mineral_statistics:
     variables:
-      {}
+      exports:
+        title: Exports of commodities
+      imports:
+        title: Imports of commodities
+      production:
+        title: Production of commodities

@@ -25,8 +25,16 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Pivot table to have a column for each category.
+    tb = tb.pivot(
+        index=["country", "year", "commodity", "sub_commodity"],
+        columns="category",
+        values="value",
+        join_column_levels_with="_",
+    )
+
     # Format table conveniently.
-    tb = tb.format(["country", "year", "category", "commodity", "sub_commodity"])
+    tb = tb.format(["country", "year", "commodity", "sub_commodity"])
 
     #
     # Save outputs.

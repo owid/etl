@@ -560,8 +560,19 @@ def run(dest_dir: str) -> None:
     # Create a table with metadata.
     tb = pr.read_from_df(df, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)  # type: ignore
 
+    # For convenience (and for consistency with other similar datasets) rename columns.
+    tb = tb.rename(
+        columns={
+            "Mineral": "commodity",
+            "Type": "sub_commodity",
+            "Reserves_t": "reserves",
+            "Production_t": "production",
+        },
+        errors="raise",
+    )
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "mineral", "type"], short_name=paths.short_name)
+    tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
 
     #
     # Save outputs.
