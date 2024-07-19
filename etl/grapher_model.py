@@ -251,7 +251,7 @@ class Chart(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
-    is_indexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
+    isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     slug: Mapped[str] = mapped_column(
         VARCHAR(255), Computed("(json_unquote(json_extract(`config`,_utf8mb4'$.slug')))", persisted=False)
     )

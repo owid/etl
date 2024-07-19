@@ -3,15 +3,15 @@ steps:
   # Population #######################
   ####################################
 
-  # Population
+  # Population OMM #############################
+  # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2022-12-08/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
     - data://garden/un/2022-07-11/un_wpp
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-  data://grapher/demography/2023-03-30/population:
-    - data://garden/demography/2022-12-08/population
 
+  # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2023-03-31/population
@@ -21,6 +21,23 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
+
+  # 2024-07-15: HYDE 3.3 + Gapminder + UN WPP 2024
+  data://garden/demography/2024-07-15/population:
+    # HYDE 3.3
+    - data://garden/hyde/2024-01-02/all_indicators
+    # Gapminder v7
+    - data://garden/gapminder/2023-03-31/population
+    # Gapminder Systema Globalis
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    # UN WPP (2024)
+    - data://garden/un/2024-07-12/un_wpp
+    # Auxiliary
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl
+  data://grapher/demography/2024-07-15/population:
+    - data://garden/demography/2024-07-15/population
 
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
@@ -51,52 +68,6 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2024-07-12/un_wpp_historical:
     - data://garden/demography/2024-07-12/un_wpp_historical
-
-
-
-  # WPP (2024) [under embargo]
-  data-private://meadow/un/2024-07-11/un_wpp:
-    ## Population
-    - snapshot-private://un/2024-07-11/un_wpp_population.csv
-    - snapshot-private://un/2024-07-11/un_wpp_population_density.xlsx
-    ## Population doubling times
-    - snapshot-private://un/2024-07-11/un_wpp_population_doubling.xlsx
-    ## Growth
-    - snapshot-private://un/2024-07-11/un_wpp_growth_rate.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_nat_change_rate.xlsx
-    ## Fertility
-    - snapshot-private://un/2024-07-11/un_wpp_fert_rate_tot.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_fert_rate_age.xlsx
-    ## Migration
-    - snapshot-private://un/2024-07-11/un_wpp_migration.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_migration_rate.xlsx
-    ## Deaths
-    - snapshot-private://un/2024-07-11/un_wpp_deaths.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_deaths_age.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_deaths_age_fem.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_deaths_age_male.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_death_rate.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_child_mortality.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_infant_mortality.xlsx
-    ## Births
-    - snapshot-private://un/2024-07-11/un_wpp_births_age.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_births_sex.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_birth_rate.xlsx
-    ## Median age
-    - snapshot-private://un/2024-07-11/un_wpp_median_age.xlsx
-    ## Child bearing age
-    - snapshot-private://un/2024-07-11/un_wpp_childbearing_age.xlsx
-    ## Life expectancy
-    - snapshot-private://un/2024-07-11/un_wpp_le.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_le_f.xlsx
-    - snapshot-private://un/2024-07-11/un_wpp_le_m.xlsx
-
-  data-private://garden/un/2024-07-11/un_wpp:
-    - data-private://meadow/un/2024-07-11/un_wpp
-  data-private://grapher/un/2024-07-11/un_wpp:
-    - data-private://garden/un/2024-07-11/un_wpp
-  data-private://grapher/un/2024-07-11/un_wpp_full:
-    - data-private://garden/un/2024-07-11/un_wpp
 
   # Population (Fariss et al.)
   data://meadow/demography/2023-12-20/population_fariss:
@@ -138,13 +109,6 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison
-
-  # Population density
-  data://garden/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/faostat/2024-03-14/faostat_rl
-  data://grapher/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-06-12/population_density
 
   ####################################
   # Life expectancy ##################
