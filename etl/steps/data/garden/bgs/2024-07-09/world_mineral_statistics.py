@@ -33,6 +33,9 @@ def run(dest_dir: str) -> None:
         join_column_levels_with="_",
     )
 
+    # Improve the name of the commodities.
+    tb["commodity"] = tb["commodity"].str.capitalize()
+
     # Format table conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"])
 
