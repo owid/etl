@@ -251,7 +251,7 @@ The schema is provided in yaml below. The top level array represents the tables,
       - name: publishedByUserId
         fkTargetTable: users
         fkTargetColumn: id
-      - name: is_indexable
+      - name: isIndexable
       - name: title
       - name: subtitle
       - name: note
