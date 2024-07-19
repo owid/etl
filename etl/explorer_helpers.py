@@ -14,7 +14,11 @@ EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 
 
 class Explorer:
-    """Explorer object, that lets us parse an explorer file, modify its content, and write to a tsv file.
+    """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
+
+    The only argument required is the name of the explorer file (without the path or the ".explorer.tsv" extension).
+    To access or modify the content of the explorer, simply work with the df_graphers and df_columns dataframes.
+    Then, to write the changes to the explorer file, call the write() method.
 
     NOTE: For now, this class is only adapted to indicator-based explorers!
     """
@@ -22,8 +26,29 @@ class Explorer:
     def __init__(self, name: str):
         self.name = name
         self.path = (EXPLORERS_DIR / name).with_suffix(".explorer.tsv")
-        self._load_content()
-        self._parse_content()
+
+        # Initialize all required internal attributes.
+        # Text content of an explorer file.
+        self.content = ""
+        # Comments at the beginning of the explorer file.
+        self.comments = []
+        # Configuration of the explorer (defined at the beginning of the file).
+        self.config = {
+            "explorerTitle": self.name,
+            "isPublished": "false",
+        }
+        # Graphers table of the explorer.
+        self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
+        # Columns table of the explorer.
+        self.df_columns = pd.DataFrame([], columns=["variableId"])
+
+        if self.path.exists():
+            log.info(f"Loading explorer file {self.path}.")
+            # Read explorer from existing file.
+            self._load_content()
+            self._parse_content()
+        else:
+            log.info(f"Initializing a new explorer file {self.path} from scratch.")
 
     def _load_content(self):
         # Load content of explorer file as a string.
