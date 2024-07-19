@@ -127,9 +127,12 @@ class Explorer:
             df["variableId"] = df["variableId"].astype("Int64")
 
         if "yVariableIds" in df.columns:
-            # Convert "yVariableIds" into a list of integers.
+            # Convert "yVariableIds" into a list of integers, or strings (if they are catalog paths).
             df["yVariableIds"] = [
-                [int(variable_id) for variable_id in variable_ids.split(" ") if variable_id.isnumeric()]
+                [
+                    int(variable_id) if variable_id.isnumeric() else variable_id
+                    for variable_id in variable_ids.split(" ")
+                ]
                 for variable_ids in df["yVariableIds"]
             ]
 
