@@ -1,5 +1,7 @@
 definitions:
   common:
+    unit: tonnes
+    short_unit: t
     presentation:
       attribution_short: BGS
       topic_tags:
