@@ -201,12 +201,12 @@
   "S\u00e3o Tom\u00e9 and Pr\u00edncipe": "Sao Tome and Principe",
   "Vatican City": "Vatican",
   "OECD": "OECD",
-  "Five Eyes": "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
-  "Global Partnership on Artificial Intelligence": "Global Partnership on Artificial Intelligence",
-  "Latin America and the Caribbean": "Latin America and the Caribbean",
+  "Five Eyes": "Five Eyes (Australia, Canada, New Zealand, UK, and the US) (CSET)",
+  "Global Partnership on Artificial Intelligence": "Global Partnership on Artificial Intelligence (CSET)",
+  "Latin America and the Caribbean": "Latin America and the Caribbean (CSET)",
   "NATO": "NATO",
-  "Northern America": "North America",
-  "Quad": "Quad (Australia, India, Japan and the US)",
-  "ASEAN": "ASEAN (Association of Southeast Asian Nations)",
-  "Asia Pacific": "Asia Pacific"
+  "Northern America": "North America (CSET)",
+  "Quad": "Quad (Australia, India, Japan and the US) (CSET)",
+  "ASEAN": "ASEAN (Association of Southeast Asian Nations) (CSET)",
+  "Asia Pacific": "Asia Pacific (CSET)"
 }

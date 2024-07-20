@@ -49,7 +49,7 @@ tables:
     variables:
       disclosed_investment:
         title: Disclosed investment
-        unit: US dollars
+        unit: constant 2021 US$
         short_unit: $
         description_short: |-
           {definitions.description_short_investment}
@@ -64,7 +64,7 @@ tables:
 
       investment_estimated:
         title: Estimated investment
-        unit: US dollars
+        unit: constant 2021 US$
         short_unit: $
         description_short: |-
           {definitions.description_short_investment}
@@ -80,7 +80,7 @@ tables:
 
       disclosed_investment_summary:
         title: Total disclosed investment
-        unit: US dollars
+        unit: constant 2021 US$
         short_unit: $
         description_short: Total disclosed investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-
@@ -94,7 +94,7 @@ tables:
 
       estimated_investment_summary:
         title: Total estimated investment
-        unit: US dollars
+        unit: constant 2021 US$
         short_unit: $
         description_short: Total estimated investment between 2013-2023. {definitions.description_short_investment}
         description_processing: |-

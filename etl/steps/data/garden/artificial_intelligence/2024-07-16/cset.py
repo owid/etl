@@ -14,7 +14,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     # Create a deep copy of the input table to avoid modifying the original data
     tb_with_regions = tb.copy()
 
-    # List of members representing different regions CSET and use these for World aggregation
+    # List of members representing different regions CSET and don't use these for World aggregation
     members = [
         "North America",
         "Europe",
