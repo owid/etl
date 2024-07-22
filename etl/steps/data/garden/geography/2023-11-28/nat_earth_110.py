@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from shapely import wkt
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -16,14 +18,21 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["nat_earth_110"].reset_index()
+    # Convert the geometry string column to a Shapely object.
+    tb["geometry_wkt"] = tb["geometry"].apply(wkt.loads)
 
+    tb["latitude_centroid"] = tb["geometry_wkt"].apply(calculate_centroid_latitude)
+    # Convert from string to float
+    tb["latitude_centroid"] = tb["latitude_centroid"].astype(float)
+    # Create an absolute version
+    tb["absolute_latitude"] = tb["latitude_centroid"].abs()
+    # Drop the geometry wkt column
+    tb = tb.drop("geometry_wkt", axis=1)
     #
     # Process data.
     #
     tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        country_col="name",
+        df=tb, countries_file=paths.country_mapping_path, country_col="name", warn_on_missing_countries=False
     )
     tb = tb.set_index(
         [
@@ -42,3 +51,7 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_centroid_latitude(geometry):
+    return geometry.centroid.y
