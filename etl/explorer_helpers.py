@@ -183,8 +183,19 @@ class Explorer:
         # Any comments in a line in the middle of the explorer will be brought to the beginning.
         comments_part = self.comments
 
-        # Reconstruct the config section
-        config_part = [f"{key}\t{value}" if value else key for key, value in self.config.items()]
+        # Reconstruct the config section.
+        config_part = []
+        for key, value in self.config.items():
+            if value is not None:
+                if isinstance(value, list):
+                    # Special case that happens at least for the "selection" key, which is a list of strings.
+                    config_part_row = f"{key}\t" + "\t".join(value)
+                else:
+                    # Normal case, where value is just one item.
+                    config_part_row = f"{key}\t{value}"
+            else:
+                config_part_row = f"{key}"
+            config_part.append(config_part_row)
 
         # Reconstruct the graphers section.
         graphers_part = ["graphers"] + self._df_to_lines(df=self.df_graphers)
