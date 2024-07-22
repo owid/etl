@@ -676,13 +676,13 @@ def interpolate_table(
 
     df = (
         df.set_index([country_col, year_col])
-        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col]))
+        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col]))  # type: ignore
         .sort_index()
     )
 
     df = (
         df.groupby(country_col)
-        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))
+        .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
         .reset_index()
     )
 
