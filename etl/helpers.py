@@ -33,7 +33,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.config import EXPLORERS
+from etl.config import EXPLORER
 from etl.explorer_helpers import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
@@ -613,6 +613,13 @@ class PathFinder:
             )
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
+        # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
+        if (len(matches) == 0) and (channel == "grapher"):
+            pattern = self.create_step_name(
+                channel="grapher", namespace=namespace, version=version, short_name=short_name, is_private=is_private
+            )
+            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
@@ -1061,9 +1068,12 @@ class DatasetAndExplorer:
     def save(self):
         # Save ETL dataset to disk.
         self.dataset.save()
-        if EXPLORERS:
+        if EXPLORER:
+            log.info(f"Writing explorer tsv file: {self.explorer.name}")
             # Write explorer tsv file to disk.
             self.explorer.write()
+        else:
+            log.info("No tsv file will be written (to do so, run etl with the '--explorer' flag).")
 
 
 def create_explorer(

@@ -55,4 +55,6 @@ steps:
   # Minerals - Minerals explorer.
   #
   data://explorers/minerals/latest/minerals:
+    # TODO: The following would be the right dependency, but it fails because GrapherStep.checksum_output() is not implemented.
+    # - grapher://grapher/minerals/2024-07-15/minerals
     - data://grapher/minerals/2024-07-15/minerals
