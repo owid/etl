@@ -31,7 +31,7 @@ SHEET_IDS = [
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"forests/{SNAPSHOT_VERSION}/dominant_driver.csv")
+    snap = Snapshot(f"forests/{SNAPSHOT_VERSION}/tree_cover_loss_by_driver.csv")
 
     tables = []
     for sheet_id in SHEET_IDS:
