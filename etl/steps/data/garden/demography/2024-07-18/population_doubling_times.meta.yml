@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Population Growth
+      attribution: HYDE (2023); Gapminder (2022); UN WPP (2024)
 
 dataset:
   title: Population doubling times
