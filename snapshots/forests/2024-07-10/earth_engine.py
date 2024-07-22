@@ -1,3 +1,4 @@
+# type: ignore
 """
 Scripts in this folder must be run in this order:
  1. snapshots/forests/2024-07-10/dominant_driver.py
