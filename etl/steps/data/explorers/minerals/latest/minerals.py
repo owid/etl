@@ -46,6 +46,11 @@ def run(dest_dir: str) -> None:
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
 
+    # Sort rows conveniently.
+    df_graphers = df_graphers.sort_values(
+        ["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown", "Source Dropdown"]
+    ).reset_index(drop=True)
+
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals",

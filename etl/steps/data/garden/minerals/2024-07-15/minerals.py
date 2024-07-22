@@ -14,13 +14,17 @@ def run(dest_dir: str) -> None:
     #
     # Load datasets.
     ds_bgs = paths.load_dataset("world_mineral_statistics")
-    ds_usgs_historical = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
+    # ds_usgs_historical = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_bgs = ds_bgs.read_table("world_mineral_statistics")
-    tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
-    tb_usgs = ds_usgs.read_table("mineral_commodity_summaries")
+    tb_bgs = ds_bgs["world_mineral_statistics"].astype(float).reset_index()
+    tb_usgs = (
+        ds_usgs["mineral_commodity_summaries"]
+        .drop(columns=["reserves_notes", "production_notes"])
+        .astype(float)
+        .reset_index()
+    )
 
     #
     # Process data.
