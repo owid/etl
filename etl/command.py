@@ -19,11 +19,14 @@ from graphlib import TopologicalSorter
 from multiprocessing import Manager
 from os import environ
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Set, get_args
 
 import rich_click as click
 import structlog
+from dask.distributed import LocalCluster
 from ipdb import launch_ipdb_on_exception
+from prefect import flow, task, task_runners
+from prefect_dask import DaskTaskRunner
 
 from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
@@ -44,6 +47,8 @@ config.enable_bugsnag()
 LIMIT_NOFILE = 4096
 
 log = structlog.get_logger()
+
+ENGINE = Literal["etl", "prefect"]
 
 
 @click.command(name="run")
@@ -139,6 +144,13 @@ log = structlog.get_logger()
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
 )
+@click.option(
+    "--engine",
+    "-e",
+    type=click.Choice(get_args(ENGINE)),
+    help="Run ETL infinitely and update changed files.",
+    default="etl",
+)
 @click.argument(
     "steps",
     nargs=-1,
@@ -161,6 +173,7 @@ def main_cli(
     use_threads: bool = True,
     strict: Optional[bool] = None,
     watch: bool = False,
+    engine: ENGINE = "etl",
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -210,6 +223,7 @@ def main_cli(
         dag_path=dag_path,
         workers=workers,
         strict=strict,
+        engine=engine,
     )
 
     if watch:
@@ -243,6 +257,7 @@ def main(
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
     strict: Optional[bool] = None,
+    engine: ENGINE = "etl",
 ) -> None:
     """
     Execute all ETL steps listed in dag file.
@@ -272,6 +287,7 @@ def main(
         excludes=excludes,
         workers=workers,
         strict=strict,
+        engine=engine,
     )
 
 
@@ -320,6 +336,7 @@ def run_dag(
     excludes: Optional[List[str]] = None,
     workers: int = 1,
     strict: Optional[bool] = None,
+    engine: ENGINE = "etl",
 ) -> None:
     """
     Run the selected steps, and anything that needs updating based on them. An empty
@@ -374,16 +391,37 @@ def run_dag(
             f"--- Would run {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
         )
         return enumerate_steps(steps)
-    elif workers == 1:
-        print(
-            f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
-        )
-        return exec_steps(steps, strict=strict)
-    else:
-        print(
-            f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
-        )
-        return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
+
+    if engine == "etl":
+        if workers == 1:
+            print(
+                f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+            )
+            return exec_steps(steps, strict=strict)
+        else:
+            print(
+                f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
+            )
+            return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
+
+    elif engine == "prefect":
+        if workers == 1:
+            task_runner = task_runners.ConcurrentTaskRunner()
+            # task_runner = task_runners.SequentialTaskRunner()
+        else:
+            cluster = LocalCluster(n_workers=workers)
+            task_runner = DaskTaskRunner(cluster=cluster)
+
+        @flow(log_prints=True, task_runner=task_runner)
+        def run_etl(steps):
+            task_futures = {}
+
+            for step in steps:
+                # include dependencies that are in the list of steps
+                wait_for = [task_futures[str(dep)] for dep in step.dependencies if str(dep) in task_futures]
+                task_futures[str(step)] = task(name=str(step))(step.run).submit(wait_for=wait_for)
+
+        return run_etl(steps)
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:

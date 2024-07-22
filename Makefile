@@ -165,3 +165,11 @@ fasttrack: .venv
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	poetry run etlwiz
+
+prefect-ui: .venv
+	@echo '--- Starting Prefect UI at http://0.0.0.0:4200'
+	poetry run prefect server start --host 0.0.0.0
+
+prefect-reset: .venv
+	@echo '--- Resetting Prefect database'
+	poetry run prefect server database reset -y

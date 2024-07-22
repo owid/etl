@@ -70,6 +70,8 @@ pymysql = "^1.1.1"
 tiktoken = "^0.7.0"
 earthengine-api = "^0.1.411"
 python-docx = "^1.1.2"
+prefect = "^2.19.9"
+prefect-dask = "^0.2.9"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
