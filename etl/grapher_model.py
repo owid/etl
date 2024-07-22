@@ -236,16 +236,17 @@ class ChartRevisions(Base):
 
 class ChartConfig(Base):
     __tablename__ = "chart_configs"
-    __table_args__ = (Index("idx_chart_configs_uuid", "uuid", unique=True),)
+    __table_args__ = (Index("idx_chart_configs_slug", "slug"),)
 
-    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True)
-    patchConfig: Mapped[dict] = mapped_column(JSON)
-    config: Mapped[dict] = mapped_column(JSON)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    uuid: Mapped[Optional[str]] = mapped_column(
-        String(36, "utf8mb4_0900_as_cs"), Computed("(bin_to_uuid(`id`,1))", persisted=False)
+    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True, server_default=text("uuid_to_bin(uuid(),1)"))
+    uuid: Mapped[Optional[str]] = mapped_column(String(36), Computed("(bin_to_uuid(`id`,1))", persisted=False))
+    patch: Mapped[dict] = mapped_column(JSON, nullable=False)
+    full: Mapped[dict] = mapped_column(JSON, nullable=False)
+    slug: Mapped[Optional[str]] = mapped_column(
+        String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
     )
-    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
 
     chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
 
@@ -289,22 +290,19 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
-        return self.chart_config.config
+        return self.chart_config.full
 
     @config.expression
     def config(cls):
-        return select(ChartConfig.config).where(ChartConfig.id == cls.configId).scalar_subquery()
+        return select(ChartConfig.full).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @hybrid_property
     def slug(self) -> Optional[str]:  # type: ignore
-        if self.chart_config and self.chart_config.config:
-            return self.chart_config.config.get("slug")
-        return None
+        return self.chart_config.slug
 
     @slug.expression
     def slug(cls):
-        # NOTE: this is really slow because `slug` is in JSON and is not indexed
-        return select(ChartConfig.config["slug"]).where(ChartConfig.id == cls.configId).scalar_subquery()
+        return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
     def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":

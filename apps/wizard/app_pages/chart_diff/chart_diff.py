@@ -607,7 +607,7 @@ def _modified_chart_configs_by_admin(
     base_q = """
     select
         c.id as chartId,
-        MD5(cc.config) as chartChecksum,
+        MD5(cc.full) as chartChecksum,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt

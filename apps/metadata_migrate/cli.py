@@ -105,10 +105,10 @@ def cli(
 
         q = f"""
         SELECT
-            cc.config
+            cc.full as config
         FROM charts c
         JOIN chart_configs cc ON c.configId = cc.id
-        WHERE cc.config->>'$.slug' = '{chart_slug}';
+        WHERE cc.slug = '{chart_slug}';
         """
         df = read_sql(q, engine)
         if df.empty:
@@ -350,7 +350,7 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
     """TODO: This is work in progress! Update this function as you like."""
     q = f"""
     select
-        cc.config
+        cc.full as config
     from variables as v
     join datasets as d on v.datasetId = d.id
     join chart_dimensions as cd on v.id = cd.variableId
