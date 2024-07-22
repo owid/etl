@@ -19,6 +19,8 @@ steps:
   #
   data://garden/bgs/2024-07-09/world_mineral_statistics:
     - data://meadow/bgs/2024-07-09/world_mineral_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
   #
   # USGS - Historical statistics for mineral and material commodities.
   #

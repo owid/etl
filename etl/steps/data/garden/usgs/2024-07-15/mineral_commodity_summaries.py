@@ -335,6 +335,9 @@ def prepare_production_data(d: pd.DataFrame):
             d["Production_notes"] = _include_note(
                 d=d, column="Production_notes", note="Production refers to titanium sponge."
             )
+        if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
+            # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
+            d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
 
         # Create a Year column and a single column for production.
         df_production = pd.DataFrame()

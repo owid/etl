@@ -22,18 +22,27 @@ def run(dest_dir: str) -> None:
     variable_ids = []
     metric_dropdown = []
     commodity_dropdown = []
+    sub_commodity_dropdown = []
+    source_dropdown = []
     for column in tb.drop(columns=["country", "year"]).columns:
         if tb[tb[column].notnull()].empty:
             continue
-        metric = column.split("_")[0].capitalize()
-        commodity = " ".join(column.split("_")[1:]).capitalize()
+        metric, commodity, sub_commodity, source = tb[column].metadata.title.split("|")
+        metric = metric.capitalize()
+        commodity = commodity.capitalize()
+        sub_commodity = sub_commodity.capitalize()
+        source = source.upper()
         variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
         metric_dropdown.append(metric)
         commodity_dropdown.append(commodity)
+        sub_commodity_dropdown.append(sub_commodity)
+        source_dropdown.append(source)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Commodity Dropdown"] = commodity_dropdown
+    df_graphers["Sub-Commodity Dropdown"] = sub_commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
+    df_graphers["Source Dropdown"] = source_dropdown
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
 

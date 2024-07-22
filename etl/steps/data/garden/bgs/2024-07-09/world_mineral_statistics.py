@@ -11,11 +11,15 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("world_mineral_statistics")
-
-    # Read table from meadow dataset.
     tb = ds_meadow.read_table("world_mineral_statistics")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -35,6 +39,21 @@ def run(dest_dir: str) -> None:
 
     # Improve the name of the commodities.
     tb["commodity"] = tb["commodity"].str.capitalize()
+
+    # TODO: There are many issues to be handled:
+    #  * Ensure that all sub-commodities have a "Total".
+    #  * But it seems that these "Total" may not be reliable. For example, for commodity "Coal", the sub-commodity "Total" only has zeros. And there is another sub-commodity "Coal" that may be the actual total.
+    #  * There are many overlapping historical regions.
+
+    # Add regions and income groups to the table.
+    REGIONS = {**geo.REGIONS, **{"World": {}}}
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        index_columns=["country", "year", "commodity", "sub_commodity"],
+    )
 
     # Format table conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"])

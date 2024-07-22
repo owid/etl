@@ -20,17 +20,20 @@ def run(dest_dir: str) -> None:
     # Pivot table to have production for each commodity.
     tb = tb.pivot(
         index=["country", "year"],
-        columns="commodity",
-        values=["imports", "exports", "production"],
-        join_column_levels_with="_",
+        columns=["commodity", "sub_commodity", "source"],
+        values=["imports", "exports", "production", "reserves"],
+        join_column_levels_with="|",
     )
 
     # Improve metadata of new columns.
     for column in tb.drop(columns=["country", "year"]).columns:
-        metric = column.split("_")[0].capitalize()
-        commodity = " ".join(column.split("_")[1:]).capitalize()
-        title = f"{metric} of {commodity}"
-        tb[column].metadata.title = title
+        metric, commodity, sub_commodity, source = column.split("|")
+        metric = metric.capitalize()
+        commodity = commodity.capitalize()
+        sub_commodity = sub_commodity.lower()
+        title_public = f"{metric} of {commodity} ({sub_commodity}), according to {source}"
+        tb[column].metadata.title = column
+        tb[column].metadata.presentation.title_public = title_public
         tb[column].metadata.unit = "tonnes"
         tb[column].metadata.short_unit = "t"
 
