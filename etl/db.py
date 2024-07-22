@@ -258,7 +258,7 @@ def get_charts_slugs(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFra
     query = """\
     SELECT
         c.id AS chart_id,
-        cc.config->>'$.slug' AS chart_slug
+        cc.slug AS chart_slug
     FROM charts c
     JOIN chart_configs cc ON c.configId = cc.id
     LEFT JOIN chart_dimensions cd ON c.id = cd.chartId
