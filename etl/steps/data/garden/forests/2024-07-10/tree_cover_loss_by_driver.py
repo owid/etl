@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -26,6 +28,7 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int) + 2000
     # Convert m2 to ha
     tb["area"] = tb["area"].astype(float).div(10000)
+    tb = convert_codes_to_drivers(tb)
     tb = tb.format(["country", "year", "category"])
 
     #
@@ -38,3 +41,16 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def convert_codes_to_drivers(tb: Table) -> Table:
+    """ """
+    code_dict = {
+        1: "Commodity driven deforestation",
+        2: "Shifting agriculture",
+        3: "Forestry",
+        4: "Wildfire",
+        5: "Urbanization",
+    }
+    tb["category"] = tb["category"].replace(code_dict)
+    return tb

@@ -18,6 +18,7 @@ meta:
       - Wildfire: Temporary loss, does not include fire clearing for agriculture.
 
       - Urbanization: Deforestation for expansion of urban centers.
+
       The commodity-driven deforestation and urbanization categories represent permanent deforestation, while tree cover usually regrows in the other categories.
 
       The data were generated using decision tree models to separate each 10 km grid cell into one of the five categories. The decision trees were created using 4,699 sample grid cells, and use metrics derived from the Hansen tree cover, tree cover gain, and tree cover loss, NASA fires, global land cover, and population count. Separate decision trees were created for each driver and each region (North America, South America, Europe, Africa, Eurasia, Southeast Asia, Oceania), for a total of 35 decision trees. The final outputs were combined into a global map, which is then overlaid with tree cover loss data to indicate the intensity of loss associated with each driver around the world.
@@ -42,6 +43,6 @@ meta:
       url: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
 
 outs:
-  - md5: baa6aa6471bb5fbad42b9b817426fc5e
-    size: 416044
+  - md5: fe751adbb6624df11033ffd4a83c803e
+    size: 3688936
     path: tree_cover_loss_by_driver.csv
