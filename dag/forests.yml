@@ -9,8 +9,9 @@ steps:
     - data://garden/forests/2024-05-08/ifl
 
   # Dominant Driver of Forest Loss
-  data://meadow/forests/2024-07-10/dominant_driver:
-    - snapshot://forests/2024-07-10/dominant_driver.tif
-    - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/forests/2024-07-10/dominant_driver:
-    - data://meadow/forests/2024-07-10/dominant_driver
+  data://meadow/forests/2024-07-10/tree_cover_loss_by_driver:
+    - snapshot://forests/2024-07-10/tree_cover_loss_by_driver.csv
+  data://garden/forests/2024-07-10/tree_cover_loss_by_driver:
+    - data://meadow/forests/2024-07-10/tree_cover_loss_by_driver
+  data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
+    - data://garden/forests/2024-07-10/tree_cover_loss_by_driver

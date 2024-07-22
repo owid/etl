@@ -12,10 +12,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("dominant_driver")
+    ds_meadow = paths.load_dataset("tree_cover_loss_by_driver")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["dominant_driver"].reset_index()
+    tb = ds_meadow["tree_cover_loss_by_driver"].reset_index()
 
     #
     # Process data.
@@ -23,7 +23,9 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.format(["country", "year"])
+    tb["year"] = tb["year"].astype(int) + 2000
+
+    tb = tb.format(["country", "year", "category"])
 
     #
     # Save outputs.
