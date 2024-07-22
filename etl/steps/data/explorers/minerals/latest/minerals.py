@@ -41,6 +41,7 @@ def run(dest_dir: str) -> None:
     config = {
         "explorerTitle": "Minerals",
         "explorerSubtitle": "Explore the amount of minerals that are produced, imported, and exported.",
+        "selection": ["World", "United States", "China"],
     }
 
     #
