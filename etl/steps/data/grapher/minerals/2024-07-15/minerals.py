@@ -21,14 +21,14 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(
         index=["country", "year"],
         columns=["commodity", "sub_commodity", "source"],
-        values=["imports", "exports", "production", "reserves"],
+        values=["imports", "exports", "production", "reserves", "unit_value"],
         join_column_levels_with="|",
     )
 
     # Improve metadata of new columns.
     for column in tb.drop(columns=["country", "year"]).columns:
         metric, commodity, sub_commodity, source = column.split("|")
-        metric = metric.capitalize()
+        metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
         sub_commodity = sub_commodity.lower()
         title_public = f"{metric} of {commodity} ({sub_commodity}), according to {source}"
