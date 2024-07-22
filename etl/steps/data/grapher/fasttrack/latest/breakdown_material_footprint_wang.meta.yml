@@ -30,6 +30,14 @@ tables:
           name: Iron
         description: |-
           Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      rare_earths:
+        title: Rare earths
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Rare earths
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
       aluminum:
         title: Aluminum
         unit: kilograms per GWh
