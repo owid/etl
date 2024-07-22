@@ -13,7 +13,7 @@ dataset:
 
 
 tables:
-  dominant_driver:
+  tree_cover_loss_by_driver:
     variables:
       area:
         title: Area of tree cover loss
