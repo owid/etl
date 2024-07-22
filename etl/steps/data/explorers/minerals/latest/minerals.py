@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
         if tb[tb[column].notnull()].empty:
             continue
         metric, commodity, sub_commodity, source = tb[column].metadata.title.split("|")
-        metric = metric.capitalize()
+        metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
         sub_commodity = sub_commodity.capitalize()
         source = source.upper()
