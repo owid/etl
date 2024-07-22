@@ -407,7 +407,13 @@ class ChartDiff:
     def _get_checksums(source_session, target_session, chart_ids) -> pd.DataFrame:
         checksums_source = gm.Chart.load_variables_checksums(source_session, chart_ids)
         checksums_target = gm.Chart.load_variables_checksums(target_session, chart_ids)
-        checksums_source, checksums_target = checksums_source.align(checksums_target)
+
+        # align dataframes with INNER join
+        # the inner join is on purpose, because we only want to compare variables that are used in both environments
+        # if the variable is not present in target, it could mean that the chart was updated in target (but we don't
+        # care about that, because it's not a data/metadata change, but chart config change)
+        checksums_source, checksums_target = checksums_source.align(checksums_target, join="inner")
+
         checksums_diff = checksums_source != checksums_target
         # If checksum has not been filled yet, assume unchanged
         checksums_diff[checksums_target.isna()] = False
