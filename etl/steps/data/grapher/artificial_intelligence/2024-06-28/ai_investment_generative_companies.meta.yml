@@ -27,7 +27,7 @@ tables:
           - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
           - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
         description_key:
-          - It is highly likely that these investments are partly allocated towards the necessary infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications. For investments in new data centers, these facilities often have broader purposes beyond just AI, and detailed data on this specific allocation is not available.
+          - The source is not clear about the extent to which investment figures cover infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications
           - For more information on how the costs to train frontier AI models are distributed refer to the article [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) by EPOCH.
 
         presentation:
