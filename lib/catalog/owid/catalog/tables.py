@@ -591,6 +591,9 @@ class Table(pd.DataFrame):
     def astype(self, *args, **kwargs) -> "Table":
         return super().astype(*args, **kwargs)  # type: ignore
 
+    def reindex(self, *args, **kwargs) -> "Table":
+        return super().reindex(*args, **kwargs)
+
     @overload
     def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
