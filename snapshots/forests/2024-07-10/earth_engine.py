@@ -3,7 +3,8 @@ Scripts in this folder must be run in this order:
  1. snapshots/forests/2024-07-10/dominant_driver.py
  2. snapshots/forests/2024-07-10/reproject_raster.py
  3. Manual upload of the reprojected raster to Earth Engine assets
- 4. python snapshots/forests/2024-07-10/earth_engine.py
+ 4. python snapshots/forests/2024-07-10/run_earth_engine.py
+ 5. Grab the Google Sheet IDs from the output of the run_earth_engine.py script and run the dominant_driver.py script with the IDs.
 
 
 To run this script you need to set up a Google Earth Engine account and authenticate it - visit here to set up an account: https://code.earthengine.google.com/ and to start a new project.
