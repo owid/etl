@@ -24,7 +24,8 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     tb["year"] = tb["year"].astype(int) + 2000
-
+    # Convert m2 to ha
+    tb["area"] = tb["area"].astype(float).div(10000)
     tb = tb.format(["country", "year", "category"])
 
     #
