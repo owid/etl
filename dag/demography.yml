@@ -96,10 +96,11 @@ steps:
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
   ## Population doubling times
-  data://garden/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-03-31/population
-  data://grapher/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-07-03/population_doubling_times
+  data://garden/demography/2024-07-18/population_doubling_times:
+    - data://garden/demography/2024-07-15/population
+  data://grapher/demography/2024-07-18/population_doubling_times:
+    - data://garden/demography/2024-07-18/population_doubling_times
+
   ## Population comparison
   data://garden/demography/2023-06-27/world_population_comparison:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
