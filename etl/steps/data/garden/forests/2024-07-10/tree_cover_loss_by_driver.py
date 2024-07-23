@@ -25,11 +25,15 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    # Some regions are broken down into smaller regions in the dataset, so we need to aggregate them here e.g. Alaska and Hawaii are recorded separately in the dataset, but the geo.harmonize_countries function renames them as United States
+    tb = tb.groupby(["country", "year", "category"]).sum().reset_index()
     tb["year"] = tb["year"].astype(int) + 2000
     # Convert m2 to ha
     tb["area"] = tb["area"].astype(float).div(10000)
     tb = convert_codes_to_drivers(tb)
-    tb = tb.format(["country", "year", "category"])
+
+    tb = tb.pivot(index=["country", "year"], columns="category", values="area").reset_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
@@ -46,11 +50,11 @@ def run(dest_dir: str) -> None:
 def convert_codes_to_drivers(tb: Table) -> Table:
     """ """
     code_dict = {
-        1: "Commodity driven deforestation",
-        2: "Shifting agriculture",
-        3: "Forestry",
-        4: "Wildfire",
-        5: "Urbanization",
+        1: "commodity_driven_deforestation",
+        2: "shifting_agriculture",
+        3: "forestry",
+        4: "wildfire",
+        5: "urbanization",
     }
     tb["category"] = tb["category"].replace(code_dict)
     return tb
