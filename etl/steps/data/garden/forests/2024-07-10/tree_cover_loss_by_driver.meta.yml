@@ -9,6 +9,9 @@ definitions:
     processing_level: major
     description_processing: >-
       This indicator is calculated by Our World in Data based on data from the Global Forest Watch. Time-series data of tree cover loss in areas of forest where tree canopy cover was greater than or equal to 30% in 2000 was extracted and cross-referenced with data on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108). Values may be slightly different to those shown on Global Forest Watch due to differences in the country boundaries used.
+    display:
+      numDecimalPlaces: 0
+      numSignificantFigures: 3
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -21,11 +24,21 @@ tables:
     variables:
       commodity_driven_deforestation:
         title: Tree cover loss driven by commodity-driven deforestation
+        display:
+          name: Commodity-driven deforestation
       forestry:
         title: Tree cover loss driven by forestry
+        display:
+          name: Forestry
       shifting_agriculture:
         title: Tree cover loss driven by shifting agriculture
+        display:
+          name: Shifting agriculture
       urbanization:
         title: Tree cover loss driven by urbanization
+        display:
+          name: Urbanization
       wildfire:
         title: Tree cover loss driven by wildfire
+        display:
+          name: Wildfire
