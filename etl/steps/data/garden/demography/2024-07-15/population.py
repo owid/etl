@@ -10,6 +10,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
@@ -110,6 +111,7 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = make_table_growth_rate(
         tb_population=tb,
     )
+    tb_growth_rate = add_smoothed_growth_rate(tb_growth_rate)
 
     # Add population density
     tb_density = make_table_density(
@@ -707,6 +709,33 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
+    return tb
+
+
+def add_smoothed_growth_rate(tb: Table) -> Table:
+    """Smooth growth rate (pre-1900) with 50-year rolling average."""
+    # Separate the data for years before 1900
+    tb_before_1900 = tb.loc[tb["year"] < 1900]
+
+    # Reindex to ensure all years from 1700 to 1900 are included for each country
+    countries = tb_before_1900["country"].unique()
+    years = range(1700, 1900)
+    tb_before_1900 = (
+        tb_before_1900.set_index(COLUMNS_INDEX)
+        .reindex(pd.MultiIndex.from_product([countries, years], names=COLUMNS_INDEX))
+        .sort_index()
+        .reset_index()
+    )
+
+    # Apply the 50-year rolling average within each country group
+    tb_before_1900["growth_rate"] = tb_before_1900.groupby("country", as_index=False)["growth_rate"].transform(
+        lambda x: x.rolling(window=50, min_periods=1, center=True).mean()
+    )
+
+    # Merge back to growth rate table
+    tb = tb.merge(tb_before_1900, on=COLUMNS_INDEX, suffixes=("", "_smoothed"), how="left")
+    tb["growth_rate_smoothed"] = tb["growth_rate_smoothed"].fillna(tb["growth_rate"])
+
     return tb
 
 
