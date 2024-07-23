@@ -1,12 +1,5 @@
 steps:
   #
-  # NOAA National Centers for Environmental Information - Long-run CO2 concentration (possibly not updateable).
-  #
-  data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration:
-    - snapshot://climate/2024-01-26/antarctic_ice_core_co2_concentration.xls
-  data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration:
-    - data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration
-  #
   # EPA - Climate change indicators (possibly not updateable).
   #
   data://meadow/epa/2024-01-29/ocean_heat_content:
@@ -61,7 +54,7 @@ steps:
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
-    - data://garden/climate/2024-05-20/climate_change_impacts
+    - data://garden/climate/2024-07-23/climate_change_impacts
   #
   # Global Wildfire Information System - Monthly burned area.
   #
@@ -171,73 +164,6 @@ steps:
   #
   data://meadow/climate/2024-05-20/sea_ice_index:
     - snapshot://climate/2024-05-20/sea_ice_index.xlsx
-  #
-  #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
-  #
-  data://garden/climate/2024-05-20/ocean_ph_levels:
-    - data://meadow/climate/2024-05-20/hawaii_ocean_time_series
-  #
-  # NOAA National Centers for Environmental Information - Ocean Heat Content.
-  #
-  data://garden/climate/2024-05-20/ocean_heat_content:
-    - data://meadow/climate/2024-05-20/ocean_heat_content
-  #
-  # GISS - Surface temperature analysis.
-  #
-  data://garden/climate/2024-05-20/surface_temperature_analysis:
-    - data://meadow/climate/2024-05-20/surface_temperature_analysis
-  #
-  # Rutgers University Global Snow Lab - Snow Cover Extent.
-  #
-  data://garden/climate/2024-05-20/snow_cover_extent:
-    - data://meadow/climate/2024-05-20/snow_cover_extent
-  #
-  # Met Office Hadley Centre - Sea surface temperature.
-  #
-  data://garden/climate/2024-05-20/sea_surface_temperature:
-    - data://meadow/climate/2024-05-20/sea_surface_temperature
-  #
-  # NOAA Global Monitoring Laboratory - GHG concentration.
-  #
-  data://garden/climate/2024-05-20/ghg_concentration:
-    - data://meadow/climate/2024-05-20/ghg_concentration
-  #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://garden/climate/2024-05-20/sea_ice_index:
-    - data://meadow/climate/2024-05-20/sea_ice_index
-  #
-  # Various sources - Long-run greenhouse gas concentration.
-  #
-  data://garden/climate/2024-05-20/long_run_ghg_concentration:
-    - data://garden/epa/2024-04-17/ghg_concentration
-    - data://garden/climate/2024-05-20/ghg_concentration
-  #
-  # Various sources - Climate change impacts.
-  #
-  data://garden/climate/2024-05-20/climate_change_impacts:
-    - data://garden/climate/2024-05-20/sea_surface_temperature
-    - data://garden/climate/2024-05-20/ocean_ph_levels
-    - data://garden/climate/2024-01-28/global_sea_level
-    - data://garden/epa/2024-04-17/ice_sheet_mass_balance
-    - data://garden/climate/2024-05-20/ghg_concentration
-    - data://garden/climate/2024-05-20/long_run_ghg_concentration
-    - data://garden/climate/2024-05-20/surface_temperature_analysis
-    - data://garden/climate/2024-05-20/ocean_heat_content
-    - data://garden/epa/2024-04-17/ocean_heat_content
-    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
-    - data://garden/climate/2024-05-20/sea_ice_index
-    - data://garden/climate/2024-05-20/snow_cover_extent
-  #
-  # Various sources - Climate change impacts (monthly).
-  #
-  data://grapher/climate/2024-05-20/climate_change_impacts_monthly:
-    - data://garden/climate/2024-05-20/climate_change_impacts
-  #
-  # Various sources - Climate change impacts (annual).
-  #
-  data://grapher/climate/2024-05-20/climate_change_impacts_annual:
-    - data://garden/climate/2024-05-20/climate_change_impacts
   #
   # Met Office Hadley Centre - Near surface temperature anomaly.
   #
