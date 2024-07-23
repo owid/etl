@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -16,7 +17,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("tree_cover_loss_by_driver.csv")
-    tb = snap.read()
+    tb = snap.read(usecols=["country", "year", "category", "area"])
     # Some large countries are broken down into smaller regions in the dataset, so we need to aggregate them here
     tb = tb.groupby(["country", "year", "category"]).sum().reset_index()
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
