@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index()
     tb = tb.rename(columns={"days_since": "year"})
 
-    tb["country"] = "State of the art"
+    tb["country"] = "Top-1 accuracy"
     tb = tb.drop("name", axis=1)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
