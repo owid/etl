@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from owid.catalog import tables
+from owid.catalog import VariablePresentationMeta, tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
@@ -846,6 +846,27 @@ def test_pivot(table_1, sources, origins) -> None:
     assert tb["country"].metadata == table_1["country"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
+
+
+def test_pivot_metadata_propagation():
+    tb = Table(
+        pd.DataFrame(
+            {
+                "year": [2020, 2021, 2022],
+                "group": ["g1", "g1", "g1"],
+                "subgroup": ["s1", "s1", "s2"],
+                "value": [1, 2, 3],
+            }
+        )
+    )
+    tb["value"].m.presentation = VariablePresentationMeta(title_public="Value")
+    tb_p = tb.pivot(index="year", columns=["group", "subgroup"], values="value", join_column_levels_with="_")
+
+    # Set title_public for one of the variables
+    tb_p["g1_s1"].m.presentation.title_public = "Group 1, Subgroup 1"
+
+    # It should not affect the other variable
+    assert tb_p["g1_s2"].m.presentation.title_public == "Value"
 
 
 def test_get_unique_sources_from_tables(table_1, sources):
