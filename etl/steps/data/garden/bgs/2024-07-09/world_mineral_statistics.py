@@ -1,10 +1,17 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.datautils.dataframes import map_series
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# For consistency with American English names, and to harmonize with USGS, rename some commodities conveniently.
+COMMODITIES = {
+    "Aluminium, primary": "Aluminum",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -40,6 +47,9 @@ def run(dest_dir: str) -> None:
     # Improve the name of the commodities.
     tb["commodity"] = tb["commodity"].str.capitalize()
 
+    # Rename certain commodities conveniently.
+    tb["commodity"] = map_series(tb["commodity"], COMMODITIES, warn_on_unused_mappings=True)
+
     # TODO: There are many issues to be handled:
     #  * Ensure that all sub-commodities have a "Total".
     #  * But it seems that these "Total" may not be reliable. For example, for commodity "Coal", the sub-commodity "Total" only has zeros. And there is another sub-commodity "Coal" that may be the actual total.
@@ -52,6 +62,7 @@ def run(dest_dir: str) -> None:
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
         index_columns=["country", "year", "commodity", "sub_commodity"],
     )
 
