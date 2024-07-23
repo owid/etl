@@ -67,32 +67,9 @@ def run(dest_dir: str) -> None:
         num_allowed_nans_per_year=0,
     )
 
-    tb["mmr"] = tb.apply(
-        lambda x: calc_for_reg(
-            x, nominator="maternal_deaths", denominator="births", original_col="mmr", factor=100_000
-        ),
-        axis=1,
-    )
-    tb["hiv_related_indirect_mmr"] = tb.apply(
-        lambda x: calc_for_reg(
-            x,
-            "hiv_related_indirect_maternal_deaths",
-            denominator="births",
-            original_col="hiv_related_indirect_mmr",
-            factor=100_000,
-        ),
-        axis=1,
-    )
-    tb["hiv_related_indirect_percentage"] = tb.apply(
-        lambda x: calc_for_reg(
-            x,
-            "hiv_related_indirect_maternal_deaths",
-            denominator="maternal_deaths",
-            original_col="hiv_related_indirect_percentage",
-            factor=100,
-        ),
-        axis=1,
-    )
+    tb["mmr"] = tb["maternal_deaths"] / tb["births"] * 100_000
+    tb["hiv_related_indirect_mmr"] = tb["hiv_related_indirect_maternal_deaths"] / tb["births"] * 100_000
+    tb["hiv_related_indirect_percentage"] = tb["hiv_related_indirect_maternal_deaths"] / tb["maternal_deaths"]
 
     tb = tb.format(["country", "year"])
 
@@ -112,10 +89,3 @@ def add_origins(tb: Table, cols: list) -> Table:
     for col in cols:
         tb[col] = tb[col].copy_metadata(tb["country"])
     return tb
-
-
-def calc_for_reg(tb_row, nominator, denominator, original_col, factor=1):
-    """If country is a region, calculate the maternal mortality ratio or hiv_related_indirect_mmr, else return MMR"""
-    if tb_row["country"] in REGIONS:
-        return (tb_row[nominator] / tb_row[denominator]) * factor
-    return tb_row[original_col]
