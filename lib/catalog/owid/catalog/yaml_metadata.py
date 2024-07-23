@@ -64,6 +64,10 @@ def update_metadata_from_yaml(
         if "description_key" in meta_dict:
             meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
+        # templates can make it string, convert it to int
+        if isinstance(meta_dict.get("display", {}).get("numDecimalPlaces", {}), str):
+            meta_dict["display"]["numDecimalPlaces"] = int(meta_dict["display"]["numDecimalPlaces"])
+
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
 
