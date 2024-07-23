@@ -16,6 +16,7 @@ The script will calculate the area of tree cover in each driver of loss (accordi
 
 Once it has completed, you can run the XXXX step to load the data to Snapshot.
 """
+
 import click
 import ee
 
@@ -28,7 +29,7 @@ DEBUG = False
 @click.option(
     "--chunk_size",
     type=int,
-    default=100,
+    default=10,
     show_default=True,
     help="The number of countries included in the chunk",
 )
@@ -90,7 +91,7 @@ def main(chunk_size: int, starting_point: int):
             geometry=geometry,
             scale=30,
             maxPixels=2.5e10,
-            bestEffort=True,
+            # bestEffort=True,
         )
 
         return ee.Feature(None, {"country": countryName, "groups": result.get("groups")})
@@ -126,9 +127,9 @@ def main(chunk_size: int, starting_point: int):
     # Current folder is here: https://drive.google.com/drive/folders/1U5xylX1uqljdQ8OzPDJrsQFfdDHPQCbJ
     export_task = ee.batch.Export.table.toDrive(
         collection=formattedResults,
-        description=f"Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_{starting_point}_{starting_point + chunk_size - 1}",
+        description=f"Forest_Loss_By_Year_And_Driver_Countries_{starting_point}_{starting_point + chunk_size - 1}",
         folder="forests",
-        fileNamePrefix=f"Forest_Loss_By_Year_And_Driver_Per_Hundred_Countries_{starting_point}_{starting_point + chunk_size - 1}",
+        fileNamePrefix=f"Forest_Loss_By_Year_And_Driver_Countries_{starting_point}_{starting_point + chunk_size - 1}",
         fileFormat="CSV",
     )
     export_task.start()
