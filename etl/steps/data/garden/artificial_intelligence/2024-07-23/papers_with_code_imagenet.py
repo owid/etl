@@ -30,6 +30,7 @@ def run(dest_dir: str) -> None:
     best_daily_models["is_improved"] = best_daily_models["top_1_accuracy"].gt(
         best_daily_models["top_1_accuracy"].cummax().shift(fill_value=-float("inf"))
     )
+    best_daily_models = best_daily_models[best_daily_models["is_improved"]].drop(columns="is_improved")
 
     best_daily_models = best_daily_models.format(["days_since", "name"])
 
