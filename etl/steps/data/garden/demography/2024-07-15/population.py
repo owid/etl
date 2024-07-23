@@ -379,10 +379,21 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     sources = tb.loc[:, ["country", "year", "source"]].copy()
     tb = tb.drop(columns=["source"])
 
+    # Build table specifically for estimating regions: (1) no historical regions, (2) interpolation of country values
+
+    ## (1) remove historical regions
+    ## This is because it looks like historical countries are being considered when estimating values for regions.
+    tb_regions = ds_regions["regions"]
+    historical_regions = set(tb_regions.loc[tb_regions["is_historical"], "name"])
+    tb_aggregates = tb.loc[~tb["country"].isin(historical_regions)].copy()
+
+    ## (2) interpolate population for countries
+    tb_aggregates = geo.interpolate_table(tb_aggregates, "country", "year")
+
     # re-estimate region aggregates
     aggregations = {"population": "sum"}
-    tb = geo.add_regions_to_table(
-        tb=tb,
+    tb_aggregates = geo.add_regions_to_table(
+        tb=tb_aggregates,
         regions=regions,
         aggregations=aggregations,
         ds_regions=ds_regions,
@@ -413,9 +424,6 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "Indonesia",
                 "Russia",
                 "Mexico",
-                "Vietnam",
-                "Philippines",
-                "Iran",
             ],
             "Lower-middle-income countries": [
                 "India",
@@ -425,15 +433,21 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "Philippines",
                 "Egypt",
                 "Kenya",
+                "Philippines",
+                "Vietnam",
+                "Iran",
             ],
             "Low-income countries": [
                 "Ethiopia",
                 "Democratic Republic of Congo",
-                "Congo",
                 "Uganda",
             ],
         },
     )
+    tb_aggregates = tb_aggregates.loc[tb_aggregates["country"].isin(regions)]
+
+    # Add historical countries back
+    tb = pr.concat([tb, tb_aggregates], ignore_index=True)
 
     # tb = tb.loc[
     #     (
