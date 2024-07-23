@@ -431,8 +431,8 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
     # Take the first dictionary as a reference.
     reference_dict = defined_dicts[0]
 
-    # Return the first dictionary if all dictionaries are identical, otherwise return None.
-    return reference_dict if all(d == reference_dict for d in defined_dicts) else None
+    # Return a copy of the first dictionary if all dictionaries are identical, otherwise return None.
+    return reference_dict.copy() if all(d == reference_dict for d in defined_dicts) else None
 
 
 def combine_variables_display(
