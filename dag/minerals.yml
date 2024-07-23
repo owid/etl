@@ -31,7 +31,6 @@ steps:
   #
   data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities:
     - data://meadow/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
-    - data://garden/bls/2024-05-16/us_consumer_prices
   #
   # USGS - Mineral commodity summaries.
   #

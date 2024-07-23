@@ -34,8 +34,14 @@ def run(dest_dir: str) -> None:
         title_public = f"{metric} of {commodity} ({sub_commodity}), according to {source}"
         tb[column].metadata.title = column
         tb[column].metadata.presentation.title_public = title_public
-        tb[column].metadata.unit = "tonnes"
-        tb[column].metadata.short_unit = "t"
+        if metric == "Unit value":
+            tb[column].metadata.unit = "constant 1998 US$ per tonne"
+            tb[column].metadata.short_unit = "$/t"
+        elif metric in ["Imports", "Exports", "Production", "Reserves"]:
+            tb[column].metadata.unit = "tonnes"
+            tb[column].metadata.short_unit = "t"
+        else:
+            raise ValueError(f"Unexpected metric: {metric}")
 
     # Format table conveniently.
     tb = tb.format(keys=["country", "year"])

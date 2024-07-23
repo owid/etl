@@ -20,7 +20,7 @@ tables:
         title: Unit value (in current US dollars)
         unit: current US$ per tonne
         short_unit: $/t
-      unit_value:
+      unit_value_constant:
         title: Unit value (in constant US dollars)
-        unit: constant 2022 US$ per tonne
+        unit: constant 1998 US$ per tonne
         short_unit: $/t

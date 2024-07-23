@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
         .drop(columns=["unit_value_current"])
         .astype(float)
         .reset_index()
+        .rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
     )
     tb_usgs = (
         ds_usgs["mineral_commodity_summaries"]
@@ -36,7 +37,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # TODO: Combine production from historical USGS data with current USGS data.
-    # TODO: Fix unit value conversion.
     # TODO: Unit value is only given for World. For now, use just this.
     # Add a sub-commodity column to the historical data (assume production and unit value correspond to the total of each commodity).
     tb_usgs_historical["sub_commodity"] = "Total"
