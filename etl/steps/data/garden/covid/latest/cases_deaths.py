@@ -395,6 +395,10 @@ def add_rolling_avg(tb: Table) -> Table:
     # TMP: DataFrame -> Table
     tb = Table(df).copy_metadata(tb)
 
+    for indicator in indicators:
+        col = f"{indicator}_7_day_avg_right"
+        tb[col] = tb[col].copy_metadata(tb[indicator])
+
     return tb
 
 
@@ -408,7 +412,7 @@ def add_cfr(tb: Table) -> Table:
         return pd.NA
 
     tb["cfr"] = 100 * tb["total_deaths"] / tb["total_cases"]
-    tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1)
+    tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1).copy_metadata(tb["cfr"])
     return tb
 
 
@@ -447,6 +451,8 @@ def add_days_since(tb: Table) -> Table:
             .apply(lambda df_group: _days_since(df_group, indicator[0], indicator[1]))
             .reset_index(level=0, drop=True)
         )
+        tb[col] = tb[col].copy_metadata(tb[indicator[0]])
+
     return tb
 
 

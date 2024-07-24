@@ -6,7 +6,6 @@ definitions:
         - COVID-19
         - Global Health
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -15,12 +14,10 @@ dataset:
 
 tables:
   cases_deaths:
-
     common:
       display:
         zeroDay: "2020-01-21"
         yearIsDay: true
-
     variables:
       # Absolute values
       new_cases:
