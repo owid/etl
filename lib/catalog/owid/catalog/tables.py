@@ -1115,6 +1115,11 @@ class TableGroupBy:
 
         return tb
 
+    def rolling(self, *args, **kwargs) -> "TableGroupBy":
+        """Apply rolling window function and return a new TableGroupBy with proper metadata."""
+        rolling_groupby = self.groupby.rolling(*args, **kwargs)
+        return TableGroupBy(rolling_groupby, self.metadata, self._fields)
+
 
 class VariableGroupBy:
     def __init__(
@@ -1149,6 +1154,11 @@ class VariableGroupBy:
                 raise NotImplementedError()
 
         return func  # type: ignore
+
+    def rolling(self, *args, **kwargs) -> "VariableGroupBy":
+        """Apply rolling window function and return a new VariableGroupBy with proper metadata."""
+        rolling_groupby = self.groupby.rolling(*args, **kwargs)
+        return VariableGroupBy(rolling_groupby, self.name, self.metadata, self.table_metadata)
 
 
 def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> Tuple[SeriesOrVariable, SeriesOrVariable]:

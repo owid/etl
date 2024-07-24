@@ -1195,3 +1195,19 @@ def test_keep_metadata_series(table_1: Table) -> None:
 
     table_1.a = to_numeric(table_1.a)
     assert table_1.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_variable_groupby_rolling():
+    tb = Table(pd.DataFrame({"country": [1, 1, 2, 2, 3, 3], "value": [4, 5, 6, 7, 8, 9]}))
+    result = tb.groupby("country")["value"].rolling(2).sum()
+    expected = pd.Series([np.nan, 9, np.nan, 13, np.nan, 17], name="value")
+    pd.testing.assert_series_equal(result, expected)
+    assert result.metadata == tb["value"].metadata
+
+
+def test_table_groupby_rolling():
+    tb = Table(pd.DataFrame({"country": [1, 1, 2, 2, 3, 3], "value": [4, 5, 6, 7, 8, 9]}))
+    result = tb.groupby("country")[["value"]].rolling(2).sum()
+    expected = pd.DataFrame({"value": [np.nan, 9, np.nan, 13, np.nan, 17]})
+    pd.testing.assert_frame_equal(result, expected)
+    assert result["value"].metadata == tb["value"].metadata
