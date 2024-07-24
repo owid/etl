@@ -5,8 +5,6 @@ definitions:
       topic_tags:
         - COVID-19
         - Global Health
-    display:
-      zeroDay: "2020-01-21"
 
 
 # Learn more about the available fields:
@@ -17,6 +15,12 @@ dataset:
 
 tables:
   cases_deaths:
+
+    common:
+      display:
+        zeroDay: "2020-01-21"
+        yearIsDay: true
+
     variables:
       # Absolute values
       new_cases:
