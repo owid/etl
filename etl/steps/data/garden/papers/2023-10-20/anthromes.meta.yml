@@ -1,6 +1,44 @@
 definitions:
   description_uninhabited_ice: &description_uninhabited_ice |
     Ice-covered areas that are not inhabited by humans or user for urban, crop or pasture land.
+  description_inhabited_treeless_and_barren_lands: &description_inhabited_treeless_and_barren_land |-
+    Regions without natural tree cover having only minor (<20%) land use and a range of populations.
+  description_irrigated_villages: &description_irrigated_villages |-
+    Villages characterized by irrigated crops.
+  description_mix_settlements: &description_mix_settlements |-
+    Suburbs, towns and rural settlements with high but fragmented populations.
+  description_pastoral_villages: &description_pastoral_villages |-
+    Villages characterized by pasture and rangeland.
+  description_populated_croplands: &description_populated_croplands |-
+    Croplands with significant human populations (1 to <10 people per km²).
+  description_populated_rangelands: &description_populated_rangelands |-
+    Rangelands with significant human populations (1 to <10 people per km²).
+  description_populated_woodlands: &description_populated_woodlands |-
+    Forest biome regions with minor land use and significant populations (1 to <10 people per km²).
+  description_rainfed_villages: &description_rainfed_villages |-
+    Villages characterized by rainfed agriculture.
+  description_remote_croplands: &description_remote_croplands |-
+    Irrigated and rainfed croplands without significant human populations (<1 person per km²).
+  description_remote_rangelands: &description_remote_rangelands |-
+    Rangelands without significant human populations (<1 person per km²).
+  description_remote_woodlands: &description_remote_woodlands |-
+    Forest biome regions with minor land use and without significant human populations (<1 person per km²).
+  description_residential_irrigated_croplands: &description_residential_irrigated_croplands |-
+    Irrigated croplands with substantial human populations (10 to <100 people per km²).
+  description_residential_rainfed_croplands: &description_residential_rainfed_croplands |-
+    Rainfed croplands with substantial human populations (10 to <100 people per km²).
+  description_residential_rangelands: &description_residential_rangelands |-
+    Rangelands with substantial human populations (10 to <100 people per km²).
+  description_residential_woodlands: &description_residential_woodlands |-
+    Forest biome regions with minor land use and substantial populations (10 to <100 people per km²).
+  description_rice_villages: &description_rice_villages |-
+    Villages characterized by paddy rice cultivation.
+  description_urban: &description_urban |-
+    Densely built-up environments with very high populations.
+  description_wild_treeless_and_barren_lands: &description_wild_treeless_and_barren_lands |-
+    Regions without natural tree cover (grasslands, shrublands, tundra, desert and barren lands) having only minor (<20%) land use and no human populations.
+  description_wild_woodlands: &description_wild_woodlands |-
+    Forests and savanna with minor land use (<20%) and no human populations.
 tables:
   anthromes:
     variables:
@@ -12,82 +50,101 @@ tables:
       land_ar_ice__uninhabited:
         title: Area of uninhabited ice
         unit: "square kilometers"
-        description_processing: *description_uninhabited_ice
+        description_short: *description_uninhabited_ice
         short_unit: "km²"
       land_ar_inhabited_treeless_and_barren_lands:
         title: Area of inhabited treeless and barren lands
+        description_short: *description_inhabited_treeless_and_barren_land
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_irrigated_villages:
         title: Area of irrigated villages
+        description_short: *description_irrigated_villages
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_mixed_settlements:
         title: Area of mixed settlements
+        description_short: *description_mix_settlements
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_pastoral_villages:
         title: Area of pastoral villages
+        description_short: *description_pastoral_villages
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_populated_croplands:
         title: Area of populated croplands
+        description_short: *description_populated_croplands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_populated_rangelands:
         title: Area of populated rangelands
+        description_short: *description_populated_rangelands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_populated_woodlands:
         title: Area of populated woodlands
+        description_short: *description_populated_woodlands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_rainfed_villages:
         title: Area of rainfed villages
+        description_short: *description_rainfed_villages
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_remote_croplands:
         title: Area of remote croplands
+        description_short: *description_remote_croplands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_remote_rangelands:
         title: Area of remote rangelands
+        description_short: *description_remote_rangelands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_remote_woodlands:
         title: Area of remote woodlands
+        description_short: *description_remote_woodlands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_residential_irrigated_croplands:
         title: Area of residential irrigated croplands
+        description_short: *description_residential_irrigated_croplands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_residential_rainfed_croplands:
         title: Area of residential rainfed croplands
+        description_short: *description_residential_rainfed_croplands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_residential_rangelands:
         title: Area of residential rangelands
+        description_short: *description_residential_rangelands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_residential_woodlands:
         title: Area of residential woodlands
+        description_short: *description_residential_woodlands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_rice_villages:
         title: Area of rice villages
+        description_short: *description_rice_villages
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_urban:
         title: Area of urban
+        description_short: *description_urban
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_wild_treeless_and_barren_lands:
         title: Area of wild treeless and barren lands
+        description_short: *description_wild_treeless_and_barren_lands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_wild_woodlands:
         title: Area of wild woodlands
+        description_short: *description_wild_woodlands
         unit: "square kilometers"
         short_unit: "km²"
       land_ar_dense_settlements:
@@ -133,7 +190,9 @@ tables:
         description_processing: |-
           Used lands are the sum of the area covered by mixed settlements, urban areas, rice villages, irrigated villages, rainfed villages, pastoral villages, residential irrigated croplands, residential rainfed croplands, populated croplands, remote croplands, residential rangelands, populated rangelands and remote rangelands.
       share_of_land_type_woodlands:
-        title: Share of land that is woodlands
+        title: Share of land that is covered by woodland
+        description_short: |-
+         The share of total land area covered by residential woodlands, populated woodlands, remote woodlands or wild woodlands.
         unit: "%"
         short_unit: "%"
         description_processing: |-
@@ -145,78 +204,97 @@ tables:
         short_unit: "%"
       share_of_land_type_inhabited_treeless_and_barren_lands:
         title: Share of land that is inhabited treeless and barren lands
+        description_short: *description_inhabited_treeless_and_barren_land
         unit: "%"
         short_unit: "%"
       share_of_land_type_irrigated_villages:
         title: Share of land that is irrigated villages
+        description_short: *description_irrigated_villages
         unit: "%"
         short_unit: "%"
       share_of_land_type_mixed_settlements:
         title: Share of land that is mixed settlements
+        description_short: *description_mix_settlements
         unit: "%"
         short_unit: "%"
       share_of_land_type_pastoral_villages:
         title: Share of land that is pastoral villages
+        description_short: *description_pastoral_villages
         unit: "%"
         short_unit: "%"
       share_of_land_type_populated_croplands:
         title: Share of land that is populated croplands
+        description_short: *description_populated_croplands
         unit: "%"
         short_unit: "%"
       share_of_land_type_populated_rangelands:
         title: Share of land that is populated rangelands
+        description_short: *description_populated_rangelands
         unit: "%"
         short_unit: "%"
       share_of_land_type_populated_woodlands:
         title: Share of land that is populated woodlands
+        description_short: *description_populated_woodlands
         unit: "%"
         short_unit: "%"
       share_of_land_type_rainfed_villages:
         title: Share of land that is rainfed villages
+        description_short: *description_rainfed_villages
         unit: "%"
         short_unit: "%"
       share_of_land_type_remote_croplands:
         title: Share of land that is remote croplands
+        description_short: *description_remote_croplands
         unit: "%"
         short_unit: "%"
       share_of_land_type_remote_rangelands:
         title: Share of land that is remote rangelands
+        description_short: *description_remote_rangelands
         unit: "%"
         short_unit: "%"
       share_of_land_type_remote_woodlands:
         title: Share of land that is remote woodlands
+        description_short: *description_remote_woodlands
         unit: "%"
         short_unit: "%"
       share_of_land_type_residential_irrigated_croplands:
         title: Share of land that is residential irrigated croplands
+        description_short: *description_residential_irrigated_croplands
         unit: "%"
         short_unit: "%"
       share_of_land_type_residential_rainfed_croplands:
         title: Share of land that is residential rainfed croplands
+        description_short: *description_residential_rainfed_croplands
         unit: "%"
         short_unit: "%"
       share_of_land_type_residential_rangelands:
         title: Share of land that is residential rangelands
+        description_short: *description_residential_rangelands
         unit: "%"
         short_unit: "%"
       share_of_land_type_residential_woodlands:
         title: Share of land that is residential woodlands
+        description_short: *description_residential_woodlands
         unit: "%"
         short_unit: "%"
       share_of_land_type_rice_villages:
         title: Share of land that is rice villages
+        description_short: *description_rice_villages
         unit: "%"
         short_unit: "%"
       share_of_land_type_urban:
         title: Share of land that is urban
+        description_short: *description_urban
         unit: "%"
         short_unit: "%"
       share_of_land_type_wild_treeless_and_barren_lands:
         title: Share of land that is wild treeless and barren lands
+        description_short: *description_wild_treeless_and_barren_lands
         unit: "%"
         short_unit: "%"
       share_of_land_type_wild_woodlands:
         title: Share of land that is wild woodlands
+        description_short: *description_wild_woodlands
         unit: "%"
         short_unit: "%"
       share_of_land_type_dense_settlements:
