@@ -4,6 +4,11 @@ definitions:
 tables:
   anthromes:
     variables:
+      land_ar_woodlands:
+        title: Area of woodlands
+        unit: "square kilometers"
+        description_processing: |-
+          To calculate this we summed of the area covered by residential woodlands, populated woodlands, remote woodlands and wild woodlands.
       land_ar_ice__uninhabited:
         title: Area of uninhabited ice
         unit: "square kilometers"
@@ -127,6 +132,12 @@ tables:
         short_unit: "km²"
         description_processing: |-
           Used lands are the sum of the area covered by mixed settlements, urban areas, rice villages, irrigated villages, rainfed villages, pastoral villages, residential irrigated croplands, residential rainfed croplands, populated croplands, remote croplands, residential rangelands, populated rangelands and remote rangelands.
+      share_of_land_type_woodlands:
+        title: Share of land that is woodlands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          To calculate this we summed the share of land covered by residential woodlands, populated woodlands, remote woodlands and wild woodlands.
       share_of_land_type_ice__uninhabited:
         title: Share of land that is uninhabited ice
         description_short: *description_uninhabited_ice
