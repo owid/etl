@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
 
-    tb = tb.underscore().set_index(["id"], verify_integrity=True).sort_index()
+    tb = tb.underscore().format("id")
 
     #
     # Save outputs.

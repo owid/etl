@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     tb_combined = add_aggregate_land_types(tb_combined)
     # Save outputs.
     tb_combined.metadata = tb_input.metadata
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_combined = tb_combined.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb_combined], check_variables_metadata=True, default_metadata=ds_meadow.metadata

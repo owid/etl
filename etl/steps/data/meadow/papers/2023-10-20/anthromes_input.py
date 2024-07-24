@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["id", "regn_nm"], verify_integrity=True).sort_index()
+    tb = tb.format(["id", "regn_nm"])
 
     #
     # Save outputs.
