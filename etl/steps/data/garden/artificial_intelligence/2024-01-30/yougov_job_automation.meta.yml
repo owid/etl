@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 180
+tables:
+  yougov_job_automation:
+    variables:
+      dont_know:
+        title: Don't know
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+      fairly_worried:
+        title: Fairly worried
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+      not_very_worried:
+        title: Not very worried
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+      not_worried_at_all:
+        title: Not worried at all
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+      very_worried:
+        title: Very worried
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true

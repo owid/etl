@@ -1,0 +1,173 @@
+definitions:
+  title_killed: |-
+      Number of << animal >> slaughtered to produce meat
+  common:
+    unit: animals
+    short_unit: ""
+    presentation:
+      topic_tags:
+      - Animal Welfare
+    description_key:
+      - The number of slaughtered animals is based on the country of production, not consumption.
+      - Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.
+      - Male baby chickens slaughtered in the egg industry are not included.
+      - Land animals for which FAOSTAT provides no data are not included.
+
+tables:
+  animals_used_for_food:
+    title: Animals used for food
+    variables:
+      cattle_killed:
+        title: <% set animal = "cattle" %>{definitions.title_killed}
+        display:
+          name: Cattle
+        presentation:
+          title_public: <% set animal = "cattle" %>{definitions.title_killed}
+      sheep_killed:
+        title: <% set animal = "sheep" %>{definitions.title_killed}
+        display:
+          name: Sheep
+        presentation:
+          title_public: <% set animal = "sheep" %>{definitions.title_killed}
+      goats_killed:
+        title: <% set animal = "goats" %>{definitions.title_killed}
+        display:
+          name: Goats
+        presentation:
+          title_public: <% set animal = "goats" %>{definitions.title_killed}
+      pigs_killed:
+        title: <% set animal = "pigs" %>{definitions.title_killed}
+        display:
+          name: Pigs
+        presentation:
+          title_public: <% set animal = "pigs" %>{definitions.title_killed}
+      chickens_killed:
+        title: <% set animal = "chickens" %>{definitions.title_killed}
+        display:
+          name: Chickens
+        presentation:
+          title_public: <% set animal = "chickens" %>{definitions.title_killed}
+      rabbits_killed:
+        title: <% set animal = "rabbits" %>{definitions.title_killed}
+        display:
+          name: Rabbits
+        presentation:
+          title_public: <% set animal = "rabbits" %>{definitions.title_killed}
+      ducks_killed:
+        title: <% set animal = "ducks" %>{definitions.title_killed}
+        display:
+          name: Ducks
+        presentation:
+          title_public: <% set animal = "ducks" %>{definitions.title_killed}
+      turkeys_killed:
+        title: <% set animal = "turkeys" %>{definitions.title_killed}
+        display:
+          name: Turkeys
+        presentation:
+          title_public: <% set animal = "turkeys" %>{definitions.title_killed}
+      horses_killed:
+        title: <% set animal = "horses" %>{definitions.title_killed}
+        display:
+          name: Horses
+        presentation:
+          title_public: <% set animal = "horses" %>{definitions.title_killed}
+      buffaloes_killed:
+        title: <% set animal = "buffaloes" %>{definitions.title_killed}
+        display:
+          name: Buffaloes
+        presentation:
+          title_public: <% set animal = "buffaloes" %>{definitions.title_killed}
+      geese_killed:
+        title: <% set animal = "geese" %>{definitions.title_killed}
+        display:
+          name: Geese
+        presentation:
+          title_public: <% set animal = "geese" %>{definitions.title_killed}
+      camels_killed:
+        title: <% set animal = "camels" %>{definitions.title_killed}
+        display:
+          name: Camels
+        presentation:
+          title_public: <% set animal = "camels" %>{definitions.title_killed}
+      pigeons_killed:
+        title: <% set animal = "pigeons" %>{definitions.title_killed}
+        display:
+          name: Pigeons
+        presentation:
+          title_public: <% set animal = "pigeons" %>{definitions.title_killed}
+      snails_killed:
+        title: <% set animal = "snails" %>{definitions.title_killed}
+        display:
+          name: Snails
+        presentation:
+          title_public: <% set animal = "snails" %>{definitions.title_killed}
+      donkeys_killed:
+        title: <% set animal = "donkeys" %>{definitions.title_killed}
+        display:
+          name: Donkeys
+        presentation:
+          title_public: <% set animal = "donkeys" %>{definitions.title_killed}
+      game_killed:
+        title: <% set animal = "game animals" %>{definitions.title_killed}
+        display:
+          name: Game animals
+        presentation:
+          title_public: <% set animal = "game animals" %>{definitions.title_killed}
+      other_non_mammals_killed:
+        title: <% set animal = "other non-mammals" %>{definitions.title_killed}
+        display:
+          name: Other non-mammals
+        presentation:
+          title_public: <% set animal = "other non-mammals" %>{definitions.title_killed}
+      other_rodents_killed:
+        title: <% set animal = "other rodents" %>{definitions.title_killed}
+        display:
+          name: Other rodents
+        presentation:
+          title_public: <% set animal = "other rodents" %>{definitions.title_killed}
+      other_camelids_killed:
+        title: <% set animal = "other camelids" %>{definitions.title_killed}
+        display:
+          name: Other camelids
+        presentation:
+          title_public: <% set animal = "other camelids" %>{definitions.title_killed}
+      mule_killed:
+        title: <% set animal = "mules" %>{definitions.title_killed}
+        display:
+          name: Mules
+        presentation:
+          title_public: <% set animal = "mules" %>{definitions.title_killed}
+      cattle_alive:
+        title: Number of live cattle used to produce meat
+      buffalo_alive:
+        title: Number of live buffaloes used to produce meat
+      sheep_alive:
+        title: Number of live sheep used to produce meat
+      goats_alive:
+        title: Number of live goats used to produce meat
+      pigs_alive:
+        title: Number of live pigs used to produce meat
+      chickens_alive:
+        title: Number of live chickens used to produce meat
+      turkeys_alive:
+        title: Number of live turkeys used to produce meat
+      horses_alive:
+        title: Number of live horses used to produce meat
+      donkeys_alive:
+        title: Number of live donkeys used to produce meat
+      mules_alive:
+        title: Number of live mules used to produce meat
+      rabbits_alive:
+        title: Number of live rabbits used to produce meat
+      bees_alive:
+        title: Number of live bees used to produce honey
+      ducks_alive:
+        title: Number of live ducks used to produce meat
+      camels_alive:
+        title: Number of live camels used to produce meat
+      geese_alive:
+        title: Number of live geese used to produce meat
+      other_rodents_alive:
+        title: Number of other live rodents used to produce meat
+      other_camelids_alive:
+        title: Number of other live camelids used to produce meat

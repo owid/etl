@@ -31,6 +31,9 @@ def split_ussr_and_russia(tb: Table) -> Table:
     """
     tb = tb.copy()
 
+    # To avoid warnings, temporarily make this column of type string.
+    tb = tb.astype({"country": str})
+
     # Name that The Shift Data Portal uses for Russia and USSR.
     shift_ussr_russia_name = "Russian Federation and USSR (Shift)"
     # The relevant part of the data is originally from EIA, who have the first data point for Russia in 1992.
@@ -56,6 +59,9 @@ def split_ussr_and_russia(tb: Table) -> Table:
         .sort_values(["country", "year"])
         .reset_index(drop=True)
     )
+
+    # Make "country" a categorical column again.
+    tb = tb.astype({"country": "category"})
 
     return tb
 

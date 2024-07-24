@@ -27,16 +27,14 @@ import argparse
 import datetime as dt
 import json
 import tempfile
-from pathlib import Path
 from typing import Any, Dict, List, cast
 
 import requests
 from dateutil import parser
 
-from etl.files import ruamel_dump
-from etl.paths import SNAPSHOTS_DIR
 from etl.scripts.faostat.shared import (
     API_BASE_URL,
+    ATTRIBUTION_SHORT,
     FAO_CATALOG_URL,
     FAO_DATA_URL,
     INCLUDED_DATASETS_CODES,
@@ -47,21 +45,7 @@ from etl.scripts.faostat.shared import (
     VERSION,
     log,
 )
-from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot, snapshot_catalog
-
-
-def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
-    # Path to new snapshot folder.
-    snapshot_dir_path = Path(SNAPSHOTS_DIR / metadata["namespace"] / metadata["version"])
-    # Path to new snapshot metadata file.
-    snapshot_file_path = (snapshot_dir_path / metadata["short_name"]).with_suffix(f".{metadata['file_extension']}.dvc")
-
-    # Ensure new snapshot folder exists, otherwise create it.
-    snapshot_dir_path.mkdir(exist_ok=True)
-
-    # Create metadata file for current domain dataset.
-    with open(snapshot_file_path, "w") as f:
-        f.write(ruamel_dump({"meta": metadata}))
+from etl.snapshot import Snapshot, SnapshotMeta, snapshot_catalog
 
 
 class FAODataset:
@@ -102,6 +86,18 @@ class FAODataset:
         return f"{self.namespace}_{self._dataset_metadata['DatasetCode'].lower()}"
 
     @property
+    def dataset_name(self) -> str:
+        return self._dataset_metadata["DatasetName"]
+
+    @property
+    def dataset_description(self) -> str:
+        return self._dataset_metadata["DatasetDescription"]
+
+    @property
+    def dataset_code(self) -> str:
+        return self._dataset_metadata["DatasetCode"]
+
+    @property
     def source_data_url(self) -> str:
         return self._dataset_metadata["FileLocation"]
 
@@ -117,26 +113,24 @@ class FAODataset:
             log.warning(f"Description for dataset {self.short_name} is missing. Type one manually.")
         return {
             "namespace": self.namespace,
-            "short_name": self.short_name,
-            "name": (f"{self._dataset_metadata['DatasetName']} - FAO" f" ({self.publication_year})"),
-            "description": self._dataset_metadata["DatasetDescription"],
-            "source": {
-                "name": SOURCE_NAME,
-                "description": self._dataset_metadata["DatasetDescription"],
-                "published_by": SOURCE_NAME,
-                "publication_year": self.publication_year,
-                "publication_date": str(self.publication_date),
-                "date_accessed": VERSION,
-                "source_data_url": self.source_data_url,
-            },
             "version": VERSION,
-            "url": f"{FAO_DATA_URL}/{self._dataset_metadata['DatasetCode']}",
+            "short_name": self.short_name,
             "file_extension": "zip",
-            "license": {
-                "name": LICENSE_NAME,
-                "url": LICENSE_URL,
+            "origin": {
+                "title": self.dataset_name,
+                "description": self.dataset_description,
+                "date_published": str(self.publication_date),
+                "date_accessed": VERSION,
+                "producer": SOURCE_NAME,
+                "citation_full": f"{SOURCE_NAME} - {self.dataset_name} ({self.publication_year}).",
+                "attribution_short": ATTRIBUTION_SHORT,
+                "url_main": f"{FAO_DATA_URL}/{self.dataset_code}",
+                "url_download": self.source_data_url,
+                "license": {
+                    "name": LICENSE_NAME,
+                    "url": LICENSE_URL,
+                },
             },
-            "is_public": True,
         }
 
     @property
@@ -151,17 +145,20 @@ class FAODataset:
         """
         log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
 
+        # Create a new snapshot metadata.
+        metadata = SnapshotMeta.from_dict(self.metadata)
+
+        # Ensure parent directory exists.
+        metadata.path.parent.mkdir(parents=True, exist_ok=True)
+
         # Create metadata file for current domain dataset.
-        create_snapshot_metadata_file(self.metadata)
+        metadata.path.write_text(metadata.to_yaml())
 
         # Create a new snapshot.
-        snap = Snapshot(self.snapshot_metadata.uri)
+        snap = Snapshot(metadata.uri)
 
-        # Download data from source.
-        snap.download_from_source()
-
-        # Add file to DVC and upload to S3.
-        snap.dvc_add(upload=True)
+        # Download data from source and upload to S3.
+        snap.create_snapshot(upload=True)
 
 
 def load_faostat_catalog() -> List[Dict[str, Any]]:
@@ -188,9 +185,15 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
-        assert snapshot.metadata.source
-        snapshot_source_data_url = snapshot.metadata.source.source_data_url
-        snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
+        assert snapshot.metadata.source or snapshot.metadata.origin
+        if snapshot.metadata.source:
+            snapshot_source_data_url = snapshot.metadata.source.source_data_url
+            snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
+        elif snapshot.metadata.origin:
+            snapshot_source_data_url = snapshot.metadata.origin.url_download
+            snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
+        else:
+            raise ValueError(f"Snapshot {snapshot.metadata.short_name} does not have source or origin.")
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
             dataset_up_to_date = True
 
@@ -211,24 +214,23 @@ class FAOAdditionalMetadata:
         return {
             "namespace": NAMESPACE,
             "short_name": f"{NAMESPACE}_metadata",
-            "name": f"Metadata and identifiers - FAO ({self.publication_year})",
-            "description": "Metadata and identifiers used in FAO datasets",
-            "source": {
-                "name": SOURCE_NAME,
-                "published_by": SOURCE_NAME,
-                "publication_year": self.publication_year,
-                "publication_date": str(self.publication_date),
-                "date_accessed": VERSION,
-                "source_data_url": None,
-            },
             "version": VERSION,
-            "url": FAO_DATA_URL,
             "file_extension": "json",
-            "license": {
-                "name": LICENSE_NAME,
-                "url": LICENSE_URL,
+            "origin": {
+                "title": "Metadata and identifiers",
+                "description": "Metadata and identifiers used in FAOSTAT datasets.",
+                "date_published": str(self.publication_date),
+                "date_accessed": VERSION,
+                "producer": SOURCE_NAME,
+                "citation_full": f"{SOURCE_NAME} ({self.publication_year}).",
+                "attribution_short": ATTRIBUTION_SHORT,
+                "url_main": FAO_DATA_URL,
+                "url_download": None,
+                "license": {
+                    "name": LICENSE_NAME,
+                    "url": LICENSE_URL,
+                },
             },
-            "is_public": True,
         }
 
     @property
@@ -260,25 +262,41 @@ class FAOAdditionalMetadata:
     def to_snapshot(self) -> None:
         log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
 
+        # Create  new snapshot metadata object.
+        metadata = SnapshotMeta.from_dict(self.metadata)
+
         # Create metadata file for current domain dataset.
-        create_snapshot_metadata_file(self.metadata)
+        metadata.path.write_text(metadata.to_yaml())
+
+        # Create a new snapshot.
+        snap = Snapshot(metadata.uri)
 
         with tempfile.NamedTemporaryFile() as f:
             # Download data into a temporary file.
             self._fetch_additional_metadata_and_save(f.name)
 
             # Create snapshot.
-            add_snapshot(uri=self.snapshot_metadata.uri, filename=f.name, upload=True)
+            snap.create_snapshot(filename=f.name, upload=True)
 
 
 def main(read_only: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
-    existing_snapshots = list(snapshot_catalog(match=NAMESPACE))
+    existing_snapshots = [
+        snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
+    ]
 
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False
     # Fetch dataset codes from FAOSTAT catalog.
     faostat_catalog = load_faostat_catalog()
+
+    # Check if any of the domains that we want to download are missing.
+    missing_domains = sorted(
+        set(INCLUDED_DATASETS_CODES) - set([entry["DatasetCode"].lower() for entry in faostat_catalog])
+    )
+    if len(missing_domains) > 0:
+        log.warning(f"The following domains cannot be found in FAOSTAT anymore: {missing_domains}")
+
     for description in faostat_catalog:
         # Build FAODataset instance.
         dataset_code = description["DatasetCode"].lower()

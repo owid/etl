@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 360
+tables:
+  chess:
+    variables:
+      elo_rating:
+        title: Elo rating
+        unit: ''
+        short_unit: ''
+        description_short: Chess ability is measured with the Elo rating system, which is calculated based on game results. A higher rating indicates that a player is more likely to win a game.
+        display:
+          numDecimalPlaces: 0
+

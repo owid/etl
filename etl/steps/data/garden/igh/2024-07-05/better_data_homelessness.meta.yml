@@ -1,0 +1,310 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &common_display
+      tolerance: 5
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Homelessness
+        - Poverty
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  better_data_homelessness:
+    variables:
+      people_experiencing_homelessness:
+        title: Number of people experiencing homelessness
+        unit: people
+        short_unit: ""
+        description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
+        presentation:
+          title_public: Number of people experiencing homelessness
+        display:
+          name: Number of people experiencing homelessness
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      people_homeless_per_10k:
+        title: People experiencing homelessness per 10,000 people
+        unit: people in homelessness per 10,000 population
+        short_unit: ""
+        description_short: Due to different definitions and data collection methods, the estimated number of people experiencing homelessness is not directly comparable across countries.
+        presentation:
+          title_public: People experiencing homelessness per 10,000 people
+        display:
+          name: People experiencing homelessness per 10,000 people
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      igh_framework_category_simplified:
+        title: IGH Framework Category (simplified)
+        unit: ""
+        short_unit: ""
+        description_short: The category of the IGH Framework that the homelessness data falls under.
+        description_key:
+          - The [IGH Global Framework](https://ighomelessness.org/wp-content/uploads/2019/10/globalframeworkforundertanding.pdf) captures three broad categories of people who may be considered homeless, defined as "lacking access to minimally adequate housing". These categories are (1) People without accommodation, (2) People living in temporary or crisis accommodation, and (3) People living in severely inadequate or insecure accommodation.
+          - Among the first category, people without accommodation, the IGH Framework distinguishes (1A) People sleeping in the streets or in other open spaces, (1B) People sleeping in public roofed spaces or buidlings not intended for human habitation, (1C) People sleeping in their cars, rickshaws, open fishing boats and other forms of transport, and (1D) "Pavement dwellers" - individuals or households who live on the street in a regular spot, usually with some form of makeshift cover.
+          - Among the second category, people living in temporary or crisis accommodation, the IGH Framework distinguishes (2A) People staying in night shelters, (2B) People living in homeless hostels and other types of temporary accommodation, (2C) Women and children living in refuges for those fleeing domestic violence, (2D) People living in camps provided for "internally displaced people", and (2E) People living in camps or reception centres/temporary accommodation for asylum seekers, refugees and other immigrants.
+          - Among the third category, people living in severely inadequate or insecure accommodation, the IGH Framework distinguishes (3A) People sharing with friends and relatives on a temporary basis, (3B) People living under threat of violence, (3C) People living in cheap hotels, bed and breakfasts and similar, (3D) People squatting in conventional housing, (3E) People living in conventional housing that is unfit for human habitation, (3F) People living in trailers, caravans and tents, (3G) People living in extremely overcrowded conditions, and (3H) People living in non-conventional buildings and temporary structures, including those living in slums/informal settlements.
+          - Within the framework, IGH targets programs and research primarily toward those in Category 1 and in a subset of Category 2 (2A-2C).
+        processing_level: major
+        description_processing: |-
+          We have simplified the original version of the IGH Framework Category in order to make the metric more clear in a chart. Regardless of the subcategories, we classify the homelessness data into these categories:
+
+          - "No accommodation" refers to mentions to the category 1 of the IGH Framework.
+          - "Temporary and crisis accommodation" refers to mentions to the category 2 of the IGH Framework.
+          - "Severely inadequate accommodation" refers to mentions to the category 3 of the IGH Framework.
+          - "None or temporary" refers to mentions to the categories 1 and 2 of the IGH Framework.
+          - "None or inadequate" refers to mentions to the categories 1 and 3 of the IGH Framework.
+          - "Temporary or inadequate" refers to mentions to the categories 2 and 3 of the IGH Framework.
+          - "None, temporary or inadequate" refers to mentions to the categories 1, 2 and 3 of the IGH Framework.
+          - "Not enough information" refers to the cases where the definition does not align or provide enough detail for IGH Framework classification.
+        presentation:
+          title_public: Forms of homelessness included in available statistics
+        display:
+          name: IGH Framework Category
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "No accommodation"
+          - "Temporary and crisis accommodation"
+          - "Severely inadequate accommodation"
+          - "None or temporary"
+          - "None or inadequate"
+          - "Temporary or inadequate"
+          - "None, temporary or inadequate"
+          - "Not enough information"
+
+      methodology:
+        title: Methodology
+        unit: ""
+        short_unit: ""
+        description_short: The methodology used to collect the homelessness data.
+        presentation:
+          title_public: Methodology
+        display:
+          name: Methodology
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      data_source_type:
+        title: Data Source Type
+        unit: ""
+        short_unit: ""
+        description_short: The type of data source used to collect the homelessness data.
+        presentation:
+          title_public: Data Source Type
+        display:
+          name: Data Source Type
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - Official government data
+          - Intergovernmental organization
+          - Non-governmental organization
+          - Academic report
+          - News media report
+
+      methodology_listed:
+        title: Methodology listed
+        unit: ""
+        short_unit: ""
+        description_short: Whether the methodology used to collect the homelessness data is listed by the data source.
+        presentation:
+          title_public: Methodology listed
+        display:
+          name: Methodology listed
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      homelessness_enumeration_primary_data_source:
+        title: Homelessness enumeration is from primary data source
+        unit: ""
+        short_unit: ""
+        description_short: Whether the data on homelessness is from a primary data source.
+        presentation:
+          title_public: Homelessness enumeration is from primary data source
+        display:
+          name: Homelessness enumeration is from primary data source
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      enumeration_conducted_within_last_four_years:
+        title: Enumeration conducted within last four years
+        unit: ""
+        short_unit: ""
+        description_short: Whether the enumeration of homelessness was conducted within the last four years.
+        presentation:
+          title_public: Enumeration conducted within last four years
+        display:
+          name: Enumeration conducted within last four years
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      enumeration_conducted_same_time_of_year:
+        title: Enumeration conducted at the same time of year
+        unit: ""
+        short_unit: ""
+        description_short: Whether the enumeration of homelessness was conducted at the same time of year or enumeration is based on routinely updated or real-time data (e.g. administrative data).
+        presentation:
+          title_public: Enumeration conducted at the same time of year
+        display:
+          name: Enumeration conducted at the same time of year
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      definition_includes_people_without_accommodation:
+        title: Definition includes people without accommodation
+        unit: ""
+        short_unit: ""
+        description_short: Whether the definition of homelessness includes people without accommodation (sleeping on the streets, open or public spaces, forms of transport).
+        presentation:
+          title_public: Definition includes people without accommodation
+        display:
+          name: Definition includes people without accommodation
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      definition_includes_living_in_emergency_accommodation:
+        title: Definition includes living in emergency accommodation
+        unit: ""
+        short_unit: ""
+        description_short: Whether the definition of homelessness includes people living in emergency accommodation, temporary shelters, hostels, or domestic violence refuges.
+        presentation:
+          title_public: Definition includes living in emergency accommodation
+        display:
+          name: Definition includes living in emergency accommodation
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      definition_includes_insecure_or_inadequate_housing:
+        title: Definition includes insecure or inadequate housing
+        unit: ""
+        short_unit: ""
+        description_short: Whether the definition of homelessness includes people living in severely inadequate or insecure housing, such as sleeping at a someone's house on a temporary basis, extremely overcrowded conditions, living in trailers/tents/accommodation not fit for human habitation, and temporary structures including informal settlements.
+        presentation:
+          title_public: Definition includes insecure or inadequate housing
+        display:
+          name: Definition includes insecure or inadequate housing
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      geographic_scope_listed:
+        title: Geographic scope listed
+        unit: ""
+        short_unit: ""
+        description_short: Whether the geographic scope of the homelessness data is listed by the data source, including disaggregation by region, city, or community.
+        presentation:
+          title_public: Geographic scope listed
+        display:
+          name: Geographic scope listed
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      disaggregation_includes_gender:
+        title: Disaggregation includes gender
+        unit: ""
+        short_unit: ""
+        description_short: Whether the homelessness data is disaggregated by gender.
+        presentation:
+          title_public: Disaggregation includes gender
+        display:
+          name: Disaggregation includes gender
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      disaggregation_includes_age:
+        title: Disaggregation includes age
+        unit: ""
+        short_unit: ""
+        description_short: Whether the homelessness data is disaggregated by age.
+        presentation:
+          title_public: Disaggregation includes age
+        display:
+          name: Disaggregation includes age
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      disaggregation_includes_at_least_two:
+        title: Disaggregation includes at least two additional categories
+        unit: ""
+        short_unit: ""
+        description_short: "Whether the homelessness data is disaggregated by at least two categories of the following: disability status, income, race or ethnicity, migratory status, length of time homeless, and relevant health data."
+        presentation:
+          title_public: Disaggregation includes at least two additional categories
+        display:
+          name: Disaggregation includes at least two additional categories
+          numDecimalPlaces: 0
+          <<: *common_display
+        type: ordinal
+        sort:
+          - "Yes"
+          - "No"
+
+      total_homeless_data_scorecard:
+        title: Homeless Data Scorecard
+        unit: ""
+        short_unit: ""
+        description_short: The Homeless Data Scorecard is an 11-point scale that provides an assessment of the current state of a country’s enumeration and data practices on homelessness. Higher values indicate better data on homelessness.
+        description_key:
+          - "Countries are given one point for each criterion satisfied under five key categories: Methodology, Timeliness, Definition, Geographic Scope, and Disaggregation."
+          - These five categories are further broken down into 11 criteria, each of which is worth one point. Methodology comprises whether the methodology used to collect the homelessness data is listed by the source and whether the enumeration is from a primary data source. Timeliness includes whether the enumeration was conducted within the last four years and whether the enumeration was conducted at the same time of year or based on routinely updated data. Definition measures whether the definition of homelessness includes people without accommodation, living in emergency accommodation, and living in insecure or inadequate housing. Geographic Scope assesses whether the geographic scope of the data is listed by the source and dissagregation by region, city, or community. Disaggregation assesses whether the data is disaggregated by gender, age or two additional categories (disability status, income, race or ethnicity, migratory status, length of time homeless, and relevant health data)."
+          - "The scale is unweighted. In other words, the same score for two countries does not imply that both countries have satisfied the criteria in the same way."
+        description_from_producer: |-
+          After gathering information related to countries’ homelessness enumeration and data practices, we evaluated countries according to our Homeless Data Scorecard (HDS). The HDS is an 11-point scale that provides a rough assessment of the current state of a country’s enumeration and data practices. Countries were given one point for each criterion satisfied under the five key categories discussed in the “Homeless Data Scorecard” section above - Methodology, Timeliness, Definition, Geographic Scope, and Disaggregation. The scale is unweighted. In other words, in awarding one point for disaggregation by gender and one point for enumerations occuring within the last four years, we are not implying that the satisfaction of one criterion is as important as the other. Furthermore, two countries being awarded a point for satisfying the same criteria should not be taken to imply that both countries have satisfied the criteria in the same way. For instance, whereas two countries may satisfy the criterion of “methodology listed,” one country may simply state that data was produced through a street count, while the other country may issue comprehensive reports detailing their data collection tactics and statistical methods used to arrive at their estimate. In cases where the relative lack of contextual information regarding how a country’s data was produced was insufficient to make a determination, countries were not scored according to the HDS.
+        presentation:
+          title_public: Quality of homelessness data
+        display:
+          name: Homeless Data Scorecard
+          numDecimalPlaces: 0
+          <<: *common_display
+

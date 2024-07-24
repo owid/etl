@@ -1,0 +1,28 @@
+
+tables:
+  urban_agglomerations_largest_cities:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      population_30_largest_cities_estimates:
+        title: Population of the top 30 largest urban agglomerations in 2018 (estimates)
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Provides the population figures for the 30 largest urban agglomerations in 2018, ranked by their population size.
+        presentation:
+          title_public: "Population the world's largest cities"
+        display:
+          numDecimalPlaces: 0
+
+      population_30_largest_cities_projections:
+        title: Population of the top 30 largest urban agglomerations in 2018 (projections)
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Provides the population figures for the 30 largest urban agglomerations in 2018, ranked by their population size.
+        presentation:
+          title_public: "Population the world's largest cities"
+        display:
+          numDecimalPlaces: 0
+          isProjection: true

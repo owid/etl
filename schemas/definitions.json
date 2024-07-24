@@ -745,9 +745,35 @@
         "description": "Unit to use in charts instead of the indicator's `unit`."
       },
       "numDecimalPlaces": {
-        "type": "integer",
         "description": "Number of decimal places to show in charts (and in the table tab).",
-        "minimum": 0
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "<%"
+          }
+        ]
+      },
+      "roundingMode": {
+        "description": "Specifies the rounding mode to use.",
+        "type": "string",
+        "enum": ["significantFigures", "decimalPlaces"]
+      },
+      "numSignificantFigures": {
+        "description": "Number of significant rounding figures in charts.",
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "<%"
+          }
+        ]
       },
       "zeroDay": {
         "type": "string",

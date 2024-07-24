@@ -41,7 +41,7 @@ assert PREFERRED_FORMAT in DEFAULT_FORMATS
 assert SUPPORTED_FORMATS[0] == PREFERRED_FORMAT
 
 # available channels in the catalog
-CHANNEL = Literal["garden", "meadow", "grapher", "backport", "open_numbers", "examples", "explorers"]
+CHANNEL = Literal["garden", "meadow", "grapher", "backport", "open_numbers", "examples", "explorers", "external"]
 
 # all pandas nullable dtypes
 NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in ("", "U") for size in (8, 16, 32, 64)]
@@ -107,12 +107,6 @@ class Dataset:
         for col in list(table.columns) + list(table.index.names):
             utils.validate_underscore(col, "Variable's name")
 
-        # non-unique index might be causing problems down the line and is typically a mistake
-        if not table.index.is_unique:
-            warnings.warn(
-                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
-            )
-
         if not table.primary_key:
             if "OWID_STRICT" in environ:
                 raise PrimaryKeyMissing(
@@ -150,18 +144,27 @@ class Dataset:
             table_filename = join(self.path, table.metadata.checked_name + f".{format}")
             table.to(table_filename, repack=repack)
 
-    def __getitem__(self, name: str) -> tables.Table:
+    def read_table(self, name: str, reset_index: bool = True) -> tables.Table:
+        """Read dataset's table from disk. Alternative to ds[table_name], but
+        with more options to optimize the reading.
+
+        :param reset_index: If true, don't set primary keys of the table. This can make loading
+            large datasets with multi-indexes much faster.
+        """
         stem = self.path / Path(name)
 
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                t = tables.Table.read(path)
+                t = tables.Table.read(path, primary_key=[] if reset_index else None)
                 # dataset metadata might have been updated, refresh it
                 t.metadata.dataset = self.metadata
                 return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
+
+    def __getitem__(self, name: str) -> tables.Table:
+        return self.read_table(name, reset_index=False)
 
     def __contains__(self, name: str) -> bool:
         return any((Path(self.path) / name).with_suffix(f".{format}").exists() for format in SUPPORTED_FORMATS)
@@ -186,17 +189,24 @@ class Dataset:
 
         # Update the copy of this datasets metadata in every table in the set.
         # TODO: this entire part should go away and we should make t.metadata.dataset read only
+        #   also dataset metadata should be only saved in `index.json` and not in every table
         for table_name in self.table_names:
-            with disable_processing_log():
-                table = self[table_name]
-            table.metadata.dataset = self.metadata
-            table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
+            # NOTE: don't load the table here, that could be slow. Just update the metadata file.
+            table_meta_path = Path(self.path) / f"{table_name}.meta.json"
+
+            with open(table_meta_path, "r") as f:
+                table_meta = json.load(f)
+                table_meta["dataset"] = self.metadata.to_dict()
+
+            with open(table_meta_path, "w") as f:
+                json.dump(table_meta, f, indent=2, default=str)
 
     def update_metadata(
         self,
         metadata_path: Path,
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
     ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
@@ -211,6 +221,10 @@ class Dataset:
             - "replace" (default): replace existing origin with new one
             - "append": append new origin to existing ones
             - "fail": raise an exception if origin already exists
+        :param errors: How to handle errors encountered during metadata update. Possible values:
+            - "ignore" (default): ignore all errors
+            - "warn": issue a warning if there's an indicator in metadata that doesn't exist in the dataset
+            - "raise": same as "warn" but also raise an exception
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
@@ -218,7 +232,15 @@ class Dataset:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
                 with disable_processing_log():
-                    table = self[table_name]
+                    try:
+                        table = self[table_name]
+                    except KeyError as e:
+                        if errors == "raise":
+                            raise e
+                        else:
+                            if errors == "warn":
+                                warnings.warn(str(e))
+                            continue
                 table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 

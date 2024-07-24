@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Seaver Wang et al. (2024). Updated Mining Footprints and Raw Material Needs for Clean Energy.
+    title: breakdown_material_footprint_wang
+    citation_full: Wang et al. (2024). Updated Mining Footprints and Raw Material Needs for Clean Energy.
+    url_main: https://thebreakthrough.org/issues/energy/updated-mining-footprints-and-raw-material-needs-for-clean-energy
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRrOlHO2wWtDfMUpCF9VYIhe3rL0rtH6x5bZ1IeaZbFZACHhoEiLa8AU8GuOvFkWlykGa3PYjH8cvq2/pub?output=csv
+    date_accessed: '2024-07-16'
+  name: Breakdown of material footprint of electricity (Wang et al. 2024)
+  description: Material footprint of electricity sources, measured without waste rock from mining.
+  license: {}
+outs:
+  - md5: 71429ceda741fdf0be223215ac7af6e4
+    size: 1110
+    path: breakdown_material_footprint_wang.csv

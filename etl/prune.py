@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Set
 from urllib.parse import urlparse
 
-import click
+import rich_click as click
 import structlog
 from owid.catalog import CHANNEL, LocalCatalog
 
@@ -18,7 +18,7 @@ log = structlog.get_logger()
 EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
 
 
-@click.command()
+@click.command(name="prune")
 @click.option(
     "--dag-path",
     type=click.Path(exists=True),
@@ -31,7 +31,11 @@ EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
     help="Path to data directory",
     default=paths.DATA_DIR,
 )
-@click.option("--dry-run", is_flag=True, help="Only print files that would be deleted")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Only print files that would be deleted",
+)
 def prune_cli(
     dag_path: Path,
     data_dir: Path,

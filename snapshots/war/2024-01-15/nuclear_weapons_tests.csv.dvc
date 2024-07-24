@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Nuclear Testing Tally
+    description: |-
+      This dataset provides the yearly number of nuclear weapons tests by country.
+    date_published: 2023-08-01
+
+    # Citation
+    producer: Arms Control Association
+    citation_full: |-
+      Arms Control Association - The Nuclear Testing Tally (2023).
+
+      Daryl Kimball, Executive Director.
+    attribution_short: ACA
+
+    # Files
+    url_main: https://www.armscontrol.org/factsheets/nucleartesttally
+    date_accessed: 2024-01-15
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-15
+outs:
+- md5: adfff25e98820e8998c2c92f6dc67a84
+  size: 1620
+  path: nuclear_weapons_tests.csv

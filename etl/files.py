@@ -4,6 +4,7 @@
 
 import hashlib
 import io
+import json
 import os
 import re
 import subprocess
@@ -13,8 +14,10 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
+import pandas as pd
 import ruamel.yaml
 import yaml
+from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.paths import BASE_DIR
@@ -49,6 +52,34 @@ class RuntimeCache:
 
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
+
+TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
+DEFAULT_CHUNK_SIZE = 512
+
+
+def istextblock(block: bytes) -> bool:
+    if not block:
+        # An empty file is considered a valid text file
+        return True
+
+    if b"\x00" in block:
+        # Files with null bytes are binary
+        return False
+
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of TEXT_CHARS from the block
+    nontext = block.translate(None, TEXT_CHARS)
+    return float(len(nontext)) / len(block) <= 0.30
+
+
+def checksum_str(s: str) -> str:
+    "Return the md5 hex digest of the string."
+    return hashlib.md5(s.encode()).hexdigest()
+
+
+def checksum_dict(d: Dict[str, Any]) -> str:
+    "Return the md5 hex digest of the dictionary."
+    return checksum_str(json.dumps(d, default=str))
 
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
@@ -90,9 +121,12 @@ def checksum_file(filename: Union[str, Path]) -> str:
     return CACHE_CHECKSUM_FILE[key]
 
 
-def checksum_str(s: str) -> str:
-    "Return the md5 hex digest of the string."
-    return hashlib.md5(s.encode()).hexdigest()
+def checksum_df(df: pd.DataFrame, index=True) -> str:
+    """Return the md5 hex digest of dataframe. It is only useful for large dataframes. For smaller
+    ones (<1M rows), it's better to use checksum_dict or checksum_str.
+    """
+    # NOTE: I tried joblib.hash, but it was much slower than pandas hash
+    return hashlib.md5(pd.util.hash_pandas_object(df, index=index).values).hexdigest()
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
@@ -115,12 +149,11 @@ class _MyDumper(Dumper):
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
     lines = data.splitlines()
-    if len(lines) > 1:  # check for multiline string
-        max_line_length = max([len(line) for line in lines])
-        if max_line_length > 120:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=">")
-        else:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    # If there are multiple lines, or there is a line that is longer than 120 characters, use the literal style.
+    # NOTE: Here the 120 is a bit arbitrary. This is the default length of our lines in the code, but once written
+    # to YAML, the lines will be longer because of the indentation. So, we could use a smaller number here.
+    if (len(lines) > 1) or (len(lines) > 0 and max([len(line) for line in lines]) > 120):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
@@ -177,7 +210,9 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
 
 
 def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
-    return ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader, preserve_quotes=True)
+    yaml = YAML(typ="rt")  # Create a YAML object with round-trip type
+    yaml.preserve_quotes = True
+    return yaml.load(f)  # Load the content using the new API
 
 
 def _strip_lines(s: str) -> str:

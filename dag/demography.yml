@@ -1,17 +1,17 @@
 steps:
-
   ####################################
   # Population #######################
   ####################################
 
-  # Population
+  # Population OMM #############################
+  # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2022-12-08/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2019-12-10/population
     - data://garden/un/2022-07-11/un_wpp
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-  data://grapher/demography/2023-03-30/population:
-    - data://garden/demography/2022-12-08/population
+
+  # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2023-03-31/population
@@ -21,6 +21,73 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
+
+  # 2024-07-15: HYDE 3.3 + Gapminder + UN WPP 2024
+  data://garden/demography/2024-07-15/population:
+    # HYDE 3.3
+    - data://garden/hyde/2024-01-02/all_indicators
+    # Gapminder v7
+    - data://garden/gapminder/2023-03-31/population
+    # Gapminder Systema Globalis
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    # UN WPP (2024)
+    - data://garden/un/2024-07-12/un_wpp
+    # Auxiliary
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/faostat/2024-03-14/faostat_rl
+  data://grapher/demography/2024-07-15/population:
+    - data://garden/demography/2024-07-15/population
+
+  # WPP (2024)
+  data://meadow/un/2024-07-12/un_wpp:
+    # Main indicators
+    - snapshot://un/2024-07-12/un_wpp_demographic_indicators.xlsx
+    # Population
+    - snapshot://un/2024-07-12/un_wpp_population_estimates.csv
+    - snapshot://un/2024-07-12/un_wpp_population_low.csv
+    - snapshot://un/2024-07-12/un_wpp_population_medium.csv
+    - snapshot://un/2024-07-12/un_wpp_population_high.csv
+    - snapshot://un/2024-07-12/un_wpp_population_constant_fertility.csv
+    # Fertility
+    - snapshot://un/2024-07-12/un_wpp_fertility.csv
+    # Deaths
+    - snapshot://un/2024-07-12/un_wpp_deaths_estimates.csv
+    - snapshot://un/2024-07-12/un_wpp_deaths_medium.csv
+  data://garden/un/2024-07-12/un_wpp:
+    - data://meadow/un/2024-07-12/un_wpp
+  data://grapher/un/2024-07-12/un_wpp:
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/un/2024-07-12/un_wpp_full:
+    - data://garden/un/2024-07-12/un_wpp
+
+  # WPP Historical comparison
+  data://garden/demography/2024-07-12/un_wpp_historical:
+    - snapshot://fasttrack/latest/un_wpp_historical.csv
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2024-07-12/un_wpp_historical:
+    - data://garden/demography/2024-07-12/un_wpp_historical
+
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2024-01-08/gleditsch_no_population
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
+
+  # HYDE 3.3
+  data://meadow/hyde/2024-01-02/all_indicators:
+    - snapshot://hyde/2024-01-02/all_indicators.zip
+    - snapshot://hyde/2024-01-02/general_files.zip
+  data://garden/hyde/2024-01-02/all_indicators:
+    - data://meadow/hyde/2024-01-02/all_indicators
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/hyde/2024-01-02/all_indicators:
+    - data://garden/hyde/2024-01-02/all_indicators
+
   ## Population by education group (Wittgenstein centre)
   data://meadow/demography/2023-04-07/population_education_wittgenstein:
     - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
@@ -29,10 +96,11 @@ steps:
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
   ## Population doubling times
-  data://garden/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-03-31/population
-  data://grapher/demography/2023-07-03/population_doubling_times:
-    - data://garden/demography/2023-07-03/population_doubling_times
+  data://garden/demography/2024-07-18/population_doubling_times:
+    - data://garden/demography/2024-07-15/population
+  data://grapher/demography/2024-07-18/population_doubling_times:
+    - data://garden/demography/2024-07-18/population_doubling_times
+
   ## Population comparison
   data://garden/demography/2023-06-27/world_population_comparison:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
@@ -42,14 +110,6 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison
-
-  # Population density
-  data://garden/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/faostat/2023-06-12/faostat_rl
-  data://grapher/demography/2023-06-12/population_density:
-    - data://garden/demography/2023-06-12/population_density
-
 
   ####################################
   # Life expectancy ##################
@@ -148,20 +208,14 @@ steps:
   data://grapher/demography/2023-11-08/modal_age_death:
     - data://garden/demography/2023-11-08/modal_age_death
 
-  # Population (Fariss et al.)
-  data://meadow/demography/2023-12-20/population_fariss:
-    - snapshot://demography/2023-12-20/population_fariss.rds
-  data://garden/demography/2023-12-20/population_fariss:
-    - data://meadow/demography/2023-12-20/population_fariss
-    - data://garden/countries/2023-09-25/gleditsch
-  data://grapher/demography/2023-12-20/population_fariss:
-    - data://garden/demography/2023-12-20/population_fariss
+  # Maddison working paper (2022)
+  data://meadow/ggdc/2024-01-19/maddison_federico_paper:
+    - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
+  data://garden/ggdc/2024-01-19/maddison_federico_paper:
+    - data://meadow/ggdc/2024-01-19/maddison_federico_paper
 
-  # HYDE 3.3
-  data://meadow/hyde/2024-01-02/all_indicators:
-    - snapshot://hyde/2024-01-02/all_indicators.zip
-    - snapshot://hyde/2024-01-02/general_files.zip
-  data://garden/hyde/2024-01-02/all_indicators:
-    - data://meadow/hyde/2024-01-02/all_indicators
-  data://grapher/hyde/2024-01-02/all_indicators:
-    - data://garden/hyde/2024-01-02/all_indicators
+  # UN WPP experiments
+  data://garden/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-03-14/un_wpp_most

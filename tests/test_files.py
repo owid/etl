@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 from etl import files
 
 
@@ -36,6 +39,13 @@ c:
     )
 
 
+def test_yaml_empty():
+    d = {
+        "a": "",
+    }
+    assert files.yaml_dump(d) == "a: ''\n"
+
+
 def test_checksum_file_regions(tmp_path):
     s = """
 - code: "FOO"
@@ -60,3 +70,17 @@ def test_checksum_file_regions(tmp_path):
     checksum2 = files.checksum_file(tmp_path / "regions.yml")
 
     assert checksum1 == checksum2
+
+
+def test_checksum_dict():
+    d = {
+        "a": 1,
+        "b": "x",
+        "c": [1, 2, 3, np.nan],
+    }
+    assert files.checksum_dict(d) == "f5ec37a48fc5bdbe085608c8689b696f"
+
+
+def test_checksum_df():
+    df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "x", "y"]})
+    assert files.checksum_df(df) == "34c7a3a435e4a0703b37904f09f967f1"

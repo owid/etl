@@ -1,0 +1,19 @@
+dataset:
+  title: Ice Sheet Mass Balance
+  update_period_days: 0
+
+tables:
+  ice_sheet_mass_balance:
+    title: Ice Sheet Mass Balance
+    variables:
+      cumulative_ice_sheet_mass_balance:
+        title: Cumulative change in mass of ice sheets
+        processing_level: minor
+      unit: "billion tonnes"
+      short_unit: "billion t"
+      description_short: Measured in billion tonnes.
+      description_key:
+        - For reference, 1 billion metric tonnes is equal to about 260 cubic miles of ice — enough to raise sea level by about 3 millimeters.
+      presentation:
+        topic_tags:
+        - Climate Change

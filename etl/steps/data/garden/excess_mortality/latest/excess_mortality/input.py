@@ -19,6 +19,7 @@ COLUMNS_YEAR_EXPECTED = [
     "_2021",
     "_2022",
     "_2023",
+    "_2024",
 ]
 COLUMNS_EXPECTED = [
     "entity",

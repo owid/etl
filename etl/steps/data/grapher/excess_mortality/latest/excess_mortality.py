@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("excess_mortality")
+    ds_garden = paths.load_dataset("excess_mortality")
 
     # Read table from garden dataset.
     tb_garden = ds_garden["excess_mortality"]

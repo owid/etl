@@ -64,6 +64,7 @@
     - "NER"
     - "NGA"
     - "OWID_ERE"
+    - "OWID_OFS"
     - "REU"
     - "RWA"
     - "SDN"
@@ -171,10 +172,12 @@
     - "MYS"
     - "NPL"
     - "OMN"
+    - "OWID_DRV"
     - "OWID_KRU"
     - "OWID_RVN"
     - "OWID_YAR"
     - "OWID_YPR"
+    - "OWID_FPK"
     - "PAK"
     - "PHL"
     - "PRK"
@@ -279,6 +282,7 @@
   aliases:
     - "Bosnia Herzegovina"
     - "Bsnia.&Hrzgvna."
+    - "Bosnia & Herzegovina"
 
 - code: "BWA"
   name: "Botswana"
@@ -348,6 +352,8 @@
   members:
     - "GGY"
     - "JEY"
+  aliases:
+    - "CHI"
 
 - code: "CHL"
   name: "Chile"
@@ -447,6 +453,7 @@
     - "D.R. of the Congo"
     - "Democratic Republic of the Congo"
     - "Zaire/ Congo , Dem. Rep."
+    - "Congo, Democratic Republic"
 
 - code: "DNK"
   name: "Denmark"
@@ -456,6 +463,8 @@
 
 - code: "DJI"
   name: "Djibouti"
+  aliases:
+    - "French Somalia"
 
 - code: "DMA"
   name: "Dominica"
@@ -472,6 +481,7 @@
   aliases:
     - "Germany, East"
     - "German Democratic Republic"
+    - "German Democratic Rep"
   end_year: 1990
   successors:
     - "DEU"
@@ -518,6 +528,7 @@
   name: "Eswatini"
   aliases:
     - "Swaziland"
+    - "Eswatini (Swaziland)"
 
 - code: "ETH"
   name: "Ethiopia"
@@ -575,6 +586,15 @@
     - "OWID_SRM"
     - "OWID_USS"
     - "OWID_YGS"
+    - "OWID_TSC"
+    - "OWID_DSI"
+    - "OWID_MOD"
+    - "OWID_SAR"
+    - "OWID_PAR"
+    - "OWID_BAD"
+    - "OWID_BAV"
+    - "OWID_SAX"
+    - "OWID_WTB"
     - "POL"
     - "PRT"
     - "ROU"
@@ -664,6 +684,7 @@
   name: "French Guiana"
   aliases:
     - "French Guyana"
+    - "France (French Guiana)"
 
 - code: "PYF"
   name: "French Polynesia"
@@ -706,6 +727,8 @@
 
 - code: "GRD"
   name: "Grenada"
+  aliases:
+    - "Granada (Winward Island)"
 
 - code: "GLP"
   name: "Guadeloupe"
@@ -777,6 +800,8 @@
 
 - code: "IRL"
   name: "Ireland"
+  aliases:
+    - "Ireland, Republic of"
 
 - code: "IMN"
   name: "Isle of Man"
@@ -810,6 +835,9 @@
 
 - code: "OWID_KOS"
   name: "Kosovo"
+  aliases:
+    - "XKX"
+    - "Kosovo (under United Nations Security Council Resolution 1244/99)"
 
 - code: "KWT"
   name: "Kuwait"
@@ -954,6 +982,8 @@
 
 - code: "NAM"
   name: "Namibia"
+  aliases:
+    - "German South West Africa"
 
 - code: "NRU"
   name: "Nauru"
@@ -1046,6 +1076,7 @@
     - "MTQ"
     - "NIC"
     - "PAN"
+    - "OWID_RCA"
     - "PRI"
     - "SLV"
     - "SPM"
@@ -1065,6 +1096,7 @@
     - "Democratic People's Republic of Korea"
     - "Korea (the Democratic People's Republic of)"
     - "Korea, Dem. People's Rep."
+    - "Korea, Dem. P.R. of"
 
 - code: "MKD"
   name: "North Macedonia"
@@ -1194,12 +1226,22 @@
 - code: "QAT"
   name: "Qatar"
 
+- code: "OWID_DRV"
+  name: "Democratic Republic of Vietnam"
+  is_historical: True
+  end_year: 1975
+  aliases:
+    - "North Vietnam"
+  successors:
+    - "VNM"
+
 - code: "OWID_RVN"
   name: "Republic of Vietnam"
   is_historical: True
   end_year: 1975
   aliases:
     - "South Vietnam"
+    - "Vietnam, S."
   successors:
     - "VNM"
 
@@ -1210,6 +1252,8 @@
 
 - code: "ROU"
   name: "Romania"
+  aliases:
+    - "ROM"
 
 - code: "RUS"
   name: "Russia"
@@ -1226,6 +1270,7 @@
   aliases:
     - "St Barth"
     - "Saint Barthélemy"
+    - "St. Barthelemy (Norvegian Colonies)"
 
 - code: "SHN"
   name: "Saint Helena"
@@ -1238,6 +1283,7 @@
   aliases:
     - "St. Kitts and Nevis"
     - "St.Kitts & Nevis"
+    - "St. Kitts - Nevis"
 
 - code: "LCA"
   name: "Saint Lucia"
@@ -1254,6 +1300,8 @@
   name: "Saint Pierre and Miquelon"
   aliases:
     - "St.Pierre & Miq."
+    - "St.Pierre e Michelon"
+    - "St. Pierre & Miquelon"
 
 - code: "VCT"
   name: "Saint Vincent and the Grenadines"
@@ -1261,9 +1309,12 @@
     - "Saint Vincent/Grenadines"
     - "St. Vincent and the Grenadines"
     - "St.Vin. & Gren."
+    - "St. Vincent & Grenadines"
 
 - code: "WSM"
   name: "Samoa"
+  aliases:
+    - "Western Samoa"
 
 - code: "SMR"
   name: "San Marino"
@@ -1272,6 +1323,7 @@
   name: "Sao Tome and Principe"
   aliases:
     - "Sao Tome & Pr."
+    - "S.Tome e Principe (Portuguess Africa)"
 
 - code: "SAU"
   name: "Saudi Arabia"
@@ -1344,6 +1396,7 @@
     - "FLK"
     - "GUF"
     - "GUY"
+    - "OWID_GCL"
     - "PER"
     - "PRY"
     - "SGS"
@@ -1360,6 +1413,7 @@
     - "Korea, Rep."
     - "Korea, Republic Of"
     - "Republic of Korea"
+    - "Korea (Rep. of)"
 
 - code: "OWID_SOS"
   name: "South Ossetia"
@@ -1431,6 +1485,7 @@
     - "U.R. Tanzania"
     - "U.R. of Tanzania: Mainland"
     - "United Republic of Tanzania"
+    - "Tanganyka (German East Africa)"
   related:
     - "OWID_ZAN"
 
@@ -1472,6 +1527,7 @@
   aliases:
     - "Turks & Caicos"
     - "Turks and Caicos Islands (the)"
+    - "Turk Island"
 
 - code: "TUV"
   name: "Tuvalu"
@@ -1512,6 +1568,7 @@
   aliases:
     - "U.Arab Emirates"
     - "United Arab Em"
+    - "UAE"
 
 - code: "GBR"
   name: "United Kingdom"
@@ -1585,6 +1642,7 @@
   name: "Vatican"
   aliases:
     - "Holy See"
+    - "Papal States"
 
 - code: "VEN"
   name: "Venezuela"
@@ -1616,6 +1674,8 @@
 
 - code: "ESH"
   name: "Western Sahara"
+  aliases:
+    - "Spanish Sahara"
 
 - code: "OWID_WRL"
   name: "World"
@@ -1639,6 +1699,8 @@
   name: "Yemen Arab Republic"
   is_historical: True
   end_year: 1990
+  aliases:
+    - "North Yemen"
   successors:
     - "YEM"
 
@@ -1677,3 +1739,368 @@
 - code: "ZWE"
   name: "Zimbabwe"
 
+# Former states in nowadays' Italy
+- code: "OWID_TSC"
+  name: "Grand Duchy of Tuscany"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Tuscany"
+  successors:
+    - "ITA"
+
+- code: "OWID_DSI"
+  name: "Kingdom of the Two Sicilies"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Regno delle Due Sicilie"
+    - "Two Sicilies"
+    - "Sicily"
+  successors:
+    - "ITA"
+
+- code: "OWID_MOD"
+  name: "Duchy of Modena and Reggio"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Modena"
+  successors:
+    - "ITA"
+
+- code: "OWID_SAR"
+  name: "Kingdom of Sardinia"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Sardinia"
+    - "Piedmont-Sardinia"
+  successors:
+    - "ITA"
+
+- code: "OWID_PAR"
+  name: "Duchy of Parma and Piacenza"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Parma"
+  successors:
+    - "ITA"
+
+# Former states in nowadays' Germany
+- code: "OWID_BAD"
+  name: "Grand Duchy of Baden"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Baden"
+  successors:
+    - "DEU"
+
+- code: "OWID_BAV"
+  name: "Kingdom of Bavaria"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Bavaria"
+  successors:
+    - "DEU"
+
+- code: "OWID_SAX"
+  name: "Kingdom of Saxony"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Saxony"
+  successors:
+    - "DEU"
+
+- code: "OWID_WTB"
+  name: "Kingdom of Wurttemberg"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Wurttemberg"
+    - "Wuerttemberg"
+  successors:
+    - "DEU"
+
+# Former states in Central America/South America
+- code: "OWID_GCL"
+  name: "Great Colombia"
+  is_historical: True
+  end_year: 1830
+  successors:
+    - "COL"
+    - "PAN"
+    - "ECU"
+    - "VEN"
+    - "GUY"
+
+- code: "OWID_RCA"
+  name: "Federal Republic of Central America"
+  is_historical: True
+  end_year: 1841
+  aliases:
+    - "Central American Union"
+  successors:
+    - "CRI"
+    - "SLV"
+    - "GTM"
+    - "HND"
+    - "NIC"
+
+# Other former states
+- code: "OWID_FPK"
+  name: "Pakistan (former)"
+  is_historical: True
+  end_year: 1971
+  successors:
+    - "PAK"
+    - "BGD"
+
+- code: "OWID_OFS"
+  name: "Orange Free State"
+  is_historical: True
+  end_year: 1902
+  successors:
+    - "ZAF"
+
+# WHO regions
+- code: WHO_AMR
+  name: "Americas (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "AIA"
+    - "ATG"
+    - "ARG"
+    - "BHS"
+    - "BLZ"
+    - "BRB"
+    - "BOL"
+    - "BRA"
+    - "CAN"
+    - "CHL"
+    - "COL"
+    - "CRI"
+    - "CUB"
+    - "CYM"
+    - "DMA"
+    - "DOM"
+    - "ECU"
+    - "SLV"
+    - "GRD"
+    - "GTM"
+    - "GUF"
+    - "GUY"
+    - "HTI"
+    - "HND"
+    - "JAM"
+    - "MEX"
+    - "MSR"
+    - "NIC"
+    - "PAN"
+    - "PRY"
+    - "PER"
+    - "PRI"
+    - "KNA"
+    - "LCA"
+    - "SUR"
+    - "TTO"
+    - "USA"
+    - "URY"
+    - "VEN"
+
+- code: WHO_AFR
+  name: "Africa (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "DZA"
+    - "AGO"
+    - "BEN"
+    - "BWA"
+    - "BFA"
+    - "BDI"
+    - "CMR"
+    - "CPV"
+    - "CAF"
+    - "TCD"
+    - "COM"
+    - "COG"
+    - "CIV"
+    - "COD"
+    - "GNQ"
+    - "ERI"
+    - "SWZ"
+    - "ETH"
+    - "GAB"
+    - "GMB"
+    - "GHA"
+    - "GIN"
+    - "GNB"
+    - "KEN"
+    - "LSO"
+    - "LBR"
+    - "MDG"
+    - "MWI"
+    - "MLI"
+    - "MRT"
+    - "MUS"
+    - "MOZ"
+    - "NAM"
+    - "NER"
+    - "NGA"
+    - "RWA"
+    - "STP"
+    - "SEN"
+    - "SYC"
+    - "SLE"
+    - "ZAF"
+    - "SSD"
+    - "TZA"
+    - "TGO"
+    - "UGA"
+    - "ZMB"
+    - "ZWE"
+- code: WHO_EMR
+  name: "Eastern Mediterranean (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "AFG"
+    - "BHR"
+    - "DJI"
+    - "EGY"
+    - "IRN"
+    - "IRQ"
+    - "JOR"
+    - "KWT"
+    - "LBN"
+    - "LBY"
+    - "MAR"
+    - "OMN"
+    - "PAK"
+    - "QAT"
+    - "SAU"
+    - "SOM"
+    - "SDN"
+    - "SYR"
+    - "TUN"
+    - "ARE"
+    - "YEM"
+- code: WHO_EUR
+  name: "Europe (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "ALB"
+    - "AND"
+    - "ARM"
+    - "AUT"
+    - "AZE"
+    - "BLR"
+    - "BEL"
+    - "BIH"
+    - "BGR"
+    - "HRV"
+    - "CYP"
+    - "CZE"
+    - "DNK"
+    - "EST"
+    - "FIN"
+    - "FRA"
+    - "GEO"
+    - "DEU"
+    - "GRC"
+    - "HUN"
+    - "ISL"
+    - "IRL"
+    - "ISR"
+    - "ITA"
+    - "KAZ"
+    - "KGZ"
+    - "LVA"
+    - "LTU"
+    - "LUX"
+    - "MLT"
+    - "MDA"
+    - "MCO"
+    - "MNE"
+    - "NLD"
+    - "MKD"
+    - "NOR"
+    - "POL"
+    - "PRT"
+    - "ROU"
+    - "RUS"
+    - "SMR"
+    - "SRB"
+    - "SVK"
+    - "SVN"
+    - "ESP"
+    - "SWE"
+    - "CHE"
+    - "TJK"
+    - "TUR"
+    - "TKM"
+    - "UKR"
+    - "GBR"
+    - "UZB"
+- code: WHO_SEAR
+  name: "South-East Asia (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "BGD"
+    - "BTN"
+    - "PRK"
+    - "IND"
+    - "IDN"
+    - "MDV"
+    - "MMR"
+    - "NPL"
+    - "THA"
+    - "TLS"
+    - "LKA"
+- code: WHO_WPAC
+  name: "Western Pacific (WHO)"
+  region_type: "aggregate"
+  defined_by: who
+  members:
+    - "AUS"
+    - "ASM"
+    - "BRN"
+    - "KHM"
+    - "CHN"
+    - "COK"
+    - "FJI"
+    - "GUM"
+    - "HKG"
+    - "JPN"
+    - "KIR"
+    - "LAO"
+    - "MAC"
+    - "MYS"
+    - "MHL"
+    - "FSM"
+    - "MNG"
+    - "MNP"
+    - "NCL"
+    - "NRU"
+    - "NZL"
+    - "NIU"
+    - "PLW"
+    - "PNG"
+    - "PHL"
+    - "PYF"
+    - "WSM"
+    - "SGP"
+    - "SLB"
+    - "KOR"
+    - "TON"
+    - "TUV"
+    - "VUT"
+    - "VNM"

@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Forests & Deforestation
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  ifl:
+    variables:
+      ifl_area:
+        title: Intact Forest Landscapes Area
+        unit: square kilometers
+        short_unit: km²
+        description_short: Area of [intact forest landscapes](#dod:intact-forest-landscapes). Intact forest landscapes are vast, continuous natural ecosystems without significant human disturbance or fragmentation.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1

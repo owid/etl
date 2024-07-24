@@ -3,8 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global Plastics Outlook - Plastics waste in 2019 by region, polymer and
-      application
+    title: Global Plastics Outlook - Plastics waste in 2019 by region, polymer and application
     description: |-
       This dataset provides estimates of plastics waste  per polymer and application for the 15 global regions of the OECD ENV-Linkages model, detailed in the Annex of the OECD Global Plastics Outlook.
 
@@ -25,6 +24,6 @@ meta:
 
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: fe9788c98058910e8a1fc6975a343fd8
-  size: 134026
-  path: plastic_waste_2019.csv
+  - md5: fd1808cd6282ee29c86346030cca13ea
+    size: 134026
+    path: plastic_waste_2019.csv

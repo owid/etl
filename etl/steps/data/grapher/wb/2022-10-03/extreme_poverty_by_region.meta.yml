@@ -56,7 +56,7 @@ tables:
 
           Prior to 1990 estimates for more than one region are missing, precluding this method.
         presentation:
-          title_public: Share of population living in extreme poverty
+          title_public: Total of population living in extreme poverty by world region
           topic_tags:
             - Poverty
             - Economic Growth

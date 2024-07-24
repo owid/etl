@@ -1,0 +1,100 @@
+steps:
+    # Artificial Intelligence (EPOCH)
+  data://meadow/artificial_intelligence/latest/epoch:
+    - snapshot://artificial_intelligence/latest/epoch.csv
+  data://garden/artificial_intelligence/latest/epoch:
+    - data://meadow/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch:
+    - data://garden/artificial_intelligence/latest/epoch
+
+  # Artificial Intelligence (EPOCH, number of systems by country)
+  data://garden/artificial_intelligence/latest/epoch_system_countries:
+    - data://meadow/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_system_countries:
+    - data://garden/artificial_intelligence/latest/epoch_system_countries
+
+  # Aggregates by domain
+  data://garden/artificial_intelligence/latest/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/latest/epoch_aggregates_domain
+
+  # Aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/latest/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_affiliation:
+
+  # Aggregates by machine learning approach
+  data://garden/artificial_intelligence/latest/epoch_aggregates_approach:
+    - data://garden/artificial_intelligence/latest/epoch
+  data://grapher/artificial_intelligence/latest/epoch_aggregates_approach:
+    - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by organization
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_organizations
+
+  # EPOCH notable systems, aggregates by organization
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_organizations:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_organizations
+
+  # EPOCH notable systes, aggregates by country
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
+
+  # AI Incidents
+  data://garden/artificial_intelligence/2023-06-14/ai_incidents:
+    - snapshot://artificial_intelligence/2023-06-14/ai_incidents.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_incidents:
+    - data://garden/artificial_intelligence/2023-06-14/ai_incidents
+ # AI job postings
+  data://garden/artificial_intelligence/2023-06-14/ai_job_postings:
+    - snapshot://artificial_intelligence/2023-06-14/ai_job_postings.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_job_postings:
+    - data://garden/artificial_intelligence/2023-06-14/ai_job_postings
+
+  # AI corporate investment
+  data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment:
+    - snapshot://artificial_intelligence/2023-06-14/ai_corporate_investment.csv
+    - snapshot://wb/2023-09-19/us_cpi.csv
+
+  data://grapher/artificial_intelligence/2023-06-14/ai_corporate_investment:
+    - data://garden/artificial_intelligence/2023-06-14/ai_corporate_investment
+
+  # AI private investment
+  data://garden/artificial_intelligence/2023-06-14/ai_private_investment:
+    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_private_investment_total.csv
+    - snapshot://wb/2023-09-19/us_cpi.csv
+
+  data://grapher/artificial_intelligence/2023-06-14/ai_private_investment:
+    - data://garden/artificial_intelligence/2023-06-14/ai_private_investment
+
+
+  # AI companies
+  data://garden/artificial_intelligence/2023-06-14/ai_companies:
+    - snapshot://artificial_intelligence/2023-06-14/ai_companies.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_companies_total.csv
+
+
+  # Artificial Intelligence Conference Attendance
+  data://garden/artificial_intelligence/2023-06-14/ai_all_conferences:
+    - snapshot://artificial_intelligence/2023-06-14/ai_large_conferences.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_small_conferences.csv
+    - snapshot://artificial_intelligence/2023-06-14/ai_conferences_total.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
+    - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
+
+  # AI Robots
+  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
+    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
+  data://garden/artificial_intelligence/2023-06-14/ai_robots:
+    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
+  data://grapher/artificial_intelligence/2023-06-14/ai_robots:
+    - data://garden/artificial_intelligence/2023-06-14/ai_robots

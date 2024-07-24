@@ -101,6 +101,10 @@ tables:
         description_short: |-
           <% set estimate = "best" %>
           {definitions.all.description_short}
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -122,6 +126,10 @@ tables:
         description_short: |-
           <% set estimate = "best" %>
           {definitions.all.description_short_per_capita}
+        description_processing: |-
+          {definitions.common.description_processing}
+
+          For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
         display:
           numDecimalPlaces: 1
 

@@ -14,6 +14,7 @@ from pandas._typing import Scalar
 from pandas.core.series import Series
 
 from . import processing_log as pl
+from . import warnings
 from .meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
@@ -91,7 +92,9 @@ class Variable(pd.Series):
         if data is None and not kwargs.get("dtype"):
             kwargs["dtype"] = "object"
 
-        super().__init__(data=data, index=index, name=name, **kwargs)
+        # DeprecationWarning: Passing a SingleBlockManager to Variable is deprecated and will raise in a future version. Use public APIs instead.
+        with warnings.ignore_warnings([DeprecationWarning]):
+            super().__init__(data=data, index=index, name=name, **kwargs)
 
     @property
     def m(self) -> VariableMeta:
@@ -231,7 +234,9 @@ class Variable(pd.Series):
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
-            log.warning("Avoid using fillna(inplace=True), which may not handle metadata as expected.")
+            warnings.warn(
+                "Avoid using fillna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
+            )
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().fillna(value, *args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
@@ -244,7 +249,9 @@ class Variable(pd.Series):
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
-            log.warning("Avoid using dropna(inplace=True), which may not handle metadata as expected.")
+            warnings.warn(
+                "Avoid using dropna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
+            )
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().dropna(*args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
@@ -283,6 +290,9 @@ class Variable(pd.Series):
             variables=[self], operation="pct_change", name=variable_name
         )
         return variable
+
+    def set_categories(self, *args, **kwargs) -> "Variable":
+        return Variable(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
     def update_log(
         self,
@@ -352,38 +362,45 @@ def _get_metadata_value_from_variables_if_all_identical(
             # There is no need to warn if units are different when doing a multiplication or a division.
             # In most cases, units will be different, and that is fine, as long as the resulting variable has no units.
             # Note that the same reasoning can be applied to other operations, so we may need to generalize this logic.
-            log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
+            warnings.warn(
+                f"Different values of '{field}' detected among variables: {unique_values}",
+                warnings.DifferentValuesWarning,
+            )
 
     return combined_value
 
 
 def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
     # Make a list of all sources of all variables.
-    sources = sum([variable.metadata.sources for variable in variables], [])
-
-    return pd.unique(sources).tolist()
+    sources = []
+    for variable in variables:
+        sources += [s for s in variable.metadata.sources if s not in sources]
+    return sources
 
 
 def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
     # Make a list of all origins of all variables.
-    origins = sum([variable.metadata.origins for variable in variables], [])
-
-    # Get unique array of tuples of origin fields (respecting the order).
-    return pd.unique(origins).tolist()
+    origins = []
+    for variable in variables:
+        # Get unique array of tuples of origin fields (respecting the order).
+        origins += [o for o in variable.metadata.origins if o not in origins]
+    return origins
 
 
 def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
     # Make a list of all licenses of all variables.
-    licenses = sum([variable.metadata.licenses for variable in variables], [])
-
-    return pd.unique(licenses).tolist()
+    licenses = []
+    for variable in variables:
+        licenses += [license for license in variable.metadata.licenses if license not in licenses]
+    return licenses
 
 
 def get_unique_description_key_points_from_variables(variables: List[Variable]) -> List[str]:
     # Make a list of all description key points of all variables.
-    description_key_points = sum([variable.metadata.description_key for variable in variables], [])
-
-    return pd.unique(description_key_points).tolist()
+    description_key_points = []
+    for variable in variables:
+        description_key_points += [k for k in variable.metadata.description_key if k not in description_key_points]
+    return description_key_points
 
 
 def combine_variables_processing_logs(variables: List[Variable]) -> ProcessingLog:
@@ -414,8 +431,8 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
     # Take the first dictionary as a reference.
     reference_dict = defined_dicts[0]
 
-    # Return the first dictionary if all dictionaries are identical, otherwise return None.
-    return reference_dict if all(d == reference_dict for d in defined_dicts) else None
+    # Return a copy of the first dictionary if all dictionaries are identical, otherwise return None.
+    return reference_dict.copy() if all(d == reference_dict for d in defined_dicts) else None
 
 
 def combine_variables_display(
@@ -461,6 +478,15 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
     return cast(PROCESSING_LEVELS, combined_processing_level)
 
 
+def combine_variables_sort(variables: List[Variable]) -> List[str]:
+    # Return sort if all variables have the same sort, otherwise return empty list.
+    sorts = [variable.metadata.sort for variable in variables if variable.metadata.sort]
+    if not sorts:
+        return []
+    else:
+        return sorts[0] if all(sort == sorts[0] for sort in sorts) else []
+
+
 def combine_variables_metadata(
     variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
@@ -498,6 +524,14 @@ def combine_variables_metadata(
     metadata.display = combine_variables_display(variables=variables_only, operation=operation)
     metadata.presentation = combine_variables_presentation(variables=variables_only, operation=operation)
     metadata.processing_level = combine_variables_processing_level(variables=variables_only)
+
+    metadata.type = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="type", operation=operation, warn_if_different=True
+    )
+    metadata.sort = combine_variables_sort(variables=variables_only)
+    metadata.license = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="license", operation=operation, warn_if_different=True
+    )
 
     if pl.enabled():
         metadata.processing_log = combine_variables_processing_logs(variables=variables_only)

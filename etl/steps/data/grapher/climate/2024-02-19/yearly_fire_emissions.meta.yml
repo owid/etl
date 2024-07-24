@@ -1,0 +1,16 @@
+
+dataset:
+  title: Global Yearly Emissions from Wildfires
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  monthly_fire_emissions:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      co2:
+        title: Yearly CO₂ emissions from fires
+
+      pm25:
+        title: Yearly PM2.5 emissions from fires

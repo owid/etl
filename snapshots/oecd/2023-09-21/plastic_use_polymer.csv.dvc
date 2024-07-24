@@ -25,6 +25,6 @@ meta:
       url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: eab53b86d7bc1ff5df01d45a8aa82859
-  size: 20537
-  path: plastic_use_polymer.csv
+  - md5: 866e730990ebc07d17881eed78376b59
+    size: 20537
+    path: plastic_use_polymer.csv

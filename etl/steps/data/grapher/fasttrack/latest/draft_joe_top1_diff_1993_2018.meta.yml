@@ -1,0 +1,38 @@
+dataset:
+  title: 'Draft: Joe – Difference in Top 1 percent share, 1993-2018, PIP vs WID data'
+  description: ''
+  licenses:
+    - {}
+tables:
+  draft_joe_top1_diff_1993_2018:
+    variables:
+      wid_top1_difference_1993_2018:
+        title: wid_top1_difference_1993_2018
+        unit: ''
+      pip_top1_difference_1993_2018:
+        title: pip_top1_difference_1993_2018
+        unit: ''
+      wid_top1_relative_difference_1993_2018:
+        title: wid_top1_relative_difference_1993_2018
+        unit: ''
+      pip_top1_relative_difference_1993_2018:
+        title: pip_top1_relative_difference_1993_2018
+        unit: ''
+      wid_top1_1993:
+        title: wid_top1_1993
+        unit: ''
+      wid_top1_2018:
+        title: wid_top1_2018
+        unit: ''
+      pip_top1_1993:
+        title: pip_top1_1993
+        unit: ''
+      pip_top1_2018:
+        title: pip_top1_2018
+        unit: ''
+      region:
+        title: region
+        unit: ''
+      population_in_2018:
+        title: population_in_2018
+        unit: ''

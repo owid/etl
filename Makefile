@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api
 
 include default.mk
 
-SRC = etl snapshots apps tests docs
+SRC = etl snapshots apps api tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -23,8 +23,12 @@ help:
 	@echo '  make format-all 	Format code (including modules in lib/)'
 	@echo '  make full      	Fetch all data and run full transformations'
 	@echo '  make grapher   	Publish supported datasets to Grapher'
+	@echo '  make sync.catalog  Sync catalog from R2 into local data/ folder'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
+	@echo '  make api   		Start the ETL API on port 8081'
+	@echo '  make fasttrack 	Start Fast-track on port 8082'
+	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
@@ -67,7 +71,15 @@ watch: .venv
 	fi
 	touch .sanity-check
 
-test: check-formatting lint check-typing unittest version-tracker
+unittest: .venv
+	@echo '==> Running unit tests'
+	poetry run pytest -m "not integration" $(SRC)
+
+test: check-formatting check-linting check-typing unittest version-tracker
+
+test-integration: .venv
+	@echo '==> Running integration tests'
+	poetry run pytest -m integration $(SRC)
 
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
@@ -84,11 +96,11 @@ coverage: .venv
 
 etl: .venv
 	@echo '==> Running etl on garden'
-	poetry run etl garden
+	poetry run etl run garden
 
 full: .venv
 	@echo '==> Running full etl'
-	poetry run etl
+	poetry run etl run
 
 clean:
 	@echo '==> Cleaning data/ folder'
@@ -105,24 +117,32 @@ lab: .venv
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	poetry run publish --private
+	poetry run etl d publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
-	poetry run reindex
+	poetry run etl d reindex
 
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
-	poetry run prune
+	poetry run etl d prune
+
+# Syncing catalog is useful if you want to avoid rebuilding it locally from scratch
+# which could take a few hours. This will download ~10gb from the main channels
+# (meadow, garden, open_numbers) and is especially useful when we increase ETL_EPOCH
+# or update regions.
+sync.catalog: .venv
+	@echo '==> Sync catalog from R2 into local data/ folder (~10gb)'
+	rclone copy owid-r2:owid-catalog/ data/ --verbose --fast-list --transfers=64 --checkers=64 --include "/meadow/**" --include "/garden/**" --include "/open_numbers/**"
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
-	poetry run etl --grapher
+	poetry run etl run --grapher
 
 dot: dependencies.pdf
 
 dependencies.pdf: .venv dag/main.yml etl/to_graphviz.py
-	poetry run generate_graph dependencies.dot
+	poetry run etl graphviz dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
 
@@ -132,4 +152,16 @@ deploy:
 
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
-	poetry run version_tracker
+	poetry run etl d version-tracker
+
+api: .venv
+	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
+	poetry run uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+
+fasttrack: .venv
+	@echo '==> Starting Fast-track on http://localhost:8082/'
+	poetry run fasttrack --skip-auto-open --port 8082
+
+wizard: .venv
+	@echo '==> Starting Wizard on http://localhost:8053/'
+	poetry run etlwiz

@@ -1,0 +1,14 @@
+from etl.paths import BASE_DIR
+
+# PATH TO WIZARD CONFIG FOLDER
+WIZARD_CFG = BASE_DIR / ".wizardcfg"
+
+# PATH WIZARD DEFAULTS (old)
+WIZARD_VARIABLES_DEFAULTS_OLD = BASE_DIR / ".wizard"
+
+# PATH WIZARD DEFAULTS (new)
+WIZARD_VARIABLES_DEFAULTS = WIZARD_CFG / "defaults.json"
+WIZARD_DB = WIZARD_CFG / "wizard.db"
+
+# STREAMLIT SECRETS
+STREAMLIT_SECRETS = BASE_DIR / ".streamlit" / "secrets.toml"

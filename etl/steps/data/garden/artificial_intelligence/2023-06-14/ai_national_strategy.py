@@ -21,7 +21,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("ai_national_strategy"))
     # Load region dataset to find all possible countries and later fill the ones that don't exist in the spreadsheet as not released (according to source that's the implication)
     ds_regions = cast(Dataset, paths.load_dependency("regions"))
-    countries_national_ai = pd.DataFrame(ds_regions["regions"]["name"])
+    tb_regions = ds_regions["regions"]
+    tb_regions = tb_regions[tb_regions["defined_by"] == "owid"]
+    countries_national_ai = pd.DataFrame(tb_regions["name"])
     countries_national_ai.reset_index(drop=True, inplace=True)
     countries_national_ai["released"] = np.NaN
     # Generate the column names from "2017" to "2022"
@@ -58,10 +60,10 @@ def run(dest_dir: str) -> None:
         # Check if any year for the current country is not NaN
         if not group["released_national_strategy_on_ai"].isna().all():
             # Forward fill NaN values after "Released"
-            group["released_national_strategy_on_ai"].fillna(method="ffill", inplace=True)
+            group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna(method="ffill")
 
         # Fill remaining NaN values with "Not Released"
-        group["released_national_strategy_on_ai"].fillna("Not released", inplace=True)
+        group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna("Not released")
         df_merged.loc[group.index] = group
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)

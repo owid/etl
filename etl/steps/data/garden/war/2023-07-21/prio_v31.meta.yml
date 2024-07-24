@@ -53,7 +53,7 @@ definitions:
     Deaths of combatants and civilians due to fighting are included.
     <% if estimate == "best" %>
 
-    For conflict years without a best deaths estimate, we conversatively coded the low estimate.
+    For conflict years without a best deaths estimate, we conservatively coded the low estimate.
     <% endif %>
 
 tables:

@@ -5,10 +5,11 @@ We already have an interactive chart showing similar data,
 for per capita GDP and per capita, consumption-based CO2 emissions:
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
-The data in the current step is not used by any grapher step, but will be used by a static chart.
-TODO: Include link to static chart once it is created.
+The data in the current step is not used by any grapher step, but will be used by the following static chart:
+https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
 
 """
+
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -65,13 +66,6 @@ def run(dest_dir: str) -> None:
 
     # Select and rename the required variables from WDI.
     tb_wdi = tb_wdi[list(COLUMNS_WDI)].rename(columns=COLUMNS_WDI, errors="raise")
-
-    ####################################################################################################################
-    # TODO: Remote this temporary solution once WDI has origins.
-    from etl.data_helpers.misc import add_origins_to_wdi
-
-    tb_wdi = add_origins_to_wdi(tb_wdi=tb_wdi)
-    ####################################################################################################################
 
     # Combine both tables.
     tb = tb_gcb.merge(tb_wdi, on=["country", "year"], how="outer", short_name=paths.short_name)

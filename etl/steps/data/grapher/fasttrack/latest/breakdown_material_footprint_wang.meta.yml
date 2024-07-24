@@ -1,0 +1,224 @@
+dataset:
+  title: Breakdown of material footprint of electricity (Wang et al. 2024)
+  description: Material footprint of electricity sources, measured without waste rock from mining.
+  licenses:
+    - {}
+tables:
+  breakdown_material_footprint_wang:
+    variables:
+      steel:
+        title: Steel
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Steel
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      concrete:
+        title: Concrete
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Concrete
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      iron:
+        title: Iron
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Iron
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      rare_earths:
+        title: Rare earths
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Rare earths
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      aluminum:
+        title: Aluminum
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Aluminum
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      boron:
+        title: Boron
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Boron
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      chromium:
+        title: Chromium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Chromium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      cobalt:
+        title: Cobalt
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Cobalt
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      copper:
+        title: Copper
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Copper
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      glass:
+        title: Glass
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Glass
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      graphite:
+        title: Graphite
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Graphite
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      lithium:
+        title: Lithium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Lithium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      lead:
+        title: Lead
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Lead
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      magnesium:
+        title: Magnesium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Magnesium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      manganese:
+        title: Manganese
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Manganese
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      molybdenum:
+        title: Molybdenum
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Molybdenum
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      nickel:
+        title: Nickel
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Nickel
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      niobium:
+        title: Niobium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Niobium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      phosphate:
+        title: Phosphate
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Phosphate
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      silicon:
+        title: Silicon
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Silicon
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      silver:
+        title: Silver
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Silver
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      solar_pv_cover_glass:
+        title: Solar PV cover glass
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Solar PV cover glass
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      tin:
+        title: Tin
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Tin
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      titanium:
+        title: Titanium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Titanium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      tungsten:
+        title: Tungsten
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Tungsten
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      zinc:
+        title: Zinc
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Zinc
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).
+      uranium:
+        title: Uranium
+        unit: kilograms per GWh
+        short_unit: kg
+        display:
+          name: Uranium
+        description: |-
+          Material footprint of each electricity source, excluding waste rock. This is measured in kilograms of material per gigawatt-hour of power (GWh).

@@ -27,8 +27,7 @@ meta:
       maps reflecting the global status quo
       list of country profiles (177 to date)
     date_published: '2022'
-    title_snapshot: Global atlas of medical devices -  Gamma Camera or Computed Tomography
-      Units (CT)
+    title_snapshot: Global atlas of medical devices -  Gamma Camera or Computed Tomography Units (CT)
     description_snapshot: |-
       The dataset comprises data extracted from The Global Atlas of Medical Devices (GAMD) regarding the total density of Computed Tomography Units (CT) per million population    # Citation
     producer: World Health Organisation
@@ -37,8 +36,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main:
-      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+    url_main: https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
     date_accessed: 2023-10-13
 
     # License
@@ -48,6 +46,6 @@ meta:
 
 wdir: ../../../data/snapshots/who/2023-10-13
 outs:
-- md5: 258639d08db29d990e795409408acef5
-  size: 63651
-  path: medical_devices_atlas_ct.csv
+  - md5: cd1fcd7d34b1c32b08d2be4135f81ca9
+    size: 63651
+    path: medical_devices_atlas_ct.csv

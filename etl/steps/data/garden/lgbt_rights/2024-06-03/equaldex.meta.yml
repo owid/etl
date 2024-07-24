@@ -1,0 +1,438 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &display_common
+      tolerance: 0
+    processing_level: major
+    description_processing: |-
+      - We have extracted the data from the official [Equaldex JSON API](https://equaldex.stoplight.io/docs/equaldex/d033e28a5cf0c-equaldex-json-api).
+      - We combine the historical and current data extracted from the API to create a time series.
+      - Whenever policy implementation dates for a status are not provided in the data, and this status is the only available for the country, we consider that this status has not changed during the entire period of the dataset.
+      - We group some of the categories the source has defined for each issue, for further clarity in our visualizations.
+      - We present this data only for sovereign states, defined by [Butcher and Griffiths (2020)](https://ourworldindata.org/grapher/sovereign-state-butcher-griffiths). We use the definitions of the latest year available.
+    presentation:
+      topic_tags:
+        - LGBT+ Rights
+        - Human Rights
+
+  description_from_producer_equality_index: |-
+    Equaldex's Equality Index is a rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBTQ+ (lesbian, gay, bisexual, transgender, queer, questioning, intersex...) people in each region. The Equality Index is an average of two indexes: the legal index and the public opinion Index.
+
+  description_from_producer_legal_index: |-
+    The LGBT legal index measures the current legal status of 15 different issues ranging from the legal status of homosexuality, same-sex marriage, transgender rights, LGBT discrimination protections, LGBT censorship laws, and more. Each topic is weighted differently (for example, if same-sex marriage is illegal in a region, it would have a much bigger impact on the score than not allowing LGBT people to serve in the military). Each topic is assigned a "total possible score" and a "score" is assigned based the status of the law using a rating scale that ranges from 0% to 100% (for example, if homosexuality is legal, it would would receive a score of 100, but if it's illegal, it would receve a score of 0.)
+
+    If the status of an issue is unknown, not applicable, or no data has not been added to Equaldex, the issue's score is completely discarded and not included in the ranking. In cases where a law varies throughout a region (for example, a country where same-sex marriage is legal in some states or provinces but not others), the score is averaged among all states or provinces, weighted equally.
+
+    Past laws that are no longer in effect do not impact the region's current score. New laws that have not gone into effect yet will not impact the region's score until the day it goes into effect.
+
+    Legal Index = (Total Possible Score for each issue × Factor of Status of Issue) / Sum of all Total Possible Scores
+
+    More details about the scores and factors are available in the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index).
+
+  description_from_producer_public_opinion_index: |-
+    The LGBT public opinion index measures the public attitudes towards LGBT people using surveys and polls from reputable organizations. This index is scored based on averaging the results of all surveys in a given region. Generally, the value averaged is usually the most “equal” response in the poll. For example, if a poll asked “Do you support same-sex marriage?” and 56% of people said “yes”, the value “56” would be used. In some cases, a survey may be weighted less if the survey is very specific or includes a specific group of people (such as Christians) and might not be a full representation of the overall attitudes of the region.
+
+    To better represent current attitudes, surveys are scored using a time-decay weighting method based on the date published. This means that the most recent surveys carry more weight in the public opinion index. Surveys from the current year and the previous year receive full weight. However, for surveys older than two years, an exponential decay of 75% applies each year. This weight decay ensures that the public opinion index is always most influenced by the most recent data, reflecting evolving public attitudes, while still taking into account older surveys to maintain a comprehensive overview. This change went into effect on July 21, 2023.
+
+    Note that public opinion data is not available in every region. In these cases, the Equality Index will only be a representation of the legal rights of LGBT people in the region. Additionally, some regions have no recent public opinion data available, so older data is used to score the region.
+
+    Public Opinion Index = (Survey Results Value × Survey Weight × Time Decay Factor) / (Survey Weight × Time Decay Factor)
+
+    More details about decay factors are available in the [Equaldex Equality Index methodology](https://www.equaldex.com/equality-index).
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  equaldex:
+    variables:
+      homosexuality:
+        title: Homosexual activity (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+        presentation:
+          title_public: Legal status of same-sex sexual acts
+        display:
+          name: Homosexual activity
+          <<: *display_common
+
+      homosexuality_current:
+        title: Homosexual activity (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
+        presentation:
+          title_public: Legal status of same-sex sexual acts
+        display:
+          name: Homosexual activity
+          <<: *display_common
+
+      changing_gender:
+        title: Right to change legal gender (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+        presentation:
+          title_public: Gender marker change
+        display:
+          name: Right to change legal gender
+          <<: *display_common
+
+      changing_gender_current:
+        title: Right to change legal gender (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
+        presentation:
+          title_public: Gender marker change
+        display:
+          name: Right to change legal gender
+          <<: *display_common
+
+      marriage:
+        title: Same-sex marriage (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+        presentation:
+          title_public: Marriage for same-sex partners
+        display:
+          name: Same-sex marriage
+          <<: *display_common
+
+
+      marriage_current:
+        title: Same-sex marriage (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
+        presentation:
+          title_public: Marriage for same-sex partners
+        display:
+          name: Same-sex marriage
+          <<: *display_common
+
+      adoption:
+        title: Same-sex adoption (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+        presentation:
+          title_public: Joint adoptions by same-sex partners
+        display:
+          name: Same-sex adoption
+          <<: *display_common
+
+      adoption_current:
+        title: Same-sex adoption (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
+        presentation:
+          title_public: Joint adoptions by same-sex partners
+        display:
+          name: Same-sex adoption
+          <<: *display_common
+
+      age_of_consent:
+        title: Equal age of consent (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+        presentation:
+          title_public: Age of consent for same-sex and different-sex partners
+        display:
+          name: Equal age of consent
+          <<: *display_common
+
+      age_of_consent_current:
+        title: Equal age of consent (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
+        presentation:
+          title_public: Age of consent for same-sex and different-sex partners
+        display:
+          name: Equal age of consent
+          <<: *display_common
+
+      blood:
+        title: Blood donations by MSMs (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+        presentation:
+          title_public: Blood donations by men who have sex with men
+        display:
+          name: Blood donations by MSMs
+          <<: *display_common
+
+      blood_current:
+        title: Blood donations by MSMs (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
+        presentation:
+          title_public: Blood donations by men who have sex with men
+        display:
+          name: Blood donations by MSMs
+          <<: *display_common
+
+      censorship:
+        title: Censorship of LGBT+ issues (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
+        presentation:
+          title_public: Censorship of LGBT+ issues
+        display:
+          name: Censorship of LGBT+ issues
+          <<: *display_common
+
+      censorship_current:
+        title: Censorship of LGBT+ issues (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes censorship or prohibition of discussing, promoting, or teaching LGBT+ topics in media, schools, and in the general public.
+        presentation:
+          title_public: Censorship of LGBT+ issues
+        display:
+          name: Censorship of LGBT+ issues
+          <<: *display_common
+
+      conversion_therapy:
+        title: Conversion therapy (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal status of conducting sexual orientation changing therapy.
+        presentation:
+          title_public: Conversion therapies
+        display:
+          name: Conversion therapy
+          <<: *display_common
+
+      conversion_therapy_current:
+        title: Conversion therapy (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal status of conducting sexual orientation changing therapy.
+        presentation:
+          title_public: Conversion therapies
+        display:
+          name: Conversion therapy
+          <<: *display_common
+
+      discrimination:
+        title: LGBT+ discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+        presentation:
+          title_public: Discrimination based on sexual orientation or gender identity
+        display:
+          name: LGBT+ discrimination
+          <<: *display_common
+
+      discrimination_current:
+        title: LGBT+ discrimination (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
+        presentation:
+          title_public: Discrimination based on sexual orientation or gender identity
+        display:
+          name: LGBT+ discrimination
+          <<: *display_common
+
+      employment_discrimination:
+        title: LGBT+ employment discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+        presentation:
+          title_public: Employment discrimination based on sexual orientation or gender identity prohibited
+        display:
+          name: LGBT+ employment discrimination
+          <<: *display_common
+
+      employment_discrimination_current:
+        title: LGBT+ employment discrimination (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
+        presentation:
+          title_public: Employment discrimination based on sexual orientation or gender identity prohibited
+        display:
+          name: LGBT+ employment discrimination
+          <<: *display_common
+
+      housing_discrimination:
+        title: LGBT+ housing discrimination (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+        presentation:
+          title_public: Housing discrimination based on sexual orientation or gender identity prohibited
+        display:
+          name: LGBT+ housing discrimination
+          <<: *display_common
+
+      housing_discrimination_current:
+        title: LGBT+ housing discrimination (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
+        presentation:
+          title_public: Housing discrimination based on sexual orientation or gender identity prohibited
+        display:
+          name: LGBT+ housing discrimination
+          <<: *display_common
+
+      military:
+        title: Serving openly in the military (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+        description_key:
+          - "\"Don't ask, don't tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
+        presentation:
+          title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
+        display:
+          name: Serving openly in the military
+          <<: *display_common
+
+      military_current:
+        title: Serving openly in the military (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the ability for homosexuals to serve in the military and be open about their sexuality.
+        description_key:
+          - "\"Don't Ask, Don't Tell\" refers to policies that prohibit military personnel from discriminating against or harassing closeted homosexuals (people who have not revealed their sexual orientation to the public), while barring openly homosexuals."
+        presentation:
+          title_public: Lesbian, gay, bisexual, and transgender people serve openly in the military
+        display:
+          name: Serving openly in the military
+          <<: *display_common
+
+      non_binary_gender_recognition:
+        title: Legal recognition of non-binary gender (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+        presentation:
+          title_public: Third gender legally recognized
+        display:
+          name: Legal recognition of non-binary gender
+          <<: *display_common
+
+      non_binary_gender_recognition_current:
+        title: Legal recognition of non-binary gender (current)
+        unit: ""
+        short_unit: ""
+        description_short: Describes the legal recognition of non-binary, genderqueer, or third gender identities.
+        presentation:
+          title_public: Third gender legally recognized
+        display:
+          name: Legal recognition of non-binary gender
+          <<: *display_common
+
+      gender_affirming_care:
+        title: Gender-affirming care (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Interventions to help transgender and non-binary people align their bodies with their gender identity. This can include hormone replacement therapy, surgeries, or psychological support.
+        presentation:
+          title_public: Gender-affirming care
+        display:
+          name: Gender-affirming care
+          <<: *display_common
+
+      gender_affirming_care_current:
+        title: Gender-affirming care (current)
+        unit: ""
+        short_unit: ""
+        description_short: Interventions to help transgender and non-binary people align their bodies with their gender identity. This can include hormone replacement therapy, surgeries, or psychological support.
+        presentation:
+          title_public: Gender-affirming care
+        display:
+          name: Gender-affirming care
+          <<: *display_common
+
+      intersex_infant_surgery:
+        title: Intersex infant surgery (historical)
+        unit: ""
+        short_unit: ""
+        description_short: Medical procedures on newborns or infants with physical sex characteristics that differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
+        presentation:
+          title_public: Intersex infant surgery
+        display:
+          name: Intersex infant surgery
+          <<: *display_common
+
+      intersex_infant_surgery_current:
+        title: Intersex infant surgery (current)
+        unit: ""
+        short_unit: ""
+        description_short: Medical procedures on newborns or infants with physical sex characteristics that do differ from typical male or female bodies, usually without the informed consent of the child who is too young to participate in the decision-making process.
+        presentation:
+          title_public: Intersex infant surgery
+        display:
+          name: Intersex infant surgery
+          <<: *display_common
+
+      ei:
+        title: Equality index
+        unit: ""
+        short_unit: ""
+        description_short: Rating from 0 to 100 (with 100 being the most equal) to help visualize the legal rights and public attitudes towards LGBT+ people in a given region.
+        description_key:
+          - "The index is the average of two other indices: the legal equality index (based on the current legal status of 15 policies) and the public opinion equality index (based on survey data)."
+        description_from_producer: |-
+          {definitions.description_from_producer_equality_index}
+
+          {definitions.description_from_producer_legal_index}
+
+          {definitions.description_from_producer_public_opinion_index}
+        presentation:
+          title_public: Equality index
+        display:
+          name: Equality index
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      ei_legal:
+        title: Legal equality index
+        unit: ""
+        short_unit: ""
+        description_short: The index captures to which extent lesbians, gay, bisexual, transgender and other people outside traditional sexuality and gender categories have the same rights as straight and cisgender people. It ranges from 0 to 100 (most equal).
+        description_key:
+          - "The index combines 15 individual policies: the legality of same-sex relationships, marriage, gender marker changes, censorship of LGBT+ issues, gender-affirming care, legal recognition of non-binary gender, LGBT+ discrimination, employment discrimination, housing discrimination, same-sex adoption, serving openly in the military, blood donations by men who have sex with men, conversion therapies, and equal age of consent between same-sex and different-sex partners."
+          - Each of these policies is weighted differently, with the most important policies receiving the highest weights. These weights are called _total possible scores_.
+          - Each policy status has a factor associated to it, ranging from o to 1. Higher scores indicate more equality.
+          - The index is calculated by summing the product of total possible scores and the factor for each policy, divided by the sum of total possible scores.
+          - For more information about the methodology and the specific scores used, please refers to the [Equaldex Equality index methodology](https://www.equaldex.com/equality-index).
+        description_from_producer: |-
+          {definitions.description_from_producer_legal_index}
+        presentation:
+          title_public: Legal equality index
+        display:
+          name: Legal equality index
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      ei_po:
+        title: Public opinion equality index
+        unit: ""
+        short_unit: ""
+        description_short: The index captures the public attitudes towards LGBT+ people in a given region. It ranges from 0 to 100 (most equal).
+        description_from_producer: |-
+          {definitions.description_from_producer_public_opinion_index}
+        presentation:
+          title_public: Public opinion equality index
+        display:
+          name: Public opinion equality index
+          numDecimalPlaces: 0
+          <<: *display_common

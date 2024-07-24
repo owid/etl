@@ -18,7 +18,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 
-load_dotenv(ENV_FILE)
+load_dotenv(ENV_FILE, override=True)
 
 API_KEY = env.get("IHME_SDG_API_KEY")
 

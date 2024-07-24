@@ -1,21 +1,13 @@
-"""Match variable IDs from and old version of a dataset to the analogous variables in the new version of the dataset.
-
-After a dataset has been uploaded to OWID's MySQL database, we need to pair new variable IDs with the old ones,
-so that all graphs update properly. If the variable names are identical, the task is trivial: find indexes of old
-variables and map them to the indexes of the identical variables in the new dataset.
-However, if variable names have changed (or the number of variables have changed) the pairing may need to be done
-manually. This script is a CLI tool that may help in either scenario.
-
-"""
-
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
-import click
+import numpy as np
 import pandas as pd
+import rich_click as click
 from rapidfuzz import fuzz
+from structlog import get_logger
 
 from etl import db
 
@@ -34,10 +26,13 @@ SIMILARITY_NAMES = {
     "partial_token_set_ratio": fuzz.partial_token_set_ratio,
     "partial_token_sort_ratio": fuzz.partial_token_sort_ratio,
     "ratio": fuzz.ratio,
+    "quick_ratio": fuzz.QRatio,
+    "weighted_ratio": fuzz.WRatio,
 }
+log = get_logger()
 
 
-@click.command(help=__doc__)
+@click.command(name="variable-match", help=__doc__)
 @click.option(
     "-f",
     "--output-file",
@@ -99,6 +94,13 @@ def main_cli(
     similarity_name: str,
     max_suggestions: int,
 ) -> None:
+    """Match variable IDs from an old dataset to a new dataset's.
+
+    After a dataset has been uploaded to OWID's MySQL database, we need to pair new variable IDs with the old ones,
+    so that all graphs update properly.
+
+    If the variable names are identical, the task is trivial: find indexes of old variables and map them to the indexes of the identical variables in the new dataset. However, if variable names have changed (or the number of variables have changed) the pairing may need to be done manually. This CLI helps in either scenario.
+    """
     main(
         old_dataset_name=old_dataset_name,
         new_dataset_name=new_dataset_name,
@@ -128,33 +130,33 @@ def main(
         new_dataset_id = db.get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
 
         # Get variables from old dataset that have been used in at least one chart.
-        old_variables = db.get_variables_in_dataset(
+        old_indicators = db.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True
         )
         # Get all variables from new dataset.
-        new_variables = db.get_variables_in_dataset(
+        new_indicators = db.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False
         )
 
     # Manually map old variable names to new variable names.
-    mapping = map_old_and_new_variables(
-        old_variables=old_variables,
-        new_variables=new_variables,
+    mapping = map_old_and_new_indicators(
+        old_indicators=old_indicators,
+        new_indicators=new_indicators,
         match_identical=match_identical,
         similarity_name=similarity_name,
         max_suggestions=max_suggestions,
     )
 
     # Display summary.
-    display_summary(old_variables=old_variables, new_variables=new_variables, mapping=mapping)
+    display_summary(old_indicators=old_indicators, new_indicators=new_indicators, mapping=mapping)
 
     # Save mapping to json file.
     save_variable_replacements_file(mapping, output_file)
 
 
-def map_old_and_new_variables(
-    old_variables: pd.DataFrame,
-    new_variables: pd.DataFrame,
+def map_old_and_new_indicators(
+    old_indicators: pd.DataFrame,
+    new_indicators: pd.DataFrame,
     max_suggestions: int,
     match_identical: bool = True,
     similarity_name: str = "partial_ratio",
@@ -163,9 +165,9 @@ def map_old_and_new_variables(
 
     Parameters
     ----------
-    old_variables : pd.DataFrame
+    old_indicators : pd.DataFrame
         Table of old variable names (column 'name') and ids (column 'id').
-    new_variables : pd.DataFrame
+    new_indicators : pd.DataFrame
         Table of new variable names (column 'name') and ids (column 'id').
     match_identical : bool
         True to automatically match variables that have identical names in both datasets. False to include them in the
@@ -180,7 +182,7 @@ def map_old_and_new_variables(
 
     """
     # get initial mapping
-    mapping, missing_old, missing_new = preliminary_mapping(old_variables, new_variables, match_identical)
+    mapping, missing_old, missing_new = preliminary_mapping(old_indicators, new_indicators, match_identical)
     # get suggestions for mapping
     suggestions = find_mapping_suggestions(missing_old, missing_new, similarity_name)
     # iterate over suggestions and get user feedback
@@ -188,14 +190,14 @@ def map_old_and_new_variables(
     return mapping
 
 
-def display_summary(old_variables: pd.DataFrame, new_variables: pd.DataFrame, mapping: pd.DataFrame) -> None:
+def display_summary(old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, mapping: pd.DataFrame) -> None:
     """Display summary of the result of the mapping.
 
     Parameters
     ----------
-    old_variables : pd.DataFrame
+    old_indicators : pd.DataFrame
         Table of old variable names (column 'name') and ids (column 'id').
-    new_variables : pd.DataFrame
+    new_indicators : pd.DataFrame
         Table of new variable names (column 'name') and ids (column 'id').
     mapping : pd.DataFrame
         Mapping table from old variable name and id to new variable name and id.
@@ -206,8 +208,8 @@ def display_summary(old_variables: pd.DataFrame, new_variables: pd.DataFrame, ma
         print(f"\n  {row['name_old']} ({row['id_old']})")
         print(f"  {row['name_new']} ({row['id_new']})")
 
-    unmatched_old = old_variables[~old_variables["name"].isin(mapping["name_old"])].reset_index(drop=True)
-    unmatched_new = new_variables[~new_variables["name"].isin(mapping["name_new"])].reset_index(drop=True)
+    unmatched_old = old_indicators[~old_indicators["name"].isin(mapping["name_old"])].reset_index(drop=True)
+    unmatched_new = new_indicators[~new_indicators["name"].isin(mapping["name_new"])].reset_index(drop=True)
     if len(unmatched_old) > 0:
         print("\nUnmatched variables in the old dataset:")
         for i, row in unmatched_old.iterrows():
@@ -242,9 +244,9 @@ def save_variable_replacements_file(mapping: pd.DataFrame, output_file: str) -> 
 
 
 def preliminary_mapping(
-    old_variables: pd.DataFrame, new_variables: pd.DataFrame, match_identical: bool
+    old_indicators: pd.DataFrame, new_indicators: pd.DataFrame, match_identical: bool
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Find initial mapping between old and new variables.
+    """Find initial mapping between old and new indicators.
 
     Builds a table with initial mapping, and two other dataframes with the remaining variables to be matched.
     Initial mapping is done by identical string comparison if `match_identical` is True. Otherwise it will be
@@ -252,9 +254,9 @@ def preliminary_mapping(
 
     Parameters
     ----------
-    old_variables : pd.DataFrame
+    old_indicators : pd.DataFrame
         Dataframe of old variables.
-    new_variables : pd.DataFrame
+    new_indicators : pd.DataFrame
         Dataframe of new variables.
     match_identical : bool
         True to skip variables that are identical in old and new datasets, when running comparison.
@@ -265,43 +267,46 @@ def preliminary_mapping(
         Dataframes of old variables, new variables, and mapping between old and new variables.
     """
     # Prepare dataframes of old and new variables.
-    old_variables = old_variables[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
-    new_variables = new_variables[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
+    old_indicators = old_indicators[["id", "name"]].rename(columns={"id": "id_old", "name": "name_old"})
+    new_indicators = new_indicators[["id", "name"]].rename(columns={"id": "id_new", "name": "name_new"})
 
     # Find variables with identical names in old and new dataset.
     if match_identical:
         mapping = pd.merge(
-            old_variables,
-            new_variables,
+            old_indicators,
+            new_indicators,
             left_on="name_old",
             right_on="name_new",
             how="inner",
         )
         names_to_omit = mapping["name_old"].tolist()
         # Remove identically named variables from dataframes of variables to sweep through in old and new datasets.
-        old_variables = old_variables[~old_variables["name_old"].isin(names_to_omit)]
-        new_variables = new_variables[~new_variables["name_new"].isin(names_to_omit)]
+        old_indicators = old_indicators[~old_indicators["name_old"].isin(names_to_omit)]
+        new_indicators = new_indicators[~new_indicators["name_new"].isin(names_to_omit)]
     else:
         mapping = pd.DataFrame()
 
-    old_variables = old_variables.reset_index(drop=True)
-    new_variables = new_variables.reset_index(drop=True)
+    old_indicators = old_indicators.reset_index(drop=True)
+    new_indicators = new_indicators.reset_index(drop=True)
 
-    return mapping, old_variables, new_variables
+    return mapping, old_indicators, new_indicators
 
 
 def find_mapping_suggestions(
     missing_old: pd.DataFrame,
     missing_new: pd.DataFrame,
     similarity_name: str = "partial_ratio",
-) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
+) -> List[Dict[str, Any]]:
     """Find suggestions for mapping old variables to new variables.
 
     Creates a list with new variable suggestions for each old variable. The list is therefore the same
-    size as len(old_variables). Each item is a dictionary with two keys:
+    size as len(old_indicators). Each item is a dictionary with two keys:
 
     - "old": Dictionary with old variable name and ID.
     - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
+
+    It uses the similiarity function `similarity_name` to estimate the score between `missing_old` and `missing_new`. Note that regardless of the score,
+    if `missing_old` and `missing_new` have the same name, this will appear first with score 9999. (see _get_score internal function).
 
     Parameters
     ----------
@@ -319,6 +324,16 @@ def find_mapping_suggestions(
     """
     # get similarity function
     matching_function = get_similarity_function(similarity_name)
+
+    def _get_score(old_name, new_name) -> float:
+        """Get similarity score for a row.
+
+        Uses matching_function, but on top of that ensures that score is maximum if names of old and new variables are identical.
+        """
+        if old_name == new_name:
+            return 9999
+        return matching_function(old_name, new_name)
+
     # Iterate over old variables, and find the right match among new variables.
     suggestions = []
     for _, row in missing_old.iterrows():
@@ -326,14 +341,94 @@ def find_mapping_suggestions(
         old_name = row["name_old"]
 
         # Sort new variables from most to least similar to current variable.
-        missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
+        missing_new["similarity"] = [_get_score(old_name, new_name) for new_name in missing_new["name_new"]]
         missing_new = missing_new.sort_values("similarity", ascending=False)
+        missing_new["similarity"] = missing_new["similarity"].apply(lambda x: min(x, 100))
 
         # Add results to suggestions list.
         suggestions.append(
             {
                 "old": row.to_dict(),
                 "new": missing_new.copy(),
+            }
+        )
+    return suggestions
+
+
+def find_mapping_suggestions_optim(
+    missing_old: pd.DataFrame,
+    missing_new: pd.DataFrame,
+    similarity_name: str = "partial_ratio",
+) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
+    """Find suggestions for mapping old variables to new variables.
+
+    Creates a list with new variable suggestions for each old variable. The list is therefore the same
+    size as len(old_indicators). Each item is a dictionary with two keys:
+
+    - "old": Dictionary with old variable name and ID.
+    - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
+
+    It uses the similiarity function `similarity_name` to estimate the score between `missing_old` and `missing_new`. Note that regardless of the score,
+    if `missing_old` and `missing_new` have the same name, this will appear first with score 9999. (see _get_score internal function).
+
+    Parameters
+    ----------
+    missing_old : pandas.DataFrame
+        Dataframe with old variables.
+    missing_new : pandas.DataFrame
+        Dataframe with new variables.
+    similarity_name : function, optional
+        Similarity function name. The default is 'partial_ratio'. Must be in `SIMILARITY_NAMES`.
+
+    Returns
+    -------
+    list
+        List of suggestions for mapping old variables to new variables.
+    """
+    # get similarity function
+    matching_function = get_similarity_function(similarity_name)
+
+    def _get_score(old_name, new_name) -> float:
+        """Get similarity score for a row.
+
+        Uses matching_function, but on top of that ensures that score is maximum if names of old and new variables are identical.
+        """
+        if old_name == new_name:
+            return 9999
+        return matching_function(old_name, new_name)
+
+    # Vectorized approach to compute similarities (this needs adjustment based on matching_function capabilities)
+    def compute_similarities_vectorized(old_names, new_names):
+        # This function needs to be adapted to your specific similarity function
+        # For example, using a vectorized string comparison if possible
+        # Placeholder for actual implementation
+        similarity_matrix = np.zeros((len(old_names), len(new_names)))
+        for i, old_name in enumerate(old_names):
+            for j, new_name in enumerate(new_names):
+                similarity_matrix[i, j] = _get_score(old_name, new_name) if old_name != new_name else 9999
+        return similarity_matrix
+
+    # Pre-compute the similarity scores for all combinations
+    old_names = missing_old["name_old"].to_numpy()
+    new_names = missing_new["name_new"].to_numpy()
+    similarity_scores = compute_similarities_vectorized(old_names, new_names)
+
+    # Iterate over old variables to sort new variables based on pre-computed similarities
+    suggestions = []
+    for idx, old_row in missing_old.iterrows():
+        # Retrieve the similarity scores for the current old_name
+        scores = similarity_scores[idx]  # type: ignore
+
+        # Sort missing_new based on these scores
+        sorted_indices = np.argsort(-scores)  # Negative for descending sort
+        sorted_missing_new = missing_new.iloc[sorted_indices].copy()
+        sorted_missing_new["similarity"] = np.minimum(scores[sorted_indices], 100)
+
+        # Add results to suggestions list
+        suggestions.append(
+            {
+                "old": old_row.to_dict(),
+                "new": sorted_missing_new,
             }
         )
     return suggestions

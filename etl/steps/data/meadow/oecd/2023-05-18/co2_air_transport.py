@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     df = df.rename(columns=rename_cols)[rename_cols.values()]
 
     # Convert the 'year' column to datetime
-    df["year"] = pd.to_datetime(df["year"])
+    df["year"] = pd.to_datetime(df["year"], format="mixed")
 
     # Extract the month and year from 'year' column and create new columns
     df["Month"] = df["year"].dt.month

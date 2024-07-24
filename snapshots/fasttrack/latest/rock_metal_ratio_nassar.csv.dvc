@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: 'Nassar et al. (2022). Rock-to-Metal Ratio: A Foundational Metric for Understanding Mine Wastes.'
+    title: rock_metal_ratio_nassar
+    description: |-
+      Main source of this data is Nassar et al. (2022). This has been combined with data from "Wang et al. (2024). Updated Mining Footprints and Raw Material Needs for Clean Energy." for uranium.
+    citation_full: 'Nassar et al. (2022). Rock-to-Metal Ratio: A Foundational Metric for Understanding Mine Wastes.'
+    url_main: https://pubs.acs.org/doi/10.1021/acs.est.1c07875
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSqmjBrEVMaXDLAXG9pJaqJVZvhkRNYGLUV8oPE_5Dfoe_jMcT_RZ97j59lBsNvfkROyv7mBvMbBQa6/pub?output=csv
+    date_accessed: '2024-07-01'
+  name: Rock-to-metal mining ratio (Nassar et al. 2022)
+  description: The amount of rock that has to be mined to produce one unit of metal.
+  license: {}
+outs:
+  - md5: 901760b108a4d250829b435216b4836e
+    size: 411
+    path: rock_metal_ratio_nassar.csv

@@ -2,6 +2,8 @@
 #  test_variables
 #
 
+import dataclasses
+
 import pandas as pd
 import pytest
 
@@ -530,3 +532,59 @@ def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
     variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # type: ignore
     variable = variable_1 / variable_2
     assert variable.metadata.presentation is None
+
+
+def test_combine_variables_sort(variable_1, variable_2) -> None:
+    variable_1 = variable_1.copy().astype(str) + "a"
+    variable_2 = variable_2.copy().astype(str) + "b"
+
+    variable_1.m.type = "ordinal"
+    variable_1.m.sort = ["1a", "2a", "3a"]
+
+    assert variable_1.m.type == "ordinal"
+    assert variable_1.dropna().m.sort == ["1a", "2a", "3a"]
+
+    variable_2.m.type = "ordinal"
+    variable_2.m.sort = ["1b", "2b", "3b"]
+
+    variable_3 = variable_1 + variable_2
+    assert variable_3.m.type == "ordinal"
+    assert variable_3.m.sort == []
+
+
+def test_combine_variables_metadata_uses_all_fields() -> None:
+    """Make sure we don't forget to process new fields in combine_variables_metadata in case we're adding
+    new fields to the VariableMeta.
+    If you add a new field to VariableMeta, you should add it to combine_variables_metadata as well and
+    this unit test.
+    """
+    assert {f.name for f in dataclasses.fields(VariableMeta)} == {
+        "title",
+        "description",
+        "description_short",
+        "description_from_producer",
+        "description_key",
+        "sources",
+        "origins",
+        "licenses",
+        "unit",
+        "short_unit",
+        "display",
+        "processing_level",
+        "processing_log",
+        "presentation",
+        "license",
+        "type",
+        "sort",
+        # This is only used right before upserting to grapher
+        "additional_info",
+        # TODO: we should implement this, if not identical, append one after another
+        "description_processing",
+    }
+
+
+def test_set_categories(variable_3) -> None:
+    new_var = variable_3.astype("category")
+    new_var = new_var.set_categories(["a", "b", "c", "d"])
+    assert new_var.m.title == "Title of Variable 3"
+    assert tuple(new_var.cat.categories) == ("a", "b", "c", "d")

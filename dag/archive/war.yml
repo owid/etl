@@ -74,3 +74,20 @@ steps:
     - data://meadow/war/2023-09-25/peace_diehl
   data://grapher/war/2023-09-26/peace_diehl:
     - data://garden/war/2023-09-25/peace_diehl
+
+  # Arms Control Association - Nuclear Weapons Tests.
+  data://meadow/war/2024-01-15/nuclear_weapons_tests:
+    - snapshot://war/2024-01-15/nuclear_weapons_tests.csv
+  data://garden/war/2024-01-15/nuclear_weapons_tests:
+    - data://meadow/war/2024-01-15/nuclear_weapons_tests
+  data://grapher/war/2024-01-15/nuclear_weapons_tests:
+    - data://garden/war/2024-01-15/nuclear_weapons_tests
+
+  # The Strategic Nuclear Forces Dataset (Suh).
+  data://meadow/war/2024-01-08/strategic_nuclear_forces:
+    - snapshot://war/2024-01-08/strategic_nuclear_forces.xlsx
+    - snapshot://war/2024-01-08/strategic_nuclear_forces_monadic.xlsx
+  data://garden/war/2024-01-08/strategic_nuclear_forces:
+    - data://meadow/war/2024-01-08/strategic_nuclear_forces
+  data://grapher/war/2024-01-08/strategic_nuclear_forces:
+    - data://garden/war/2024-01-08/strategic_nuclear_forces

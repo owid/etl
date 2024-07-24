@@ -17,7 +17,6 @@ dataset:
     This dataset provides information on military and civilian deaths from wars, drawn from the book by Dunnigan and Martel (1987).
   licenses:
     - name: Doubleday (1987)
-      url: # TO BE FILLED. Example: https://url_of_testing_source.com/license
   sources:
     - *source-testing
 

@@ -3,7 +3,7 @@ meta:
     name: CO2 emissions of transport modes (UK Government)
     url: 
       https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2022
-    source_data_url: 
+    source_data_url:
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQdPQzEhhLdpBGTqx1MV17TLlnjKuAvYRUy5q7lu55DlgIc815en-MqzEZ80QQutjr9OxALoQF-ryqf/pub?output=csv
     date_accessed: '2023-12-06'
     publication_year: '2022'

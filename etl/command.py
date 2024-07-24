@@ -3,19 +3,24 @@
 #  etl.py
 #
 
+import difflib
 import itertools
+import json
 import re
 import resource
 import sys
 import time
+from collections.abc import MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
+from functools import partial
 from graphlib import TopologicalSorter
+from multiprocessing import Manager
 from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
-import click
+import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 
@@ -40,40 +45,59 @@ LIMIT_NOFILE = 4096
 log = structlog.get_logger()
 
 
-@click.command()
-@click.option("--dry-run", is_flag=True, help="Only print the steps that would be run")
-@click.option("--force", is_flag=True, help="Redo a step even if it appears done and up-to-date")
-@click.option("--private", is_flag=True, help="Execute private steps")
-# TODO: once grapher channel stops using the grapher db, remove this flag
+@click.command(name="run")
 @click.option(
-    "--grapher-channel/--no-grapher-channel",
-    default=True,
-    type=bool,
-    help="Include grapher channel (OWID staff only, needs access to DB)",
+    "--dry-run",
+    is_flag=True,
+    help="Preview the steps without actually running them.",
+)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Re-run the steps even if they appear done and up-to-date",
+)
+@click.option(
+    "--private",
+    "-p",
+    is_flag=True,
+    help="Run private steps.",
 )
 @click.option(
     "--grapher/--no-grapher",
+    "-g/-ng",
     default=False,
     type=bool,
-    help="Upsert datasets from grapher channel to DB (OWID staff only, needs access to DB)",
+    help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
-@click.option("--ipdb", is_flag=True, help="Run the debugger on uncaught exceptions")
+@click.option(
+    "--ipdb",
+    is_flag=True,
+    help="Run the debugger on uncaught exceptions.",
+)
 @click.option(
     "--backport",
+    "-b",
     is_flag=True,
-    help="Add steps for backporting OWID datasets",
+    help="Add steps for backporting OWID datasets.",
 )
 @click.option(
     "--downstream",
+    "-d",
     is_flag=True,
-    help="Include downstream dependencies (steps that depend on the included steps)",
+    help="Include downstream dependencies (steps that depend on the included steps).",
 )
 @click.option(
     "--only",
+    "-o",
     is_flag=True,
-    help="Only run the selected step (no upstream or downstream dependencies). Overrides `downstream` option",
+    help="Only run the selected step (no upstream or downstream dependencies). Overrides `--downstream` option.",
 )
-@click.option("--exclude", help="Comma-separated patterns to exclude")
+@click.option(
+    "--exclude",
+    "-e",
+    help="Comma-separated patterns to exclude",
+)
 @click.option(
     "--dag-path",
     type=click.Path(exists=True),
@@ -82,34 +106,41 @@ log = structlog.get_logger()
 )
 @click.option(
     "--workers",
+    "-w",
     type=int,
-    help=f"Parallelize execution of steps. [{config.RUN_STEPS_WORKERS}]",
-    default=config.RUN_STEPS_WORKERS,
+    help="Parallelize execution of steps.",
+    default=1,
 )
 @click.option(
     "--use-threads/--no-threads",
+    "-t/-nt",
     type=bool,
     help="Use threads when checking dirty steps and upserting to MySQL. Turn off when debugging.",
     default=True,
 )
 @click.option(
     "--strict/--no-strict",
+    "-s/-ns",
     is_flag=True,
-    help="Force strict or lax validation on DAG steps, e.g. checks for primary keys in data steps.",
+    help="Force strict or lax validation on DAG steps (e.g. checks for primary keys in data steps).",
     default=None,
 )
 @click.option(
     "--watch",
+    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
 )
-@click.argument("steps", nargs=-1)
+@click.argument(
+    "steps",
+    nargs=-1,
+    type=str,
+)
 def main_cli(
     steps: List[str],
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    grapher_channel: bool = True,
     grapher: bool = False,
     backport: bool = False,
     ipdb: bool = False,
@@ -117,29 +148,50 @@ def main_cli(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     use_threads: bool = True,
     strict: Optional[bool] = None,
     watch: bool = False,
 ) -> None:
-    _update_open_file_limit()
+    """Generate datasets by running their corresponding ETL steps.
 
-    # enable grapher channel when called with --grapher
-    grapher_channel = grapher_channel or grapher
+    Run all ETL steps in the DAG matching the value of `STEPS`. A match is a dataset with an uri that contains the value of any of the words in `STEPS`.
+
+    **Example 1**: Run steps matching "mars" in the DAG file:
+
+    ```
+    $ etl run mars
+    ```
+
+    **Example 2**: Preview those steps that match "mars" or "prio" (i.e. don't run them):
+
+    ```
+    $ etl run mars prio
+    ```
+
+    **Example 3**: If you only want to preview what would be executed, use the `--dry-run` flag:
+
+    ```
+    $ etl run mars prio --dry-run
+    ```
+    """
+    _update_open_file_limit()
 
     # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
         config.DIRTY_STEPS_WORKERS = 1
-        config.RUN_STEPS_WORKERS = 1
         workers = 1
+
+    # GRAPHER_INSERT_WORKERS should be split among workers
+    if workers > 1:
+        config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
 
     kwargs = dict(
         steps=steps,
         dry_run=dry_run,
         force=force,
         private=private,
-        grapher_channel=grapher_channel,
         grapher=grapher,
         backport=backport,
         downstream=downstream,
@@ -160,7 +212,6 @@ def main_cli(
             config.IPDB_ENABLED = True
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
-            config.RUN_STEPS_WORKERS = 1
             kwargs["workers"] = 1
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
@@ -173,14 +224,13 @@ def main(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    grapher_channel: bool = True,
     grapher: bool = False,
     backport: bool = False,
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -200,7 +250,6 @@ def main(
         dry_run=dry_run,
         force=force,
         private=private,
-        include_grapher_channel=grapher_channel,
         downstream=downstream,
         only=only,
         excludes=excludes,
@@ -249,11 +298,10 @@ def run_dag(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    include_grapher_channel: bool = False,
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = config.RUN_STEPS_WORKERS,
+    workers: int = 1,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -264,21 +312,27 @@ def run_dag(
     looking at their checksum.
     """
     excludes = excludes or []
-    if not include_grapher_channel:
-        # exclude grapher channel
-        excludes.append("data://grapher")
 
     _validate_private_steps(dag)
 
     if not private:
         excludes.append("-private://")
 
+    # Exclude grapher regions, they're fetched by owid-grapher as CSV from catalog
+    # but are not supposed to be in DB
+    excludes.append("grapher://grapher/regions/latest/regions")
+
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 
     if not steps:
-        raise ValueError(
-            f"No steps matched the given input `{' '.join(includes or [])}`. Check spelling or consult `etl --help` for more options"
-        )
+        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
+        # Print a short error message, show a list of the closest matches, and exit.
+        includes_str = " ".join(includes or [])
+        print(f"No steps matched `{includes_str}`. Closest matches:")
+        # NOTE: We could use a better edit distance to find the closest matches.
+        for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
+            print(match)
+        sys.exit(1)
 
     # do not run dependencies if `only` is set by setting them to non-dirty
     if only:
@@ -295,25 +349,44 @@ def run_dag(
         print("--- All datasets up to date!")
         return
 
+    # Calculate total expected time for all steps (if run sequentially)
+    total_expected_time_seconds = sum(_get_execution_time(str(step)) or 0 for step in steps)
+
     if dry_run:
-        print(f"--- Running {len(steps)} steps:")
+        print(
+            f"--- Would run {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return enumerate_steps(steps)
     elif workers == 1:
-        print(f"--- Running {len(steps)} steps:")
+        print(
+            f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return exec_steps(steps, strict=strict)
     else:
-        print(f"--- Running {len(steps)} steps with {workers} processes:")
+        print(
+            f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
+        )
         return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
+    execution_times = {}
     for i, step in enumerate(steps, 1):
-        print(f"--- {i}. {step}...")
+        print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
+
+        # Determine strictness level for the current step
         strict = _detect_strictness_level(step, strict)
+
         with strictness_level(strict):
+            # Execute the step and measure the time taken
             time_taken = timed_run(lambda: step.run())
-            click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.1f}s)")
+            execution_times[str(step)] = time_taken
+
+            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
             print()
+
+        # Write the recorded execution times to the file after all steps have been executed
+        _write_execution_times(execution_times)
 
 
 def _steps_sort_key(step: Step) -> int:
@@ -336,16 +409,27 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
     # the load on MySQL
     steps = sorted(steps, key=_steps_sort_key)
 
-    # create execution graph from steps
-    exec_graph = {}
-    steps_str = {str(step) for step in steps}
-    for step in steps:
-        # only add dependencies that are in the list of steps (i.e. are dirty)
-        # NOTE: we have to compare their string versions, the actual objects might have
-        # different attributes
-        exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
+    # Use a Manager dict to collect execution times in parallel execution
+    with Manager() as manager:
+        execution_times = manager.dict()
 
-    exec_graph_parallel(exec_graph, _exec_step_job, workers, dag=dag, strict=strict)
+        # Create execution graph from steps
+        exec_graph = {}
+        steps_str = {str(step) for step in steps}
+        for step in steps:
+            # only add dependencies that are in the list of steps (i.e. are dirty)
+            # NOTE: we have to compare their string versions, the actual objects might have
+            # different attributes
+            exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
+
+        # Prepare a function for execution that includes the necessary arguments
+        exec_func = partial(_exec_step_job, execution_times=execution_times, dag=dag, strict=strict)
+
+        # Execute the graph of tasks in parallel
+        exec_graph_parallel(exec_graph, exec_func, workers)
+
+        # After all tasks have completed, write the execution times to the file
+        _write_execution_times(dict(execution_times))
 
 
 def exec_graph_parallel(
@@ -369,11 +453,21 @@ def exec_graph_parallel(
         # Dictionary to keep track of future tasks
         future_to_task: Dict[Future, str] = {}
 
+        ready_tasks = []
+
         while topological_sorter.is_active():
+            # add new tasks
+            ready_tasks += topological_sorter.get_ready()
+
             # Submit tasks that are ready to the executor
-            for task in topological_sorter.get_ready():
+            # NOTE: limit it to `workers`, otherwise it might accept tasks that are not CPU bound
+            # and overload our DB
+            for task in ready_tasks[:workers]:
                 future = executor.submit(func, task, **kwargs)
                 future_to_task[future] = task
+
+            # remove ready tasks
+            ready_tasks = ready_tasks[workers:]
 
             # Wait for at least one future to complete
             done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
@@ -385,7 +479,24 @@ def exec_graph_parallel(
                 topological_sorter.done(task)
 
 
-def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[bool] = None) -> None:
+def _create_expected_time_message(
+    expected_time: Optional[float], prepend_message: str = " (", append_message: str = ")"
+) -> str:
+    minutes, seconds = divmod(expected_time or 0, 60)
+    if minutes < 1:
+        partial_message = f"{seconds:.1f}s"
+    else:
+        partial_message = f"{int(minutes)}m{seconds: .1f}s"
+
+    if (expected_time is None) or (expected_time == 0):
+        return ""
+    else:
+        return prepend_message + partial_message + append_message
+
+
+def _exec_step_job(
+    step_name: str, execution_times: MutableMapping, dag: Optional[DAG] = None, strict: Optional[bool] = None
+) -> None:
     """
     Executes a step.
 
@@ -393,19 +504,52 @@ def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[b
     :param dag: The original DAG used to create Step object. This must be the same DAG as given to ETL.
     :param strict: The strictness level for the step execution.
     """
-    print(f"--- Starting {step_name}", flush=True)
+    print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     assert dag
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
-        time_taken = timed_run(lambda: step.run())
+        execution_times[step_name] = timed_run(lambda: step.run())
+    print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
-    print(f"--- Finished {step_name} ({time_taken:.0f}s)", flush=True)
+
+def _write_execution_times(execution_times: Dict) -> None:
+    # Write the recorded execution times to a hidden json file that contains the time it took to execute each step
+    execution_time_file = paths.EXECUTION_TIME_FILE
+    if execution_time_file.exists():
+        with open(execution_time_file, "r") as file:
+            stored_times = json.load(file)
+    else:
+        stored_times = {}
+
+    stored_times.update(execution_times)
+    with open(execution_time_file, "w") as file:
+        json.dump(stored_times, file, indent=4, sort_keys=True)
+
+
+def _get_step_identifier(step_name: str) -> str:
+    return step_name.replace(step_name.split("/")[-2] + "/", "")
+
+
+def _get_execution_time(step_name: str) -> Optional[float]:
+    # Read execution time of a given step from the hidden json file
+    # If it doesn't exist, try to read another version of the same step, and if no other version exists, return None
+    if not paths.EXECUTION_TIME_FILE.exists():
+        return None
+    else:
+        with open(paths.EXECUTION_TIME_FILE, "r") as file:
+            execution_times = json.load(file)
+        execution_time = execution_times.get(step_name)
+        if not execution_time:
+            # If the step has not been timed yet, try to find a previous version
+            step_identifiers = {_get_step_identifier(step): value for step, value in execution_times.items()}
+            execution_time = step_identifiers.get(_get_step_identifier(step_name))
+        return execution_time
 
 
 def enumerate_steps(steps: List[Step]) -> None:
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}")
+        print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
@@ -465,6 +609,8 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
     # get all backports, this takes a long time
     if filter_steps is None:
         match = "backport/.*"
+    elif len(filter_steps) == 0:
+        return {}
     else:
         match = "|".join([step.split("/")[-1] for step in filter_steps])
 

@@ -1,0 +1,15 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
+dataset:
+  update_period_days: 365
+
+tables:
+  maddison_federico_paper:
+    variables:
+      {}
+

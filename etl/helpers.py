@@ -8,31 +8,32 @@ import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
+from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
-import pandas as pd
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table
+from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
+    combine_tables_update_period_days,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.datautils.common import ExceptionFromDocstring
+from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
 from etl.snapshot import Snapshot, SnapshotMeta
-from etl.steps import extract_step_attributes, load_dag, reverse_graph
+from etl.steps import load_dag
 
 log = structlog.get_logger()
 
@@ -77,7 +78,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
-def grapher_checks(ds: catalog.Dataset) -> None:
+def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl import grapher_helpers as gh
 
@@ -98,6 +99,9 @@ def grapher_checks(ds: catalog.Dataset) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            _validate_description_key(tab[col].m.description_key, col)
+            _validate_ordinal_variables(tab, col)
+
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab
@@ -109,10 +113,29 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             # would override the indicator title in the Data Page.
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if display_name and not title_public:
-                log.warning(
+            if warn_title_public and display_name and not title_public:
+                warnings.warn(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                    warnings.DisplayNameWarning,
                 )
+
+
+def _validate_description_key(description_key: list[str], col: str) -> None:
+    if description_key:
+        assert not all(
+            len(x) == 1 for x in description_key
+        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+
+
+def _validate_ordinal_variables(tab: Table, col: str) -> None:
+    if tab[col].m.sort:
+        # Exclude NaN values, these will be dropped before inserting to the database.
+        vals = tab[col].dropna()
+
+        extra_values = set(vals) - set(vals.m.sort)
+        assert (
+            not extra_values
+        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
 
 
 def create_dataset(
@@ -125,6 +148,8 @@ def create_dataset(
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    errors: Literal["ignore", "warn", "raise"] = "raise",
+    repack: bool = True,
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -142,6 +167,7 @@ def create_dataset(
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
     :param if_origins_exist: What to do if origins already exist in the dataset metadata.
+    :param repack: Repack dataframe before adding it to the dataset.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -158,7 +184,10 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
+            update_period_days_combined = combine_tables_update_period_days(tables=tables)
+            default_metadata = DatasetMeta(
+                licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
+            )
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)
@@ -181,7 +210,7 @@ def create_dataset(
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
-        ds.add(table, formats=formats)
+        ds.add(table, formats=formats, repack=repack)
 
     # set metadata from dest_dir
     pattern = (
@@ -205,7 +234,7 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
@@ -338,11 +367,11 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
     """Current step must be listed in the dag."""
 
 
-class NoMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """No steps found among dependencies of current ETL step, that match the given specifications."""
 
 
-class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstring):
+class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
     """Multiple steps found among dependencies of current ETL step, that match the given specifications."""
 
 
@@ -352,6 +381,10 @@ class UnknownChannel(ExceptionFromDocstring):
 
 class WrongStepName(ExceptionFromDocstring):
     """Wrong step name. If this step was in the dag, it should be corrected."""
+
+
+# loading DAG can take up to 1 second, so cache it
+load_dag_cached = cache(load_dag)
 
 
 class PathFinder:
@@ -367,11 +400,8 @@ class PathFinder:
     def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
-        # Load dag.
-        if "/archive/" in __file__:
-            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
-        else:
-            self.dag = load_dag()
+        # Lazy load dag when needed.
+        self._dag = None
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -388,6 +418,16 @@ class PathFinder:
 
         # Default logger
         self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
+
+    @property
+    def dag(self):
+        """Lazy loading of DAG."""
+        if self._dag is None:
+            if "/archive/" in str(self.f):
+                self._dag = load_dag_cached(paths.DAG_ARCHIVE_FILE)
+            else:
+                self._dag = load_dag_cached()
+        return self._dag
 
     @property
     def channel(self) -> str:
@@ -441,6 +481,16 @@ class PathFinder:
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
+    @property
+    def step_name(self) -> str:
+        """Return step name."""
+        return self.create_step_name(
+            short_name=self.short_name,
+            channel=self.channel,  # type: ignore
+            namespace=self.namespace,
+            version=self.version,
+        )
+
     @staticmethod
     def create_step_name(
         short_name: str,
@@ -464,7 +514,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
@@ -561,9 +611,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            raise NoMatchingStepsAmongDependencies
+            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
-            raise MultipleMatchingStepsAmongDependencies
+            raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
         dependency = matches[0]
 
@@ -601,15 +651,29 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+    def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
-        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name, **kwargs)
         assert isinstance(snap, Snapshot)
         return snap
 
-    def load_dataset(self, short_name: Optional[str] = None) -> catalog.Dataset:
+    def read_snap_table(self, short_name: Optional[str] = None, **kwargs) -> Table:
+        """Load snapshot dependency. short_name defaults to the current step's short_name."""
+        snap = self.load_snapshot(short_name=short_name)
+        tb = snap.read(**kwargs)
+        return tb
+
+    def load_dataset(
+        self,
+        short_name: Optional[str] = None,
+        channel: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[Union[str, int]] = None,
+    ) -> catalog.Dataset:
         """Load dataset dependency. short_name defaults to the current step's short_name."""
-        dataset = self.load_dependency(short_name=short_name or self.short_name)
+        dataset = self.load_dependency(
+            short_name=short_name or self.short_name, channel=channel, namespace=namespace, version=version
+        )
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
@@ -620,357 +684,15 @@ class PathFinder:
         return deps[0].replace("etag://", "https://")
 
 
-def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
-    """List all steps in a dag.
-
-    Parameters
-    ----------
-    dag : Dict[str, Any]
-        Dag.
-
-    Returns
-    -------
-    all_steps : List[str]
-        List of steps in dag.
-
-    """
-    all_steps = sorted(set([step for step in dag] + sum([list(dag[step]) for step in dag], [])))
-
-    return all_steps
-
-
-def get_direct_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
-    """Get direct dependencies of a given step in a dag.
-
-    Direct dependencies of a step are those datasets that are listed in the dag as the step's dependencies.
-
-    Parameters
-    ----------
-    dag : Dict[str, Any]
-        Dag.
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    dependencies : Set[str]
-        Direct dependencies of a step in a dag.
-
-    """
-    dependencies = dag[step]
-
-    return dependencies
-
-
-def get_direct_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
-    """Get direct usages of a given step in a dag.
-
-    Direct usages of a step are those datasets that have the current step listed in the dag as one of the dependencies.
-
-    Parameters
-    ----------
-    dag : Dict[str, Any]
-        Dag.
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    dependencies : Set[str]
-        Direct usages of a step in a dag.
-
-    """
-
-    used_by = set([_step for _step in dag if step in dag[_step]])
-
-    return used_by
-
-
-def _recursive_get_all_dependencies_for_step_in_dag(
-    dag: Dict[str, Any], step: str, dependencies: Set[str] = set()
-) -> Set[str]:
-    if step in dag:
-        # If step is in the dag, gather all its substeps.
-        substeps = dag[step]
-        # Add substeps to the set of dependencies (union of sets, to avoid repetitions).
-        dependencies = dependencies | set(substeps)
-        for substep in substeps:
-            # For each of the substeps, repeat the process.
-            dependencies = dependencies | _recursive_get_all_dependencies_for_step_in_dag(
-                dag, step=substep, dependencies=dependencies
-            )
-    else:
-        # If step is not in the dag, return the default dependencies (which is an empty set).
-        pass
-
-    return dependencies
-
-
-def get_all_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
-    """Get all dependencies for a given step in a dag.
-
-    This function returns all dependencies of a step, as well as their direct dependencies, and so on. In the end, the
-    result contains all datasets that the given step depends on, directly or indirectly.
-
-    Parameters
-    ----------
-    dag : Dict[str, Any]
-        Dag.
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    dependencies : Set[str]
-        All dependencies of a given step in a dag.
-    """
-    dependencies = _recursive_get_all_dependencies_for_step_in_dag(dag=dag, step=step)
-
-    return dependencies
-
-
-def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
-    """Get all dependencies for a given step in a dag.
-
-    This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
-    are also dependencies, and so on. In the end, the result contains all datasets that use, directly or indirectly, the
-    given step.
-
-    Parameters
-    ----------
-    dag : Dict[str, Any]
-        Dag.
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    dependencies : Set[str]
-        All usages of a given step in a dag.
-
-    """
-    # A simple solution is to simply reverse the graph, and apply the already existing function that finds all
-    # dependencies.
-    reverse_dag = reverse_graph(graph=dag)
-    dependencies = get_all_dependencies_for_step_in_dag(dag=reverse_dag, step=step)
-
-    return dependencies
-
-
-class ArchiveStepUsedByActiveStep(ExceptionFromDocstring):
-    """Archived steps have been found as dependencies of active steps.
-
-    The solution is either:
-    * To archive those active steps.
-    * To un-archive those archive steps.
-    """
-
-
-class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
-    """The latest version of each data step should be in the dag as a main step (maybe it was accidentally removed)."""
-
-
-class VersionTracker:
-    """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
-    checks for inconsistencies.
-
-    """
-
-    def __init__(self):
-        # Load dag of active and archive steps.
-        self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
-        # Load dag of active steps.
-        self.dag_active = load_dag(paths.DAG_FILE)
-        # Generate the dag of only archive steps.
-        self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
-        # List all unique steps that exist in the dag.
-        self.all_steps = list_all_steps_in_dag(self.dag_all)
-        # List all unique active steps.
-        self.all_active_steps = list_all_steps_in_dag(self.dag_active)
-        # List all steps that are dependencies of active steps.
-        self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
-
-        # Dataframe of step attributes will only be initialized once it's called.
-        # This dataframe will have one row per existing step.
-        self._step_attributes_df = None
-        # Dataframe of steps will only be initialized once it's called.
-        # This dataframe will have as many rows as entries in the dag.
-        self._steps_df = None
-
-        # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
-
-    def get_direct_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
-
-        return dependencies
-
-    def get_direct_usages_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_usages_for_step_in_dag(dag=self.dag_all, step=step)
-
-        return dependencies
-
-    def get_all_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
-
-        return dependencies
-
-    def get_all_usages_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_usages_for_step_in_dag(dag=self.dag_all, step=step)
-
-        return dependencies
-
-    def get_all_dependencies_of_active_steps(self) -> Set[str]:
-        # Gather all dependencies of active steps in the dag.
-        active_dependencies = set()
-        for step in self.dag_active:
-            active_dependencies = active_dependencies | self.get_all_dependencies_for_step(step=step)
-
-        return active_dependencies
-
-    def _create_step_attributes(self) -> pd.DataFrame:
-        # Extract all attributes of each unique active/archive/dependency step.
-        step_attributes = pd.DataFrame(
-            [extract_step_attributes(step).values() for step in self.all_steps],
-            columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
-        )
-
-        # Create custom features that will let us prioritize which datasets to update.
-
-        # Add list of all existing versions for each step.
-        versions = (
-            step_attributes.groupby("identifier", as_index=False)
-            .agg({"version": lambda x: sorted(list(x))})
-            .rename(columns={"version": "versions"})
-        )
-        step_attributes = pd.merge(step_attributes, versions, on="identifier", how="left")
-
-        # Count number of versions for each step.
-        step_attributes["n_versions"] = step_attributes["versions"].apply(len)
-
-        # Find the latest version of each step.
-        step_attributes["latest_version"] = step_attributes["versions"].apply(lambda x: x[-1])
-
-        # Find how many newer versions exist for each step.
-        step_attributes["n_newer_versions"] = [
-            row["n_versions"] - row["versions"].index(row["version"]) - 1
-            for i, row in step_attributes[["n_versions", "versions", "version"]].iterrows()
-        ]
-
-        return step_attributes
-
-    def _create_steps_df(self) -> pd.DataFrame:
-        steps = []
-        # Gather active steps and their dependencies.
-        for step in self.dag_active:
-            steps.append([step, step, "active"])
-            for substep in self.dag_all[step]:
-                steps.append([substep, step, "dependency"])
-        # Gather archive steps and their dependencies.
-        for step in self.dag_archive:
-            steps.append([step, step, "archive"])
-            for substep in self.dag_archive[step]:
-                steps.append([substep, step, "dependency"])
-
-        # Store all steps and their dependencies.
-        # Column "used_by" includes:
-        # * For a dependency step, the main step that is using it.
-        # * For a main step, the main step itself.
-        steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "status"])
-
-        # Add attributes to steps.
-        steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
-
-        return steps
-
-    @property
-    def step_attributes_df(self) -> pd.DataFrame:
-        if self._step_attributes_df is None:
-            self._step_attributes_df = self._create_step_attributes()
-
-        return self._step_attributes_df
-
-    @property
-    def steps_df(self) -> pd.DataFrame:
-        if self._steps_df is None:
-            self._steps_df = self._create_steps_df()
-
-        return self._steps_df
-
-    def check_that_archive_steps_are_not_dependencies_of_active_steps(self) -> None:
-        # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
-        missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
-
-        if len(missing_steps) > 0:
-            for missing_step in missing_steps:
-                direct_usages = self.get_direct_usages_for_step(step=missing_step)
-                print(f"Archive step {missing_step} is used by active steps: {direct_usages}")
-            raise ArchiveStepUsedByActiveStep
-
-    def check_that_latest_version_of_steps_are_active(self) -> None:
-        # Check that the latest version of each main data step is in the dag.
-        # If not, it could be because it has been deleted by accident.
-        # We may decide to remove this test, because it will raise an error if an old step is archived, and it has no
-        # newer version. This can happen for example if the name of the step was changed during the update.
-        latest_data_steps = set(
-            self.step_attributes_df[
-                (self.step_attributes_df["n_newer_versions"] == 0)
-                & (self.step_attributes_df["channel"].isin(["meadow", "garden"]))
-            ]["step"]
-        )
-        missing_steps = latest_data_steps - set(list(self.dag_active))
-        if len(missing_steps) > 0:
-            for missing_step in missing_steps:
-                print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")
-            raise LatestVersionOfStepShouldBeActive
-
-    def check_that_all_active_steps_are_necessary(self) -> None:
-        # TODO: This function may need to become recurrent, because once an unused step is taken out, another step
-        #  may also become unnecessary (e.g. the meadow step of an unused garden step will be detected only after the
-        #  garden step has been removed).
-        outdated_data_steps = set(
-            self.steps_df[
-                (self.steps_df["n_newer_versions"] > 0)
-                & (self.steps_df["status"] == "active")
-                & (self.steps_df["channel"].isin(["meadow", "garden"]))
-            ]["step"]
-        )
-
-        unused_data_steps = outdated_data_steps - set(self.all_active_dependencies)
-
-        if len(unused_data_steps) > 0:
-            log.warning(f"Some data steps can be safely archived: {unused_data_steps}")
-
-    def get_backported_db_dataset_ids(self) -> List[int]:
-        """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
-
-        Returns
-        -------
-        backported_dataset_ids : List[int]
-            Grapher DB dataset ids that are used in ETL backported datasets.
-        """
-        backported_dataset_names = [step for step in self.all_active_dependencies if step.startswith("backport://")]
-        backported_dataset_ids = sorted(
-            set([int(step.split("dataset_")[1].split("_")[0]) for step in backported_dataset_names])
-        )
-
-        return backported_dataset_ids
-
-    def apply_sanity_checks(self) -> None:
-        self.check_that_archive_steps_are_not_dependencies_of_active_steps()
-        # self.check_that_latest_version_of_steps_are_active()
-        self.check_that_all_active_steps_are_necessary()
-
-
-def run_version_tracker_checks():
-    VersionTracker().apply_sanity_checks()
-
-
-def print_tables_metadata_template(tables: List[Table]):
+def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     # This function is meant to be used when creating code in an interactive window (or a notebook).
     # It prints a template for the metadata of the tables in the list.
     # The template can be copied and pasted into the corresponding yaml file.
     # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
     # AI-generated texts when possible.
+
+    if fields is None:
+        fields = ["title", "unit", "short_unit", "description_short"]
 
     # Initialize output dictionary.
     dict_tables = {}
@@ -978,7 +700,7 @@ def print_tables_metadata_template(tables: List[Table]):
         dict_variables = {}
         for column in tb.columns:
             dict_values = {}
-            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
+            for field in fields:
                 value = getattr(tb[column].metadata, field) or ""
 
                 # Add some simple rules to simplify some common cases.
@@ -1044,3 +766,285 @@ def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
     with path.open("r") as f:
         dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
         return cast(Dict[str, Any], dix)
+
+
+def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
+    """Get the comment lines right above a step in the dag file."""
+
+    # Read the content of the dag file.
+    with open(dag_file, "r") as _dag_file:
+        lines = _dag_file.readlines()
+
+    # Initialize a list to store the header lines.
+    header_lines = []
+    for line in lines:
+        if line.strip().startswith("-") or (
+            line.strip().endswith(":") and (not line.strip().startswith("#")) and (step not in line)
+        ):
+            # Restart the header if the current line:
+            # * Is a dependency.
+            # * Is a step that is not the current step.
+            # * Is a special line like "steps:" or "include:".
+            header_lines = []
+        elif step in line and line.strip().endswith(":"):
+            # If the current line is the step, stop reading the rest of the file.
+            return "\n".join([line.strip() for line in header_lines]) + "\n" if len(header_lines) > 0 else ""
+        elif line.strip() == "":
+            # If the current line is empty, ignore it.
+            continue
+        else:
+            # Any line that is not a dependency,
+            header_lines.append(line)
+
+    # If the step has not been found, raise an error and return nothing.
+    log.error(f"Step {step} not found in dag file {dag_file}.")
+
+    return ""
+
+
+def write_to_dag_file(
+    dag_file: Path,
+    dag_part: Dict[str, Any],
+    comments: Optional[Dict[str, str]] = None,
+    indent_step=2,
+    indent_dependency=4,
+):
+    """Update the content of a dag file, respecting the comments above the steps.
+
+    NOTE: A simpler implementation of function may be possible using ruamel. However, I couldn't find out how to respect
+    comments that are above steps.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    dag_part : Dict[str, Any]
+        Partial dag, containing the steps that need to be updated.
+        This partial dag is a dictionary with steps as keys and the set of dependencies as values.
+    comments : Optional[Dict[str, str]], optional
+        Comments to add above the steps in the partial dag. The keys are the steps, and the values are the comments.
+    indent_step : int, optional
+        Number of spaces to use as indentation for steps in the dag.
+    indent_dependency : int, optional
+        Number of spaces to use as indentation for dependencies in the dag.
+
+    """
+
+    # If comments is not defined, assume an empty dictionary.
+    if comments is None:
+        comments = {}
+
+    for step in comments:
+        if len(comments[step]) > 0 and comments[step][-1] != "\n":
+            # Ensure all comments end in a line break, otherwise add it.
+            comments[step] = comments[step] + "\n"
+
+    # Read the lines in the original dag file.
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
+    section_steps = []
+    section_include = []
+    inside_section_steps = True
+    for line in lines:
+        if line.strip().startswith("include"):
+            inside_section_steps = False
+        if inside_section_steps:
+            section_steps.append(line)
+        else:
+            section_include.append(line)
+
+    # Now the "steps" section will be updated, and at the end the "include" section will be appended.
+
+    # Initialize a list with the new lines that will be written to the dag file.
+    updated_lines = []
+    # Initialize a list of comments preceding the next step after a given step.
+    comments_next_step = []
+    # Initialize a flag to skip lines until the next step.
+    skip_until_next_step = False
+    # Initialize a set to keep track of the steps that were found in the original dag file.
+    steps_found = set()
+    for line in section_steps:
+        # Remove leading and trailing whitespace from the line.
+        stripped_line = line.strip()
+
+        # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
+        if stripped_line.endswith(":") and not stripped_line.startswith("-") and not stripped_line.startswith("steps:"):
+            if comments_next_step:
+                updated_lines.extend(comments_next_step)
+                comments_next_step = []
+            # Extract the name of the step (without the ":" at the end).
+            current_step = ":".join(stripped_line.split(":")[:-1])
+            if current_step in dag_part:
+                # This step was in dag_part, which means it needs to be updated.
+                # First add the step itself.
+                updated_lines.append(line)
+                # Now add each of its dependencies.
+                for dep in dag_part[current_step]:
+                    updated_lines.append(" " * indent_dependency + f"- {dep}\n")
+                # Skip the following lines until the next step is found.
+                skip_until_next_step = True
+                # Start tracking possible comments of the next step.
+                comments_next_step = []
+                # Add the current step to the set of steps found in the dag file.
+                steps_found.add(current_step)
+                continue
+            else:
+                # This step was not in dag_part, so it will be copied as is.
+                skip_until_next_step = False
+
+        # Skip dependencies and comments among dependencies of the step being updated.
+        if skip_until_next_step:
+            if stripped_line.startswith("-"):
+                # Remove comments among dependencies.
+                comments_next_step = []
+                continue
+            elif stripped_line.startswith("#"):
+                # Add comments that may potentially be related to the next step.
+                comments_next_step.append(line)
+                continue
+
+        # Add lines that should not be skipped.
+        updated_lines.append(line)
+
+    # Append new steps that weren't found in the original content.
+    for step, dependencies in dag_part.items():
+        if step not in steps_found:
+            # Add the comment for this step, if any was given.
+            if step in comments:
+                updated_lines.append(
+                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")[:-1]) + "\n"
+                    if len(comments[step]) > 0
+                    else ""
+                )
+            # Add the step itself.
+            updated_lines.append(" " * indent_step + f"{step}:\n")
+            # Add each of its dependencies.
+            for dep in dependencies:
+                updated_lines.append(" " * indent_dependency + f"- {dep}\n")
+
+    if len(section_include) > 0:
+        # Append the include section, ensuring there is only one line break in between.
+        for i in range(len(updated_lines) - 1, -1, -1):
+            if updated_lines[i] != "\n":
+                # Slice the list to remove trailing line breaks
+                updated_lines = updated_lines[: i + 1]
+                break
+        # Add a single line break before the include section, and then add the include section.
+        updated_lines.extend(["\n"] + section_include)
+
+    # Write the updated content back to the dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(updated_lines)
+
+
+def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    _number_of_comment_lines = 0
+    _step_detected = False
+    _continue_until_the_end = False
+    num_spaces_indent = 0
+    for line in lines:
+        if line.startswith("include"):
+            # Nothing should be removed from here onwards, so, skip until the end of the file.
+            _continue_until_the_end = True
+
+            # Ensure there is a space before the include section starts.
+            if new_lines[-1].strip() != "":
+                new_lines.append("\n")
+
+        if line.startswith("steps:"):
+            # Store this special line and move on.
+            new_lines.append(line)
+            # If there were comments above "steps", keep them.
+            _number_of_comment_lines = 0
+            continue
+
+        if _continue_until_the_end:
+            new_lines.append(line)
+            continue
+
+        if not _step_detected:
+            if line.strip().startswith("#") or line.strip() == "":
+                _number_of_comment_lines += 1
+                new_lines.append(line)
+                continue
+            elif line.strip().startswith(step):
+                if _number_of_comment_lines > 0:
+                    # Remove the previous comment lines and ignore the current line.
+                    new_lines = new_lines[:-_number_of_comment_lines]
+                # Find the number of spaces on the left of the step name.
+                # We need this to know if the next comments are indented (as comments within dependencies).
+                num_spaces_indent = len(line) - len(line.lstrip())
+                _step_detected = True
+                continue
+            else:
+                # This line corresponds to any other step or step dependency.
+                new_lines.append(line)
+                _number_of_comment_lines = 0
+                continue
+        else:
+            if line.strip().startswith("- "):
+                # Ignore the dependencies of the step.
+                continue
+            elif (line.strip().startswith("#")) and (len(line) - len(line.lstrip()) > num_spaces_indent):
+                # Ignore comments that are indented (as comments within dependencies).
+                continue
+            elif line.strip() == "":
+                # Ignore empty lines.
+                continue
+            else:
+                # The step dependencies have ended. Append current line and continue until the end of the dag file.
+                new_lines.append(line)
+                _continue_until_the_end = True
+                continue
+
+    # Write the new content to the active dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(new_lines)
+
+
+def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
+    """Remove specific steps from a dag file, including their comments.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    steps_to_remove : List[str]
+        List of steps to be removed from the DAG file.
+        Their dependencies do not need to be specified (they will also be removed).
+
+    """
+    for step in steps_to_remove:
+        _remove_step_from_dag_file(dag_file=dag_file, step=step)
+
+
+def create_dag_archive_file(dag_file_archive: Path) -> None:
+    """Create an empty dag archive file, and add it to the main dag archive file.
+
+    Parameters
+    ----------
+    dag_file_archive : Path
+        Path to a specific dag archive file that does not exist yet.
+
+    """
+    # Create a new archive dag file.
+    dag_file_archive.write_text("steps:\n")
+    # Find the number of spaces in the indentation of the main dag archive file.
+    n_spaces_include_section = 2
+    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
+        lines = file.readlines()
+    for i, line in enumerate(lines):
+        if line.strip().startswith("include"):
+            n_spaces_include_section = [
+                len(_line) - len(_line.lstrip()) for _line in lines[i + 1 :] if _line.strip().startswith("- ")
+            ][0]
+    # Add this archive dag file to the main dag archive file.
+    dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
+    with open(paths.DAG_ARCHIVE_FILE, "a") as file:
+        file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")

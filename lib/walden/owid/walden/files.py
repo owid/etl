@@ -22,6 +22,9 @@ from rich.progress import (
 
 from .ui import log
 
+TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
+DEFAULT_CHUNK_SIZE = 512
+
 
 def _create_progress_bar() -> Progress:
     """Create a fancy progress bar to use for display of download progress.
@@ -37,6 +40,21 @@ def _create_progress_bar() -> Progress:
         "•",
         TimeElapsedColumn(),
     )
+
+
+def istextblock(block: bytes) -> bool:
+    if not block:
+        # An empty file is considered a valid text file
+        return True
+
+    if b"\x00" in block:
+        # Files with null bytes are binary
+        return False
+
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of TEXT_CHARS from the block
+    nontext = block.translate(None, TEXT_CHARS)
+    return float(len(nontext)) / len(block) <= 0.30
 
 
 def _stream_to_file(
@@ -78,7 +96,12 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
     # issues one some systems, it's safer to stream directly to the file and remove it
     # if md5 don't match
     tmp_filename = filename + ".tmp"
-    with open(tmp_filename, "wb") as f, requests.get(url, stream=True) as r:
+    # Add a header to the request, to avoid a "requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: ..."
+    # error when accessing data files in certain URLs.
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
+    }
+    with open(tmp_filename, "wb") as f, requests.get(url, stream=True, headers=headers) as r:
         r.raise_for_status()
 
         md5 = _stream_to_file(r, f, **kwargs)

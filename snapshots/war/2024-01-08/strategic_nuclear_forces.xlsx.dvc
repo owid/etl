@@ -1,0 +1,33 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Strategic Nuclear Forces Dataset
+    description: |-
+      This dataset describes times-series-cross-sectional information on all nuclear-armed states' strategic nuclear forces, and provides three indicators: the deliverable strategic warhead count, the equivalent megatonnage (EMT) index, and the counter military potential (CMP) index.
+    date_published: 2023-09-15
+    version_producer: v2.0
+
+    # Citation
+    producer: Suh
+    citation_full: |-
+      Kyungwon Suh - The Strategic Nuclear Forces Dataset (2023).
+
+      Suh, Kyungwon. 2022. “Nuclear Balance and the Initiation of Nuclear Crises: Does Superiority Matter?” Journal of Peace Research, Vol. 60, No. 2 (March): 337-351. Doi:10.1177/00223433211067899.
+    attribution: Suh - The Strategic Nuclear Forces Dataset v2.0 (2023)
+    attribution_short: Suh
+
+    # Files
+    url_main: https://kyungwonsuh.weebly.com/datasets.html
+    url_download: https://kyungwonsuh.weebly.com/uploads/1/4/6/1/146191116/snforce2_ndy.xlsx
+    date_accessed: 2024-01-08
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-08
+
+outs:
+- md5: ea6b9a96e6068a98ae315a42a57073f6
+  size: 156328
+  path: strategic_nuclear_forces.xlsx

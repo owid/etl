@@ -4,13 +4,12 @@
 #  Unit tests for basic catalog and dataset functionality.
 #
 
-from pathlib import Path
 import datetime as dt
+from pathlib import Path
 
-from jsonschema import Draft7Validator, validate, ValidationError
 import pytest
-
-from owid.walden.catalog import INDEX_DIR, Dataset, Catalog, load_schema, iter_docs
+from jsonschema import Draft7Validator, ValidationError, validate
+from owid.walden.catalog import INDEX_DIR, Catalog, Dataset, iter_docs, load_schema
 
 
 def test_schema():
@@ -25,7 +24,7 @@ def test_catalog_entries():
     for filename, doc in iter_docs():
         try:
             validate(doc, schema)
-        except ValidationError as e:
+        except ValidationError:
             print("Error in file:", Path(filename).relative_to(INDEX_DIR))
             raise
 
@@ -50,7 +49,7 @@ def test_catalog_find():
 
 def test_catalog_find_one_success():
     catalog = Catalog()
-    dataset = catalog.find_one("who", "2021-07-01", "gho")
+    dataset = catalog.find_one("who", "2022-07-17", "who_vaccination")
     assert isinstance(dataset, Dataset)
 
 
@@ -60,7 +59,7 @@ def test_catalog_find_one_too_many():
         catalog.find_one()
 
     with pytest.raises(Exception):
-        catalog.find_one("who")
+        catalog.find_one("ihme_gbd")
 
 
 def test_catalog_find_one_too_few():
@@ -71,16 +70,16 @@ def test_catalog_find_one_too_few():
 
 def test_catalog_find_latest():
     catalog = Catalog()
-    dataset = catalog.find_latest("who", "gho")
+    dataset = catalog.find_latest("who", "who_vaccination")
     assert isinstance(dataset, Dataset)
 
 
 def test_metadata_pruning():
     """Make sure we're not losing metadata keys with False values."""
     catalog = Catalog()
-    dataset = catalog.find_one("who", "2021-07-01", "gho")
+    dataset = catalog.find_one("who", "2022-07-17", "who_vaccination")
     dataset.is_public = False
-    assert dataset.metadata["is_public"] == False
+    assert dataset.metadata["is_public"] is False
 
 
 def test_default_dataset_version():

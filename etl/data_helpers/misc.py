@@ -10,7 +10,9 @@ should probably be moved to owid-datautils. However this can be time consuming a
 - Prior to moving them to owid-datautils, we can test and discuss them.
 
 """
-from typing import Any, List, Set, Union
+
+import math
+from typing import Any, List, Optional, Set, Union
 
 import pandas as pd
 import plotly.express as px
@@ -51,41 +53,6 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
 
 ########################################################################################################################
 # TODO: Remote this temporary function once WDI has origins.
-def add_origins_to_wdi(tb_wdi: Table) -> Table:
-    tb_wdi = tb_wdi.copy()
-
-    # List all non-index columns in the WDI table.
-    data_columns = [column for column in tb_wdi.columns if column not in ["country", "year"]]
-
-    # For each indicator, add an origin (using information from the old source) and then remove the source.
-    for column in data_columns:
-        assert len(tb_wdi[column].metadata.sources) == 1, f"Expected only one source in column {column}"
-        source = tb_wdi[column].metadata.sources[0]
-        error = "Remove temporary solution where origins where manually created."
-        assert tb_wdi[column].metadata.origins == [], error
-        tb_wdi[column].metadata.origins = [
-            Origin(
-                title="World Development Indicators",
-                producer=source.name,
-                attribution="Multiple sources compiled by World Bank (2023)",
-                url_main="https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators",
-                url_download="http://databank.worldbank.org/data/download/WDI_csv.zip",
-                date_accessed="2023-05-29",
-                date_published="2023-05-11",
-                citation_full="World Bank's World Development Indicators (WDI).",
-                description="The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.",
-                license=License(name="CC BY 4.0"),
-            )
-        ]
-
-        # Remove sources from indicator.
-        tb_wdi[column].metadata.sources = []
-
-    return tb_wdi
-
-
-########################################################################################################################
-# TODO: Remote this temporary function once WDI has origins.
 def add_origins_to_mortality_database(tb_who: Table) -> Table:
     tb_who = tb_who.copy()
 
@@ -114,6 +81,41 @@ def add_origins_to_mortality_database(tb_who: Table) -> Table:
         tb_who[column].metadata.sources = []
 
     return tb_who
+
+
+##################################################################################
+# TODO: Remote this temporary function once WDI has origins.
+def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
+    tb_gbd = tb_gbd.copy()
+
+    # List all non-index columns in the WDI table.
+    data_columns = [column for column in tb_gbd.columns if column not in ["country", "year"]]
+
+    # For each indicator, add an origin (using information from the old source) and then remove the source.
+    for column in data_columns:
+        tb_gbd[column].metadata.sources = []
+        error = "Remove temporary solution where origins were manually created."
+        assert tb_gbd[column].metadata.origins == [], error
+        tb_gbd[column].metadata.origins = [
+            Origin(
+                title="Global Burden of Disease",
+                producer="Institute of Health Metrics and Evaluation",
+                url_main="https://vizhub.healthdata.org/gbd-results/",
+                date_accessed="2021-12-01",
+                date_published="2020-10-17",
+                citation_full="Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.",
+                description="The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated. GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.",
+                license=License(
+                    name="Free-of-Charge Non-commercial User Agreement",
+                    url="https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement",
+                ),
+            )
+        ]
+
+        # Remove sources from indicator.
+        tb_gbd[column].metadata.sources = []
+
+    return tb_gbd
 
 
 ########################################################################################################################
@@ -260,3 +262,147 @@ def compare_tables(
         # Plot all listed figures.
         for fig in figures:
             fig.show()
+
+
+def round_to_nearest_power_of_ten(value: Union[int, float], floor: bool = True) -> float:
+    """Round a number to its nearest power of ten.
+
+    If `floor`, values are rounded down, e.g. 123 -> 100. Otherwise, they are rounded up, e.g. 123 -> 1000.
+
+    NOTE: For convenience, negative numbers are rounded down in absolute value.
+    For example, when `floor` is True, -123 -> -100.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    floor : bool, optional
+        Whether to round the value down or up.
+
+    Returns
+    -------
+    float
+        Nearest power of ten.
+    """
+    if value == 0:
+        return 0
+
+    if floor:
+        rounded_value = 10 ** (math.floor(math.log10(abs(value))))
+    else:
+        rounded_value = 10 ** (math.ceil(math.log10(abs(value))))
+
+    if value < 0:
+        rounded_value = -rounded_value
+
+    return rounded_value
+
+
+def round_to_sig_figs(value: Union[int, float], sig_figs: int = 1) -> float:
+    """Round a number to a fixed amount of significant figures.
+
+    For example, if `sig_figs=1`:
+    * 0.123 -> 0.1
+    * 0.992 -> 1
+    * 12.3 -> 10
+    And, if `sig_figs=2`:
+    * 0.123 -> 0.12
+    * 0.992 -> 0.99
+    * 12.3 -> 12
+
+    NOTE: Python will always ignore trailing zeros (even when printing in scientific notation).
+    We could have a function that returns a string that respects significant trailing zeros.
+    But for now, this is good enough.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    sig_figs : int, optional
+        Number of significant figures.
+
+    Returns
+    -------
+    float
+        Rounded value.
+    """
+    return round(value, sig_figs - 1 - math.floor(math.log10(abs(value if value != 0 else 1))))
+
+
+def round_to_shifted_power_of_ten(
+    value: Union[int, float], shifts: Optional[List[int]] = None, floor: bool = True
+) -> Union[int, float]:
+    """Round a number to its nearest power of ten, shifted by a certain coefficient.
+
+    By default, the coefficients are 1, 2, 3, and 5.
+
+    If `floor` is True, values are rounded down, e.g. 123 -> 100. Otherwise, they are rounded up, e.g. 123 -> 200.
+
+    For example (if `floor` is True):
+    0 -> 0
+    0.1 -> 0.1
+    0.09 -> 0.05
+    0.11 -> 0.1
+    123 -> 100
+    199 -> 100
+    201 -> 200
+    350 -> 300
+    500 -> 500
+
+    NOTE: For convenience, negative numbers are rounded down in absolute value.
+    For example, when `floor` is True, -123 -> -100.
+
+    Parameters
+    ----------
+    value : Union[int, float]
+        Number to round.
+    shifts : Optional[List[int]]
+        Coefficients that determine the shift from the closest power of ten.
+    floor : bool, optional
+        Whether to round the value down (if True) or up (if False).
+
+    Returns
+    -------
+    closest_shifted_value : Union[int,float]
+        Nearest shifted power of ten.
+    """
+    if value == 0:
+        # Handle special case for zero.
+        return 0
+
+    # Define the absolute value.
+    value_abs = abs(value)
+
+    if shifts is None:
+        shifts = [1, 2, 3, 5]
+
+    # Find the closest power of 10 that is smaller than the value.
+    log_value = math.log10(value_abs)
+    power_of_10 = 10 ** math.floor(log_value)
+
+    # Generate all possible values shifted by the coefficients given in "shifts".
+    _values = [power_of_10 * shift for shift in shifts]
+
+    if floor:
+        # Find the largest shifted value that is still smaller than or equal to the given value.
+        closest_shifted_value = max([_value for _value in _values if _value <= value_abs], default=power_of_10)
+    else:
+        # Generate possible shifted values for the next power of 10.
+        next_power_of_10 = 10 ** math.ceil(log_value)
+        _values += [next_power_of_10 * shift for shift in shifts]
+        # Find the smallest shifted value that is still greater than or equal to the given value.
+        closest_shifted_value = min([_value for _value in _values if _value >= value_abs], default=next_power_of_10)
+
+    # Due to floating precision errors, the returned number differs from the expected one.
+    # Round to 1 significant figure.
+    closest_shifted_value = round_to_sig_figs(closest_shifted_value, sig_figs=1)
+
+    # Respect the type of the input value.
+    if isinstance(value, int):
+        closest_shifted_value = int(closest_shifted_value)
+
+    # Respect the sign of the input value.
+    if value < 0:
+        closest_shifted_value = -closest_shifted_value
+
+    return closest_shifted_value

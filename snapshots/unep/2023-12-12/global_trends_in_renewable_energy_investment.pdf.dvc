@@ -23,6 +23,6 @@ meta:
 
 wdir: ../../../data/snapshots/unep/2023-12-12
 outs:
-- md5: 9c2b121bef8bb635650d1a224aa7a09e
-  size: 4683701
-  path: global_trends_in_renewable_energy_investment.pdf
+  - md5: d0629a9a4218ed60412761be9030049b
+    size: 4681700
+    path: global_trends_in_renewable_energy_investment.pdf

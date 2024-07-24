@@ -47,20 +47,11 @@ def run(dest_dir: str) -> None:
     # Pivot the table to get the counts for each domain in a separate column
     df_pivot_domain = domain_counts.pivot(index="year", columns="domain", values="count").reset_index()
 
+    domains = tb["domain"].unique().tolist()
     # Melting the dataframe
     melted_df = df_pivot_domain.melt(
         id_vars=["year"],
-        value_vars=[
-            "Drawing",
-            "Games",
-            "Language",
-            "Multimodal",
-            "Not specified",
-            "Other",
-            "Recommendation",
-            "Speech",
-            "Vision",
-        ],
+        value_vars=domains,
         var_name="domain",
         value_name="yearly_count",
     )
@@ -72,17 +63,7 @@ def run(dest_dir: str) -> None:
     # Melting the dataframe
     melted_df_cumulative = df_pivot_domain.melt(
         id_vars=["year"],
-        value_vars=[
-            "Drawing",
-            "Games",
-            "Language",
-            "Multimodal",
-            "Not specified",
-            "Other",
-            "Recommendation",
-            "Speech",
-            "Vision",
-        ],
+        value_vars=domains,
         var_name="domain",
         value_name="cumulative_count",
     )

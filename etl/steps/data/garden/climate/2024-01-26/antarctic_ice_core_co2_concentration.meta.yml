@@ -1,0 +1,17 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+        - CO2 & Greenhouse Gas Emissions
+
+dataset:
+  update_period_days: 0
+
+tables:
+  antarctic_ice_core_co2_concentration:
+    variables:
+      co2_concentration:
+        title: Long-run CO₂ concentration
+        unit: parts per million volume
+        short_unit: ppmv

@@ -58,6 +58,7 @@ meta:
       2023, Earth Syst. Sci. Data, 15, 5301-5369, https://doi.org/10.5194/essd-15-5301-2023,
       2023.
     attribution: Global Carbon Budget (2023)
+    attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
     url_download: 
       https://globalcarbonbudgetdata.org/downloads/latest-data/National_Fossil_Carbon_Emissions_2023v1.0.xlsx

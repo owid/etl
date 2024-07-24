@@ -2,15 +2,13 @@ import datetime as dt
 import json
 import re
 import tempfile
-from contextlib import contextmanager
 from dataclasses import dataclass
-from multiprocessing import Lock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
-import fasteners
 import owid.catalog.processing as pr
 import pandas as pd
+import structlog
 import yaml
 from dataclasses_json import dataclass_json
 from owid.catalog import Table, s3_utils
@@ -25,53 +23,11 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.walden import files
-from tenacity import Retrying
-from tenacity.retry import retry_if_exception_type
-from tenacity.stop import stop_after_attempt
-
-if TYPE_CHECKING:
-    from dvc.repo import Repo
 
 from etl import config, paths
-from etl.files import RuntimeCache, yaml_dump
+from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
 
-# DVC is not thread-safe, so we need to lock it
-dvc_lock = Lock()
-unignore_backports_lock = Lock()
-dvc_pull_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/dvc_pull_lock")
-
-DVC_REPO_CACHE = RuntimeCache()
-
-
-def get_dvc(use_cache: bool = True) -> "Repo":
-    """Return DVC repo. If `use_cache` is True, the repo is cached in memory. Cache is thread-safe."""
-    from dvc.repo import Repo
-
-    key = str(paths.BASE_DIR)
-    cache = DVC_REPO_CACHE
-    if not use_cache or key not in cache:
-        if config.R2_ACCESS_KEY and config.R2_SECRET_KEY:
-            remote_config = {
-                "access_key_id": config.R2_ACCESS_KEY,
-                "secret_access_key": config.R2_SECRET_KEY,
-                "region": "auto",
-            }
-            dvc_config = {"remote": {"public": remote_config, "private": remote_config}}
-        else:
-            dvc_config = None
-
-        dvc = Repo(
-            paths.BASE_DIR,
-            config=dvc_config,
-        )
-
-        # Store repo in cache.
-        if use_cache:
-            cache.add(key, dvc)
-    else:
-        dvc = cache[key]
-
-    return dvc
+log = structlog.get_logger()
 
 
 @dataclass
@@ -86,7 +42,7 @@ class Snapshot:
         self.uri = uri
 
         if not self.metadata_path.exists():
-            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found")
+            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found, but {uri} is in DAG.")
 
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
@@ -109,63 +65,69 @@ class Snapshot:
         else:
             return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
-    def _cached_dvc_repo(self) -> Any:
-        """Return DVC repo and cache it. Backported steps do not use cached repository."""
-        if "backport" in str(self.metadata_path):
-            # The repo has to be created again to pick unignored files
-            return get_dvc(use_cache=False)
+    def _download_dvc_file(self, md5: str) -> None:
+        """Download file from remote to self.path."""
+        self.path.parent.mkdir(exist_ok=True, parents=True)
+        if self.metadata.is_public:
+            # TODO: temporarily download files from R2 instead of public link to prevent
+            # issues with cached snapshots. Remove this when convenient
+            download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
+            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
-            return get_dvc(use_cache=True)
+            download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
+            s3_utils.download(download_url, str(self.path))
+
+        # Check if file was downloaded correctly. This should never happen
+        downloaded_md5 = checksum_file(self.path)
+        if downloaded_md5 != md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(
+                f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}. It is possible that download got interrupted."
+            )
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
         if not force and not self.is_dirty():
             return
 
-        from dvc.exceptions import CheckoutError
+        assert len(self.metadata.outs) == 1
+        expected_md5 = self.metadata.outs[0]["md5"]
 
-        # DVC locking is terrible. It'd fail if we didn't use our own file locks.
-        # This is pretty limiting as it allows us to only pull
-        # one snapshot at a time. One option is to pre-pull all snapshot steps or
-        # we could just download the file directly.
-        # The combination of different kinds of locks is kinda magical and waiting
-        # to be refactored soon.
-        with dvc_pull_lock, _unignore_backports(self.path):
-            try:
-                repo = self._cached_dvc_repo()
-                repo.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
-                ) from e
+        self._download_dvc_file(expected_md5)
+
+        expected_size = self.metadata.outs[0]["size"]
+        downloaded_size = self.path.stat().st_size
+        if downloaded_size != expected_size:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Size mismatch for {self.path}: expected {expected_size}, got {downloaded_size}")
+
+        downloaded_md5 = checksum_file(self.path)
+        if downloaded_md5 != expected_md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Checksum mismatch for {self.path}: expected {expected_md5}, got {downloaded_md5}")
 
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
-        from dvc.dvcfile import load_file
-        from dvc.rwlock import RWLockFileCorruptedError
-
         if not self.path.exists():
             return True
 
-        with open(self.metadata_path) as istream:
-            if "outs:\n" not in istream.read():
-                raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
+        if self.metadata.outs is None:
+            raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
 
-        # See notes about locking in `pull` method.
-        with dvc_lock, _unignore_backports(self.metadata_path):
-            repo = self._cached_dvc_repo()
-            dvc_file = load_file(repo, self.metadata_path.as_posix())
-            with repo.lock:
-                # DVC returns empty dictionary if file is up to date
-                stage = dvc_file.stage
-                try:
-                    return stage.status() != {}
-                except RWLockFileCorruptedError:
-                    rwlock_path = paths.BASE_DIR / ".dvc/tmp/rwlock"
-                    # If the lock file is corrupted, we need to delete it and try again
-                    if rwlock_path.exists():
-                        rwlock_path.unlink()
-                    return stage.status() != {}
+        assert len(self.metadata.outs) == 1
+        file_size = self.path.stat().st_size
+        # Compare file size if it's larger than 20MB, otherwise compare md5
+        # This should be pretty safe and speeds up the process significantly
+        # NOTE: on 2024-06-12 this caused a discrepancy between production and staging
+        # for snapshot://climate/latest/weekly_wildfires.csv.dvc. Data was slightly updated, but
+        # the file size was the same. This should be a very rare case.
+        if file_size >= 20 * 2**20:  # 20MB
+            return file_size != self.m.outs[0]["size"]
+        else:
+            return checksum_file(self.path.as_posix()) != self.m.outs[0]["md5"]
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -192,20 +154,23 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        from dvc.exceptions import UploadError
+        if not upload:
+            log.warn("Skipping upload", snapshot=self.uri)
+            return
 
-        dvc = get_dvc()
+        # Upload to S3
+        md5 = checksum_file(self.path)
+        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
+        s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        with dvc_lock, _unignore_backports(self.path):
-            dvc.add(str(self.path), fname=str(self.metadata_path))
-            if upload:
-                # DVC sometimes returns UploadError, retry a few times
-                for attempt in Retrying(
-                    stop=stop_after_attempt(3),
-                    retry=retry_if_exception_type(UploadError),
-                ):
-                    with attempt:
-                        dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+        # Update metadata file
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
+
+        with open(self.metadata_path, "w") as f:
+            f.write(ruamel_dump(meta))
 
     def create_snapshot(
         self,
@@ -222,27 +187,19 @@ class Snapshot:
             self.download_from_source()
             self.dvc_add(upload=upload)
 
-    def to_table_metadata(self):
+    def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
 
     def read(self, *args, **kwargs) -> Table:
         """Read file based on its Snapshot extension."""
-        if self.metadata.file_extension == "csv":
-            return self.read_csv(*args, **kwargs)
-        elif self.metadata.file_extension == "feather":
-            return self.read_feather(*args, **kwargs)
-        elif self.metadata.file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-            return self.read_excel(*args, **kwargs)
-        elif self.metadata.file_extension == "json":
-            return self.read_json(*args, **kwargs)
-        elif self.metadata.file_extension == "dta":
-            return self.read_stata(*args, **kwargs)
-        elif self.metadata.file_extension == "rds":
-            return self.read_rds(*args, **kwargs)
-        elif self.metadata.file_extension == "rda":
-            return self.read_rda(*args, **kwargs)
-        else:
-            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+        return read_table_from_snapshot(
+            *args,
+            path=self.path,
+            table_metadata=self.to_table_metadata(),
+            snapshot_origin=self.metadata.origin,
+            file_extension=self.metadata.file_extension,
+            **kwargs,
+        )
 
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
@@ -274,6 +231,10 @@ class Snapshot:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_fwf(self, *args, **kwargs) -> Table:
+        """Read a table of fixed-width formatted lines with metadata."""
+        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -281,10 +242,6 @@ class Snapshot:
     def read_from_dict(self, *args, **kwargs) -> Table:
         """Read data from a dictionary into a Table and populate it with metadata."""
         return pr.read_from_dict(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
-
-    def read_fwf(self, *args, **kwargs) -> Table:
-        """Read a table of fixed-width formatted lines with metadata."""
-        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
         """Return an Excel file object ready for parsing."""
@@ -300,6 +257,26 @@ class Snapshot:
         self.extract(temp_dir.name)
         # Return temporary directory
         return temp_dir
+
+    def read_in_archive(self, filename: str, *args, **kwargs) -> Table:
+        """Read data from file inside a zip/tar archive.
+
+        If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
+
+        To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+        """
+        with self.extract_to_tempdir() as tmpdir:
+            new_extension = filename.split(".")[-1]
+            # Read
+            tb = read_table_from_snapshot(
+                *args,
+                path=Path(tmpdir) / filename,
+                table_metadata=self.to_table_metadata(),
+                snapshot_origin=self.metadata.origin,
+                file_extension=new_extension,
+                **kwargs,
+            )
+            return tb
 
 
 @pruned_json
@@ -340,7 +317,7 @@ class SnapshotMeta:
         # exclude `outs` with md5, we reset it when saving new metadata
         d.pop("outs", None)
 
-        # remove is_public if it's True
+        # remove default values
         if d["is_public"]:
             del d["is_public"]
 
@@ -503,6 +480,44 @@ class SnapshotMeta:
         return table_meta
 
 
+def read_table_from_snapshot(
+    path: Union[str, Path],
+    table_metadata: TableMeta,
+    snapshot_origin: Union[Origin, None],
+    file_extension: str,
+    *args,
+    **kwargs,
+) -> Table:
+    """Read snapshot as a table."""
+    # Define kwargs / args
+    args = [
+        path,
+        *args,
+    ]
+    kwargs = {
+        **kwargs,
+        "metadata": table_metadata,
+        "origin": snapshot_origin,
+    }
+    # Read table
+    if file_extension == "csv":
+        return pr.read_csv(*args, **kwargs)
+    elif file_extension == "feather":
+        return pr.read_feather(*args, **kwargs)
+    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
+        return pr.read_excel(*args, **kwargs)
+    elif file_extension == "json":
+        return pr.read_json(*args, **kwargs)
+    elif file_extension == "dta":
+        return pr.read_stata(*args, **kwargs)
+    elif file_extension == "rds":
+        return pr.read_rds(*args, **kwargs)
+    elif file_extension == "rda":
+        return pr.read_rda(*args, **kwargs)
+    else:
+        raise ValueError(f"Unknown extension {file_extension}")
+
+
 def add_snapshot(
     uri: str,
     filename: Optional[Union[str, Path]] = None,
@@ -544,38 +559,6 @@ def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
         if re.search(match, uri):
             yield Snapshot(uri)
-
-
-@contextmanager
-def _unignore_backports(path: Path):
-    """Folder snapshots/backports contains thousands of .dvc files which adds significant overhead
-    to running DVC commands (+8s overhead). That is why we ignore this folder in .dvcignore. This
-    context manager checks if the path is in snapshots/backports and if so, temporarily removes
-    this folder from .dvcignore.
-    This makes non-backport DVC operations run under 1s and backport DVC operations at ~8s.
-    Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
-    DVC and subrepos).
-    """
-    dvc_ignore_path = paths.BASE_DIR / ".dvcignore"
-    if "backport/" in str(path):
-        with unignore_backports_lock:
-            with open(dvc_ignore_path) as f:
-                s = f.read()
-            try:
-                with open(dvc_ignore_path, "w") as f:
-                    dataset_id = path.name.split("_")[1]
-                    f.write(
-                        s.replace(
-                            "snapshots/backport/latest/*",
-                            f"snapshots/backport/latest/*\n!snapshots/backport/latest/dataset_{dataset_id}*",
-                        )
-                    )
-                yield
-            finally:
-                with open(dvc_ignore_path, "w") as f:
-                    f.write(s)
-    else:
-        yield
 
 
 def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:

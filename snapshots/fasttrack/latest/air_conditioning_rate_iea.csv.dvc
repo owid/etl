@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: International Energy Agency (IEA). Future of Cooling.
+    title: air_conditioning_rate_iea
+    citation_full: International Energy Agency (IEA). Future of Cooling.
+    url_main: https://www.iea.org/data-and-statistics/charts/percentage-of-households-equiped-with-ac-in-selected-countries-2018
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTIRDPDGyiDkHBMiFV7UTsaYaeXyFE0IXYa4J04_XKyTVqITwDF6FWAUioKXZ93ebWYKxR8V6dJmfNM/pub?output=csv
+    date_accessed: '2024-05-28'
+  name: Air conditioning rates by country (IEA, 2018)
+  description: Share of households that have air conditioning for a select number of countries.
+  license: {}
+outs:
+  - md5: bd65aed0d701a2fe5e5793343e2ba7b1
+    size: 218
+    path: air_conditioning_rate_iea.csv

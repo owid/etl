@@ -103,6 +103,7 @@ steps:
   data://garden/war/2023-09-21/brecke:
     - data://meadow/war/2023-09-21/brecke
     - data://garden/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
   data://grapher/war/2023-09-21/brecke:
     - data://garden/war/2023-09-21/brecke
 
@@ -128,3 +129,79 @@ steps:
     - snapshot://war/2023-11-29/chupilkin_koczan.dta
   data://garden/war/2023-11-29/chupilkin_koczan:
     - data://meadow/war/2023-11-29/chupilkin_koczan
+
+  # The Strategic Nuclear Forces Dataset (Suh).
+  data://meadow/war/2024-01-30/strategic_nuclear_forces:
+    - snapshot://war/2024-01-30/strategic_nuclear_forces.xlsx
+    - snapshot://war/2024-01-30/strategic_nuclear_forces_monadic.xlsx
+  data://garden/war/2024-01-30/strategic_nuclear_forces:
+    - data://meadow/war/2024-01-30/strategic_nuclear_forces
+  data://grapher/war/2024-01-30/strategic_nuclear_forces:
+    - data://garden/war/2024-01-30/strategic_nuclear_forces
+
+  # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+  data://meadow/war/2024-01-09/nuclear_weapons_inventories:
+    - snapshot://war/2024-01-09/nuclear_weapons_inventories.csv
+  data://garden/war/2024-01-09/nuclear_weapons_inventories:
+    - data://meadow/war/2024-01-09/nuclear_weapons_inventories
+  data://grapher/war/2024-01-09/nuclear_weapons_inventories:
+    - data://garden/war/2024-01-09/nuclear_weapons_inventories
+
+  # Federation of American Scientists - Status of World Nuclear Forces.
+  data://meadow/war/2024-01-09/status_of_world_nuclear_forces:
+    - snapshot://war/2024-01-09/status_of_world_nuclear_forces.csv
+  data://garden/war/2024-01-09/status_of_world_nuclear_forces:
+    - data://meadow/war/2024-01-09/status_of_world_nuclear_forces
+  data://grapher/war/2024-01-09/status_of_world_nuclear_forces:
+    - data://garden/war/2024-01-09/status_of_world_nuclear_forces
+
+  # Nuclear Threat Initiative - Overview.
+  data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
+    - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv
+  data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
+    - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview
+
+  # Bleek - Spread of Nuclear Weapons.
+  data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
+    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
+  data://garden/war/2024-01-11/spread_of_nuclear_weapons:
+    - data://meadow/war/2024-01-11/spread_of_nuclear_weapons
+
+  # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
+  data://garden/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/spread_of_nuclear_weapons
+    - data://garden/war/2024-01-11/nuclear_threat_initiative_overview
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/nuclear_weapons_proliferation
+
+  # Arms Control Association - Nuclear Weapons Tests.
+  data://meadow/war/2024-01-25/nuclear_weapons_tests:
+    - snapshot://war/2024-01-25/nuclear_weapons_tests.csv
+  data://garden/war/2024-01-25/nuclear_weapons_tests:
+    - data://meadow/war/2024-01-25/nuclear_weapons_tests
+  data://grapher/war/2024-01-25/nuclear_weapons_tests:
+    - data://garden/war/2024-01-25/nuclear_weapons_tests
+
+  # UNODA - Treaties Database.
+  data://meadow/war/2024-01-23/nuclear_weapons_treaties:
+    - snapshot://war/2024-01-23/geneva_protocol.csv
+    - snapshot://war/2024-01-23/partial_test_ban.csv
+    - snapshot://war/2024-01-23/comprehensive_test_ban.csv
+    - snapshot://war/2024-01-23/non_proliferation.csv
+    - snapshot://war/2024-01-23/prohibition.csv
+  data://garden/war/2024-01-23/nuclear_weapons_treaties:
+    - data://meadow/war/2024-01-23/nuclear_weapons_treaties
+    - data://garden/un/2023-10-30/un_members
+  data://grapher/war/2024-01-23/nuclear_weapons_treaties:
+    - data://garden/war/2024-01-23/nuclear_weapons_treaties
+  data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
+    - data://garden/war/2024-01-23/nuclear_weapons_treaties
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+
+  ######################################################################################################################
+
+
+

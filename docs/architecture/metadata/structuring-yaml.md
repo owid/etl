@@ -1,3 +1,8 @@
+---
+tags:
+  - 👷 Staff
+---
+
 ## Creating YAML Files
 
 Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. Their content is applied **at the very end** of any ETL step. Therefore, YAML files have "the final word" on the metadata of any step. The conventional structure is as follows:
@@ -16,10 +21,10 @@ tables:
 To generate a metadata YAML file with pre-populated variable names for an existing garden dataset, execute:
 
 ```
-poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset
+poetry run etl metadata export data/garden/my_namespace/my_version/my_dataset
 ```
 
-Check `poetry run etl-metadata-export --help` for more options.
+Check `poetry run etl metadata-export --help` for more options.
 
 ## Handling Multi-line Strings and Whitespace
 
@@ -42,6 +47,7 @@ my_var_1:
 
 
 !!! note "Note"
+
     This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (or ++option+z++ in VS Code on Mac).
 
 ### Folded style `>`
@@ -60,6 +66,7 @@ my_var_1:
 ```
 
 !!! note "Note"
+
     This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
 
 
@@ -190,6 +197,7 @@ There are also special variables like `{ TODAY }` that can be used for automatic
 Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
 
 !!! note
+
     We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var }}`.
 
 

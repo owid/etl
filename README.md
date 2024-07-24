@@ -16,3 +16,7 @@ _The compute graph for Our World in Data's data processing._
 
 See: https://docs.owid.io/projects/etl/
 
+<hr>
+<p align='center'>
+🪷 <i>There is no extract, there is no load, there is only transform.</i>
+</p>

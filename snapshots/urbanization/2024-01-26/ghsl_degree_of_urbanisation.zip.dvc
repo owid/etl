@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Human Settlement Layer Dataset
+    description: |-
+      This dataset provides a comprehensive classification of urbanization levels for administrative regions worldwide, using the Global ADMinistrative layer version 4.1 (GADM4.1) as the source of administrative units. The classification is derived from the application of the Degree of Urbanisation model's Stage II, which evaluates each unit based on urbanization criteria. It utilizes the Global Human Settlement Layer (GHSL) data, specifically the Settlement Classification (GHS-SMOD_GLOBE_R2023A) that categorizes areas as urban, suburban, or rural, and the Population Grid (GHS-POP_GLOBE_R2023A) that provides detailed population information.
+
+      The dataset encompasses an Excel table summarizing global and country-level statistics, along with 72 CSV files. These files are organized according to various administrative division levels (from GADM levels 0 to 5) and cover different time periods from 1975 to 2030, offering a detailed view of urbanization classification for each administrative unit.
+    date_published: 2023
+    version_producer: 2023-10-31
+
+    # Citation
+    producer: European Commission, Joint Research Centre (JRC)
+    citation_full: |-
+      Schiavina, Marcello; Melchiorri, Michele; Freire, Sergio (2023): GHS-DUC R2023A - GHS Degree of Urbanisation Classification, application of the Degree of Urbanisation methodology (stage II) to GADM 4.1 layer, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/DC0EB21D-472C-4F5A-8846-823C50836305 PID: http://data.europa.eu/89h/dc0eb21d-472c-4f5a-8846-823c50836305
+    attribution_short: European Commission, JRC
+
+    # Files
+    url_main: https://ghsl.jrc.ec.europa.eu/CFS.php
+    url_download: 
+      https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_DUC_GLOBE_R2023A/V1-0/GHS_DUC_GLOBE_R2023A_V1_0.zip
+    date_accessed: 2024-01-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://commission.europa.eu/legal-notice_en
+
+wdir: ../../../data/snapshots/urbanization/2024-01-26
+outs:
+- md5: e7a7140ce1e8d850e0a42dff417f0a9a
+  size: 383171303
+  path: ghsl_degree_of_urbanisation.zip

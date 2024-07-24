@@ -1,0 +1,15 @@
+dataset:
+  title: Projections of air conditioning units (IEA, 2018)
+  description: Projected number of air conditioning units.
+  licenses:
+    - {}
+tables:
+  projections_air_conditioners_iea:
+    variables:
+      number_air_conditioner_units:
+        title: Air conditioners
+        unit: untis
+        short_unit: units
+        display:
+          conversionFactor: 1000000
+        description: Projected number of air conditioning units.

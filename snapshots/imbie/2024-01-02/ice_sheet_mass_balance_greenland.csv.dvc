@@ -1,0 +1,28 @@
+meta:
+  origin:
+    # TODO: Move to a separate namespace, given that this is not updated.
+    producer: Ice sheet Mass Balance Inter-comparison Exercise team
+    title: IMBIE 2021 Greenland and Antarctica dataset
+    title_snapshot: IMBIE 2021 Greenland and Antarctica dataset - Greenland
+    description: |-
+      This dataset contains rates of mass change and cumulative mass change and their associated uncertainty for the Antarctic Ice Sheet and the Greenland Ice Sheet between 1992 and 2020. The data are reconciled estimates of mass balance from three independent satellite-based techniques: altimetry, gravimetry and input-output method.
+    citation_full: |-
+      Ice sheet Mass Balance Inter-comparison Exercise team (IMBIE) - Antarctic and Greenland Ice Sheet mass balance 1992-2020 for IPCC AR6 (2021).
+
+      Shepherd, A., Ivins, E., Rignot, E., Smith, B., van den Broeke, M., Velicogna, I., Whitehouse, P., Briggs, K., Joughin, I., Krinner, G., Nowicki, S., Payne, A., Scambos, T., Schlegel, N., A, G., Agosta, C., Ahlstrøm, A., Babonis, G., Barletta, V., … Wuite, J. (2021). Antarctic and Greenland Ice Sheet mass balance 1992-2020 for IPCC AR6 (Version 1.0) [Data set]. UK Polar Data Centre, Natural Environment Research Council, UK Research & Innovation. https://doi.org/10.5285/77B64C55-7166-4A06-9DEF-2E400398E452
+
+      This work is an outcome of the Ice Sheet Mass Balance Inter-Comparison Exercise (IMBIE) supported by the ESA Climate Change Initiative and the NASA Cryosphere Program. Andrew Shepherd was additionally supported by a Royal Society Wolfson Research Merit Award and the UK Natural Environment Research Council Centre for Polar Observation and Modelling (cpom30001).
+    attribution_short: IMBIE
+    url_main: http://imbie.org/
+    url_download: 
+      https://ramadda.data.bas.ac.uk/repository/entry/get/imbie_greenland_2021_Gt.csv?entryid=synth%3A77b64c55-7166-4a06-9def-2e400398e452%3AL2ltYmllX2dyZWVubGFuZF8yMDIxX0d0LmNzdg%3D%3D
+    date_accessed: '2024-01-02'
+    date_published: '2021-03-15'
+    license:
+      name: Open Government Licence v3.0
+      url: https://data.bas.ac.uk/full-record.php?id=GB/NERC/BAS/PDC/01477
+wdir: ../../../data/snapshots/imbie/2024-01-02
+outs:
+- md5: a65247fc89743f2b44e350a943f7890d
+  size: 15864
+  path: ice_sheet_mass_balance_greenland.csv

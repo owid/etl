@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Unknown
+    url: ''
+    source_data_url: gAAAAABmL1lEzUVLcy2C2i110dgfNWcHA6blyCqw0ouh8kq_IkTT_9LF_IP6Hi9a8PpkXqeeD9YFxba8wkLN5MkciVbiPX4zMhUk3mQFVjZ2ldcI7ybG3qc=
+    date_accessed: '2024-04-29'
+  name: DRAFT conflict_deaths_combined
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 8549e5e0296c5f0a5f025fa8bc4d2c3b
+    size: 407
+    path: conflict_deaths_combined.csv

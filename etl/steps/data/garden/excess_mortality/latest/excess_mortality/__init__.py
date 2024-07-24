@@ -6,13 +6,12 @@ Both sources are updated weekly.
 This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
 """
+from input import build_df
 from owid.catalog import Table
+from process import process_df
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .input import build_df
-from .process import process_df
 
 log = get_logger()
 
@@ -37,6 +36,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+
+    # HOTFIX: Remove age groups for countries Australia and Canada.
+    # See full extent of reasons for it in https://owid.slack.com/archives/CV5RY8F1B/p1706099289965929
+    # TL;DR: HMD is creating their standard age groups for these countries from an input data that has
+    # different age group binning (bigger bins). This results into unaccurate restimates.
+    df = df[~((df["entity"].isin(["Australia", "Canada"])) & (df["age"] != "all_ages"))]
+
+    # Actual processing
     log.info("excess_mortality: processing data")
     df = process_df(df)
     # Create a new table with the processed data.

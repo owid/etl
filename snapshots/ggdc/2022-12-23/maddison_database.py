@@ -1,25 +1,23 @@
-"""This script takes a snapshot of Maddison Database 2010, the last dataset with 1 to 1820 world GDP estimates`."""
+"""Script to create a snapshot of dataset."""
 
-import pathlib
+from pathlib import Path
 
 import click
 
 from etl.snapshot import Snapshot
 
-CURRENT_DIR = pathlib.Path(__file__).parent
+# Version for current snapshot dataset.
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
 @click.command()
-@click.option(
-    "--upload/--skip-upload",
-    default=True,
-    type=bool,
-    help="Upload snapshot",
-)
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
-    snap = Snapshot("ggdc/2022-12-23/maddison_database.xlsx")
-    snap.download_from_source()
-    snap.dvc_add(upload=upload)
+    # Create a new snapshot.
+    snap = Snapshot(f"ggdc/{SNAPSHOT_VERSION}/maddison_database.xlsx")
+
+    # Download data from source, add file to DVC and upload to S3.
+    snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

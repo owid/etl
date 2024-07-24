@@ -1,0 +1,23 @@
+dataset:
+  title: Aviation share of CO2 emissions (Lee, Bergero et al. and GCP)
+  description: Aviation's share of global CO2 emissions since 1940.
+  licenses:
+    - {}
+tables:
+  aviation_emissions_lee_bergero_gcp:
+    variables:
+      aviation_emissions_lee_bergero:
+        title: Aviation emissions
+        unit: billion tonnes
+        short_unit: Gt
+        description: Global CO2 emissions produced from passenger and freight aviation.
+      aviation_share_fossil_co2:
+        title: Fossil share
+        unit: '%'
+        short_unit: '%'
+        description: Global CO2 emissions from aviation as a share of emissions from all fossil sources.
+      aviation_share_total_co2:
+        title: Fossil and land use share
+        unit: '%'
+        short_unit: '%'
+        description: Global CO2 emissions from aviation as a share of emissions from all fossil sources and land use.

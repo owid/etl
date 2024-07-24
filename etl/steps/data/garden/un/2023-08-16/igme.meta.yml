@@ -128,12 +128,13 @@ tables:
       obs_value:
         title: Under fifteen mortality
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
-        unit: share of live births
-        short_unit: "%"
+        unit: |-
+          {definitions.unit_of_measure.unit}
+        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: 1
+          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
         presentation:

@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+    display:
+      numDecimalPlaces: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 740
+  title: Historical World Population Prospects
+
+
+tables:
+  projections:
+    variables:
+      population:
+        title: Population, UN <<revision>> Revision (UN Medium projection)
+        description_short: |-
+          De facto population in a country, area or region as of July 1 of the year indicated and UN WPP <<revision>> revision. Based on UN's Medium variant projection.
+        unit: people
+        display:
+          name: <<revision>> projection
+        presentation:
+          title_public: Population, UN <<revision>> revision
+          attribution: UN, World Population Prospects (1968 - 2024)
+
+  estimates:
+    variables:
+      population_estimates:
+        title: Population, UN <<revision>> Revision (estimates)
+        description_short: |-
+          De facto population in a country, area or region as of July 1 of the year indicated and UN WPP <<revision>> revision.
+        unit: people
+        display:
+          name: <<revision>> estimates
+        presentation:
+          title_public: Population, UN <<revision>> revision
+          attribution: UN, World Population Prospects (1968 - 2024)

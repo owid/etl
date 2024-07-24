@@ -29,7 +29,36 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index()
     df = df.loc[
         df.variant.isin(["estimates", "low", "medium", "high"])
-        & -(df.metric.isin(["net_migration", "net_migration_rate"]) & (df.location == "World"))
+        & ~(
+            df.metric.isin(["net_migration", "net_migration_rate"])
+            & (df.location == "World")
+            & ~(df.metric == "population")
+            & (
+                df.age.isin(
+                    [  # Dropping from five-year age groups
+                        "20-24",
+                        "25-29",
+                        "30-34",
+                        "35-39",
+                        "40-44",
+                        "45-49",
+                        "50-54",
+                        "55-59",
+                        "60-64",
+                        "65-69",
+                        "70-74",
+                        "75-79",
+                        "80-84",
+                        "85-89",
+                        "90-94",
+                        "95-99",
+                        # Dropping from ten-year age groups
+                        "0-9",
+                        "10-19",
+                    ]
+                )
+            )
+        )
     ].reset_index(drop=True)
     return df
 

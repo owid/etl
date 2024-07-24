@@ -1,0 +1,102 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Crop Yields
+
+dataset:
+  update_period_days: 0
+
+tables:
+  ray_et_al_2019:
+    title: Climate impact on crop yields
+    variables:
+      barley_change_in_yield:
+        title: "Barley yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      barley_change_with_respect_to_current:
+        title: "Barley yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      cassava_change_in_yield:
+        title: "Cassava yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      cassava_change_with_respect_to_current:
+        title: "Cassava yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      maize_change_in_yield:
+        title: "Maize yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      maize_change_with_respect_to_current:
+        title: "Maize yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      oilpalm_change_in_yield:
+        title: "Oil palm yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      oilpalm_change_with_respect_to_current:
+        title: "Oil palm yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      rapeseed_change_in_yield:
+        title: "Rapeseed yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      rapeseed_change_with_respect_to_current:
+        title: "Rapeseed yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      rice_change_in_yield:
+        title: "Rice yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      rice_change_with_respect_to_current:
+        title: "Rice yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      sorghum_change_in_yield:
+        title: "Sorghum yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      sorghum_change_with_respect_to_current:
+        title: "Sorghum yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      soybean_change_in_yield:
+        title: "Soybean yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      soybean_change_with_respect_to_current:
+        title: "Soybean yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      sugarcane_change_in_yield:
+        title: "Sugarcane yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      sugarcane_change_with_respect_to_current:
+        title: "Sugarcane yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      wheat_change_in_yield:
+        title: "Wheat yield change"
+        unit: "tonnes per hectare"
+        short_unit: "t/ha"
+      wheat_change_with_respect_to_current:
+        title: "Wheat yield change with respect to current yield"
+        unit: "%"
+        short_unit: "%"
+      change_across_10_crops:
+        title: "Calorie change across 10 crops"
+        unit: "%"
+        short_unit: "%"
+      change_across_all_food:
+        title: "Calorie change across all foods"
+        unit: "%"
+        short_unit: "%"

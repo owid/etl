@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    unit: '%'
+    short_unit: '%'
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    display:
+      numDecimalPlaces: 1
+      zeroDay: '2019-01-01'
+      yearIsDay: true
+tables:
+  papers_with_code_coding:
+    variables:
+      performance_code_any_interview:
+        title: Coding competitions
+        description_key:
+          - This benchmark measures the accuracy of models in coding competitions based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context. It aims to replicate the evaluation process used for human programmers by presenting coding problems in unrestricted natural language and assessing the correctness of solutions.
+
+          - The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
+
+
+      performance_code_any_competition:
+        title: Coding interviews
+        description_key:
+          - This benchmark assesses the accuracy of models in coding interviews based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context, simulating the evaluation process employed during human programmer interviews. It presents coding problems in unrestricted natural language and evaluates the correctness of solutions.
+
+          - The coding tasks within this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks cover a spectrum of difficulty levels, ranging from introductory to collegiate competition level. The benchmark measures the accuracy of models in solving programming tasks specifically tailored for coding interviews.
+

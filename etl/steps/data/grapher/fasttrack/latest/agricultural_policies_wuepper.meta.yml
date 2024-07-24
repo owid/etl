@@ -1,0 +1,42 @@
+dataset:
+  title: Agricultural policies (Wuepper et al. 2024)
+  description: The number and stringency of agricultural-environmental policies by country.
+  licenses:
+    - {}
+tables:
+  agricultural_policies_wuepper:
+    variables:
+      number_policies:
+        title: Number of policies
+        unit: policies
+        description: The number of national-level agricultural-environmental policies.
+      number_policies_eu:
+        title: number_policies_EU
+        unit: policies
+        display:
+          name: Number of policies
+        description: The number of national-level agricultural-environmental policies, including those in force within the
+          European Union.
+      environmental_performance_agri:
+        title: Environmental Performance Index, Agriculture
+        unit: ''
+        description: |-
+          A country's "Environmental Performance Index", specifically for agriculture. This is measured from 0 to 100, where 100 is the best performance.
+      environmental_performance_index:
+        title: Environmental Performance Index
+        unit: ''
+        description: A country's "Environmental Performance Index". This is measured from 0 to 100, where 100 is the best
+          performance.
+      agri_policy_stringency:
+        title: Stringency of agricultural-environmental policies
+        unit: ''
+        description: The stringency of agricultural-environmental policies.
+      agri_policy_enforcement:
+        title: Enforcement of agricultural-environmental policies
+        unit: ''
+        description: Levels of enforcement of agricultural-environmental policies.
+      agri_policy_intensity:
+        title: Intensity of agricultural-environmental policies
+        unit: ''
+        description: |-
+          The intensity of agricultural-environmental policies. This is the number of policies weighted by how stringently they're enforced.

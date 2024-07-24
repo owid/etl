@@ -94,6 +94,7 @@ def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool 
         .replace("”", "")
         .replace("#", "")
         .replace("^", "")
+        .replace("ˆ", "")
         .lower()
     )
 
@@ -186,6 +187,10 @@ def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
     yd.update(params)
 
     # additional parameters
+    # NOTE: TODAY is dynamic and can depend on the time of creation. This goes against our
+    #   philosophy of having deterministic outputs from snapshots and its use is therefore
+    #   discouraged. You should use origin.date_accessed instead if possible.
+    #   We only keep it here because of its convenience for COVID and AI automatic updates.
     yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
 
     return yd

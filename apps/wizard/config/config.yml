@@ -1,0 +1,213 @@
+# Use this file to add new apps (or pages) to Wizard (see property 'sections')
+#
+# There are three main properties in this file:
+# - main: Reserved for 'Home' and 'Expert' pages.
+# - etl: This is the section for the ETL apps. Each app in this section will be shown in the ETL home page.
+# - sections: This is a list of sections. Each section is a group of apps. Each section will have its own home page.
+#
+# HOW TO ADD A NEW APP?
+# ----------------------
+# Each app should be added as an item in the 'apps' property of the section you want this app to live.
+#
+# Your app should have the following properties:
+# - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
+# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
+# - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
+# - maintenaner (str): Slack handle of the person responsible for the app.
+# - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
+# - icon (str): Emoji or material icon to show in the sidebar menu.
+# - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
+# - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
+#     bool: Whether the app is disabled in all settings.
+#     dict: Whether the app is disabled in certain settings. The key is the setting and the value is a boolean. Available settings (keys) are 'production', 'staging', 'dev'. 'dev' stands for local environments.
+
+# Main pages
+main:
+  home:
+    title: "Home"
+    description: "App homepage"
+    maintainer: "@lucas"
+    entrypoint: home.py
+    icon: ":material/home:"
+  expert:
+    title: "Expert"
+    description: "Ask the expert ETL questions!"
+    maintainer:
+      - "@lucas"
+      - "@daniel"
+    entrypoint: app_pages/expert/app.py
+    icon: ":material/hotel_class:"
+
+# ETL steps
+etl:
+  title: ETL steps
+  description: Create an ETL step.
+  steps:
+    snapshot:
+      title: "Snapshot"
+      entrypoint: etl_steps/snapshot.py
+      icon: ":material/photo_camera:"
+      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
+      disable:
+        "production": True
+    express:
+      title: "Express"
+      entrypoint: etl_steps/express.py
+      icon: ":material/bolt:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+      disable:
+        "production": True
+    meadow:
+      title: "Meadow"
+      entrypoint: etl_steps/meadow.py
+      icon: ":material/nature:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
+      disable:
+        "production": True
+    garden:
+      title: "Garden"
+      entrypoint: etl_steps/garden.py
+      icon: ":material/deceased:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
+      disable:
+        "production": True
+    grapher:
+      title: "Grapher"
+      entrypoint: etl_steps/grapher.py
+      icon: ":material/database:"
+      image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+      disable:
+        "production": True
+    fasttrack:
+      title: "Fast Track"
+      alias: fasttrack
+      entrypoint: app_pages/fasttrack/app.py
+      icon: ":material/fast_forward:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
+
+sections:
+
+  - title: "Data tools"
+    description: |-
+      Updates, data edits, etc.
+    apps:
+    - title: "Indicator Upgrader"
+      alias: indicator-upgrade
+      entrypoint: app_pages/indicator_upgrade/app.py
+      description: Migrate indicators in charts
+      maintainer: "@lucas"
+      icon: ":material/upgrade:"
+      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+      disable:
+        production: True
+    - title: "Chart Diff"
+      alias: chart-diff
+      entrypoint: app_pages/chart_diff/app.py
+      description: Compare charts in staging and prod
+      maintainer: "@mojmir"
+      icon: ":material/difference:"
+      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+      disable:
+        production: True
+    - title: "Harmonizer"
+      alias: harmonizer
+      description: "Harmonize a column of a table"
+      maintainer: "@lucas"
+      entrypoint: app_pages/harmonizer.py
+      icon: ":material/music_note:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+    - title: "Map Bracketer"
+      alias: map_brackets
+      entrypoint: app_pages/map_brackets.py
+      description: Create optimal map brackets
+      maintainer: "@pablo"
+      icon: ":material/map:"
+      image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
+
+
+  - title: "Monitoring"
+    description: |-
+      Control panel for ETL steps.
+    apps:
+      - title: "Dashboard"
+        alias: dashboard
+        entrypoint: app_pages/dashboard.py
+        description: Control panel for ETL steps
+        maintainer: "@pablo"
+        icon: ":material/tv_gen:"
+        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
+      - title: "Datasets"
+        alias: dataexp
+        description: "Explore datasets and their metadata"
+        maintainer: "@lucas"
+        entrypoint: app_pages/dataset_explorer.py
+        icon: ":material/search:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+
+  - title: "Research"
+    description: |-
+      Research tools.
+    apps:
+      - title: "Insighter"
+        alias: insighter
+        description: "Data insights with GPT"
+        maintainer: "@daniel"
+        entrypoint: app_pages/datainsight_robot.py
+        icon: ":material/lightbulb:"
+        image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+
+  - title: "Misc"
+    description: |-
+      Other helpful tools in the ETL ecosystem.
+    apps:
+      - title: "News"
+        alias: news
+        description: "Latest ETL news"
+        maintainer: "@lucas"
+        entrypoint: app_pages/news.py
+        icon: ":material/newspaper:"
+        image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
+      - title: "owidle"
+        alias: owidle
+        description: "Guess the country game!"
+        maintainer: "@lucas"
+        entrypoint: app_pages/owidle.py
+        icon: ":material/videogame_asset:"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
+
+  - title: "Metadata"
+    description: |-
+      Improve our metadata or learn how to use it.
+    apps:
+      - title: "Meta Upgrader"
+        description: "Migrate old metadata to new format."
+        maintainer: "@veronika / @lucas"
+        entrypoint: app_pages/metagpt.py
+        icon: ":material/upgrade:"
+        alias: metagpt
+        image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
+        disable:
+          "production": True
+          "staging": True
+      - title: "Meta Playground"
+        alias: metaplay
+        description: "How is metadata presented in data pages?"
+        maintainer: "@lucas"
+        entrypoint: app_pages/metaplay.py
+        icon: ":material/sports_volleyball:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+        disable:
+          "production": True
+          "staging": True
+
+# legacy:
+#   description: |-
+#     The pages below are legacy now. They are kept in case the new pages are not working properly.
+#   apps:
+#     - title:
+#       alias:
+#       entrypoint:
+#       description:
+#       maintainer:
+#       icon:
+#       image_url:

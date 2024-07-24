@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from owid.catalog import tables
+from owid.catalog import VariablePresentationMeta, tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
@@ -36,6 +36,35 @@ def test_create_with_underscore():
     t = Table({"GDP": [100, 102, 104]}, underscore=True, short_name="GDP Table")
     assert t.columns == ["gdp"]
     assert t.metadata.short_name == "gdp_table"
+
+
+def test_create_format():
+    t = Table({"GDP": [100, 104, 102], "country": ["C", "A", "B"]}, short_name="GDP Table")
+    t = t.format("country")
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country"]
+    ## Check sorting
+    assert (t.index == ["A", "B", "C"]).all()
+
+    # Check with default keys
+    t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"], "year": [2001, 2000, 2000]}, short_name="GDP Table")
+    t = t.format()
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country", "year"]
+    ## Check sorting
+    index_check = pd.MultiIndex.from_tuples([("A", 2000), ("A", 2001), ("B", 2000)], names=["country", "year"])
+    assert index_check.equals(t.index)
+
+    # Check error
+    with pytest.raises(ValueError):
+        t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"]}, short_name="GDP Table")
+        t = t.format("country")
 
 
 def test_add_table_metadata():
@@ -545,6 +574,42 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     assert tb.metadata.description is None
 
 
+def test_merge_keeps_metadata(table_1, table_2, origins) -> None:
+    table_1.a.m.origins = [origins[1]]
+    _ = tables.merge(table_1, table_2, on=["country", "year"])
+    assert table_1.a.m.origins == [origins[1]]
+
+
+def test_merge_categoricals(table_1, table_2, origins) -> None:
+    table_1.country.m.origins = [origins[1]]
+    table_2.loc[0, "country"] = "Poland"
+
+    # both tables have different categories for "country"
+    table_1 = table_1.astype({"country": "category"})
+    table_2 = table_2.astype({"country": "category"})
+
+    tb = tables.merge(table_1, table_2, on=["country", "year"])
+
+    # categorical type and metadata are preserved despite having different categories
+    assert tb.country.dtype == "category"
+    assert tb.country.m.origins[0] == origins[1]
+
+
+def test_concat_categoricals(table_1, table_2, origins) -> None:
+    table_1.country.m.origins = [origins[1]]
+    table_2.loc[0, "country"] = "Poland"
+
+    # both tables have different categories for "country"
+    table_1 = table_1.astype({"country": "category"})
+    table_2 = table_2.astype({"country": "category"})
+
+    tb = tables.concat([table_1, table_2])
+
+    # categorical type and metadata are preserved despite having different categories
+    assert tb.country.dtype == "category"
+    assert tb.country.m.origins[0] == origins[1]
+
+
 def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> None:
     tb = tables.concat([table_1, table_2])
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
@@ -783,6 +848,27 @@ def test_pivot(table_1, sources, origins) -> None:
     assert tb.metadata == table_1.metadata
 
 
+def test_pivot_metadata_propagation():
+    tb = Table(
+        pd.DataFrame(
+            {
+                "year": [2020, 2021, 2022],
+                "group": ["g1", "g1", "g1"],
+                "subgroup": ["s1", "s1", "s2"],
+                "value": [1, 2, 3],
+            }
+        )
+    )
+    tb["value"].m.presentation = VariablePresentationMeta(title_public="Value")
+    tb_p = tb.pivot(index="year", columns=["group", "subgroup"], values="value", join_column_levels_with="_")
+
+    # Set title_public for one of the variables
+    tb_p["g1_s1"].m.presentation.title_public = "Group 1, Subgroup 1"
+
+    # It should not affect the other variable
+    assert tb_p["g1_s2"].m.presentation.title_public == "Value"
+
+
 def test_get_unique_sources_from_tables(table_1, sources):
     unique_sources = get_unique_sources_from_tables([table_1, table_1])
     assert unique_sources == [
@@ -969,6 +1055,14 @@ def test_groupby_levels(table_1) -> None:
     assert gt.a.m.title == "Title of Table 1 Variable a"
 
 
+def test_groupby_as_index(table_1) -> None:
+    table_1.m.title = "Table 1"
+    table_1 = table_1.astype({"country": "category"})
+    gt = table_1.groupby(["country", "year"], as_index=False)["a"].min()
+    assert gt.m.primary_key == []
+    assert gt.m.title == "Table 1"
+
+
 def test_set_columns(table_1) -> None:
     table_1.columns = ["country", "year", "new_a", "new_b"]
     assert table_1.new_a.m.title == "Title of Table 1 Variable a"
@@ -1036,3 +1130,48 @@ def test_fillna_with_another_table(table_1, origins, licenses) -> None:
     # # Now check the table metadata has not changed.
     assert tb.metadata == table_1.metadata
     assert tb2.metadata == table_1.metadata
+
+
+def test_ffill_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[1, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].ffill()
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[1, "a"] == table_1.loc[0, "a"]
+
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[1, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(method="ffill")
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[1, "a"] == table_1.loc[0, "a"]
+
+
+def test_bfill_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].bfill()
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[0, "a"] == table_1.loc[1, "a"]
+
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(method="bfill")
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[0, "a"] == table_1.loc[1, "a"]
+
+
+def test_fillna_error(table_1: Table) -> None:
+    with pytest.raises(ValueError):
+        table_1["a"].fillna()

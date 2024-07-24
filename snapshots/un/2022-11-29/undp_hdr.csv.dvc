@@ -22,6 +22,6 @@ meta:
     This file contains the data.
 wdir: ../../../data/snapshots/un/2022-11-29
 outs:
-- md5: a7f78e9e86ac64657406328aa0c03fd3
-  size: 1781357
-  path: undp_hdr.csv
+  - md5: 6682503b24efe5fbc0e7bd695d677819
+    size: 1781357
+    path: undp_hdr.csv

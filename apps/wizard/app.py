@@ -1,39 +1,91 @@
-"""Entry page."""
-from pathlib import Path
+"""Entry page.
 
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page.
+
+NOTE: This only works with >1.35 (nightly) version of Streamlit.
+"""
 import streamlit as st
-from st_pages import Page, Section, add_indentation, show_pages
-from streamlit_extras.switch_page_button import switch_page
 
-from apps.wizard import utils
+from apps.wizard.config import WIZARD_CONFIG
+from etl.paths import DOCS_DIR
 
-# Get current directory
-CURRENT_DIR = Path(__file__).parent
-# Page config
-st.set_page_config(page_title="Wizard", page_icon="🪄")
-st.title("Wizard")
+###########################################
+# DEFINE PAGES
+###########################################
+pages = {}
 
 
-# Specify what pages should be shown in the sidebar, and what their titles and icons
-# should be
-show_pages(
-    [
-        Page(str(CURRENT_DIR / "home.py"), "Home", icon="🏠"),
-        Section("Create new ETL steps"),
-        Page(str(CURRENT_DIR / "templating/snapshot.py"), "Snapshot", icon="1️⃣"),
-        Page(str(CURRENT_DIR / "templating/meadow.py"), "Meadow", icon="2️⃣"),
-        Page(str(CURRENT_DIR / "templating/garden.py"), "Garden", icon="3️⃣"),
-        Page(str(CURRENT_DIR / "templating/grapher.py"), "Grapher", icon="4️⃣"),
-        Section("Other tools"),
-        Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊"),
-        Page(str(CURRENT_DIR / "metagpt.py"), "MetaGPT", icon="🤖"),
-        Page(str(CURRENT_DIR / "dataset_explorer.py"), "Dataset Explorer", icon="🕵️"),
-    ]
-)
+# Initial apps (etl steps)
+pages_ = []
+for step in WIZARD_CONFIG["main"].values():
+    pages_.append(
+        st.Page(
+            page=str(step["entrypoint"]),
+            title=step["title"],
+            icon=step["icon"],
+            url_path=step["title"].lower(),
+            default=step["title"] == "Home",
+        )
+    )
+pages["Overview"] = pages_
 
-add_indentation()
+# ETL steps
+pages_ = []
+for step in WIZARD_CONFIG["etl"]["steps"].values():
+    if step["enable"]:
+        pages_.append(
+            st.Page(
+                page=str(step["entrypoint"]),
+                title=step["title"],
+                icon=step["icon"],
+                url_path=step["alias"],
+            )
+        )
+pages[WIZARD_CONFIG["etl"]["title"]] = pages_
 
-if utils.AppState.args.phase == "all":  # type: ignore
-    switch_page("Home")  # type: ignore
-if utils.AppState.args.phase != "all":  # type: ignore
-    switch_page(utils.AppState.args.phase.title())  # type: ignore
+# Sections
+for section in WIZARD_CONFIG["sections"]:
+    apps = [app for app in section["apps"] if app["enable"]]
+    if apps:
+        pages_ = []
+        for app in apps:
+            pages_.append(
+                st.Page(
+                    page=str(app["entrypoint"]),
+                    title=app["title"],
+                    icon=app["icon"],
+                    url_path=app["alias"],
+                )
+            )
+        pages[section["title"]] = pages_
+
+# Legacy
+if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
+    pages_ = []
+    for app in WIZARD_CONFIG["legacy"]["apps"]:
+        if app["enable"]:
+            pages_.append(
+                st.Page(
+                    page=str(app["entrypoint"]),
+                    title=app["title"],
+                    icon=app["icon"],
+                    url_path=app["alias"],
+                )
+            )
+    pages["Legacy"] = pages_
+
+###########################################
+# RUN PAGES
+###########################################
+# Create navigation
+page = st.navigation(pages)
+
+# Run navigation
+if page is not None:
+    page.run()
+else:
+    st.error("Pages could not be loaded!")
+
+
+# LOGO
+st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))

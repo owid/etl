@@ -27,9 +27,11 @@ import structlog
 import yaml
 from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
+from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
+from sqlalchemy.engine import Engine
 
-from etl import config, files, git, paths
+from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl.db import get_engine
 from etl.snapshot import Snapshot
@@ -40,7 +42,7 @@ Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
 
-ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/ipynb_lock")
+ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
 
 def compile_steps(
@@ -317,6 +319,31 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
     return attributes
 
 
+def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
+    """Load an ETL dataset from a URI."""
+    attributes = extract_step_attributes(cast(str, uri))
+    # Walden
+    if attributes["channel"] == "walden":
+        dataset = WaldenCatalog().find_one(
+            namespace=attributes["namespace"], version=attributes["version"], short_name=attributes["name"]
+        )
+    # Snapshot
+    elif attributes["channel"] == "snapshot":
+        path = f"{attributes['namespace']} / {attributes['version']} / {attributes['name']}"
+        try:
+            dataset = Snapshot(path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
+    # Data
+    else:
+        path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
+        try:
+            dataset = catalog.Dataset(paths.DATA_DIR / path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. You may want to run `etl {uri}` first")
+    return dataset
+
+
 class Step(Protocol):
     path: str
     is_public: bool = True
@@ -445,8 +472,11 @@ class DataStep(Step):
     def has_existing_data(self) -> bool:
         return self._dest_dir.is_dir()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
         return (
             # python script
             sp.with_suffix(".py").exists()
@@ -470,6 +500,13 @@ class DataStep(Step):
         for f in self._step_files():
             checksums[f] = files.checksum_file(f)
 
+            # if using SUBSET to process just a subset of the data, then add it to its checksum if
+            # the file contains it
+            if config.SUBSET:
+                with open(f) as istream:
+                    if "SUBSET" in istream.read():
+                        checksums[f] += config.SUBSET
+
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
 
@@ -482,7 +519,8 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        return self._output_dataset.checksum()
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -536,7 +574,7 @@ class DataStep(Step):
         if sys.platform == "linux":
             args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
 
-        args.extend(["poetry", "run", "run_python_step"])
+        args.extend(["poetry", "run", "etl", "d", "run-python-step"])
 
         if config.IPDB_ENABLED:
             args.append("--ipdb")
@@ -658,6 +696,14 @@ class SnapshotStep(Step):
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
 
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        try:
+            Snapshot(self.path)
+            return True
+
+        except Exception:
+            return False
+
     def run(self) -> None:
         snap = Snapshot(self.path)
         snap.pull(force=True)
@@ -670,16 +716,11 @@ class SnapshotStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        # NOTE: we could use the checksum from `_dvc_path` to
-        # speed this up. Test the performance on
-        # time poetry run etl garden --dry-run
-        # Make sure that the checksum below is the same as DVC checksum! It
-        # looks like it might be different for some reason
         return files.checksum_file(self._dvc_path)
 
     @property
     def _dvc_path(self) -> str:
-        return f"snapshots/{self.path}.dvc"
+        return f"{paths.SNAPSHOTS_DIR}/{self.path}.dvc"
 
     @property
     def _path(self) -> str:
@@ -766,6 +807,10 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
+        # We sometimes get a warning, but it's unclear where it is coming from
+        # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
             verbose = True
@@ -783,7 +828,7 @@ class GrapherStep(Step):
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                table = gh._adapt_table_for_grapher(table)
+                table = gh._adapt_table_for_grapher(table, engine)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
@@ -812,11 +857,20 @@ class GrapherStep(Step):
 
             variable_upsert_results = [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER:
-            self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+        if not config.GRAPHER_FILTER and not config.SUBSET:
+            # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
+            # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
+            # needed for remapping. However, we can delete it on next ETL run
+            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, variable_upsert_results)
 
             # set checksum and updatedAt timestamps after all data got inserted
-            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+            if success:
+                checksum = self.data_step.checksum_input()
+            # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
+            else:
+                checksum = "to_be_rerun"
+
+            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
@@ -824,13 +878,16 @@ class GrapherStep(Step):
     @classmethod
     def _cleanup_ghost_resources(
         cls,
+        engine: Engine,
         dataset_upsert_results,
         variable_upsert_results: List[Any],
-    ) -> None:
+    ) -> bool:
         """
         Cleanup all ghost variables and sources that weren't upserted
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
+
+        Return True if cleanup was successfull, False otherwise.
         """
         import etl.grapher_import as gi
 
@@ -841,12 +898,15 @@ class GrapherStep(Step):
         upserted_source_ids = [source_id for source_id in upserted_source_ids if source_id is not None]
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        gi.cleanup_ghost_variables(
+        success = gi.cleanup_ghost_variables(
+            engine,
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
-        gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
+
+        return success
 
 
 @dataclass
@@ -857,7 +917,7 @@ class GithubStep(Step):
     """
 
     path: str
-    gh_repo: git.GithubRepo = field(repr=False)
+    gh_repo: git_helpers.GithubRepo = field(repr=False)
     version: str = "latest"
     dependencies = []
 
@@ -868,7 +928,7 @@ class GithubStep(Step):
         except ValueError:
             raise Exception("github step is not in the form github://<org>/<repo>")
 
-        self.gh_repo = git.GithubRepo(org, repo)
+        self.gh_repo = git_helpers.GithubRepo(org, repo)
 
     def __str__(self) -> str:
         return f"github://{self.path}"
@@ -937,7 +997,7 @@ class BackportStep(DataStep):
 
         self.after_run()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         return True
 
     @property

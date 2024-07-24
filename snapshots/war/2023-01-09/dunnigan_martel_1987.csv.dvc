@@ -115,6 +115,6 @@ meta:
     book, starting at page 207.
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-- md5: 5ab165a63ccfdec62b72d3bddf114497
-  size: 150480
-  path: dunnigan_martel_1987.csv
+  - md5: f197fb1e4ea3807a186e7dfffa93d1ed
+    size: 150480
+    path: dunnigan_martel_1987.csv

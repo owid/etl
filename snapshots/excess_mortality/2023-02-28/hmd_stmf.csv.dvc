@@ -6,9 +6,7 @@ meta:
   publication_year: 2023
   publication_date: 2023-02-27
   source_name: HMD
-  source_published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic
-    Research (Germany), University of California, Berkeley (USA), and French Institute
-    for Demographic Studies (France). Available at www.mortality.org.
+  source_published_by: HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
   url: https://www.mortality.org/Data/STMF
   source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
   file_extension: csv
@@ -28,6 +26,6 @@ meta:
     HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
 wdir: ../../../data/snapshots/excess_mortality/2023-02-28
 outs:
-- md5: 8a9aaa380ea3c36885f206ec52489815
-  size: 19604292
-  path: hmd_stmf.csv
+  - md5: 98e231bcfe97c79aa3d3773566490b64
+    size: 19604292
+    path: hmd_stmf.csv

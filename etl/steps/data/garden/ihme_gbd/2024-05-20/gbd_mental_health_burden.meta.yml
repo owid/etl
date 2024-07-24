@@ -1,0 +1,107 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Mental Health
+    processing_level: major
+  prevalence:
+    unit: |-
+      <% if metric == "Rate" %>
+      cases per 100,000 people
+      <% elif metric == "Share" %>
+      %
+      <%- endif -%>
+    short_unit: |-
+      <% if metric == "Share" %>%<% elif metric == "Rate"%><%- endif -%>
+    title: |-
+      <% if metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized current cases of << cause.lower() >>, per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      Total current number of individuals with << cause.lower() >>, per 100,000 people
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      Age-standardized current cases of << cause.lower() >>, per 100 people
+      <% elif metric == "Share" and age == 'All ages'%>
+      Total current number of individuals with << cause.lower() >>, per 100 people
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Rate" and age == 'Age-standardized'%>
+      The estimated age-standardized prevalence of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated prevalence of << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      The estimated age-standardized prevalence of << cause.lower() >>, per 100 people.
+      <% elif metric == "Share" and age == 'All ages'%>
+      The estimated prevalence of << cause.lower() >> per 100 people.
+      <%- endif -%>
+  dalys:
+    unit: |-
+      <% if metric == "Rate" %>
+      DALYs per 100,000 people
+      <% elif metric == "Share" %>
+      share of total DALYs
+      <%- endif -%>
+    short_unit: |-
+      <% if metric == "Share" %>%<% elif metric == "Rate"%><%- endif -%>
+    title: |-
+      <% if metric == "Rate" and age == 'Age-standardized'%>
+      Age-standardized DALYs from << cause.lower() >> per 100,000 people
+      <% elif metric == "Rate" and age == 'All ages'%>
+      DALYs from << cause.lower() >> per 100,000 people
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      Share of total age-standardized DALYs that are from << cause.lower() >>
+      <% elif metric == "Share" and age == 'All ages'%>
+      Share of total DALYs that are from << cause.lower() >>
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "Rate" and age == 'Age-standardized'%>
+      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Rate" and age == 'All ages'%>
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+      <% elif metric == "Share" and age == 'Age-standardized'%>
+      The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      <% elif metric == "Share" and age == 'All ages'%>
+      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+tables:
+  gbd_mental_health_burden_entities:
+    variables:
+      dalys__disability_adjusted_life_years__rate:
+        title: Disability-adjusted life years (DALYs)
+        unit: DALYs
+        description_short: Disability-adjusted life years (DALYs) from each mental illness
+        display:
+          numDecimalPlaces: 1
+      prevalence_rate:
+        title: Current rate of cases of each mental illness
+        unit: cases per 100,000 people
+        description_short: Current rate of cases of each mental illness, per 100,000 people
+        display:
+          numDecimalPlaces: 1
+      prevalence_share:
+        title: Current share of population with each mental illness
+        unit: '%'
+        short_unit: '%'
+        description_short: Current share of population with each mental illness
+        display:
+          numDecimalPlaces: 1
+  gbd_mental_health_burden_dalys:
+    variables:
+      value:
+        title: |-
+          {definitions.dalys.title}
+        unit: |-
+          {definitions.dalys.unit}
+        description_short: |-
+          {definitions.dalys.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: 1

@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Estimated Global Nuclear Warhead Inventories
+    description: |-
+      This dataset provides information on the number of stockpiled nuclear warheads by the nuclear powers.
+    date_published: 2023-03-28
+
+    # Citation
+    producer: Federation of American Scientists
+    citation_full: |-
+      Hans M. Kristensen, Matt Korda, Robert S. Norris, and Eliana Reynolds, Federation of American Scientists - Estimated Global Nuclear Warhead Inventories (2023).
+    attribution_short: FAS
+
+    # Files
+    url_main: https://fas.org/initiative/status-world-nuclear-forces/
+    date_accessed: 2024-01-09
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-09
+outs:
+- md5: e923102a89e7bebaf65056df3f6f8521
+  size: 28942
+  path: nuclear_weapons_inventories.csv

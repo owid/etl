@@ -1,0 +1,48 @@
+dataset:
+  title: Hurricane forecasting error (National Hurricane Center, 2023)
+  description: Track error of hurricanes and tropical cyclones from the National Hurricane Center.
+  licenses:
+    - {}
+tables:
+  hurricane_forecasts_nhc:
+    variables:
+      forecast_0_hours:
+        title: 0 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 0 hours ahead.
+      forecast_12_hours:
+        title: 12 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 12 hours ahead.
+      forecast_24_hours:
+        title: 24 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 24 hours ahead.
+      forecast_36_hours:
+        title: 36 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 36 hours ahead.
+      forecast_48_hours:
+        title: 48 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 48 hours ahead.
+      forecast_72_hours:
+        title: 72 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 72 hours ahead.
+      forecast_96_hours:
+        title: 96 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 96 hours ahead.
+      forecast_120_hours:
+        title: 120 hours
+        unit: nautical miles
+        short_unit: nautical miles
+        description: Track error of hurricane and cyclone forecasts, 120 hours ahead.
