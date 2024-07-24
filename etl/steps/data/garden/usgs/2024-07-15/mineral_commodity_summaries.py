@@ -53,20 +53,19 @@ commodity_mapping = {
     ("Barite", "Mine production"): ("Barite", "Mine production"),
     ("Barite", "Mine production, barite"): ("Barite", "Mine production"),
     ("Barite", "Mine production, excluding U.S."): ("Barite", "Mine production"),
-    # TODO: Separate Bauxite and alumina, for consistency with BGS data.
+    # TODO: Ensure that the units say calcined equivalent weights, or otherwise add it to the notes.
     ("Bauxite and alumina", "Alumina, refinery production - calcined equivalent weights"): (
-        "Bauxite and alumina",
-        "Alumina, refinery production - calcined equivalent weights",
+        "Alumina",
+        "Refinery production",
     ),
-    ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite and alumina", "Bauxite, mine production"),
-    ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite and alumina", "Mine production, bauxite"),
-    ("Bauxite and alumina", "Mine production, bauxite, dry tons"): (
-        "Bauxite and alumina",
-        "Mine production, bauxite, dry tons",
-    ),
+    ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite", "Mine production"),
+    ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite", "Mine production"),
+    # TODO: Ensure that the units say dry tons, otherwise add it to the notes.
+    ("Bauxite and alumina", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine production"),
+    # TODO: Ensure that the units say calcined equivalent weights, or otherwise add it to the notes.
     ("Bauxite and alumina", "Refinery production, alumina - calcined equivalent weights"): (
-        "Bauxite and alumina",
-        "Refinery production, alumina - calcined equivalent weights",
+        "Alumina",
+        "Refinery production",
     ),
     ("Beryllium", "Mine production"): ("Beryllium", "Mine production"),
     ("Beryllium", "Mine production, beryllium"): ("Beryllium", "Mine production"),
