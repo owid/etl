@@ -75,7 +75,7 @@ def run(dest_dir: str) -> None:
     ## Add period-aggregtes, doublig days
     tb = add_period_aggregates(tb, "weekly", 7)
     tb = add_period_aggregates(tb, "biweekly", 14)
-    tb = add_doubling_days(tb)
+    # tb = add_doubling_days(tb)
     ## Per-capita indicators
     tb = add_per_capita(tb)
     ## Add rolling averages
@@ -84,6 +84,10 @@ def run(dest_dir: str) -> None:
     tb = add_cfr(tb)
     ## 'Days since' indicators
     tb = add_days_since(tb)
+    ## Add Exemplars indicators
+    tb = add_exemplars(tb)
+    ## Drop population
+    tb = tb.drop(columns=["population"])
     ## Dtypes
     tb = set_dtypes(tb)
 
@@ -357,7 +361,6 @@ def add_per_capita(tb: Table) -> Table:
     ]
     for indicator in indicators:
         tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population"] / 1_000_000)
-    tb = tb.drop(columns=["population"])
     return tb
 
 
@@ -447,6 +450,20 @@ def add_days_since(tb: Table) -> Table:
     return tb
 
 
+def add_exemplars(tb: Table):
+    paths.log.info("Adding exemplars metrics…")
+
+    # Inject days since 100th case IF population ≥ 5M
+    def mapper_days_since(row):
+        if pd.notnull(row["population"]) and row["population"] >= 5e6:
+            return row["days_since_100_total_cases"]
+        return pd.NA
+
+    tb["days_since_100_total_cases_and_5m_pop"] = tb.apply(mapper_days_since, axis=1)
+
+    return tb
+
+
 def set_dtypes(tb: Table) -> Table:
     """Set Dtypes for the table."""
     dtypes = {
@@ -463,16 +480,17 @@ def set_dtypes(tb: Table) -> Table:
                 "weekly_deaths",
                 "biweekly_cases",
                 "biweekly_deaths",
+                "days_since_100_total_cases_and_5m_pop",
             }
         },
         **{
             col: "Float64"
             for col in {
                 "cfr_100_cases",
-                "doubling_days_total_deaths_7_day_period",
-                "doubling_days_total_deaths_3_day_period",
-                "doubling_days_total_cases_7_day_period",
-                "doubling_days_total_cases_3_day_period",
+                # "doubling_days_total_deaths_7_day_period",
+                # "doubling_days_total_deaths_3_day_period",
+                # "doubling_days_total_cases_7_day_period",
+                # "doubling_days_total_cases_3_day_period",
                 "weekly_pct_growth_cases",
                 "weekly_pct_growth_deaths",
                 "biweekly_pct_growth_deaths",

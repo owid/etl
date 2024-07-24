@@ -5,55 +5,218 @@ definitions:
       topic_tags:
         - COVID-19
         - Global Health
+    display:
+      zeroDay: "2020-01-21"
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 374
-
+  update_period_days: 31
+  title: COVID-19 confirmed cases and deaths
 
 tables:
   cases_deaths:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      # Absolute values
+      new_cases:
+        title: Daily new confirmed cases of COVID-19
+        description_short: |-
+          New confirmed cases of COVID-19. Counts can include probable cases, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 0
 
+      total_cases:
+        title: Total confirmed cases of COVID-19
+        description_short: Total confirmed cases of COVID-19. Counts can include probable cases, where reported.
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 0
+
+      new_deaths:
+        title: Daily new confirmed deaths due to COVID-19
+        description_short: |-
+          New deaths attributed to COVID-19. Counts can include probable deaths, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
+        unit: 'deaths'
+        display:
+          numDecimalPlaces: 0
+
+      total_deaths:
+        title: Total confirmed deaths due to COVID-19
+        description_short: |-
+          Total deaths attributed to COVID-19. Counts can include probable deaths, where reported.
+        unit: 'deaths'
+        display:
+          numDecimalPlaces: 0
+
+      # Per million
+      new_cases_per_million:
+        title: "Daily new confirmed cases of COVID-19 per million people"
+        description_short: |-
+          New confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
+        unit: 'cases per million people'
+        display:
+          numDecimalPlaces: 3
+
+      new_deaths_per_million:
+        title: "Daily new confirmed deaths due to COVID-19 per million people"
+        description_short: |-
+          New deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        unit: 'deaths per million people'
+        display:
+          numDecimalPlaces: 3
+
+      total_cases_per_million:
+        title: "Total confirmed cases of COVID-19 per million people"
+        description_short: |-
+          Total confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
+        unit: 'cases per million people'
+        display:
+          numDecimalPlaces: 3
+
+      total_deaths_per_million:
+        title: "Total confirmed deaths due to COVID-19 per million people"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        unit: 'deaths per million people'
+        display:
+          numDecimalPlaces: 3
+
+      # Days since
+      days_since_100_total_cases:
+        title: "Days since the total confirmed cases of COVID-19 reached 100"
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+
+      days_since_100_total_cases_and_5m_pop:
+        title: "Days since the total confirmed cases of COVID-19 reached 100 (with population ≥ 5M)"
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+
+      days_since_5_total_deaths:
+        title: "Days since the total confirmed deaths of COVID-19 reached 5"
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+      days_since_1_total_cases_per_million:
+        title: "Days since the total confirmed cases of COVID-19 per million people reached 1"
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+      days_since_0_1_total_deaths_per_million:
+        title: "Days since the total confirmed deaths of COVID-19 per million people reached 0.1"
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+
+      # Rolling averages
+      new_cases_7_day_avg_right:
+        title: "Daily new confirmed cases due to COVID-19 (rolling 7-day average, right-aligned)"
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 3
+      new_deaths_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)"
+        unit: 'deaths'
+        display:
+          numDecimalPlaces: 3
+
+      # Rolling averages - per million
+      new_cases_per_million_7_day_avg_right:
+        title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
+        unit: 'cases per million people'
+        display:
+          numDecimalPlaces: 3
+      new_deaths_per_million_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
+        unit: 'deaths per million people'
+        display:
+          numDecimalPlaces: 3
+
+      # Case fatality ratio
+      cfr:
+        title: "Case fatality rate of COVID-19 (%)"
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 3
+      cfr_100_cases:
+        title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 3
+
+      # Weekly aggregates
+      weekly_cases:
+        title: Weekly cases
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 0
+      weekly_deaths:
+        title: Weekly deaths
+        unit: 'deaths'
+        display:
+          numDecimalPlaces: 0
+      weekly_pct_growth_cases:
+        title: Weekly case growth (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 3
+      weekly_pct_growth_deaths:
+        title: Weekly death growth (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 3
+
+      # Biweekly aggregates
+      biweekly_cases:
+        title: Biweekly cases
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 0
+      biweekly_deaths:
+        title: Biweekly deaths
+        unit: 'deaths'
+        display:
+          numDecimalPlaces: 0
+      biweekly_pct_growth_cases:
+        title: Biweekly case growth (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      biweekly_pct_growth_deaths:
+        title: Biweekly death growth (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      # Weekly aggregates per capita
+      weekly_cases_per_million:
+        title: "Weekly cases per million people"
+        unit: 'cases per million people'
+        display:
+          numDecimalPlaces: 3
+      weekly_deaths_per_million:
+        title: "Weekly deaths per million people"
+        unit: 'deaths per million people'
+        display:
+          numDecimalPlaces: 3
+      # Biweekly aggregates per capita
+      biweekly_cases_per_million:
+        title: "Biweekly cases per million people"
+        unit: 'cases per million people'
+        display:
+          numDecimalPlaces: 3
+      biweekly_deaths_per_million:
+        title: "Biweekly deaths per million people"
+        unit: 'deaths per million people'
+        display:
+          numDecimalPlaces: 3
