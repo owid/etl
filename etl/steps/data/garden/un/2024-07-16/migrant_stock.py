@@ -8,8 +8,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# List of regions (in opposition to countries) in the data set
-# To remove in table destination and origins to not count migration flows multiple times
+# List of regions (in opposition to countries) before harmonization in the data set
+# To remove in table "destination and origins" to not count migration flows multiple times
+
 REGION_NAMES_IN_DATA = [
     "WORLD",
     "Sub-Saharan Africa",
@@ -150,30 +151,24 @@ def run(dest_dir: str) -> None:
 
     tb_do = tb_do.format(["country_destination", "country_origin", "year"])
 
-    ## data on destination
+    ## format data on destination
     tb_d_total = format_table(tb_d_total, ["country"], "migrants")
     tb_d_share = format_table(tb_d_share, ["country"], "migrant_share")
 
-    ## data on origin
+    ## format data on origin
     tb_o = format_table(tb_o, ["country"], "migrants")
 
-    ## data on sex and age
+    ## format data on sex and age
     sa_share_cols_rename = {key: "share_of_" + value for key, value in SA_COLS_RENAME.items()}
-
     # rename columns
     tb_sa_total = tb_sa_total.rename(columns=SA_COLS_RENAME, errors="raise")
     tb_sa_share = tb_sa_share.rename(columns=sa_share_cols_rename, errors="raise")
-
     # change dtype to numeric
     for col in SA_COLS_RENAME.values():
-        tb_sa_total[col] = pd.to_numeric(tb_sa_total[col], errors="coerce")
-
-    tb_sa_total = add_metadata(tb_sa_total, list(SA_COLS_RENAME.values()), "year")
-
+        tb_sa_total[col] = tb_sa_total[col].astype("Float64")
     # drop total columns (they add up to 100)
     tb_sa_total = tb_sa_total.drop(columns=["total", "total_1", "total_2"])
     tb_sa_share = tb_sa_share.drop(columns=["total", "total_1", "total_2"])
-
     # harmonize country names
     tb_sa_total = geo.harmonize_countries(
         df=tb_sa_total, countries_file=paths.country_mapping_path, country_col="country", warn_on_unused_countries=False
@@ -181,7 +176,6 @@ def run(dest_dir: str) -> None:
     tb_sa_share = geo.harmonize_countries(
         df=tb_sa_share, countries_file=paths.country_mapping_path, country_col="country", warn_on_unused_countries=False
     )
-
     # remove duplicate data
     tb_sa_total = tb_sa_total.drop_duplicates()
     tb_sa_share = tb_sa_share.drop_duplicates()
@@ -189,15 +183,44 @@ def run(dest_dir: str) -> None:
     ## population data
     # population data is given in thousands in original table - so rescale here
     for col in tb_pop.columns[2:]:
-        tb_pop[col] = pd.to_numeric(tb_pop[col], errors="coerce")
+        tb_pop[col] = tb_pop[col].astype("Float64")
         tb_pop[col] = tb_pop[col] * 1000
     tb_pop = geo.harmonize_countries(
         df=tb_pop, countries_file=paths.country_mapping_path, country_col="country", warn_on_unused_countries=False
     )
     tb_pop = tb_pop.drop_duplicates()
 
-    ## combine tables except for destination and origin table
-    # rename columns to differentiate between values
+    ## all combine tables except for destination and origin table
+    tb = combine_all_tables(tb_d_total, tb_d_share, tb_o, tb_sa_total, tb_sa_share, tb_pop)
+
+    ## Calculate missing values:
+    # statistics on child migrants
+    tb = calulate_child_migrants(tb)
+
+    # statistics on change in migrants over 5 years
+    tb = calculate_change_over_5_years(tb)
+
+    # share of emigrants in total population in home country
+    tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
+
+    # drop total population columns
+    tb = tb.drop(columns=["total_population", "male_population", "female_population"])
+
+    tb = tb.format(["country", "year"], short_name="migrant_stock")
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb_do, tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def combine_all_tables(tb_d_total, tb_d_share, tb_o, tb_sa_total, tb_sa_share, tb_pop):
+    """Combine all tables except for destination and origin table to one table by renaming column names and merging"""
     tb_d_total = tb_d_total.rename(
         columns={
             "migrants_all_sexes": "immigrants_all",
@@ -229,8 +252,18 @@ def run(dest_dir: str) -> None:
         [tb_d_total, tb_d_share, tb_o, tb_sa_total, tb_sa_share, tb_pop], on=["country", "year"], how="outer"
     )
 
-    ## Calculate missing values:
-    # under 15 y/o migrants, under 20 y/o migrants
+    return tb
+
+
+def calulate_child_migrants(tb: Table):
+    """Calculate statistics for values for child migrants in additional columns
+    - immigrants_under_15: total number of immigrants in destination country under 15 years old
+    - immigrants_under_20: total number of immigrants in destination country under 20 years old
+    - immigrants_under_15_per_1000_people: number of immigrants under 15 per 1000 people in destination country
+    - immmigrants_under_20_per_1000_people: number of immigrants under 20 per 1000 people in destination country
+    """
+    # calculating migrants under 15 and 20
+    # if one of the values is NaN, the sum should be NaN as well
     tb["immigrants_under_15"] = (
         tb["all_immigrants_aged_0_to_4"] + tb["all_immigrants_aged_5_to_9"] + tb["all_immigrants_aged_10_to_14"]
     )
@@ -240,6 +273,16 @@ def run(dest_dir: str) -> None:
     tb["immigrants_under_15_per_1000_people"] = tb["immigrants_under_15"] / (tb["total_population"] / 1000)
     tb["immigrants_under_20_per_1000_people"] = tb["immigrants_under_20"] / (tb["total_population"] / 1000)
 
+    return tb
+
+
+def calculate_change_over_5_years(tb):
+    """Calculate change in migrants over 5 years and change in migrants over 5 years per 1000 people
+    - immigrant_change_5_years: total change of immigrant stock in destination in the last 5 years
+    - emigrant_change_5_years: change in the total amount of emigrants who have left in origin in the last 5 years
+    - immigrant_change_5_years_per_1000: change of immigrant stock in destination in the last 5 years per 1000 people
+    - emigrant_change_5_years_per_1000: change in the total amount of emigrants who have left in origin in the last 5 years per 1000 people
+    """
     # total change in migrants over 5 years
     tb["immigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "immigrants_all"), axis=1)
     tb["emigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "emigrants_all"), axis=1)
@@ -251,10 +294,6 @@ def run(dest_dir: str) -> None:
     tb["immigrants_change_5_years_per_1000"] = tb["immigrants_change_5_years"] / (tb["total_population"] / 1000)
     tb["emigrants_change_5_years_per_1000"] = tb["emigrants_change_5_years"] / (tb["total_population"] / 1000)
 
-    # share of emigrants in total population in home country
-    tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
-
-    # adjust dtype for change columns and add back metadata
     change_cols = [
         "immigrants_change_5_years",
         "emigrants_change_5_years",
@@ -265,20 +304,7 @@ def run(dest_dir: str) -> None:
     for col in change_cols:
         tb[col] = tb[col].astype("Float64")
 
-    # drop total population columns
-    tb = tb.drop(columns=["total_population", "male_population", "female_population"])
-
-    tb = tb.format(["country", "year"], short_name="migrant_stock")
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_do, tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb
 
 
 def migrant_change_5_years(tb, tb_row, col_name):
