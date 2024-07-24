@@ -1,8 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -33,6 +34,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("cases_deaths")
+    ds_regions = paths.load_dataset("regions")
+    ds_income = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read_table("cases_deaths")
@@ -59,6 +62,13 @@ def run(dest_dir: str) -> None:
 
     # Main processing
     tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d")
+
+    # Remaining processing
+    tb = discard_rows(tb)
+    tb = add_regions(tb, ds_regions, ds_income)
+    tb = add_period_aggregates(tb, "weekly", 7)
+    tb = add_period_aggregates(tb, "biweekly", 14)
+    tb = add_doubling_days(tb)
 
     # Sort rows by country and date
     tb = tb.sort_values(["country", "date"])
@@ -160,6 +170,7 @@ def fill_date_gaps(tb: Table) -> Table:
 
 
 def discard_rows(tb: Table):
+    """Discard outliers."""
     print("Discarding rows…")
     # For all rows where new_cases or new_deaths is negative, we keep the cumulative value but set
     # the daily change to NA. This also sets the 7-day rolling average to NA for the next 7 days.
@@ -173,31 +184,130 @@ def discard_rows(tb: Table):
     for ldc in LARGE_DATA_CORRECTIONS_SINCE:
         tb.loc[(tb["country"] == ldc[0]) & (tb["date"].astype(str) >= ldc[1]), f"new_{ldc[2]}"] = np.nan
 
-    # If the last known value is above 1000 cases or 100 deaths but the latest reported value is 0
-    # then set that value to NA in case it's a temporary reporting error. (Up to 7 days in the past)
+    # Sort (legacy)
     tb = tb.sort_values(["country", "date"])
-    tb = tb.groupby("country").apply(hide_recent_zeros)  # type: ignore
 
     return tb
 
 
-def hide_recent_zeros(tb: pd.DataFrame) -> pd.DataFrame:
-    last_reported_date = tb["date"].max()
+def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
+    return geo.add_regions_to_table(
+        tb,
+        ds_regions,
+        ds_income,
+        year_col="date",
+        regions={
+            # Standard continents
+            "Africa": {},
+            "Asia": {},
+            "Europe": {},
+            "North America": {},
+            "Oceania": {},
+            "South America": {},
+            # Income groups
+            "Low-income countries": {},
+            "Lower-middle-income countries": {},
+            "Upper-middle-income countries": {},
+            "High-income countries": {},
+            # Special regions
+            "European Union (27)": {},
+            "World excl. China": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China"],
+            },
+            "World excl. China and South Korea": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China", "South Korea"],
+            },
+            "World excl. China, South Korea, Japan and Singapore": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China", "South Korea", "Japan", "Singapore"],
+            },
+            "Asia excl. China": {
+                "additional_regions": ["Asia"],
+                "excluded_members": ["China", "South Korea", "Japan", "Singapore", "Taiwan"],
+            },
+        },
+    )
 
-    last_positive_cases_date = tb.loc[tb["new_cases"] > 0, "date"].max()
-    if pd.isnull(last_positive_cases_date):
-        return tb
-    if last_positive_cases_date != last_reported_date:
-        last_known_cases = tb.loc[tb["date"] == last_positive_cases_date, "new_cases"].item()
-        if last_known_cases >= 100 and (last_reported_date - last_positive_cases_date).days < 7:
-            tb.loc[tb["date"] > last_positive_cases_date, "new_cases"] = np.nan
 
-    last_positive_deaths_date = tb.loc[tb["new_deaths"] > 0, "date"].max()
-    if pd.isnull(last_positive_deaths_date):
-        return tb
-    if last_positive_deaths_date != last_reported_date:
-        last_known_deaths = tb.loc[tb["date"] == last_positive_deaths_date, "new_deaths"].item()
-        if last_known_deaths >= 10 and (last_reported_date - last_positive_deaths_date).days < 7:
-            tb.loc[tb["date"] > last_positive_deaths_date, "new_deaths"] = np.nan
+def add_period_aggregates(tb: Table, prefix: str, periods: int):
+    # Convert Table to DataFrame
+    df = pd.DataFrame(tb)
 
+    # Period-aggregate cases and deaths
+    cases_colname = f"{prefix}_cases"
+    deaths_colname = f"{prefix}_deaths"
+    df[[cases_colname, deaths_colname]] = (
+        df[["country", "new_cases", "new_deaths"]]
+        .groupby("country")[["new_cases", "new_deaths"]]
+        .rolling(window=periods, min_periods=periods - 1, center=False)
+        .sum()
+        .reset_index(level=0, drop=True)
+    )
+
+    # Period-growth of cases and deaths
+    cases_growth_colname = f"{prefix}_pct_growth_cases"
+    deaths_growth_colname = f"{prefix}_pct_growth_deaths"
+    df[[cases_growth_colname, deaths_growth_colname]] = (
+        df[["country", cases_colname, deaths_colname]]
+        .groupby("country")[[cases_colname, deaths_colname]]
+        .pct_change(periods=periods, fill_method=None)
+        .round(3)
+        .replace([np.inf, -np.inf], pd.NA)
+        * 100
+    )
+
+    # Set NaNs where the original data was NaN
+    df.loc[df["new_cases"].isnull(), cases_colname] = np.nan
+    df.loc[df["new_deaths"].isnull(), deaths_colname] = np.nan
+
+    # Convert dataframe to Table
+    tb_new = Table(df).copy_metadata(tb)
+    tb_new[cases_colname] = tb_new[cases_colname].copy_metadata(tb["new_cases"])
+    tb_new[deaths_colname] = tb_new[deaths_colname].copy_metadata(tb["new_deaths"])
+    tb_new[cases_growth_colname] = tb_new[cases_growth_colname].copy_metadata(tb["new_cases"])
+    tb_new[deaths_growth_colname] = tb_new[deaths_growth_colname].copy_metadata(tb["new_deaths"])
+
+    return tb_new
+
+
+def add_doubling_days(tb: Table) -> Table:
+    paths.log.info("Adding doubling days…")
+
+    DOUBLING_DAYS_SPEC = {
+        "doubling_days_total_cases_3_day_period": {
+            "value_col": "total_cases",
+            "periods": 3,
+        },
+        "doubling_days_total_cases_7_day_period": {
+            "value_col": "total_cases",
+            "periods": 7,
+        },
+        "doubling_days_total_deaths_3_day_period": {
+            "value_col": "total_deaths",
+            "periods": 3,
+        },
+        "doubling_days_total_deaths_7_day_period": {
+            "value_col": "total_deaths",
+            "periods": 7,
+        },
+    }
+
+    for col, spec in DOUBLING_DAYS_SPEC.items():
+        value_col = spec["value_col"]
+        periods = spec["periods"]
+        tb.loc[tb[value_col] == 0, value_col] = np.nan
+        tb[col] = (
+            tb.groupby("country", as_index=False)[value_col]
+            .pct_change(periods=periods, fill_method=None)
+            .map(lambda pct: pct_change_to_doubling_days(pct, periods))
+        )
     return tb
+
+
+def pct_change_to_doubling_days(pct_change, periods):
+    if pd.notnull(pct_change) and pct_change != 0:
+        doubling_days = periods * np.log(2) / np.log(1 + pct_change)
+        return np.round(doubling_days, decimals=2)
+    return pd.NA
