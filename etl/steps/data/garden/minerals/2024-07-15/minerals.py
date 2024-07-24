@@ -1,6 +1,5 @@
 """Compilation of minerals data from different origins."""
 
-import owid.catalog.processing as pr
 from owid.catalog import VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -66,38 +65,6 @@ def run(dest_dir: str) -> None:
     # If we combine all production data into one column (as it would be the customary thing to do in a garden step), the
     # data will show as having 3 sources, whereas each data point would have just one source (or two, in a few cases).
     # So it seems more convenient to create a wide table where each column has its own source(s), instead of a long one.
-    #
-    # Check that there is no overlap between USGS current and historical data.
-    # NOTE: This is not necessary, but it will be good to notice when this changes. If so, simply remove it.
-    common_columns = ["country", "year", "commodity", "sub_commodity", "production"]
-    check = pr.concat(
-        [
-            tb_usgs[common_columns].assign(**{"source": "USGS"}),
-            tb_usgs_historical[common_columns].drop(columns="production").assign(**{"source": "USGS"}),
-        ],
-        ignore_index=True,
-        short_name=paths.short_name,
-    )
-    counts = check.groupby(["country", "year", "commodity", "sub_commodity"], observed=True, as_index=False).agg(
-        {"source": "count"}
-    )
-    error = "Now there is overlap between USGS current and historical production data. Remove this part of the code."
-    assert counts[counts["source"] > 1].empty, error
-
-    # Check that there is no overlap between USGS and BGS data.
-    check = pr.concat(
-        [
-            tb_bgs[common_columns].assign(**{"source": "BGS"}),
-            tb_usgs[common_columns].assign(**{"source": "USGS"}),
-            # tb_usgs_historical[common_columns].assign(**{"source": "USGS"}),
-        ],
-        ignore_index=True,
-    )
-    counts = check.groupby(["country", "year", "commodity", "sub_commodity"], observed=True, as_index=False).agg(
-        {"source": "count"}
-    )
-    error = "Now there is overlap between USGS current production data and BGS data. Remove this part of the code."
-    assert counts[counts["source"] > 1].empty, error
 
     # TODO: Data from BGS and USGS historical are very different for certain commodities, namely:
     # * Salt.

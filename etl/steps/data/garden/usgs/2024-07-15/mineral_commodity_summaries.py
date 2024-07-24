@@ -39,7 +39,7 @@ MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 # Harmonize commodity-subcommodity names.
 # NOTE: This list should contain all commodity-subcommodity pairs expected in the data.
 # Set to None any commodity-subcommodity that should not be included.
-commodity_mapping = {
+COMMODITY_MAPPING = {
     ("Aluminum", "Smelter production, aluminum"): ("Aluminum", "Smelter production"),
     ("Aluminum", "Smelter yearend capacity"): None,
     ("Aluminum", "smelter production"): ("Aluminum", "Smelter production"),
@@ -831,7 +831,7 @@ def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> 
 
 def harmonize_commodity_subcommodity_pairs(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    for pair_old, pair_new in commodity_mapping.items():
+    for pair_old, pair_new in COMMODITY_MAPPING.items():
         if pair_old == pair_new:
             # Nothing to do, continue.
             continue
