@@ -1,9 +1,13 @@
+definitions:
+  description_uninhabited_ice: &description_uninhabited_ice |
+    Ice-covered areas that are not inhabited by humans or user for urban, crop or pasture land.
 tables:
   anthromes:
     variables:
       land_ar_ice__uninhabited:
         title: Area of uninhabited ice
         unit: "square kilometers"
+        description_processing: *description_uninhabited_ice
         short_unit: "km²"
       land_ar_inhabited_treeless_and_barren_lands:
         title: Area of inhabited treeless and barren lands
@@ -125,6 +129,7 @@ tables:
           Used lands are the sum of the area covered by mixed settlements, urban areas, rice villages, irrigated villages, rainfed villages, pastoral villages, residential irrigated croplands, residential rainfed croplands, populated croplands, remote croplands, residential rangelands, populated rangelands and remote rangelands.
       share_of_land_type_ice__uninhabited:
         title: Share of land that is uninhabited ice
+        description_short: *description_uninhabited_ice
         unit: "%"
         short_unit: "%"
       share_of_land_type_inhabited_treeless_and_barren_lands:

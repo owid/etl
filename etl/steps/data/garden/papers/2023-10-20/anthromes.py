@@ -100,6 +100,12 @@ def add_aggregate_land_types(tb: Table) -> Table:
             "land_ar_populated_rangelands",
             "land_ar_remote_rangelands",
         ],
+        "land_ar_woodlands": [
+            "land_ar_residential_woodlands",
+            "land_ar_populated_woodlands",
+            "land_ar_remote_woodlands",
+            "land_ar_wild_woodlands",
+        ],
         "share_of_land_type_dense_settlements": ["share_of_land_type_mixed_settlements", "share_of_land_type_urban"],
         "share_of_land_type_villages": [
             "share_of_land_type_rice_villages",
@@ -142,6 +148,12 @@ def add_aggregate_land_types(tb: Table) -> Table:
             "share_of_land_type_residential_rangelands",
             "share_of_land_type_populated_rangelands",
             "share_of_land_type_remote_rangelands",
+        ],
+        "share_of_land_type_woodlands": [
+            "share_of_land_type_residential_woodlands",
+            "share_of_land_type_populated_woodlands",
+            "share_of_land_type_remote_woodlands",
+            "share_of_land_type_wild_woodlands",
         ],
     }
 
