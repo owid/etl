@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -36,6 +35,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("cases_deaths")
     ds_regions = paths.load_dataset("regions")
     ds_income = paths.load_dataset("income_groups")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read_table("cases_deaths")
@@ -64,17 +64,31 @@ def run(dest_dir: str) -> None:
     tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d")
 
     # Remaining processing
+    ## Drop rows
     tb = discard_rows(tb)
+    ## Add population
+    tb["year"] = tb["date"].dt.year
+    tb = geo.add_population_to_table(tb, ds_population)
+    tb = tb.drop(columns=["year"])
+    ## Add regions
     tb = add_regions(tb, ds_regions, ds_income)
+    ## Add period-aggregtes, doublig days
     tb = add_period_aggregates(tb, "weekly", 7)
     tb = add_period_aggregates(tb, "biweekly", 14)
     tb = add_doubling_days(tb)
-
-    # Sort rows by country and date
-    tb = tb.sort_values(["country", "date"])
+    ## Per-capita indicators
+    tb = add_per_capita(tb)
+    ## Add rolling averages
+    tb = add_rolling_avg(tb)
+    ## Add CFR
+    tb = add_cfr(tb)
+    ## 'Days since' indicators
+    tb = add_days_since(tb)
+    ## Dtypes
+    tb = set_dtypes(tb)
 
     # Format
-    tb = tb.format(["country", "date_reported"])
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
@@ -191,7 +205,7 @@ def discard_rows(tb: Table):
 
 
 def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
-    return geo.add_regions_to_table(
+    tb = geo.add_regions_to_table(
         tb,
         ds_regions,
         ds_income,
@@ -229,6 +243,18 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
             },
         },
     )
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions,
+        ds_income,
+        year_col="date",
+        regions={
+            "World": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+            }
+        },
+    )
+    return tb
 
 
 def add_period_aggregates(tb: Table, prefix: str, periods: int):
@@ -311,3 +337,147 @@ def pct_change_to_doubling_days(pct_change, periods):
         doubling_days = periods * np.log(2) / np.log(1 + pct_change)
         return np.round(doubling_days, decimals=2)
     return pd.NA
+
+
+def add_per_capita(tb: Table) -> Table:
+    """Add per-million-capita indicators."""
+    paths.log.info("Add per-capita indicators…")
+    # Fix population value for France (Should not include overseas territories for the WHO)
+    tb.loc[tb["country"] == "France", "population"] -= 2e6
+    # Estimate per-million-capita indicator variants
+    indicators = [
+        "new_cases",
+        "new_deaths",
+        "total_cases",
+        "total_deaths",
+        "weekly_cases",
+        "weekly_deaths",
+        "biweekly_cases",
+        "biweekly_deaths",
+    ]
+    for indicator in indicators:
+        tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population"] / 1_000_000)
+    tb = tb.drop(columns=["population"])
+    return tb
+
+
+def add_rolling_avg(tb: Table) -> Table:
+    """Add rolling average for new cases and deaths (per-capita too)."""
+    paths.log.info("Adding rolling averages…")
+    indicators = [
+        "new_cases",
+        "new_deaths",
+        "new_cases_per_million",
+        "new_deaths_per_million",
+    ]
+    tb = tb.copy().sort_values(by="date")
+
+    # TMP: Table -> DataFrame
+    df = pd.DataFrame(tb)
+
+    for indicator in indicators:
+        col = f"{indicator}_7_day_avg_right"
+        df[col] = df[indicator].astype("float")
+        df[col] = (
+            df.groupby("country")[col]
+            .rolling(
+                window=7,
+                min_periods=6,
+                center=False,
+            )
+            .mean()
+            .reset_index(level=0, drop=True)
+        )
+
+    # TMP: DataFrame -> Table
+    tb = Table(df).copy_metadata(tb)
+
+    return tb
+
+
+def add_cfr(tb: Table) -> Table:
+    """Add CFR."""
+    paths.log.info("Adding case-fatality-rate indicators...")
+
+    def _apply_row_cfr_100(row):
+        if pd.notnull(row["total_cases"]) and row["total_cases"] >= 100:
+            return row["cfr"]
+        return pd.NA
+
+    tb["cfr"] = 100 * tb["total_deaths"] / tb["total_cases"]
+    tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1)
+    return tb
+
+
+def add_days_since(tb: Table) -> Table:
+    """Add 'days since'-type indicators."""
+    paths.log.info("Adding days-since indicators...")
+    indicators = [
+        ("total_cases", 100),
+        ("total_deaths", 5),
+        ("total_cases_per_million", 1),
+        ("total_deaths_per_million", 0.1),
+    ]
+
+    def _days_since(tb, indicator_name, threshold):
+        def _get_date_of_threshold(tb, col, threshold):
+            try:
+                return tb["date"][tb[col] >= threshold].iloc[0]
+            except Exception:
+                return None
+
+        def _date_diff(a, b):
+            if pd.isnull(a) or pd.isnull(b):
+                return None
+            diff = (a - b).days
+            return diff
+
+        ref_date = pd.to_datetime(_get_date_of_threshold(tb, indicator_name, threshold))
+        return pd.to_datetime(tb["date"]).map(lambda date: _date_diff(date, ref_date)).astype("Int64")
+
+    tb = tb.copy()
+    for indicator in indicators:
+        col = f"days_since_{indicator[1]}_{indicator[0]}".replace(".", "_")
+        tb[col] = (
+            tb[["date", "country", indicator[0]]]
+            .groupby("country")
+            .apply(lambda df_group: _days_since(df_group, indicator[0], indicator[1]))
+            .reset_index(level=0, drop=True)
+        )
+    return tb
+
+
+def set_dtypes(tb: Table) -> Table:
+    """Set Dtypes for the table."""
+    dtypes = {
+        "country": "string",
+        "date": "datetime64[ns]",
+        **{
+            col: "Int64"
+            for col in {
+                "new_cases",
+                "total_cases",
+                "new_deaths",
+                "total_deaths",
+                "weekly_cases",
+                "weekly_deaths",
+                "biweekly_cases",
+                "biweekly_deaths",
+            }
+        },
+        **{
+            col: "Float64"
+            for col in {
+                "cfr_100_cases",
+                "doubling_days_total_deaths_7_day_period",
+                "doubling_days_total_deaths_3_day_period",
+                "doubling_days_total_cases_7_day_period",
+                "doubling_days_total_cases_3_day_period",
+                "weekly_pct_growth_cases",
+                "weekly_pct_growth_deaths",
+                "biweekly_pct_growth_deaths",
+                "biweekly_pct_growth_cases",
+            }
+        },
+    }
+    return tb.astype(dtypes)
