@@ -21,7 +21,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb["year"] = pd.to_datetime(tb["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2020-01-21")
+    tb["year"] = (pd.to_datetime(tb["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2020-01-21")).dt.days
+    tb = tb.drop(columns=["date"])
     tb = tb.format(["country", "year"])
 
     #
