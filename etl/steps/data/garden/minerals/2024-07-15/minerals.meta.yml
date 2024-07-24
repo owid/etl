@@ -9,8 +9,19 @@ dataset:
   title: Minerals
 
 tables:
+  minerals_usgs:
+    title: Minerals - USGS
+    variables:
+      {}
+  minerals_usgs_historical:
+    title: Minerals - USGS historical production and value
+    variables:
+      {}
+  minerals_bgs:
+    title: Minerals - BGS
+    variables:
+      {}
   minerals:
     title: Minerals
     variables:
       {}
-

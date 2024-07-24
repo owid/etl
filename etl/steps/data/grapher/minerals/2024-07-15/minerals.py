@@ -10,44 +10,9 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset and read its main table.
+    # Load garden dataset and read its flat table.
     ds_garden = paths.load_dataset("minerals")
-    tb = ds_garden.read_table("minerals")
-
-    #
-    # Process data.
-    #
-    # Pivot table to have production for each commodity.
-    tb = tb.pivot(
-        index=["country", "year"],
-        columns=["commodity", "sub_commodity", "source"],
-        values=["imports", "exports", "production", "reserves", "unit_value"],
-        join_column_levels_with="|",
-    )
-
-    # Improve metadata of new columns.
-    for column in tb.drop(columns=["country", "year"]).columns:
-        metric, commodity, sub_commodity, source = column.split("|")
-        metric = metric.replace("_", " ").capitalize()
-        commodity = commodity.capitalize()
-        sub_commodity = sub_commodity.lower()
-        title_public = f"{metric} of {commodity} ({sub_commodity}), according to {source}"
-        tb[column].metadata.title = column
-        tb[column].metadata.presentation.title_public = title_public
-        if metric == "Unit value":
-            tb[column].metadata.unit = "constant 1998 US$ per tonne"
-            tb[column].metadata.short_unit = "$/t"
-        elif metric in ["Imports", "Exports", "Production", "Reserves"]:
-            tb[column].metadata.unit = "tonnes"
-            tb[column].metadata.short_unit = "t"
-        else:
-            raise ValueError(f"Unexpected metric: {metric}")
-
-    # Format table conveniently.
-    tb = tb.format(keys=["country", "year"])
-
-    # Fix format.
-    tb = tb.astype("Float64")
+    tb = ds_garden["minerals"]
 
     #
     # Save outputs.

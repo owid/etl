@@ -24,32 +24,28 @@ def run(dest_dir: str) -> None:
     metric_dropdown = []
     commodity_dropdown = []
     sub_commodity_dropdown = []
-    source_dropdown = []
     for column in tqdm(tb.drop(columns=["country", "year"]).columns):
         if tb[tb[column].notnull()].empty:
             continue
-        metric, commodity, sub_commodity, source = tb[column].metadata.title.split("|")
+        metric, commodity, sub_commodity = tb[column].metadata.title.split("|")
         metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
         sub_commodity = sub_commodity.capitalize()
-        source = source.upper()
         variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
         metric_dropdown.append(metric)
         commodity_dropdown.append(commodity)
         sub_commodity_dropdown.append(sub_commodity)
-        source_dropdown.append(source)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Commodity Dropdown"] = commodity_dropdown
     df_graphers["Sub-Commodity Dropdown"] = sub_commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
-    df_graphers["Source Dropdown"] = source_dropdown
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
 
     # Sort rows conveniently.
     df_graphers = df_graphers.sort_values(
-        ["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown", "Source Dropdown"]
+        ["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown"]
     ).reset_index(drop=True)
 
     # Prepare explorer metadata.
