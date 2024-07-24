@@ -412,7 +412,12 @@ def add_cfr(tb: Table) -> Table:
         return pd.NA
 
     tb["cfr"] = 100 * tb["total_deaths"] / tb["total_cases"]
-    tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1).copy_metadata(tb["cfr"])
+    tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1)
+    tb["cfr_100_cases"] = tb["cfr_100_cases"].copy_metadata(tb["cfr"])
+
+    # Replace inf
+    tb["cfr"] = tb["cfr"].replace([np.inf, -np.inf], pd.NA)
+    tb["cfr_100_cases"] = tb["cfr_100_cases"].replace([np.inf, -np.inf], pd.NA)
     return tb
 
 
@@ -465,7 +470,10 @@ def add_exemplars(tb: Table):
             return row["days_since_100_total_cases"]
         return pd.NA
 
-    tb["days_since_100_total_cases_and_5m_pop"] = tb.apply(mapper_days_since, axis=1)
+    tb["days_since_100_total_cases_and_5m_pop"] = tb.apply(func=mapper_days_since, axis=1)
+    tb["days_since_100_total_cases_and_5m_pop"] = tb["days_since_100_total_cases_and_5m_pop"].copy_metadata(
+        tb["days_since_100_total_cases"]
+    )
 
     return tb
 
@@ -492,6 +500,7 @@ def set_dtypes(tb: Table) -> Table:
         **{
             col: "Float64"
             for col in {
+                "cfr",
                 "cfr_100_cases",
                 # "doubling_days_total_deaths_7_day_period",
                 # "doubling_days_total_deaths_3_day_period",
