@@ -91,7 +91,7 @@ tables:
         title: Total number of child immigrants (<20 years old)
         description_short: The total number of children under 20 years old that were born in another country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
         description_processing: We calculated the number of child migrants by adding all immigrants aged between 0 and 19 years.
-      share_of_immigrants_under_15:
+      immigrants_under_15_per_1000_people:
         title: Number of child immigrants (<15 years old) per 1,000 people
         unit: per 1,000
         description_short: The total number of children under 15 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.
@@ -99,7 +99,7 @@ tables:
         description_processing: We calculated the share of child migrants by adding all immigrants aged between 0 and 14 years and then dividing by the total population of the host country, per 1,000 people.
         display:
           numDecimalPlaces: 1
-      share_of_immigrants_under_20:
+      immigrants_under_20_per_1000_people:
         title: Number of child immigrants (<20 years old) per 1,000 people
         unit: per 1,000
         description_short: The total number of children under 20 years old that were born in another country, per 1,000 people in the host country. This measures the cumulative immigrant stock, and should not be confused with the flow of new immigrants.

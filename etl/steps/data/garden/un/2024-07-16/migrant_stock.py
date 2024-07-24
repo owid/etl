@@ -9,7 +9,8 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # List of regions (in opposition to countries) in the data set
-REGIONS = [
+# To remove in table destination and origins to not count migration flows multiple times
+REGION_NAMES_IN_DATA = [
     "WORLD",
     "Sub-Saharan Africa",
     "Northern Africa and Western Asia",
@@ -128,22 +129,22 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("migrant_stock")
     # Read tables from meadow dataset.
     # destination and origin table
-    tb_do = ds_meadow["migrant_stock_dest_origin"].reset_index()
+    tb_do = ds_meadow.read_table("migrant_stock_dest_origin")
     # destination table, total numbers and shares
-    tb_d_total = ds_meadow["migrant_stock_dest_total"].reset_index()
-    tb_d_share = ds_meadow["migrant_stock_dest_share"].reset_index()
+    tb_d_total = ds_meadow.read_table("migrant_stock_dest_total")
+    tb_d_share = ds_meadow.read_table("migrant_stock_dest_share")
     # origin table
-    tb_o = ds_meadow["migrant_stock_origin"].reset_index()
+    tb_o = ds_meadow.read_table("migrant_stock_origin")
     # table for data by sex and age
-    tb_sa_total = ds_meadow["migrant_stock_sex_age_total"].reset_index()
-    tb_sa_share = ds_meadow["migrant_stock_sex_age_share"].reset_index()
+    tb_sa_total = ds_meadow.read_table("migrant_stock_sex_age_total")
+    tb_sa_share = ds_meadow.read_table("migrant_stock_sex_age_share")
     # population data
-    tb_pop = ds_meadow["total_population"].reset_index()
+    tb_pop = ds_meadow.read_table("total_population")
 
     ## data on destination and origin
     # Remove aggregated regions from the dataset.
-    tb_do = tb_do[~tb_do["country_destination"].isin(REGIONS)]
-    tb_do = tb_do[~tb_do["country_origin"].isin(REGIONS)]
+    tb_do = tb_do[~tb_do["country_destination"].isin(REGION_NAMES_IN_DATA)]
+    tb_do = tb_do[~tb_do["country_origin"].isin(REGION_NAMES_IN_DATA)]
 
     tb_do = format_table(tb_do, ["country_destination", "country_origin"], "migrants")
 
@@ -160,8 +161,8 @@ def run(dest_dir: str) -> None:
     sa_share_cols_rename = {key: "share_of_" + value for key, value in SA_COLS_RENAME.items()}
 
     # rename columns
-    tb_sa_total = tb_sa_total.rename(columns=SA_COLS_RENAME)
-    tb_sa_share = tb_sa_share.rename(columns=sa_share_cols_rename)
+    tb_sa_total = tb_sa_total.rename(columns=SA_COLS_RENAME, errors="raise")
+    tb_sa_share = tb_sa_share.rename(columns=sa_share_cols_rename, errors="raise")
 
     # change dtype to numeric
     for col in SA_COLS_RENAME.values():
@@ -186,6 +187,7 @@ def run(dest_dir: str) -> None:
     tb_sa_share = tb_sa_share.drop_duplicates()
 
     ## population data
+    # population data is given in thousands in original table - so rescale here
     for col in tb_pop.columns[2:]:
         tb_pop[col] = pd.to_numeric(tb_pop[col], errors="coerce")
         tb_pop[col] = tb_pop[col] * 1000
@@ -201,7 +203,8 @@ def run(dest_dir: str) -> None:
             "migrants_all_sexes": "immigrants_all",
             "migrants_female": "immigrants_female",
             "migrants_male": "immigrants_male",
-        }
+        },
+        errors="raise",
     )
 
     tb_d_share = tb_d_share.rename(
@@ -209,7 +212,8 @@ def run(dest_dir: str) -> None:
             "migrant_share_all_sexes": "immigrant_share_of_dest_population_all",
             "migrant_share_female": "immigrant_share_of_dest_population_female",
             "migrant_share_male": "immigrant_share_of_dest_population_male",
-        }
+        },
+        errors="raise",
     )
 
     tb_o = tb_o.rename(
@@ -217,13 +221,13 @@ def run(dest_dir: str) -> None:
             "migrants_all_sexes": "emigrants_all",
             "migrants_female": "emigrants_female",
             "migrants_male": "emigrants_male",
-        }
+        },
+        errors="raise",
     )
 
     tb = pr.multi_merge(
         [tb_d_total, tb_d_share, tb_o, tb_sa_total, tb_sa_share, tb_pop], on=["country", "year"], how="outer"
     )
-    tb.metadata.short_name = "migrant_stock"
 
     ## Calculate missing values:
     # under 15 y/o migrants, under 20 y/o migrants
@@ -232,13 +236,16 @@ def run(dest_dir: str) -> None:
     )
     tb["immigrants_under_20"] = tb["immigrants_under_15"] + tb["all_immigrants_aged_15_to_19"]
 
-    # share of migrants under 15 and 20 in total population
-    tb["share_of_immigrants_under_15"] = tb["immigrants_under_15"] / (tb["total_population"] / 1000)
-    tb["share_of_immigrants_under_20"] = tb["immigrants_under_20"] / (tb["total_population"] / 1000)
+    # calculating migrants under 15 and 20 in per 1000 people in total population (e.g. migrants under 15 per 1000 people in destination country)
+    tb["immigrants_under_15_per_1000_people"] = tb["immigrants_under_15"] / (tb["total_population"] / 1000)
+    tb["immigrants_under_20_per_1000_people"] = tb["immigrants_under_20"] / (tb["total_population"] / 1000)
 
     # total change in migrants over 5 years
     tb["immigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "immigrants_all"), axis=1)
     tb["emigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "emigrants_all"), axis=1)
+
+    tb["immigrants_change_5_years"] = tb["immigrants_change_5_years"].copy_metadata(tb["immigrants_all"])
+    tb["emigrants_change_5_years"] = tb["emigrants_change_5_years"].copy_metadata(tb["emigrants_all"])
 
     # change in migrants over 5 years per 1000 people
     tb["immigrants_change_5_years_per_1000"] = tb["immigrants_change_5_years"] / (tb["total_population"] / 1000)
@@ -256,14 +263,12 @@ def run(dest_dir: str) -> None:
     ]
 
     for col in change_cols:
-        tb[col] = pd.to_numeric(tb[col], errors="coerce")
-
-    tb = add_metadata(tb, change_cols, "year")
+        tb[col] = tb[col].astype("Float64")
 
     # drop total population columns
     tb = tb.drop(columns=["total_population", "male_population", "female_population"])
 
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="migrant_stock")
     #
     # Save outputs.
     #
@@ -284,6 +289,8 @@ def migrant_change_5_years(tb, tb_row, col_name):
     else:
         tb_prev = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)].iloc[0]
         if tb_prev.empty:
+            return pd.NA
+        elif pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
             return pd.NA
         else:
             return float(tb_row[col_name] - tb_prev[col_name])
@@ -317,13 +324,10 @@ def format_table(tb, country_cols, value_name):
         tb[col] = tb[col].str.strip()
 
     # change dtype to numeric
-    tb[value_name] = pd.to_numeric(tb[value_name], errors="coerce")
+    tb[value_name] = tb[value_name].astype("Float64")
 
     # pivot table to have one row per country and year and have values for sexes in extra columns
-    tb = tb.pivot_table(index=country_cols + ["year"], columns="sex", values=value_name).reset_index()
-
-    # add metadata
-    tb = add_metadata(tb, ["all sexes", "females", "males"], "year")
+    tb = tb.pivot(index=country_cols + ["year"], columns="sex", values=value_name).reset_index()
 
     # rename columns
     tb = tb.rename(
@@ -331,7 +335,8 @@ def format_table(tb, country_cols, value_name):
             "all sexes": f"{value_name}_all_sexes",
             "females": f"{value_name}_female",
             "males": f"{value_name}_male",
-        }
+        },
+        errors="raise",
     )
     # harmonize country names
     for cnt in country_cols:

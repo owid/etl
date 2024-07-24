@@ -3,14 +3,14 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: International Migrant Stock 2020 (UN DESA)
+    title: International Migrant Stock
     description: |-
       The estimates of the number (or “stock”) of international migrants disaggregated by age, sex and country or area of origin are based on national statistics, in most cases obtained from population censuses. Additionally, population registers and nationally representative surveys provided information on the number and composition of international migrants.
 
       The dataset presents estimates of international migrant by age, sex and origin. Estimates are presented for 1990, 1995, 2000, 2005, 2010, 2015 and 2020 and are available for 232 countries and areas of the world. The estimates are based on official statistics on the foreign-born or the foreign population.
     date_published: "2020"
-    version_producer: POP/DB/MIG/Stock/Rev.2020
-    title_snapshot: International Migrant Stock 2020 - Destination and Origin
+    version_producer: 2020 - POP/DB/MIG/Stock/Rev.2020
+    title_snapshot: International Migrant Stock - Destination and Origin
 
     # Citation
     producer: United Nations Department of Economic and Social Affairs
