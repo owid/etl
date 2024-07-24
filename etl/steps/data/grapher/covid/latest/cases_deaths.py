@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = tb.rename_index_names({"date": "year"})
 
     #
     # Save outputs.
