@@ -14,7 +14,7 @@ tables:
     variables:
       production:
         title: Production
-        unit: metric tonnes
+        unit: tonnes
         short_unit: t
       unit_value_current:
         title: Unit value (in current US dollars)
