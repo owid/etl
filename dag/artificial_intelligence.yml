@@ -94,6 +94,13 @@ steps:
     - data://garden/artificial_intelligence/2023-06-14/ai_adoption
 
 
+ # AI adoption by organisations - AI Index Report 2024
+  data://garden/artificial_intelligence/2024-06-28/ai_adoption:
+    - snapshot://artificial_intelligence/2024-06-28/ai_adoption.csv
+  data://grapher/artificial_intelligence/2024-06-28/ai_adoption:
+    - data://garden/artificial_intelligence/2024-06-28/ai_adoption
+
+
   # AI bills passed into law
   data://garden/artificial_intelligence/2023-06-14/ai_bills:
     - snapshot://artificial_intelligence/2023-06-14/ai_bills.csv

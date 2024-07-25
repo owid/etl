@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+              note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent’s nation to global GDP.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_adoption:
+    variables:
+       pct_of_respondents:
+        title: Organizations reporting having adopted AI
+        description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function, out of 1,684 companies that responded to a global survey.
+        description_key:
+          - Share of respondents who reported that their organizations have adopted AI in at least one function, with a breakdown by region. The regional groupings, as defined by McKinsey & Company, classify countries into specific categories. The "Developing Markets" grouping includes countries such as India, Latin America, and the Middle East and North Africa (MENA). The "Greater China" grouping includes Hong Kong and Taiwan.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
