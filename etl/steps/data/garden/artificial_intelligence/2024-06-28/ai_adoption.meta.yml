@@ -8,8 +8,6 @@ definitions:
 
       grapher_config:
               note: Companies represent a range of industries, sizes, functional specialties, and tenures. To adjust for differences in response rates, the data are weighted by the contribution of each respondent’s nation to global GDP.
-    display:
-      numDecimalPlaces: 0
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
