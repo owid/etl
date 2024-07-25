@@ -31,22 +31,16 @@ tables:
         title: Most robots have already developed higher levels of intelligence than humans
         presentation:
           title_public: "Robots smarter than humans now"
-        display:
-          name: "Robots smarter than humans now"
 
       robots_will_be_able_to_develop_higher_levels_of_intelligence_than_humans_in_the_future:
         title: Robots will be able to develop higher levels of intelligence than humans in the future
         presentation:
           title_public: "Robots will surpass human intelligence in the future"
-        display:
-          name: "Robots will surpass human intelligence in the future"
 
       robots_will_never_be_able_to_develop_higher_levels_of_intelligence_than_humans:
         title: Robots will never be able to develop higher levels of intelligence than humans
         presentation:
           title_public: "Robots will never surpass human intelligence"
-        display:
-          name: "Robots will never surpass human intelligence"
 
       dont_know:
         title: Don't know
