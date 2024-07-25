@@ -3,7 +3,7 @@ all_sources:
       name: UN WPP (2022)
       published_by: United Nations, Department of Economic and Social Affairs, Population Division (2022). World Population Prospects 2022, Online Edition
       url: https://population.un.org/wpp/Download/
-      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/un/2022-07-11/un_wpp.zip
+      owid_data_url: https://walden.owid.io/un/2022-07-11/un_wpp.zip
       date_accessed: "2022-09-09"
       publication_date: "2022-07-11"
       publication_year: 2022
@@ -11,7 +11,7 @@ all_sources:
       name: Human Mortality Database
       published_by: Human Mortality Database
       url: https://www.mortality.org/Data/ZippedDataFiles
-      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/hmd/2022-11-04/life_tables.zip
+      owid_data_url: https://walden.owid.io/hmd/2022-11-04/life_tables.zip
       date_accessed: "2022-11-04"
       publication_year: 2022
   - zijdeman: &zijdeman_source
@@ -19,7 +19,7 @@ all_sources:
       published_by: Zijdeman et al. (2015) (via clio-infra.eu)
       url: https://clio-infra.eu/Indicators/LifeExpectancyatBirthTotal.html
       source_data_url: https://clio-infra.eu/data/LifeExpectancyatBirth(Total)_Broad.xlsx
-      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/zijdeman_et_al_2015.xlsx
+      owid_data_url: https://walden.owid.io/papers/2022-11-01/zijdeman_et_al_2015.xlsx
       date_accessed: "2022-11-01"
       publication_year: 2015
   - riley: &riley_source
@@ -27,7 +27,7 @@ all_sources:
       published_by: Riley, J. C. (2005). Estimates of Regional and Global Life Expectancy, 1800-2001. Population and Development Review, 31(3), 537–543. http://www.jstor.org/stable/3401478
       url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
       source_data_url: https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
-      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/riley_2005.pdf
+      owid_data_url: https://walden.owid.io/papers/2022-11-01/riley_2005.pdf
       date_accessed: "2022-11-01"
       publication_date: "2005-10-21"
       publication_year: 2005

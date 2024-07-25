@@ -67,7 +67,7 @@ tables:
           - "None, temporary or inadequate" refers to mentions to the categories 1, 2 and 3 of the IGH Framework.
           - "Not enough information" refers to the cases where the definition does not align or provide enough detail for IGH Framework classification.
         presentation:
-          title_public: IGH Framework Category
+          title_public: Forms of homelessness included in available statistics
         display:
           name: IGH Framework Category
           numDecimalPlaces: 0
@@ -302,7 +302,7 @@ tables:
         description_from_producer: |-
           After gathering information related to countries’ homelessness enumeration and data practices, we evaluated countries according to our Homeless Data Scorecard (HDS). The HDS is an 11-point scale that provides a rough assessment of the current state of a country’s enumeration and data practices. Countries were given one point for each criterion satisfied under the five key categories discussed in the “Homeless Data Scorecard” section above - Methodology, Timeliness, Definition, Geographic Scope, and Disaggregation. The scale is unweighted. In other words, in awarding one point for disaggregation by gender and one point for enumerations occuring within the last four years, we are not implying that the satisfaction of one criterion is as important as the other. Furthermore, two countries being awarded a point for satisfying the same criteria should not be taken to imply that both countries have satisfied the criteria in the same way. For instance, whereas two countries may satisfy the criterion of “methodology listed,” one country may simply state that data was produced through a street count, while the other country may issue comprehensive reports detailing their data collection tactics and statistical methods used to arrive at their estimate. In cases where the relative lack of contextual information regarding how a country’s data was produced was insufficient to make a determination, countries were not scored according to the HDS.
         presentation:
-          title_public: Homeless Data Scorecard
+          title_public: Quality of homelessness data
         display:
           name: Homeless Data Scorecard
           numDecimalPlaces: 0
