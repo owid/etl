@@ -62,7 +62,7 @@ def repack_series(s: pd.Series) -> pd.Series:
     if s.dtype.name in ("Int64", "int64", "UInt64", "uint64"):
         return shrink_integer(s)
 
-    if s.dtype.name in ("object", "float64", "Float64"):
+    if s.dtype.name in ("object", "string", "float64", "Float64"):
         for strategy in [to_int, to_float, to_category]:
             try:
                 return strategy(s)
