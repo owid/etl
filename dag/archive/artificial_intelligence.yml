@@ -98,7 +98,6 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
-
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
@@ -122,3 +121,18 @@ steps:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
   data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
     - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
+
+  # YouGov AI surveys
+  data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
+    - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_robots:
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
+  data://grapher/artificial_intelligence/2024-01-30/yougov_robots:
+    - data://garden/artificial_intelligence/2024-01-30/yougov_robots
+
+  data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation
