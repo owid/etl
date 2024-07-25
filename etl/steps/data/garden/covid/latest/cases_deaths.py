@@ -243,7 +243,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
             },
             "Asia excl. China": {
                 "additional_regions": ["Asia"],
-                "excluded_members": ["China", "South Korea", "Japan", "Singapore", "Taiwan"],
+                "excluded_members": ["China"],
             },
         },
     )
@@ -252,11 +252,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
         ds_regions,
         ds_income,
         year_col="date",
-        regions={
-            "World": {
-                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-            }
-        },
+        regions={"World": {}},
     )
     return tb
 
