@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("guardian_mentions")
     ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["guardian_mentions"].reset_index()
@@ -53,6 +54,27 @@ def run(dest_dir: str) -> None:
 
     ## Get relative values
     tb = add_relative_indicators(tb, ["num_pages_tags", "num_pages_mentions"])
+
+    ## Add data for regions
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        regions=[
+            "Europe",
+            "Asia",
+            "Africa",
+            "North America",
+            "South America",
+            "Oceania",
+            "North America (WB)",
+            "Latin America and Caribbean (WB)",
+            "Middle East and North Africa (WB)",
+            "Sub-Saharan Africa (WB)",
+            "Europe and Central Asia (WB)",
+            "South Asia (WB)",
+            "East Asia and Pacific (WB)",
+        ],
+    )
 
     ## Add per-capita indicators
     tb = geo.add_population_to_table(tb, ds_population)
@@ -84,6 +106,7 @@ def run(dest_dir: str) -> None:
         tb,
         tb_10y_avg,
     ]
+
     #
     # Save outputs.
     #
