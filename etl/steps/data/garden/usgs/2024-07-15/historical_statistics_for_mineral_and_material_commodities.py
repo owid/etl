@@ -50,10 +50,10 @@ def run(dest_dir: str) -> None:
     # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
     # For now, we'll only keep "production".
     tb_us_production = tb[["commodity", "year", "production"]].assign(**{"country": "United States"})
-    # Remove spurious footnotes like "W" (and "nan", caused by saving the column as string).
+    # Remove spurious footnotes like "W".
     tb_us_production["production"] = map_series(
         tb_us_production["production"],
-        mapping={"W": None, "nan": None},
+        mapping={"W": None},
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
     ).astype({"production": float})
@@ -78,9 +78,9 @@ def run(dest_dir: str) -> None:
             errors="raise",
         )
     )
-    # Remove spurious footnotes like "W" (and "nan", caused by saving the column as string).
+    # Remove spurious footnotes like "W".
     for column in ["unit_value_current", "unit_value_constant"]:
-        tb_unit_value[column] = tb_unit_value[column].astype(str).replace("W", None).replace("nan", None).astype(float)
+        tb_unit_value[column] = tb_unit_value[column].astype("string").replace("W", None).astype(float)
 
     # Combine tables.
     tb_combined = pr.concat([tb_us_production, tb_world_production], ignore_index=True)
