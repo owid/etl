@@ -2,7 +2,7 @@
 
 import json
 import zipfile
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -89,12 +89,29 @@ def _extract_notes_and_footnotes_from_soup(soup: BeautifulSoup) -> Tuple[List[st
     return notes, footnotes
 
 
+def _extract_unit_from_soup(soup) -> Optional[str]:
+    # Find the table in the soup.
+    table = soup.find("table", class_="bodyTable")
+
+    # Traverse backwards to find the paragraph or relevant tag immediately preceding the table.
+    previous_element = table.find_previous()
+
+    # Get the text of the first paragraph found.
+    while previous_element:
+        if previous_element.name == "p":
+            unit_text = previous_element.get_text(strip=True)
+            return unit_text if unit_text else None
+        previous_element = previous_element.find_previous()
+
+    return None
+
+
 def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
-    # Transform dataframe to have a column for country, commodity, year, note and value.
+    # Transform dataframe to have a column for country, commodity, year, note, value, and unit.
     # NOTE: The following is a bit convoluted, there may be an easier approach.
     df = df_raw.copy()
     df.columns = ["_".join(col).strip() if col[1] else col[0] for col in df.columns]
-    df = df.melt(id_vars=["Category", "Country", "Commodity", "Sub-commodity"])
+    df = df.melt(id_vars=["Category", "Country", "Commodity", "Sub-commodity", "Unit"])
     df["Year"] = df["variable"].str.split("_").str[0]
     df["note"] = df["variable"].str.split("_").str[1]
     df = df.drop(columns="variable")
@@ -123,7 +140,9 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
         df = df.drop_duplicates(
             subset=["Category", "Country", "Commodity", "Sub-commodity", "Year", "note"], keep="last"
         ).reset_index(drop=True)
-    df = df.pivot(index=["Category", "Country", "Commodity", "Sub-commodity", "Year"], columns=["note"]).reset_index()
+    df = df.pivot(
+        index=["Category", "Country", "Commodity", "Sub-commodity", "Year", "Unit"], columns=["note"]
+    ).reset_index()
     df.columns = [columns[0] if columns[0] != "value" else columns[1] for columns in df.columns]
     if "Note" not in df.columns:
         # If there were no notes in this table, there is no "Note" column in the pivoted table. Create one.
@@ -135,7 +154,7 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
 def process_raw_data(data: Dict[str, Any]):
     # Initialize a dataframe that will contain all the combined data.
     df_all = pd.DataFrame(
-        columns=["Country", "Commodity", "Sub-commodity", "Year", "Category", "Note", "Value", "General notes"]
+        columns=["Country", "Commodity", "Sub-commodity", "Year", "Category", "Note", "Value", "Unit", "General notes"]
     )
     # Go through all nests in the fetched data, process and add to the combined dataframe.
     for data_type in tqdm(list(data), desc="Data type"):
@@ -156,6 +175,16 @@ def process_raw_data(data: Dict[str, Any]):
                 # Extract notes and footnotes from the soup.
                 notes, footnotes = _extract_notes_and_footnotes_from_soup(soup=soup)
 
+                # Extract the unit from the soup, if it's given.
+                # It seems the unit simply appears on the top-right of the table, sometimes.
+                # For example, this happens for mercury production:
+                # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Production&commodity=95&dateFrom=2010&dateTo=2016&country=&agreeToTsAndCs=agreed
+                unit = _extract_unit_from_soup(soup=soup)
+
+                if not unit:
+                    # If no unit is explicitly given, assume it's tonnes.
+                    unit = "tonnes"
+
                 # Create a raw dataframe with the data extracted from the soup.
                 df_raw = _create_raw_dataframe_from_soup(soup=soup)
 
@@ -170,6 +199,12 @@ def process_raw_data(data: Dict[str, Any]):
 
                 # Add a column specifying the data type.
                 df_raw["Category"] = data_type
+
+                # Add a column specifying the unit.
+                df_raw["Unit"] = unit
+
+                if (commodity == "mercury") & (data_type == "Production"):
+                    break
 
                 # Process dataframe.
                 df = _clean_raw_dataframe(df_raw=df_raw)

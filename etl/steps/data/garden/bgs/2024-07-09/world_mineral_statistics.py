@@ -8,6 +8,14 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Convert carats to metric tonnes.
+CARATS_TO_TONNES = 2e-7
+# Convert million cubic meters of helium to metric tonnes.
+MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
+# Convert million cubic meters of natural gas to metric tonnes.
+# TODO: Figure out if this is a good idea, otherwise keep in million cubic meters.
+MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES = 800
+
 # Harmonize commodity-subcommodity names.
 # NOTE: This list should contain all commodity-subcommodity pairs expected in the data.
 # Set to None any commodity-subcommodity that should not be included.
@@ -717,6 +725,52 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
     return tb
 
 
+def harmonize_units(tb: Table) -> Table:
+    tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
+    units = sorted(set(tb["unit"]))
+
+    # Mapping from original unit names to tonnes.
+    mapping = {
+        "tonnes": "tonnes",
+        "tonnes (metric)": "tonnes",
+        "tonnes (Al2O3 content)": "tonnes of Al2O3 content",
+        "tonnes (K20 content)": "tonnes of K₂O content",
+        "tonnes (metal content)": "tonnes of metal content",
+        "kilograms": "tonnes",
+        "kilograms (metal content)": "tonnes of metal content",
+        "Carats": "tonnes",
+        "million cubic metres": "tonnes",
+    }
+
+    # Sanity check.
+    error = "Unexpected units found. Add them to the unit mapping and decide its conversion."
+    assert set(units) == set(mapping), error
+
+    for unit in units:
+        mask = tb["unit"] == unit
+        if unit in [
+            "tonnes",
+            "tonnes (metal content)",
+            "tonnes (Al2O3 content)",
+            "tonnes (K20 content)",
+            "tonnes (metric)",
+        ]:
+            pass
+        elif unit in ["kilograms", "kilograms (metal content)"]:
+            tb.loc[mask, "value"] *= 1e-3
+        elif unit in ["Carats"]:
+            tb.loc[mask, "value"] *= CARATS_TO_TONNES
+        elif unit in ["million cubic metres"]:
+            # TODO: Assert that commodity is either helium or natural gas, and convert accordingly.
+            error = "Unexpected commodity using million cubic metres."
+            assert set(tb[mask]["commodity"]) == {"helium", "natural gas"}, error
+            tb.loc[mask & (tb["commodity"] == "helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            tb.loc[mask & (tb["commodity"] == "natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
+        tb.loc[mask, "unit"] = mapping[unit]
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -739,13 +793,8 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    # Pivot table to have a column for each category.
-    tb = tb.pivot(
-        index=["country", "year", "commodity", "sub_commodity"],
-        columns="category",
-        values="value",
-        join_column_levels_with="_",
-    )
+    # Harmonize units.
+    tb = harmonize_units(tb=tb)
 
     # Improve the name of the commodities.
     tb["commodity"] = tb["commodity"].str.capitalize()
@@ -753,10 +802,16 @@ def run(dest_dir: str) -> None:
     # Harmonize commodity-subcommodity pairs.
     tb = harmonize_commodity_subcommodity_pairs(tb=tb)
 
+    # Pivot table to have a column for each category.
+    tb = tb.pivot(
+        index=["country", "year", "commodity", "sub_commodity", "unit"],
+        columns="category",
+        values="value",
+        join_column_levels_with="_",
+    )
+
     # TODO: There are many issues to be handled:
-    #  * Ensure that all sub-commodities have a "Total".
-    #  * But it seems that these "Total" may not be reliable. For example, for commodity "Coal", the sub-commodity "Total" only has zeros. And there is another sub-commodity "Coal" that may be the actual total.
-    #  * There are many overlapping historical regions.
+    #  * There are many overlapping historical regions. For example, Diatomite has production from USSR until 2006!
 
     # Add regions and income groups to the table.
     REGIONS = {**geo.REGIONS, **{"World": {}}}
@@ -770,7 +825,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Format table conveniently.
-    tb = tb.format(["country", "year", "commodity", "sub_commodity"])
+    # NOTE: All commodities have the same unit for imports, exports and production except one:
+    #  Potash Chloride uses "tonnes" for imports and exports, and "tonnes of K20 content" (which is also misspelled).
+    #  Due to this, the index cannot simply be "country", "year", "commodity", "sub_commodity"; we need also "unit".
+    # counts = tb.groupby(["commodity", "sub_commodity", "country", "year"], observed=True, as_index=False).nunique()
+    # counts[counts["unit"] > 1][["commodity", "sub_commodity"]].drop_duplicates()
+    tb = tb.format(["country", "year", "commodity", "sub_commodity", "unit"])
 
     #
     # Save outputs.
