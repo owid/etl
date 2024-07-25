@@ -81,6 +81,13 @@ steps:
 
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
+  data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2024-07-23/papers_with_code_imagenet.html
+  data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet
+
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
   # Math & Code and Language
