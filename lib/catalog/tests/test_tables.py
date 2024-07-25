@@ -275,7 +275,7 @@ def mock_table() -> Table:
 
 
 def test_load_csv_table_over_http() -> None:
-    Table.read_csv("http://owid-catalog.nyc3.digitaloceanspaces.com/reference/countries_regions.csv")
+    Table.read_csv("https://catalog.ourworldindata.org/reference/countries_regions.csv")
 
 
 def test_rename_columns() -> None:
