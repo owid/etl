@@ -19,6 +19,6 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
