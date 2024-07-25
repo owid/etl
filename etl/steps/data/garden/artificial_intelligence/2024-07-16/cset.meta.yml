@@ -23,13 +23,13 @@ definitions:
 
   description_short_citations: Citations take time to accumulate so recent years may have fewer citations, and the measure for these years may not completely reflective of their eventual total.
 
-  note_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years. Data for 2021-2023 is therefore incomplete.
+  note_citations: The citation counts for papers published in a specific year are subject to a time lag, as papers often accrue most citations in subsequent years. Data for 2022-2023 is therefore incomplete.
 
   note_articles:  Data for 2021-2023 is incomplete.
 
-  note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI). Data for 2021-2023 is incomplete.
+  note_investment: Data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI). Data for 2022-2023 is incomplete.
 
-  note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.  Data for 2020-2023 is incomplete.
+  note_patents: According to calculations by CSET, the median time for a patent to be granted is 826 days from its initial filing date, while the average time is 860 days.  Data for 2021-2023 is incomplete.
 
   description_key_patents: &description_key_patents |-
     World aggregate does not include data for Micronesia, Tonga, Samoa, Kiribati, Fiji, Papua New Guinea, Palau, Tuvalu, Bermuda, Armenia, Belarus, Georgia, Gibraltar, Jersey, Kosovo, Moldova, Isle of Man, Iceland, Albania, Andorra, Bosnia and Herzegovina, Malta, Montenegro, San Marino, North Macedonia, Liechtenstein, Monaco, Vatican City, Guernsey, Afghanistan, Kyrgyzstan, Bahrain, Laos, Bangladesh, Lebanon, Bhutan, Maldives, Cambodia, Syria, Tajikistan, Cyprus, Mongolia, North Korea, Myanmar, Timor-Leste, Nepal, Turkmenistan, Pakistan, Palestine, Iraq, United Arab Emirates, Uzbekistan, Kazakhstan, Qatar, Vietnam, Yemen, Kuwait, Algeria, Cape Verde, Equatorial Guinea, Swaziland, Namibia, Central African Republic (the), Angola, Ethiopia, Niger, Benin, Gabon, Nigeria, Botswana, Gambia, Rwanda, Burkina Faso, Ghana, São Tomé and Príncipe, Burundi, Guinea, Senegal, Guinea-Bissau, Seychelles, Cameroon, Sierra Leone, Lesotho, Somalia, Chad, Liberia, Libya, South Sudan, Congo, Madagascar, Sudan, Côte d'Ivoire, Malawi, Togo, Mali, Djibouti, Mauritania, Uganda, Egypt, Mauritius, Tanzania, Zambia, Eritrea, Mozambique, Zimbabwe, Comoros, Antigua and Barbuda, Bolivia, Suriname, Nicaragua, Dominican Republic, Bahamas, Ecuador, Paraguay, Barbados, Saint Vincent and the Grenadines, El Salvador, Belize, Grenada, Saint Kitts and Nevis, Guatemala, Guyana, Haiti, Honduras, Trinidad and Tobago, Jamaica, Venezuela, Puerto Rico, Cayman Islands (the), Turks and Caicos Islands, Saint Lucia, and Dominica.
@@ -144,7 +144,7 @@ tables:
       num_patent_granted_summary:
         title: Total patent applications granted
         unit: granted applications
-        description_short: Total number of patents granted between 2013-2020. {definitions.description_short_patents}
+        description_short: Total number of patents granted between 2013-2023. {definitions.description_short_patents}
         description_key:
           - *description_key_patents
         presentation:
