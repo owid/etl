@@ -10,7 +10,7 @@
   "license_name": "CC BY 3.0",
   "license_url": "https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/readme_release_HYDE3.2.1.txt",
   "source_data_url": "https://dataportaal.pbl.nl/downloads/HYDE/HYDE3.2/baseline.zip",
-  "owid_data_url": "https://nyc3.digitaloceanspaces.com/walden/hyde/2017/baseline.zip",
+  "owid_data_url": "https://walden.owid.io/hyde/2017/baseline.zip",
   "file_extension": "zip",
   "md5": "acdbbd3908a29fb8ae75f3e081c980ad"
 }

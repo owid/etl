@@ -100,7 +100,7 @@ steps:
   # Registered vehicles per 1000 people
   data://garden/who/2024-05-20/vehicles:
     - data://garden/who/2024-01-03/gho
-    - data://garden/demography/2023-03-31/population
+    - data://garden/demography/2024-07-15/population
   data://grapher/who/2024-05-20/vehicles:
     - data://garden/who/2024-05-20/vehicles
 
