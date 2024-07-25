@@ -28,7 +28,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb.format(["country", "year"])
-
     #
     # Save outputs.
     #
