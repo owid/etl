@@ -8,7 +8,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/demography/2024-07-15/population
-
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
 
