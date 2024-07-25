@@ -78,7 +78,7 @@ def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.
     df["unit"] = unit
 
     # Extract notes written below the table in the first column.
-    notes = list(df[~df["Year"].astype(str).str.isdigit()]["Year"])
+    notes = list(df.loc[~df["Year"].astype("string").str.isdigit()]["Year"])
     # One of the notes is always the citation (but the order changes).
     _citation = [note[1:] for note in notes if "1Compiled" in str(note)]
     assert len(_citation) == 1, error
@@ -86,7 +86,7 @@ def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.
     df["source"] = _citation[0]
 
     # Remove notes from the table.
-    df = df[df["Year"].astype(str).str.isdigit()].reset_index(drop=True)
+    df = df.loc[df["Year"].astype("string").str.isdigit()].reset_index(drop=True)
 
     # Rename some columns so they are consistent with other tables.
     df = df.rename(
@@ -158,7 +158,7 @@ def run(dest_dir: str) -> None:
 
     # Columns contain a mix of numbers and strings (I suppose corresponding to footnotes).
     # For now, save all data as strings.
-    tb = tb.astype({column: str for column in tb.columns})
+    tb = tb.astype({column: "string" for column in tb.columns})
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     # NOTE: There are duplicated rows with different data, e.g. Nickel 2019. We'll fix it in the garden step.

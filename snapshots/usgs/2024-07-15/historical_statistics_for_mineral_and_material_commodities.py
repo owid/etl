@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from owid.catalog.utils import underscore
+from owid.datautils.web import download_file_from_url
 from tqdm.auto import tqdm
 
 from etl.snapshot import Snapshot
@@ -130,10 +131,14 @@ def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
         # Download files for all commodities.
         for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Downloading files"):
             if row["supply_demand_url"] != "NA":
-                _download_file(row["supply_demand_url"], supply_demand_dir, row["commodity"])
+                download_file_from_url(
+                    url=row["supply_demand_url"], local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx"
+                )
 
             if row["end_use_url"] != "NA":
-                _download_file(row["end_use_url"], end_use_dir, row["commodity"])
+                download_file_from_url(
+                    url=row["end_use_url"], local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx"
+                )
 
         # Create the zip file at the snapshot path.
         with ZipFile(snapshot_path, "w") as zipf:

@@ -25,16 +25,15 @@ def run(dest_dir: str) -> None:
     commodity_dropdown = []
     sub_commodity_dropdown = []
     for column in tqdm(tb.drop(columns=["country", "year"]).columns):
-        if tb[tb[column].notnull()].empty:
-            continue
-        metric, commodity, sub_commodity = tb[column].metadata.title.split("|")
-        metric = metric.replace("_", " ").capitalize()
-        commodity = commodity.capitalize()
-        sub_commodity = sub_commodity.capitalize()
-        variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
-        metric_dropdown.append(metric)
-        commodity_dropdown.append(commodity)
-        sub_commodity_dropdown.append(sub_commodity)
+        if tb[column].notnull().any():
+            metric, commodity, sub_commodity = tb[column].metadata.title.split("|")
+            metric = metric.replace("_", " ").capitalize()
+            commodity = commodity.capitalize()
+            sub_commodity = sub_commodity.capitalize()
+            variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
+            metric_dropdown.append(metric)
+            commodity_dropdown.append(commodity)
+            sub_commodity_dropdown.append(sub_commodity)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Commodity Dropdown"] = commodity_dropdown

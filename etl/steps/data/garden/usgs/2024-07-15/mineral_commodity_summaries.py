@@ -514,7 +514,7 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
     if (year == 2023) & (mineral == "PEAT"):
         # There are spurious notes in "Reserves_kt", and no column for "Reserves_notes".
         # Fix this.
-        index_issue = d[d["Reserves_kt"] == "Included with “Other countries.”"].index
+        index_issue = d.loc[d["Reserves_kt"] == "Included with “Other countries.”"].index
         d.loc[index_issue, "Reserves_kt"] = pd.NA
         assert "Reserves_notes" not in d.columns
         d["Reserves_notes"] = pd.NA
@@ -563,18 +563,21 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     series = series.fillna("").astype(str).str.strip()
     for na_value in NA_VALUES:
         series = series.replace(na_value, pd.NA)
-    # Remove spurious commas from numbers, like "7,200,000".
-    series = series.str.replace(",", "", regex=False)
-    # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
-    series = series.str.replace(">", "", regex=False)
-    # There is also at least one case (2022 Helium) of "<1". Remove the "<".
-    series = series.str.replace("<", "", regex=False)
-    # There is also at least one case (2022 Vermiculite) of 'Less than ½ unit.'. Replace it by "0.5".
-    series = series.str.replace("Less than ½ unit.", "0.5", regex=False)
-    # There is also at least one case (2024 Sand and gravel (industrial)) of numbers starting with "e", e.g. "4200".
-    # I suppose that probably means "estimated" (and the corresponding notes mention the word "estimated").
-    # Remove those "e".
-    series = series.str.replace("e", "", regex=False)
+    series = (
+        # Remove spurious commas from numbers, like "7,200,000".
+        series.str.replace(",", "", regex=False)
+        # There is also at least one case (2023 Nickel) of ">100000000". Remove the ">".
+        .str.replace(">", "", regex=False)
+        # There is also at least one case (2022 Helium) of "<1". Remove the "<".
+        .str.replace("<", "", regex=False)
+        # There is also at least one case (2022 Vermiculite) of 'Less than ½ unit.'. Replace it by "0.5".
+        .str.replace("Less than ½ unit.", "0.5", regex=False)
+        # There is also at least one case (2024 Sand and gravel (industrial)) of numbers starting with "e", e.g. "4200".
+        # I suppose that probably means "estimated" (and the corresponding notes mention the word "estimated").
+        # Remove those "e".
+        .str.replace("e", "", regex=False)
+    )
+
     # Convert to float.
     series = series.astype("Float64")
 
