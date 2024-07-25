@@ -203,9 +203,6 @@ def process_raw_data(data: Dict[str, Any]):
                 # Add a column specifying the unit.
                 df_raw["Unit"] = unit
 
-                if (commodity == "mercury") & (data_type == "Production"):
-                    break
-
                 # Process dataframe.
                 df = _clean_raw_dataframe(df_raw=df_raw)
 
