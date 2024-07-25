@@ -11,7 +11,7 @@ definitions:
 
     description_key:
     - "Respondents were asked, 'Which ONE, if any, of the following statements do you  MOST agree with?'"
-    - "Possible answers were: 'Most robots have already developed higher levels of intelligence than humans', 'Robots will be able to develop higher levels of intelligence than humans in the future', 'Robots will never be able to develop higher levels of intelligence than humans', 'None of these', 'Don't know'å"
+    - "Possible answers were: 'Most robots have already developed higher levels of intelligence than humans', 'Robots will be able to develop higher levels of intelligence than humans in the future', 'Robots will never be able to develop higher levels of intelligence than humans', 'None of these', and 'Don't know'"
     description_short: Survey respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with?"
     unit: '%'
     short_unit: '%'
