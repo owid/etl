@@ -2,7 +2,7 @@ steps:
 
   # WHO - Cases and deaths
   data://meadow/covid/latest/cases_deaths:
-    - snapshot://covid/2024-07-23/cases_deaths.csv
+    - snapshot://covid/latest/cases_deaths.csv
   data://garden/covid/latest/cases_deaths:
     - data://meadow/covid/latest/cases_deaths
     - data://garden/regions/2023-01-01/regions
