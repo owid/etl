@@ -20,13 +20,15 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Prepare graphers table of explorer.
+    # TODO: Something is wrong, it seems that all columns have units "tonnes".
+    #  Whereas, BGS data should have, e.g. "tonnes of metal content".
     variable_ids = []
     metric_dropdown = []
     commodity_dropdown = []
     sub_commodity_dropdown = []
     for column in tqdm(tb.drop(columns=["country", "year"]).columns):
         if tb[column].notnull().any():
-            metric, commodity, sub_commodity = tb[column].metadata.title.split("|")
+            metric, commodity, sub_commodity, unit = tb[column].metadata.title.split("|")
             metric = metric.replace("_", " ").capitalize()
             commodity = commodity.capitalize()
             sub_commodity = sub_commodity.capitalize()

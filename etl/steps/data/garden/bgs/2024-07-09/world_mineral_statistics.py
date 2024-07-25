@@ -821,7 +821,7 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
-        index_columns=["country", "year", "commodity", "sub_commodity"],
+        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
     )
 
     # Format table conveniently.

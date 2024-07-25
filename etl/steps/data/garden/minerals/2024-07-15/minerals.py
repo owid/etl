@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb_bgs = (
         ds_bgs["world_mineral_statistics"]
         .astype(float)
-        .reset_index()[["country", "year", "commodity", "sub_commodity", "exports", "imports", "production"]]
+        .reset_index()[["country", "year", "commodity", "sub_commodity", "exports", "imports", "production", "unit"]]
     )
     tb_usgs_historical = (
         ds_usgs_historical["historical_statistics_for_mineral_and_material_commodities"]
@@ -40,6 +40,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # TODO: Find the actual units of USGS data.
+    # For now, assume all USGS data is in tonnes. Later on, Unit value will be changed to USD.
+    tb_usgs["unit"] = "tonnes"
+    tb_usgs_historical["unit"] = "tonnes"
     #
     # Add a sub-commodity column to the historical data.
     # TODO: The subcommodity and unit of "World production" for each commodity can be slightly different.
@@ -66,10 +70,12 @@ def run(dest_dir: str) -> None:
     # data will show as having 3 sources, whereas each data point would have just one source (or two, in a few cases).
     # So it seems more convenient to create a wide table where each column has its own source(s), instead of a long one.
 
-    # TODO: Data from BGS and USGS historical are very different for certain commodities, namely:
-    # * Salt.
-    # * Mercury.
+    # TODO: Data from BGS and USGS historical are significantly different for Salt (by a factor of 2 or 3).
+    #  Other series are similar, but have some range where there are large discrepancies, e.g. Iron ore and Asbestos.
     # country = "World"
+    # import owid.catalog.processing as pr
+    # check = pr.concat([tb_bgs.assign(**{"source": "BGS"}), tb_usgs_historical.assign(**{"source": "USGS"})], ignore_index=True)
+    # check["unit"] = check["unit"].fillna("tonnes")
     # for commodity in tb_usgs["commodity"].unique():
     #     _check = check[(check["country"] == country) & (check["commodity"] == commodity) & (check["sub_commodity"] == "Total")].dropna(subset="production")
     #     if _check["source"].nunique() == 2:
@@ -80,7 +86,7 @@ def run(dest_dir: str) -> None:
     # Pivot USGS table and remove empty columns.
     tb_usgs_flat = tb_usgs.pivot(
         index=["country", "year"],
-        columns=["commodity", "sub_commodity"],
+        columns=["commodity", "sub_commodity", "unit"],
         values=["production", "reserves"],
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
@@ -88,7 +94,7 @@ def run(dest_dir: str) -> None:
     # Pivot USGS historical table and remove empty columns.
     tb_usgs_historical_flat = tb_usgs_historical.pivot(
         index=["country", "year"],
-        columns=["commodity", "sub_commodity"],
+        columns=["commodity", "sub_commodity", "unit"],
         values=["production", "unit_value"],
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
@@ -96,7 +102,7 @@ def run(dest_dir: str) -> None:
     # Pivot BGS table and remove empty columns.
     tb_bgs_flat = tb_bgs.pivot(
         index=["country", "year"],
-        columns=["commodity", "sub_commodity"],
+        columns=["commodity", "sub_commodity", "unit"],
         values=["exports", "imports", "production"],
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
@@ -109,7 +115,7 @@ def run(dest_dir: str) -> None:
 
     # Improve metadata of new columns.
     for column in tb.drop(columns=["country", "year"]).columns:
-        metric, commodity, sub_commodity = column.split("|")
+        metric, commodity, sub_commodity, unit = column.split("|")
         metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
         sub_commodity = sub_commodity.lower()
@@ -118,21 +124,19 @@ def run(dest_dir: str) -> None:
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
         tb[column].metadata.presentation.title_public = title_public
+        tb[column].metadata.unit = unit
+        # TODO: Create short unit.
+        tb[column].metadata.short_unit = "t"
         if metric == "Unit value":
             tb[column].metadata.unit = "constant 1998 US$ per tonne"
             tb[column].metadata.short_unit = "$/t"
-        elif metric in ["Imports", "Exports", "Production", "Reserves"]:
-            tb[column].metadata.unit = "tonnes"
-            tb[column].metadata.short_unit = "t"
-        else:
-            raise ValueError(f"Unexpected metric: {metric}")
 
     # Format tables conveniently.
-    tb_usgs = tb_usgs.format(["country", "year", "commodity", "sub_commodity"], short_name="minerals_usgs")
+    tb_usgs = tb_usgs.format(["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_usgs")
     tb_usgs_historical = tb_usgs_historical.format(
-        ["country", "year", "commodity", "sub_commodity"], short_name="minerals_usgs_historical"
+        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_usgs_historical"
     )
-    tb_bgs = tb_bgs.format(["country", "year", "commodity", "sub_commodity"], short_name="minerals_bgs")
+    tb_bgs = tb_bgs.format(["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_bgs")
     tb = tb.format(["country", "year"], short_name="minerals")
 
     #
