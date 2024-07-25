@@ -1,6 +1,4 @@
 import owid.catalog.processing as pr
-import pandas as pd
-import pdfplumber
 from structlog import get_logger
 
 from etl.snapshot import Snapshot
