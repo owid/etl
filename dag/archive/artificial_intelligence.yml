@@ -98,6 +98,29 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
+  # ImageNet
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
+
+  # Math & Code and Language
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
+  # Atari
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
+  # All benchmarks combined
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
 
   # YouGov AI surveys
   data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
