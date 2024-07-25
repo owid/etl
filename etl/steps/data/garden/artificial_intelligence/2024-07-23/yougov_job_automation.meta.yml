@@ -5,6 +5,15 @@ definitions:
     presentation:
       topic_tags:
         - Artificial Intelligence
+    description_key:
+      - Respondents were asked, "How worried, if it all, are you that your type of work could be automated within your lifetime?".
+      - Possible responses were "Very worried", "Fairly worried", "Not very worried", "Not worried at all", and "Don't know".
+    unit: '%'
+    short_unit: '%'
+    display:
+      numDecimalPlaces: 1
+      zeroDay: '2021-01-01'
+      yearIsDay: true
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -14,41 +23,15 @@ tables:
     variables:
       dont_know:
         title: Don't know
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          zeroDay: '2021-01-01'
-          yearIsDay: true
+
       fairly_worried:
         title: Fairly worried
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          zeroDay: '2021-01-01'
-          yearIsDay: true
+
       not_very_worried:
         title: Not very worried
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          zeroDay: '2021-01-01'
-          yearIsDay: true
+
       not_worried_at_all:
         title: Not worried at all
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          zeroDay: '2021-01-01'
-          yearIsDay: true
+
       very_worried:
         title: Very worried
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          zeroDay: '2021-01-01'
-          yearIsDay: true

@@ -2,37 +2,8 @@ meta:
   origin:
     title_snapshot: Robot intelligence survey - Biannual tracker
     title: Robot intelligence survey
-    description: >
-      Biannual tracker of Americans' concerns regarding robotic intelligence. Next
-      update is in January. The provided results are
-      weighted to ensure they are representative of the United States population across
-      various demographic factors. The weighting
-      is based on factors such as age, gender, race, education, region, political
-      party affiliation, and income level. This
-      weighting process helps to account for the diversity within the population and
-      ensures that the results reflect a broader
-      representation of the United States as a whole. Each wave comprises responses
-      from 1004 - 1085 US Adults.
-
-
-      Respondents were asked, "Which ONE, if any, of the following statements do you
-      MOST agree with?"
-
-
-      - Most robots have already developed higher levels of intelligence than humans
-
-
-      - None of these
-
-
-      - Robots will be able to develop higher levels of intelligence than humans in
-      the future
-
-
-      - Robots will never be able to develop higher levels of intelligence than humans
-
-
-      - Don't know
+    description: |
+      Biannual tracker of Americans' concerns regarding robotic intelligence. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1001 - 1085 US Adults.
     producer: YouGov
     citation_full: YouGov (2024)
     url_main: https://today.yougov.com/topics/politics/trackers/robot-intelligence

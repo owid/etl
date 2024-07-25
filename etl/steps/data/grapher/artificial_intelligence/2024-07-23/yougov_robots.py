@@ -14,20 +14,21 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("yougov_robots")
 
     # Read table from garden dataset.
-    tb = ds_garden["yougov_robots"].reset_index()
+    tb = ds_garden["yougov_robots"]
 
     #
     # Process data.
     #
-    # Rename the 'question' column to 'country' and days_since_2021 to year for visualising in the grapher
-    tb = tb.rename(columns={"days_since_2021": "year", "group": "country"})
-    tb = tb.format(["year", "country"])
+    # Rename the 'question' to 'country' and days_since_2021 to year for visualising in the grapher
+    tb = tb.rename_index_names({"days_since_2021": "year", "group": "country"})
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = create_dataset(
+        dest_dir, tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True
+    )
 
     #
     # Checks.

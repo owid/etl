@@ -13,7 +13,6 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("yougov_robots.start")
     #
     # Load inputs.
     #
@@ -25,11 +24,9 @@ def run(dest_dir: str) -> None:
     #
     tb_all_sheets = shared.process_data(snap)
 
-    tb_all_sheets = tb_all_sheets.underscore()
     tb_all_sheets = tb_all_sheets.format(
-        ["which_one__if_any__of_the_following_statements_do_you_most_agree_with", "date", "group"],
-        verify_integrity=True,
-    ).sort_index()
+        ["which_one__if_any__of_the_following_statements_do_you_most_agree_with", "date", "group"]
+    )
     #
     # Save outputs.
     #
@@ -40,5 +37,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
-
-    log.info("yougov_robots.end")

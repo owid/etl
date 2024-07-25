@@ -13,7 +13,6 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("yougov_job_automation.start")
     #
     # Load inputs.
     #
@@ -25,15 +24,13 @@ def run(dest_dir: str) -> None:
     #
     tb_all_sheets = shared.process_data(snap)
 
-    tb_all_sheets = tb_all_sheets.underscore()
     tb_all_sheets = tb_all_sheets.format(
         [
             "how_worried__if_it_all__are_you_that_your_type_of_work_could_be_automated_within_your_lifetime",
             "date",
             "group",
-        ],
-        verify_integrity=True,
-    ).sort_index()
+        ]
+    )
 
     #
     # Save outputs.
@@ -45,5 +42,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
-
-    log.info("yougov_job_automation.end")

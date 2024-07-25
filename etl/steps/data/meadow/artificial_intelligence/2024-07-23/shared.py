@@ -28,28 +28,6 @@ def process_data(snap: Snapshot):
         tables.append(filtered_tb)
 
     # Concatenate all the processed DataFrames
-    tb_concat = pr.concat(tables, axis=0)
-    tb_concat.reset_index(drop=True, inplace=True)
+    tb_concat = pr.concat(tables, axis=0, ignore_index=True)
+
     return tb_concat
-
-
-def read_table_from_pdf(pdf_path, page_number: int) -> pd.DataFrame:
-    """
-    Read a table from a PDF file and convert it into a DataFrame.
-
-    Args:
-        pdf_path (str): The path to the PDF file.
-        page_number (int): The page number containing the table (1-indexed).
-
-    Returns:
-        pd.DataFrame: The extracted table as a DataFrame.
-    """
-    table_settings = {"vertical_strategy": "text", "horizontal_strategy": "text"}
-    with pdfplumber.open(pdf_path) as pdf:
-        page = pdf.pages[page_number - 1]  # Adjust page number to 0-indexed
-        table = page.extract_tables(table_settings=table_settings)[0]  # Extract the first table with custom settings
-
-        # Convert the table data into a DataFrame
-        df = pd.DataFrame(table[1::], columns=table[0])
-
-        return df
