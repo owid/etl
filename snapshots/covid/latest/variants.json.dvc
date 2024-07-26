@@ -1,15 +1,17 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
+  is_public: false
+
   origin:
     # Data product / Snapshot
     title: COVID-19, variants
     description: |-
       Enabled by data from GISAID (https://gisaid.org).
 
-      CoVariants provides an overview of SARS-CoV-2 variants and mutations that are of interest. 
+      CoVariants provides an overview of SARS-CoV-2 variants and mutations that are of interest.
 
-      CoVariants is a free and open source project. The content, derived data, code used to generate the data, and code that implements this web application can be found on GitHub: github.com/hodcroftlab/covariants .
+      CoVariants is a free and open source project. The content, derived data, code used to generate the data, and code that implements this web application can be found on GitHub: github.com/hodcroftlab/covariants.
 
       The SARS-CoV-2 pandemic & research surrounding it is ongoing. Every effort is made to try to keep this repository up-to-date, but readers should take care to double-check that the information is the latest available.
 
