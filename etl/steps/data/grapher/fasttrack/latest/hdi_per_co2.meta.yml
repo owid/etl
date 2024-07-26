@@ -1,0 +1,12 @@
+dataset:
+  title: HDI per capita CO2 (UNDP Project)
+  description: ''
+  licenses:
+    - {}
+tables:
+  hdi_per_co2:
+    variables:
+      hdi_per_co2:
+        title: HDI per capita CO2 emissions
+        unit: ''
+        description: Human Development Index divided by per capita consumption-based CO2 emissions.
