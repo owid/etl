@@ -38,7 +38,7 @@ tables:
       comp_performance_per_dollar:
         title: GPU computational performance per dollar
         unit: FLOP/s/$
-        description_short: Graphics processing units (GPUs) are the dominant computing hardware for artificial intelligence systems. GPU performance is shown in [floating-point operations](#dod:flop) operations/second (FLOP/s) per US dollar,
+        description_short: Graphics processing units (GPUs) are the dominant computing hardware for artificial intelligence systems. GPU performance is shown in [floating-point operations](#dod:flop) operations/second (FLOP/s) per US dollar, not adjusted for inflation.
         presentation:
           grapher_config:
             note: FLOP/s values refer to 32-bit (full) precision.
