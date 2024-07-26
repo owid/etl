@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 from owid.catalog import Dataset, Table, Variable, VariableMeta
 from owid.catalog.utils import underscore
 
