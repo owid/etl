@@ -17,6 +17,29 @@ LATEST_YEAR = 2020  # latest year for which data is available - to not include p
 
 REPRODUCTIVE_AGES = ["15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"]
 
+# regions where who data on maternal deaths is not reliable (see also https://docs.google.com/spreadsheets/d/1aCNKea-M489pOSLUpurQojEED3ATqnRZeTsSpTNXRA0/edit?gid=0#gid=0)
+WHO_REMOVE_REGIONS = [
+    "Israel",
+    "Suriname",
+    "Brazil",
+    "Trinidad and Tobago",
+    "Guyana",
+    "Puerto Rico",
+    "Guatemala",
+    "Dominican Republic",
+    "North America",
+    "Belize",
+    "Costa Rica",
+    "Chile",
+    "Jamaica",
+    "Russia",
+    "Thailand",
+    "Ecuador",
+    "Argentina",
+    "Colombia",
+    "Sao Tome and Principe",
+]
+
 
 def run(dest_dir: str) -> None:
     """Creates long running data set on maternal mortality combining following sources (in brackets - timeframes available for each source):
@@ -61,6 +84,8 @@ def run(dest_dir: str) -> None:
     tb_who_mortality = tb_who_mortality[tb_who_mortality["year"] <= LATEST_YEAR]
     # who data has a bunch of zeros, which seem to be missing data, so we replace them with NA
     tb_who_mortality["maternal_deaths"] = tb_who_mortality["maternal_deaths"].replace(0, pd.NA)
+    # remove regions with data we don't want to use
+    tb_who_mortality = tb_who_mortality[~tb_who_mortality["country"].isin(WHO_REMOVE_REGIONS)]
 
     # we need births from WPP
     tb_wpp_births = tb_wpp_births[
