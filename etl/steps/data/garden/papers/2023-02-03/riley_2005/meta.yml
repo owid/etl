@@ -17,7 +17,7 @@ dataset:
     - name: Riley (2005)
       url: https://doi.org/10.1111/j.1728-4457.2005.00083.x
       source_data_url: https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
-      owid_data_url: https://walden.owid.io/papers/2022-11-01/riley_2005.pdf
+      owid_data_url: https://walden.nyc3.digitaloceanspaces.com/papers/2022-11-01/riley_2005.pdf
       date_accessed: "2022-11-01"
       publication_date: "2005-10-21"
       publication_year: 2005

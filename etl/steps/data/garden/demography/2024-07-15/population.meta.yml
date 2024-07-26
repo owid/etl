@@ -104,24 +104,6 @@ tables:
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
 
           - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
-      growth_rate_smoothed:
-        title: Population growth rate (smoothed)
-        description_short: |
-          Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on subsequent years. Available from 1700 to 2100, based on data and estimates from different sources.
-        unit: "%"
-        short_unit: "%"
-        description_processing: |-
-          The data is constructed by combining data from multiple sources:
-
-          - 1700 BCE - 1799: Historical estimates by HYDE (v3.3).
-
-          - 1800 - 1949: Historical estimates by Gapminder (v7).
-
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
-
-          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
-
-          Data before 1900 has been smoothed using a 50-year moving average to reduce noise in the data.
 
   # Historical data
   historical:
@@ -178,24 +160,6 @@ tables:
         unit: "{tables.population_growth_rate.variables.growth_rate.unit}"
         short_unit: "{tables.population_growth_rate.variables.growth_rate.short_unit}"
 
-      growth_rate_smoothed_historical:
-        title: |-
-          {tables.population_growth_rate.variables.growth_rate_smoothed.title} (historical)
-        description_short: |-
-          Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on subsequent years. Available from 1700 to 2023, based on data and estimates from different sources.
-        description_processing: |-
-          The data is constructed by combining data from multiple sources:
-
-          - 1700 BCE - 1799: Historical estimates by HYDE (v3.3).
-
-          - 1800 - 1949: Historical estimates by Gapminder (v7).
-
-          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
-
-          Data before 1900 has been smoothed using a 50-year moving average to reduce noise in the data.
-        unit: "{tables.population_growth_rate.variables.growth_rate_smoothed.unit}"
-        short_unit: "{tables.population_growth_rate.variables.growth_rate_smoothed.short_unit}"
-
   # Projection data
   projections:
     common:
@@ -231,13 +195,6 @@ tables:
           Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on subsequent years. Available from 2024 to 2100, based on UN medium scenario projections.
         unit: "{tables.population_growth_rate.variables.growth_rate.unit}"
         short_unit: "{tables.population_growth_rate.variables.growth_rate.short_unit}"
-      growth_rate_smoothed_projection:
-        title: |-
-          {tables.population_growth_rate.variables.growth_rate_smoothed.title} (projections)
-        description_short: |-
-          Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1) where P1 and P2 are the populations on subsequent years. Available from 2024 to 2100, based on UN medium scenario projections.
-        unit: "{tables.population_growth_rate.variables.growth_rate_smoothed.unit}"
-        short_unit: "{tables.population_growth_rate.variables.growth_rate_smoothed.short_unit}"
 
 dataset:
   title: Population

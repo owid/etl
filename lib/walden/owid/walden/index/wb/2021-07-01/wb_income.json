@@ -12,6 +12,6 @@
   "md5": "35839e39566c48fd7019b53b7c2b7d93",
   "publication_year": 2021,
   "publication_date": "2021-07-01",
-  "owid_data_url": "https://walden.owid.io/wb/2021-07-01/wb_income.xlsx",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/wb/2021-07-01/wb_income.xlsx",
   "license_name": "CC BY 4.0"
 }

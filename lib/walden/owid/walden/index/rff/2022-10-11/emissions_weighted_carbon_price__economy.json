@@ -13,6 +13,6 @@
   "version": "2022-10-11",
   "publication_year": 2022,
   "publication_date": "2022-10-11",
-  "owid_data_url": "https://walden.owid.io/rff/2022-10-11/emissions_weighted_carbon_price__economy.zip",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/rff/2022-10-11/emissions_weighted_carbon_price__economy.zip",
   "md5": "815b4165346b2211d46927a37d64d70b"
 }

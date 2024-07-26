@@ -1,21 +1,35 @@
-from owid.catalog import Table, Variable
+from pathlib import Path
 
-from etl.helpers import PathFinder, create_dataset
+from owid import catalog
+from owid.catalog import Dataset, Table, Variable
 
-# naming conventions
-paths = PathFinder(__file__)
+CURRENT_DIR = Path(__file__).parent
+METADATA_PATH = CURRENT_DIR / "patents_articles.meta.yml"
+SHORT_NAME = "patents_wdi_unwpp"
+NAMESPACE = "research_development"
+VERSION = "2024-05-20"
 
 
 def run(dest_dir: str) -> None:
+    ds = Dataset.create_empty(dest_dir)
+
     # Create and add patents table
     table = make_table()
 
     # Set an appropriate index and sort conveniently
     table = table.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    table = Table(table, short_name=paths.short_name, underscore=True)
+    # Add table to dataset
+    ds.add(table)
 
-    create_dataset(dest_dir, tables=[table]).save()
+    # Add metadata to dataset.
+    ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
+    ds.metadata.short_name = SHORT_NAME
+    ds.metadata.namespace = NAMESPACE
+    ds.metadata.version = VERSION
+
+    # Save
+    ds.save()
 
 
 def make_table() -> Table:
@@ -25,19 +39,20 @@ def make_table() -> Table:
     table_population = load_key_indicators()
     # Combine sources
     table = make_combined(table_wdi, table_population)
+    table.update_metadata_from_yaml(METADATA_PATH, "patents_articles")
     return table
 
 
 def load_wdi() -> Table:
-    ds_garden_wdi = paths.load_dataset("wdi")
-    wdi = ds_garden_wdi["wdi"].reset_index()
-    wdi = wdi.loc[:, ["country", "year", "ip_pat_resd", "ip_jrn_artc_sc"]]
+    wdi = catalog.find_latest(dataset="wdi").reset_index()
+    wdi = wdi[["country", "year", "ip_pat_resd", "ip_jrn_artc_sc"]]
     return wdi
 
 
 def load_key_indicators() -> Table:
-    population = paths.load_dataset("population")["population"]
-    return population.reset_index().loc[:, ["country", "year", "population"]]
+    population = catalog.find_latest(dataset="population").reset_index()
+    population = population[["country", "year", "population"]]
+    return population
 
 
 def make_combined(table_wdi: Table, table_population: Table) -> Table:

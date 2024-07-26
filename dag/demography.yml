@@ -96,11 +96,10 @@ steps:
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
   ## Population doubling times
-  data://garden/demography/2024-07-18/population_doubling_times:
-    - data://garden/demography/2024-07-15/population
-  data://grapher/demography/2024-07-18/population_doubling_times:
-    - data://garden/demography/2024-07-18/population_doubling_times
-
+  data://garden/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-03-31/population
+  data://grapher/demography/2023-07-03/population_doubling_times:
+    - data://garden/demography/2023-07-03/population_doubling_times
   ## Population comparison
   data://garden/demography/2023-06-27/world_population_comparison:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
@@ -219,14 +218,3 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
-
-  # Migration UN DESA
-  data://meadow/un/2024-07-16/migrant_stock:
-    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
-  data://garden/un/2024-07-16/migrant_stock:
-    - data://meadow/un/2024-07-16/migrant_stock
-  data://grapher/un/2024-07-16/migrant_stock:
-    - data://garden/un/2024-07-16/migrant_stock

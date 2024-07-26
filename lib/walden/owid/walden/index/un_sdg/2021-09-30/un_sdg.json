@@ -11,6 +11,6 @@
   "md5": "76aa94b5e8c4e3716b88151438624ae0",
   "publication_year": 2021,
   "publication_date": "2021-09-30",
-  "owid_data_url": "https://walden.owid.io/un_sdg/2021-09-30/un_sdg.zip",
+  "owid_data_url": "http://nyc3.digitaloceanspaces.com/walden/un_sdg/2021-09-30/un_sdg.zip",
   "access_notes": "Fetched via API using this call: https://gist.github.com/spoonerf/e2d753ab7fd28066983c902f9cd5e060"
 }

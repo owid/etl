@@ -145,9 +145,6 @@ def run(dest_dir: str) -> None:
         if col not in ["country", "year"]:
             tb_women[col] *= 100
 
-    # Add share of men to the table
-    tb_women = add_men_share(tb=tb_women)
-
     # Merge women table with main table
     tb = pr.merge(tb, tb_women, on=["country", "year"], how="outer", short_name=paths.short_name)
 
@@ -220,21 +217,5 @@ def add_years_to_table_number_table(tb: Table, years: Dict[int, Dict[int, List[s
         # Assign specific years to countries
         for year, countries in years[original_year].items():
             tb.loc[(tb["year"] == original_year) & (tb["country"].isin(countries)), "year"] = year
-
-    return tb
-
-
-def add_men_share(tb: Table) -> Table:
-    """
-    Add share of men in homelessness to the table, by substracting the share of women from 100.
-    """
-
-    tb = tb.copy()
-
-    # Define the different column types for share_of_women
-    column_types = ["point_in_time_1_2_3", "flow_1_2_3", "flow_2_3", "point_in_time_2_3", "point_in_time_1"]
-
-    for col_type in column_types:
-        tb[f"share_of_men_{col_type}"] = 100 - tb[f"share_of_women_{col_type}"]
 
     return tb

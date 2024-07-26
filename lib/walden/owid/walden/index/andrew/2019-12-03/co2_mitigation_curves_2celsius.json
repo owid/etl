@@ -14,6 +14,6 @@
   "version": "2019-12-03",
   "publication_year": 2019,
   "publication_date": "2019-12-03",
-  "owid_data_url": "https://walden.owid.io/andrew/2019-12-03/co2_mitigation_curves_2celsius.csv",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/andrew/2019-12-03/co2_mitigation_curves_2celsius.csv",
   "md5": "cb695aa35203bcd8b55a10d59413d6eb"
 }

@@ -171,8 +171,6 @@ definitions:
 
   description_processing_years: We have included the years the data has been captured for each country, according to the source's notes. Whenever the data was captured over different years, we have included the latest year.
 
-  description_processing_men: We have estimated the share of people experiencing homelessness who are men by subtracting the share of people experiencing homelessness who are women from 100%.
-
   description_processing_10000_to_100000: We have transformed the data from homelessness per 10,000 population to homeless per 100,000 population.
 
 
@@ -478,124 +476,6 @@ tables:
           title_public: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
         display:
           name: Share of women as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      share_of_men_point_in_time_1_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1, 2 and 3)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.description_short_ethos_1_2_3} {definitions.description_short_point_in_time}"
-        description_processing: |-
-          {definitions.description_processing_men}
-
-          {definitions.description_processing_years}
-        description_key:
-          - "{definitions.ethos_1_2_3}"
-          - "{definitions.point_in_time_count}"
-          - "{definitions.harmonization}"
-          - "{definitions.gender_breakdown}"
-          - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
-          - "{definitions.methodology_issues}"
-          - "{definitions.country_notes}"
-        presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
-        display:
-          name: Share of men as a percentage of people experiencing homelessness (ETHOS 1, 2 and 3)
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      share_of_men_point_in_time_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_point_in_time}"
-        description_processing: |-
-          {definitions.description_processing_men}
-
-          {definitions.description_processing_years}
-        description_key:
-          - "{definitions.ethos_2_3}"
-          - "{definitions.point_in_time_count}"
-          - "{definitions.harmonization}"
-          - "{definitions.gender_breakdown}"
-          - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
-          - "{definitions.methodology_issues}"
-          - "{definitions.country_notes}"
-        presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 2 and 3)
-        display:
-          name: Share of men as a percentage of people experiencing homelessness (ETHOS 2 and 3)
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      share_of_men_point_in_time_1:
-        title: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.description_short_ethos_1} {definitions.description_short_point_in_time}"
-        description_processing: |-
-          {definitions.description_processing_men}
-
-          {definitions.description_processing_years}
-        description_key:
-          - "{definitions.ethos_1}"
-          - "{definitions.point_in_time_count}"
-          - "{definitions.harmonization}"
-          - "{definitions.gender_breakdown}"
-          - Data for the United Kingdom only considers England. Its gender breakdown refers to single adults with or without dependent children (ETHOS Light 2 and 3), in addition to individuals sleeping rough (ETHOS Light 1).
-          - "{definitions.methodology_issues}"
-          - "{definitions.country_notes}"
-        presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (point-in-time, ETHOS 1)
-        display:
-          name: Share of men as a percentage of people experiencing homelessness (ETHOS 1)
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      share_of_men_flow_1_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.description_short_ethos_1_2_3} {definitions.description_short_flow}"
-        description_processing: |-
-          {definitions.description_processing_men}
-
-          {definitions.description_processing_years}
-        description_key:
-          - "{definitions.ethos_1_2_3}"
-          - "{definitions.flow_count}"
-          - "{definitions.harmonization}"
-          - "{definitions.gender_breakdown}"
-          - "{definitions.methodology_issues}"
-          - "{definitions.country_notes}"
-        presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
-        display:
-          name: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 1, 2 and 3)
-          numDecimalPlaces: 0
-          <<: *display_common
-
-      share_of_men_flow_2_3:
-        title: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
-        unit: "%"
-        short_unit: "%"
-        description_short: "{definitions.description_short_ethos_2_3} {definitions.description_short_flow}"
-        description_processing: |-
-          {definitions.description_processing_men}
-
-          {definitions.description_processing_years}
-        description_key:
-          - "{definitions.ethos_2_3}"
-          - "{definitions.flow_count}"
-          - "{definitions.harmonization}"
-          - "{definitions.gender_breakdown}"
-          - "{definitions.methodology_issues}"
-          - "{definitions.country_notes}"
-        presentation:
-          title_public: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
-        display:
-          name: Share of men as a percentage of people experiencing homelessness (flow, ETHOS 2 and 3)
           numDecimalPlaces: 0
           <<: *display_common
 

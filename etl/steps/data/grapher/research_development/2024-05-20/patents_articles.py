@@ -1,31 +1,16 @@
-"""Load a garden dataset and create a grapher dataset."""
+from owid import catalog
 
+from etl.paths import DATA_DIR
 
-from etl.helpers import PathFinder, create_dataset
-
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
+DATASET_GARDEN = DATA_DIR / "garden/research_development/2024-05-20/patents_articles"
 
 
 def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load garden dataset.
-    ds_garden = paths.load_dataset("patents_articles")
+    garden_dataset = catalog.Dataset(DATASET_GARDEN)
+    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
 
-    # Read table from garden dataset.
-    tb = ds_garden["patents_articles"]
+    # Add population table to dataset
+    dataset.add(garden_dataset["patents_articles"])
 
-    #
-    # Save outputs.
-    #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
-
-    # NOTE: this is bad practice, dataset short_name should be always equal to the path
-    #   we should fix this in new version
-    ds_grapher.m.short_name = "patents_wdi_unwpp"
-
-    # Save changes in the new grapher dataset.
-    ds_grapher.save()
+    # Save dataset
+    dataset.save()

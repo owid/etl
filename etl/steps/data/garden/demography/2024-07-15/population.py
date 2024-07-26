@@ -10,7 +10,6 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
@@ -111,7 +110,6 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = make_table_growth_rate(
         tb_population=tb,
     )
-    tb_growth_rate = add_smoothed_growth_rate(tb_growth_rate)
 
     # Add population density
     tb_density = make_table_density(
@@ -381,21 +379,10 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
     sources = tb.loc[:, ["country", "year", "source"]].copy()
     tb = tb.drop(columns=["source"])
 
-    # Build table specifically for estimating regions: (1) no historical regions, (2) interpolation of country values
-
-    ## (1) remove historical regions
-    ## This is because it looks like historical countries are being considered when estimating values for regions.
-    tb_regions = ds_regions["regions"]
-    historical_regions = set(tb_regions.loc[tb_regions["is_historical"], "name"])
-    tb_aggregates = tb.loc[~tb["country"].isin(historical_regions)].copy()
-
-    ## (2) interpolate population for countries
-    tb_aggregates = geo.interpolate_table(tb_aggregates, "country", "year")
-
     # re-estimate region aggregates
     aggregations = {"population": "sum"}
-    tb_aggregates = geo.add_regions_to_table(
-        tb=tb_aggregates,
+    tb = geo.add_regions_to_table(
+        tb=tb,
         regions=regions,
         aggregations=aggregations,
         ds_regions=ds_regions,
@@ -426,6 +413,9 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "Indonesia",
                 "Russia",
                 "Mexico",
+                "Vietnam",
+                "Philippines",
+                "Iran",
             ],
             "Lower-middle-income countries": [
                 "India",
@@ -435,21 +425,15 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
                 "Philippines",
                 "Egypt",
                 "Kenya",
-                "Philippines",
-                "Vietnam",
-                "Iran",
             ],
             "Low-income countries": [
                 "Ethiopia",
                 "Democratic Republic of Congo",
+                "Congo",
                 "Uganda",
             ],
         },
     )
-    tb_aggregates = tb_aggregates.loc[tb_aggregates["country"].isin(regions)]
-
-    # Add historical countries back
-    tb = pr.concat([tb, tb_aggregates], ignore_index=True)
 
     # tb = tb.loc[
     #     (
@@ -709,33 +693,6 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
-    return tb
-
-
-def add_smoothed_growth_rate(tb: Table) -> Table:
-    """Smooth growth rate (pre-1900) with 50-year rolling average."""
-    # Separate the data for years before 1900
-    tb_before_1900 = tb.loc[tb["year"] < 1900]
-
-    # Reindex to ensure all years from 1700 to 1900 are included for each country
-    countries = tb_before_1900["country"].unique()
-    years = range(1700, 1900)
-    tb_before_1900 = (
-        tb_before_1900.set_index(COLUMNS_INDEX)
-        .reindex(pd.MultiIndex.from_product([countries, years], names=COLUMNS_INDEX))
-        .sort_index()
-        .reset_index()
-    )
-
-    # Apply the 50-year rolling average within each country group
-    tb_before_1900["growth_rate"] = tb_before_1900.groupby("country", as_index=False)["growth_rate"].transform(
-        lambda x: x.rolling(window=50, min_periods=1, center=True).mean()
-    )
-
-    # Merge back to growth rate table
-    tb = tb.merge(tb_before_1900, on=COLUMNS_INDEX, suffixes=("", "_smoothed"), how="left")
-    tb["growth_rate_smoothed"] = tb["growth_rate_smoothed"].fillna(tb["growth_rate"])
-
     return tb
 
 

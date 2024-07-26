@@ -15,6 +15,6 @@
   "publication_date": "2022-06-01",
   "source_url": "https://stats.oecd.org/OECDStat_Metadata/ShowMetadata.ashx?Dataset=REGION_SOCIAL&Lang=en",
   "source_data_url": "https://stats.oecd.org/wbos/fileview2.aspx?IDFile=db68c5c3-5fd5-465c-b25b-b50aa14c2da1",
-  "owid_data_url": "https://walden.owid.io/oecd/2022-06-01/territorial_grid/OECD%20Territorial%20grid%20and%20Regional%20typologies%20-%20June%202022%20-%20sent.xlsx",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/oecd/2022-06-01/territorial_grid/OECD%20Territorial%20grid%20and%20Regional%20typologies%20-%20June%202022%20-%20sent.xlsx",
   "md5": "aeb9afeaf863ebdc60e3f596a262eecd"
 }

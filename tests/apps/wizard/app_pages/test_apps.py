@@ -80,9 +80,8 @@ def test_app_indicator_upgrade():
     # Click on Next (1/3)
     _pick_button_by_label(at, "Next (1/3)").click().run()
 
-    # NOTE: default datasets might return `It looks as the dataset 6378 has no indicator in use in any chart! Therefore, no mapping is needed.`
     # Click on Next (2/3)
-    # _pick_button_by_label(at, "Next (2/3)").click().run()
+    _pick_button_by_label(at, "Next (2/3)").click().run()
 
     assert not at.exception
 

@@ -13,6 +13,6 @@
   "version": "2017-01-01",
   "publication_year": 2017,
   "publication_date": "2017-01-01",
-  "owid_data_url": "https://walden.owid.io/smil/2017-01-01/global_primary_energy.csv",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/smil/2017-01-01/global_primary_energy.csv",
   "md5": "ebb24fa147511d78f4c11cf63bea0a91"
 }

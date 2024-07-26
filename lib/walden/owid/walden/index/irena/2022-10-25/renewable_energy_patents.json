@@ -13,6 +13,6 @@
   "version": "2022-10-25",
   "publication_year": 2021,
   "publication_date": "2021-12-19",
-  "owid_data_url": "https://walden.owid.io/irena/2022-10-25/renewable_energy_patents.csv",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/irena/2022-10-25/renewable_energy_patents.csv",
   "md5": "3f16d91fbfa7eaac688ab402fed5b2cf"
 }

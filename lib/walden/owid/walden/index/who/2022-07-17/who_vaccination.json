@@ -12,6 +12,6 @@
   "is_public": true,
   "version": "2022-07-17",
   "publication_date": "2022-07-17",
-  "owid_data_url": "https://walden.owid.io/who/2022-07-17/who_vaccination.xlsx",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/who/2022-07-17/who_vaccination.xlsx",
   "md5": "a4d816879793a6f9663009e83e901791"
 }

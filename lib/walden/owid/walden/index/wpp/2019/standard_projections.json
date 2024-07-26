@@ -7,7 +7,7 @@
   "source_name": "United Nations",
   "publication_year": 2019,
   "url": "https://population.un.org/wpp2019/Download/Standard/Population/",
-  "owid_data_url": "https://walden.owid.io/wpp/2019/WPP2019.zip",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/wpp/2019/WPP2019.zip",
   "file_extension": "zip",
   "date_accessed": "2021-10-08",
   "license_url": "https://data.un.org/Host.aspx?Content=UNdataUse",

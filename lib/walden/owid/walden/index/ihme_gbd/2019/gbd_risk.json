@@ -11,6 +11,6 @@
   "is_public": true,
   "version": "2019",
   "publication_year": 2019,
-  "owid_data_url": "https://walden.owid.io/ihme_gbd/2019/gbd_risk.feather",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/ihme_gbd/2019/gbd_risk.feather",
   "md5": "1cc78351acd8d1dcea960880ac87ce26"
 }

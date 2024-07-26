@@ -15,16 +15,6 @@ ADMIN_GRAPHER_USER_ID = 1
 log = get_logger()
 
 
-# Some datasets like COVID or certain AI datasets use {TODAY} in their metadata, making the metadata dependent
-# on the creation date. Merging a day later results in many metadata changes. The current workaround is to
-# exclude these datasets from comparison, similar to what we do for data-diff.
-EXCLUDE_METADATA_CHANGES = [
-    "grapher/covid/latest",
-    "grapher/climate/.*/surface_temperature_annual_average",
-    "grapher/artificial_intelligence/.*/epoch",
-]
-
-
 class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
@@ -422,12 +412,6 @@ class ChartDiff:
         # If checksum has not been filled yet, assume unchanged
         checksums_diff[checksums_target.isna()] = False
 
-        # If the chart was updated by indicator upgrader, then variables in both charts will have different
-        # variable ids (and catalog paths). We don't want to label these as data or metadata changes, as they
-        # will be labaled as config change (if the change was done on the staging server). This helps with
-        # false positives when rebasing PRs.
-        checksums_diff[checksums_source.isna()] = False
-
         return checksums_diff
 
 
@@ -587,11 +571,6 @@ def _modified_data_metadata_by_admin(
             "metadataEdited": source_df.metadataChecksum != target_df.metadataChecksum,
         }
     )
-
-    # Exclude metadata changes for certain datasets
-    for ex in EXCLUDE_METADATA_CHANGES:
-        ix = diff.index.get_level_values("catalogPath").str.contains(ex)
-        diff.loc[ix, "metadataEdited"] = False
 
     diff = diff.groupby("chartId").any()
 

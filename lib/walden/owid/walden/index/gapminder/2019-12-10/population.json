@@ -10,7 +10,7 @@
   "publication_year": 2019,
   "file_extension": "xlsx",
   "source_data_url": "https://gapm.io/dl_popv6",
-  "owid_data_url": "https://walden.owid.io/gapminder/2019-12-10/popv6.xlsx",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/gapminder/2019-12-10/popv6.xlsx",
   "md5": "da45e276780dbda314ebeefb8b8fd8c9",
   "license_url": "https://www.gapminder.org/data/documentation/gd003/"
 }

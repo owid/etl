@@ -7,7 +7,7 @@ from owid.datautils import s3
 
 
 def test_s3_path_to_bucket_key():
-    url = "https://walden.owid.io/a/test.csv"
+    url = "https://walden.nyc3.digitaloceanspaces.com/a/test.csv"
     assert s3.s3_path_to_bucket_key(url) == ("walden", "a/test.csv")
 
     url = "s3://walden/a/test.csv"

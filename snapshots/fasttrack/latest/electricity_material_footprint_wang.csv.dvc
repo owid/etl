@@ -6,11 +6,11 @@ meta:
     url_main: https://thebreakthrough.org/issues/energy/updated-mining-footprints-and-raw-material-needs-for-clean-energy
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTQyVJx22AzXYK66CpIpfZoJRTWhCqlDKjGFpl_pIyNdV89rxVVW-DJ34HTKP4Q5ha-VphKMMvTdVgB/pub?output=csv
-    date_accessed: '2024-07-24'
+    date_accessed: '2024-07-16'
   name: Material footprint of electricity (Wang et al. 2024)
   description: Material footprint of electricity sources, measured with and without waste rock from mining.
   license: {}
 outs:
-  - md5: 1c591d1f8a19d8c5ad47d5631c1c10fd
-    size: 364
+  - md5: 81b8006447d5d305a8e632f730659b79
+    size: 360
     path: electricity_material_footprint_wang.csv

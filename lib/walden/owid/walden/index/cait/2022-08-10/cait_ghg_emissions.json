@@ -14,6 +14,6 @@
   "version": "2022-08-10",
   "publication_year": 2022,
   "publication_date": "2022-06-07",
-  "owid_data_url": "https://walden.owid.io/cait/2022-08-10/cait_ghg_emissions.json.gz",
+  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/cait/2022-08-10/cait_ghg_emissions.json.gz",
   "md5": "b95309e805129f50010594873499648b"
 }
