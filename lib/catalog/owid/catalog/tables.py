@@ -1895,7 +1895,6 @@ def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[
     return [t[col] for col in cols]  # type: ignore
 
 
-
 def read_df(
     df: pd.DataFrame,
     metadata: Optional[TableMeta] = None,
@@ -1921,6 +1920,7 @@ def read_df(
     table = Table(df, underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
+
 
 def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callable[..., Union[Table, Variable]]:
     """Decorator that turns a function that works on DataFrame or Series into a function that works
