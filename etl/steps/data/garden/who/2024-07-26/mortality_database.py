@@ -15,10 +15,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("mortality_database")
-
-    # Read table from meadow dataset.
-    tb = ds_meadow["mortality_database"]
-    tb = tb.reset_index()
+    tb = ds_meadow.read_table("mortality_database")
     #
     # Process data.
     #
@@ -41,7 +38,6 @@ def tidy_causes_dimension(tb: Table) -> Table:
     """
     cause_dict = {"Diabetes mellitus and endocrine disorders": "Diabetes mellitus, blood and endocrine disorders"}
     tb["cause"] = tb["cause"].cat.rename_categories(lambda x: cause_dict.get(x, x))
-    # tb["cause"] = tb["cause"].replace(cause_dict, regex=False)
     return tb
 
 
@@ -50,7 +46,6 @@ def tidy_sex_dimension(tb: Table) -> Table:
     Improve the labelling of the sex column
     """
     sex_dict = {"All": "Both sexes", "Female": "Females", "Male": "Males", "Unknown": "Unknown sex"}
-    # tb["sex"] = tb["sex"].replace(sex_dict, regex=False)
     tb["sex"] = tb["sex"].cat.rename_categories(lambda x: sex_dict.get(x, x))
     return tb
 
@@ -80,6 +75,5 @@ def tidy_age_dimension(tb: Table) -> Table:
         "[All]": "all ages",
     }
 
-    # tb["age_group"] = tb["age_group"].replace(age_dict, regex=False)
     tb["age_group"] = tb["age_group"].cat.rename_categories(lambda x: age_dict.get(x, x))
     return tb
