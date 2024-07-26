@@ -28,10 +28,8 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns="broad_cause_group")
     tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
-    ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, tb=tb)
-
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=False, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb], check_variables_metadata=False, default_metadata=ds_meadow.metadata
     )
     # Save changes in the new garden dataset.
     ds_garden.save()
