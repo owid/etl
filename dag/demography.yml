@@ -223,3 +223,5 @@ steps:
     - snapshot://un/2024-07-25/refugee_data.zip
   data://garden/un/2024-07-25/refugee_data:
     - data://meadow/un/2024-07-25/refugee_data
+  data://meadow/un/2024-07-25/resettlement:
+    - snapshot://un/2024-07-25/resettlement.zip

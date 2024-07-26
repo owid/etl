@@ -5,55 +5,73 @@ definitions:
       topic_tags:
         - Migration
         - War & Peace
+    unit: people
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+  description_international_protection: Other people in need of international protection refers to people who are outside their country or territory of origin, typically because they have been forcibly displaced across international borders, who have not been reported under other categories (asylum-seekers, refugees, people in refugee-like situations) but who likely need international protection, including protection against forced return, as well as access to basic services on a temporary or longer-term basis.
+  description_interally_displaced: Internally displaced persons (IDPs) are persons or groups of persons who have been forced or obliged to flee or to leave their homes or places of habitual residence, in particular as a result of, or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized State border. For the purposes of UNHCR’s statistics, this population includes only conflict-generated IDPs to whom the Office extends protection and/or assistance. The IDP population also includes people in an IDP-like situation.
+  description_stateless: |-
+    Individuals under UNHCR’s statelessness mandate are defined under the 1954 Convention Relating to the Status of Stateless People as those not considered as nationals by any State under the operation of its law. In other words, they do not possess the nationality of any State. UNHCR statistics refer to people who fall under the organization’s statelessness mandate as those who are stateless according to this international definition. Data from some countries may also include people with undetermined nationality. These are people who lack proof of possession of any nationality and at the same time have or are regarded as having important links to more than one State. UNHCR also works with populations at risk of statelessness, but persons at risk of statelessness are not reported on under the statistical category of individuals under UNHCR’s statelessness mandate.
+  description_asylum: |-
+    Persons who have filed an application for asylum in a country other than their own and whose claims have not yet been determined.
+    These include those filing primary applications or subsequent applications following an appeal. The date on which the application for asylum is filed marks their entry into the status of asylum seeker.
+    They remain in the status of asylum seeker until their application is considered and adjudicated.
+  description_refugee: |-
+    Refugees include individuals recognized under the 1951 Convention relating to the Status of Refugees, its 1967 Protocol, the 1969 Organization of African Unity (OAU) Convention Governing the Specific Aspects of Refugee Problems in Africa, the refugee definition contained in the 1984 Cartagena Declaration on Refugees as incorporated into national laws, those recognized in accordance with the UNHCR Statute, individuals granted complementary forms of protection, and those enjoying temporary protection. The refugee population also includes people in refugee-like situations.
+  description_host_community: |-
+    Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently. UNHCR reports on host communities in countries with substantive programmes focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
+  description_other_concern: |-
+   Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of the other groups (refugees, asylum-seekers, stateless persons, internally displaced persons) but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 180
 
 
 tables:
   refugee_data:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      refugees_under_unhcrs_mandate_origin:
+        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country of origin.
+        description_from_producer: "{description_refugee}"
+      asylum_seekers_origin:
+        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin.
+        description_from_producer: "{description_asylum}"
+      idps_of_concern_to_unhcr_origin:
+        description_short: Number of internally displaced persons (IDPs) of concern to UNHCR within a country.
+        description_from_producer: "{description_interally_displaced}"
+      other_people_in_need_of_international_protection_origin:
+        # TODO: add DoDs
+        description_short: Number of people in need of international protection in all regions by the country of origin.
+        description_from_producer: "{description_international_protection}"
+      stateless_persons_origin:
+        description_short: Number of stateless persons by the country of origin.
+        description_from_producer: "{description_stateless}"
+
+      host_community_origin:
+        description_from_producer: "{description_host_community}"
+      others_of_concern_origin:
+        description_from_producer: "{description_other_concern}"
+
+      refugees_under_unhcrs_mandate_asylum:
+        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in.
+        description_from_producer: "{description_refugee}"
+      asylum_seekers_asylum:
+        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in.
+        description_from_producer: "{description_asylum}"
+      idps_of_concern_to_unhcr_asylum:
+        description_short: Number of internally displaced persons (IDPs) of concern to UNHCR within a country.
+        description_from_producer: "{description_interally_displaced}"
+      other_people_in_need_of_international_protection_asylum:
+        description_short: Number of people in need of international protection in all regions by the country they live in.
+        description_from_producer: "{description_international_protection}"
+      stateless_persons_asylum:
+        description_short: Number of stateless persons by the country they live in.
+        description_from_producer: "{description_stateless}"
+
+      host_community_asylum:
+        description_from_producer: "{description_host_community}"
+      others_of_concern_asylum:
+        description_from_producer: "{description_other_concern}"
 
