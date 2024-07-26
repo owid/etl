@@ -18,7 +18,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 31
-  title: COVID-19 confirmed cases and deaths
+  title: COVID-19, confirmed cases and deaths
 
 tables:
   cases_deaths:
