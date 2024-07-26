@@ -33,12 +33,12 @@ tables:
         unit: US$
         short_unit: $
         description_short: The price of the GPU at the time of its release.
-        description_from_producer: Whenever available, the producer uses the release price of the hardware, adjust it for inflation and assume a two-year amortization time as detailed in Cotra (2020).
+        description_from_producer: The release price of the hardware is not adjusted for inflation.
 
       comp_performance_per_dollar:
         title: GPU computational performance per dollar
         unit: FLOP/s/$
-        description_short: The number of floating-point operations per second that can be performed for every US dollar spent on the GPU.
+        description_short: Graphics processing units (GPUs) are the dominant computing hardware for artificial intelligence systems. GPU performance is shown in [floating-point operations](#dod:flop) operations/second (FLOP/s) per US dollar,
         presentation:
           grapher_config:
             note: FLOP/s values refer to 32-bit (full) precision.
