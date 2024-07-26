@@ -1,0 +1,42 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      grapher_config:
+        note: Number of respondents ranges between n = 460 and n = 533 US working adults per survey wave.
+
+    description_key:
+      - Respondents were asked, "How worried, if it all, are you that your type of work could be automated within your lifetime?".
+      - Possible responses were "Very worried", "Fairly worried", "Not very worried", "Not worried at all", and "Don't know".
+    description_short: Survey respondents were asked, "How worried, if it all, are you that your type of work could be automated within your lifetime?"
+    unit: '%'
+    short_unit: '%'
+    display:
+      numDecimalPlaces: 1
+      zeroDay: '2021-01-01'
+      yearIsDay: true
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 180
+tables:
+  yougov_job_automation:
+    variables:
+      dont_know:
+        title: Don't know
+
+      fairly_worried:
+        title: Fairly worried
+
+      not_very_worried:
+        title: Not very worried
+
+      not_worried_at_all:
+        title: Not worried at all
+
+      very_worried:
+        title: Very worried

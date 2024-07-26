@@ -81,27 +81,12 @@ steps:
 
   # Artificial Intelligence Papers with Code (benchmarks)
   # ImageNet
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
-  # Math & Code and Language
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
-  # Atari
-  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
-    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
-  # All benchmarks combined
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
-    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
-  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
-  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
-    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
+  data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2024-07-23/papers_with_code_imagenet.html
+  data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet
 
   # AI Index report
 
@@ -169,19 +154,19 @@ steps:
     - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
 
   # YouGov AI surveys
-  data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
-    - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
-  data://garden/artificial_intelligence/2024-01-30/yougov_robots:
-    - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
-  data://grapher/artificial_intelligence/2024-01-30/yougov_robots:
-    - data://garden/artificial_intelligence/2024-01-30/yougov_robots
+  data://meadow/artificial_intelligence/2024-07-23/yougov_robots:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_robots
+  data://grapher/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_robots
 
-  data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation:
-    - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
-  data://garden/artificial_intelligence/2024-01-30/yougov_job_automation:
-    - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
-  data://grapher/artificial_intelligence/2024-01-30/yougov_job_automation:
-    - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation
+  data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_job_automation
 
   data://meadow/artificial_intelligence/2023-06-08/yougov_jobs:
     - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
@@ -204,7 +189,6 @@ steps:
     - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
   data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
     - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
-
 
  # CSET data on articles, patents and investment
   data://meadow/artificial_intelligence/2023-07-25/cset:
@@ -263,26 +247,26 @@ steps:
 
   # AI Index Report 2024 - Conference Attendance
   data://garden/artificial_intelligence/2024-06-28/ai_conferences:
-     - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_conferences.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_conferences:
     - data://garden/artificial_intelligence/2024-06-28/ai_conferences
 
   # AI Index Report 2024 - Incidents
   data://garden/artificial_intelligence/2024-06-28/ai_incidents:
-     - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_incidents.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_incidents:
     - data://garden/artificial_intelligence/2024-06-28/ai_incidents
 
   # AI Index Report 2024 - AI job postings
   data://garden/artificial_intelligence/2024-06-28/ai_jobs:
-     - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_jobs.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_jobs:
     - data://garden/artificial_intelligence/2024-06-28/ai_jobs
 
   # AI Index Report 2024 - AI investment trends
   data://garden/artificial_intelligence/2024-06-28/ai_investment:
-     - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
-     - data://garden/bls/2024-05-16/us_consumer_prices
+    - snapshot://artificial_intelligence/2024-06-28/ai_investment.csv
+    - data://garden/bls/2024-05-16/us_consumer_prices
 
   # Grapher dataset for private investment in AI
   data://grapher/artificial_intelligence/2024-06-28/ai_private_investment:
@@ -298,7 +282,7 @@ steps:
 
   # AI Index Report 2024 - AI robots
   data://garden/artificial_intelligence/2024-06-28/ai_robots:
-     - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
+    - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
 
@@ -320,3 +304,14 @@ steps:
     - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_phds:
     - data://garden/artificial_intelligence/2024-06-28/ai_phds
+
+  # CSET data on articles, patents and investment
+  data://meadow/artificial_intelligence/2024-07-16/cset:
+    - snapshot://artificial_intelligence/2024-07-16/cset.csv
+  data://garden/artificial_intelligence/2024-07-16/cset:
+    - data://meadow/artificial_intelligence/2024-07-16/cset
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/bls/2024-05-16/us_consumer_prices
+  data://grapher/artificial_intelligence/2024-07-16/cset:
+    - data://garden/artificial_intelligence/2024-07-16/cset
