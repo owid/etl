@@ -14,6 +14,6 @@
   "is_public": true,
   "version": "2022-10-29",
   "publication_year": 2022,
-  "owid_data_url": "https://walden.nyc3.digitaloceanspaces.com/wb/2022-10-29/wb_gender.zip",
+  "owid_data_url": "https://walden.owid.io/wb/2022-10-29/wb_gender.zip",
   "md5": "13b79aadd4dc5ffdd39aa6408a7dbf07"
 }

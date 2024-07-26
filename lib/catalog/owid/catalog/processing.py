@@ -4,6 +4,7 @@
 from .tables import (
     ExcelFile,
     concat,
+    keep_metadata,
     melt,
     merge,
     multi_merge,
@@ -20,6 +21,7 @@ from .tables import (
     read_rda,
     read_rds,
     read_stata,
+    to_numeric,
 )
 
 __all__ = [
@@ -41,4 +43,6 @@ __all__ = [
     "read_rda",
     "read_rds",
     "read_df",
+    "to_numeric",
+    "keep_metadata",
 ]

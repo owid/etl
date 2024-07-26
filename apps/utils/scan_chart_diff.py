@@ -51,6 +51,9 @@ def cli(dry_run: bool) -> None:
             if "Unknown database" in str(e):
                 log.warning("scan-chart-diff.unknown-database", pr=pr)
                 continue
+            if "Unknown column" in str(e):
+                log.warning("scan-chart-diff.unknown-column", pr=pr)
+                continue
             if "Can't connect to MySQL server" in str(e):
                 log.warning("scan-chart-diff.cant-connect", pr=pr)
                 continue

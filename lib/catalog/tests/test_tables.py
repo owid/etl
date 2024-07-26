@@ -20,6 +20,7 @@ from owid.catalog.tables import (
     Table,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
+    keep_metadata,
 )
 from owid.catalog.variables import Variable
 
@@ -275,7 +276,7 @@ def mock_table() -> Table:
 
 
 def test_load_csv_table_over_http() -> None:
-    Table.read_csv("http://owid-catalog.nyc3.digitaloceanspaces.com/reference/countries_regions.csv")
+    Table.read_csv("https://catalog.ourworldindata.org/reference/countries_regions.csv")
 
 
 def test_rename_columns() -> None:
@@ -1175,3 +1176,22 @@ def test_bfill_with_number(table_1) -> None:
 def test_fillna_error(table_1: Table) -> None:
     with pytest.raises(ValueError):
         table_1["a"].fillna()
+
+
+def test_keep_metadata_dataframe(table_1: Table) -> None:
+    @keep_metadata
+    def rolling_sum(df: pd.DataFrame) -> pd.DataFrame:
+        return df.rolling(window=2, min_periods=1).sum()
+
+    tb = rolling_sum(table_1[["a", "b"]])
+    assert list(tb.a) == [1.0, 3.0, 5.0]
+    assert tb.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_keep_metadata_series(table_1: Table) -> None:
+    @keep_metadata
+    def to_numeric(s: pd.Series) -> pd.Series:
+        return pd.to_numeric(s)
+
+    table_1.a = to_numeric(table_1.a)
+    assert table_1.a.m.title == "Title of Table 1 Variable a"
