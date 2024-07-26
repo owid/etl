@@ -20,7 +20,7 @@ tables:
     variables:
       number:
         title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
-        description_short: Total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
+        description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
         unit: deaths
         display:
           numDecimalPlaces: 0
@@ -30,7 +30,7 @@ tables:
               {definitions.footnote}
       percentage_of_cause_specific_deaths_out_of_total_deaths:
         title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
-        description_short: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
+        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
         unit: "%"
         short_unit: "%"
         display:
@@ -41,7 +41,7 @@ tables:
               {definitions.footnote}
       age_standardized_death_rate_per_100_000_standard_population:
         title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people
-        description_short: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
+        description_short: Reported age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
@@ -51,7 +51,7 @@ tables:
               {definitions.footnote}
       death_rate_per_100_000_population:
         title: Deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>
-        description_short: Deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>.
+        description_short: Reported deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>.
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
