@@ -27,7 +27,8 @@ def run(dest_dir: str) -> None:
     tb = tidy_age_dimension(tb)
     tb = tidy_causes_dimension(tb)
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
+    tb = tb.drop(columns="broad_cause_group")
+    tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
     ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, tb=tb)
 
     # Save changes in the new garden dataset.
