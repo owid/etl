@@ -653,7 +653,7 @@ def add_population_to_dataframe(
 
 
 def interpolate_table(
-    df: TableOrDataFrame, country_col: str, year_col: str, all_years: bool = False
+    df: TableOrDataFrame, country_col: str, time_col: str, all_years: bool = False
 ) -> TableOrDataFrame:
     """Interpolate missing values in a column linearly.
 
@@ -668,15 +668,15 @@ def interpolate_table(
     # Optionally fill missing years linearly.
     countries_in_data = df[country_col].unique()
     if all_years:
-        min_year = df[year_col].min()
-        max_year = df[year_col].max()
+        min_year = df[time_col].min()
+        max_year = df[time_col].max()
         years_in_data = range(min_year, max_year + 1)
     else:
-        years_in_data = df[year_col].unique()
+        years_in_data = df[time_col].unique()
 
     df = (
-        df.set_index([country_col, year_col])
-        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col]))  # type: ignore
+        df.set_index([country_col, time_col])
+        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
         .sort_index()
     )
 

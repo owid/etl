@@ -211,6 +211,7 @@ nav:
       - Using different environments: "guides/environment.md"
       - Staging servers: "guides/staging-servers.md"
       - Private dataset import to ETL: "guides/private-import.md"
+      - Automate regular updates: "guides/auto-regular-updates.md"
       - Backport a dataset to ETL: "guides/backport.md"
       - Metadata in data pages: "guides/metadata-play.md"
       - Edit the documentation: "dev/docs.md"
