@@ -109,7 +109,7 @@ class ChartDiffConflictResolver:
             options=[1, 2],
             captions=["Insert production config", "Insert staging config"],
             format_func=lambda x: ENVIRONMENT_IDS[x],
-            key=f"conflict-radio-{field['key']}",
+            key=f"conflict-radio-{field['key']}-{self.diff.chart_id}",
             horizontal=True,
             label_visibility="collapsed",
         )
@@ -125,7 +125,7 @@ class ChartDiffConflictResolver:
             placeholder=f"This field is not present in {ENVIRONMENT_IDS[choice]}!" if is_none else "",
             help="Edit the final config here. When cliking on 'Resolve conflicts', this value will be used to update the chart config.",
             disabled=is_none,
-            key=f"conflict-editor-{field['key']}",
+            key=f"conflict-editor-{field['key']}-{self.diff.chart_id}",
         )
 
     def resolve_conflicts(self, rerun: bool = False):

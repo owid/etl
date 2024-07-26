@@ -203,6 +203,7 @@ class ChartDiffShow:
             st.warning("This is under development! Find below a form with the different fields that present conflicts.")
         with col2:
             st.button(
+                key=f"resolve-conflicts-{self.diff.chart_id}",
                 label="⚠️ Mark as resolved: Accept all changes from staging",
                 help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useul if you're happy with the changes in staging as they are.",
                 on_click=_mark_as_resolved,
@@ -223,7 +224,7 @@ class ChartDiffShow:
             st.button(
                 "Resolve conflicts",
                 help="Click to resolve the conflicts and update the chart config.",
-                key="resolve-conflicts-btn",
+                key=f"resolve-conflicts-btn-{self.diff.chart_id}",
                 type="primary",
                 on_click=lambda r=resolver: _resolve_conflicts(r),
             )
