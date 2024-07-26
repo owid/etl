@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["anthromes"].reset_index()
     tb_input = ds_meadow_input["anthromes_input"].reset_index().drop(columns=["pot_veg", "pot_vll"])
     # Bit of a hack as the metadata for tb_input is not passed though when opening the shapefile
-    tb_input.metadata = tb.metadata
+    tb_input = tb_input.copy_metadata(tb)
 
     land_areas = calculate_regional_land_areas(tb_input)
 
@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     tb_combined = underscore_table(tb_combined)
     tb_combined = add_aggregate_land_types(tb_combined)
     # Save outputs.
-    tb_combined.metadata = tb_input.metadata
+    tb_combined = tb_combined.copy_metadata(tb_input)
     tb_combined = tb_combined.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
