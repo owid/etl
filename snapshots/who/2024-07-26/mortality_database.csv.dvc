@@ -15,7 +15,7 @@ meta:
     date_published: "2024-02-21"
 
     # Citation
-    producer: World Health Organization
+    producer: WHO Mortality Database
     citation_full: |-
       WHO Mortality Database, Data, Analytics & Delivery for impact (DDI), World Health Organization (2024)
     attribution_short: WHO
