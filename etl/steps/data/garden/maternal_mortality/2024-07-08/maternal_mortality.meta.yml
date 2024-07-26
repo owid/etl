@@ -6,15 +6,15 @@ definitions:
         The WHO Mortality Database and Gapminder contain reported figures from countries, and are likely to underestimate the true maternal mortality figures. The UN MMEIG aims to estimates the true rate, by adjusting for underreporting and misclassification. Sudden jumps in mortality rate in 1985 are a consequence of switching data sources (from reported to estimated figures).
       - For the years between 1950 - 1985 we calculated the maternal mortality ratio and maternal mortality rate based
         on the number of maternal deaths from the WHO mortality database and live births and female population of reproductive age from the UN WPP.
+      - Where the reported maternal deaths in the WHO Mortality Database differed significantly from the estimated figures in the UN MMEIG data, we opted not to include them.
       - Where a data point is attached to a range of years in the Gapminder data set, we used the midpoint of the range.
       - The UN MMEIG data shown (post 1985) is the point estimate - this means there is a 50% chance that the true measure lies above this point,
         and a 50% chance that the true value lies below this point.
-      - We calculated regional aggregates by summing the maternal deaths and live births
-        of all countries in the region and then calculating the MMR based on these figures.
+      - We calculated regional aggregates by summing the maternal deaths and live births of all countries in the region and then calculating the MMR based on these figures.
     presentation:
       grapher_config:
         note: |-
-          Prior to 1985, only reported data are available, which are likely to underestimate the true maternal mortality rate. From 1985, estimates are shown, which aim to adjust for underreporting and misclassification. Sudden changes do not necessarily reflect an underlying increase.
+          Prior to 1985, only reported data are available, which are likely to underestimate the true maternal mortality rate. From 1985, estimates are shown, which aim to adjust for underreporting and misclassification.
   description_maternal_mortality: |-
     Maternal deaths are defined as a death of a woman while pregnant or within 42 days of termination of pregnancy, irrespective of the duration and site of pregnancy,
     from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.

@@ -11,7 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"] + ["World"]
+REGIONS = [reg for reg in geo.REGIONS.keys() if reg not in ["European Union (27)", "North America"]] + ["World"]
 
 LATEST_YEAR = 2020  # latest year for which data is available - to not include predictions from UN WPP
 
@@ -27,7 +27,6 @@ WHO_REMOVE_REGIONS = [
     "Puerto Rico",
     "Guatemala",
     "Dominican Republic",
-    "North America",
     "Belize",
     "Costa Rica",
     "Chile",
