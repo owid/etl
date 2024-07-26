@@ -6,8 +6,6 @@ definitions:
         - Causes of Death
     processing_level: minor
     description_key: ["The ICD 10 codes that define this cause of death are << icd10_codes  >>."]
-  footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -24,10 +22,6 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
       percentage_of_cause_specific_deaths_out_of_total_deaths:
         title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
         description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
@@ -35,10 +29,6 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
       age_standardized_death_rate_per_100_000_standard_population:
         title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people
         description_short: Reported age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
@@ -48,14 +38,10 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              {definitions.footnote}
+              To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
       death_rate_per_100_000_population:
         title: Deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>
         description_short: Reported deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>.
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
