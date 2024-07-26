@@ -1,5 +1,4 @@
 ---
-status: new
 tags:
   - 👷 Staff
 ---

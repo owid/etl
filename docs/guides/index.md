@@ -26,13 +26,19 @@ In this section you will find guides for different use cases and tasks you might
 
     It provides various tools to create ETL steps, improve existing ones, and more.
 
--   **[:octicons-terminal-16: &nbsp; our CLI](etl-cli)**
+-   **[:octicons-terminal-16: &nbsp; CLI](etl-cli)**
 
     ***
 
     We also have a CLI, so that you can do some tasks from your terminal.
 
--   **[:octicons-globe-16: &nbsp; Using different environments](environment)**
+-   **[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)**
+
+    ***
+
+    Standardize country names to use OWID's defaults.
+
+-   **[:octicons-globe-16: &nbsp; Environments](environment)**
 
     ***
 
@@ -44,23 +50,24 @@ In this section you will find guides for different use cases and tasks you might
 
     What are they? And how do we actually work with them?
 
--   **[:fontawesome-solid-bone: &nbsp; Backport datasets](backport)**
-
-    ***
-
-    We use backporting to add legacy datasets to our catalog.
-
--   **[:octicons-lock-16: &nbsp; Import private datasets](private-import)**
+-   **[:octicons-lock-16: &nbsp; Private datasets](private-import)**
 
     ***
 
     Import private datasets.
 
--   **[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)**
+-   **[:octicons-clock-16: &nbsp; Regular updates](auto-regular-updates)**
 
     ***
 
-    Standardize country names to use OWID's defaults.
+    Automate regular updates of datasets.
+
+
+-   **[:fontawesome-solid-bone: &nbsp; Backport datasets](backport)**
+
+    ***
+
+    We use backporting to add legacy datasets to our catalog.
 
 -   **[:material-note-edit: &nbsp; Edit the docs](../dev/docs)**
 
