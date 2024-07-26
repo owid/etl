@@ -676,7 +676,7 @@ def interpolate_table(
 
     df = (
         df.set_index([country_col, time_col])
-        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, year_col]))  # type: ignore
+        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
         .sort_index()
     )
 
