@@ -44,6 +44,11 @@ def run(dest_dir: str) -> None:
     tb_combined = add_aggregate_land_types(tb_combined)
     # Save outputs.
     tb_combined = tb_combined.copy_metadata(tb_input)
+
+    # Set the origins of the new table to the origins of the original table.
+    for col in tb_combined.columns:
+        tb_combined[col].metadata.origins = tb["_10000bc"].metadata.origins
+
     tb_combined = tb_combined.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
