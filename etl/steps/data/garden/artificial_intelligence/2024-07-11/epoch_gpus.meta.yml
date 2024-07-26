@@ -23,7 +23,7 @@ tables:
         short_unit: ''
         description_short: The company that produced the GPU.
 
-      fp32_performance__flop_s:
+      fp32__single_precision__performance__flop_s:
         title: FP32 performance
         unit: FLOP/s
         description_short: The number of floating-point operations per second that can be performed by the GPU. FLOP/s values refer to 32-bit (full) precision.

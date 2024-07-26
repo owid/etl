@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
@@ -21,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
+    print(tb.columns)
     # Convert publication date to a datetime objects
     tb["release_date"] = pd.to_datetime(tb["release_date"], format="mixed")
 
@@ -37,7 +38,7 @@ def run(dest_dir: str) -> None:
     tb["release_price__usd"] = tb["release_price__usd"].astype(str)
     tb["release_price__usd"] = tb["release_price__usd"].replace({"\$": "", ",": ""}, regex=True).astype(float)
 
-    tb["comp_performance_per_dollar"] = tb["fp32_performance__flop_s"] / tb["release_price__usd"]
+    tb["comp_performance_per_dollar"] = tb["fp32__single_precision__performance__flop_s"] / tb["release_price__usd"]
     tb = tb.format(["days_since_2000", "name_of_the_hardware"])
     tb = tb.drop(columns=["release_date"])
 

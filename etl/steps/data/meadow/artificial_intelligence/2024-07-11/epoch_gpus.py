@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     cols = [
         "Manufacturer",
         "Name of the hardware",
-        "FP32 Performance (FLOP/s)",
+        "FP32 (single precision) Performance (FLOP/s)",
         "Release date",
         "Release price (USD)",
     ]
