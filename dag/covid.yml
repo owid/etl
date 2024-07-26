@@ -1,4 +1,13 @@
 steps:
+
+  # Variants
+  data-private://meadow/covid/2024-07-26/variants:
+    - snapshot-private://covid/latest/variants.json
+  data-private://garden/covid/2024-07-26/variants:
+    - data-private://meadow/covid/2024-07-26/variants
+  data-private://grapher/covid/2024-07-26/variants:
+    - data-private://garden/covid/2024-07-26/variants
+
   data://grapher/covid/latest/google_mobility_trends:
     - data://garden/covid/latest/google_mobility_trends
   data://garden/covid/latest/google_mobility_trends:
@@ -27,10 +36,10 @@ steps:
     - data-private://garden/covid/latest/sweden
   data-private://garden/covid/latest/sweden:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv
-  data-private://grapher/covid/latest/variants:
-    - data-private://garden/covid/latest/variants
-  data-private://garden/covid/latest/variants:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
+  # data-private://grapher/covid/latest/variants:
+  #   - data-private://garden/covid/latest/variants
+  # data-private://garden/covid/latest/variants:
+  #   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
   data-private://grapher/covid/latest/sequencing:
     - data-private://garden/covid/latest/sequencing
   data-private://garden/covid/latest/sequencing:
