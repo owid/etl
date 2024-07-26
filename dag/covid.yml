@@ -1,12 +1,12 @@
 steps:
 
   # Variants
-  data-private://meadow/covid/2024-07-26/variants:
+  data-private://meadow/covid/latest/variants:
     - snapshot-private://covid/latest/variants.json
-  data-private://garden/covid/2024-07-26/variants:
-    - data-private://meadow/covid/2024-07-26/variants
-  data-private://grapher/covid/2024-07-26/variants:
-    - data-private://garden/covid/2024-07-26/variants
+  data-private://garden/covid/latest/variants:
+    - data-private://meadow/covid/latest/variants
+  data-private://grapher/covid/latest/variants:
+    - data-private://garden/covid/latest/variants
 
   data://grapher/covid/latest/google_mobility_trends:
     - data://garden/covid/latest/google_mobility_trends
