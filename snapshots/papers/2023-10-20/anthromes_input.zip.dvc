@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Anthromes
+    description: |-
+      Ellis et al. (2021). "People have shaped most of terrestrial nature for at least 12,000 years". Proceedings of the National Academy of Sciences doi: 10.1073/pnas.2023483118.
+            This repository contains the full Anthromes-12k-DGG dataset in .csv format for all three uncertainty levels (baseline, lower and upper), as well as the an12_dgg_inputs shapefile containing the discrete global grid polygons and supplemental data which can be joined to the .csv files for mapping. See the included README file for details of the included datasets.
+            Please refer to the associated R analysis code and research compendium at doi:10.7910/DVN/6FWPZ9 for the associated anthrome class names and example code for working with these data in R.
+
+            Related publication: 
+
+            Erle C. Ellis, Nicolas Gauthier, Kees Klein Goldewijk, Rebecca Bliege Bird, Nicole Boivin, Sandra Díaz, Dorian Q. Fuller, Jacquelyn L. Gill, Jed O. Kaplan, Naomi Kingston, Harvey Locke, Crystal N. H. McMichael, Darren Ranco, Torben C. Rick, M. Rebecca Shaw, Lucas Stephens, Jens-Christian Svenning, and James E.M. Watson, (2021). "People have shaped most of terrestrial nature for at least 12,000 years". Proceedings of the National Academy of Sciences. doi: 10.1073/pnas.2023483118
+    date_published: 2021-03-26
+    version_producer: v1
+    title_snapshot: Anthromes - input
+
+    # Citation
+    producer: Gauthier et al.
+    citation_full: |-
+      Gauthier, Nicolas; Ellis, Erle; Klein Goldewijk, Kees, 2021, "Anthromes 12K DGG (V1) Full Dataset", https://doi.org/10.7910/DVN/E3H3AK, Harvard Dataverse
+
+    # Files
+    url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/E3H3AK
+    url_download: https://dataverse.harvard.edu/api/access/datafile/4343709
+    date_accessed: 2023-10-20
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://support.dataverse.harvard.edu/harvard-dataverse-general-terms-use
+
+wdir: ../../../data/snapshots/papers/2023-10-20
+outs:
+- md5: 280d577f448af13b0ba8453b2a0811f3
+  size: 119805929
+  path: anthromes_input.zip
