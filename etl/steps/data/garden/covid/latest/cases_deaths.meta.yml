@@ -3,6 +3,8 @@ definitions:
   common_display: &common_display
       zeroDay: "2020-01-21"
       yearIsDay: true
+  daily_population: &daily_population |-
+    This indicator is estimated by normalizing by population. We have used daily population estimates, which leads to changes in the denominator between datapoints from different days. For instance, the denominator for January 1st will be different to the one on January 2nd.
   common:
     display:
       numDecimalPlaces: 3
@@ -62,24 +64,28 @@ tables:
         title: "Daily new confirmed cases of COVID-19 per million people"
         description_short: |-
           New confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
+        description_processing: *daily_population
         unit: 'cases per million people'
 
       new_deaths_per_million:
         title: "Daily new confirmed deaths due to COVID-19 per million people"
         description_short: |-
           New deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
         unit: 'deaths per million people'
 
       total_cases_per_million:
         title: "Total confirmed cases of COVID-19 per million people"
         description_short: |-
           Total confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
+        description_processing: *daily_population
         unit: 'cases per million people'
 
       total_deaths_per_million:
         title: "Total confirmed deaths due to COVID-19 per million people"
         description_short: |-
           Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
         unit: 'deaths per million people'
 
       # Days since
@@ -105,12 +111,14 @@ tables:
           <<: *common_display
       days_since_1_total_cases_per_million:
         title: "Days since the total confirmed cases of COVID-19 per million people reached 1"
+        description_processing: *daily_population
         unit: 'days'
         display:
           numDecimalPlaces: 0
           <<: *common_display
       days_since_0_1_total_deaths_per_million:
         title: "Days since the total confirmed deaths of COVID-19 per million people reached 0.1"
+        description_processing: *daily_population
         unit: 'days'
         display:
           numDecimalPlaces: 0
@@ -128,9 +136,11 @@ tables:
       new_cases_per_million_7_day_avg_right:
         title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
         unit: 'cases per million people'
+        description_processing: *daily_population
       new_deaths_per_million_7_day_avg_right:
         title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
         unit: 'deaths per million people'
+        description_processing: *daily_population
 
       # Case fatality ratio
       cfr:
@@ -196,13 +206,17 @@ tables:
       weekly_cases_per_million:
         title: "Weekly cases per million people"
         unit: 'cases per million people'
+        description_processing: *daily_population
       weekly_deaths_per_million:
         title: "Weekly deaths per million people"
         unit: 'deaths per million people'
+        description_processing: *daily_population
       # Biweekly aggregates per capita
       biweekly_cases_per_million:
         title: "Biweekly cases per million people"
         unit: 'cases per million people'
+        description_processing: *daily_population
       biweekly_deaths_per_million:
         title: "Biweekly deaths per million people"
         unit: 'deaths per million people'
+        description_processing: *daily_population
