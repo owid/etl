@@ -337,27 +337,27 @@ class Chart(Base):
         q = """
         select
             cd.chartId,
-            v.id as variableId,
+            v.catalogPath,
             v.dataChecksum,
             v.metadataChecksum
         from chart_dimensions as cd
         join variables as v on v.id = cd.variableId
         where cd.chartId in %(chart_id)s
         """
-        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "variableId"])
+        return read_sql(q, session, params={"chart_id": chart_ids}).set_index(["chartId", "catalogPath"])
 
     def load_variable_checksums(self, session: Session) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
         q = """
         select
-            v.id as variableId,
+            v.catalogPath,
             v.dataChecksum,
             v.metadataChecksum
         from chart_dimensions as cd
         join variables as v on v.id = cd.variableId
         where cd.chartId = %(chart_id)s
         """
-        return read_sql(q, session, params={"chart_id": self.id}).set_index("variableId")
+        return read_sql(q, session, params={"chart_id": self.id}).set_index("catalogPath")
 
     def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
         """Remap variable ids from source to target session. Variable in source is uniquely identified

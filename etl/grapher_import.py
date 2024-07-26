@@ -183,6 +183,10 @@ def _update_variables_metadata(table: catalog.Table) -> None:
         if meta.unit:
             meta.display.setdefault("unit", meta.unit)
 
+        # Templates can make numDecimalPlaces string, convert it to int
+        if meta.display and isinstance(meta.display.get("numDecimalPlaces"), str):
+            meta.display["numDecimalPlaces"] = int(meta.display["numDecimalPlaces"])
+
         # Prune empty fields from description_key
         if meta.description_key:
             meta.description_key = [k for k in meta.description_key if k.strip()]

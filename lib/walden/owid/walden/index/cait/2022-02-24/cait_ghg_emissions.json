@@ -8,7 +8,7 @@
   "publication_date": "2021-03-11",
   "date_accessed": "2022-02-24",
   "url": "https://www.climatewatchdata.org/api/v1/data/historical_emissions/",
-  "owid_data_url": "https://nyc3.digitaloceanspaces.com/walden/cait/2022-02-24/cait_ghg_emissions.json.gz",
+  "owid_data_url": "https://walden.owid.io/cait/2022-02-24/cait_ghg_emissions.json.gz",
   "file_extension": "json.gz",
   "license_url": "https://www.climatewatchdata.org/about/permissions",
   "license_name": "Creative Commons CC BY 4.0",

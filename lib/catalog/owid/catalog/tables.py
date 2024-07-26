@@ -591,6 +591,10 @@ class Table(pd.DataFrame):
     def astype(self, *args, **kwargs) -> "Table":
         return super().astype(*args, **kwargs)  # type: ignore
 
+    def reindex(self, *args, **kwargs) -> "Table":
+        t = super().reindex(*args, **kwargs)
+        return cast(Table, t)
+
     @overload
     def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
         ...
@@ -1889,3 +1893,42 @@ def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[
     if isinstance(cols, str):
         cols = [cols]
     return [t[col] for col in cols]  # type: ignore
+
+
+def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callable[..., Union[Table, Variable]]:
+    """Decorator that turns a function that works on DataFrame or Series into a function that works
+    on Table or Variable and preserves metadata.  If the decorated function renames columns, their
+    metadata won't be copied.
+
+    Usage:
+
+    import owid.catalog.processing as pr
+
+    @pr.keep_metadata
+    def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
+        return df + 1
+
+    tb = my_df_func(tb)
+
+
+    @pr.keep_metadata
+    def my_series_func(s: pd.Series) -> pd.Series:
+        return s + 1
+
+    tb.a = my_series_func(tb.a)
+    """
+
+    def wrapper(*args: Any, **kwargs: Any) -> Union[Table, Variable]:
+        tb = args[0]
+        df = func(*args, **kwargs)
+        if isinstance(df, pd.Series):
+            return Variable(df, name=tb.name, metadata=tb.metadata)
+        elif isinstance(df, pd.DataFrame):
+            return Table(df).copy_metadata(tb)
+        else:
+            raise ValueError(f"Unexpected return type: {type(df)}")
+
+    return wrapper
+
+
+to_numeric = keep_metadata(pd.to_numeric)
