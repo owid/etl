@@ -7,6 +7,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+REGIONS = ["Asia", "Europe", "Africa", "Oceania", "North America", "South America"]
 
 
 def run(dest_dir: str) -> None:
@@ -15,7 +16,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("tree_cover_loss_by_driver")
-
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow["tree_cover_loss_by_driver"].reset_index()
 
@@ -33,6 +35,7 @@ def run(dest_dir: str) -> None:
     tb = convert_codes_to_drivers(tb)
 
     tb = tb.pivot(index=["country", "year"], columns="category", values="area").reset_index()
+    tb = geo.add_regions_to_table(tb, ds_regions=ds_regions, regions=REGIONS, min_num_values_per_year=1)
     tb = tb.format(["country", "year"])
 
     #
