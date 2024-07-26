@@ -51,6 +51,7 @@ steps:
     - snapshot://artificial_intelligence/2024-07-11/epoch_gpus.csv
   data://garden/artificial_intelligence/2024-07-11/epoch_gpus:
     - data://meadow/artificial_intelligence/2024-07-11/epoch_gpus
+    - data://garden/bls/2024-05-16/us_consumer_prices
   data://grapher/artificial_intelligence/2024-07-11/epoch_gpus:
     - data://garden/artificial_intelligence/2024-07-11/epoch_gpus
 
