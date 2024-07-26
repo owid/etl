@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("mortality_database"))
+    ds_meadow = paths.load_dataset("mortality_database")
 
     # Read table from meadow dataset.
     tb = ds_meadow["mortality_database"]
@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb = tidy_sex_dimension(tb)
     tb = tidy_age_dimension(tb)
     tb = tidy_causes_dimension(tb)
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     ds_garden = add_metadata(dest_dir=dest_dir, ds_meadow=ds_meadow, tb=tb)
 
@@ -38,10 +38,11 @@ def run(dest_dir: str) -> None:
 
 def tidy_causes_dimension(tb: Table) -> Table:
     """
-    To clarify blood disorders are also included in this group.
+    Improve the labelling of the cause column to make it clear that blood disorders are included in this category.
     """
     cause_dict = {"Diabetes mellitus and endocrine disorders": "Diabetes mellitus, blood and endocrine disorders"}
-    tb["cause"] = tb["cause"].replace(cause_dict, regex=False)
+    tb["cause"] = tb["cause"].cat.rename_categories(lambda x: cause_dict.get(x, x))
+    # tb["cause"] = tb["cause"].replace(cause_dict, regex=False)
     return tb
 
 
@@ -50,7 +51,8 @@ def tidy_sex_dimension(tb: Table) -> Table:
     Improve the labelling of the sex column
     """
     sex_dict = {"All": "Both sexes", "Female": "Females", "Male": "Males", "Unknown": "Unknown sex"}
-    tb["sex"] = tb["sex"].replace(sex_dict, regex=False)
+    # tb["sex"] = tb["sex"].replace(sex_dict, regex=False)
+    tb["sex"] = tb["sex"].cat.rename_categories(lambda x: sex_dict.get(x, x))
     return tb
 
 
@@ -79,8 +81,8 @@ def tidy_age_dimension(tb: Table) -> Table:
         "[All]": "all ages",
     }
 
-    tb["age_group"] = tb["age_group"].replace(age_dict, regex=False)
-
+    # tb["age_group"] = tb["age_group"].replace(age_dict, regex=False)
+    tb["age_group"] = tb["age_group"].cat.rename_categories(lambda x: age_dict.get(x, x))
     return tb
 
 
