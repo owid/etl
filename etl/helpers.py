@@ -33,7 +33,6 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.config import EXPLORER
 from etl.explorer_helpers import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
@@ -433,6 +432,10 @@ class PathFinder:
         return self._dag
 
     @property
+    def step_type(self) -> str:
+        return self.f.parent.parent.parent.parent.name
+
+    @property
     def channel(self) -> str:
         return self.f.parent.parent.parent.name
 
@@ -501,6 +504,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[int, str]] = None,
         is_private: Optional[bool] = False,
+        step_type: Optional[str] = "data",
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
 
@@ -529,6 +533,10 @@ class PathFinder:
         else:
             raise UnknownChannel
 
+        # Replace "data" with the actual step type.
+        if step_type != "data":
+            step_name = "explorer://" + step_name.split("://")[1]
+
         return step_name
 
     def _create_current_step_name(self):
@@ -538,6 +546,7 @@ class PathFinder:
             namespace=self.namespace,
             version=self.version,
             is_private=self.is_private,
+            step_type=self.step_type,
         )
 
     @staticmethod
@@ -1060,31 +1069,14 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
 
 
-class DatasetAndExplorer:
-    def __init__(self, dataset, explorer):
-        self.dataset = dataset
-        self.explorer = explorer
-
-    def save(self):
-        # Save ETL dataset to disk.
-        self.dataset.save()
-        if EXPLORER:
-            log.info(f"Writing explorer tsv file: {self.explorer.name}")
-            # Write explorer tsv file to disk.
-            self.explorer.write()
-        else:
-            log.info("No tsv file will be written (to do so, run etl with the '--explorer' flag).")
-
-
 def create_explorer(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     df_columns: Optional[pd.DataFrame] = None,
-) -> DatasetAndExplorer:
+) -> Explorer:
     # Extract information about this step from dest_dir.
     channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
-
     # Initialize explorer.
     explorer = Explorer(short_name)
     # Add a comment to avoid manual edits.
@@ -1098,11 +1090,4 @@ def create_explorer(
     if df_columns is not None:
         explorer.df_columns = df_columns
 
-    # Just so that ETL doesn't break, create an empty dataset with basic metadata.
-    metadata = DatasetMeta(channel=channel, namespace=namespace, version=version, short_name=short_name)
-    dataset = catalog.Dataset.create_empty(dest_dir, metadata=metadata)
-
-    # Create a "dataset and explorer object".
-    ds_explorer = DatasetAndExplorer(dataset=dataset, explorer=explorer)
-
-    return ds_explorer
+    return explorer

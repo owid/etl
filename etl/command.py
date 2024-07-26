@@ -251,12 +251,10 @@ def main(
         sanity_check_db_settings()
 
     if explorer:
-        # Set the global variable "EXPLORER" to True.
-        os.environ["EXPLORER"] = "1"
         # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
         grapher = True
 
-    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher)
+    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher, explorer=explorer)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -285,7 +283,7 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) -> DAG:
+def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool, explorer: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
@@ -305,6 +303,10 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) 
     # If --grapher is set, add steps for upserting to DB
     if grapher:
         dag.update(_grapher_steps(dag, private))
+
+    # if explorer is not set, remove all steps
+    if not explorer:
+        dag = {step: deps for step, deps in dag.items() if not step.startswith("explorer://")}
 
     return dag
 

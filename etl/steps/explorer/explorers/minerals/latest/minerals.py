@@ -60,5 +60,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
-    ds_explorer.save()
+    explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    explorer.write()
