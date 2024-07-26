@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    print(tb.columns)
     # Convert publication date to a datetime objects
     tb["release_date"] = pd.to_datetime(tb["release_date"], format="mixed")
 
