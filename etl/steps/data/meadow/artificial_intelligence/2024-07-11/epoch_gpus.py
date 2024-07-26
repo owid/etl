@@ -34,8 +34,8 @@ def run(dest_dir: str) -> None:
     # Select the columns of interest
     tb = tb[cols]
 
-    # Check that there are no NaN values in the system column
-    assert not tb["Manufacturer"].isna().any(), "NaN values found in 'System' column."
+    # Check that there are no NaN values in the name of the hardware column
+    assert not tb["Name of the hardware"].isna().any(), "NaN values found in 'Name of the hardware' column."
     #
     # Create a new table and ensure all columns are snake-case.
     #

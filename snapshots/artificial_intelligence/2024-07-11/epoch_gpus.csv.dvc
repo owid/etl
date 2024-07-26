@@ -10,8 +10,7 @@ meta:
 
     # Citation
     producer: Epoch
-    citation_full: |-
-      Marius Hobbhahn, Lennart Heim and Gökçe Aydos (2023), "Trends in Machine Learning Hardware". Published online at epochai.org. Retrieved from: 'https://epochai.org/blog/trends-in-machine-learning-hardware' [online resource]
+    citation_full: Epoch AI, 'Data on ML GPUs'. Forthcoming.
 
     # Files
     url_main: https://airtable.com/appDFXXgaG1xLtXGL/shr5STcUv1HmzUIyw/tblNMdPBHaKqJJbW6

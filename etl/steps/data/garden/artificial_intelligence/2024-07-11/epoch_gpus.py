@@ -44,6 +44,7 @@ def run(dest_dir: str) -> None:
 
     tb["release_price__usd"] = tb["release_price__usd"].astype(str)
     tb["release_price__usd"] = tb["release_price__usd"].replace({"\$": "", ",": ""}, regex=True).astype(float)
+
     # Extract year from 'release_date' and create a new 'year' column
     tb["year"] = tb["release_date"].dt.year
 
@@ -56,14 +57,14 @@ def run(dest_dir: str) -> None:
     tb_cpi = pr.merge(tb, tb_us_cpi_2023, on="year", how="left")
 
     tb_cpi["release_price__usd"] = round(tb_cpi["release_price__usd"] / tb_cpi["cpi_adj_2023"])
-
     tb_cpi = tb_cpi.drop("cpi_adj_2023", axis=1)
 
     tb_cpi["comp_performance_per_dollar"] = (
         tb_cpi["fp32__single_precision__performance__flop_s"] / tb["release_price__usd"]
     )
-    tb_cpi = tb_cpi.format(["days_since_2000", "name_of_the_hardware"])
     tb_cpi = tb_cpi.drop(columns=["release_date", "year"])
+
+    tb_cpi = tb_cpi.format(["days_since_2000", "name_of_the_hardware"])
 
     #
     # Save outputs.
