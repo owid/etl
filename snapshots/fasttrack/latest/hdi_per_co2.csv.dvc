@@ -4,11 +4,11 @@ meta:
     title: hdi_per_co2
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vREFjOvi_pQetTUwcLYXb0u4ibqXoBQUkHo6Fh5_jtABwGBtORiZEfUicnovA3ngK9ncnyhhDfObpkX/pub?output=csv
-    date_accessed: '2024-07-26'
+    date_accessed: '2024-07-28'
   name: HDI per capita CO2 (UNDP Project)
   description: ''
   license: {}
 outs:
-  - md5: 33e9cc34af26de603345806125b9c273
-    size: 69795
+  - md5: c890f3d8be714bd20d2569921cd18782
+    size: 293140
     path: hdi_per_co2.csv
