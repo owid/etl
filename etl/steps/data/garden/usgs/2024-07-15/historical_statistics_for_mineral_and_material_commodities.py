@@ -1,12 +1,132 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Harmonize commodity-subcommodity names.
+# NOTE: The original data had only commodity (not subcommodity), so we assume subcommodity "Total" for all minerals to
+#  begin with. Therefore, all keys in the following dictionary will have "Total" as subcommodity".
+#  Those keys should contain all commodities expected in the data.
+#  Set the value to None for any commodity-subcommodity that should not be included in the output.
+#  To use a subcommodity different than "Total", simply rewrite the value.
+COMMODITY_MAPPING = {
+    ("Alumina", "Total"): ("Alumina", "Total"),
+    ("Aluminum", "Total"): ("Aluminum", "Total"),
+    ("Aluminum oxide", "Total"): ("Aluminum oxide", "Total"),
+    ("Aluminum-zirconium oxide", "Total"): ("Aluminum-zirconium oxide", "Total"),
+    ("Antimony", "Total"): ("Antimony", "Total"),
+    ("Arsenic", "Total"): ("Arsenic", "Total"),
+    ("Asbestos", "Total"): ("Asbestos", "Total"),
+    ("Ball clay", "Total"): ("Ball clay", "Total"),
+    ("Barite", "Total"): ("Barite", "Total"),
+    ("Bauxite", "Total"): ("Bauxite", "Total"),
+    ("Bentonite", "Total"): ("Bentonite", "Total"),
+    ("Beryllium", "Total"): ("Beryllium", "Total"),
+    ("Bismuth", "Total"): ("Bismuth", "Total"),
+    ("Boron", "Total"): ("Boron", "Total"),
+    ("Boron carbide", "Total"): ("Boron carbide", "Total"),
+    ("Cadmium", "Total"): ("Cadmium", "Total"),
+    ("Cement", "Total"): ("Cement", "Total"),
+    ("Cesium", "Total"): ("Cesium", "Total"),
+    ("Chromium", "Total"): ("Chromium", "Total"),
+    ("Cobalt", "Total"): ("Cobalt", "Total"),
+    ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
+    ("Copper", "Total"): ("Copper", "Total"),
+    ("Crushed stone", "Total"): ("Crushed stone", "Total"),
+    ("Diatomite", "Total"): ("Diatomite", "Total"),
+    ("Dimension stone", "Total"): ("Dimension stone", "Total"),
+    ("Direct Reduced Iron", "Total"): ("Direct Reduced Iron", "Total"),
+    ("Feldspar", "Total"): ("Feldspar", "Total"),
+    ("Fire clay", "Total"): ("Fire clay", "Total"),
+    ("Fluorspar", "Total"): ("Fluorspar", "Total"),
+    ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
+    ("Gallium", "Total"): ("Gallium", "Total"),
+    ("Germanium", "Total"): ("Germanium", "Total"),
+    ("Gold", "Total"): ("Gold", "Total"),
+    ("Graphite", "Total"): ("Graphite", "Total"),
+    ("Gypsum", "Total"): ("Gypsum", "Total"),
+    ("Helium", "Total"): ("Helium", "Total"),
+    ("Indium", "Total"): ("Indium", "Total"),
+    ("Industrial diamond", "Total"): ("Industrial diamond", "Total"),
+    ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
+    ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
+    ("Iron Oxide Pigments", "Total"): ("Iron Oxide Pigments", "Total"),
+    ("Iron and Steel Slag", "Total"): ("Iron and Steel Slag", "Total"),
+    ("Iron ore", "Total"): ("Iron ore", "Total"),
+    ("Kaolin", "Total"): ("Kaolin", "Total"),
+    ("Lead", "Total"): ("Lead", "Total"),
+    ("Lime", "Total"): ("Lime", "Total"),
+    ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
+    ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
+    ("Manganese", "Total"): ("Manganese", "Total"),
+    ("Mercury", "Total"): ("Mercury", "Total"),
+    ("Metallic abrasives", "Total"): ("Metallic abrasives", "Total"),
+    ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
+    ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
+    ("Miscellaneous clay", "Total"): ("Miscellaneous clay", "Total"),
+    ("Molybdenum", "Total"): ("Molybdenum", "Total"),
+    ("Nickel", "Total"): ("Nickel", "Total"),
+    ("Niobium", "Total"): ("Niobium", "Total"),
+    ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
+    ("Peat", "Total"): ("Peat", "Total"),
+    ("Perlite", "Total"): ("Perlite", "Total"),
+    ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
+    ("Pig Iron", "Total"): ("Pig Iron", "Total"),
+    ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
+    ("Salt", "Total"): ("Salt", "Total"),
+    ("Selenium", "Total"): ("Selenium", "Total"),
+    ("Silicon", "Total"): ("Silicon", "Total"),
+    ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
+    ("Silver", "Total"): ("Silver", "Total"),
+    ("Soda ash", "Total"): ("Soda ash", "Total"),
+    ("Steel", "Total"): ("Steel", "Total"),
+    ("Strontium", "Total"): ("Strontium", "Total"),
+    ("Sulfur", "Total"): ("Sulfur", "Total"),
+    ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
+    ("Tantalum", "Total"): ("Tantalum", "Total"),
+    ("Tellurium", "Total"): ("Tellurium", "Total"),
+    ("Tin", "Total"): ("Tin", "Total"),
+    ("Titanium dioxide", "Total"): ("Titanium dioxide", "Total"),
+    ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
+    ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
+    ("Total clay", "Total"): ("Clays", "Total"),
+    ("Total manufactured abrasives ", "Total"): ("Manufactured abrasives ", "Total"),
+    ("Tungsten", "Total"): ("Tungsten", "Total"),
+    ("Vanadium", "Total"): ("Vanadium", "Total"),
+    ("Zinc", "Total"): ("Zinc", "Total"),
+}
+
+
+def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
+    tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
+    for pair_old, pair_new in COMMODITY_MAPPING.items():
+        if pair_old == pair_new:
+            # Nothing to do, continue.
+            continue
+
+        # Get the old commodity-subcommodity names.
+        commodity_old, subcommodity_old = pair_old
+        if pair_new is None:
+            # Remove rows for this combination.
+            index_to_drop = tb.loc[(tb["commodity"] == commodity_old) & (tb["sub_commodity"] == subcommodity_old)].index
+            tb = tb.drop(index_to_drop).reset_index(drop=True)
+            continue
+
+        # Get the new commodity-subcommodity names.
+        commodity_new, subcommodity_new = pair_new
+        # Rename the commodity-subcommodity pair.
+        tb.loc[
+            (tb["commodity"] == commodity_old) & (tb["sub_commodity"] == subcommodity_old),
+            ["commodity", "sub_commodity"],
+        ] = pair_new
+
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -91,8 +211,14 @@ def run(dest_dir: str) -> None:
         subset=["production", "unit_value_current", "unit_value_constant"], how="all"
     ).reset_index(drop=True)
 
+    # To begin with, assume subcommodity "Total" for all minerals.
+    tb_combined["sub_commodity"] = "Total"
+
+    # Harmonize commodity-subcommodity pairs.
+    tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
+
     # Format tables conveniently.
-    tb_combined = tb_combined.format(["country", "year", "commodity"])
+    tb_combined = tb_combined.format(["country", "year", "commodity", "sub_commodity"])
 
     #
     # Save outputs.

@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
         .astype(float)
         .reset_index()
         .rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
-    )[["country", "year", "commodity", "production", "unit_value"]]
+    )[["country", "year", "commodity", "sub_commodity", "production", "unit_value"]]
     tb_usgs = (
         ds_usgs["mineral_commodity_summaries"]
         .drop(columns=["reserves_notes", "production_notes"])
@@ -45,13 +45,6 @@ def run(dest_dir: str) -> None:
     tb_usgs["unit"] = "tonnes"
     tb_usgs_historical["unit"] = "tonnes"
     #
-    # Add a sub-commodity column to the historical data.
-    # TODO: The subcommodity and unit of "World production" for each commodity can be slightly different.
-    #  But the only place where this is explained seems to be a doc file inside the xlsx file.
-    #  That is an absurdly convoluted way to store metadata, and it will be complicated to fetch programmatically.
-    #  For now, assume that world and US historical production and unit value correspond to the total of each commodity.
-    tb_usgs_historical["sub_commodity"] = "Total"
-
     # We extract data from three sources:
     # * From BGS we extract imports, exports, and production.
     # * From USGS (current) we extract production and reserves.
@@ -119,7 +112,7 @@ def run(dest_dir: str) -> None:
         metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
         sub_commodity = sub_commodity.lower()
-        title_public = f"{metric} of {commodity} ({sub_commodity})"
+        title_public = f"{metric} of {commodity.lower()} ({sub_commodity.lower()})"
         tb[column].metadata.title = column
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
