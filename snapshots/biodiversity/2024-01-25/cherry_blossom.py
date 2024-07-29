@@ -9,6 +9,8 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
+# DELETE ME!!!
+
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")

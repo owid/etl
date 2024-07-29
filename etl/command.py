@@ -21,12 +21,12 @@ from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Set, get_args
 
+import prefect
+import prefect.task_runners
 import rich_click as click
 import structlog
-from dask.distributed import LocalCluster
 from ipdb import launch_ipdb_on_exception
-from prefect import flow, task, task_runners
-from prefect_dask import DaskTaskRunner
+from prefect_dask import DaskTaskRunner  # type: ignore
 
 from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
@@ -406,20 +406,19 @@ def run_dag(
 
     elif engine == "prefect":
         if workers == 1:
-            task_runner = task_runners.ConcurrentTaskRunner()
             # task_runner = task_runners.SequentialTaskRunner()
+            task_runner = prefect.task_runners.ConcurrentTaskRunner()
         else:
-            cluster = LocalCluster(n_workers=workers, asynchronous=True)
-            task_runner = DaskTaskRunner(cluster=cluster)
+            task_runner = DaskTaskRunner(cluster_kwargs={"n_workers": workers})
 
-        @flow(log_prints=True, task_runner=task_runner)
+        @prefect.flow(log_prints=True, task_runner=task_runner)
         def run_etl(steps):
             task_futures = {}
 
             for step in steps:
                 # include dependencies that are in the list of steps
                 wait_for = [task_futures[str(dep)] for dep in step.dependencies if str(dep) in task_futures]
-                task_futures[str(step)] = task(name=str(step))(step.run).submit(wait_for=wait_for)
+                task_futures[str(step)] = prefect.task(name=str(step))(step.run).submit(wait_for=wait_for)
 
         return run_etl(steps)
 
