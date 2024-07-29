@@ -139,7 +139,7 @@ steps:
     - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
   data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
     - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Fossil Fuel Production 2023.
@@ -167,7 +167,7 @@ steps:
   data://garden/irena/2023-06-26/renewable_electricity_capacity:
     - data://meadow/irena/2023-06-26/renewable_electricity_capacity
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
   data://grapher/irena/2023-06-26/renewable_electricity_capacity:
@@ -202,7 +202,7 @@ steps:
   data://garden/ember/2023-07-10/yearly_electricity:
     - data://meadow/ember/2023-07-10/yearly_electricity
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Energy mix (2023).
@@ -210,7 +210,7 @@ steps:
   data://garden/energy/2023-07-10/energy_mix:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/energy/2023-07-10/energy_mix:
     - data://garden/energy/2023-07-10/energy_mix
   #
@@ -232,7 +232,7 @@ steps:
   data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
   #
@@ -242,7 +242,7 @@ steps:
     - snapshot://eia/2023-07-10/international_energy_data.zip
   data://garden/eia/2023-07-10/energy_consumption:
     - data://meadow/eia/2023-07-10/energy_consumption
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Fossil Fuel Production.
@@ -284,7 +284,7 @@ steps:
   data://garden/energy/2023-12-12/energy_mix:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/energy/2023-12-12/energy_mix:
     - data://garden/energy/2023-12-12/energy_mix
   #
@@ -315,7 +315,7 @@ steps:
   data://garden/ember/2023-12-12/yearly_electricity:
     - data://meadow/ember/2023-12-12/yearly_electricity
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Ember - Combined electricity 2023.
@@ -359,7 +359,7 @@ steps:
     - snapshot://energy_institute/2023-12-12/statistical_review_of_world_energy.xlsx
   data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2023-12-12/statistical_review_of_world_energy
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Electricity mix (EI & Ember).
