@@ -614,6 +614,9 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
+        # NOTE: This was added so that explorer steps can depend on grapher://grapher steps.
+        #  But maybe it's enough if they depend on data://grapher steps (given that the --explorer flag also implies
+        #  --grapher). Consider removing.
         if (len(matches) == 0) and (channel == "grapher"):
             pattern = self.create_step_name(
                 channel="grapher", namespace=namespace, version=version, short_name=short_name, is_private=is_private
