@@ -45,20 +45,23 @@ COMMODITY_MAPPING = {
     ("Asbestos", "Chrysotile"): ("Asbestos", "Chrysotile"),
     ("Asbestos", "Crocidolite"): ("Asbestos", "Crocidolite"),
     ("Asbestos", "Total"): ("Asbestos", "Total"),
-    ("Asbestos, unmanufactured", "Amosite"): ("Asbestos, unmanufactured", "Amosite"),
-    ("Asbestos, unmanufactured", "Chrysotile"): ("Asbestos, unmanufactured", "Chrysotile"),
-    ("Asbestos, unmanufactured", "Crocidolite"): ("Asbestos, unmanufactured", "Crocidolite"),
-    ("Asbestos, unmanufactured", "Other manufactured"): ("Asbestos, unmanufactured", "Other manufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured"): ("Asbestos, unmanufactured", "Unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured, crude"): ("Asbestos, unmanufactured", "Unmanufactured, crude"),
-    ("Asbestos, unmanufactured", "Unmanufactured, fibre"): ("Asbestos, unmanufactured", "Unmanufactured, fibre"),
-    ("Asbestos, unmanufactured", "Unmanufactured, shorts"): ("Asbestos, unmanufactured", "Unmanufactured, shorts"),
-    ("Asbestos, unmanufactured", "Unmanufactured, waste"): ("Asbestos, unmanufactured", "Unmanufactured, waste"),
-    ("Asbestos, unmanufactured", "Waste"): ("Asbestos, unmanufactured", "Waste"),
-    ("Barytes", "Barium minerals"): ("Barytes", "Barium minerals"),
-    ("Barytes", "Barytes"): ("Barytes", "Barytes"),
-    ("Barytes", "Total"): ("Barytes", "Total"),
-    ("Barytes", "Witherite"): ("Barytes", "Witherite"),
+    ("Asbestos, unmanufactured", "Amosite"): ("Asbestos", "Amosite, unmanufactured"),
+    ("Asbestos, unmanufactured", "Chrysotile"): ("Asbestos", "Chrysotile, unmanufactured"),
+    ("Asbestos, unmanufactured", "Crocidolite"): ("Asbestos", "Crocidolite, unmanufactured"),
+    # NOTE: In the original BGS data, there is "Asbestos, unmanufactured" with subcommodity "Other manufactured".
+    #  It's unclear what this means, but I'll assume that it's a mistake and that it should be other unmanufactured.
+    #  This happens, e.g. to USA 1986 imports.
+    ("Asbestos, unmanufactured", "Other manufactured"): ("Asbestos", "Other, unmanufactured"),
+    ("Asbestos, unmanufactured", "Unmanufactured"): ("Asbestos", "Total, unmanufactured"),
+    ("Asbestos, unmanufactured", "Unmanufactured, crude"): ("Asbestos", "Crude, unmanufactured"),
+    ("Asbestos, unmanufactured", "Unmanufactured, fibre"): ("Asbestos", "Fibre, unmanufactured"),
+    ("Asbestos, unmanufactured", "Unmanufactured, shorts"): ("Asbestos", "Shorts, unmanufactured"),
+    ("Asbestos, unmanufactured", "Unmanufactured, waste"): ("Asbestos", "Waste, unmanufactured"),
+    ("Asbestos, unmanufactured", "Waste"): ("Asbestos", "Waste, unmanufactured"),
+    ("Barytes", "Barium minerals"): ("Barite", "Barium minerals"),
+    ("Barytes", "Barytes"): ("Barite", "Total"),
+    ("Barytes", "Total"): ("Barite", "Total"),
+    ("Barytes", "Witherite"): ("Barite", "Witherite"),
     ("Bauxite", "Total"): ("Bauxite", "Total"),
     ("Bauxite, alumina and aluminium", "Alumina"): ("Bauxite, alumina and aluminum", "Alumina"),
     ("Bauxite, alumina and aluminium", "Alumina hydrate"): ("Bauxite, alumina and aluminum", "Alumina hydrate"),
@@ -154,6 +157,8 @@ COMMODITY_MAPPING = {
     ("Copper, mine", "Total"): ("Copper", "Mine production"),
     ("Copper, refined", "Total"): ("Copper", "Refinery production"),
     ("Copper, smelter", "Total"): ("Copper", "Smelter production"),
+    # TODO: Production does not include synthetic diamond, but imports and exports of "Dust" does include synthetic diamond.
+    # This should at least be mentioned in the footnotes.
     ("Diamond", "Cut"): ("Diamond", "Cut"),
     ("Diamond", "Dust"): ("Diamond", "Dust"),
     ("Diamond", "Gem"): ("Diamond", "Gem"),
@@ -728,6 +733,14 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
 def harmonize_units(tb: Table) -> Table:
     tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
     units = sorted(set(tb["unit"]))
+
+    # The unit of diamonds (Carats) is sometimes explicitly given on top of the table, but not always
+    # (see e.g. exports between 2010 and 2019).
+    # Additionally, in the table footnotes they explain that sometimes the value is in Pounds!
+    # Therefore, assume that the unit is always carats (and convert to tonnes), and, where that footnote appears, simply
+    # remove the value.
+    tb.loc[(tb["commodity"] == "diamond"), "unit"] = "Carats"
+    tb.loc[(tb["commodity"]=="diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
 
     # Mapping from original unit names to tonnes.
     mapping = {

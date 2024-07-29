@@ -23,7 +23,7 @@ COMMODITY_MAPPING = {
     ("Antimony", "Total"): ("Antimony", "Total"),
     ("Arsenic", "Total"): ("Arsenic", "Total"),
     ("Asbestos", "Total"): ("Asbestos", "Total"),
-    ("Ball clay", "Total"): ("Ball clay", "Total"),
+    ("Ball clay", "Total"): ("Clays", "Ball clay"),
     ("Barite", "Total"): ("Barite", "Total"),
     ("Bauxite", "Total"): ("Bauxite", "Total"),
     ("Bentonite", "Total"): ("Bentonite", "Total"),
@@ -38,12 +38,12 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Total"): ("Cobalt", "Total"),
     ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
     ("Copper", "Total"): ("Copper", "Total"),
-    ("Crushed stone", "Total"): ("Crushed stone", "Total"),
+    ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
     ("Direct Reduced Iron", "Total"): ("Direct Reduced Iron", "Total"),
     ("Feldspar", "Total"): ("Feldspar", "Total"),
-    ("Fire clay", "Total"): ("Fire clay", "Total"),
+    ("Fire clay", "Total"): ("Clays", "Fire clay"),
     ("Fluorspar", "Total"): ("Fluorspar", "Total"),
     ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
     ("Gallium", "Total"): ("Gallium", "Total"),
@@ -53,7 +53,8 @@ COMMODITY_MAPPING = {
     ("Gypsum", "Total"): ("Gypsum", "Total"),
     ("Helium", "Total"): ("Helium", "Total"),
     ("Indium", "Total"): ("Indium", "Total"),
-    ("Industrial diamond", "Total"): ("Industrial diamond", "Total"),
+    # NOTE: Total diamond production includes natural and synthetic diamonds.
+    ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
     ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
     ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
     ("Iron Oxide Pigments", "Total"): ("Iron Oxide Pigments", "Total"),
@@ -69,7 +70,7 @@ COMMODITY_MAPPING = {
     ("Metallic abrasives", "Total"): ("Metallic abrasives", "Total"),
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
-    ("Miscellaneous clay", "Total"): ("Miscellaneous clay", "Total"),
+    ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous clay"),
     ("Molybdenum", "Total"): ("Molybdenum", "Total"),
     ("Nickel", "Total"): ("Nickel", "Total"),
     ("Niobium", "Total"): ("Niobium", "Total"),
@@ -211,10 +212,10 @@ def run(dest_dir: str) -> None:
         subset=["production", "unit_value_current", "unit_value_constant"], how="all"
     ).reset_index(drop=True)
 
-    # To begin with, assume subcommodity "Total" for all minerals.
-    tb_combined["sub_commodity"] = "Total"
-
     # Harmonize commodity-subcommodity pairs.
+    # To begin with, assume subcommodity "Total" for all minerals, and then rewrite when needed (using the dictionary
+    # COMMODITY_MAPPING defined above).
+    tb_combined["sub_commodity"] = "Total"
     tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
 
     # Format tables conveniently.

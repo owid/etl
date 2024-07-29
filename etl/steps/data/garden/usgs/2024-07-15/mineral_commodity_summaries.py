@@ -290,7 +290,7 @@ COMMODITY_MAPPING = {
         "Total production, natural and synthetic",
     ),
     ("Soda ash", "World total production, synthetic soda ash (rounded)"): ("Soda ash", "Plant production, synthetic"),
-    ("Stone (dimension)", "Mine production, dimension stone"): ("Stone (dimension)", "Mine production"),
+    ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine production"),
     ("Strontium", "Mine production"): ("Strontium", "Mine production"),
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine production"),
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Production, all forms"),
