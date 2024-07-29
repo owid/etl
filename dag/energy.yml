@@ -81,7 +81,7 @@ steps:
   data://garden/ember/2024-05-08/yearly_electricity:
     - data://meadow/ember/2024-05-08/yearly_electricity
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Photovoltaic cost and capacity.
@@ -116,7 +116,7 @@ steps:
   data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy:
     - data://meadow/energy_institute/2024-06-20/statistical_review_of_world_energy
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   #
   # Energy Institute - Statistical Review of World Energy.
   #
@@ -139,7 +139,7 @@ steps:
   data://garden/energy/2024-06-20/energy_mix:
     - data://garden/demography/2023-03-31/population
     - data://garden/energy_institute/2024-06-20/statistical_review_of_world_energy
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   #
   # Energy - Energy mix.
   #
