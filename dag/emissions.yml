@@ -8,7 +8,7 @@ steps:
     - data://meadow/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/climate_watch/2023-10-31/emissions_by_sector:
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
   #

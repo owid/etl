@@ -222,7 +222,7 @@ steps:
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
 
   data://grapher/health/2023-08-09/unaids:
     - data://garden/health/2023-08-09/unaids
@@ -291,7 +291,7 @@ steps:
     - data://meadow/tuberculosis/2023-11-27/burden_estimates
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/demography/2023-03-31/population
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates
@@ -303,7 +303,7 @@ steps:
     - data://meadow/tuberculosis/2023-12-01/budget
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
 
@@ -314,7 +314,7 @@ steps:
     - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/demography/2023-03-31/population
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
@@ -328,7 +328,7 @@ steps:
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/un/2022-07-11/un_wpp
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2023-11-27/laboratories:
     - data://garden/tuberculosis/2023-11-27/laboratories
 
@@ -347,7 +347,7 @@ steps:
     - data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2023-11-27/drug_resistance_surveillance:
     - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
 
@@ -376,7 +376,7 @@ steps:
     - data://meadow/tuberculosis/2023-12-11/notifications
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2023-11-27/notifications:
     - data://garden/tuberculosis/2023-11-27/notifications
 
@@ -395,7 +395,7 @@ steps:
   data://garden/tuberculosis/2023-11-27/outcomes_disagg:
     - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
     - data://garden/tuberculosis/2023-11-27/outcomes_disagg
 
@@ -462,7 +462,7 @@ steps:
   data://garden/who/2024-04-08/polio:
     - data://meadow/who/2024-04-08/polio_afp
     - data://garden/who/2024-04-09/polio_historical
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - snapshot://fasttrack/latest/gpei.csv
@@ -655,7 +655,7 @@ steps:
   data://garden/un/2024-07-08/maternal_mortality:
     - data://meadow/un/2024-07-08/maternal_mortality
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
@@ -665,7 +665,7 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
     - data://garden/who/2023-08-01/mortality_database
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
