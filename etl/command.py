@@ -409,7 +409,7 @@ def run_dag(
             task_runner = task_runners.ConcurrentTaskRunner()
             # task_runner = task_runners.SequentialTaskRunner()
         else:
-            cluster = LocalCluster(n_workers=workers)
+            cluster = LocalCluster(n_workers=workers, asynchronous=True)
             task_runner = DaskTaskRunner(cluster=cluster)
 
         @flow(log_prints=True, task_runner=task_runner)
