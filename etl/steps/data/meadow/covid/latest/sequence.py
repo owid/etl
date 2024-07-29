@@ -25,8 +25,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = unpivot(tb)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "week"])
+    tb = tb.format(["country", "week", "cluster"])
 
     #
     # Save outputs.
@@ -51,8 +53,18 @@ def read_table(snap: Snapshot) -> Table:
     df = pd.json_normalize(data=data, record_path=["distribution"], meta=["country"])
     # Convert to Table (df -> tb)
     tb = _add_table_and_variables_metadata_to_table(
-        table=Table(df),
+        table=Table(df, underscore=False),
         metadata=snap.to_table_metadata(),
         origin=snap.metadata.origin,
     )
     return tb
+
+
+def unpivot(tb: Table) -> Table:
+    """Unpivot incoming table."""
+    df = tb.melt(
+        id_vars=["country", "total_sequences", "week"],
+        var_name="cluster",
+        value_name="num_sequences",
+    )
+    return df
