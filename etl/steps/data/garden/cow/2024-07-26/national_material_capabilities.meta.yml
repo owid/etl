@@ -1,0 +1,342 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &common-display
+      tolerance: 5
+    presentation:
+      topic_tags:
+        - Military Personnel & Spending
+
+  description_from_producer_milex: |-
+    _Data Acquisition and Generation_
+
+    Since our primary interest was to index all financial resources available to the military in time of war, we coded all resources devoted to military forces that could be deployed, irrespective of their active or reserve status.
+
+    Appropriations for all the types of units mentioned earlier were included when the units were under the authority of officials of the national government, even if the units did not contribute to the personnel variable. Such units typically were excluded from published budgets, in any case. It is important to note that in our assessments the sources of military expenditure data often provided gross (rather than net) expenditure figures.
+
+    We sought to identify and exclude all appropriations of a non-military character because some nations have civil ministries under military control (national police forces is the most prevalent example). The use of such unadjusted budgets would substantially over-estimate the military capability of those nations. If there was a clear bureaucratic division between the execution of civil and military functions, this task was easily accomplished. For instance, if there were separate accounting and authorization procedures for merchant- and military-marine, expenditures of the former were excluded. On the other hand, merchant marine expenditures charged to the same administrative units that carried out military marine functions were included in the project's tabulations. Likewise, the budget figures were adjusted upward where we determined that outlays in other parts of the budget served to enhance military capacity.
+
+    Having made the above distinction concerning money spent on military forces, we delimited part of the latter directly related to a country's war fighting capacity; that is, we had to distinguish which figures going for military purposes were destined to enhance capability. We deemed that expenditures on pensions, superannuation pay, relief, and subsidies to widows and orphans do not contribute to military power and excluded them where possible. For most statistically developed countries, these items were found to be readily identified in a separate section of the military budget, or charged outright to the finance ministry.
+
+    We decided to identify gross rather than net expenditures, so as to sidestep problems of accounting for the yearly variations in stockpile buildup, depreciation, and liquidation. As with the accounting of energy stocks, little was found that would have allowed us to determine net expenditures.
+
+    We closely attended to allocations, usually found in supplemental budgets, special accounts, and war credits and loans, over and above regular appropriations. Examples include the special funds and credits voted during the mobilizations prior to and during the two world wars, and the loans contracted by Prussia prior to the Franco-Prussian War.
+
+    With regard to these special appropriations, some ambiguity exists as to which year the expenditures should be assigned. Since our objective was that each unit of currency spent on military capabilities should be counted only in the year that it directly enhanced military capability, it counted surpluses and credits transferred from past years (when known) among the expenditures of the referent year.
+
+    For example, expenditures from special accounts (such as the construction of fortifications or the purchase of armaments) were included in the expenditure totals for that year. If the special account was composed of transfers from the general budget, expenditures on that account were included in the year in which they were spent or projected to be spent. If the special account was composed of credits budgeted to a war ministry in previous years, but unspent in those previous years, we included only actual expenditures from that account in the project's totals for the appropriate years. Outlays for the amortization of debts incurred were excluded, since the project had already counted them in the year in which the military items were acquired. Thus, if a naval ship was acquired in 1923 but not paid for until 1926, we counted the corresponding expenditure in 1923. Surplus military appropriations from previous years were counted as military expenditures only for those years when the funds were actually spent.
+
+    The customary difficulties in Soviet statistics were resolved by period. For the years prior to the Second World War, the fragmentation of the evidence precludes an appraisal of real expenditures. Rather than engage in speculation, the project reported the official figures published in the League of Nations Armaments Year-Book from 1924 to 1940. From 1955 to 1963 we utilized SIPRI estimates and from 1963 on have used ACDA figures.
+
+  description_from_producer_milper: |-
+    _Data Acquisition and Generation_
+
+    Military personnel are defined as troops under the command of the national government, intended for use against foreign adversaries, and held ready for combat as of January 1 of the referent year. It is important to note that any date besides January 1st would have been appropriate for the majority of cases because the data values change slowly. On occasion, however, there are instances where there are rapid changes in troop strength, such as mobilizations for conflicts and wars. Short-term variations in strength are not reflected in the project's data unless the changes remained in effect until the following January 1. With this definition in place, there are five important aspects of quantifying military personnel that need elaboration.
+
+    First, the project counted only those troops under the command of the national government. These troop strengths include active, regular military units of the land, naval, and air components. Troops in the reserves such as those found in the United States were not included in the state’s annual total. Colonial troops (such as Indian troops under British command during India’s colonial period) were usually not included in this total if they were a separately administered force.
+
+    Second, the military personnel data exclude the military forces of foreign military forces, semi-autonomous states and protectorates, and insurgent troops. Such units were not part of a regular national armed force under a military chain of command. Their inclusion would distort the number of personnel that could be summoned when deemed necessary.
+
+    Third, these figures reflect the project's best judgment on which forces were intended for combat with foreign parties. Irregular forces such as civil defense units, frontier guards, gendarmerie, carabineri, and other quasi-military units were nominally responsible for defending outlying districts or for internal security and could be mobilized in time of war. We usually excluded them, however, because they were not integral to the regular armed forces (e.g. Cossack troops of nineteenth century Russia). When these forces were the only military a nation had they were still excluded (e.g. Costa Rica and Switzerland).
+
+    A fourth aspect concerns armed forces in several semi-feudal nations, including the warlord armies in pre-modern Japan and China, and Jannissary troops in the Ottoman Empire. Not all nations were quick to adopt Western military organization. We counted only those forces that were acting at the behest of the central government. For example, we included only the Imperial troops and those armies of feudal lords operating on the behalf of the throne in the case of pre-modern Japan.
+
+    A final aspect concerns national police forces organized for both foreign and domestic purposes and found in several developing nations in the twentieth century. Such units come directly under the military chain of command and are fully a part of the armed forces at the immediate disposal of a national government. Examples include the old National Guard of Nicaragua and the national police forces of many African states. When such forces provided dual functions of foreign combat and internal security, we included them in its military personnel figures; otherwise, they were excluded.
+
+    Usually it was only after 1960 that we found ready-made data (including army, navy, and air force totals) meeting our coding criteria and aggregated into the desired totals. Elsewhere, we assembled the data from bits and pieces. Given a figure that did not fully meet our inclusion/exclusion criteria, we used it only after locating supplementary information that could be used to adjust it. Confronted with conflicting figures, we adopted those that best matched the contemporary data, and only if they seemed historically plausible. In practice, frequently it was impossible to find documentation reflecting the January 1 criterion. In most such cases, however, the figures were changing sufficiently slowly to afford an acceptable approximation. In cases of rapid military change, such as the onset of war, we took note of the fact in arriving at a plausible estimate. Because of the relatively great sensitivity of personnel levels to transitory circumstances such as war involvement, we used estimates to fill missing entries only when they did not occur in such circumstances.
+
+  description_from_producer_irst: |-
+    _Data Acquisition and Generation_
+
+    Iron and steel production trends since 1816 involve transitions concerning the categories of iron produced and the types of fuels used in making iron and steel. In general, “cast iron” means all iron, including “pig iron” that has at least 0.3% carbon. Specifically, cast iron includes all iron that has been molded into functional shapes. “Wrought iron” (“puddle iron” or “bar iron”) is made from pig iron (except in a small percentage prior to 1850, when it was made directly from ore) in a puddling furnace. It is very pure (containing less than 0.04% carbon) and relatively malleable. Steel has an intermediate carbon content between 0.04 and 2.25%.
+
+    Until around 1870, cast iron and wrought iron were the principal products. The proportion of the former as a final product steadily decreased until castings, as a proportion of total blast furnace production, amounted to less than 0.1% and wrought iron became the primary metal of construction.
+
+    By 1880, the Bessemer invention and improvements in coking made wrought iron production obsolete. The use of coke as an inexpensive, non-volatile, and structurally solid fuel allowed the construction of larger blast furnaces. The use of coke combined with the rapid steel production in the Bessemer invention, made steel the primary commercial metal.
+
+    While wrought iron was of primary importance as a finished good prior to 1870, we did not use it as an indicator because: 1) pig iron data is more readily available; 2) in our judgment, use of the former would underestimate industrial activity in some states, notably the United States; and 3) such use would downplay the importance of cast iron production, especially prior to 1850. Steel production totals were too low in many states to reflect accurately industrial activity in the nineteenth century. Instead, for the years 1816-1899, we estimated iron production from pig iron output. When direct castings output was reported separately from pig iron, we added these totals to the reported pig iron. This reflects our judgment that direct castings are nothing more than “cast” pig iron. Our selection of crude pig iron plus separately reported direct castings is plausible because this output was part of every activity in the iron and steel sectors of the economy.
+
+    Where iron production appeared in disaggregated form, we summed the appropriate raw figures to form the total pig iron output. This was done most often for Prussian and Austrian data when we had to transform the old Prussian and Austrian centners into tons.
+
+    By 1900, the preferred product of this economic sector was clearly steel, hence our use of steel output as an indicator. This date is somewhat arbitrary since any year from 1890 to around 1910 could have been chosen for the same reason. It is, however, a reasonable midpoint for our analysis. By 1910, virtually every nation that produced iron in the nineteenth century had matched in the output of steel its previous rank as measured in pig iron. We are confident that the two indicators are roughly equivalent measures of industrial activity at the point of transition.
+
+  description_from_producer_pec: |-
+    _Data Acquisition and Generation_
+
+    Primary Energy Consumption measures one element of the industrial capacity of states in the international system. Simply put, the greater the energy consumption, the larger the potential manufacturing base of an economy, the larger the potential economy of the state in question, and the more wealth and potential influence that state could or should have. PEC is a derived indicator, computed using Equation One below:
+
+    Equation ENER 1: Primary Energy Consumption Formula Consumption = Production + Imports – Exports – Δ in Domestic Stocks
+
+    This formula is quite similar to the one utilized in the original coding manual, except for one change—the inclusion of domestic stocks into the equation (Singer et al, p. 21). This reflects that states will maintain supplies of energy-producing commodities in the event that there are disruptions of import or export flows.
+
+    Primary Energy Consumption comes from (and is computed using data about) four broad categories of sources—coal, petroleum, electricity, and natural gas. Each of these elements is broken into a variety of different elements. It is important to note that these forms of energy are all types of commercial energy. Many other forms (such as animal waste, peat, and wood- burning) exist, however these other energy sources are of such small amounts that they do not qualify as industrial energy sources. The raw data for each commodity is converted into a common unit (in this case, one thousand metric ton coal equivalents) and then summed to produce the energy consumption for a given state in a particular year.
+
+    The data series runs from 1816 (when the Correlates of War project begins to track the international system) until 1998 (the last year the United Nations publishes comparable, cross- national data on energy consumption). Data on these commodities comes primarily from two sources. For the pre-1970 portion of the data, much of the data necessary to compute PEC comes from the Mitchell International Historical Statistics series. After 1970, the data come from the Energy Statistics Yearbook published by the United Nations. This is a change from previous data sets. Older versions of the data set obtained much of the PEC data during the pre-1970 period through state-specific sources, and not a single, common source. This made tracing the source of many of the original data points impossible. In this version, however, there are far more points that come from only a few sources instead of an amalgamation.
+
+    United Nations Data. This data source was utilized for all states whenever possible. Overall, the UN began collecting PEC data for some states (particularly the United States, Western Europe, Soviet Union, China, Japan, and Australia) starting in 1950. Comprehensive data on all the states in the international system only began between 1968 and 19707.
+
+    The United Nations data arrives already converted into one thousand metric coal-ton equivalents. However, Mitchell data were disaggregated into four major commodities (coal, petroleum, electricity, and natural gas); UN data is aggregated into four major categories: production, imports, exports, and changes in domestic stocks (in accordance with Equation One above). This required a different combination scheme. Simply put, Equation One was applied to the UN data to calculate PEC. However, there were a number of blank cells contained within the data that had to be addressed in order to make the calculations. The assumption that was used for the UN data only was that if the data were missing, the value was zero.
+
+    Using this technique, there were no negative data values produced. As is also apparent, there are no data cells where all the information is missing; there are some values that can be calculated for each state in the international system.
+
+    Mitchell Data. Primary Energy Consumption computed using Mitchell data is comprised of four energy-producing commodities: 1) Coal; 2) Petroleum; 3) Electricity; and 4) Natural Gas. This section will discuss each of these commodities, looking at a brief history, conversion formulas, and potential problems found within each commodity.
+    Coal. Of all the industrial indicators, coal is the only indicator that covers the entire time span from 1816 to the present. Coal is the primary energy consumption element for all states prior to World War One. It is also the metric standard by which all this energy consumption data is measured.
+
+    In this data collection effort, three types of coal were identified: Anthracite, Bituminous, and Brown. Anthracite and Bituminous are very similar; they are the hard, black coal found in most mines throughout the world8. These two types of coal are the standard by which all other energy consumption elements are measured.
+
+    Brown coal, on the other hand, is softer, quicker burning, and less efficient as an industrial fuel. There are a variety of different types of brown coals (a type called lignite is mentioned most often), and their quality is often dependent on where a state is located in the world. In order to account for these differences, this data set utilized a state-by-state brown coal conversion table.
+
+    Some similar conversion values appeared in previous versions of the coder’s manual (Singer et al, Table Three, p. 28). There are some differences between that table and the one presented by Darmstadter. We choose to utilize the table as presented by Darmstadter. One potential problem arose in these brown coal conversions. There were three cases where there was no brown coal conversion presented for a given state, even though the Mitchell data documented that the state in question produced brown coal. These states are Hungary (HUN, 310), Iran (IRN, 630), and Mongolia (MON, 712). For these three states, this computation utilized the conversion factor for a state on the list that is geographically proximate to the state in question. These proximate states were Austria (AUS, 305), Turkey (TUR, 640), and North Korea (PRK, 731), respectively.
+
+    Petroleum. Petroleum is the second most prevalent source of industrial energy consumption. Relatively speaking, petroleum products were a minor source of commercial energy until the advent of the automobile after the turn of the century. Since then, however, petroleum has become a highly important industrial energy source.
+
+    In generating usable data from the raw petroleum figures presented, it is often necessary to perform two types of conversions. First, it is necessary to convert the raw data into metric tons. Second, it is then necessary to convert data from the metric ton of petroleum into metric tons of coal equivalency. I will look at each of these in turn.
+
+    There were two alternate measures used throughout the Mitchell Data. They were “One Million US Gallons” and “One Thousand Barrels.” The conversions from their respective units into metric ton equivalencies for each of these measures are listed in Equations ENER 4 and ENER 5 below:
+
+    Equation ENER 4: Millions of US Gallons to Thousands of Metric Tons of Oil ____M US Gallons * 3.2468 = ____K Metric Tons of Oil
+    Equation ENER 5: Thousands of Barrels to Thousands of Metric Tons of Oil ____K Barrels * 0.1366 = ____K Metric Tons of Oil
+
+    In converting petroleum into coal-ton equivalents, Mitchell distinguished between two major forms of petroleum: 1) Crude, and 2) Refined. The conversions for each of these two types of oil are listed below:
+
+    Equation ENER 6: Crude Petroleum to Coal Ton Equivalents
+    ____K Metric Tons Crude Petroleum * 1.429 = ____K Coal Ton Equivalent
+
+    Equation ENER 7: Refined Petroleum to Coal Ton Equivalents
+    ____K Metric Tons Refined Petroleum * 1.474 = ____K Coal-Ton Equivalent
+
+    One of the difficulties of converting petroleum products into coal equivalents is that petroleum products come in a variety of different weights and types, each of which has its own conversion value. Unfortunately, Mitchell does not distinguish between the many different weights and types of petroleum products—this source only utilizes the crude and refined categories listed above. In order to overcome this problem, it was necessary to make some assumptions about the conversion formulas utilized here. For crude oil, the conversion factor utilized here is the conversion for crude oil of average viscosity15. For refined products, the conversion stems from two considerations. First, this value is the conversion for kerosene, the major refined petroleum product prior to World War One. Second, it is also the approximate mean value for all refined petroleum products that have been produced following World War One. For instance, gasoline and liquefied petroleum gases both have higher conversion factors to coal-ton equivalents than kerosene (1.500 and 1.554, respectively, as compared to 1.474 for kerosene; taken from Energy Statistics Yearbook, p. xlv). However, gas-diesel oils and residual fuel oil have lower conversion formulas than kerosene (1.450 and 1.416, respectively; taken from Energy Statistics Yearbook, p. xlv). Because some types of refined petroleum products have greater conversion factors and others have smaller conversion factors, this conversion value appears to be a good approximation for all types of refined petroleum products. It is vital to note, however, that in the UN data this assumption is unnecessary. The United Nations collects data on each individual commodity, in its original form, and makes its calculations based on the values of these individual characteristics instead of on an assumption about homogeneity. Therefore, these assumed values above are only concerned with the Mitchell Data calculated before 1970.
+
+    Electricity. After 1900, electrical production enters the world energy picture. It is important to note, however, that the electrical production values listed here DO NOT include electricity produced from fossil fuels; these types of energy production are included in the coal, oil, and natural gas components of the data. Electrical production here includes three types of electrical production: 1) Hydroelectric, 2) Nuclear, and 3) Geothermal.
+
+    Conversion from electrical energy production into coal-ton equivalents utilizes the following formula:
+
+    Equation ENER 8: Electrical Energy Conversion
+    ____ Giggawatts * 0.123 = ____ K Coal-Ton Equivalents
+
+    Mitchell’s aggregation of raw data again makes assuming necessary, which is central to this conversion factor. Mitchell does not distinguish between hydroelectric, nuclear, or geothermal energy. He aggregates these three vastly different categories into one category. Therefore, it was again necessary to assume about the type of energy that was produced prior to 1970.
+
+    The assumption utilized here (and in the conversion above) is that all electricity before 1970 is hydroelectric power. Prior to 1970, this assumption is quite tenable—before World War Two, nuclear and geothermic electricity did not exist. After World War Two, the nuclear reactor was only becoming commercially available and viable in the early 1960s16, and only by 1970 were there enough nuclear plants to make any measurable contribution to energy production. Only after the oil shocks of the 1970s (when this data set utilizes UN data that separates conversion rates for each type of electricity) did research and utilization of these alternate forms of electrical generation step into high gear.
+
+    The potential biasing impact of this assumption is diminished again because of the prevalence of UN data. The UN again distinguishes between all three of the aforementioned electricity types, converting each according to its own conversion factor. Therefore, in states where nuclear power is prevalent, such as the United States, Western Europe, Soviet Union, China, and Japan, their data come from the UN beginning in 1950, making this assumption not apply to these states in question.
+
+    One difference between the version presented here and version 2.1 is a change in the conversion rates utilized. Version 2.1 utilized a conversion rate that evolved from 1.0 in 1919 to 0.3 in 1971 (Singer et al, 1990, p. 28; originally published in Darmstadter 1971, p. 83017). The original researchers believed that there was an evolution of electric-producing technology, making more efficient electrical production possible over time, necessitating a moving scale. The UN, however, rejects this conversion and utilizes fixed conversion factors. Because the UN data is utilized for computing far more data points than anything in the Darmstadter era, version three utilizes UN data conversion techniques, which for electrical consumption utilizes a constant conversion rate.
+
+    Natural Gas. Natural gas production was the last of the four energy commodities to appear on the industrial scene. Present for as long as there were petroleum production facilities, natural gas was often burned off at the site, instead of being used for more commercial purposes. Only in the last fifty years has the condensation, refrigeration, and storage technology been available to harness this source of energy for commercial purposes.
+
+    The conversion formulas for computing natural gas production into coal ton equivalents appear as Formulas ENER 9 and ENER 10 below.
+
+    Formula ENER 9: Cubic Meters of Natural Gas to Coal Ton Equivalents ____M Cubic Meters Natural Gas * 1.33 = ____K Coal-Ton Equivalents
+    Formula ENER 10: Petajoules of Natural Gas to Coal Ton Equivalents ____Petajoules * 34.121 = ____K Coal-Ton Equivalents
+
+    For most of the data points, the “million cubic meters” is the standard unit for natural gas production. The Petajoule became the basic unit of natural gas production in 1966, necessitating a different conversion formula.
+
+  description_from_producer_tpop: |-
+    _Data Acquisition and Generation_
+
+    While the most reliable total population figures usually appear in national government tallies, modern census-taking was rare before 1850 in Europe and countries of European settlement, and rare before the First World War elsewhere. In all periods, the accuracy and reliability of national census data seem to vary with the level of economic development. As a result, data from the developing world require particular scrutiny.
+
+    A census may be of the de facto population, comprising all residents within the national boundaries, or of the de jure population, comprising only those who are legal residents. We used the former, where possible, to which totals of military personnel abroad were added. Since the differences between de jure and de facto (between "total" and "total home") population are typically small, we did not analyze this data for sensitivity to these coding distinctions.
+
+    The United Nations Statistical Office has an estimated yearly total population series, corrected for over- and under-enumeration to the extent possible, for most nations since 1919. We relied on those series where possible.
+
+    For prior years and nations where we found one or more plausible time series, we took data from the sources presenting the greatest continuity with the U.N. data. We uncovered most of the general censuses taken since 1816 and used alternative sources for the numerous remaining gaps. For example, Japan maintained a system of population registration through a rough running tally. Other countries took sample surveys from which they constructed estimates of the total population. We judged these sources the most reliable.
+
+    For the occasional nation maintaining reasonably complete registers of vital events (e.g. the United Kingdom), we estimated missing data utilizing Formula TPOP One:
+    Formula TPOP 1: Missing Total Population Data Estimations p(t) = p(to) + b(t) - d(t) + i(t) - e(t),
+    where:
+    p(t) is the known or estimated population at time t, p (to) is the population recorded at time to, and
+    b(t), d(t), i(t), and e(t) are the respective numbers of births, deaths, immigrants, and emigrants recorded since t0.
+
+    Net migration is usually small enough to be safely disregarded. For nations maintaining registers of births and deaths but not of migration, we estimated i(t) - e(t) to be zero.
+
+    In lieu of complete demographic records, we resorted to estimation either (1) by interpolation, or (2) by least-squares linear regression with time as the independent variable. The choice between them was based on the availability and quality of information, and on whether the period in question was marked by major wars or territorial boundary changes. First, however, we must note four types of situations in which such change did not take place.
+
+    The first concerns the many cases for which censuses had been taken regularly. In these cases, the only missing records were for the intervening years. In such instances we interpolated between census records using Formula TPOP Two Below:
+
+    Formula TPOP Two: Interpolation Between Known Data Points
+
+    logp(t)= (logp(t2)−logp(tx) (t2 −t1)(t−t1)+logp(t)
+
+    where:
+    p(t1) and p(t2) are the known population figures at time t1 and t2.
+
+    This method entailed the assumption of a constant growth rate over the period delineated by t1, t2, and tx from which the formula is derived.
+
+    In a second type of situation, taking account of the country's demographic history, the manner and quality of its census-taking, the later population trends, and the opinion of demographers, we were able to discern a plausibly reliable population series even though regular censuses were not available. Again, we resorted to interpolation as here it seemed appropriate.
+
+    A second type of concern arose where data for the final years in a series were missing, either because of loss of national identity (e.g. Estonia, Latvia, and Lithuania in 1940, or Austria- Hungary during World War One). In these cases, we resorted to extrapolation using the above interpolation formula.
+
+    A third concern was a problem of having no uniform data series at our disposal and what sources were available providing only a patchwork of spotty and conflicting coverage. In this type of situation, we estimated population by regression performed on the logarithms of the known data. A prime consideration in our willingness to use this technique was that data for well-documented nations indicates that growth rates usually change quite slowly. Distortions were thereby introduced but not to as great a degree as would arise from applying interpolation and extrapolation to these highly erratic data. Where necessary, to bring the estimates into agreement with the uniform (typically post-1919 United Nations) series of an adjoining epoch, we raised or lowered the regression line - while maintaining the same slope - such that the line passed through the adjacent values of the series.
+
+    Finally, in situations of marked discontinuity in population trends associated with wars and exchanges of territory, we applied the above methods as appropriate, but only to the separate intervals on either side of the discontinuity, and only where it could document its demographic magnitude. Interpolation, for example, could be used only if total population before and after the break, or one of them plus the magnitude of the change, was known. We treated all cases in which the nation gained or lost at least 1% of its total home population in this manner. For territorial exchanges, we were able to document many of the gains and losses. We were, however, usually unsuccessful in documenting war losses. Its method was to adjust for the affect of territorial changes and then to extrapolate forward from pre-war and backward from post-war data. Unless otherwise noted, population losses due to war were prorated over its duration. The most pronounced instance was over estimate of Chinese population during and immediately after the Taiping rebellion.
+
+  description_from_producer_upop: |-
+    _Data Acquisition and Generation_
+
+    "Urban population" is a difficult concept to specify and operationalize for a professional demographer, let alone an international relations researcher. What criterion best captures the meaning of the term? A common approach is to include all cities that exceed a size threshold. Many such thresholds, ranging from 5,000 to 100,000 inhabitants, have been advanced. By virtue of its simplicity, we adopted the threshold criterion using the upper value of 100,000.
+
+    This choice has the advantage of facilitating data completeness, which is problematic at lower values. It has the corresponding liability that, in the early 1800s, many areas that one might consider "urban" did not contain 100,000 people. Moreover, the approach appears less well suited for the contemporary period, when build-up areas frequently are comprised, in large part, of many smaller cities and unincorporated places.
+
+    While the best data came from national censuses, several of them do not tabulate urban population. Some developed nations take sample surveys to construct reasonable estimates of urban population while multinational sources and demographic experts also publish data based on their own estimation procedures. We used such estimates whenever they did not contradict formal census figures.
+
+    The data reflect varying national definitions of what constitutes an incorporated city or urban area; we used these figures where alternatives were unavailable. Occasionally, a source changed its city definition, thus creating a discontinuity in the time series. In instances before 1945 where more than one alternative was offered as to the boundaries of a city, we adopted the one more closely reflecting the built-up area. Otherwise, we entered the data as it was reported.
+
+    Occasionally, the data reflect a mix of and de jure information. In some states, it was the case that there would be de facto data for one urban area while there would only be de jure data for another urban area of within a state. For instance, looking to Russian urban data, it is rather easy to find recorded urban population data for the Moscow urban area; finding recorded data on St. Petersburg or Vladivostok is much more challenging. Usually we found only one or the other; secondary sources offered scant clarification in order to present a series with as much documented data as possible. Faced with this ambiguity, we averaged across de facto and de jure totals. For the occasional country that mixes data from different years in the same report, the project used interpolation and extrapolation to estimate the referent year.
+
+    Often, the value of the same urban population datum is revised from one demographic yearbook to the next. Presuming that revised data are more accurate, we used them. When, as often was the case, this introduced a discontinuity between the first year appearing in the revised series and the previous year appearing in the old, we performed log-linear regression on all the old data in our pooled series and adjusted the regression line to match the revised data points.
+
+    When we encountered numbers from other sources significantly different from the United Nations series, we used the U.N. figures unless they were irregular. In the latter cases, we used the log-linear regression method on available data points, the United Nations and otherwise. For cases of recently declining urbanization (e.g. Belgium and the Netherlands in the 1970s), we filled the data gaps in the same way using a constant negative growth rate.
+
+    We conceive of urbanization as a continuous process, for which the growth rate should vary smoothly. On the other hand, the inclusion of additional cities, as they exceed the population threshold, introduces discontinuities in the census totals. Moreover, some cities appear in one enumeration, but are absent from the next. Cities also occasionally make first-time appearances bearing totals well over the threshold population value. Secondary sources remedied the situation to a limited extent. Since interpolated and extrapolated values can be dominated by such irregularities, we frequently used log-linear regression as a means of smoothing the data obtained by the above methods to obtain a final estimate.
+
+  description_from_producer_cinc: |-
+    The Composite Index of National Capability (CINC) score (Singer, Bremer and Stuckey, 1972) aggregates the six individual measured components of national material capabilities into a single value per state-year. The CINC reflects an average of a state’s share of the system total of each element of capabilities in each year, weighting each component equally. In doing so, the CINC will always range between 0 and 1. “0.0” would indicate that a state had 0% of the total capabilities present in the system in that year, while “1.0” would indicate that the state had 100% of the capabilities in a given year (and by definition that every other state had exactly 0% capabilities in that year.) More specifically, the CINC is calculated using the following steps:
+
+    1) The sum of each of the six capability elements is computed separately for each year. For example, if there were 10 states in the system in a given year, the IRST values for those 10 states would be summed to create a total amount of IRST production in the system. If a state’s value is missing, it contributes nothing to the total. This creates six “total” variables for each year: total IRST, total PEC, etc. ;
+
+    2) Each state’s individual value in a year is divided by the total to create a share of the system total. For example, if a state has a MILPER value of 300, and the system total is 20000, the state’s share is 0.015. Each state now has a share-of-system value for each of the NMC six components. If a state’s individual value is missing, then the share value is coded missing; and
+
+    3) For each state, the values of the non-missing shares are averaged to produce the CINC score. So if a state had share values of 0.01, 0.02, 0.02, 0.03, 0.03, and 0.076, the CINC (average) value would be 0.031. The average is computed across the non-missing components only. Hypothetically, CINC could then be computed on as few as one component, if the other give were all missing in a given year. In practice, all observations in the NMC data set have at least two components. 83.29% of the state-year observations in the set have data on all six components; 13.76% have data on five; 2.71% have data on four; 0.23% of cases have data only on two or three components. Because CINC is sometimes computed on a varying number of components, the sum of all CINC scores across all states in the system in any year may be slightly greater than or less than 1.0.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  national_material_capabilities:
+    variables:
+      milex:
+        title: Military expenditure (current GBP and US$)
+        unit: "current GBP and US$"
+        short_unit: "$"
+        description_short: This data is expressed in British pounds prior to 1914 and US dollars thereafter. It is not adjusted for inflation or differences in the cost of living between countries.
+        description_from_producer: |-
+          Military expenditure is each state’s total military budget in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_milex}
+        processing_level: minor
+        presentation:
+          title_public: Military expenditure
+        display:
+          name: Military expenditure
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      milper:
+        title: Military personnel
+        unit: "people"
+        short_unit: ""
+        description_short: Troops under the command of the national government, intended for use against foreign adversaries, and held ready for combat as of January 1 of the given year.
+        description_from_producer: |-
+          Military Personnel is the size of a state’s military personnel in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_milper}
+        processing_level: minor
+        presentation:
+          title_public: Military personnel
+        display:
+          name: Military personnel
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      milper_share:
+        title: Military personnel as a share of total population
+        unit: "%"
+        short_unit: "%"
+        description_short: The ratio of military personnel to total population, expressed as a percentage.
+        description_processing: |-
+          We have divided the number of military personnel by the total population and multiplied by 100 to express the result as a percentage. Both indicators are provided by the source.
+        processing_level: major
+        presentation:
+          title_public: Military personnel as a share of total population
+        display:
+          name: Military personnel as a share of total population
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      irst:
+        title: Iron and steel production
+        unit: "metric tons"
+        short_unit: "t"
+        description_short: Involve transitions concerning the categories of iron produced and the types of fuels used in making iron and steel.
+        description_from_producer: |-
+          Iron and Steel production reflects a state’s production of pig iron (1816-1899) and steel (1900-2016) in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_irst}
+        processing_level: minor
+        presentation:
+          title_public: Iron and steel production
+        display:
+          name: Iron and steel production
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      pec:
+        title: Primary energy consumption
+        unit: "coal-ton equivalent"
+        short_unit: ""
+        description_short: Measures one element of the industrial capacity of states in the international system. Simply put, the greater the energy consumption, the larger the potential manufacturing base of an economy, the larger the potential economy of the state in question, and the more wealth and potential influence that state could or should have.
+        description_from_producer: |-
+          Primary Energy Consumption is a state’s consumption of energy (metric ton coal equivalent) in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_pec}
+        processing_level: minor
+        presentation:
+          title_public: Primary energy consumption
+        display:
+          name: Primary energy consumption
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      tpop:
+        title: Total population
+        unit: "people"
+        short_unit: ""
+        description_short: ""
+        description_from_producer: |-
+          Total population is the size of a state’s civilian population in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_tpop}
+        processing_level: minor
+        presentation:
+          title_public: Total population
+        display:
+          name: Total population
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      upop:
+        title: Urban population
+        unit: "people"
+        short_unit: ""
+        description_short: ""
+        description_from_producer: |-
+          Urban population is the size of a state’s urban population in each year for the period 1816-2016.
+
+          {definitions.description_from_producer_upop}
+        processing_level: minor
+        presentation:
+          title_public: Urban population
+        display:
+          name: Urban population
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      cinc:
+        title: Composite Index of National Capability (CINC)
+        unit: ""
+        short_unit: ""
+        description_short: "Measures national power by averaging the state's global share of six different components: military expenditure, military personnel, iron and steel production, primary energy consumption, total population, and urban population."
+        description_from_producer: |-
+          {definitions.description_from_producer_cinc}
+        processing_level: minor
+        presentation:
+          title_public: Composite Index of National Capability (CINC)
+        display:
+          name: Composite Index of National Capability (CINC)
+          numDecimalPlaces: 3
+          <<: *common-display

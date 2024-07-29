@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: National Material Capabilities
+    description: |-
+      The National Material Capabilities data set contains annual values for total population, urban population, iron and steel production, energy consumption, military personnel, and military expenditure of all state members, currently from 1816-2016. The widely-used Composite Index of National Capability (CINC) index is based on these six variables and included in the data set.
+    date_published: "2021-07-22"
+    version_producer: Version 6.0
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      - Singer, J. David, Stuart Bremer, and John Stuckey. (1972). “Capability Distribution, Uncertainty, and Major Power War, 1820-1965.” in Bruce Russett (ed) Peace, War, and Numbers, Beverly Hills: Sage, 19-48.
+      - Singer, J. David. 1987. “Reconstructing the Correlates of War Dataset on Material Capabilities of States, 1816-1985” International Interactions, 14: 115-32.
+    attribution: Correlates of War - National Material Capabilities Version 6.0 (2021)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/national-material-capabilities/
+    date_accessed: 2024-07-26
+
+    # License
+    license:
+      name: Correlates of War - FAQ
+      url: https://correlatesofwar.org/faq/
+
+outs:
+  - md5: deb9233af1bc4ebc5c1852e93272990e
+    size: 905231
+    path: national_material_capabilities.csv
