@@ -117,6 +117,13 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
+
+  # AI adoption by organisations
+  data://garden/artificial_intelligence/2023-06-14/ai_adoption:
+    - snapshot://artificial_intelligence/2023-06-14/ai_adoption.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_adoption:
+    - data://garden/artificial_intelligence/2023-06-14/ai_adoption
+
   # ImageNet
   data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
     - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
