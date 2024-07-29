@@ -20,9 +20,10 @@ tables:
     variables:
        pct_of_respondents:
         title: Organizations reporting having adopted AI
-        description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function, based on an average of 1,763 companies that responded to a global survey over those years.
+        description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function.
         description_key:
           - Share of respondents who reported that their organizations have adopted AI in at least one function, with a breakdown by region. The regional groupings, as defined by McKinsey & Company, classify countries into specific categories. The "Developing Markets" grouping includes countries such as India, Latin America, and the Middle East and North Africa (MENA). The "Greater China" grouping includes Hong Kong and Taiwan.
+          - The number of companies that respond to the survey varies between years and ranged between 1365 and 1843 between 2021 and 2024.
         unit: '%'
         short_unit: '%'
         display:
