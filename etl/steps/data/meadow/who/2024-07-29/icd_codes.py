@@ -2,7 +2,6 @@
 
 import zipfile
 
-from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
