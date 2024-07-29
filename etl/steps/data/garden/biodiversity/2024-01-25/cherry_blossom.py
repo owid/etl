@@ -1,7 +1,11 @@
+import time
+
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# DELETEME
 
 log = get_logger()
 
@@ -11,6 +15,8 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("cherry_blossom.start")
+
+    time.sleep(63)
 
     # read dataset from meadow
     ds_meadow = paths.load_dataset("cherry_blossom")

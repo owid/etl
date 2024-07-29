@@ -416,20 +416,28 @@ def run_dag(
         def on_failure_hook(task: prefect.Task, task_run: TaskRun, state: prefect.State):
             """Cancel all tasks if one fails."""
             with get_dask_client() as client:
-                futures = client.futures_of(client)
-                for future in futures:
-                    client.cancel(future)
+                print("Failure detected. Shutting down Dask client and cancelling all tasks.")
+                # force kill Dask client
+                client.shutdown()
 
         @prefect.flow(log_prints=True, task_runner=task_runner)
         def run_etl(steps):
             task_futures: Dict[str, PrefectFuture] = {}
 
             for step in steps:
-                task = prefect.task(name=str(step), on_failure=[on_failure_hook])
+                # task = prefect.task(name=str(step), on_failure=[on_failure_hook])
+                task = prefect.task(name=str(step))
 
                 # include dependencies that are in the list of steps
                 wait_for = [task_futures[str(dep)] for dep in step.dependencies if str(dep) in task_futures]
-                task_futures[str(step)] = task(step.run).submit(wait_for=wait_for)
+
+                def run_step(grapher_insert_workers=config.GRAPHER_INSERT_WORKERS):
+                    # We dynamically update `GRAPHER_INSERT_WORKERS` based on number of processes, the change in config
+                    # is not propagated when Dask creates a new process. We have to set it inside each task.
+                    config.GRAPHER_INSERT_WORKERS = grapher_insert_workers
+                    return step.run()
+
+                task_futures[str(step)] = task(run_step).submit(wait_for=wait_for)  # type: ignore
 
         return run_etl(steps)
 
