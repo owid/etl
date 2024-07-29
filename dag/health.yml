@@ -189,6 +189,7 @@ steps:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+    - data://garden/owid/latest/key_indicators
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 

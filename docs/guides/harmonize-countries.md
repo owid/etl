@@ -1,7 +1,3 @@
----
-status: new
----
-
 A crucial step in the ETL process is harmonizing country names. This is because different datasets or providers may use different names to refer to the same country. We want to keep country names consistent, and use names from our standardised list.
 
 !!! info
@@ -135,7 +131,6 @@ harmonize_ipython(
 ```
 
 The harmonizer will present a form with a list of ambiguous country names and ask you to select the correct country name from a list of suggestions (ranked by similarity). This is similar to the experience that you'd get from Wizard or the CLI.
-
 
 <figure markdown="span">
   ![Chart Upgrader](../assets/harmonize-ipython.gif)

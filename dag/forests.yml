@@ -7,3 +7,12 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/forests/2024-05-08/ifl:
     - data://garden/forests/2024-05-08/ifl
+
+  # Dominant Driver of Forest Loss
+  data://meadow/forests/2024-07-10/tree_cover_loss_by_driver:
+    - snapshot://forests/2024-07-10/tree_cover_loss_by_driver.csv
+  data://garden/forests/2024-07-10/tree_cover_loss_by_driver:
+    - data://meadow/forests/2024-07-10/tree_cover_loss_by_driver
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
+    - data://garden/forests/2024-07-10/tree_cover_loss_by_driver

@@ -1,0 +1,33 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: COVID-19 Dashboard
+    description: Daily COVID-19 cases and deaths by date reported to WHO
+    description_snapshot: |-
+      From the 31 December 2019 to the 21 March 2020, WHO collected the numbers of confirmed COVID-19 cases and deaths through official communications under the International Health Regulations (IHR, 2005), complemented by monitoring the official ministries of health websites and social media accounts. Since 22 March 2020, global data is compiled through WHO region-specific dashboards, and/or aggregate count data reported to WHO headquarters.
+
+      WHO COVID-19 Dashboard is updated every Friday for the period of two weeks prior.
+
+      Counts primarily reflect laboratory-confirmed cases and deaths, based upon WHO case definitions; although some departures may exist due to local adaptations. Counts include both domestic and repatriated cases. Case detection, definitions, testing strategies, reporting practice, and lag times (e.g. time to case notification, and time to reporting of deaths) differ between countries, territories and areas. These factors, amongst others, influence the counts presented with variable under or overestimation of true case and death counts, and variable delays to reflecting these data at a global level.
+
+      All data represent date of reporting as opposed to date of symptom onset. All data are subject to continuous verification and may change based on retrospective updates to accurately reflect trends, changes in country case definitions and/or reporting practices. Significant data errors detected or reported to WHO may be corrected at more frequent intervals.
+
+      New case and death counts from the Region of the Americas
+      Starting from the week commencing on 11 September 2023, the source of the data from the Region of the Americas was switched to the aggregated national surveillances, received through the COVID-19, Influenza, RSV and Other Respiratory Viruses program in the Americas. Data have been included retrospectively since 31 July 2023.
+
+      Rates
+      <0.001 per 100,000 population may be rounded to 0.
+    citation_full: 'WHO COVID-19 Dashboard. Geneva: World Health Organization, 2020. Available online: https://covid19.who.int/'
+    attribution_short: WHO
+    version_producer: WHO COVID-19 Dashboard - Daily cases and deaths
+    url_main: https://covid19.who.int/
+    url_download: https://covid19.who.int/WHO-COVID-19-global-data.csv
+    date_accessed: 2024-07-29
+    date_published: '2024-07-07'
+    license:
+      name: CC BY 4.0
+      url: https://data.who.int/dashboards/covid19/
+outs:
+  - md5: e6d290946608c4618dbfdb1d006ad021
+    size: 2648213
+    path: cases_deaths.csv

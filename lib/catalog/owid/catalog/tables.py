@@ -1895,6 +1895,33 @@ def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[
     return [t[col] for col in cols]  # type: ignore
 
 
+def read_df(
+    df: pd.DataFrame,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    """Create a Table (with metadata and an origin) from a DataFrame.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame.
+    metadata : Optional[TableMeta], optional
+        Table metadata (with a title and description).
+    origin : Optional[Origin], optional
+        Origin of the table.
+    underscore : bool, optional
+        True to ensure all column names are snake case.
+    Returns
+    -------
+    Table
+        Original data as a Table with metadata and an origin.
+    """
+    table = Table(df, underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return cast(Table, table)
+
+
 def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callable[..., Union[Table, Variable]]:
     """Decorator that turns a function that works on DataFrame or Series into a function that works
     on Table or Variable and preserves metadata.  If the decorated function renames columns, their

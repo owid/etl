@@ -212,3 +212,7 @@ steps:
     - snapshot://fasttrack/latest/breakdown_material_footprint_wang.csv
   data://grapher/fasttrack/latest/rock_metal_ratio_nassar_wang:
     - snapshot://fasttrack/latest/rock_metal_ratio_nassar_wang.csv
+  data://grapher/fasttrack/latest/hdi_per_co2:
+    - snapshot://fasttrack/latest/hdi_per_co2.csv
+  data://grapher/fasttrack/latest/hdi_per_land_use:
+    - snapshot://fasttrack/latest/hdi_per_land_use.csv
