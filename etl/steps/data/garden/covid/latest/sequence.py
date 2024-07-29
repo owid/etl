@@ -99,7 +99,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # First table: Variants
-    tb = filter_by_num_sequences(tb)
+    tb = filter_by_num_sequences(tb, "total_sequences")
     tb = tb.rename(columns={"total_sequences": "num_sequences_total", "cluster": "variant"})
     tb = rename_variant_names(tb)
     ## Fix variants
@@ -116,6 +116,7 @@ def run(dest_dir: str) -> None:
     tb = add_category_non_relevant(tb)
     tb = add_percent(tb)
     tb = add_omicron(tb)
+    tb = filter_by_num_sequences(tb, "num_sequences_total")
 
     # Second table: Sequencing
     tb_seq = tb.astype({"country": "string", "variant": "string"}).copy()
@@ -123,6 +124,8 @@ def run(dest_dir: str) -> None:
     tb_seq = add_variant_totals(tb_seq)
     tb_seq = add_per_capita(tb_seq, ds_population)
     tb_seq = add_cumsum(tb_seq)
+
+    tb = tb.drop(columns=["num_sequences_total"])
 
     # Format
     tb = tb.format(["country", "date", "variant"], short_name="variants")
@@ -144,8 +147,8 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def filter_by_num_sequences(tb: Table) -> Table:
-    msk = tb["total_sequences"] < NUM_SEQUENCES_TOTAL_THRESHOLD
+def filter_by_num_sequences(tb: Table, col_total: str) -> Table:
+    msk = tb[col_total] < NUM_SEQUENCES_TOTAL_THRESHOLD
     # Info
     _sk_perc_rows = round(100 * (msk.sum() / len(tb)), 2)
     _sk_num_countries = tb.loc[msk, "country"].nunique()
