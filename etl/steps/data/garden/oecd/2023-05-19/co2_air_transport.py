@@ -60,8 +60,12 @@ def run(dest_dir: str) -> None:
     pivot_table_ye = process_annual_data(df)
 
     # Add population data to the DataFrame
-    pivot_table_ye = geo.add_population_to_dataframe(
-        pivot_table_ye, country_col="country", year_col="year", population_col="population"
+    pivot_table_ye = geo.add_population_to_table(
+        Table(pivot_table_ye),
+        paths.load_dataset("population"),
+        country_col="country",
+        year_col="year",
+        population_col="population",
     )
 
     emissions_columns = [col for col in pivot_table_ye.columns if col not in ("country", "year", "population")]
