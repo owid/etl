@@ -37,13 +37,13 @@ def run(dest_dir: str) -> None:
     idx_parameters = tb[["parameters", "year"]].fillna(0).groupby("year")["parameters"].idxmax()
 
     # Create indicator columns
-    tb["largest_compute"] = 0
-    tb["largest_data"] = 0
-    tb["largest_parameters"] = 0
+    tb["largest_compute"] = 1
+    tb["largest_data"] = 1
+    tb["largest_parameters"] = 1
 
-    tb.loc[idx_compute, "largest_compute"] = 1
-    tb.loc[idx_data, "largest_data"] = 1
-    tb.loc[idx_parameters, "largest_parameters"] = 1
+    tb.loc[idx_compute, "largest_compute"] = 2
+    tb.loc[idx_data, "largest_data"] = 2
+    tb.loc[idx_parameters, "largest_parameters"] = 2
     tb = tb.drop("year", axis=1)
     for col in ["largest_compute", "largest_data", "largest_parameters"]:
         tb[col].metadata.origins = tb["domain"].metadata.origins
