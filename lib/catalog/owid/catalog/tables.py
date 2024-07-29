@@ -980,6 +980,10 @@ class Table(pd.DataFrame):
         """Groupby that preserves metadata."""
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
+    def rolling(self, *args, **kwargs) -> "TableRolling":
+        """Rolling operation that preserves metadata."""
+        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)
+
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
         if ignore_columns is None:
@@ -1115,10 +1119,9 @@ class TableGroupBy:
 
         return tb
 
-    def rolling(self, *args, **kwargs) -> "TableGroupBy":
-        """Apply rolling window function and return a new TableGroupBy with proper metadata."""
+    def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
-        return TableGroupBy(rolling_groupby, self.metadata, self._fields)
+        return TableRollingGroupBy(rolling_groupby, self.metadata, self._fields)
 
 
 class VariableGroupBy:
@@ -1159,6 +1162,56 @@ class VariableGroupBy:
         """Apply rolling window function and return a new VariableGroupBy with proper metadata."""
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
         return VariableGroupBy(rolling_groupby, self.name, self.metadata, self.table_metadata)
+
+
+class TableRolling:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: TableMeta, fields: Dict[str, Any]):
+        self.rolling = rolling
+        self.metadata = metadata
+        self._fields = fields
+
+    def __getattr__(self, name: str) -> Callable[..., "Table"]:
+        # Calling method on the rolling object
+        if isinstance(getattr(self.rolling, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.rolling, name)(*args, **kwargs)
+                return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            raise NotImplementedError()
+
+
+class TableRollingGroupBy:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(
+        self, rolling_groupby: pd.core.window.rolling.RollingGroupby, metadata: TableMeta, fields: Dict[str, Any]
+    ):
+        self.rolling_groupby = rolling_groupby
+        self.metadata = metadata
+        self._fields = fields
+
+    def __getattr__(self, name: str) -> Callable[..., "Table"]:
+        # Calling method on the rolling object
+        if isinstance(getattr(self.rolling_groupby, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.rolling_groupby, name)(*args, **kwargs)
+                return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            raise NotImplementedError()
 
 
 def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> Tuple[SeriesOrVariable, SeriesOrVariable]:
