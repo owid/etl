@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
 import pandas as pd
+from shared import to_grapher_date
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -16,14 +17,12 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("cases_deaths")
 
     # Read table from garden dataset.
-    tb = ds_garden["cases_deaths"].reset_index()
+    tb = ds_garden["cases_deaths"]
 
     #
     # Process data.
     #
-    tb["year"] = (pd.to_datetime(tb["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2020-01-21")).dt.days
-    tb = tb.drop(columns=["date"])
-    tb = tb.format(["country", "year"])
+    tb = to_grapher_date(tb)
 
     #
     # Save outputs.
