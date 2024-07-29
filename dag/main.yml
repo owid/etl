@@ -791,6 +791,16 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
+  # WB income groups
+  data://meadow/wb/2024-07-29/income_groups:
+    - snapshot://wb/2024-07-29/income_groups.xlsx
+
+  data://garden/wb/2024-07-29/income_groups:
+    - data://meadow/wb/2024-07-29/income_groups
+
+  data://grapher/wb/2024-07-29/income_groups:
+    - data://garden/wb/2024-07-29/income_groups
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
