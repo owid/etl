@@ -8,7 +8,7 @@ steps:
     - data://meadow/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/climate_watch/2023-10-31/emissions_by_sector:
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
   #
@@ -88,7 +88,7 @@ steps:
   data://garden/emissions/2024-04-08/national_contributions:
     - data://meadow/emissions/2024-04-08/national_contributions
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/emissions/2024-04-08/national_contributions:
     - data://garden/emissions/2024-04-08/national_contributions
@@ -111,7 +111,7 @@ steps:
     - data://meadow/gcp/2023-12-12/global_carbon_budget
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/energy/2024-06-20/primary_energy_consumption
   #
   # GCP - Global Carbon Budget.

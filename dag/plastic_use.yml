@@ -96,7 +96,7 @@ steps:
   data://garden/un/2023-10-09/plastic_waste:
     - data://meadow/un/2023-10-09/plastic_waste
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/demography/2023-03-31/population
 
   data://grapher/un/2023-10-09/plastic_waste:

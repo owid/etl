@@ -260,7 +260,7 @@ steps:
     - data://garden/happiness/2023-03-20/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
   data://grapher/happiness/2024-06-09/happiness:
     - data://garden/happiness/2024-06-09/happiness
 
@@ -592,7 +592,7 @@ steps:
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
     - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/children_out_of_school:
@@ -601,7 +601,7 @@ steps:
   # Missing Data - Neuropsychiatric Conditions
   data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
     - data://garden/who/2023-08-01/mortality_database
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
@@ -610,7 +610,7 @@ steps:
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
     - data://garden/who/2024-03-24/self_inflicted_injuries
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/who_md_suicides:

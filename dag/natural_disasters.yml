@@ -8,7 +8,7 @@ steps:
   data://garden/emdat/2024-04-11/natural_disasters:
     - data://meadow/emdat/2024-04-11/natural_disasters
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_wdi/2024-05-20/wdi
   # The following dataset has all (yearly and decadal) variables together.
@@ -36,7 +36,7 @@ steps:
   data://garden/noaa_ncei/2024-05-09/natural_hazards:
     - data://meadow/noaa_ncei/2024-05-09/natural_hazards
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2024-03-11/income_groups
   data://grapher/noaa_ncei/2024-05-09/natural_hazards:
     - data://garden/noaa_ncei/2024-05-09/natural_hazards
 
