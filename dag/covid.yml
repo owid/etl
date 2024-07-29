@@ -5,6 +5,7 @@ steps:
     - snapshot-private://covid/latest/sequence.json
   data-private://garden/covid/latest/sequence:
     - data-private://meadow/covid/latest/sequence
+    - data://garden/demography/2024-07-15/population
   data-private://grapher/covid/latest/sequence:
     - data-private://garden/covid/latest/sequence
 
