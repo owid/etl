@@ -490,6 +490,3 @@ OWID_ENV = OWIDEnv(
 
 # Default path to the explorers folder.
 EXPLORERS_DIR = env.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers")
-# Flag that, if called, will let ETL write explorer files when running explorer steps.
-# This values becomes True if etl is run with the "--explorer" flag.
-EXPLORER = bool(env.get("EXPLORER", False))
