@@ -1,0 +1,148 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Maternal Mortality
+        - Causes of Death
+    description_processing: |-
+      - The data shown is the UN MMEIG point estimate - this means there is a 50% chance that the true measure lies above this point,
+        and a 50% chance that the true value lies below this point.
+  description_hiv: |-
+    For countries with generalized HIV epidemics and high HIV prevalence, HIV/AIDS is a leading cause of death during pregnancy and after delivery.
+    Furthermore, evidence suggests that women with HIV infection have an eight times higher risk of pregnancy-related death compared with non-HIV infected women.
+
+    When estimating maternal mortality in these countries, it is, thus, important to differentiate between incidental HIV deaths (non-maternal deaths) and HIV-related indirect maternal deaths (maternal deaths caused by the aggravating effects of pregnancy on HIV) among HIV-positive pregnant and postpartum women who have died.
+  description_methodology: |-
+    Data on maternal mortality and other relevant variables are obtained through databases maintained by WHO, UNPD, UNICEF, and the World Bank Group. Data available from countries varies in terms of the source and methods.
+
+    Given the variability of the sources of data, different methods are used for each data source in order to arrive at country estimates that are comparable and permit regional and global aggregation.
+
+    The current methodology employed by the Maternal Mortality Estimation Inter-Agency Group (MMEIG) in this round
+    followed an improved approach that built directly upon methods used to produce the previous
+    rounds of estimates published by the MMEIG since 2008.
+
+    Estimates for this round were generated using a Bayesian approach, referred to as the Bayesian maternal mortality estimation model, or BMat model.
+    This enhanced methodology uses the same core estimation method as in those previous rounds, but adds refinements to optimize the use of country-specific data sources and excludes late maternal deaths.
+    It therefore provides more accurate estimates, and a more realistic assessment of certainty about those estimates.
+
+    The new model still incorporates the same covariates which are;
+    - the Gross Domestic Product per capita based on purchasing power parity conversion (GDP),
+    - the general fertility rate (GFR)
+    - proportion of births attended by a skilled health worker (SAB).
+
+    The MMEIG has developed a method to adjust existing data in order to take into account these data quality issues and ensure the comparability of different data sources.
+    This method involves assessment of data for underreporting and, where necessary, adjustment for incompleteness and misclassification of deaths as well as development of estimates through statistical modelling for countries with no reliable national level data.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  maternal_mortality:
+    variables:
+      births:
+        title: Estimated live births
+        description_short: The estimated number of live births in a given year.
+        unit: births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          - {definitions.description_methodology}
+      mmr:
+        title: Estimated maternal mortality ratio
+        description_short: |-
+          The estimated maternal mortality ratio (MMR) is the number of maternal deaths per 100,000 live births.
+        unit: deaths per 100,000 live births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          {definitions.description_methodology}
+      mm_rate:
+        title: Estimated maternal mortality rate
+        description_short: |-
+          The estimated maternal mortality rate is the number of maternal deaths per 100,000 women of reproductive age (15-49 years old).
+        unit: deaths per 100,000 women
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          {definitions.description_methodology}
+        description_processing: The data is originally given in deaths per person-years for women of reproductive age. To make the figures comparable with other sources, we multiply it by 100,000 to get deaths per 100,000 person-years (corresponding roughly to 100,000 women of reproductive age).
+      lifetime_risk:
+        title: Lifetime risk of maternal death
+        description_short: |-
+          The probability for one woman to die from a maternal cause during her reproductive lifespan.
+        unit: percent
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          {definitions.description_methodology}
+      lifetime_risk_1_in:
+        title: Lifetime risk of maternal death (1 in x)
+        description_short: |-
+          Statistically, 1 of x women is expected to die from a maternal cause during her reproductive lifespan.
+        unit: ""
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          {definitions.description_methodology}
+      pm:
+        title: Proportion of deaths due to maternal causes
+        description_short: |-
+          The proportion of deaths among women of reproductive age (15-49 years old) that are due to maternal causes.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          {definitions.description_methodology}
+      hiv_related_indirect_maternal_deaths:
+        title: Estimated HIV-related indirect maternal deaths
+        description_short: |-
+          The estimated number of indirect maternal deaths and late maternal deaths caused by the aggravating effects of pregnancy on HIV.
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          - {definitions.description_hiv}
+          - {definitions.description_methodology}
+      hiv_related_indirect_mmr:
+        title: Estimated HIV-related indirect maternal mortality ratio
+        description_short: |-
+          The maternal mortality ratio (MMR) of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
+        unit: deaths per 100,000 live births
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          - {definitions.description_hiv}
+          - {definitions.description_methodology}
+      hiv_related_indirect_percentage:
+        title: Estimated proportion of HIV-related maternal deaths
+        description_short: |-
+          The proportion of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_from_producer: |-
+          - {definitions.description_hiv}
+          - {definitions.description_methodology}
+      maternal_deaths:
+        title: Estimated maternal deaths
+        description_short: The estimated number of maternal deaths in a given year.
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: |-
+          {definitions.description_methodology}
+
