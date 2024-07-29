@@ -193,13 +193,6 @@ steps:
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
-  # WHO Mortality Database - 1st level causes
-  data://meadow/who/2023-08-01/mortality_database:
-    - snapshot://who/2023-08-01/mortality_database.csv
-  data://garden/who/2023-08-01/mortality_database:
-    - data://meadow/who/2023-08-01/mortality_database
-  data://grapher/who/2023-08-01/mortality_database:
-    - data://garden/who/2023-08-01/mortality_database
 
   # WHO Mortality DB - ICD Codes
   data://meadow/who/2023-08-04/icd_codes:
@@ -650,9 +643,18 @@ steps:
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
 
+  # WHO Mortality Database
   data://meadow/who/2024-07-26/mortality_database:
     - snapshot://who/2024-07-26/mortality_database.csv
   data://garden/who/2024-07-26/mortality_database:
     - data://meadow/who/2024-07-26/mortality_database
   data://grapher/who/2024-07-26/mortality_database:
     - data://garden/who/2024-07-26/mortality_database
+
+  # WHO ICD codes
+  data://meadow/who/2024-07-29/icd_codes:
+    - snapshot://who/2024-07-29/icd_codes.zip
+  data://garden/who/2024-07-29/icd_codes:
+    - data://meadow/who/2024-07-29/icd_codes
+  data://grapher/who/2024-07-29/icd_codes:
+    - data://garden/who/2024-07-29/icd_codes

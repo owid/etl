@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  icd_totals:
+    variables:
+      countries_using_icd_code:
+        title: Total countries using each version of ICD code
+        unit: 'countries'
+        display:
+          numDecimalPlaces: 0
+  icd_country_year:
+    variables:
+      icd:
+        title: The version of ICD codes that a country is using each year
+        description_short: A country is only included here if their data is a reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
+        unit: ICD version
