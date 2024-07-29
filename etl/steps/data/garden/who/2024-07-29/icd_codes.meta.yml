@@ -4,7 +4,11 @@ definitions:
     presentation:
       topic_tags:
         - Causes of Death
-
+  version_sort: &version_sort
+    - ICD-7
+    - ICD-8
+    - ICD-9
+    - ICD-10
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -25,3 +29,5 @@ tables:
         title: The version of ICD codes that a country is using each year
         description_short: A country is only included here if their data is a reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
         unit: ICD version
+        type: ordinal
+        sort: *version_sort
