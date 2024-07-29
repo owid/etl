@@ -14,7 +14,7 @@ dataset:
 
 
 tables:
-  sequence:
+  variants:
     variables:
       # testing_variable:
       #   title: Testing variable title
@@ -57,3 +57,7 @@ tables:
       #
       {}
 
+
+  sequencing:
+    variables:
+      {}
