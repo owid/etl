@@ -671,6 +671,15 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
+  data://meadow/papers/2023-10-20/anthromes_input:
+    - snapshot://papers/2023-10-20/anthromes_input.zip
+  data://meadow/papers/2023-10-20/anthromes:
+    - snapshot://papers/2023-10-20/anthromes.csv
+  data://garden/papers/2023-10-20/anthromes:
+    - data://meadow/papers/2023-10-20/anthromes
+    - data://meadow/papers/2023-10-20/anthromes_input
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
   ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:

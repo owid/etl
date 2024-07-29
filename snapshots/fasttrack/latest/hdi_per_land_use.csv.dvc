@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: UN Development Programme, UN FAO, and Poore and Nemecek (2018)
+    title: hdi_per_land_use
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRRGv70RHtIiFVe5ysnN6uwZGn56wj5OwrWEZGNBkoEktsl0nt0NRUBlzHo1HfUwpXItSEOlIMKePfd/pub?output=csv
+    date_accessed: '2024-07-28'
+  name: HDI per capita land use (UNDP Project)
+  description: ''
+  license: {}
+outs:
+  - md5: a6020629321abc7041fccb8375960f55
+    size: 4218
+    path: hdi_per_land_use.csv

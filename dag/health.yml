@@ -189,16 +189,10 @@ steps:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
+    - data://garden/owid/latest/key_indicators
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
-  # WHO Mortality Database - 1st level causes
-  data://meadow/who/2023-08-01/mortality_database:
-    - snapshot://who/2023-08-01/mortality_database.csv
-  data://garden/who/2023-08-01/mortality_database:
-    - data://meadow/who/2023-08-01/mortality_database
-  data://grapher/who/2023-08-01/mortality_database:
-    - data://garden/who/2023-08-01/mortality_database
 
   # WHO Mortality DB - ICD Codes
   data://meadow/who/2023-08-04/icd_codes:
@@ -665,7 +659,6 @@ steps:
   data://grapher/un/2024-07-08/maternal_mortality:
     - data://garden/un/2024-07-08/maternal_mortality
 
-
   # Maternal Mortality long run data set (OWID OMM)
   data://garden/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/gapminder/2024-07-08/maternal_mortality
@@ -677,3 +670,28 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
     - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+
+  # WHO Mortality Database
+  data://meadow/who/2024-07-26/mortality_database:
+    - snapshot://who/2024-07-26/mortality_database.csv
+  data://garden/who/2024-07-26/mortality_database:
+    - data://meadow/who/2024-07-26/mortality_database
+  data://grapher/who/2024-07-26/mortality_database:
+    - data://garden/who/2024-07-26/mortality_database
+
+  # WHO Mortality Database - 1st level causes
+  data://meadow/who/2023-08-01/mortality_database:
+    - snapshot://who/2023-08-01/mortality_database.csv
+  data://garden/who/2023-08-01/mortality_database:
+    - data://meadow/who/2023-08-01/mortality_database
+  data://grapher/who/2023-08-01/mortality_database:
+    - data://garden/who/2023-08-01/mortality_database
+
+  # WHO ICD codes
+  data://meadow/who/2024-07-29/icd_codes:
+    - snapshot://who/2024-07-29/icd_codes.zip
+  data://garden/who/2024-07-29/icd_codes:
+    - data://meadow/who/2024-07-29/icd_codes
+  data://grapher/who/2024-07-29/icd_codes:
+    - data://garden/who/2024-07-29/icd_codes
+

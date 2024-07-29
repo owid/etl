@@ -1,0 +1,26 @@
+dataset:
+  title: HDI per capita CO2 (UNDP Project)
+  description: ''
+  licenses:
+    - {}
+tables:
+  hdi_per_co2:
+    variables:
+      hdi_per_co2_consumption:
+        title: hdi_per_co2_consumption
+        unit: ''
+        description: Human Development Index divided by per capita consumption-based CO2 emissions.
+      hdi_per_co2_production:
+        title: hdi_per_co2_production
+        unit: ''
+        description: Human Development Index divided by per capita production-based CO2 emissions.
+      hdi_per_co2:
+        title: hdi_per_co2
+        unit: ''
+        description: |-
+          Human Development Index divided by per capita consumption-based CO2 emissions, if they are available. Otherwise, production-based emissions are used.
+      production_or_consumption_co2:
+        title: production_or_consumption_co2
+        unit: ''
+        description: |-
+          Indicates whether consumption-based CO2 emissions are available, or whether production-based emissions are used as a substitute.

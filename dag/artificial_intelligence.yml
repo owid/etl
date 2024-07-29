@@ -46,25 +46,15 @@ steps:
   data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain
 
- # Main EPOCH dataset
-  data://meadow/artificial_intelligence/2024-06-03/epoch:
-    - snapshot://artificial_intelligence/2024-06-03/epoch.csv
-  data://garden/artificial_intelligence/2024-06-03/epoch:
-    - data://meadow/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch:
-    - data://garden/artificial_intelligence/2024-06-03/epoch
+  # EPOCH dataset on Trends in Machine Learning Hardware
+  data://meadow/artificial_intelligence/2024-07-11/epoch_gpus:
+    - snapshot://artificial_intelligence/2024-07-11/epoch_gpus.csv
+  data://garden/artificial_intelligence/2024-07-11/epoch_gpus:
+    - data://meadow/artificial_intelligence/2024-07-11/epoch_gpus
+    - data://garden/bls/2024-05-16/us_consumer_prices
+  data://grapher/artificial_intelligence/2024-07-11/epoch_gpus:
+    - data://garden/artificial_intelligence/2024-07-11/epoch_gpus
 
-  # EPOCH aggregates by domain
-  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
-    - data://meadow/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
-
-  # EPOCH aggregates by researcher affiliaiton
-  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2024-06-03/epoch
-  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
 
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:

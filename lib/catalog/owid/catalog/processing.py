@@ -10,6 +10,7 @@ from .tables import (
     multi_merge,
     pivot,
     read_csv,
+    read_df,
     read_excel,
     read_feather,
     read_from_df,
@@ -41,6 +42,7 @@ __all__ = [
     "read_stata",
     "read_rda",
     "read_rds",
+    "read_df",
     "to_numeric",
     "keep_metadata",
 ]
