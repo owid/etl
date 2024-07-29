@@ -650,3 +650,9 @@ steps:
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
 
+  data://meadow/who/2024-07-26/mortality_database:
+    - snapshot://who/2024-07-26/mortality_database.csv
+  data://garden/who/2024-07-26/mortality_database:
+    - data://meadow/who/2024-07-26/mortality_database
+  data://grapher/who/2024-07-26/mortality_database:
+    - data://garden/who/2024-07-26/mortality_database
