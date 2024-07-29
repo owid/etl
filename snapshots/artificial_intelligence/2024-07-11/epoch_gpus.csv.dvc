@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trends in Machine Learning Hardware
+    description: |-
+      This dataset contains performance data for 53 GPUs and AI chips used in machine learning experiments from 2008 to 2023. It includes details on computational performance, memory capacities and bandwidths, and interconnect bandwidths.
+    date_published: "2024-07-26"
+
+    # Citation
+    producer: Epoch
+    citation_full: Epoch AI, 'Data on ML GPUs'. Forthcoming.
+
+    # Files
+    url_main: https://airtable.com/appDFXXgaG1xLtXGL/shr5STcUv1HmzUIyw/tblNMdPBHaKqJJbW6
+    date_accessed: 2024-07-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 203e0dbe58281c4df75de8c4a5620174
+    size: 17264
+    path: epoch_gpus.csv
