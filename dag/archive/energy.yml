@@ -97,7 +97,7 @@ steps:
   data://garden/ember/2023-06-01/yearly_electricity:
     - data://meadow/ember/2023-06-01/yearly_electricity
     - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # BP - Energy mix 2023.
