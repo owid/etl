@@ -26,7 +26,9 @@ import prefect.task_runners
 import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
-from prefect_dask import DaskTaskRunner  # type: ignore
+from prefect.futures import PrefectFuture
+from prefect.server.schemas.core import TaskRun
+from prefect_dask import DaskTaskRunner, get_dask_client  # type: ignore
 
 from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
@@ -409,16 +411,25 @@ def run_dag(
             # task_runner = task_runners.SequentialTaskRunner()
             task_runner = prefect.task_runners.ConcurrentTaskRunner()
         else:
-            task_runner = DaskTaskRunner(cluster_kwargs={"n_workers": workers})
+            task_runner = DaskTaskRunner(cluster_kwargs={"n_workers": workers, "threads_per_worker": 1})
+
+        def on_failure_hook(task: prefect.Task, task_run: TaskRun, state: prefect.State):
+            """Cancel all tasks if one fails."""
+            with get_dask_client() as client:
+                futures = client.futures_of(client)
+                for future in futures:
+                    client.cancel(future)
 
         @prefect.flow(log_prints=True, task_runner=task_runner)
         def run_etl(steps):
-            task_futures = {}
+            task_futures: Dict[str, PrefectFuture] = {}
 
             for step in steps:
+                task = prefect.task(name=str(step), on_failure=[on_failure_hook])
+
                 # include dependencies that are in the list of steps
                 wait_for = [task_futures[str(dep)] for dep in step.dependencies if str(dep) in task_futures]
-                task_futures[str(step)] = prefect.task(name=str(step))(step.run).submit(wait_for=wait_for)
+                task_futures[str(step)] = task(step.run).submit(wait_for=wait_for)
 
         return run_etl(steps)
 

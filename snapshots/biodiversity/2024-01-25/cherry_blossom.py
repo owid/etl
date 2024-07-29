@@ -9,7 +9,7 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# DELETE ME!!!
+# DELETE ME!!!!
 
 
 @click.command()

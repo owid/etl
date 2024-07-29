@@ -1,5 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
-
+# DELETEMEE
 from typing import List, cast
 
 import pandas as pd
@@ -26,6 +26,8 @@ THRESHOLD_ANSWERS = 100
 
 def run(dest_dir: str) -> None:
     log.info("wgm_mental_health: start")
+
+    raise ValueError("This is a test error")
 
     #
     # Load inputs.
