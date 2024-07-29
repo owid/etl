@@ -19,11 +19,9 @@ def run(dest_dir: str) -> None:
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_bgs = (
-        ds_bgs["world_mineral_statistics"]
-        .astype(float)
-        .reset_index()[["country", "year", "commodity", "sub_commodity", "exports", "imports", "production", "unit"]]
-    )
+    tb_bgs = ds_bgs.read_table("world_mineral_statistics").reset_index()[
+        ["country", "year", "commodity", "sub_commodity", "exports", "imports", "production", "unit"]
+    ]
     tb_usgs_historical = (
         ds_usgs_historical["historical_statistics_for_mineral_and_material_commodities"]
         .astype(float)

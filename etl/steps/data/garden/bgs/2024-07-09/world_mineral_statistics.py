@@ -158,7 +158,7 @@ COMMODITY_MAPPING = {
     ("Copper, refined", "Total"): ("Copper", "Refinery production"),
     ("Copper, smelter", "Total"): ("Copper", "Smelter production"),
     # TODO: Production does not include synthetic diamond, but imports and exports of "Dust" does include synthetic diamond.
-    # This should at least be mentioned in the footnotes.
+    # This should at least be mentioned in the footnotes.
     ("Diamond", "Cut"): ("Diamond", "Cut"),
     ("Diamond", "Dust"): ("Diamond", "Dust"),
     ("Diamond", "Gem"): ("Diamond", "Gem"),
@@ -704,6 +704,21 @@ COMMODITY_MAPPING = {
 }
 
 
+# There are many historical regions with overlapping data with their successor countries.
+# Accept only overlaps on the year when the historical country stopped existing.
+ACCEPTED_OVERLAPS = [
+    {1991: {"USSR", "Armenia"}},
+    {1991: {"USSR", "Belarus"}},
+    {1991: {"USSR", "Russia"}},
+    {1992: {"Czechia", "Czechoslovakia"}},
+    {1992: {"Slovakia", "Czechoslovakia"}},
+    {1990: {"Germany", "East Germany"}},
+    {1990: {"Germany", "West Germany"}},
+    {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
+    {1990: {"Yemen", "Yemen People's Republic"}},
+]
+
+
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
     tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
     for pair_old, pair_new in COMMODITY_MAPPING.items():
@@ -740,7 +755,7 @@ def harmonize_units(tb: Table) -> Table:
     # Therefore, assume that the unit is always carats (and convert to tonnes), and, where that footnote appears, simply
     # remove the value.
     tb.loc[(tb["commodity"] == "diamond"), "unit"] = "Carats"
-    tb.loc[(tb["commodity"]=="diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
+    tb.loc[(tb["commodity"] == "diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
 
     # Mapping from original unit names to tonnes.
     mapping = {
@@ -785,6 +800,25 @@ def harmonize_units(tb: Table) -> Table:
     return tb
 
 
+def remove_data_from_non_existing_regions(tb: Table) -> Table:
+    # Remove data for historical regions after they stop existing, and successor countries before they came to existence.
+    tb.loc[(tb["country"] == "USSR") & (tb["year"] > 1991), "value"] = None
+    tb.loc[(tb["country"] == "Armenia") & (tb["year"] == 1990), "value"] = None
+    tb.loc[(tb["country"] == "North Macedonia") & (tb["year"] == 1991), "value"] = None
+    tb.loc[(tb["country"] == "Czechia") & (tb["year"] == 1990), "value"] = None
+    tb.loc[(tb["country"] == "East Germany") & (tb["year"] > 1990), "value"] = None
+    tb.loc[(tb["country"].isin(["Serbia", "Montenegro"])) & (tb["year"].isin([2002, 2003, 2004, 2005])), "value"] = None
+    tb.loc[
+        (tb["country"].isin(["Aruba", "Bonaire Sint Eustatius and Saba"]))
+        & (tb["year"].isin([2001, 2002, 2007, 2008, 2009])),
+        "value",
+    ] = None
+    tb.loc[(tb["country"] == "Yemen") & (tb["year"].isin([1987, 1988, 1989, 1991])), "value"] = None
+    tb = tb.dropna(subset="value").reset_index(drop=True)
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -807,6 +841,9 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
+    # Remove data for regions that did not exist at the time.
+    tb = remove_data_from_non_existing_regions(tb=tb)
+
     # Harmonize units.
     tb = harmonize_units(tb=tb)
 
@@ -817,15 +854,26 @@ def run(dest_dir: str) -> None:
     tb = harmonize_commodity_subcommodity_pairs(tb=tb)
 
     # Pivot table to have a column for each category.
-    tb = tb.pivot(
-        index=["country", "year", "commodity", "sub_commodity", "unit"],
-        columns="category",
-        values="value",
-        join_column_levels_with="_",
+    tb = (
+        tb.pivot(
+            index=["country", "year", "commodity", "sub_commodity", "unit"],
+            columns="category",
+            values=["value", "note"],
+            join_column_levels_with="_",
+        )
+        .underscore()
+        .rename(
+            columns={"value_production": "production", "value_imports": "imports", "value_exports": "exports"},
+            errors="raise",
+        )
     )
 
-    # TODO: There are many issues to be handled:
-    #  * There are many overlapping historical regions. For example, Diatomite has production from USSR until 2006!
+    # Remove empty notes.
+    for column in ["note_production", "note_imports", "note_exports"]:
+        tb.loc[tb[column] == "", column] = None
+
+    # Set an appropriate format for value columns.
+    tb = tb.astype({column: "Float64" for column in ["production", "imports", "exports"]})
 
     # Add regions and income groups to the table.
     REGIONS = {**geo.REGIONS, **{"World": {}}}
@@ -836,6 +884,7 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
+        accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
     # Format table conveniently.
