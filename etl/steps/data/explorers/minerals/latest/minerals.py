@@ -1,6 +1,5 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 import pandas as pd
-from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder, create_explorer
 
@@ -26,7 +25,7 @@ def run(dest_dir: str) -> None:
     metric_dropdown = []
     commodity_dropdown = []
     sub_commodity_dropdown = []
-    for column in tqdm(tb.drop(columns=["country", "year"]).columns):
+    for column in tb.drop(columns=["country", "year"]).columns:
         if tb[column].notnull().any():
             metric, commodity, sub_commodity, unit = tb[column].metadata.title.split("|")
             metric = metric.replace("_", " ").capitalize()
@@ -43,6 +42,10 @@ def run(dest_dir: str) -> None:
     df_graphers["Metric Dropdown"] = metric_dropdown
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
+
+    df_graphers[
+        df_graphers.duplicated(subset=["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown"], keep=False)
+    ]
 
     # Sort rows conveniently.
     df_graphers = df_graphers.sort_values(

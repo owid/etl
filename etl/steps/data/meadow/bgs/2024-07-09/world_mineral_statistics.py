@@ -180,20 +180,26 @@ def process_raw_data(data: Dict[str, Any]):
                 # It seems the unit simply appears on the top-right of the table, sometimes.
                 # For example, this happens for mercury production:
                 # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Production&commodity=95&dateFrom=2010&dateTo=2016&country=&agreeToTsAndCs=agreed
+                # The unit randomly appears and disappears from one year to another.
+                # See, e.g. Potash Chloride production, from 1984 to 1984:
+                # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Production&commodity=118&dateFrom=1984&dateTo=1984&country=&agreeToTsAndCs=agreed
+                # No units, whereas from 1985 to 1985:
+                # https://www2.bgs.ac.uk/mineralsUK/statistics/wms.cfc?method=listResults&dataType=Production&commodity=118&dateFrom=1985&dateTo=1985&country=&agreeToTsAndCs=agreed
+                # The unit appears.
                 unit = _extract_unit_from_soup(soup=soup)
-
-                if not unit:
-                    # If no unit is explicitly given, assume it's tonnes.
-                    unit = "tonnes"
 
                 # Create a raw dataframe with the data extracted from the soup.
                 df_raw = _create_raw_dataframe_from_soup(soup=soup)
 
                 # The field Sub-commodity is often empty.
-                # I assume that this is the total of that commodity.
+                # Initially I thought this could be the total of a commodity, but it clearly isn't the case.
+                # See, e.g. copper exports. The only case with empty subcommodity is South Africa in 1970 and 1971.
+                # The value is ~106k tonnes of copper. This is smaller than "Unwrought" for the same country-years.
+                # So it seems that the empty subcommodity is not the total.
+                # Unfortunately, an empty subcommodity happens in around 38% of all rows.
                 # Although we will see below that sometimes there are rows with different values for the same
                 # country, commodity, sub-commodity, and year, which seems to be an issue in the dataset.
-                df_raw.loc[df_raw["Sub-commodity"] == "", "Sub-commodity"] = "Total"
+                df_raw.loc[df_raw["Sub-commodity"] == "", "Sub-commodity"] = "Unknown"
 
                 # Add column for commodity.
                 df_raw["Commodity"] = commodity
