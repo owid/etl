@@ -1,0 +1,137 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Military Personnel & Spending
+
+  description_short_includes: Includes military and civil personnel, operation and maintenance, procurement, military research and development, infrastructure, and aid. Civil defense and current expenditures for previous military activities are excluded.
+
+  description_short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
+
+  description_short_current_usd: This data is expressed in US dollars. It is not adjusted for inflation or differences in the cost of living between countries.
+
+  description_from_producer_military_expenditure:
+    "Although the lack of sufficiently detailed data makes it difficult to apply a common definition of military expenditure on a worldwide basis, SIPRI has adopted a definition as a guideline. Where possible, SIPRI military expenditure data include all current and capital expenditure on:
+
+    (a) the armed forces, including peacekeeping forces;
+
+    (b) defence ministries and other government agencies engaged in defence projects;
+
+    (c) paramilitary forces, when judged to be trained and equipped for military operations; and
+
+    (d) military space activities.
+
+    This should include expenditure on:
+
+    i. personnel, including:
+
+            a. salaries of military and civil personnel;
+
+            b. retirement pensions of military personnel, and;
+
+            c. social services for personnel;
+
+    ii. operations and maintenance;
+
+    iii. procurement;
+
+    iv. military research and development;
+
+    v. military infrastructure spending, including military bases. and;
+
+    vi. military aid (in the military expenditure of the donor country).
+
+    SIPRI’s estimate of military aid includes financial contributions, training and operational costs, replacement costs of the military equipment stocks donated to recipients and payments to procure additional military equipment for the recipient. However, it does not include the estimated value of military equipment stocks donated.
+
+    Civil defence and current expenditures on previous military activities, such as veterans' benefits, demobilization, conversion and weapon destruction are excluded.
+
+    In practice it is not possible to apply this definition for all countries, and in many cases SIPRI is confined to using the national data provided. Priority is then given to the choice of a uniform definition over time for each country in order to achieve consistency over time, rather than to adjusting the figures for single years according to a common definition. In the light of these difficulties, military expenditure data is most appropriately used for comparisons over time, and may be less suitable for close comparison between individual countries. Reference should always be made, when comparing data for different countries, to the footnotes and special notes attached to the data for these countries, which indicate deviations from the SIPRI definition, where these are known."
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  military_expenditure:
+    variables:
+      constant_usd:
+        title: Military expenditure (constant US$)
+        unit: "constant 2022 US$"
+        short_unit: "$"
+        description_short: |-
+          {definitions.description_short_includes} {definitions.description_short_constant_usd}
+        description_from_producer: |-
+          Military expenditure by country, in constant (2022) US$, 1949-2023.
+          Figures are in US$, at constant 2022 prices and exchange rates.
+
+          {definitions.description_from_producer_military_expenditure}
+
+          _Regional estimates_
+
+          Figures do not always add up to totals because of the conventions of rounding.
+
+          Notes regarding estimates and regional coverage
+          1) The temporal coverage varies by region, based on data availability. A meaningful world total is not possible before 1988 due to the lack of data for the USSR.
+          2) All world totals and most regional totals include estimates for at least one country.
+          3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2022) US$. These are shown in the column to the right of the data for each region
+          4) The set of countries excluded from the totals for Africa has changed compared to the previous SIPRI data release in April 2016. Therefore, the estimates for World, Africa and Sub-Saharan Africa have changed.
+        presentation:
+          title_public: Military expenditure
+        display:
+          name: Military expenditure
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      share_gdp:
+        title: Military expenditure (% of GDP)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: |-
+          {definitions.description_short_includes}
+        description_from_producer: |-
+          {definitions.description_from_producer_military_expenditure}
+        presentation:
+          title_public: Military expenditure (% of GDP)
+        display:
+          name: Military expenditure (% of GDP)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      per_capita:
+        title: Military expenditure per capita (current US$)
+        unit: "current US$"
+        short_unit: "$"
+        description_short: |-
+          {definitions.description_short_includes} {definitions.description_short_current_usd}
+        description_from_producer: |-
+          Figures are in current US$.
+
+          {definitions.description_from_producer_military_expenditure}
+        presentation:
+          title_public: Military expenditure per capita
+        display:
+          name: Military expenditure per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+
+      share_govt_spending:
+        title: Military expenditure (% of government spending)
+        unit: "% of government spending"
+        short_unit: "%"
+        description_short: |-
+          {definitions.description_short_includes}
+        description_from_producer: |-
+          {definitions.description_from_producer_military_expenditure}
+        presentation:
+          title_public: Military expenditure (% of government spending)
+        display:
+          name: Military expenditure (% of government spending)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+
