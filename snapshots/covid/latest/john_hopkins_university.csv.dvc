@@ -7,7 +7,7 @@ meta:
     description: |-
       This is the data repository for the 2019 Novel Coronavirus Visual Dashboard operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
 
-       
+
       For the historic of changes and modifications to the data, refer to https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data. For more details, refer to https://github.com/CSSEGISandData/COVID-19/tree/master.
     date_published: "2023-03-09"
 
