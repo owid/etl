@@ -1195,3 +1195,27 @@ def test_keep_metadata_series(table_1: Table) -> None:
 
     table_1.a = to_numeric(table_1.a)
     assert table_1.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_table_rolling(table_1: Table):
+    tb = table_1[["a", "b"]].copy()
+
+    rolling = tb.rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"
+
+
+def test_table_groupby_rolling(table_1: Table):
+    tb = table_1.copy()
+
+    rolling = tb.groupby("country").rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"

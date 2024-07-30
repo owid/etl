@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Index Report
+    description: |-
+      The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
+    date_published: "2024"
+    title_snapshot: AI Index Report - AI adoption
+
+    description_snapshot: |-
+      Data from the “The State of AI in 2023: Generative AI’s Breakout Year,” alongside data from prior editions from McKinsey & Company Survey via AI Index Report. The 2023 McKinsey analysis is based on a survey of 1,684 respondents across various regions, industries, company sizes, functional areas, and tenures. For the first time, this year’s version of the McKinsey survey included detailed questions about generative AI adoption and hiring trends for AI-related positions.
+
+    # Citation
+    producer: McKinsey & Company Survey via AI Index
+    citation_full: |-
+      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Vanessa Parli, Anka Reuel, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald, and Jack Clark, “The AI Index 2024 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2024.
+    attribution_short: AI Index
+
+    # Files
+    url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+    url_download: https://drive.google.com/uc?export=download&id=1AoGV9m9n7jyco5oWgBkVrJbokxD4KykD
+    date_accessed: 2024-06-28
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+
+outs:
+  - md5: 9f87a29dec31a3d417270d6eb7e54584
+    size: 463
+    path: ai_adoption.csv

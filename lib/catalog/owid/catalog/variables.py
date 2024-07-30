@@ -6,7 +6,7 @@ import copy
 import json
 import os
 from collections import defaultdict
-from typing import Any, Dict, List, Literal, Optional, Union, cast, overload
+from typing import Any, Callable, Dict, List, Literal, Optional, Union, cast, overload
 
 import pandas as pd
 import structlog
@@ -318,6 +318,10 @@ class Variable(pd.Series):
         )
         return self
 
+    def rolling(self, *args, **kwargs) -> "VariableRolling":
+        """Rolling operation that preserves metadata."""
+        return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)
+
     def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
 
@@ -335,6 +339,25 @@ for k in VariableMeta.__dataclass_fields__:
         raise Exception(f'metadata field "{k}" would overwrite a Pandas built-in')
 
     setattr(Variable, k, metadata_property(k))
+
+
+class VariableRolling:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: VariableMeta, name: Optional[str] = None):
+        self.rolling = rolling
+        self.metadata = metadata
+        self.name = name
+
+    def __getattr__(self, name: str) -> Callable[..., "Variable"]:
+        def func(*args, **kwargs):
+            """Apply function and return variable with proper metadata."""
+            x = getattr(self.rolling, name)(*args, **kwargs)
+            return Variable(x, name=self.name, metadata=self.metadata)
+
+        self.__annotations__[name] = Callable[..., "Variable"]
+        return func
 
 
 def _get_metadata_value_from_variables_if_all_identical(

@@ -236,14 +236,11 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
 
 
 def add_period_aggregates(tb: Table, prefix: str, periods: int):
-    # Convert Table to DataFrame
-    df = pd.DataFrame(tb)
-
     # Period-aggregate cases and deaths
     cases_colname = f"{prefix}_cases"
     deaths_colname = f"{prefix}_deaths"
-    df[[cases_colname, deaths_colname]] = (
-        df[["country", "new_cases", "new_deaths"]]
+    tb[[cases_colname, deaths_colname]] = (
+        tb[["country", "new_cases", "new_deaths"]]
         .groupby("country")[["new_cases", "new_deaths"]]
         .rolling(window=periods, min_periods=periods - 1, center=False)
         .sum()
@@ -253,8 +250,8 @@ def add_period_aggregates(tb: Table, prefix: str, periods: int):
     # Period-growth of cases and deaths
     cases_growth_colname = f"{prefix}_pct_growth_cases"
     deaths_growth_colname = f"{prefix}_pct_growth_deaths"
-    df[[cases_growth_colname, deaths_growth_colname]] = (
-        df[["country", cases_colname, deaths_colname]]
+    tb[[cases_growth_colname, deaths_growth_colname]] = (
+        tb[["country", cases_colname, deaths_colname]]
         .groupby("country")[[cases_colname, deaths_colname]]
         .pct_change(periods=periods, fill_method=None)
         .round(3)
@@ -263,17 +260,10 @@ def add_period_aggregates(tb: Table, prefix: str, periods: int):
     )
 
     # Set NaNs where the original data was NaN
-    df.loc[df["new_cases"].isnull(), cases_colname] = np.nan
-    df.loc[df["new_deaths"].isnull(), deaths_colname] = np.nan
+    tb.loc[tb["new_cases"].isnull(), cases_colname] = np.nan
+    tb.loc[tb["new_deaths"].isnull(), deaths_colname] = np.nan
 
-    # Convert dataframe to Table
-    tb_new = Table(df).copy_metadata(tb)
-    tb_new[cases_colname] = tb_new[cases_colname].copy_metadata(tb["new_cases"])
-    tb_new[deaths_colname] = tb_new[deaths_colname].copy_metadata(tb["new_deaths"])
-    tb_new[cases_growth_colname] = tb_new[cases_growth_colname].copy_metadata(tb["new_cases"])
-    tb_new[deaths_growth_colname] = tb_new[deaths_growth_colname].copy_metadata(tb["new_deaths"])
-
-    return tb_new
+    return tb
 
 
 def add_doubling_days(tb: Table) -> Table:
@@ -349,14 +339,11 @@ def add_rolling_avg(tb: Table) -> Table:
     ]
     tb = tb.copy().sort_values(by="date")
 
-    # TMP: Table -> DataFrame
-    df = pd.DataFrame(tb)
-
     for indicator in indicators:
         col = f"{indicator}_7_day_avg_right"
-        df[col] = df[indicator].astype("float")
-        df[col] = (
-            df.groupby("country")[col]
+        tb[col] = tb[indicator].astype("float")
+        tb[col] = (
+            tb.groupby("country")[col]
             .rolling(
                 window=7,
                 min_periods=6,
@@ -365,9 +352,6 @@ def add_rolling_avg(tb: Table) -> Table:
             .mean()
             .reset_index(level=0, drop=True)
         )
-
-    # TMP: DataFrame -> Table
-    tb = Table(df).copy_metadata(tb)
 
     for indicator in indicators:
         col = f"{indicator}_7_day_avg_right"

@@ -454,7 +454,7 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
     ]
     frame = frame.loc[-frame["country"].isin(regions_ignore)]
     # add population
-    df = geo.add_population_to_dataframe(frame.copy())
+    df = geo.add_population_to_table(frame.copy(), N.load_dataset("population"))
 
     # estimate values for regions
     # y(country) = weight(country) * metric(country)

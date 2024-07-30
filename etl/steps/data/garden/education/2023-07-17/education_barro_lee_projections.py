@@ -39,6 +39,7 @@ def add_data_for_regions(tb: Table, ds_regions: Dataset) -> Table:
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
             aggregations=aggregations,
+            ds_population=paths.load_dataset("population"),
         )
 
     return tb_with_regions

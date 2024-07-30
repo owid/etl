@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Dataset
 from owid.datautils.dataframes import groupby_agg
 
 from etl.data_helpers import geo
@@ -35,7 +36,7 @@ def add_region_aggregates_education(
     year_col: str = "year",
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
-    population: Optional[pd.DataFrame] = None,
+    ds_population: Optional[Dataset] = None,
 ) -> pd.DataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
@@ -96,6 +97,8 @@ def add_region_aggregates_education(
         Original dataset after adding (or replacing) data for selected region.
 
     """
+    assert ds_population is not None, "Population dataset must be provided."
+
     if countries_in_region is None:
         # List countries in the region.
         countries_in_region = geo.list_countries_in_region(
@@ -106,7 +109,7 @@ def add_region_aggregates_education(
         # List countries that should present in the data (since they are expected to contribute the most).
         countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
             region=region,
-            population=population,
+            population=ds_population["population"],
         )
 
     # If aggregations are not defined for each variable, assume 'sum'.
@@ -117,7 +120,10 @@ def add_region_aggregates_education(
 
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-    df_countries = geo.add_population_to_dataframe(df_countries)
+    df_countries = geo.add_population_to_table(
+        df_countries,
+        ds_population,
+    )
 
     weights = df_countries["population"]
 

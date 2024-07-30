@@ -3,11 +3,17 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.helpers import PathFinder
 
 log = get_logger()
+
+# naming conventions
+paths = PathFinder(__file__)
+
 # Maximum year
 YEAR_MAX = 2024
 
@@ -283,7 +289,7 @@ def add_cum_metrics(df: pd.DataFrame) -> pd.DataFrame:
 def add_population(df: pd.DataFrame) -> pd.DataFrame:
     # Load population data
     df["year"] = df["date"].dt.year
-    df = geo.add_population_to_dataframe(df, country_col="entity", year_col="year")
+    df = geo.add_population_to_table(Table(df), paths.load_dataset("population"), country_col="entity", year_col="year")
     df = df.drop(columns=["year"])
     # Get per million metrics
     df["excess_per_million_proj_all_ages"] = df["excess_proj_all_ages"] / (df["population"] / 1e6)
