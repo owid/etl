@@ -91,7 +91,7 @@ COLUMNS_OUT = [
     "perc_sequences",
     "num_sequences_total",
 ]
-NUM_SEQUENCES_TOTAL_THRESHOLD = 0
+NUM_SEQUENCES_TOTAL_THRESHOLD = 50
 
 
 def run(dest_dir: str) -> None:
@@ -109,7 +109,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # First table: Variants
-    tb = filter_by_num_sequences(tb, "total_sequences")
+    # tb = filter_by_num_sequences(tb, "total_sequences")
     tb = tb.rename(columns={"total_sequences": "num_sequences_total", "cluster": "variant"})
     tb = rename_variant_names(tb)
     ## Fix variants
