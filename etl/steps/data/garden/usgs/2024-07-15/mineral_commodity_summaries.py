@@ -946,6 +946,19 @@ def gather_and_process_data(data) -> pd.DataFrame:
     return df
 
 
+def clean_notes(notes):
+    notes_clean = []
+    for note in notes:
+        if len(note) > 1:
+            # Ensure each note starts with a capital letter, and ends in a single period.
+            # NOTE: Using capitalize() would make all characters lower case except the first.
+            note = note[0].upper() + (note[1:].replace("\xa0", " ") + ".").replace("..", ".")
+            if note not in notes_clean:
+                notes_clean.append(note)
+
+    return notes_clean
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -980,16 +993,6 @@ def run(dest_dir: str) -> None:
     # For consistency with other steps of mineral data, add a column with the unit.
     tb["unit"] = "tonnes"
     tb["unit"] = tb["unit"].copy_metadata(tb["production"])
-
-    def clean_notes(notes):
-        notes_clean = []
-        for note in notes:
-            # Ensure each note starts with a capital letter, and ends in a single period.
-            note = (note.capitalize() + ".").replace("..", ".")
-            if note not in notes_clean:
-                notes_clean.append(note)
-
-        return notes_clean
 
     # Clean notes columns.
     for category in ["Reserves", "Production"]:
