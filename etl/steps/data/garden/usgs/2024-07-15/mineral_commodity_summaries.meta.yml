@@ -16,13 +16,13 @@ tables:
     variables:
       reserves:
         title: Reserves of commodities
-      reserves_notes:
+      notes_reserves:
         title: Technical notes on reserves data
         unit: ""
         short_unit: ""
       production:
         title: Production of commodities
-      production_notes:
+      notes_production:
         title: Technical notes on production data
         unit: ""
         short_unit: ""

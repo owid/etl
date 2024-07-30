@@ -1,6 +1,6 @@
 """Compilation of minerals data from different origins."""
 import ast
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 from owid.catalog import Table, VariablePresentationMeta
@@ -17,22 +17,22 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def gather_bgs_notes(tb_bgs: Table) -> Dict[str, str]:
+def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     # Create another table with the same structure, but containing notes.
-    tb_bgs_flat_notes = tb_bgs.pivot(
+    tb_flat_notes = tb.pivot(
         index=["country", "year"],
         columns=["commodity", "sub_commodity", "unit"],
-        values=["notes_exports", "notes_imports", "notes_production"],
+        values=notes_columns,
         join_column_levels_with="|",
     )
-    tb_bgs_flat_notes = tb_bgs_flat_notes.rename(
-        columns={column: column.replace("notes_", "") for column in tb_bgs_flat_notes.columns}
+    tb_flat_notes = tb_flat_notes.rename(
+        columns={column: column.replace("notes_", "") for column in tb_flat_notes.columns}
     )
 
     # Gather all notes for each column.
     notes_dict = {}
-    for column in tqdm(tb_bgs_flat_notes.drop(columns=["country", "year"]).columns):
-        _notes = tb_bgs_flat_notes[column].dropna().tolist()
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
+        _notes = tb_flat_notes[column].dropna().tolist()
         if len(_notes) > 0:
             # Gather all notes for this column.
             notes = sum(_notes, [])
@@ -58,12 +58,7 @@ def run(dest_dir: str) -> None:
     # Read tables.
     tb_bgs = ds_bgs.read_table("world_mineral_statistics")
     tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
-    tb_usgs = (
-        ds_usgs["mineral_commodity_summaries"]
-        .drop(columns=["reserves_notes", "production_notes"])
-        .astype(float)
-        .reset_index()
-    )[["country", "year", "commodity", "sub_commodity", "reserves", "production"]]
+    tb_usgs = ds_usgs.read_table("mineral_commodity_summaries")
 
     #
     # Process data.
@@ -73,37 +68,30 @@ def run(dest_dir: str) -> None:
         columns=["unit_value_current"], errors="raise"
     )
 
-    # Parse notes as lists of strings.
-    for column in [
-        "notes_production",
-        "notes_imports",
-        "notes_exports",
-    ]:
-        tb_bgs[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb_bgs[column]]]
+    def parse_notes(tb: Table, notes_columns: List[str]) -> Table:
+        tb = tb.copy()
+        # Parse BGS notes as lists of strings.
+        for column in notes_columns:
+            tb[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb[column]]]
 
-    # TODO: Find the actual units of USGS data.
-    # TODO: Move this to usgs garden step.
-    # For now, assume all USGS data is in tonnes. Later on, Unit value will be changed to USD.
-    tb_usgs["unit"] = "tonnes"
+        return tb
 
-    #
+    # Parse BGS notes as lists of strings.
+    tb_bgs = parse_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
+
+    # Parse USGS current data notes as lists of strings.
+    tb_usgs = parse_notes(tb_usgs, notes_columns=["notes_production", "notes_reserves"])
+
     # We extract data from three sources:
     # * From BGS we extract imports, exports, and production.
     # * From USGS (current) we extract production and reserves.
     # * From USGS (historical) we extract production and unit value.
     #
-    # Ideally (if all commodities and subcommodities were well harmonized) we would need to:
-    # * Firstly, combine USGS current and historical production data.
-    #   This way, we would have long-run (historical) data for the US and World, and all other countries would have
-    #   some years of production and reserves data.
-    # * Secondly, combine USGS and BGS production data. We would need to decide which one to prioritize.
-    #
-    # However, currently, given the lack of harmonization, there is absolutely no overlap between USGS current and
-    # historical data; and there is also no overlap between USGS and BGS data.
-    # There is overlap, however, between USGS historical and BGS data.
+    # However, there is little overlap between the three sources.
     # If we combine all production data into one column (as it would be the customary thing to do in a garden step), the
-    # data will show as having 3 sources, whereas each data point would have just one source (or two, in a few cases).
-    # So it seems more convenient to create a wide table where each column has its own source(s), instead of a long one.
+    # data will show as having 3 sources, whereas in reality most data points would come from just one source.
+    # So it seems more convenient to create a wide table where each column has its own source(s), instead of a long one,
+    # and then combine the flat tables.
 
     # TODO: Data from BGS and USGS historical are significantly different for Salt (by a factor of 2 or 3).
     #  Other series are similar, but have some range where there are large discrepancies, e.g. Iron ore and Asbestos.
@@ -141,7 +129,10 @@ def run(dest_dir: str) -> None:
     )
 
     # Gather notes for BGS data.
-    notes_bgs = gather_bgs_notes(tb_bgs)
+    notes_bgs = gather_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
+
+    # Gather notes for USGS current data.
+    notes_usgs = gather_notes(tb_usgs, notes_columns=["notes_production", "notes_reserves"])
 
     # Create a combined flat table.
     tb = combine_two_overlapping_dataframes(
@@ -180,9 +171,15 @@ def run(dest_dir: str) -> None:
             tb[column].metadata.unit = "constant 1998 US$ per tonne"
             tb[column].metadata.short_unit = "$/t"
 
+        # Add notes to metadata.
+        combined_notes = ""
         if column in notes_bgs:
-            combined_note = "Notes found in BGS original data:\n" + notes_bgs[column]
-            tb[column].metadata.description_from_producer = combined_note
+            combined_notes += "Notes found in BGS original data:\n" + notes_bgs[column]
+        if column in notes_usgs:
+            combined_notes += "\n\nNotes found in USGS original data:\n" + notes_usgs[column]
+
+        if len(combined_notes) > 0:
+            tb[column].metadata.description_from_producer = combined_notes
 
     # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals")
