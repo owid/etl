@@ -33,45 +33,72 @@ tables:
   refugee_data:
     variables:
       refugees_under_unhcrs_mandate_origin:
-        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country of origin.
-        description_from_producer: "{description_refugee}"
+        title: Refugees by country of origin
+        description_short: Number of [refugees](#dod:refugee) in all regions by the country of origin.  This measures the total number of refugees from the country; not the number per year.
+        description_from_producer: "{definitions.description_refugee}"
+      refugees_per_1000_pop_origin:
+        title: Refugees by country of origin per 1,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country.
+        description_from_producer: "{definitions.description_refugee}"
       asylum_seekers_origin:
-        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin.
-        description_from_producer: "{description_asylum}"
+        title: Asylum seekers by country of origin
+        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
+        description_from_producer: "{definitions.description_asylum}"
+      asylum_seekers_per_100k_pop_origin:
+        title: Asylum seekers by country of origin per 100,000 people
+        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of origin, per 100,000 people in that country.
+        description_from_producer: "{definitions.description_asylum}"
       idps_of_concern_to_unhcr_origin:
-        description_short: Number of internally displaced persons (IDPs) of concern to UNHCR within a country.
-        description_from_producer: "{description_interally_displaced}"
+        title: Internally displaced persons by country
+        description_short: Number of [internally displaced persons (IDPs)](#dod:internally-displaced) of concern to UNHCR within a country.  This measures the total number of persons; not the number per year.
+        description_from_producer: "{definitions.description_interally_displaced}"
       other_people_in_need_of_international_protection_origin:
-        # TODO: add DoDs
-        description_short: Number of people in need of international protection in all regions by the country of origin.
-        description_from_producer: "{description_international_protection}"
+        title: Other people in need of international protection by country of origin
+        description_short: Number of [other people in need of international protection](#dod:international-protection) in all regions by the country of origin. This measures the total number of persons; not the number per year.
+        description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_origin:
-        description_short: Number of stateless persons by the country of origin.
-        description_from_producer: "{description_stateless}"
-
+        title: Stateless persons by country of origin
+        description_short: Number of [stateless persons](#dod:stateless) by the country of origin. This measures the total number of stateless people; not the number per year.
+        description_from_producer: "{definitions.description_stateless}"
       host_community_origin:
-        description_from_producer: "{description_host_community}"
+        title: People in host communities by country of origin
+        description_short: Number of people in [host communities](#dod:host-community) by the country of origin.
+        description_from_producer: "{definitions.description_host_community}"
       others_of_concern_origin:
-        description_from_producer: "{description_other_concern}"
+        title: Other persons of concern by country of origin
+        description_short: Number of [other persons of concern](#dod:unhcr-concern) to the UNHCR by the country of origin. This measures the total number of persons; not the number per year.
+        description_from_producer: "{definitions.description_other_concern}"
 
       refugees_under_unhcrs_mandate_asylum:
-        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in.
-        description_from_producer: "{description_refugee}"
+        title: Refugees by country of residence
+        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in. This measures the total number of refugees; not the number per year.
+        description_from_producer: "{definitions.description_refugee}"
+      refugees_per_1000_pop_asylum:
+        title: Refugees by country of residence per 1,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country.
+        description_from_producer: "{definitions.description_refugee}"
       asylum_seekers_asylum:
-        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in.
-        description_from_producer: "{description_asylum}"
-      idps_of_concern_to_unhcr_asylum:
-        description_short: Number of internally displaced persons (IDPs) of concern to UNHCR within a country.
-        description_from_producer: "{description_interally_displaced}"
+        title: Asylum seekers by country of residence
+        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in. This measures the total number of asylum-seekers; not the number per year.
+        description_from_producer: "{definitions.description_asylum}"
+      asylum_seekers_per_100k_pop_asylum:
+        title: Asylum seekers by country of residence per 100,000 people
+        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of residence, per 100,000 people in that country.
+        description_from_producer: "{definitions.description_asylum}"
       other_people_in_need_of_international_protection_asylum:
-        description_short: Number of people in need of international protection in all regions by the country they live in.
-        description_from_producer: "{description_international_protection}"
+        title: Other people in need of international protection by country
+        description_short: Number of [other people in need of international protection](#dod:international-protection) in all regions by the country they live in. This measures the total number of persons; not the number per year.
+        description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_asylum:
-        description_short: Number of stateless persons by the country they live in.
-        description_from_producer: "{description_stateless}"
-
+        title: Stateless persons by country of residence
+        description_short: Number of [stateless persons](#dod:stateless) by the country they live in. This measures the total number of stateless people; not the number per year.
+        description_from_producer: "{definitions.description_stateless}"
       host_community_asylum:
-        description_from_producer: "{description_host_community}"
+        title: People in host communities by country of residence
+        description_short: Number of people in [host communities](#dod:host-community) in this country.
+        description_from_producer: "{definitions.description_host_community}"
       others_of_concern_asylum:
-        description_from_producer: "{description_other_concern}"
+        title: Other persons of concern by country of residence
+        description_short: Number of [other persons of concern](#dod:unhcr-concern) to the UNHCR in this country. This measures the total number of persons; not the number per year.
+        description_from_producer: "{definitions.description_other_concern}"
 

@@ -219,9 +219,16 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
+
+  # UNHCR refugee data
   data://meadow/un/2024-07-25/refugee_data:
     - snapshot://un/2024-07-25/refugee_data.zip
   data://garden/un/2024-07-25/refugee_data:
     - data://meadow/un/2024-07-25/refugee_data
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2024-07-25/refugee_data:
+    - data://garden/un/2024-07-25/refugee_data
+
   data://meadow/un/2024-07-25/resettlement:
     - snapshot://un/2024-07-25/resettlement.zip
+
