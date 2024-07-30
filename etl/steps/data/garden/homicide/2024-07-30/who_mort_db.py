@@ -1,5 +1,5 @@
 import numpy as np
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 
