@@ -1,5 +1,14 @@
 steps:
 
+  # Sequencing (variants)
+  data-private://meadow/covid/latest/sequence:
+    - snapshot-private://covid/latest/sequence.json
+  data-private://garden/covid/latest/sequence:
+    - data-private://meadow/covid/latest/sequence
+    - data://garden/demography/2024-07-15/population
+  data-private://grapher/covid/latest/sequence:
+    - data-private://garden/covid/latest/sequence
+
   # WHO - Cases and deaths
   data://meadow/covid/latest/cases_deaths:
     - snapshot://covid/latest/cases_deaths.csv
