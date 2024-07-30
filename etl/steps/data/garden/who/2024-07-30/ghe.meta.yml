@@ -1,0 +1,193 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+      grapher_config:
+        note: |-
+          {definitions.footnote}
+        selectedEntityNames:
+          - World
+    processing_level: minor
+  age: |-
+    <% if age_group == "ALLAges" %>
+    all ages
+    <% elif age_group == "age-standardized" %>
+    an age-standardized population
+    <% elif age_group == "YEARS0-14" %>
+    0-14 year olds
+    <% elif age_group == "YEARS0-4" %>
+    0-4 year olds
+    <% elif age_group == "YEARS5-14" %>
+    5-14 year olds
+    <% elif age_group == "YEARS15-19" %>
+    15-19 year olds
+    <% elif age_group == "YEARS15-49" %>
+    15-49 year olds
+    <% elif age_group == "YEARS20-24" %>
+    20-24 year olds
+    <% elif age_group == "YEARS25-34" %>
+    25-34 year olds
+    <% elif age_group == "YEARS35-44" %>
+    35-44 year olds
+    <% elif age_group == "YEARS45-54" %>
+    45-54 year olds
+    <% elif age_group == "YEARS50-69" %>
+    50-69 year olds
+    <% elif age_group == "YEARS55-64" %>
+    55-64 year olds
+    <% elif age_group == "YEARS65-74" %>
+    65-74 year olds
+    <% elif age_group == "YEARS70+" %>
+    70+ year olds
+    <% elif age_group == "YEARS75-84" %>
+    75-84 year olds
+    <% elif age_group == "YEARS85PLUS" %>
+    85+ year olds
+    <%- endif -%>
+  sex: |-
+    <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<% endif %>
+  deaths_title: |-
+    <% if age_group == "ALLAges" %>
+    Total deaths from << cause.lower() >> among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized deaths from << cause.lower() >> among {definitions.sex}
+    <% else %>
+    Deaths from << cause.lower() >> among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  deaths_description: |-
+    <% if age_group == "ALLAges" %>
+    Estimated number of deaths from << cause.lower() >> in {definitions.sex}.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}.
+    <% else %>
+    Estimated number of deaths from << cause.lower() >> among {definitions.sex}  aged {definitions.age}.
+    <%- endif -%>
+  death_rate_title: |-
+    <% if age_group == "ALLAges" %>
+    Death rate from << cause.lower() >> among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized death rate from << cause.lower() >> among {definitions.sex}
+    <% else %>
+    Death rate from << cause.lower() >> among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  death_rate_description: |-
+    <% if age_group == "ALLAges" %>
+    Estimated number of deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized deaths from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% else %>
+    Estimated number of deaths from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people.
+    <%- endif -%>
+  dalys_title: |-
+    <% if age_group == "ALLAges" %>
+    DALYs from << cause.lower() >> among {definitions.sex}
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized DALYs from << cause.lower() >> among {definitions.sex}
+    <% else %>
+    DALYs from << cause.lower() >> among {definitions.sex} aged {definitions.age}
+    <%- endif -%>
+  dalys_description: |-
+    <% if age_group == "ALLAges" %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}.
+    <% else %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged {definitions.age}.
+    <%- endif -%>
+  dalys_rate_title: |-
+    <% if age_group == "ALLAges" %>
+    DALYs from << cause.lower() >>, among {definitions.sex} per 100,000 people
+    <% elif age_group == "Age-standardized" %>
+    Age-standardized DALYs from << cause.lower() >> among {definitions.sex}, per 100,000 people
+    <% else %>
+    DALYs from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people
+    <%- endif -%>
+  dalys_rate_description: |-
+    <% if age_group == "ALLAges" %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% elif age_group == "Age-standardized" %>
+    Estimated number of age-standardized [DALYs](#dod:dalys) from << cause.lower() >> in {definitions.sex}, per 100,000 people.
+    <% else %>
+    Estimated number of [DALYs](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged {definitions.age}, per 100,000 people.
+    <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+tables:
+  ghe:
+    variables:
+      death_count:
+        title: |-
+          {definitions.deaths_title}
+        description_short: |-
+          {definitions.deaths_description}
+        unit: deaths
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      death_rate100k:
+        title: |-
+          {definitions.death_rate_title}
+        description_short: |-
+          {definitions.death_rate_description}
+        unit: deaths per 100,000 people
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      daly_count:
+        title: |-
+          {definitions.dalys_title}
+        description_short: |-
+          {definitions.dalys_description}
+        description_from_producer: |
+          **Rationale:**
+          Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
+          One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
+
+          **Definition:**
+          DALYs expressed per 100 000 population. DALYs for a disease or health condition are the sum of the years of life lost to due to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+
+          **Method of estimation:**
+          DALYs expressed per 100 000 population. DALYs for a specific cause are calculated as the sum of the years of life lost due to premature mortality (YLLs) from that cause and the years of years of healthy life lost due to disability (YLDs) for people living in states of less than good health resulting from the specific cause.
+          The YLLs for a cause are calculated as the number of cause-specific deaths multiplied by a loss function specifying the years lost for deaths as a function of the age at which death occurs. The loss function is based on the frontier national life expectancy projected for the year 2050 by the World Population Prospects 2012 (UN Population Division, 2013), with a life expectancy at birth of 92 years.
+          Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
+          More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
+        unit: DALYs
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      daly_rate100k:
+        title: |-
+          {definitions.dalys_rate_title}
+        description_short: |-
+          {definitions.dalys_rate_description}
+        description_key:
+          - |-
+            **Rationale:**
+            Mortality does not give a complete picture of the burden of disease borne by individuals in different populations. The overall burden of disease is assessed using the disability-adjusted life year (DALY), a time-based measure that combines years of life lost due to premature mortality (YLLs) and years of life lost due to time lived in states of less than full health, or years of healthy life lost due to disability (YLDs).
+            One DALY represents the loss of the equivalent of one year of full health. Using DALYs, the burden of diseases that cause premature death but little disability (such as drowning or measles) can be compared to that of diseases that do not cause death but do cause disability (such as cataract causing blindness).
+          - |-
+            **Definition:**
+            DALYs expressed per 100 000 population. DALYs for a disease or health condition are the sum of the years of life lost to due to premature mortality (YLLs) and the years lived with a disability (YLDs) due to prevalent cases of the disease or health condition in a population.
+          - |-
+            **Method of estimation:**
+            DALYs expressed per 100 000 population. DALYs for a specific cause are calculated as the sum of the years of life lost due to premature mortality (YLLs) from that cause and the years of years of healthy life lost due to disability (YLDs) for people living in states of less than good health resulting from the specific cause.
+            The YLLs for a cause are calculated as the number of cause-specific deaths multiplied by a loss function specifying the years lost for deaths as a function of the age at which death occurs. The loss function is based on the frontier national life expectancy projected for the year 2050 by the World Population Prospects 2012 (UN Population Division, 2013), with a life expectancy at birth of 92 years.
+            Prevalence YLDs are used here. Prevalence YLDs are calculated as the prevalence of each non-fatal condition multiplied by its disability weight.
+            More detailed method of estimation is available at: http://www.who.int/entity/healthinfo/statistics/GlobalDALYmethods_2000_2011.pdf?ua=1
+        unit: DALYs per 100,000 people
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+
+  ghe_suicides_ratio:
+    variables:
+      death_rate100k_ratio:
+        title: Male to female suicide death rate ratio (age-standardized)
+        description_short: Age-standardized suicide rate of males divided by the age-standardized suicide rate of females.
+        description_processing: |-
+          After age-standardizing the suicide rates according to the WHO, we've estimate the ratio between male and female suicide rates.
+
+          Age-standardization process is explained here: https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/gpe_discussion_paper_series_paper31_2001_age_standardization_rates.pdf
+        unit: ""

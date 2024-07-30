@@ -107,12 +107,18 @@ description = "- " + "\n- ".join(
     "-s",
     help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
 )
+@click.option(
+    "--step-update",
+    is_flag=True,
+    help="Run after updating a step in ETL Dashboard. In addition to creating PR, this will commit generated files.",
+)
 def cli(
     new_branch: Optional[str] = None,
     base_branch: Optional[str] = None,
     title: Optional[str] = None,
     category: Optional[str] = None,
     scope: Optional[str] = None,
+    step_update: bool = False,
 ) -> None:
     if not GITHUB_TOKEN:
         log.error(
@@ -193,6 +199,11 @@ def cli(
     log.info("Creating an empty commit.")
     repo.git.commit("--allow-empty", "-m", title or f"Start a new staging server for branch '{new_branch}'")
 
+    if step_update:
+        log.info("Committing all files.")
+        repo.git.add(".")
+        repo.git.commit("-m", "Copy steps")
+
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", new_branch)
 
@@ -211,6 +222,21 @@ def cli(
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
+        return
+
+    # modify the PR body to include the diff link
+    if step_update:
+        __import__("ipdb").set_trace()
+        diff_link = f"{js['html_url']}/files/{repo.head.commit.hexsha}..HEAD"
+
+        # Update body of the pull request
+        requests.patch(
+            js["url"],
+            json={
+                "body": f"[View diff without step copy]({diff_link})",
+            },
+            headers=headers,
+        )
 
 
 def generate_pr_title(title: str | None, category: str | None, scope: str | None) -> None | str:
