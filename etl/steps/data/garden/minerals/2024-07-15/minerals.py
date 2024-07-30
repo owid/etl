@@ -1,12 +1,49 @@
 """Compilation of minerals data from different origins."""
+import ast
+from typing import Dict
 
-from owid.catalog import VariablePresentationMeta
+import pandas as pd
+from owid.catalog import Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from structlog import get_logger
+from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder, create_dataset
 
+# Initialize logger.
+log = get_logger()
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def gather_bgs_notes(tb_bgs: Table) -> Dict[str, str]:
+    # Create another table with the same structure, but containing notes.
+    tb_bgs_flat_notes = tb_bgs.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=["notes_exports", "notes_imports", "notes_production"],
+        join_column_levels_with="|",
+    )
+    tb_bgs_flat_notes = tb_bgs_flat_notes.rename(
+        columns={column: column.replace("notes_", "") for column in tb_bgs_flat_notes.columns}
+    )
+
+    # Gather all notes for each column.
+    notes_dict = {}
+    for column in tqdm(tb_bgs_flat_notes.drop(columns=["country", "year"]).columns):
+        _notes = tb_bgs_flat_notes[column].dropna().tolist()
+        if len(_notes) > 0:
+            # Gather all notes for this column.
+            notes = sum(_notes, [])
+            # Get unique notes keeping the order.
+            notes = pd.unique(pd.Series(notes)).tolist()
+            # Join notes.
+            if len(notes) > 0:
+                notes_str = "- " + "\n- ".join(notes)
+                notes_dict[column] = notes_str
+
+    return notes_dict
 
 
 def run(dest_dir: str) -> None:
@@ -19,9 +56,7 @@ def run(dest_dir: str) -> None:
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_bgs = ds_bgs.read_table("world_mineral_statistics").reset_index()[
-        ["country", "year", "commodity", "sub_commodity", "exports", "imports", "production", "unit"]
-    ]
+    tb_bgs = ds_bgs.read_table("world_mineral_statistics")
     tb_usgs_historical = (
         ds_usgs_historical["historical_statistics_for_mineral_and_material_commodities"]
         .astype(float)
@@ -38,7 +73,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Parse notes as lists of strings.
+    for column in [
+        "notes_production",
+        "notes_imports",
+        "notes_exports",
+    ]:
+        tb_bgs[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb_bgs[column]]]
+
     # TODO: Find the actual units of USGS data.
+    # TODO: Move this to usgs garden step.
     # For now, assume all USGS data is in tonnes. Later on, Unit value will be changed to USD.
     tb_usgs["unit"] = "tonnes"
     tb_usgs_historical["unit"] = "tonnes"
@@ -90,13 +134,16 @@ def run(dest_dir: str) -> None:
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
 
-    # Pivot BGS table and remove empty columns.
+    # Pivot BGS table.
     tb_bgs_flat = tb_bgs.pivot(
         index=["country", "year"],
         columns=["commodity", "sub_commodity", "unit"],
         values=["exports", "imports", "production"],
         join_column_levels_with="|",
-    ).dropna(axis=1, how="all")
+    )
+
+    # Gather notes for BGS data.
+    notes_bgs = gather_bgs_notes(tb_bgs)
 
     # Create a combined flat table.
     tb = combine_two_overlapping_dataframes(
@@ -116,25 +163,26 @@ def run(dest_dir: str) -> None:
             tb[column].metadata.presentation = VariablePresentationMeta()
         tb[column].metadata.presentation.title_public = title_public
         tb[column].metadata.unit = unit
-        # TODO: Create short unit.
-        tb[column].metadata.short_unit = "t"
+        if unit.startswith("tonnes"):
+            # Create short unit.
+            tb[column].metadata.short_unit = "t"
+        else:
+            log.warning(f"Unexpected unit for column: {column}")
+            tb[column].metadata.short_unit = ""
         if metric == "Unit value":
             tb[column].metadata.unit = "constant 1998 US$ per tonne"
             tb[column].metadata.short_unit = "$/t"
 
-    # Format tables conveniently.
-    tb_usgs = tb_usgs.format(["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_usgs")
-    tb_usgs_historical = tb_usgs_historical.format(
-        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_usgs_historical"
-    )
-    tb_bgs = tb_bgs.format(["country", "year", "commodity", "sub_commodity", "unit"], short_name="minerals_bgs")
+        if column in notes_bgs:
+            combined_note = "Notes found in BGS original data:\n" + notes_bgs[column]
+            tb[column].metadata.description_from_producer = combined_note
+
+    # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb_usgs, tb_usgs_historical, tb_bgs, tb], check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()

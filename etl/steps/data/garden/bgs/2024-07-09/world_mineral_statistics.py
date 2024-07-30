@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import ast
+
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -386,7 +388,7 @@ COMMODITY_MAPPING = {
     ("Lithium minerals", "Petalite"): ("Lithium minerals", "Petalite"),
     ("Lithium minerals", "Spodumene"): ("Lithium minerals", "Spodumene"),
     ("Lithium minerals", "Total"): ("Lithium minerals", "Total"),
-    ("Magnesite", "Total"): ("Magnesite", "Total"),
+    ("Magnesite", "Total"): ("Magnesite and magnesia", "Magnesite"),
     ("Magnesite and magnesia", "Magnesia"): ("Magnesite and magnesia", "Magnesia"),
     ("Magnesite and magnesia", "Magnesite"): ("Magnesite and magnesia", "Magnesite"),
     ("Magnesite and magnesia", "Magnesite, calcined"): ("Magnesite and magnesia", "Magnesite, calcined"),
@@ -819,6 +821,17 @@ def remove_data_from_non_existing_regions(tb: Table) -> Table:
     return tb
 
 
+def clean_notes(notes):
+    notes_clean = []
+    for note in notes:
+        # Ensure each note starts with a capital letter, and ends in a single period.
+        note = (note.capitalize() + ".").replace("..", ".")
+        if note not in notes_clean:
+            notes_clean.append(note)
+
+    return notes_clean
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -858,7 +871,7 @@ def run(dest_dir: str) -> None:
         tb.pivot(
             index=["country", "year", "commodity", "sub_commodity", "unit"],
             columns="category",
-            values=["value", "note"],
+            values=["value", "note", "general_notes"],
             join_column_levels_with="_",
         )
         .underscore()
@@ -868,14 +881,21 @@ def run(dest_dir: str) -> None:
         )
     )
 
-    # Remove empty notes.
-    for column in ["note_production", "note_imports", "note_exports"]:
-        tb.loc[tb[column] == "", column] = None
-
     # Set an appropriate format for value columns.
     tb = tb.astype({column: "Float64" for column in ["production", "imports", "exports"]})
 
-    # Add regions and income groups to the table.
+    # Parse notes as lists of strings.
+    for column in [
+        "note_production",
+        "note_imports",
+        "note_exports",
+        "general_notes_production",
+        "general_notes_imports",
+        "general_notes_exports",
+    ]:
+        tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
+
+    # Add regions to the table.
     REGIONS = {**geo.REGIONS, **{"World": {}}}
     tb = geo.add_regions_to_table(
         tb=tb,
@@ -886,6 +906,16 @@ def run(dest_dir: str) -> None:
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )
+
+    # Clean notes columns, and combine notes at the individual row level with general table notes.
+    for category in ["exports", "imports", "production"]:
+        tb[f"notes_{category}"] = [
+            clean_notes(note) for note in tb[f"note_{category}"] + tb[f"general_notes_{category}"]
+        ]
+        # Ensure the new column has metadata.
+        # To avoid ETL failing when storing the table, convert lists of notes to strings.
+        tb[f"notes_{category}"] = tb[f"notes_{category}"].copy_metadata(tb[f"note_{category}"]).astype(str)
+        tb = tb.drop(columns=[f"note_{category}", f"general_notes_{category}"])
 
     # Format table conveniently.
     # NOTE: All commodities have the same unit for imports, exports and production except one:

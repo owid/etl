@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import json
+import re
 import zipfile
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -213,18 +214,10 @@ def process_raw_data(data: Dict[str, Any]):
                 ]
                 if None in sum(notes_mapped, []):
                     log.warning(f"Missing footnotes for: {data_type} - {commodity} - {year_start}")
-                df["Note"] = [
-                    ". ".join(
-                        [
-                            footnotes[note] if note in footnotes else ""
-                            for note in str(notes).replace("(", "").replace(")", "")
-                        ]
-                    ).replace("..", ".")
-                    for notes in df["Note"].fillna("")
-                ]
+                df["Note"] = [[note for note in notes if note] for notes in notes_mapped]
 
                 # Add general notes as a new column.
-                df["General notes"] = ". ".join(notes).replace("..", ".")
+                df["General notes"] = [[re.sub(r"^\d+:\s", "", note) for note in notes if note]] * len(df)
 
                 # Add current dataframe to the combined dataframe.
                 df_all = pd.concat([df_all, df], ignore_index=True)
@@ -259,6 +252,10 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["category", "country", "commodity", "sub_commodity", "year"])
+
+    # To avoid ETL failing when storing the table, convert lists of notes to strings.
+    tb["note"] = tb["note"].astype(str)
+    tb["general_notes"] = tb["general_notes"].astype(str)
 
     #
     # Save outputs.
