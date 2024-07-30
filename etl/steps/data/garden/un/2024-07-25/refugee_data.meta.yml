@@ -25,6 +25,15 @@ definitions:
   description_other_concern: |-
    Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of the other groups (refugees, asylum-seekers, stateless persons, internally displaced persons) but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
 
+  description_return: |-
+    Returned [refugees](#dod:refugee) are former refugees who have returned to their countries of origin, either spontaneously or in an organized fashion, but are yet to be fully integrated. Such returns would ideally take place only under conditions of safety and dignity. For the purpose of UNHCR's statistics, only refugees who returned during the calendar year are included, although in practice, operations may assist returnees for longer periods.
+  description_idp_return: |-
+    Returned [internally displaced people](#dod:internally-displaced) refers to those IDPs who were beneficiaries of UNHCR’s protection and assistance activities, and who returned to their areas of origin or habitual residence during the calendar year. In practice, however, operations may assist IDP returnees for longer periods.
+  description_naturalization: |-
+    Naturalized [refugees](#dod:refugee) refers to those refugees that have naturalized in their country of asylum. Naturalization is the legal act or process by which a non-citizen in a country may acquire citizenship or nationality of that country. It is used as a proxy measure of local integration. The International Recommendations on Refugee Statistics make several recommendations on appropriate indicators for measuring and quantifying local integration in a way that is comparable and consistent across different contexts. However, the availability of such data about refugees remains very poor. Even data on naturalization is limited by the uneven availability of data and poor coverage as well as policy and legal changes over time. In particular, it can be difficult to distinguish between the naturalization of refugees and non-refugees. Therefore, the data are only indicative at best and provide an underestimate of the extent to which refugees are naturalized.
+  description_resettlement: |-
+    Resettled [refugees](#dod:refugee) are those who have who have been resettled to another country. Resettlement is used to assist refugees in countries that cannot provide them with appropriate protection and support. Resettlement is primarily facilitated by UNHCR in most countries around the world, although significant private sponsorship schemes do exist as well (e.g. in Canada).
+
 dataset:
   update_period_days: 180
 
@@ -40,6 +49,8 @@ tables:
         title: Refugees by country of origin per 1,000 people
         description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country.
         description_from_producer: "{definitions.description_refugee}"
+        display:
+          numDecimalPlaces: 1
       asylum_seekers_origin:
         title: Asylum seekers by country of origin
         description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
@@ -48,6 +59,8 @@ tables:
         title: Asylum seekers by country of origin per 100,000 people
         description_short: Number of [asylum seekers](#dod:asylumseeker) by country of origin, per 100,000 people in that country.
         description_from_producer: "{definitions.description_asylum}"
+        display:
+          numDecimalPlaces: 1
       idps_of_concern_to_unhcr_origin:
         title: Internally displaced persons by country
         description_short: Number of [internally displaced persons (IDPs)](#dod:internally-displaced) of concern to UNHCR within a country.  This measures the total number of persons; not the number per year.
@@ -77,6 +90,8 @@ tables:
         title: Refugees by country of residence per 1,000 people
         description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country.
         description_from_producer: "{definitions.description_refugee}"
+        display:
+          numDecimalPlaces: 1
       asylum_seekers_asylum:
         title: Asylum seekers by country of residence
         description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in. This measures the total number of asylum-seekers; not the number per year.
@@ -85,8 +100,10 @@ tables:
         title: Asylum seekers by country of residence per 100,000 people
         description_short: Number of [asylum seekers](#dod:asylumseeker) by country of residence, per 100,000 people in that country.
         description_from_producer: "{definitions.description_asylum}"
+        display:
+          numDecimalPlaces: 1
       other_people_in_need_of_international_protection_asylum:
-        title: Other people in need of international protection by country
+        title: Other people in need of international protection by country of residence
         description_short: Number of [other people in need of international protection](#dod:international-protection) in all regions by the country they live in. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_asylum:
@@ -101,4 +118,55 @@ tables:
         title: Other persons of concern by country of residence
         description_short: Number of [other persons of concern](#dod:unhcr-concern) to the UNHCR in this country. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_other_concern}"
+
+      returned_refugees_origin:
+        title: Returned refugees by country of origin
+        description_short: Number of returned [refugees](#dod:refugee) by the country of origin. Only refugees who returned during the calendar year are included.
+        description_from_producer: |-
+          - {definitions.description_return}
+          - {definitions.description_refugee}
+      returned_idpss_origin:
+        title: Returned internally displaced people by country
+        description_short: Number of returned [internally displaced people (IDPs)](#dod:internally-displaced) by the country of origin. Only IDPs who returned during the calendar year are included.
+        description_from_producer: |-
+          - {definitions.description_idp_return}
+          - {definitions.description_interally_displaced}
+      resettlement_arrivals_origin:
+        title: Resettlement arrivals by country of origin
+        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin.
+        description_from_producer: "{definitions.description_resettlement}"
+      naturalisation_origin:
+        title: Naturalised refugees by country of origin
+        description_short: Number of [naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of origin per calendar year.
+        description_from_producer: |-
+          - {definitions.description_naturalization}
+          - {definitions.description_refugee}
+
+      returned_refugees_dest:
+        title: Returned refugees by country they returned from
+        description_short: Number of returned [refugees](#dod:refugee) by the country of residence. Only refugees who returned during the calendar year are included.
+        description_from_producer: |-
+          - {definitions.description_return}
+          - {definitions.description_refugee}
+      resettlement_arrivals_dest:
+        title: Resettlement arrivals by country of resettlement
+        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of residence.
+        description_from_producer: "{definitions.description_resettlement}"
+      naturalisation_dest:
+        title: Naturalised refugees by country of naturalization
+        description_short: Number of [naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of naturalization per calendar year.
+        description_from_producer: "{definitions.description_naturalization}"
+
+      resettlement_per_100k_origin:
+        title: Resettlement arrivals by country of origin per 100,000 people
+        description_short: Number of newly [resettled refugees](#dod:resettlement) by country of origin, per 100,000 people living in the country of origin.
+        description_from_producer: "{definitions.description_resettlement}"
+        display:
+          numDecimalPlaces: 1
+      resettlement_per_100k_dest:
+        title: Resettlement arrivals by country of resettlement per 100,000 people
+        description_short: Number of newly [resettled refugees](#dod:resettlement) in this country, per 100,000 people living in the settlement country.
+        description_from_producer: "{definitions.description_resettlement}"
+        display:
+          numDecimalPlaces: 1
 

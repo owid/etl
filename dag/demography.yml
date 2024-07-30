@@ -226,9 +226,17 @@ steps:
   data://garden/un/2024-07-25/refugee_data:
     - data://meadow/un/2024-07-25/refugee_data
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-25/resettlement
   data://grapher/un/2024-07-25/refugee_data:
     - data://garden/un/2024-07-25/refugee_data
 
+  # UNHCR resettlement data
   data://meadow/un/2024-07-25/resettlement:
     - snapshot://un/2024-07-25/resettlement.zip
-
+  data://garden/un/2024-07-25/resettlement:
+    - data://meadow/un/2024-07-25/resettlement
+    - data://garden/demography/2024-07-15/population
+  data://meadow/unicef/2024-07-30/child_migration:
+    - snapshot://unicef/2024-07-30/child_migration.csv
+  data://grapher/unicef/2024-07-30/child_migration:
+    - data://garden/unicef/2024-07-30/child_migration

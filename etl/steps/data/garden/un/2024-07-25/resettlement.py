@@ -1,5 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -14,15 +13,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("refugee_data")
-    ds_population = paths.load_dataset("population")
-    ds_resettlement = paths.load_dataset("resettlement")
+    ds_meadow = paths.load_dataset("resettlement")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("refugee_data")
-    tb_resettlement = ds_resettlement.read_table("resettlement")
+    tb = ds_meadow.read_table("resettlement")
 
-    # group table by country_of_origin and year
+    # group table by country and year
     tb_origin = tb.drop(columns=["country_of_asylum"]).groupby(["country_of_origin", "year"]).sum().reset_index()
     tb_asylum = tb.drop(columns=["country_of_origin"]).groupby(["country_of_asylum", "year"]).sum().reset_index()
 
@@ -47,7 +43,7 @@ def run(dest_dir: str) -> None:
         left_on=["country_of_origin", "year"],
         right_on=["country_of_asylum", "year"],
         how="outer",
-        suffixes=("_origin", "_asylum"),
+        suffixes=("_origin", "_dest"),
     )
 
     # merge country column (data is split between origin and asylum in columns)
@@ -56,34 +52,9 @@ def run(dest_dir: str) -> None:
     # drop country of asylum column
     tb = tb.rename(columns={"country_of_origin": "country"}).drop(columns=["country_of_asylum"])
 
-    # drop "idps_of_concern_to_unhcr_asylum" since it is identical to "idps_of_concern_to_unhcr_origin"
-    tb = tb.drop(columns=["idps_of_concern_to_unhcr_asylum"])
+    # drop idps destination since it is identical to idps origin
+    tb = tb.drop(columns=["returned_idpss_dest"])
 
-    # merge resettlement data
-    tb = pr.merge(
-        tb,
-        tb_resettlement,
-        left_on=["country", "year"],
-        right_on=["country", "year"],
-        how="outer",
-    )
-
-    # calculate shares per 1000/ 100,000 population
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
-
-    tb["refugees_per_1000_pop_origin"] = tb["refugees_under_unhcrs_mandate_origin"] / tb["population"] * 1000
-    tb["refugees_per_1000_pop_asylum"] = tb["refugees_under_unhcrs_mandate_asylum"] / tb["population"] * 1000
-
-    tb["asylum_seekers_per_100k_pop_origin"] = tb["asylum_seekers_origin"] / tb["population"] * 100_000
-    tb["asylum_seekers_per_100k_pop_asylum"] = tb["asylum_seekers_asylum"] / tb["population"] * 100_000
-
-    tb["resettlement_per_100k_origin"] = tb["resettlement_arrivals_origin"] / tb["population"] * 100_000
-    tb["resettlement_per_100k_dest"] = tb["resettlement_arrivals_dest"] / tb["population"] * 100_000
-
-    # drop population column
-    tb = tb.drop(columns=["population"])
-
-    # format table
     tb = tb.format(["country", "year"])
 
     #
