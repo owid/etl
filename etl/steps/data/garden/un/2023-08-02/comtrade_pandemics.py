@@ -252,7 +252,7 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
     # Estimate per-capita variables.
     ## Add population variable
-    tb = geo.add_population_to_dataframe(tb, ds_population, expected_countries_without_population=[])
+    tb = geo.add_population_to_table(tb, ds_population, expected_countries_without_population=[])
     ## Estimate ratio
     for col in tb.columns:
         if col not in ["population", "year", "country"]:

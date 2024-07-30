@@ -1550,7 +1550,7 @@ def clean_data(
     # because for one item we may have more European countries informed than for the other.
     data = add_population(df=data, population_col="population_with_data", warn_on_missing_countries=False)
 
-    # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
+    # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_table`)
     data = data.astype({"country": "category"})
 
     return data
