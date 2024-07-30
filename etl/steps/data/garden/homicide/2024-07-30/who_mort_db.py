@@ -96,8 +96,6 @@ def add_age_groups(tb: Table) -> Table:
         "Age75_79": "Age 70+",
         "Age80_84": "Age 70+",
         "Age85_over": "Age 70+",
-        "All ages": "All ages",
-        "Unknown age": "Unknown age",
     }
 
     age_groups_decadal = {
@@ -120,8 +118,6 @@ def add_age_groups(tb: Table) -> Table:
         "Age75_79": "Age 75-84",
         "Age80_84": "Age 75-84",
         "Age85_over": "Age 85+",
-        "All ages": "All ages",
-        "Unknown age": "Unknown age",
     }
 
     age_groups_child = {
@@ -137,7 +133,7 @@ def add_age_groups(tb: Table) -> Table:
     tb_age_group_child = build_custom_age_groups(tb, age_groups=age_groups_child)
     tb_orig = remove_granular_age_groups(tb)
     tb_combined = pr.concat([tb_orig, tb_age_group_ihme, tb_age_group_decadal, tb_age_group_child], axis=0)
-    tb_combined = tb_combined.loc[:, ~tb_combined.columns.duplicated()]
+    tb_combined = tb_combined.drop_duplicates()
     return tb_combined
 
 
