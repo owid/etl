@@ -16,9 +16,9 @@ tables:
         unit: "%"
         short_unit: "%"
       age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized death rate from homicide in << sex.lower() >> in << age_group.lower() >>
+        title: Age-standardized homicide rate in << sex.lower() >> in << age_group.lower() >>
         unit: deaths per 100,000 people
       death_rate_per_100_000_population:
-        title: Death rate from homicide in << sex.lower() >> in << age_group.lower() >> per 100,000 population
+        title: Homicide rate in << sex.lower() >> in << age_group.lower() >> per 100,000 population
         unit: deaths per 100,000 people
 

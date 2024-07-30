@@ -48,6 +48,7 @@ def run(dest_dir: str) -> None:
     tb = clean_up_dimensions(tb)
     tb = add_age_groups(tb)
 
+    tb = tb.format(["country", "year", "age_group", "sex"])
     ds_garden = create_dataset(
         dest_dir,
         tables=[tb],
@@ -196,45 +197,3 @@ def remove_granular_age_groups(tb: Table) -> Table:
     tb = tb[tb["age_group"].isin(age_groups_to_keep)]
     assert len(tb["age_group"].drop_duplicates()) == len(age_groups_to_keep)
     return tb
-
-
-def build_metadata(col: tuple) -> VariableMeta:
-    """
-    Building the variable level metadata for each of the age-sex-metric combinations
-    """
-    metric_dict = {
-        "age_standardized_death_rate_per_100_000_standard_population": {
-            "title": "Age standardized homicide rate per 100,000 population",
-            "unit": "homicides per 100,000 people",
-            "short_unit": "",
-            "numDecimalPlaces": 1,
-        },
-        "death_rate_per_100_000_population": {
-            "title": "Homicide rate per 100,000 population",
-            "unit": "homicides per 100,000 people",
-            "short_unit": "",
-            "numDecimalPlaces": 1,
-        },
-        "percentage_of_cause_specific_deaths_out_of_total_deaths": {
-            "title": "Share of total deaths",
-            "unit": "%",
-            "short_unit": "%",
-            "numDecimalPlaces": 1,
-        },
-        "number": {
-            "title": "Number of homicides",
-            "unit": "homicides",
-            "short_unit": "",
-            "numDecimalPlaces": 0,
-        },
-    }
-    meta = VariableMeta(
-        title=f"{metric_dict[col[0]]['title']} - {col[1]} - {col[2]}",
-        description=f"The {metric_dict[col[0]]['title'].lower()} for {col[1].lower()}, {col[2].lower()}.",
-        unit=f"{metric_dict[col[0]]['unit']}",
-        short_unit=f"{metric_dict[col[0]]['short_unit']}",
-    )
-    meta.display = {
-        "numDecimalPlaces": metric_dict[col[0]]["numDecimalPlaces"],
-    }
-    return meta
