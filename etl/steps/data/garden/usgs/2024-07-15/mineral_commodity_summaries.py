@@ -969,6 +969,12 @@ def run(dest_dir: str) -> None:
         snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
         data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
+
     #
     # Process data.
     #
@@ -981,10 +987,14 @@ def run(dest_dir: str) -> None:
     # For convenience (and for consistency with other similar datasets) rename columns.
     tb = tb.rename(
         columns={
+            "Country": "country",
+            "Year": "year",
             "Mineral": "commodity",
             "Type": "sub_commodity",
             "Reserves_t": "reserves",
             "Production_t": "production",
+            "Reserves_notes": "notes_reserves",
+            "Production_notes": "notes_production",
         },
         errors="raise",
     )
@@ -994,15 +1004,22 @@ def run(dest_dir: str) -> None:
     tb["unit"] = "tonnes"
     tb["unit"] = tb["unit"].copy_metadata(tb["production"])
 
+    # Add regions to the table.
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
+        # accepted_overlaps=ACCEPTED_OVERLAPS,
+    )
+
     # Clean notes columns.
-    for category in ["Reserves", "Production"]:
-        column_old = f"{category}_notes"
-        column_new = f"notes_{category.lower()}"
-        tb[column_new] = [clean_notes([note]) if pd.notnull(note) else [] for note in tb[column_old]]
+    for column in ["notes_reserves", "notes_production"]:
+        tb[column] = [clean_notes([note]) if pd.notnull(note) else [] for note in tb[column]]
         # Ensure the new column has metadata.
         # To avoid ETL failing when storing the table, convert lists of notes to strings.
-        tb[column_new] = tb[column_new].copy_metadata(tb[column_old]).astype(str)
-        tb = tb.drop(columns=[column_old])
+        tb[column] = tb[column].copy_metadata(tb["production"]).astype(str)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
