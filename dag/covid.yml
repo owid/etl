@@ -107,7 +107,10 @@ steps:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
 
   # John Hopkins University
-  data-private://grapher/covid/latest/john_hopkins_university:
-    - data-private://garden/covid/latest/john_hopkins_university
-  data-private://garden/covid/latest/john_hopkins_university:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/jhu/COVID-19%20-%20Johns%20Hopkins%20University.csv
+  data://meadow/covid/latest/john_hopkins_university:
+    - snapshot://covid/latest/john_hopkins_university.csv
+  data://garden/covid/latest/john_hopkins_university:
+    - data://meadow/covid/latest/john_hopkins_university
+  data://grapher/covid/latest/john_hopkins_university:
+    - data://garden/covid/latest/john_hopkins_university
+
