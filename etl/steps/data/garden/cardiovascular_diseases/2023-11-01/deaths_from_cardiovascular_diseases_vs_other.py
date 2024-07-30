@@ -51,9 +51,8 @@ def run(dest_dir: str) -> None:
     ds_garden_who = paths.load_dataset("mortality_database")
 
     tb = ds_garden_who["mortality_database"].reset_index()
-    # Identify table names that are relevant for our analysis (those that include '_sexes__all_ages').
-    # table_names = [name for name in ds_garden_who.table_names if "_sexes__all_ages" in name]
-
+    # Grab the origins for reuse later
+    origins = tb["number"].metadata.origins
     tb = tb[(tb["cause"].isin(CAUSE_MAPPING.keys())) & (tb["age_group"] == "all ages") & (tb["sex"] == "Both sexes")]
     # Assert all the causes are included
     assert len(tb["cause"].unique()) == len(
@@ -89,7 +88,9 @@ def run(dest_dir: str) -> None:
     ).reset_index()
 
     tb = tb.format(["country", "year"], short_name="deaths_from_cardiovascular_diseases_vs_other")
-
+    # Add the origins back in
+    for col in tb.columns:
+        tb[col].metadata.origins = origins
     # Save the processed data.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
