@@ -20,6 +20,15 @@ steps:
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
 
+
+  # JHU - cases and deaths
+  data://meadow/covid/latest/john_hopkins_university:
+    - snapshot://covid/latest/john_hopkins_university.csv
+  data://garden/covid/latest/john_hopkins_university:
+    - data://meadow/covid/latest/john_hopkins_university
+  data://grapher/covid/latest/john_hopkins_university:
+    - data://garden/covid/latest/john_hopkins_university
+
   ######################################
   # Mobility
   data://grapher/covid/latest/google_mobility_trends:
@@ -106,11 +115,4 @@ steps:
   data-private://garden/covid/latest/sequencing:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
 
-  # John Hopkins University
-  data://meadow/covid/latest/john_hopkins_university:
-    - snapshot://covid/latest/john_hopkins_university.csv
-  data://garden/covid/latest/john_hopkins_university:
-    - data://meadow/covid/latest/john_hopkins_university
-  data://grapher/covid/latest/john_hopkins_university:
-    - data://garden/covid/latest/john_hopkins_university
 
