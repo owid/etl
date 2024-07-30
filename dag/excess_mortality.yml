@@ -19,7 +19,7 @@ steps:
     - data://garden/excess_mortality/latest/xm_karlinsky_kobak
     - data://garden/excess_mortality/latest/wmd
     - data://garden/excess_mortality/latest/hmd_stmf
-    - data://garden/owid/latest/key_indicators
+    - data://garden/demography/2022-12-08/population
   # Grapher
   data://grapher/excess_mortality/latest/excess_mortality:
     - data://garden/excess_mortality/latest/excess_mortality

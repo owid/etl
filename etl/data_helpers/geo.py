@@ -547,7 +547,7 @@ def harmonize_countries(
     return df_harmonized  # type: ignore
 
 
-def add_population_to_dataframe(
+def _add_population_to_dataframe(
     df: TableOrDataFrame,
     ds_population: Optional[Dataset] = None,
     country_col: str = "country",
@@ -733,7 +733,7 @@ def add_population_to_table(
 
     """
     # Create a dataframe with an additional population column.
-    df_with_population = add_population_to_dataframe(
+    df_with_population = _add_population_to_dataframe(
         df=tb,
         ds_population=ds_population,
         country_col=country_col,

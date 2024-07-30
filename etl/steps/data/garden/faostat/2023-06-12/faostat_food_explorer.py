@@ -14,10 +14,14 @@ from typing import cast
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR, NAMESPACE
+from shared import NAMESPACE
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.paths import DATA_DIR
+
+# naming conventions
+paths = PathFinder(__file__)
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
@@ -27,6 +31,7 @@ DATASET_DESCRIPTION = (
     "FBS) datasets. Each row contains all the metrics for a specific combination of (country, "
     "product, year). The metrics may come from different datasets."
 )
+DATASET_POPULATION = DATA_DIR / "garden/demography/2022-12-08/population"
 
 # The names of the products to include in the food explorer will be further edited in owid-content, following to the
 # following file:
@@ -491,7 +496,9 @@ def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
     data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
 
     # Add column for OWID population.
-    data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+    data_wide = geo.add_population_to_table(
+        data_wide, ds_population=paths.load_dataset("population"), warn_on_missing_countries=False
+    )
 
     # Fill gaps in OWID population with FAO population (for "* (FAO)" countries, i.e. countries that were not
     # harmonized and for which there is no OWID population).
@@ -513,12 +520,6 @@ def run(dest_dir: str) -> None:
     #
     # Fetch the dataset short name from dest_dir.
     dataset_short_name = Path(dest_dir).name
-
-    # Define path to current step file.
-    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
-
-    # Get paths and naming conventions for current data step.
-    paths = PathFinder(current_step_file.as_posix())
 
     # Load latest qcl and fbsc datasets from garden.
     qcl_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_qcl")
