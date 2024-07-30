@@ -414,8 +414,8 @@ def add_cumsum(tb: Table) -> Table:
 def add_metadata_variant_groups(tb: Table) -> Table:
     text_common = "This is a group of lineages which includes:"
 
-    def to_list_str(l):
-        return "\n- " + "\n- ".join([f"`{v}`" for v in l])
+    def to_list_str(values):
+        return "\n- " + "\n- ".join([f"`{v}`" for v in values])
 
     list_variants_non_relevant = to_list_str(VARIANTS_NON_RELEVANT)
     list_variants_omicron_ba = to_list_str(VARIANTS_OMICRON_BA)
