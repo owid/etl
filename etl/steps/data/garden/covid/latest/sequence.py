@@ -15,7 +15,9 @@ paths = PathFinder(__file__)
 
 # Variables
 ## CoVariants -> OWID name mapping. If relevant=False, variant is placed in bucket "non_who", along with "others"
-CATEGORY_NON_RELEVANT = "non_who"
+CATEGORY_OTHERS = "Others"
+CATEGORY_NON_RELEVANT = "Non-relevant"
+CATEGORY_O_NON_RELEVANT = "Omicron (others)"
 VARIANTS_DETAILS = {
     "20A.EU2": {"rename": "B.1.160", "relevant": False},
     "20A/S:439K": {"rename": "B.1.258", "relevant": False},
@@ -43,12 +45,12 @@ VARIANTS_DETAILS = {
     "22A (Omicron)": {"rename": "Omicron (BA.4)", "relevant": True},
     "22B (Omicron)": {"rename": "Omicron (BA.5)", "relevant": True},
     "22C (Omicron)": {"rename": "Omicron (BA.2.12.1)", "relevant": True},
-    "22D (Omicron)": {"rename": "Omicron (BA.2.75)", "relevant": False},
+    "22D (Omicron)": {"rename": "Omicron (BA.2.75)", "relevant": True},
     "22E (Omicron)": {"rename": "Omicron (BQ.1)", "relevant": True},
-    "22F (Omicron)": {"rename": "Omicron (XBB)", "relevant": True},
+    "22F (Omicron)": {"rename": "Omicron (XBB.1)", "relevant": True},
     "23A (Omicron)": {"rename": "Omicron (XBB.1.5)", "relevant": True},
     "23B (Omicron)": {"rename": "Omicron (XBB.1.16)", "relevant": True},
-    "23C (Omicron)": {"rename": "Omicron (CH.1.1)", "relevant": False},
+    "23C (Omicron)": {"rename": "Omicron (CH.1.1)", "relevant": True},
     "23D (Omicron)": {"rename": "Omicron (XBB.1.9)", "relevant": True},
     "23E (Omicron)": {"rename": "Omicron (XBB.2.3)", "relevant": True},
     "23F (Omicron)": {"rename": "Omicron (EG.5.1)", "relevant": True},
@@ -64,6 +66,14 @@ VARIANTS_DETAILS = {
 }
 VARIANTS_MAPPING = {k: v["rename"] for k, v in VARIANTS_DETAILS.items()}
 VARIANTS_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["relevant"]))
+VARIANTS_NON_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if not v["relevant"]))
+VARIANTS_OMICRON_BA = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (BA")))
+VARIANTS_OMICRON_XBB = list(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (XBB"))
+)
+VARIANTS_OMICRON_JN = list(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JNN"))
+)
 
 COUNTRY_MAPPING = {
     "USA": "United States",
@@ -115,7 +125,7 @@ def run(dest_dir: str) -> None:
     tb = add_category_others(tb)
     tb = add_category_non_relevant(tb)
     tb = add_percent(tb)
-    tb = add_omicron(tb)
+    tb = add_groupings(tb)
     tb = filter_by_num_sequences(tb, "num_sequences_total")
 
     # Second table: Sequencing
@@ -126,6 +136,9 @@ def run(dest_dir: str) -> None:
     tb_seq = add_cumsum(tb_seq)
 
     tb = tb.drop(columns=["num_sequences_total"])
+
+    # Edit description key
+    tb = add_metadata_variant_groups(tb)
 
     # Format
     tb = tb.format(["country", "date", "variant"], short_name="variants")
@@ -143,6 +156,7 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
+    print(ds_garden["variants"]["num_sequences"].metadata.description_processing)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -225,10 +239,10 @@ def add_category_others(tb: Table) -> Table:
         .rename(columns={"num_sequences": "num_sequences_categorised"})
     )
     tb_c = tb_a.merge(tb_b, on=["date", "country"])
-    tb_c["others"] = tb_c["num_sequences_total"] - tb_c["num_sequences_categorised"]
+    tb_c[CATEGORY_OTHERS] = tb_c["num_sequences_total"] - tb_c["num_sequences_categorised"]
     tb_c = tb_c.melt(
         id_vars=["country", "date", "num_sequences_total"],
-        value_vars="others",
+        value_vars=CATEGORY_OTHERS,
         var_name="variant",
         value_name="num_sequences",
     )
@@ -289,20 +303,20 @@ def _correct_excess_percentage(tb: Table) -> Table:
     # Fill NaN, nearby zero
     tb["excess"] = tb["excess"].fillna(0).round(0)
     # Correct
-    mask = tb["variant"].isin(["others"])
+    mask = tb["variant"].isin([CATEGORY_OTHERS])
     tb.loc[mask, "perc_sequences"] = (tb.loc[mask, "perc_sequences"] - tb.loc[mask, "excess"]).round(4)
     tb = tb.drop(columns="excess")
 
     return tb
 
 
-def add_omicron(tb: Table) -> Table:
+def add_group_by_prefix(tb: Table, starts_with: str, variant_group_name: str) -> Table:
     """Get totals for 'Omicron'.
 
     That is, aggregate all Omicron sub-variants.
     """
     # Get only Omicron rows
-    msk = tb["variant"].str.startswith("Omicron")
+    msk = tb["variant"].str.startswith(starts_with)
     # Group
     tbg = tb.loc[msk].groupby(["country", "date"], observed=True, as_index=False)
     # Sum values
@@ -313,8 +327,40 @@ def add_omicron(tb: Table) -> Table:
     num_seq_ttl["num_sequences_total"] = num_seq_ttl["num_sequences_total"].apply(lambda x: x[0])
     # Build df
     values = values.merge(num_seq_ttl, on=["country", "date"])
-    values["variant"] = "Omicron"
+    values["variant"] = variant_group_name
     tb = pr.concat([tb, values], ignore_index=True)
+    return tb
+
+
+def add_groupings(tb: Table) -> Table:
+    tb = add_omicron(tb)
+    tb = add_omicron_ba(tb)
+    tb = add_omicron_xbb(tb)
+    tb = add_omicron_jn(tb)
+    return tb
+
+
+def add_omicron(tb: Table) -> Table:
+    """Get totals for 'Omicron' sublineages."""
+    tb = add_group_by_prefix(tb, "Omicron", "Omicron")
+    return tb
+
+
+def add_omicron_ba(tb: Table) -> Table:
+    """Get totals for 'Omicron (BA)' sublineages."""
+    tb = add_group_by_prefix(tb, "Omicron (BA", "Omicron (BA)")
+    return tb
+
+
+def add_omicron_xbb(tb: Table) -> Table:
+    """Get totals for 'Omicron (XBB)' sublineages."""
+    tb = add_group_by_prefix(tb, "Omicron (XBB", "Omicron (XBB)")
+    return tb
+
+
+def add_omicron_jn(tb: Table) -> Table:
+    """Get totals for 'Omicron (JN)' sublineages."""
+    tb = add_group_by_prefix(tb, "Omicron (JN", "Omicron (JN)")
     return tb
 
 
@@ -323,7 +369,7 @@ def add_variant_dominant(tb: Table) -> Table:
     # Remove Omicron (check dominant within sub-variants)
     tb = tb.loc[tb["variant"] != "Omicron"]
     # Rest of the code
-    tb["variant"] = tb["variant"].replace({"non_who": "!non_who"})
+    tb["variant"] = tb["variant"].replace({CATEGORY_NON_RELEVANT: "!non_who"})
     # Sort rows
     tb = tb.sort_values(["num_sequences", "variant"], ascending=[False, True]).drop_duplicates(
         subset=["country", "date"], keep="first"
@@ -362,4 +408,21 @@ def add_cumsum(tb: Table) -> Table:
     tb_cum = tb.groupby(["country"])[["num_sequences", "num_sequences_per_1M"]].cumsum()
     tb["num_sequences_cumulative"] = tb_cum.num_sequences
     tb["num_sequences_cumulative_per_1M"] = tb_cum.num_sequences_per_1M
+    return tb
+
+
+def add_metadata_variant_groups(tb: Table) -> Table:
+    text_common = "This is a group of lineages which includes:"
+
+    def to_list_str(l):
+        return "\n- " + "\n- ".join([f"`{v}`" for v in l])
+
+    list_variants_non_relevant = to_list_str(VARIANTS_NON_RELEVANT)
+    list_variants_omicron_ba = to_list_str(VARIANTS_OMICRON_BA)
+    list_variants_omicron_xbb = to_list_str(VARIANTS_OMICRON_XBB)
+    list_variants_omicron_jn = to_list_str(VARIANTS_OMICRON_JN)
+
+    tb["num_sequences"].metadata.description_key = [
+        f"""<% if variant == '{CATEGORY_NON_RELEVANT}' %>{text_common}{list_variants_non_relevant}<% elif variant == 'Omicron (BA)' %>{text_common}{list_variants_omicron_ba}<% elif variant == 'Omicron (XBB)' %>{text_common}{list_variants_omicron_xbb}<% elif variant == 'Omicron (JN)' %>{text_common}{list_variants_omicron_jn}<%- endif -%>"""
+    ]
     return tb
