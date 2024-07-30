@@ -10,7 +10,7 @@ definitions:
       topic_tags:
         - Economic Growth
 
-  description_key_attribution: The Maddison Project Database is based on the work of many researchers that have produced estimates of economic growth and population for individual countries. The full list of sources for this historical data is given in [the original dataset (_Sources_ sheet)](https://dataverse.nl/api/access/datafile/421302).
+  description_key_attribution: The Maddison Project Database is based on the work of many researchers who have produced estimates of economic growth and population for individual countries. The full list of sources for this historical data is given in [the original dataset (_Sources_ sheet)](https://dataverse.nl/api/access/datafile/421302).
 
 
 # Learn more about the available fields:
