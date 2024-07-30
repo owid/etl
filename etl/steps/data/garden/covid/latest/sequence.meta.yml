@@ -17,6 +17,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  non_redistributable: true
   update_period_days: 14
 
 tables:
