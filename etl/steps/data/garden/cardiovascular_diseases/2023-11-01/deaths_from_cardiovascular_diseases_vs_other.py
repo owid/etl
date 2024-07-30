@@ -79,7 +79,14 @@ def run(dest_dir: str) -> None:
         columns={"Unidentified causes": "percentage_of_cause_specific_deaths_out_of_total_deaths"}
     )
     tb = pr.concat([tb, tb_group])
-    tb = tb.format(["country", "year", "cause"], short_name="deaths_from_cardiovascular_diseases_vs_other")
+    tb = tb.pivot_table(
+        index=["country", "year"],
+        columns="cause",
+        values="percentage_of_cause_specific_deaths_out_of_total_deaths",
+        observed=True,
+    ).reset_index()
+
+    tb = tb.format(["country", "year"], short_name="deaths_from_cardiovascular_diseases_vs_other")
 
     # Save the processed data.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
