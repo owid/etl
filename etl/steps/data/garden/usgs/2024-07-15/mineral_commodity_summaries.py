@@ -115,7 +115,7 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine production"),
     ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine production"),
     ("Copper", "Mine production, contained copper"): ("Copper", "Mine production"),
-    # TODO: I'm assuming "Mine production, contained copper" is equivalent to "Mine production, recoverable copper content".
+    # NOTE: I'm assuming "Mine production, contained copper" is equivalent to "Mine production, recoverable copper content".
     #  The former is used in the 2022 file, and the latter is used in the 2023 and 2024 files.
     ("Copper", "Mine production, recoverable copper content"): ("Copper", "Mine production"),
     ("Copper", "Refinery production"): ("Copper", "Refinery production"),

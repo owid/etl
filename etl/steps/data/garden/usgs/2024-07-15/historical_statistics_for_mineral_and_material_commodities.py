@@ -145,9 +145,25 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Harmonize units.
+    assert set(tb["unit"]) == {"metric tonnes", "metric tonnes of gross weight"}
+    tb["unit"] = (
+        tb["unit"]
+        .astype("string")
+        .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes, gross weight"})
+    )
+
     # Remove duplicated rows that have exactly the same data.
     tb = tb.drop_duplicates(
-        subset=["commodity", "year", "production", "world_production", "unit_value_dollar_t", "unit_value_98dollar_t"]
+        subset=[
+            "commodity",
+            "year",
+            "production",
+            "world_production",
+            "unit",
+            "unit_value_dollar_t",
+            "unit_value_98dollar_t",
+        ]
     ).reset_index(drop=True)
 
     ####################################################################################################################
@@ -170,7 +186,7 @@ def run(dest_dir: str) -> None:
     # Select columns for US production.
     # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
     # For now, we'll only keep "production".
-    tb_us_production = tb[["commodity", "year", "production"]].assign(**{"country": "United States"})
+    tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
     # Remove spurious footnotes like "W".
     tb_us_production["production"] = map_series(
         tb_us_production["production"],
@@ -184,7 +200,7 @@ def run(dest_dir: str) -> None:
     # "world_mine_production__metal_content", and "world_refinery_production".
     # For now, we'll only keep "world_production".
     tb_world_production = (
-        tb[["commodity", "year", "world_production"]]
+        tb[["commodity", "year", "world_production", "unit"]]
         .rename(columns={"world_production": "production"}, errors="raise")
         .assign(**{"country": "World"})
         .astype({"production": float})

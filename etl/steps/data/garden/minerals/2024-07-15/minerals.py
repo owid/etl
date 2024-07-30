@@ -57,12 +57,7 @@ def run(dest_dir: str) -> None:
 
     # Read tables.
     tb_bgs = ds_bgs.read_table("world_mineral_statistics")
-    tb_usgs_historical = (
-        ds_usgs_historical["historical_statistics_for_mineral_and_material_commodities"]
-        .astype(float)
-        .reset_index()
-        .rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
-    )[["country", "year", "commodity", "sub_commodity", "production", "unit_value"]]
+    tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
     tb_usgs = (
         ds_usgs["mineral_commodity_summaries"]
         .drop(columns=["reserves_notes", "production_notes"])
@@ -73,6 +68,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Select and rename columns in USGS historical data.
+    tb_usgs_historical = tb_usgs_historical.rename(columns={"unit_value_constant": "unit_value"}, errors="raise").drop(
+        columns=["unit_value_current"], errors="raise"
+    )
+
     # Parse notes as lists of strings.
     for column in [
         "notes_production",
@@ -85,7 +85,7 @@ def run(dest_dir: str) -> None:
     # TODO: Move this to usgs garden step.
     # For now, assume all USGS data is in tonnes. Later on, Unit value will be changed to USD.
     tb_usgs["unit"] = "tonnes"
-    tb_usgs_historical["unit"] = "tonnes"
+
     #
     # We extract data from three sources:
     # * From BGS we extract imports, exports, and production.
@@ -115,8 +115,6 @@ def run(dest_dir: str) -> None:
     #     _check = check[(check["country"] == country) & (check["commodity"] == commodity) & (check["sub_commodity"] == "Total")].dropna(subset="production")
     #     if _check["source"].nunique() == 2:
     #         px.line(_check, x="year", y="production", color="source", markers=True, title=f"{commodity} - {country}").show()
-
-    # Create a wide version for each table.
 
     # Pivot USGS table and remove empty columns.
     tb_usgs_flat = tb_usgs.pivot(
@@ -150,6 +148,15 @@ def run(dest_dir: str) -> None:
         df1=tb_usgs_flat, df2=tb_usgs_historical_flat, index_columns=["country", "year"]
     )
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_bgs_flat, index_columns=["country", "year"])
+
+    # Uncomment for debugging purposes.
+    # for column in tb.drop(columns=["country", "year"]).columns:
+    #     if (column in tb_usgs_flat.columns) and (column in tb_usgs_historical_flat.columns):
+    #         log.info(f"Combining overlapping data from USGS current and historical data: {column}")
+    #     if (column in tb_usgs_flat.columns) and (column in tb_bgs_flat.columns):
+    #         log.info(f"Combining overlapping data from USGS current and BGS data: {column}")
+    #     if (column in tb_usgs_historical_flat.columns) and (column in tb_bgs_flat.columns):
+    #         log.info(f"Combining overlapping data from USGS historical and BGS data: {column}")
 
     # Improve metadata of new columns.
     for column in tb.drop(columns=["country", "year"]).columns:
