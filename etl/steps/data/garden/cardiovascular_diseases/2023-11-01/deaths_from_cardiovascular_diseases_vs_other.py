@@ -78,7 +78,9 @@ def run(dest_dir: str) -> None:
     tb_group = tb_group.rename(
         columns={"Unidentified causes": "percentage_of_cause_specific_deaths_out_of_total_deaths"}
     )
+    # Append the unidentified causes to the main table.
     tb = pr.concat([tb, tb_group])
+    # Pivot the table to have causes as columns
     tb = tb.pivot_table(
         index=["country", "year"],
         columns="cause",

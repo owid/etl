@@ -123,7 +123,7 @@ tables:
             name: Cardiovascular diseases
             numDecimalPlaces: 1
 
-        unidentified_cause:
+        unidentified_causes:
           title: Share of deaths from unidentified causes
           unit: '%'
           short_unit: '%'
