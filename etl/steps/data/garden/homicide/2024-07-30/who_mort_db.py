@@ -1,4 +1,4 @@
-import numpy as np
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
@@ -175,9 +175,7 @@ def build_custom_age_groups(tb: Table, age_groups: dict) -> Table:
         axis=1,
     )
     tb_age = tb_age.groupby(["country", "year", "sex", "age_group"], observed=True).sum()
-    tb_age["death_rate_per_100_000_population"] = (
-        tb_age["number"].div(tb_age["population"]).replace(np.inf, np.nan)
-    ) * 100000
+    tb_age["death_rate_per_100_000_population"] = (tb_age["number"] / tb_age["population"].replace(0, pd.NA)) * 100000
     tb_age = tb_age.drop(columns=["population"]).reset_index()
 
     assert total_deaths == tb_age["number"].sum()
