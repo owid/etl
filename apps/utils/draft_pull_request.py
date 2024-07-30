@@ -226,7 +226,6 @@ def cli(
 
     # modify the PR body to include the diff link
     if step_update:
-        __import__("ipdb").set_trace()
         diff_link = f"{js['html_url']}/files/{repo.head.commit.hexsha}..HEAD"
 
         # Update body of the pull request
