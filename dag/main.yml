@@ -797,6 +797,7 @@ steps:
     - snapshot://homicide/2024-07-30/who_mort_db.csv
   data://garden/homicide/2024-07-30/who_mort_db:
     - data://meadow/homicide/2024-07-30/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2024-07-30/who_mort_db:
     - data://garden/homicide/2024-07-30/who_mort_db
 include:

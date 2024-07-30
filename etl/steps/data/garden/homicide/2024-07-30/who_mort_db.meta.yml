@@ -1,58 +1,24 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
       topic_tags:
-        - Homicides
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
-dataset:
-  update_period_days: 365
-
+        - Global Health
+    processing_level: minor
 
 tables:
   who_mort_db:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      number:
+        title: Deaths from homicide in << sex.lower() >> in << age_group.lower() >>
+        unit: deaths
+      percentage_of_cause_specific_deaths_out_of_total_deaths:
+        title: Share of total deaths from homicide in << sex.lower() >> in << age_group.lower() >>
+        unit: "%"
+        short_unit: "%"
+      age_standardized_death_rate_per_100_000_standard_population:
+        title: Age-standardized death rate from homicide in << sex.lower() >> in << age_group.lower() >>
+        unit: deaths per 100,000 people
+      death_rate_per_100_000_population:
+        title: Death rate from homicide in << sex.lower() >> in << age_group.lower() >> per 100,000 population
+        unit: deaths per 100,000 people
 

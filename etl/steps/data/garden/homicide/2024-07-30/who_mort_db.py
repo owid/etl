@@ -1,16 +1,11 @@
-import json
-from typing import List, cast
-
 import numpy as np
-import pandas as pd
-from owid.catalog import Dataset, Table, VariableMeta
-from owid.catalog.utils import underscore
+from owid.catalog import Table, VariableMeta
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.data_helpers.population import add_population
-from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
 
@@ -52,47 +47,29 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
     tb = clean_up_dimensions(tb)
     tb = add_age_groups(tb)
-    df_piv = df.pivot_table(
-        index=["country", "year"],
-        columns=["sex", "age_group"],
-        values=[
-            "number",
-            "percentage_of_cause_specific_deaths_out_of_total_deaths",
-            "age_standardized_death_rate_per_100_000_standard_population",
-            "death_rate_per_100_000_population",
-        ],
+
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
-    # create new dataset with the same metadata as meadow
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
 
-    # create new table with the same metadata as meadow and add it to dataset
-    tb_garden = Table(df_piv, short_name="who_mort_db")
-    new_tb_garden = Table(short_name="who_mort_db")
-    for col in tb_garden.columns:
-        col_metadata = build_metadata(col)
-        new_col = underscore(" ".join(col).strip())
-        new_tb_garden[new_col] = tb_garden[col]
-        new_tb_garden[new_col].metadata = col_metadata
-
-    ds_garden.add(new_tb_garden)
-
-    # update metadata from yaml file
-    ds_garden.update_metadata(paths.metadata_path)
-
+    # Save changes in the new garden dataset.
     ds_garden.save()
 
     log.info("who_mort_db.end")
 
 
-def clean_up_dimensions(df: pd.DataFrame) -> pd.DataFrame:
+def clean_up_dimensions(tb: Table) -> Table:
     sex_dict = {"All": "Both Sexes", "Male": "Males", "Female": "Females", "Unknown": "Unknown sex"}
     age_dict = {"Age_all": "All ages", "Age_unknown": "Unknown age"}
-    df = df.astype({"sex": str, "age_group": str}).replace({"sex": sex_dict, "age_group": age_dict})
+    tb = tb.astype({"sex": str, "age_group": str}).replace({"sex": sex_dict, "age_group": age_dict})
 
-    return df
+    return tb
 
 
-def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+def add_age_groups(tb: Table) -> Table:
     """
     Create custom age-group aggregations, there are a range of different ones that might be useful for this dataset.
     For example, we may want to compare to other causes of death imported via the IHME dataset, so we should include age-groups that match our chosen IHME groups.
@@ -154,29 +131,29 @@ def add_age_groups(df: pd.DataFrame) -> pd.DataFrame:
         "Age15_19": "Age 0-19",
     }
 
-    df_age_group_ihme = build_custom_age_groups(df, age_groups=age_groups_ihme)
-    df_age_group_decadal = build_custom_age_groups(df, age_groups=age_groups_decadal)
-    df_age_group_child = build_custom_age_groups(df, age_groups=age_groups_child)
-    df_orig = remove_granular_age_groups(df)
-    df_combined = pd.concat([df_orig, df_age_group_ihme, df_age_group_decadal, df_age_group_child], axis=0)
-    df_combined = df_combined.loc[:, ~df_combined.columns.duplicated()]
-    return df_combined
+    tb_age_group_ihme = build_custom_age_groups(tb, age_groups=age_groups_ihme)
+    tb_age_group_decadal = build_custom_age_groups(tb, age_groups=age_groups_decadal)
+    tb_age_group_child = build_custom_age_groups(tb, age_groups=age_groups_child)
+    tb_orig = remove_granular_age_groups(tb)
+    tb_combined = pr.concat([tb_orig, tb_age_group_ihme, tb_age_group_decadal, tb_age_group_child], axis=0)
+    tb_combined = tb_combined.loc[:, ~tb_combined.columns.duplicated()]
+    return tb_combined
 
 
-def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
+def build_custom_age_groups(tb: Table, age_groups: dict) -> Table:
     """
     Estimate metrics for broader age groups. In line with the age-groups we define in the age_groups dict:
     """
-    df_age = df.copy()
+    tb_age = tb.copy()
     # Add population values for each dimension
     log.info("who_mort_db.add_population_values")
 
-    df_age = df_age[df_age["age_group"].isin(age_groups.keys())]
+    tb_age = tb_age[tb_age["age_group"].isin(age_groups.keys())]
 
-    total_deaths = df_age["number"].sum()
+    total_deaths = tb_age["number"].sum()
 
-    df_age = add_population(
-        df=df_age,
+    tb_age = add_population(
+        df=tb_age,
         country_col="country",
         year_col="year",
         sex_col="sex",
@@ -189,10 +166,10 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
     # Map age groups to broader age groups. Missing age groups in the list are passed as they are (no need to assign to broad group)
     log.info("who_mort_db.create_broader_age_groups")
 
-    df_age["age_group"] = df_age["age_group"].map(age_groups)
+    tb_age["age_group"] = tb_age["age_group"].map(age_groups)
 
     # Sum
-    df_age = df_age.drop(
+    tb_age = tb_age.drop(
         [
             "percentage_of_cause_specific_deaths_out_of_total_deaths",
             "age_standardized_death_rate_per_100_000_standard_population",
@@ -200,28 +177,28 @@ def build_custom_age_groups(df: pd.DataFrame, age_groups: dict) -> pd.DataFrame:
         ],
         axis=1,
     )
-    df_age = df_age.groupby(["country", "year", "sex", "age_group"], observed=True).sum()
-    df_age["death_rate_per_100_000_population"] = (
-        df_age["number"].div(df_age["population"]).replace(np.inf, np.nan)
+    tb_age = tb_age.groupby(["country", "year", "sex", "age_group"], observed=True).sum()
+    tb_age["death_rate_per_100_000_population"] = (
+        tb_age["number"].div(tb_age["population"]).replace(np.inf, np.nan)
     ) * 100000
-    df_age = df_age.drop(columns=["population"]).reset_index()
+    tb_age = tb_age.drop(columns=["population"]).reset_index()
 
-    assert total_deaths == df_age["number"].sum()
+    assert total_deaths == tb_age["number"].sum()
 
-    return df_age
+    return tb_age
 
 
-def remove_granular_age_groups(df: pd.DataFrame) -> pd.DataFrame:
+def remove_granular_age_groups(tb: Table) -> Table:
     """
     Remove the small five-year age-groups that are in the original dataset
     """
     age_groups_to_keep = ["All ages", "Unknown age"]
-    df = df[df["age_group"].isin(age_groups_to_keep)]
-    assert len(df["age_group"].drop_duplicates()) == len(age_groups_to_keep)
-    return df
+    tb = tb[tb["age_group"].isin(age_groups_to_keep)]
+    assert len(tb["age_group"].drop_duplicates()) == len(age_groups_to_keep)
+    return tb
 
 
-def build_metadata(col: tuple) -> pd.DataFrame:
+def build_metadata(col: tuple) -> VariableMeta:
     """
     Building the variable level metadata for each of the age-sex-metric combinations
     """
@@ -230,19 +207,19 @@ def build_metadata(col: tuple) -> pd.DataFrame:
             "title": "Age standardized homicide rate per 100,000 population",
             "unit": "homicides per 100,000 people",
             "short_unit": "",
-            "numDecimalPlaces": 2,
+            "numDecimalPlaces": 1,
         },
         "death_rate_per_100_000_population": {
             "title": "Homicide rate per 100,000 population",
             "unit": "homicides per 100,000 people",
             "short_unit": "",
-            "numDecimalPlaces": 2,
+            "numDecimalPlaces": 1,
         },
         "percentage_of_cause_specific_deaths_out_of_total_deaths": {
             "title": "Share of total deaths",
             "unit": "%",
             "short_unit": "%",
-            "numDecimalPlaces": 2,
+            "numDecimalPlaces": 1,
         },
         "number": {
             "title": "Number of homicides",
