@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import pandas as pd
+from shared import year_to_date
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -22,8 +23,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     ## Convert number of days since 2020-01-21 to date
-    tb["date"] = pd.Timestamp("2020-01-21") + pd.to_timedelta(tb["Year"], unit="days")  # type: ignore
-    tb = tb.drop(columns=["Year"])
+    tb = year_to_date(tb)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "date"])

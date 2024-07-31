@@ -35,8 +35,8 @@ steps:
     - snapshot://covid/latest/decoupling_israel.csv
   data://garden/covid/latest/decoupling:
     - data://meadow/covid/latest/decoupling
-  # data://grapher/covid/latest/decoupling:
-  #   - data://garden/covid/latest/decoupling
+  data://grapher/covid/latest/decoupling:
+    - data://garden/covid/latest/decoupling
 
   ######################################
   # Mobility

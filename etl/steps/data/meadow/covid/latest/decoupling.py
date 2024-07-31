@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
+from shared import year_to_date
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -23,9 +25,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    ## Convert number of days since 2020-01-21 to date
+    tb_usa = year_to_date(tb_usa)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
-        tb_usa.format(["country", "year"]),
+        tb_usa.format(["country", "date"]),
         tb_spain.format(["provincia_iso", "sexo", "grupo_edad", "fecha"]),
         tb_israel.format(["date"]),
     ]

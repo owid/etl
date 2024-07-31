@@ -1,9 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -19,15 +19,21 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_spain = ds_meadow["decoupling_spain"].reset_index()
+    tb_usa = ds_meadow["decoupling_usa"].reset_index()
+    tb_israel = ds_meadow["decoupling_israel"].reset_index()
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb_spain,
-        countries_file=paths.country_mapping_path,
-    )
-    tb = tb.format(["country", "year"])
+    tb_spain = process_spain(tb_spain)
+    tb_israel = process_israel(tb_israel)
+    # tb_usa = process_usa(tb_israel)
+
+    # Combine
+    tb = combine_tables(tb_spain, tb_israel, tb_usa)
+
+    # Format
+    tb = tb.format(["country", "date"], short_name="decoupling")
 
     #
     # Save outputs.
@@ -41,7 +47,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def process_esp(tb: Table) -> Table:
+def process_spain(tb: Table) -> Table:
     """Process spain table."""
     tb = (
         tb[["fecha", "num_casos", "num_hosp", "num_uci", "num_def"]]
@@ -74,6 +80,57 @@ def process_esp(tb: Table) -> Table:
         hosp_variable="hospital_flow",
         icu_variable="icu_flow",
     )
+
+    tb = tb.rename(
+        columns={
+            "Country": "country",
+        }
+    )
+
+    return tb
+
+
+def process_israel(tb: Table) -> Table:
+    tb = (
+        tb.loc[
+            :,
+            [
+                "date",
+                "new_infected",
+                "new_serious",
+                "new_deaths",
+                "easy",
+                "medium",
+                "hard",
+            ],
+        ]
+        .rename(
+            columns={
+                "new_infected": "confirmed_cases",
+                "new_serious": "icu_flow",
+                "new_deaths": "confirmed_deaths",
+            }
+        )
+        .sort_values("date")
+        .head(-1)
+    )
+
+    tb["hospital_stock"] = tb["easy"] + tb["medium"] + tb["hard"]
+
+    vars = ["confirmed_cases", "icu_flow", "confirmed_deaths"]
+    tb[vars] = tb[vars].rolling(7).sum()
+
+    tb["date"] = pd.to_datetime(tb["date"])
+
+    tb = adjust_x_and_y(
+        tb=tb,
+        start_date="2020-11-15",
+        end_date="2021-04-01",
+        hosp_variable="hospital_stock",
+        icu_variable="icu_flow",
+    )
+
+    tb["country"] = "Israel"
 
     return tb
 
@@ -111,4 +168,22 @@ def adjust_x_and_y(
     tb[icu_variable] = (100 * tb[icu_variable] / icu_peak).round(1)
     tb["confirmed_deaths"] = (100 * tb.confirmed_deaths / death_peak).round(1)
 
+    return tb
+
+
+def combine_tables(tb_spain: Table, tb_israel: Table, tb_usa: Table) -> Table:
+    """Combine all tables."""
+    tb = pr.concat([tb_usa, tb_spain, tb_israel], ignore_index=True)
+    tb = tb[
+        [
+            "country",
+            "date",
+            "confirmed_cases",
+            "hospital_flow",
+            "hospital_stock",
+            "icu_flow",
+            "icu_stock",
+            "confirmed_deaths",
+        ]
+    ]
     return tb
