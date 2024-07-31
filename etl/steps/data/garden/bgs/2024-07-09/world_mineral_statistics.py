@@ -190,7 +190,7 @@ COMMODITY_MAPPING = {
     ),
     ("Ferro-alloys", "Ferro-alloys"): ("Ferro-alloys", "Ferro-alloys"),
     ("Ferro-alloys", "Ferro-aluminium"): ("Ferro-alloys", "Ferro-aluminum"),
-    ("Ferro-alloys", "Ferro-aluminium & ferro-silico-aluminum"): (
+    ("Ferro-alloys", "Ferro-aluminium & ferro-silico-aluminium"): (
         "Ferro-alloys",
         "Ferro-aluminum & ferro-silico-aluminum",
     ),
@@ -722,6 +722,13 @@ ACCEPTED_OVERLAPS = [
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
     tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
+    missing_mappings = set(
+        [tuple(pair) for pair in tb[["commodity", "sub_commodity"]].drop_duplicates().values.tolist()]
+    ) - set(COMMODITY_MAPPING)
+    assert len(missing_mappings) == 0, f"Missing mappings: {missing_mappings}"
+    # NOTE: Do not assert that all mappings are used, since mappings are shared for imports, exports and production.
+    # unused_mappings = set(COMMODITY_MAPPING) - set([tuple(pair) for pair in df[["commodity", "sub_commodity"]].drop_duplicates().values.tolist()])
+    # assert len(unused_mappings) == 0, f"Unused mappings: {unused_mappings}"
     for pair_old, pair_new in COMMODITY_MAPPING.items():
         if pair_old == pair_new:
             # Nothing to do, continue.

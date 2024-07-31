@@ -173,8 +173,11 @@ def run(dest_dir: str) -> None:
 
         # Get notes from USGS' description_from_producer field.
         notes_usgs = None
+        footnotes_usgs = None
         if column in tb_usgs_flat.columns:
             notes_usgs = tb_usgs_flat[column].metadata.description_from_producer
+            if tb_usgs_flat[column].metadata.presentation.grapher_config is not None:
+                footnotes_usgs = tb_usgs_flat[column].metadata.presentation.grapher_config["note"]
 
         # Add notes to metadata.
         combined_notes = ""
@@ -189,6 +192,9 @@ def run(dest_dir: str) -> None:
 
         if len(combined_notes) > 0:
             tb[column].metadata.description_from_producer = combined_notes
+
+        if footnotes_usgs is not None:
+            tb[column].metadata.presentation.grapher_config["note"] = footnotes_usgs
 
     # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals")

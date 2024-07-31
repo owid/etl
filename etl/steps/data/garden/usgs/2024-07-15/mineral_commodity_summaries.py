@@ -11,7 +11,7 @@ from zipfile import ZipFile
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -40,14 +40,15 @@ MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 
 # Harmonize commodity-subcommodity names.
 # NOTE: This list should contain all commodity-subcommodity pairs expected in the data.
-# Set to None any commodity-subcommodity that should not be included.
+#  Set to None any commodity-subcommodity that should not be included.
+# NOTE: Sometimes the original names include relevant information.
+#  This information will be included in the footnotes (see FOOTNOTES defined below).
 COMMODITY_MAPPING = {
     ("Aluminum", "Smelter production, aluminum"): ("Aluminum", "Smelter production"),
     ("Aluminum", "Smelter yearend capacity"): None,
     ("Aluminum", "smelter production"): ("Aluminum", "Smelter production"),
     ("Antimony", "Mine production"): ("Antimony", "Mine production"),
     ("Antimony", "Mine production, contained antimony"): ("Antimony", "Mine production"),
-    # TODO: In notes, mention that Arsenic - Plant production refers to arsenic trioxide or calculated equivalent.
     ("Arsenic", "Plant production, arsenic trioxide or calculated equivalent."): ("Arsenic", "Plant production"),
     ("Arsenic", "arsenic trioxide"): ("Arsenic", "Plant production"),
     ("Asbestos", "Mine production"): ("Asbestos", "Mine production"),
@@ -55,16 +56,13 @@ COMMODITY_MAPPING = {
     ("Barite", "Mine production"): ("Barite", "Mine production"),
     ("Barite", "Mine production, barite"): ("Barite", "Mine production"),
     ("Barite", "Mine production, excluding U.S."): ("Barite", "Mine production"),
-    # TODO: Ensure that the units say calcined equivalent weights, or otherwise add it to the notes.
     ("Bauxite and alumina", "Alumina, refinery production - calcined equivalent weights"): (
         "Alumina",
         "Refinery production",
     ),
     ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite", "Mine production"),
     ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite", "Mine production"),
-    # TODO: Ensure that the units say dry tons, otherwise add it to the notes.
     ("Bauxite and alumina", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine production"),
-    # TODO: Ensure that the units say calcined equivalent weights, or otherwise add it to the notes.
     ("Bauxite and alumina", "Refinery production, alumina - calcined equivalent weights"): (
         "Alumina",
         "Refinery production",
@@ -94,13 +92,13 @@ COMMODITY_MAPPING = {
     ("Boron", "ulexite"): ("Boron", "Mine production, ulexite"),
     ("Bromine", "Plant production, bromine content"): ("Bromine", "Plant production"),
     ("Bromine", "Production, bromine content"): ("Bromine", "Plant production"),
+    ("Bromine", "Production, bromine content, excluding U.S. production"): ("Bromine", "Plant production"),
     ("Bromine", "Production"): ("Bromine", "Plant production"),
     ("Cadmium", "Refinery production"): ("Cadmium", "Refinery production"),
     ("Cement", "Cement production, estimated"): ("Cement", "Production"),
     ("Cement", "Clinker capacity, estimated"): None,
-    # TODO: Add a note saying that Chromium mine production refers to gross weight (if this is not already mentioned).
     ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine production, marketable chromite ore"),
-    ("Chromium", "Mine production, grosss weight, marketable chromite ore"): (
+    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): (
         "Chromium",
         "Mine production, marketable chromite ore",
     ),
@@ -126,7 +124,7 @@ COMMODITY_MAPPING = {
     ("Diamond (industrial)", "Mine production, industrial diamond"): ("Diamond", "Mine production, industrial"),
     ("Diatomite", "Mine production"): ("Diatomite", "Mine production"),
     ("Diatomite", "Mine production, diatomite"): ("Diatomite", "Mine production"),
-    # TODO: In 2022, for Feldspar and nepheline syenite, the subcommodity is "Mine production", whereas in 2023 and 2024, it is "Mine production, feldspar".
+    # NOTE: In 2022, for Feldspar and nepheline syenite, the subcommodity is "Mine production", whereas in 2023 and 2024, it is "Mine production, feldspar".
     #  Maybe 2022 also refers to only feldspar?
     ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar and nepheline syenite", "Mine production"),
     ("Feldspar and nepheline syenite", "Mine production, feldspar"): ("Feldspar", "Mine production"),
@@ -150,7 +148,6 @@ COMMODITY_MAPPING = {
     ("Indium", "Refinery production"): ("Indium", "Refinery production"),
     ("Indium", "Refinery production, indium"): ("Indium", "Refinery production"),
     ("Iodine", "Mine production"): ("Iodine", "Mine production"),
-    # TODO: Add note saying that Iodine - Mine production refers to elemental iodine.
     ("Iodine", "Mine production, elemental iodine"): ("Iodine", "Mine production"),
     ("Iron and steel", "Pig iron"): ("Iron and steel", "Pig iron"),
     ("Iron and steel", "Pig iron, million metric tons"): ("Iron and steel", "Pig iron"),
@@ -237,12 +234,10 @@ COMMODITY_MAPPING = {
     ("Platinum-group metals", "World mine production: Palladium"): ("Palladium", "Mine production"),
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum", "Mine production"),
     ("Potash", "Mine production"): ("Potash", "Mine production"),
-    # TODO: Ensure that the units say potassium oxide equivalent, or otherwise add it to the notes.
     ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine production"),
     ("Pumice and pumicite", "Mine production"): ("Pumice and pumicite", "Mine production"),
     ("Pumice and pumicite", "Mine production, puice and pumicite"): ("Pumice and pumicite", "Mine production"),
     ("Pumice and pumicite", "Mine production, pumice and pumicite"): ("Pumice and pumicite", "Mine production"),
-    # TODO: Ensure that the units say rare-earth-oxide equivalent, or otherwise add it to the notes.
     ("Rare earths", "Mine production, metric tons of rare-earth-oxide (REO) equivalent"): (
         "Rare earths",
         "Mine production",
@@ -346,7 +341,6 @@ COMMODITY_MAPPING = {
         "Titanium mineral concentrates",
         "Mine production, ilmenite and rutile",
     ),
-    # TODO: Ensure that the units say titanium dioxide (TiO2) content, or otherwise add it to the notes.
     ("Titanium mineral concentrates", "Mine production: Ilmenite, titanium dioxide (TiO2) content."): (
         "Titanium mineral concentrates",
         "Mine production, ilmenite",
@@ -404,6 +398,22 @@ COMMODITY_MAPPING = {
         "Zirconium and hafnium",
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
     ): ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"),
+}
+
+# Footnotes (that will appear in the footer of charts) to add to the flattened output table.
+FOOTNOTES = {
+    # TODO: Add the following notes to reserves, where possible.
+    # TODO: Create a dictionary of special units instead of footnotes (and change the column name accordingly!).
+    "production|Arsenic|Plant production|tonnes": "Plant production refers to arsenic trioxide or calculated equivalent.",
+    "production|Alumina|Refinery production|tonnes": "Refinery production refers to calcined equivalent weights.",
+    "production|Bauxite|Mine production|tonnes": "Mine production refers to dry tons.",
+    "production|Chromium|Mine production, marketable chromite ore|tonnes": "Mine production refers to gross weight.",
+    "production|Iodine|Mine production|tonnes": "Mine production refers to elemental iodine.",
+    "production|Potash|Mine production|tonnes": "Mine production refers to potassium oxide equivalent.",
+    "production|Rare earths|Mine production|tonnes": "Mine production refers to rare-earth-oxide equivalent.",
+    "production|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "Mine production refers to titanium dioxide content.",
+    "production|Titanium mineral concentrates|Mine production, rutile|tonnes": "Mine production refers to titanium dioxide content.",
+    "production|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "Mine production refers to titanium dioxide content.",
 }
 
 
@@ -839,6 +849,13 @@ def fix_helium_issue(df_reserves: pd.DataFrame, df_production: pd.DataFrame) -> 
 
 def harmonize_commodity_subcommodity_pairs(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
+    missing_mappings = set([tuple(pair) for pair in df[["Mineral", "Type"]].drop_duplicates().values.tolist()]) - set(
+        COMMODITY_MAPPING
+    )
+    assert len(missing_mappings) == 0, f"Missing mappings: {missing_mappings}"
+    # NOTE: Do not assert that all mappings are used, since mappings are shared for reserves and production.
+    # unused_mappings = set(COMMODITY_MAPPING) - set([tuple(pair) for pair in df[["Mineral", "Type"]].drop_duplicates().values.tolist()])
+    # assert len(unused_mappings) == 0, f"Unused mappings: {unused_mappings}"
     for pair_old, pair_new in COMMODITY_MAPPING.items():
         if pair_old == pair_new:
             # Nothing to do, continue.
@@ -1075,8 +1092,11 @@ def run(dest_dir: str) -> None:
     for column in ["notes_reserves", "notes_production"]:
         tb[column] = tb[column].copy_metadata(tb["production"]).astype(str)
 
-    # Add some necessary footnotes.
-    # TODO
+    # Add footnotes.
+    for column, note in FOOTNOTES.items():
+        if not tb_flat[column].metadata.presentation:
+            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
+        tb_flat[column].metadata.presentation.grapher_config["note"] = note
 
     # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
