@@ -28,11 +28,7 @@ def add_rolling_average(tb: Table) -> Table:
 
     # Create a rolling average with a window of one year, linearly interpolating missing values.
     tb_with_average["ocean_ph_yearly_average"] = (
-        tb_with_average["ocean_ph"]
-        .interpolate(method="time")
-        .rolling(365)
-        .mean()
-        .copy_metadata(tb_with_average["ocean_ph"])
+        tb_with_average["ocean_ph"].interpolate(method="time").rolling(365).mean()
     )
 
     # Drop empty rows.
