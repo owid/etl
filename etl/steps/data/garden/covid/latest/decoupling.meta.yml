@@ -1,0 +1,42 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      numDecimalPlaces: 1
+      zeroDay: "2020-01-01"
+      yearIsDay: true
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, decoupling of indicators
+
+
+tables:
+  decoupling:
+    variables:
+      confirmed_cases:
+        title: Confirmed cases
+        unit: cases
+      hospital_flow:
+        title: Hospital admissions
+        unit: admissions
+      hospital_stock:
+        title: Patients in hospital
+        unit: patients
+      icu_flow:
+        title: ICU admissions
+        unit: admisions
+      icu_stock:
+        title: Patients in ICU
+        unit: patients
+      confirmed_deaths:
+        title: Confirmed deaths
+        unit: deaths
+

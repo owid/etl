@@ -29,22 +29,21 @@ steps:
   data://grapher/covid/latest/john_hopkins_university:
     - data://garden/covid/latest/john_hopkins_university
 
+  data://meadow/covid/latest/decoupling:
+    - snapshot://covid/latest/decoupling_usa.csv
+    - snapshot://covid/latest/decoupling_spain.csv
+    - snapshot://covid/latest/decoupling_israel.csv
+  data://garden/covid/latest/decoupling:
+    - data://meadow/covid/latest/decoupling
+  data://grapher/covid/latest/decoupling:
+    - data://garden/covid/latest/decoupling
+
   ######################################
   # Mobility
   data://grapher/covid/latest/google_mobility_trends:
     - data://garden/covid/latest/google_mobility_trends
   data://garden/covid/latest/google_mobility_trends:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/Google%20Mobility%20Trends%20(2020).csv
-  # Cases and deaths
-  data-private://grapher/covid/latest/cases_and_deaths_who:
-    - data-private://garden/covid/latest/cases_and_deaths_who
-  data-private://garden/covid/latest/cases_and_deaths_who:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv
-  # Decoupling
-  data-private://grapher/covid/latest/decoupling_metrics:
-    - data-private://garden/covid/latest/decoupling_metrics
-  data-private://garden/covid/latest/decoupling_metrics:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Decoupling%20of%20metrics.csv
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
     - data://garden/covid/latest/hospital_and_icu
@@ -114,5 +113,8 @@ steps:
     - data-private://garden/covid/latest/sequencing
   data-private://garden/covid/latest/sequencing:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
-
-
+  # Cases and deaths
+  data-private://grapher/covid/latest/cases_and_deaths_who:
+    - data-private://garden/covid/latest/cases_and_deaths_who
+  data-private://garden/covid/latest/cases_and_deaths_who:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv

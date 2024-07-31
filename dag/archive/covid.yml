@@ -1,0 +1,6 @@
+steps:
+  # Decoupling
+  data-private://grapher/covid/latest/decoupling_metrics:
+    - data-private://garden/covid/latest/decoupling_metrics
+  data-private://garden/covid/latest/decoupling_metrics:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Decoupling%20of%20metrics.csv
