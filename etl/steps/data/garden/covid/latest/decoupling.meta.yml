@@ -6,6 +6,8 @@ definitions:
         - COVID-19
     display:
       numDecimalPlaces: 1
+      zeroDay: "2020-01-01"
+      yearIsDay: true
     processing_level: major
 
 
