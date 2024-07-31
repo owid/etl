@@ -236,7 +236,12 @@ steps:
   data://garden/un/2024-07-25/resettlement:
     - data://meadow/un/2024-07-25/resettlement
     - data://garden/demography/2024-07-15/population
+
+  # Child migration (UNICEF)
   data://meadow/unicef/2024-07-30/child_migration:
     - snapshot://unicef/2024-07-30/child_migration.csv
+  data://garden/unicef/2024-07-30/child_migration:
+    - data://meadow/unicef/2024-07-30/child_migration
+    - data://garden/demography/2024-07-15/population
   data://grapher/unicef/2024-07-30/child_migration:
     - data://garden/unicef/2024-07-30/child_migration

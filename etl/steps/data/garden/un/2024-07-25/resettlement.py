@@ -48,12 +48,10 @@ def run(dest_dir: str) -> None:
 
     # merge country column (data is split between origin and asylum in columns)
     tb["country_of_origin"] = tb["country_of_origin"].fillna(tb["country_of_asylum"])
+    tb = tb.rename(columns={"country_of_origin": "country"}, errors="raise")
 
-    # drop country of asylum column
-    tb = tb.rename(columns={"country_of_origin": "country"}).drop(columns=["country_of_asylum"])
-
-    # drop idps destination since it is identical to idps origin
-    tb = tb.drop(columns=["returned_idpss_dest"])
+    # drop country of asylum and idps destination (since it is identical to idps origin) column
+    tb = tb.drop(columns=["country_of_asylum", "returned_idpss_dest"], errors="raise")
 
     tb = tb.format(["country", "year"])
 
