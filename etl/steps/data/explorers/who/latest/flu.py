@@ -88,7 +88,7 @@ def fill_na_with_zero(group_df: pd.DataFrame, col: str) -> pd.DataFrame:
     first_non_na = group_df[col].first_valid_index()
     last_non_na = group_df[col].last_valid_index()
     if first_non_na is not None:
-        group_df[col].loc[first_non_na + 1 : last_non_na] = group_df[col].loc[first_non_na + 1 : last_non_na].fillna(0)
+        group_df.loc[first_non_na + 1 : last_non_na, col] = group_df.loc[first_non_na + 1 : last_non_na, col].fillna(0)
     return group_df
 
 
@@ -125,11 +125,11 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
         country_df = df[df["country"] == country]
         min_date = country_df.date.min()
         max_date = country_df.date.max()
-        date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").format(), name="date")
+        date_series = pd.Series(pd.date_range(min_date, max_date, freq="7D").astype(str), name="date")
 
         if len(date_series[~date_series.isin(country_df["date"])]) > 0:
             country_df = pd.merge(country_df, date_series, how="outer")
-            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].fillna(method="ffill")
+            country_df[["country", "hemisphere"]] = country_df[["country", "hemisphere"]].ffill()
             assert len(date_series) == country_df.shape[0]
             assert country_df.country.isna().sum() == 0
 

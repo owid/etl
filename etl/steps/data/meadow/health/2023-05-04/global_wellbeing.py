@@ -59,8 +59,8 @@ def run(dest_dir: str) -> None:
 
     # Create index columns
     log.info("global_wellbeing: build index columns")
-    df["country"] = df[df.columns[0]].fillna(method="ffill")
-    df["dimension"] = df[df.columns[1]].fillna(method="ffill")
+    df["country"] = df[df.columns[0]].ffill()
+    df["dimension"] = df[df.columns[1]].ffill()
     df["dimension"] = "(" + df["dimension"] + "?) " + df[df.columns[2]]
 
     # Set index and get only relevant columns

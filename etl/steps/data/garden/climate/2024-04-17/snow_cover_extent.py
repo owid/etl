@@ -35,11 +35,7 @@ def add_rolling_average(tb: Table, original_column_name: str) -> Table:
 
     # Create a rolling average with a window of one year, linearly interpolating missing values.
     tb_with_average[f"{original_column_name}_yearly_average"] = (
-        tb_with_average[original_column_name]
-        .interpolate(method="linear")
-        .rolling(365)
-        .mean()
-        .copy_metadata(tb_with_average[original_column_name])
+        tb_with_average[original_column_name].interpolate(method="linear").rolling(365).mean()
     )
 
     # Drop empty rows.

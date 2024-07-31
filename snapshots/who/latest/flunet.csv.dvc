@@ -16,6 +16,6 @@ meta:
     The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: f182b5ce6c87f4158cd8216f7bc5ca76
-    size: 26409924
+  - md5: 1c5a5de7ce03ef38008e3419b78b2356
+    size: 26412284
     path: flunet.csv

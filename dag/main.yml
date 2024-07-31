@@ -12,7 +12,7 @@ steps:
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -83,15 +83,6 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - WHO
-  data://meadow/homicide/2023-01-03/who_mort_db:
-    - snapshot://homicide/2023-01-03/who_mort_db.csv
-  data://garden/homicide/2023-01-03/who_mort_db:
-    - data://meadow/homicide/2023-01-03/who_mort_db
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/homicide/2023-01-03/who_mort_db:
-    - data://garden/homicide/2023-01-03/who_mort_db
-
   # Homicide - UNODC - current
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
@@ -100,13 +91,6 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-  # Homicide - OMM
-  data://garden/homicide/2023-01-03/homicide_long_run_omm:
-    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
-    - data://garden/homicide/2023-01-03/who_mort_db
-    - data://garden/homicide/2023-07-04/unodc
-  data://grapher/homicide/2023-01-03/homicide_long_run_omm:
-    - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
   #
   # UN
@@ -330,14 +314,6 @@ steps:
     - data://garden/demography/2022-12-08/population
   data://grapher/oecd/2023-05-19/co2_air_transport:
     - data://garden/oecd/2023-05-19/co2_air_transport
-
-  # WB income groups
-  data://meadow/wb/2023-04-30/income_groups:
-    - snapshot://wb/2023-04-30/income_groups.xlsx
-  data://garden/wb/2023-04-30/income_groups:
-    - data://meadow/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-04-30/income_groups:
-    - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2024-05-02/world_economic_outlook:
@@ -609,7 +585,7 @@ steps:
 
   # Missing Data - Neuropsychiatric Conditions
   data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
-    - data://garden/who/2023-08-01/mortality_database
+    - data://garden/who/2024-07-26/mortality_database
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
@@ -692,15 +668,7 @@ steps:
 
   #Latitude
   data://grapher/geography/2024-07-18/latitude:
-  - data://garden/geography/2023-11-28/nat_earth_110
-
-  # WB income groups
-  data://meadow/wb/2024-03-11/income_groups:
-    - snapshot://wb/2024-03-11/income_groups.xlsx
-  data://garden/wb/2024-03-11/income_groups:
-    - data://meadow/wb/2024-03-11/income_groups
-  data://grapher/wb/2024-03-11/income_groups:
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/geography/2023-11-28/nat_earth_110
 
   # Attention in Media: The Guardian
   data://meadow/news/2024-05-08/guardian_mentions:
@@ -791,6 +759,49 @@ steps:
     - data://meadow/un/2024-06-24/sdg_regions
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
+
+# WHO Mort DB Homicides
+  data://meadow/homicide/2024-07-30/who_mort_db:
+    - snapshot://homicide/2024-07-30/who_mort_db.csv
+  data://garden/homicide/2024-07-30/who_mort_db:
+    - data://meadow/homicide/2024-07-30/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/homicide/2024-07-30/who_mort_db:
+    - data://garden/homicide/2024-07-30/who_mort_db
+
+  # Homicide - OMM
+  data://garden/homicide/2024-07-30/homicide_long_run_omm:
+    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+    - data://garden/homicide/2024-07-30/who_mort_db
+    - data://garden/homicide/2023-07-04/unodc
+  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
+    - data://garden/homicide/2024-07-30/homicide_long_run_omm
+
+# WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+# WB income groups 2024-03-11
+  data://meadow/wb/2024-03-11/income_groups:
+    - snapshot://wb/2024-03-11/income_groups.xlsx
+  data://garden/wb/2024-03-11/income_groups:
+    - data://meadow/wb/2024-03-11/income_groups
+  data://grapher/wb/2024-03-11/income_groups:
+    - data://garden/wb/2024-03-11/income_groups
+
+# WB income groups 2024-07-29
+  data://meadow/wb/2024-07-29/income_groups:
+    - snapshot://wb/2024-07-29/income_groups.xlsx
+
+  data://garden/wb/2024-07-29/income_groups:
+    - data://meadow/wb/2024-07-29/income_groups
+
+  data://grapher/wb/2024-07-29/income_groups:
+    - data://garden/wb/2024-07-29/income_groups
 
 include:
   - dag/open_numbers.yml

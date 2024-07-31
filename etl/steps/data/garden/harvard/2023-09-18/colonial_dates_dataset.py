@@ -61,6 +61,8 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
     # Capitalize colonizer column and replace Britain by United Kingdom
     tb["colonizer"] = tb["colonizer"].str.capitalize().replace("Britain", "United Kingdom")
 
+    tb["col"] = tb["col"].astype(str)
+
     # Create two tables, one for colonized countries and one for colonizers/not colonized countries
     tb_colonized = tb[tb["col"] == "1"].reset_index(drop=True)
     tb_rest = tb[tb["col"] == "0"].reset_index(drop=True)
@@ -84,8 +86,11 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
 
     # Create a year column with one value per row representing the range between colstart_max and colend_max
     # NOTE: I have decided to use last date aggregations, but we could also use mean aggregations
-    tb_colonized["year"] = tb_colonized.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
-    tb_rest["year"] = tb_rest.apply(lambda x: list(range(x["colstart_max"], x["colend_max"] + 1)), axis=1)
+    for t in [tb_colonized, tb_rest]:
+        t["year"] = [
+            list(range(colstart_max, colend_max + 1))
+            for colstart_max, colend_max in zip(t["colstart_max"], t["colend_max"])
+        ]
 
     # Explode the year column
     tb_colonized = tb_colonized.explode("year").reset_index(drop=True)
@@ -126,7 +131,7 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
     tb = pr.concat([tb_colonized, tb_rest, tb_count], short_name="colonial_dates_dataset")
 
     # Fill years in the range (tb_colonized['year'].min(), LATEST_YEAR) not present for each country
-    tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()
+    tb = tb.set_index(["country", "year"]).unstack().stack(dropna=False).reset_index()  # type: ignore
 
     # Create an additional summarized colonizer column, replacing the values with " - " with "More than one colonizer"
     # I add the "z." to have this at the last position of the map brackets
@@ -138,8 +143,8 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
     tb["years_colonized"] = tb.groupby(["country"])["colonizer"].transform(lambda x: x.notnull().cumsum())
 
     # Create last_colonizer column, which is the most recent non-null colonizer for each country and year
-    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].fillna(method="ffill")
-    tb["last_colonizer_grouped"] = tb.groupby(["country"])["colonizer_grouped"].fillna(method="ffill")
+    tb["last_colonizer"] = tb.groupby(["country"])["colonizer"].ffill()
+    tb["last_colonizer_grouped"] = tb.groupby(["country"])["colonizer_grouped"].ffill()
 
     # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
     for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
