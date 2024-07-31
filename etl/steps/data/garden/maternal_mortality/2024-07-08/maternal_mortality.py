@@ -65,7 +65,7 @@ WHO_REMOVE_REGIONS = [
 def run(dest_dir: str) -> None:
     """Creates long running data set on maternal mortality combining following sources (in brackets - timeframes available for each source):
     - Gapminder maternal mortality data (1751 - 2008)
-    - WHO mortality database (1950 - 2020) & UN WPP (1950 - 2020)
+    - WHO mortality database (1950 - 2022) & UN WPP (1950 - 2020)
     - UN MMEIG maternal mortality data (1985 - 2020)
     We combine them following the hierarchy below, where the most recent data is used when available:
     - UN MMEIG >> WHO/UN >> Gapminder
