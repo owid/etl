@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, Hospitalized and infected
+    description: |-
+      Latest COVID-19 figures from Israel.
+    date_published: "2023-05-07"
+
+    # Citation
+    producer: Israeli Minsitry of Health's COVID-19 dashboard's
+    citation_full: |-
+      Israeli Ministry of Health. COVID-19 Dashboard. https://datadashboard.health.gov.il/COVID-19. Accessed 2023-05-07.
+
+
+    # Files
+    url_main: https://datadashboard.health.gov.il/COVID-19/general
+    url_download: https://github.com/dancarmoz/israel_moh_covid_dashboard_data/raw/master/hospitalized_and_infected.csv
+    date_accessed: 2023-05-07
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: d71af94087d0f3c2e7e17126361f0c14
+    size: 186310
+    path: decoupling_israel.csv
