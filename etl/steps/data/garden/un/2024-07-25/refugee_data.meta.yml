@@ -7,7 +7,10 @@ definitions:
         - War & Peace
     unit: people
     short_unit: ""
-    processing_level: minor
+    processing_level: major
+    description_processing: |-
+      - The data collected by the UNHCR describes movement of refugees between individual regions. To calculate the total number of refugees in a region, we sum up the data from all origin countries. The same applies to calculating all refugees from one country of origin.
+      - To calculate the number of refugees per 1,000 people in a country, we divide the number of refugees by the total population of the country and multiply by 1,000. We use our long term population data for this calculation.
     display:
       numDecimalPlaces: 0
   description_international_protection: Other people in need of international protection refers to people who are outside their country or territory of origin, typically because they have been forcibly displaced across international borders, who have not been reported under other categories (asylum-seekers, refugees, people in refugee-like situations) but who likely need international protection, including protection against forced return, as well as access to basic services on a temporary or longer-term basis.
