@@ -1,5 +1,5 @@
 dataset:
-    title: Long run homicide rates (1250-2020; Eisner, WHO, UNODC)
+    title: Long run homicide rates (1250-2022; Eisner, WHO, UNODC)
     sources:
     - name: OWID based on Eisner (2014); United Nations Office of Drugs and Crime (2022); WHO Mortality Database (2022)
 tables:
