@@ -46,6 +46,15 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     return notes_dict
 
 
+def parse_notes(tb: Table, notes_columns: List[str]) -> Table:
+    tb = tb.copy()
+    # Parse BGS notes as lists of strings.
+    for column in notes_columns:
+        tb[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb[column]]]
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -58,7 +67,7 @@ def run(dest_dir: str) -> None:
     # Read tables.
     tb_bgs = ds_bgs.read_table("world_mineral_statistics")
     tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
-    tb_usgs = ds_usgs.read_table("mineral_commodity_summaries")
+    tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
 
     #
     # Process data.
@@ -68,19 +77,8 @@ def run(dest_dir: str) -> None:
         columns=["unit_value_current"], errors="raise"
     )
 
-    def parse_notes(tb: Table, notes_columns: List[str]) -> Table:
-        tb = tb.copy()
-        # Parse BGS notes as lists of strings.
-        for column in notes_columns:
-            tb[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb[column]]]
-
-        return tb
-
     # Parse BGS notes as lists of strings.
     tb_bgs = parse_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
-
-    # Parse USGS current data notes as lists of strings.
-    tb_usgs = parse_notes(tb_usgs, notes_columns=["notes_production", "notes_reserves"])
 
     # We extract data from three sources:
     # * From BGS we extract imports, exports, and production.
@@ -104,14 +102,6 @@ def run(dest_dir: str) -> None:
     #     if _check["source"].nunique() == 2:
     #         px.line(_check, x="year", y="production", color="source", markers=True, title=f"{commodity} - {country}").show()
 
-    # Pivot USGS table and remove empty columns.
-    tb_usgs_flat = tb_usgs.pivot(
-        index=["country", "year"],
-        columns=["commodity", "sub_commodity", "unit"],
-        values=["production", "reserves"],
-        join_column_levels_with="|",
-    ).dropna(axis=1, how="all")
-
     # Pivot USGS historical table and remove empty columns.
     tb_usgs_historical_flat = tb_usgs_historical.pivot(
         index=["country", "year"],
@@ -128,11 +118,21 @@ def run(dest_dir: str) -> None:
         join_column_levels_with="|",
     )
 
+    # For consistency with other tables, rename USGS current columns and adapt column types.
+    tb_usgs_flat = tb_usgs_flat.rename(
+        columns={
+            column: tb_usgs_flat[column].metadata.title
+            for column in tb_usgs_flat.columns
+            if column not in ["country", "year"]
+        },
+        errors="raise",
+    )
+    tb_usgs_flat = tb_usgs_flat.astype(
+        {column: "Float64" for column in tb_usgs_flat.columns if column not in ["country", "year"]}
+    )
+
     # Gather notes for BGS data.
     notes_bgs = gather_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
-
-    # Gather notes for USGS current data.
-    notes_usgs = gather_notes(tb_usgs, notes_columns=["notes_production", "notes_reserves"])
 
     # Create a combined flat table.
     tb = combine_two_overlapping_dataframes(
@@ -171,12 +171,21 @@ def run(dest_dir: str) -> None:
             tb[column].metadata.unit = "constant 1998 US$ per tonne"
             tb[column].metadata.short_unit = "$/t"
 
+        # Get notes from USGS' description_from_producer field.
+        notes_usgs = None
+        if column in tb_usgs_flat.columns:
+            notes_usgs = tb_usgs_flat[column].metadata.description_from_producer
+
         # Add notes to metadata.
         combined_notes = ""
         if column in notes_bgs:
             combined_notes += "Notes found in BGS original data:\n" + notes_bgs[column]
-        if column in notes_usgs:
-            combined_notes += "\n\nNotes found in USGS original data:\n" + notes_usgs[column]
+
+        if (column in notes_bgs) and (notes_usgs is not None):
+            combined_notes += "\n\n"
+
+        if notes_usgs is not None:
+            combined_notes += notes_usgs
 
         if len(combined_notes) > 0:
             tb[column].metadata.description_from_producer = combined_notes

@@ -6,11 +6,13 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
+from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -959,6 +961,35 @@ def clean_notes(notes):
     return notes_clean
 
 
+def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+    # Create another table with the same structure, but containing notes.
+    tb_flat_notes = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=notes_columns,
+        join_column_levels_with="|",
+    )
+    tb_flat_notes = tb_flat_notes.rename(
+        columns={column: column.replace("notes_", "") for column in tb_flat_notes.columns}
+    )
+
+    # Gather all notes for each column.
+    notes_dict = {}
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
+        _notes = tb_flat_notes[column].dropna().tolist()
+        if len(_notes) > 0:
+            # Gather all notes for this column.
+            notes = sum(_notes, [])
+            # Get unique notes keeping the order.
+            notes = pd.unique(pd.Series(notes)).tolist()
+            # Join notes.
+            if len(notes) > 0:
+                notes_str = "- " + "\n- ".join(notes)
+                notes_dict[column] = notes_str
+
+    return notes_dict
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -1004,6 +1035,10 @@ def run(dest_dir: str) -> None:
     tb["unit"] = "tonnes"
     tb["unit"] = tb["unit"].copy_metadata(tb["production"])
 
+    # Before creating aggregates, ensure notes are lists of strings.
+    for column in ["notes_reserves", "notes_production"]:
+        tb[column] = [[note] if pd.notnull(note) else [] for note in tb[column]]
+
     # Add regions to the table.
     tb = geo.add_regions_to_table(
         tb=tb,
@@ -1014,19 +1049,43 @@ def run(dest_dir: str) -> None:
         # accepted_overlaps=ACCEPTED_OVERLAPS,
     )
 
-    # Clean notes columns.
+    # Clean notes columns (e.g. remove repeated notes).
     for column in ["notes_reserves", "notes_production"]:
-        tb[column] = [clean_notes([note]) if pd.notnull(note) else [] for note in tb[column]]
-        # Ensure the new column has metadata.
-        # To avoid ETL failing when storing the table, convert lists of notes to strings.
+        tb[column] = [clean_notes(note) if len(note) > 0 else [] for note in tb[column]]
+
+    # Gather all notes in a dictionary.
+    notes = gather_notes(tb, notes_columns=["notes_production", "notes_reserves"])
+
+    # Create a flattened table and remove empty columns.
+    tb_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=["production", "reserves"],
+        join_column_levels_with="|",
+    ).dropna(axis=1, how="all")
+
+    # NOTE: Here, I could loop over columns and improve metadata.
+    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
+    # So, for now, simply add descriptions from producer.
+    for column in tb_flat.drop(columns=["country", "year"]).columns:
+        if column in notes:
+            tb_flat[column].metadata.description_from_producer = "Notes found in USGS original data:\n" + notes[column]
+
+    # To avoid ETL failing when storing the table, convert lists of notes to strings (and add metadata).
+    for column in ["notes_reserves", "notes_production"]:
         tb[column] = tb[column].copy_metadata(tb["production"]).astype(str)
 
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    # Add some necessary footnotes.
+    # TODO
+
+    # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
+    tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_flat], check_variables_metadata=True)
     ds_garden.save()

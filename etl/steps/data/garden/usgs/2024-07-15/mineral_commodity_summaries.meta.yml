@@ -10,9 +10,11 @@ definitions:
 
 dataset:
   update_period_days: 365
+  title: Mineral Commodity Summaries
 
 tables:
   mineral_commodity_summaries:
+    title: Mineral Commodity Summaries
     variables:
       reserves:
         title: Reserves of commodities
@@ -26,3 +28,8 @@ tables:
         title: Technical notes on production data
         unit: ""
         short_unit: ""
+  mineral_commodity_summaries_flat:
+    title: Mineral Commodity Summaries
+    variables:
+      # Metadata is filled up programmatically.
+      {}
