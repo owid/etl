@@ -1,7 +1,7 @@
 dataset:
     title: Long run homicide rates (1250-2022; Eisner, WHO, UNODC)
     sources:
-    - name: OWID based on Eisner (2014); United Nations Office of Drugs and Crime (2022); WHO Mortality Database (2022)
+    - name: OWID based on Eisner (2014); United Nations Office of Drugs and Crime (2022); WHO Mortality Database (2024)
 tables:
   homicide_long_run_omm:
     variables:
@@ -38,7 +38,7 @@ tables:
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
 
 
-          This variable is a combination of homicide rate estimates from Eisner (2014) and the WHO Mortality Database (2022). For the following countries we use Eisner (2014) before the given date and the WHO Mortality Database for all later datapoints:
+          This variable is a combination of homicide rate estimates from Eisner (2014) and the WHO Mortality Database. For the following countries we use Eisner (2014) before the given date and the WHO Mortality Database for all later datapoints:
 
           * 1950: France, Ireland, Netherlands
 
@@ -55,7 +55,7 @@ tables:
           For Corsica and Sardinia; England and Wales and Sweden and Finland all datapoints are from Eisner (2014).
 
 
-          All other datapoints not specified above are sourced from the WHO Mortality Database (2022).
+          All other datapoints not specified above are sourced from the WHO Mortality Database.
         short_unit: ''
         unit: 'homicides per 100,000 people'
         origins:
@@ -79,13 +79,13 @@ tables:
           Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
 
 
-          This variable is a combination of homicide rate estimates from Eisner (2014) and the United Nations Office of Drugs and Crime (2022). For the following countries we use Eisner (2014) before 1990 and the United Nations Office of Drugs and Crime for all later datapoints: France, Ireland, Netherlands, Italy, Spain, Sweden, Switzerland, Belgium, Germany.
+          This variable is a combination of homicide rate estimates from Eisner (2014) and the United Nations Office of Drugs and Crime. For the following countries we use Eisner (2014) before 1990 and the United Nations Office of Drugs and Crime for all later datapoints: France, Ireland, Netherlands, Italy, Spain, Sweden, Switzerland, Belgium, Germany.
 
 
           For Corsica and Sardinia; England and Wales and Sweden and Finland all datapoints are from Eisner (2014).
 
 
-          All other datapoints not specified above are sourced from the United Nations Office of Drugs and Crime (2022).
+          All other datapoints not specified above are sourced from the United Nations Office of Drugs and Crime.
         short_unit: ''
         unit: 'homicides per 100,000 people'
         origins:
