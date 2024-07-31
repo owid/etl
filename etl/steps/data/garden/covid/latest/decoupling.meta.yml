@@ -13,7 +13,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 0
-  title: COVID-19, Hospitalizations, UCI, and cases
+  title: COVID-19, decoupling of indicators
 
 
 tables:
