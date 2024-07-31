@@ -402,18 +402,28 @@ COMMODITY_MAPPING = {
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
-    # TODO: Add the following notes to reserves, where possible.
-    # TODO: Create a dictionary of special units instead of footnotes (and change the column name accordingly!).
-    "production|Arsenic|Plant production|tonnes": "Plant production refers to arsenic trioxide or calculated equivalent.",
-    "production|Alumina|Refinery production|tonnes": "Refinery production refers to calcined equivalent weights.",
-    "production|Bauxite|Mine production|tonnes": "Mine production refers to dry tons.",
-    "production|Chromium|Mine production, marketable chromite ore|tonnes": "Mine production refers to gross weight.",
     "production|Iodine|Mine production|tonnes": "Mine production refers to elemental iodine.",
-    "production|Potash|Mine production|tonnes": "Mine production refers to potassium oxide equivalent.",
-    "production|Rare earths|Mine production|tonnes": "Mine production refers to rare-earth-oxide equivalent.",
-    "production|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "Mine production refers to titanium dioxide content.",
-    "production|Titanium mineral concentrates|Mine production, rutile|tonnes": "Mine production refers to titanium dioxide content.",
-    "production|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "Mine production refers to titanium dioxide content.",
+    "reserves|Iodine|Mine production|tonnes": "Mine production refers to elemental iodine.",
+}
+
+# Dictionary of special units.
+UNITS_MAPPING = {
+    "production|Arsenic|Plant production|tonnes": "tonnes of arsenic trioxide or calculated equivalent",
+    "production|Alumina|Refinery production|tonnes": "tonnes of calcined equivalent weights",
+    "production|Bauxite|Mine production|tonnes": "tonnes of dry content",
+    "reserves|Bauxite|Mine production|tonnes": "tonnes of dry content",
+    "production|Chromium|Mine production, marketable chromite ore|tonnes": "tonnes of gross weight",
+    "reserves|Chromium|Mine production, marketable chromite ore|tonnes": "tonnes of gross weight",
+    "production|Potash|Mine production|tonnes": "tonnes of potassium oxide equivalent",
+    "reserves|Potash|Mine production|tonnes": "tonnes of potassium oxide equivalent",
+    "production|Rare earths|Mine production|tonnes": "tonnes of rare-earth-oxide equivalent",
+    "reserves|Rare earths|Mine production|tonnes": "tonnes of rare-earth-oxide equivalent",
+    "production|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
+    "reserves|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
+    "production|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
+    "reserves|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
+    "production|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
+    "reserves|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
 }
 
 
@@ -1047,8 +1057,9 @@ def run(dest_dir: str) -> None:
         errors="raise",
     )
 
-    # Assume that all data is in tonnes (given that the column names end in "_t").
-    # For consistency with other steps of mineral data, add a column with the unit.
+    # Assume that all data is in tonnes.
+    # NOTE: Values have already been converted based on column names (e.g. columns often contain "_t", or "_kt").
+    #  And later, special cases are handled after flattening the table.
     tb["unit"] = "tonnes"
     tb["unit"] = tb["unit"].copy_metadata(tb["production"])
 
@@ -1080,6 +1091,15 @@ def run(dest_dir: str) -> None:
         values=["production", "reserves"],
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
+
+    # Handle special units.
+    tb["unit_production"] = tb["unit"].copy()
+    tb["unit_reserves"] = tb["unit"].copy()
+    for column, unit in UNITS_MAPPING.items():
+        tb_flat = tb_flat.rename(columns={column: column.replace("|tonnes", f"|{unit}")}, errors="raise")
+        # Handle special units for long table too.
+        category, commodity, sub_commodity, unit_old = column.split("|")
+        tb.loc[(tb["commodity"] == commodity) & (tb["sub_commodity"] == sub_commodity), f"unit_{category}"] = unit
 
     # NOTE: Here, I could loop over columns and improve metadata.
     # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
