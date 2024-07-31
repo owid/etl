@@ -7,6 +7,7 @@ definitions:
         - Violence Against Children & Children's Rights
     unit: people
     short_unit: ""
+    processing_level: minor
   unicef_descriptions:
     refugee: |-
       Person who are outside their country of nationality or habitual residence, who cannot return due to a well-founded fear of being persecuted because of their race, religion, nationality, membership of a particular social group or political opinion. This number only accounts those who have been recognized as refugees or find themselves in refugee-like situations.
@@ -17,9 +18,13 @@ definitions:
     international_migrant: |-
       Persons living in a country or area other than their country of birth.
       This data is sourced from: *United Nations, Department of Economic and Social Affairs, Population Division, Trends in International Migrant Stock: The 2019 Revision, United Nations, New York, 2017.* Share of under 18 calculated by UNICEF based on *United Nations, Department of Economic and Social Affairs, Population Division, Trends in International Migrant Stock: Migrants by Age and Sex, United Nations, New York, 2019.*
+  other_descriptions:
+    unrwa: |-
+      The United Nations Relief and Works Agency for Palestine Refugees in the Near East (UNRWA) is a UN agency that was established in 1949 to carry out direct relief and works programmes for Palestine refugees.
+      UNRWA has a humanitarian and development mandate to “provide assistance and protection to Palestine refugees pending a just and lasting solution to their plight.” This includes essential service delivery, primarily in the areas of basic education, primary health care and mental health care, relief and social services, microcredit, and emergency assistance, including in situations of armed conflict to registered Palestinian refugees.
+      They operate in Jordan, Lebanon, Syria the West Bank including East Jerusalem, and Gaza. The Agency does not have a mandate to engage in political negotiations or durable solutions.
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
 dataset:
   update_period_days: 365
 
@@ -33,37 +38,40 @@ tables:
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_disaster:
-        title: Number of internally displaced children younger than 18 due to natural disasters
+        title: Number of internally displaced children younger than 18 due to disasters
         description_short: |-
-          [Internally displaced children](#dod:internally-displaced), who are children under 18 years old, displaced due to disaster. This number describes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+          [Internally displaced children](#dod:internally-displaced), who are children under 18 years old, displaced due to disasters. This number describes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_total:
-        title: Number of internally displaced children younger than  18
+        title: Number of internally displaced children younger than 18
         description_short: |-
           Total number of [internally displaced children](#dod:internally-displaced) under 18 years old. This number describes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       international_migrants_under_18_dest:
-        title: Number of immigrants under 18 years old by country of destination
+        title: Number of immigrants under 18 years old by destination
         description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) by the country of destination. This number is the total migrant stock, so all migrants who are currently living in the destination country and does not describe migrants arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
       migrants_under_18_dest_per_1000:
-        title: Number of immigrants under 18 years old per 1000 inhabitants of the destination country
+        title: Number of immigrants under 18 years old by destination per 1000 inhabitants
         description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) per 1000 inhabitants of the destination country. This number is the total migrant stock, so all migrants who are currently living in the destination country and does not describe migrants arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
+        processing_level: major
+        description_processing: |-
+          - We divide the number of migrants by the total population of the destination country and multiply by 1000 to get the number of migrants per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
       new_idps_under_18_conflict_violence:
-        title: Number of newly internally displaced children younger than 18 due to conflict and violence
+        title: Number of newly internally displaced children younger than 18 due to conflict
         description_short: |-
           [Internally displaced children](#dod:internally-displaced) under 18 years old, displaced during this calendar year due to conflict and violence.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       new_idps_under_18_disaster:
-        title: Number of newly internally displaced children younger than 18 due to natural disasters
+        title: Number of newly internally displaced children younger than 18 due to disasters
         description_short: |-
-          [Internally displaced children](#dod:internally-displaced) under 18 years old, displaced during this calendar year due to disaster.
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, displaced during this calendar year due to disasters.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       new_idps_under_18_total:
@@ -78,22 +86,30 @@ tables:
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
       refugees_under_18_asylum_per_1000:
-        title: Number of child refugees under 18 years old per 1000 people
+        title: Number of child refugees under 18 years old per 1000 inhabitants of the country of asylum
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This number is the total refugee stock, so all refugees who are currently living in the asylum country and does not describe refugees arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
+        processing_level: major
+        description_processing: |-
+          - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
       refugees_under_18_origin:
-        title: Number of child refugees under 18 years old by country of origin
+        title: Number of child refugees under 18 years old by origin
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of origin. This number is the total refugee stock, so all refugees who have left the origin country and does not describe refugees leaving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
       refugees_under_18_origin_per_1000:
-        title: Number of child refugees under 18 years old per 1000 people
+        title: Number of child refugees under 18 years old per 1000 inhabitants of the country of origin
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This number is the total refugee stock, so all refugees who have left the origin country and does not describe refugees leaving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
+        processing_level: major
+        description_processing: |-
+          - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
       refugees_under_18_unrwa_asylum:
         title: Number of child refugees under 18 years old under UNRWA mandate
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) under [UNRWA mandate](#dod:unrwa). These are registered Palestinian refugees who live in Jordan, Lebanon, Syria, the West Bank and Gaza.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
+        description_key:
+          - "{definitions.other_descriptions.unrwa}"
