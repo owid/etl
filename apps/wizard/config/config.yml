@@ -143,6 +143,13 @@ sections:
         entrypoint: app_pages/dataset_explorer.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      - title: "Prefect UI"
+        alias: prefect
+        description: "Prefect UI for viewing ETL runs"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/prefect.py
+        icon: ":material/browse_activity:"
+        image_url: "https://avatars.githubusercontent.com/u/39270919?s=48&v=4"
 
   - title: "Research"
     description: |-
@@ -174,13 +181,6 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
-      - title: "Prefect UI"
-        alias: prefect
-        description: "Prefect UI for viewing ETL runs"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/prefect.py
-        icon: ":material/browse_activity:"
-        image_url: "https://avatars.githubusercontent.com/u/39270919?s=48&v=4"
 
   - title: "Metadata"
     description: |-
