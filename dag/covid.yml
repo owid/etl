@@ -29,6 +29,15 @@ steps:
   data://grapher/covid/latest/john_hopkins_university:
     - data://garden/covid/latest/john_hopkins_university
 
+  data://meadow/covid/latest/decoupling:
+    - snapshot://covid/latest/decoupling_usa.csv
+    - snapshot://covid/latest/decoupling_spain.csv
+    - snapshot://covid/latest/decoupling_israel.csv
+  data://garden/covid/latest/decoupling:
+    - data://meadow/covid/latest/decoupling
+  # data://grapher/covid/latest/decoupling:
+  #   - data://garden/covid/latest/decoupling
+
   ######################################
   # Mobility
   data://grapher/covid/latest/google_mobility_trends:
@@ -114,5 +123,3 @@ steps:
     - data-private://garden/covid/latest/sequencing
   data-private://garden/covid/latest/sequencing:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
-
-
