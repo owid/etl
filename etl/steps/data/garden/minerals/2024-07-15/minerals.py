@@ -1,4 +1,20 @@
-"""Compilation of minerals data from different origins."""
+"""Compilation of minerals data from different origins.
+
+Currently, the three sources of minerals data are:
+* From BGS we extract imports, exports, and production.
+* From USGS (current) we extract production and reserves.
+* From USGS (historical) we extract production and unit value.
+
+Initially, I thought of creating long tables in the garden steps of USGS current, USGS historical, and BGS data.
+
+However, there is little overlap between the three origins (at the country-year-commodity-subcommodity-unit level).
+If we combined all production data into one column (as it would be common to do in a garden step), the resulting data
+would show as having 3 origins, whereas in reality most data points would come from just one origin.
+
+So it seems more convenient to create wide tables, where each column has its own origin, and then combine the wide
+tables (on those few columns where there is overlap).
+
+"""
 import ast
 from typing import Dict, List
 
@@ -80,28 +96,6 @@ def run(dest_dir: str) -> None:
     # Parse BGS notes as lists of strings.
     tb_bgs = parse_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
 
-    # We extract data from three sources:
-    # * From BGS we extract imports, exports, and production.
-    # * From USGS (current) we extract production and reserves.
-    # * From USGS (historical) we extract production and unit value.
-    #
-    # However, there is little overlap between the three sources.
-    # If we combine all production data into one column (as it would be the customary thing to do in a garden step), the
-    # data will show as having 3 sources, whereas in reality most data points would come from just one source.
-    # So it seems more convenient to create a wide table where each column has its own source(s), instead of a long one,
-    # and then combine the flat tables.
-
-    # TODO: Data from BGS and USGS historical are significantly different for Salt (by a factor of 2 or 3).
-    #  Other series are similar, but have some range where there are large discrepancies, e.g. Iron ore and Asbestos.
-    # country = "World"
-    # import owid.catalog.processing as pr
-    # check = pr.concat([tb_bgs.assign(**{"source": "BGS"}), tb_usgs_historical.assign(**{"source": "USGS"})], ignore_index=True)
-    # check["unit"] = check["unit"].fillna("tonnes")
-    # for commodity in tb_usgs["commodity"].unique():
-    #     _check = check[(check["country"] == country) & (check["commodity"] == commodity) & (check["sub_commodity"] == "Total")].dropna(subset="production")
-    #     if _check["source"].nunique() == 2:
-    #         px.line(_check, x="year", y="production", color="source", markers=True, title=f"{commodity} - {country}").show()
-
     # Pivot USGS historical table and remove empty columns.
     tb_usgs_historical_flat = tb_usgs_historical.pivot(
         index=["country", "year"],
@@ -148,6 +142,23 @@ def run(dest_dir: str) -> None:
     #         log.info(f"Combining overlapping data from USGS current and BGS data: {column}")
     #     if (column in tb_usgs_historical_flat.columns) and (column in tb_bgs_flat.columns):
     #         log.info(f"Combining overlapping data from USGS historical and BGS data: {column}")
+
+    # Uncomment to visualize potential discrepancies between the three different sources of data.
+    # import plotly.express as px
+    # for column in tb.drop(columns=["country", "year"]).columns:
+    #     # Initialize an empty dataframe, and add data to it from whatever source has data for it.
+    #     _df = pd.DataFrame()
+    #     if column in tb_bgs_flat.columns:
+    #         _df = pd.concat([_df, tb_bgs_flat[["country", "year", column]].assign(**{"source": "BGS"})], ignore_index=True)
+    #     if column in tb_usgs_flat.columns:
+    #         _df = pd.concat([_df, tb_usgs_flat[["country", "year", column]].assign(**{"source": "USGS current"})], ignore_index=True)
+    #     if column in tb_usgs_historical_flat.columns:
+    #         _df = pd.concat([_df, tb_usgs_historical_flat[["country", "year", column]].assign(**{"source": "USGS historical"})], ignore_index=True)
+    #     _df = _df.dropna().reset_index(drop=True)
+    #     for country in _df["country"].unique():
+    #         _df_country = _df[_df["country"] == country]
+    #         if _df_country["source"].nunique() >1:
+    #             px.line(_df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}").show()
 
     # Improve metadata of new columns.
     for column in tb.drop(columns=["country", "year"]).columns:

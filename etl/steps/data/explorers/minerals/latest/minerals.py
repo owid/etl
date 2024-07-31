@@ -19,8 +19,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Prepare graphers table of explorer.
-    # TODO: Something is wrong, it seems that all columns have units "tonnes".
-    #  Whereas, BGS data should have, e.g. "tonnes of metal content".
     variable_ids = []
     metric_dropdown = []
     commodity_dropdown = []
