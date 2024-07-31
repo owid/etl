@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: SIPRI Military Expenditure Database
+    description: |-
+      The SIPRI Military Expenditure Database contains consistent time series on the military spending of countries for the period 1949–2023. The database is updated annually, which may include updates to data for any of the years included in the database.
+
+      Military expenditure in local currency at current prices is presented according to both the financial year of each country and according to calendar year, calculated on the assumption that, where financial years do not correspond to calendar years, spending is distributed evenly through the year. Figures in constant (2022) and current US dollars, as a share of gross domestic product (GDP) and per capita are presented according to calendar year. Figures given as a share of government expenditure are presented according to financial year.
+
+      The availability of data varies considerably by country, but for a majority of countries that were independent at the time, data is available from at least the late 1950s. Estimates for regional military expenditure have been extended backwards depending on availability of data for countries in the region, but no estimates for total world military expenditure are available before 1988 due to the lack of data for the Soviet Union.
+
+      SIPRI military expenditure data is based on open sources only.
+    date_published: "2024-05-22"
+
+    # Citation
+    producer: Stockholm International Peace Research Institute
+    citation_full: |-
+      Information from the Stockholm International Peace Research Institute (SIPRI) Military Expenditure Database, https://doi.org/10.55163/CQGC9685
+    attribution_short: SIPRI
+
+    # Files
+    url_main: https://www.sipri.org/databases/milex
+    url_download: https://www.sipri.org/sites/default/files/SIPRI-Milex-data-1948-2023.xlsx
+    date_accessed: 2024-07-08
+
+    # License
+    license:
+      name: SIPRI Terms and Conditions
+      url: https://www.sipri.org/about/terms-and-conditions
+
+outs:
+  - md5: 36451d7e635012baa442e5e761bf798f
+    size: 839559
+    path: military_expenditure.xlsx

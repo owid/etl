@@ -48,6 +48,25 @@ steps:
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_countries:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_countries
 
+  # Main EPOCH dataset
+  data://meadow/artificial_intelligence/2024-06-03/epoch:
+    - snapshot://artificial_intelligence/2024-06-03/epoch.csv
+  data://garden/artificial_intelligence/2024-06-03/epoch:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
+
+  # EPOCH aggregates by domain
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_domain
+
+  # EPOCH aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch
+  data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
   # AI Incidents
   data://garden/artificial_intelligence/2023-06-14/ai_incidents:
     - snapshot://artificial_intelligence/2023-06-14/ai_incidents.csv
@@ -98,3 +117,48 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
+
+  # AI adoption by organisations
+  data://garden/artificial_intelligence/2023-06-14/ai_adoption:
+    - snapshot://artificial_intelligence/2023-06-14/ai_adoption.csv
+  data://grapher/artificial_intelligence/2023-06-14/ai_adoption:
+    - data://garden/artificial_intelligence/2023-06-14/ai_adoption
+
+  # ImageNet
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_imagenet.html
+
+  # Math & Code and Language
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_math.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_coding.html
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_language.html
+  # Atari
+  data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari:
+    - snapshot://artificial_intelligence/2023-06-14/papers_with_code_atari.html
+  # All benchmarks combined
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_atari
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_math_code_language
+    - data://meadow/artificial_intelligence/2023-06-14/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks
+  data://grapher/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art:
+    - data://garden/artificial_intelligence/2023-06-14/papers_with_code_benchmarks_state_of_the_art
+
+  # YouGov AI surveys
+  data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
+    - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_robots:
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
+  data://grapher/artificial_intelligence/2024-01-30/yougov_robots:
+    - data://garden/artificial_intelligence/2024-01-30/yougov_robots
+
+  data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-01-30/yougov_job_automation:
+    - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation

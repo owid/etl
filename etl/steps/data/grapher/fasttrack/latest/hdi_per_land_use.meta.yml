@@ -1,0 +1,16 @@
+dataset:
+  title: HDI per capita land use (UNDP Project)
+  description: ''
+  licenses:
+    - {}
+tables:
+  hdi_per_land_use:
+    variables:
+      land_per_capita:
+        title: land_per_capita
+        unit: ''
+        description: Agricultural land use per capita, measured in hectares.
+      hdi_per_land_use:
+        title: hdi_per_land_use
+        unit: ''
+        description: Human development index, divided by agricultural land use per person.

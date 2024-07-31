@@ -856,7 +856,7 @@ def survey_count(tb: Table) -> Table:
     tb_survey["survey_available"] = 0
     tb_survey.loc[tb_survey["_merge"] == "both", "survey_available"] = 1
 
-    # Sum for each entity the surveys available for the previous 9 years and the current year
+    # Sum for each entity the surveys available for the previous 9 years and the current year.
     tb_survey["surveys_past_decade"] = (
         tb_survey["survey_available"]
         .groupby(tb_survey["country"], sort=False)

@@ -980,6 +980,10 @@ class Table(pd.DataFrame):
         """Groupby that preserves metadata."""
         return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
+    def rolling(self, *args, **kwargs) -> "TableRolling":
+        """Rolling operation that preserves metadata."""
+        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)
+
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
         if ignore_columns is None:
@@ -1115,6 +1119,10 @@ class TableGroupBy:
 
         return tb
 
+    def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
+        rolling_groupby = self.groupby.rolling(*args, **kwargs)
+        return TableRollingGroupBy(rolling_groupby, self.metadata, self._fields)
+
 
 class VariableGroupBy:
     def __init__(
@@ -1149,6 +1157,61 @@ class VariableGroupBy:
                 raise NotImplementedError()
 
         return func  # type: ignore
+
+    def rolling(self, *args, **kwargs) -> "VariableGroupBy":
+        """Apply rolling window function and return a new VariableGroupBy with proper metadata."""
+        rolling_groupby = self.groupby.rolling(*args, **kwargs)
+        return VariableGroupBy(rolling_groupby, self.name, self.metadata, self.table_metadata)
+
+
+class TableRolling:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: TableMeta, fields: Dict[str, Any]):
+        self.rolling = rolling
+        self.metadata = metadata
+        self._fields = fields
+
+    def __getattr__(self, name: str) -> Callable[..., "Table"]:
+        # Calling method on the rolling object
+        if isinstance(getattr(self.rolling, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.rolling, name)(*args, **kwargs)
+                return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            raise NotImplementedError()
+
+
+class TableRollingGroupBy:
+    # fixes type hints
+    __annotations__ = {}
+
+    def __init__(
+        self, rolling_groupby: pd.core.window.rolling.RollingGroupby, metadata: TableMeta, fields: Dict[str, Any]
+    ):
+        self.rolling_groupby = rolling_groupby
+        self.metadata = metadata
+        self._fields = fields
+
+    def __getattr__(self, name: str) -> Callable[..., "Table"]:
+        # Calling method on the rolling object
+        if isinstance(getattr(self.rolling_groupby, name), types.MethodType):
+
+            def func(*args, **kwargs):
+                """Apply function and return variable with proper metadata."""
+                df = getattr(self.rolling_groupby, name)(*args, **kwargs)
+                return _create_table(df, self.metadata, self._fields)
+
+            self.__annotations__[name] = Callable[..., "Table"]
+            return func
+        else:
+            raise NotImplementedError()
 
 
 def align_categoricals(left: SeriesOrVariable, right: SeriesOrVariable) -> Tuple[SeriesOrVariable, SeriesOrVariable]:
@@ -1189,6 +1252,11 @@ def merge(
             "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
         )
 
+    # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
+    # It is necessary to copy metadata here to avoid mutating passed left.
+    left = left.copy(deep=False)
+    right = right.copy(deep=False)
+
     # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
     if isinstance(on, str):
         on = [on]
@@ -1211,10 +1279,8 @@ def merge(
     # Create merged table.
     tb = Table(
         pd.merge(
-            # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
-            # It is necessary to copy metadata here to avoid mutating passed left.
-            left=left.copy(deep=False),
-            right=right.copy(deep=False),
+            left=left,
+            right=right,
             how=how,
             on=on,
             left_on=left_on,
@@ -1893,3 +1959,69 @@ def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[
     if isinstance(cols, str):
         cols = [cols]
     return [t[col] for col in cols]  # type: ignore
+
+
+def read_df(
+    df: pd.DataFrame,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    """Create a Table (with metadata and an origin) from a DataFrame.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame.
+    metadata : Optional[TableMeta], optional
+        Table metadata (with a title and description).
+    origin : Optional[Origin], optional
+        Origin of the table.
+    underscore : bool, optional
+        True to ensure all column names are snake case.
+    Returns
+    -------
+    Table
+        Original data as a Table with metadata and an origin.
+    """
+    table = Table(df, underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return cast(Table, table)
+
+
+def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callable[..., Union[Table, Variable]]:
+    """Decorator that turns a function that works on DataFrame or Series into a function that works
+    on Table or Variable and preserves metadata.  If the decorated function renames columns, their
+    metadata won't be copied.
+
+    Usage:
+
+    import owid.catalog.processing as pr
+
+    @pr.keep_metadata
+    def my_df_func(df: pd.DataFrame) -> pd.DataFrame:
+        return df + 1
+
+    tb = my_df_func(tb)
+
+
+    @pr.keep_metadata
+    def my_series_func(s: pd.Series) -> pd.Series:
+        return s + 1
+
+    tb.a = my_series_func(tb.a)
+    """
+
+    def wrapper(*args: Any, **kwargs: Any) -> Union[Table, Variable]:
+        tb = args[0]
+        df = func(*args, **kwargs)
+        if isinstance(df, pd.Series):
+            return Variable(df, name=tb.name, metadata=tb.metadata)
+        elif isinstance(df, pd.DataFrame):
+            return Table(df).copy_metadata(tb)
+        else:
+            raise ValueError(f"Unexpected return type: {type(df)}")
+
+    return wrapper
+
+
+to_numeric = keep_metadata(pd.to_numeric)

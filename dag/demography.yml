@@ -220,6 +220,17 @@ steps:
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
 
+  # Migration UN DESA
+  data://meadow/un/2024-07-16/migrant_stock:
+    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
+  data://garden/un/2024-07-16/migrant_stock:
+    - data://meadow/un/2024-07-16/migrant_stock
+  data://grapher/un/2024-07-16/migrant_stock:
+    - data://garden/un/2024-07-16/migrant_stock
+
   # UNHCR refugee data
   data://meadow/un/2024-07-25/refugee_data:
     - snapshot://un/2024-07-25/refugee_data.zip

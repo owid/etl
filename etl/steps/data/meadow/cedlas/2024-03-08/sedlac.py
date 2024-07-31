@@ -225,7 +225,7 @@ def format_long_tables(
 
         # Create column country by selecting the rows in countries list
         t["country"] = t.loc[t["index"].isin(countries), "index"]
-        t["country"] = t["country"].fillna(method="ffill")
+        t["country"] = t["country"].ffill()
 
         # Do the same for year
         t["year"] = t.loc[t["index"].astype(str).str[:4].str.isnumeric(), "index"]
@@ -257,7 +257,7 @@ def format_long_tables(
 
         # And for survey
         t["survey"] = t.loc[~(t["index"].isin(countries)) & ~(t["index"].astype(str).str[:4].str.isnumeric()), "index"]
-        t["survey"] = t["survey"].fillna(method="ffill")
+        t["survey"] = t["survey"].ffill()
 
         # Drop index column
         t = t.drop(columns="index")

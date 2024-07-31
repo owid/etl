@@ -45,6 +45,6 @@ meta:
       url: {{cookiecutter.license_url}}
       {%- endif %}
 
-  {% if cookiecutter.is_private == "True" %}
+  {% if cookiecutter.is_private == True %}
   is_public: false
   {%- endif -%}

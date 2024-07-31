@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Military Spending Dataset
+    description: |-
+      Military spending data measure key international relations concepts such as balancing, arms races, the distribution of power, and the severity of military burdens. Unfortunately, missing values and measurement error threaten the validity of existing findings. Addressing this challenge, we introduce the Global Military Spending Dataset (GMSD). GMSD collates new and existing expenditure variables from a comprehensive collection of sources, expands data coverage, and employs a latent variable model to estimate missing values and quantify measurement error.
+    date_published: "2024-03-07"
+    version_producer: Version 4
+    title_snapshot: Global Military Spending Dataset - Constant US$
+
+    # Citation
+    producer: Barnum et al.
+    citation_full: |-
+      - Miriam Barnum; Christopher Fariss; Jonathan Markowitz; Gaea Morales (2024). Measuring Arms: Introducing the Global Military Spending Dataset. Journal of Conflict Resolution, 0(0). https://doi.org/10.1177/00220027241232964
+      - Miriam Barnum; Christopher Fariss; Jonathan Markowitz; Gaea Morales (2022). "Global Military Spending Dataset", https://doi.org/10.7910/DVN/DHMZOW, Harvard Dataverse, V4; estimates_milex_con_20231205.rds [fileName]
+    attribution: Barnum et al. - Global Military Spending Dataset (2024)
+    attribution_short: GMSD
+
+    # Files
+    url_main: https://journals.sagepub.com/doi/10.1177/00220027241232964
+    url_download: https://dataverse.harvard.edu/api/access/datafile/8140016
+    date_accessed: 2024-07-22
+
+    # License
+    license:
+      name: CC0
+      url: https://doi.org/10.7910/DVN/DHMZOW
+
+outs:
+  - md5: 2186bc80478db0aae2a62c8c94759c6b
+    size: 17706812
+    path: global_military_spending_dataset.rds

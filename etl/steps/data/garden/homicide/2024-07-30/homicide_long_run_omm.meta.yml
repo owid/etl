@@ -1,0 +1,99 @@
+dataset:
+    title: Long run homicide rates (1250-2022; Eisner, WHO, UNODC)
+    sources:
+    - name: OWID based on Eisner (2014); United Nations Office of Drugs and Crime (2022); WHO Mortality Database (2024)
+tables:
+  homicide_long_run_omm:
+    variables:
+      death_rate_per_100_000_population_eisner:
+        title: Homicide rate per 100,000 population - Eisner
+        description_processing: >
+          All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
+
+
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
+
+
+          Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
+        short_unit: ''
+        unit: 'homicides per 100,000 people'
+        origins:
+          - title: Eisner (2014)
+            date_published: "2014"
+            producer: Eisner (2014)
+            citation_full: "Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press"
+            url_main: https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents
+            date_accessed: "2024-01-03"
+        display:
+          numDecimalPlaces: 2
+      death_rate_per_100_000_population_eisner_who:
+        title: Homicide rate per 100,000 population - Eisner and WHO Mortality Database
+        description_processing: >
+          All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
+
+
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
+
+
+          Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
+
+
+          This variable is a combination of homicide rate estimates from Eisner (2014) and the WHO Mortality Database. For the following countries we use Eisner (2014) before the given date and the WHO Mortality Database for all later datapoints:
+
+          * 1950: France, Ireland, Netherlands
+
+
+          * 1951: Italy, Spain, Sweden, Switzerland
+
+
+          * 1954: Belgium
+
+
+          * 1990: Germany
+
+
+          For Corsica and Sardinia; England and Wales and Sweden and Finland all datapoints are from Eisner (2014).
+
+
+          All other datapoints not specified above are sourced from the WHO Mortality Database.
+        short_unit: ''
+        unit: 'homicides per 100,000 people'
+        origins:
+          - title: OWID based on Eisner and WHO Mortality Database
+            date_published: "2024-02-21"
+            producer: Eisner (2014); WHO Mortality Database (2024)
+            citation_full: "Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press; WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2024)"
+            date_accessed: "2024-07-26"
+            url_main: Eisner (2014) - https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents; WHO Mortality Database (2024) - https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
+        display:
+          numDecimalPlaces: 2
+      death_rate_per_100_000_population_eisner_unodc:
+        title: Homicide rate per 100,000 population - Eisner and UNODC
+        description_processing: >
+          All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
+
+
+          In Eisner (2014) homicide rates are given for a range of years - we allocate the homicide rate at the midpoint of the given period. Our data-management and -visualization system can currently only observations that happen in a particular year (or day), therefore we can't store the time-information as presented by the original source and instead allocate the observation the midpoint of the given period.
+
+
+          Historical estimates of homicide rates are derived from national vital statistics and judicial archives. The older data is often fragmented and subject to a number of biases including: geographic bias, incomplete records, changing age structure, wound treatment, and the lethality of weapons.
+
+
+          This variable is a combination of homicide rate estimates from Eisner (2014) and the United Nations Office of Drugs and Crime. For the following countries we use Eisner (2014) before 1990 and the United Nations Office of Drugs and Crime for all later datapoints: France, Ireland, Netherlands, Italy, Spain, Sweden, Switzerland, Belgium, Germany.
+
+
+          For Corsica and Sardinia; England and Wales and Sweden and Finland all datapoints are from Eisner (2014).
+
+
+          All other datapoints not specified above are sourced from the United Nations Office of Drugs and Crime.
+        short_unit: ''
+        unit: 'homicides per 100,000 people'
+        origins:
+          - title: OWID based on Eisner (2014) and United Nations Office of Drugs and Crime (2022)
+            date_published: "2022"
+            producer: Eisner (2014); United Nations Office of Drugs and Crime (2022)
+            citation_full: "Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press; United Nations Office of Drugs and Crime (2022)"
+            url_main: Eisner (2014) - https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents; United Nations Office of Drugs and Crime (2022) - https://dataunodc.un.org/dp-intentional-homicide-victims
+            date_accessed: "2023-07-04"
+        display:
+          numDecimalPlaces: 2

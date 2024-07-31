@@ -774,7 +774,7 @@ if submitted:
         # Create files
         generate_step(
             cookiecutter_path=utils.COOKIE_SNAPSHOT,
-            data=dict(**form.dict(), channel="snapshots"),
+            data=dict(**form.model_dump(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
         ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
