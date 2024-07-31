@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract year from 'publication_date' and create a new 'year' column
-    tb["year"] = tb["publication_date"].dt.year
+    tb["year"] = tb["publication_date"].dt.month
     # Find the index of the maximum 'training_computation_petaflop', 'data', and 'parameters' in each year
     # Fill NaN values with 0 before finding the index of the maximum
     idx_compute = (
@@ -39,13 +39,13 @@ def run(dest_dir: str) -> None:
     idx_parameters = tb[["parameters", "year"]].fillna(0).groupby("year")["parameters"].idxmax()
 
     # Create indicator columns
-    tb["largest_compute"] = 10
-    tb["largest_data"] = 10
-    tb["largest_parameters"] = 10
+    tb["largest_compute"] = 1000
+    tb["largest_data"] = 1000
+    tb["largest_parameters"] = 1000
 
-    tb.loc[idx_compute, "largest_compute"] = 100
-    tb.loc[idx_data, "largest_data"] = 100
-    tb.loc[idx_parameters, "largest_parameters"] = 100
+    tb.loc[idx_compute, "largest_compute"] = 10000
+    tb.loc[idx_data, "largest_data"] = 10000
+    tb.loc[idx_parameters, "largest_parameters"] = 10000
     # Create a copy of the rows with largest compute values
     max_compute_rows = tb.loc[idx_compute].copy()
 
