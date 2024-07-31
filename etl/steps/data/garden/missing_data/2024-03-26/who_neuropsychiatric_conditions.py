@@ -2,7 +2,6 @@
 
 from owid.catalog import Table
 
-from etl.data_helpers.misc import add_origins_to_mortality_database
 from etl.helpers import PathFinder, create_dataset
 
 from . import shared
@@ -18,38 +17,35 @@ def run(dest_dir: str) -> None:
     ds_income_groups = paths.load_dataset("income_groups")
     ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index()
-    tb = ds_data["neuropsychiatric_conditions__both_sexes__all_ages"].reset_index()
-    tb = add_origins_to_mortality_database(tb_who=tb)
+    tb = ds_data["mortality_database"].reset_index()
+    tb = tb[
+        (tb["age_group"] == "all ages") & (tb["sex"] == "Both sexes") & (tb["cause"] == "Neuropsychiatric conditions")
+    ].reset_index(drop=True)
 
     tb_data = tb.filter(
-        items=["country", "year"]
-        + [col for col in tb if col.startswith("deaths_from_neuropsychiatric_conditions_per_100_000_people")]
+        items=["country", "year"] + [col for col in tb if col.startswith("death_rate_per_100_000_population")]
     )
-    tb_data = tb_data.dropna(
-        subset=["deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"]
-    )
+    tb_data = tb_data.dropna(subset=["death_rate_per_100_000_population"])
 
     df_merged = shared.map_countries_and_merge_data(
         tb_data,
         ds_regions,
         ds_income_groups,
         tb_population,
-        "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
+        "death_rate_per_100_000_population",
     )
 
     # Calculate missing details for each region and income group.
-    region_details = shared.calculate_missing_data(
-        df_merged, "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages", "region"
-    )
+    region_details = shared.calculate_missing_data(df_merged, "death_rate_per_100_000_population", "region")
     income_details = shared.calculate_missing_data(
         df_merged,
-        "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
+        "death_rate_per_100_000_population",
         "income_group",
     )
 
     global_details = shared.calculate_missing_data(
         df_merged,
-        "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
+        "death_rate_per_100_000_population",
         "global",
     )
 
@@ -58,14 +54,12 @@ def run(dest_dir: str) -> None:
         income_details,
         global_details,
         df_merged,
-        "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
+        "death_rate_per_100_000_population",
     )
     tb_garden = Table(combined, short_name="neuropsychiatric_conditions")
     # Ensure metadata is correctly associated.
     for column in tb_garden.columns:
-        tb_garden[column].metadata.origins = tb[
-            "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"
-        ].metadata.origins
+        tb_garden[column].metadata.origins = tb["death_rate_per_100_000_population"].metadata.origins
 
     # Save the final dataset.
     ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_garden], check_variables_metadata=True)

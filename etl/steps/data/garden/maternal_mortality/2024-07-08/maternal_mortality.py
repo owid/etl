@@ -65,7 +65,7 @@ WHO_REMOVE_REGIONS = [
 def run(dest_dir: str) -> None:
     """Creates long running data set on maternal mortality combining following sources (in brackets - timeframes available for each source):
     - Gapminder maternal mortality data (1751 - 2008)
-    - WHO mortality database (1950 - 2020) & UN WPP (1950 - 2020)
+    - WHO mortality database (1950 - 2022) & UN WPP (1950 - 2020)
     - UN MMEIG maternal mortality data (1985 - 2020)
     We combine them following the hierarchy below, where the most recent data is used when available:
     - UN MMEIG >> WHO/UN >> Gapminder
@@ -94,14 +94,21 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_gm = ds_gm["maternal_mortality"].reset_index()
     tb_un = ds_un["maternal_mortality"].reset_index()
-    tb_who_mortality = ds_who_mortality["maternal_conditions__both_sexes__all_ages"].reset_index()
+    tb_who_mortality = ds_who_mortality["mortality_database"].reset_index()
+    # Filtering out the data we need from WHO mortality database
+    tb_who_mortality = tb_who_mortality[
+        (tb_who_mortality["cause"] == "Maternal conditions")
+        & (tb_who_mortality["age_group"] == "all ages")
+        & (tb_who_mortality["sex"] == "Both sexes")
+    ]
+    assert tb_who_mortality.shape[0] > 0
     tb_wpp_pop = ds_wpp["population"].reset_index()
     tb_wpp_births = ds_wpp["births"].reset_index()
 
     # calculate maternal mortality ratio/ rate out of WHO mortality database and UN WPP
-    tb_who_mortality = tb_who_mortality.rename(
-        columns={"total_deaths_that_are_from_maternal_conditions__in_both_sexes_aged_all_ages": "maternal_deaths"}
-    )[["country", "year", "maternal_deaths"]]
+    tb_who_mortality = tb_who_mortality.rename(columns={"number": "maternal_deaths"})[
+        ["country", "year", "maternal_deaths"]
+    ]
     tb_who_mortality = tb_who_mortality[tb_who_mortality["year"] <= LATEST_YEAR]
     # who data has a bunch of zeros, which seem to be missing data, so we replace them with NA
     tb_who_mortality["maternal_deaths"] = tb_who_mortality["maternal_deaths"].replace(0, pd.NA)

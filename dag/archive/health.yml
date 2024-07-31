@@ -103,3 +103,19 @@ steps:
     - data://meadow/ihme_gbd/2019/gbd_mental_health
   data://grapher/ihme_gbd/2019/gbd_mental_health:
     - data://garden/ihme_gbd/2019/gbd_mental_health
+
+  # WHO Mortality Database - 1st level causes
+  data://meadow/who/2023-08-01/mortality_database:
+    - snapshot://who/2023-08-01/mortality_database.csv
+  data://garden/who/2023-08-01/mortality_database:
+    - data://meadow/who/2023-08-01/mortality_database
+  data://grapher/who/2023-08-01/mortality_database:
+    - data://garden/who/2023-08-01/mortality_database
+
+  # WHO Mortality DB - ICD Codes
+  data://meadow/who/2023-08-04/icd_codes:
+    - snapshot://who/2023-08-04/icd_codes.zip
+  data://garden/who/2023-08-04/icd_codes:
+    - data://meadow/who/2023-08-04/icd_codes
+  data://grapher/who/2023-08-04/icd_codes:
+    - data://garden/who/2023-08-04/icd_codes

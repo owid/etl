@@ -83,15 +83,6 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - WHO
-  data://meadow/homicide/2023-01-03/who_mort_db:
-    - snapshot://homicide/2023-01-03/who_mort_db.csv
-  data://garden/homicide/2023-01-03/who_mort_db:
-    - data://meadow/homicide/2023-01-03/who_mort_db
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/homicide/2023-01-03/who_mort_db:
-    - data://garden/homicide/2023-01-03/who_mort_db
-
   # Homicide - UNODC - current
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
@@ -100,13 +91,6 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-  # Homicide - OMM
-  data://garden/homicide/2023-01-03/homicide_long_run_omm:
-    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
-    - data://garden/homicide/2023-01-03/who_mort_db
-    - data://garden/homicide/2023-07-04/unodc
-  data://grapher/homicide/2023-01-03/homicide_long_run_omm:
-    - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
   #
   # UN
@@ -601,7 +585,7 @@ steps:
 
   # Missing Data - Neuropsychiatric Conditions
   data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
-    - data://garden/who/2023-08-01/mortality_database
+    - data://garden/who/2024-07-26/mortality_database
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
@@ -792,6 +776,7 @@ steps:
     - data://garden/homicide/2023-07-04/unodc
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
+
 # WB income groups 2023-04-30
   data://meadow/wb/2023-04-30/income_groups:
     - snapshot://wb/2023-04-30/income_groups.xlsx
