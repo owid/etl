@@ -19,101 +19,8 @@ paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
 
-INCOMES_SHEETS = {"deciles_pci": {"header": [6, 7], "short_name": "deciles_pci"}}
 POVERTY_SHEETS = {
-    "poverty USD2.15": {"header": [6, 7, 8], "short_name": "poverty_215"},
-    "poverty USD3.65": {"header": [6, 7, 8], "short_name": "poverty_365"},
-    "poverty USD6.85": {"header": [6, 7, 8], "short_name": "poverty_685"},
-    "poverty median": {"header": [6, 7, 8], "short_name": "poverty_median"},
-}
-INEQUALITY_DECILES_INDICES_SHEETS = {
-    "deciles pci": {
-        "header": 7,
-        "short_name": "ineq_deciles_pci",
-    },  # decile shares and income ratios - per capita income
-    "indices pci": {"header": 5, "short_name": "ineq_indices_pci"},  # inequality indices - per capita income
-    "deciles ei": {
-        "header": 7,
-        "short_name": "ineq_deciles_ei",
-    },  # decile shares and income ratios - equivalized income
-    "indices ei": {"header": 5, "short_name": "ineq_indices_ei"},  # inequality indices - equivalized income
-    # "deciles lmi": {
-    #     "header": 7,
-    #     "short_name": "ineq_deciles_lmi",
-    # },  # decile shares and income ratios - equivalized labor monetary income
-    # "indices lmi": {
-    #     "header": 5,
-    #     "short_name": "ineq_indices_lmi",
-    # },  # inequality indices - equivalized labor monetary income
-    # "deciles ni": {
-    #     "header": 7,
-    #     "short_name": "ineq_deciles_ni",
-    # },  # decile shares and income ratios - income or consumption variable for computing poverty with national lines
-    # "indices ni": {
-    #     "header": 5,
-    #     "short_name": "ineq_indices_ni",
-    # },  # inequality indices - income or consumption variable for computing poverty with national lines
-}
-
-INEQUALITY_GINI_SHEETS = {
-    "gini1": {"header": [5, 6, 7], "short_name": "gini1"},  # Gini for different household income variables
-    "gini2": {"header": [5, 6, 7, 8], "short_name": "gini2"},  # page 2
-    # "gini3": {"header": [5, 6], "short_name": "gini3"},  # Gini including and excluding zero income
-    # "polarization": {"header": [4, 5, 6]},  # Indices of bipolarization (EGR and Wolfson)
-}
-
-DECILES_INDICES_COLUMNS = {
-    "1": "decile1_share",
-    "2": "decile2_share",
-    "3": "decile3_share",
-    "4": "decile4_share",
-    "5": "decile5_share",
-    "6": "decile6_share",
-    "7": "decile7_share",
-    "8": "decile8_share",
-    "9": "decile9_share",
-    "10": "decile10_share",
-    "10/1": "10_1_ratio",
-    "90/10": "90_10_ratio",
-    "95/5": "95_5_ratio",
-    "95/50": "95_50_ratio",
-    "50/5": "50_5_ratio",
-    "95/80": "95_80_ratio",
-    "Gini": "gini",
-    "Theil": "theil",
-    "CV": "cv",
-    "A(.5)": "a_05",
-    "A(1)": "a_1",
-    "A(2)": "a_2",
-    "E(0)": "e_0",
-}
-
-GINI_COLUMNS = {
-    "Per capita_income_Unnamed: 1_level_2": "per_capita_income",
-    "Equivalized_income_A": "equivalized_income_a",
-    "Equivalized_income_B": "equivalized_income_b",
-    "Equivalized_income_C": "equivalized_income_c",
-    "Equivalized_income_D": "equivalized_income_d",
-    "Equivalized_income_E": "equivalized_income_e",
-    "Total_household _income": "total_household_income",
-    "Equivalized_income A_Age 0-10": "equivalized_income_a_age_0_10",
-    "Equivalized_income A_Age 20-30": "equivalized_income_a_age_20_30",
-    "Equivalized_income A_Age 40-50": "equivalized_income_a_age_40_50",
-    "Equivalized_income A_Age 60-70": "equivalized_income_a_age_60_70",
-    "Per capita_income_Only urban_Unnamed: 1_level_3": "per_capita_income_only_urban",
-    "Per capita_income_Only rural_Unnamed: 2_level_3": "per_capita_income_only_rural",
-    "Equivalized_income_Only urban_Unnamed: 3_level_3": "equivalized_income_only_urban",
-    "Equivalized_income_Only rural_Unnamed: 4_level_3": "equivalized_income_only_rural",
-    "Per capita_income_Only labor _Unnamed: 5_level_3": "per_capita_income_only_labor",
-    "Per capita_income_Only monetary _Unnamed: 6_level_3": "per_capita_income_only_monetary",
-    "Per capita_income_Only labor _monetary": "per_capita_income_only_labor_monetary",
-    "Per capita_income_Urban labor _monetary": "per_capita_income_urban_labor_monetary",
-    "Per capita income_Without zeros": "per_capita_income_without_zeros",
-    "Per capita income_With zeros": "per_capita_income_with_zeros",
-    "Equivalized income_Without zeros": "equivalized_income_without_zeros",
-    "Equivalized income_With zeros": "equivalized_income_with_zeros",
-    '"National" income variable_Without zeros': "national_income_variable_without_zeros",
-    '"National" income variable_With zeros': "national_income_variable_with_zeros",
+    "poverty median": {"header": [7, 8, 9], "short_name": "poverty_median"},
 }
 
 POVERTY_COLUMNS = {
@@ -162,21 +69,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap_inequality = paths.load_snapshot("sedlac_inequality.xlsx")
-    snap_poverty = paths.load_snapshot("sedlac_poverty.xlsx")
+    snap_poverty = paths.load_snapshot("sedlac_poverty_2016.xls")
 
     # Load all the sheets from the snapshots.
-    inequality_deciles_indices_tables = load_tables_from_snapshot(snap_inequality, INEQUALITY_DECILES_INDICES_SHEETS)
-    inequality_gini_tables = load_tables_from_snapshot(snap_inequality, INEQUALITY_GINI_SHEETS)
     poverty_tables = load_tables_from_snapshot(snap_poverty, POVERTY_SHEETS)
 
     #
     # Process data.
-    inequality_deciles_indices_tables = format_long_tables(
-        inequality_deciles_indices_tables, COUNTRIES, DECILES_INDICES_COLUMNS
-    )
-    inequality_gini_tables = format_long_tables(inequality_gini_tables, COUNTRIES, GINI_COLUMNS)
-
     poverty_tables = format_long_tables(poverty_tables, COUNTRIES, POVERTY_COLUMNS, POVERTY_COLUMNS_TO_DROP)
 
     #
@@ -185,7 +84,7 @@ def run(dest_dir: str) -> None:
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(
         dest_dir,
-        tables=inequality_deciles_indices_tables + inequality_gini_tables + poverty_tables,
+        tables=poverty_tables,
         check_variables_metadata=True,
         default_metadata=snap_poverty.metadata,
     )
