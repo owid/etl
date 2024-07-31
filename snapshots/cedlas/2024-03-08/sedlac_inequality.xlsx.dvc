@@ -27,7 +27,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/#1496160514336-bdc44a1d-8955
+      url: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
 outs:
   - md5: 6357cc13d6b4db562c49c72306c164ea
     size: 2212610
