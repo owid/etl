@@ -8,9 +8,11 @@ definitions:
 
 dataset:
   update_period_days: 365
+  title: Historical statistics for mineral and material commodities
 
 tables:
   historical_statistics_for_mineral_and_material_commodities:
+    title: Historical statistics for mineral and material commodities
     variables:
       production:
         title: Production
@@ -24,3 +26,8 @@ tables:
         title: Unit value (in constant US dollars)
         unit: constant 1998 US$ per tonne
         short_unit: $/t
+  historical_statistics_for_mineral_and_material_commodities_flat:
+    title: Historical statistics for mineral and material commodities
+    variables:
+      # Metadata is filled up programmatically.
+      {}

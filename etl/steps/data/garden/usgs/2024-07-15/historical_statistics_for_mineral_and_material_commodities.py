@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
@@ -101,6 +101,12 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Total"): ("Tungsten", "Total"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
     ("Zinc", "Total"): ("Zinc", "Total"),
+}
+
+# Footnotes (that will appear in the footer of charts) to add to the flattened output table.
+FOOTNOTES = {
+    # Example:
+    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
 }
 
 
@@ -234,14 +240,45 @@ def run(dest_dir: str) -> None:
     tb_combined["sub_commodity"] = "Total"
     tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
 
+    # Create a wide table.
+    # For the wide table, select only unit value in constant USD.
+    tb_flat = (
+        tb_combined.rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
+        .drop(columns=["unit_value_current"], errors="raise")
+        .pivot(
+            index=["country", "year"],
+            columns=["commodity", "sub_commodity", "unit"],
+            values=["production", "unit_value"],
+            join_column_levels_with="|",
+        )
+        .dropna(axis=1, how="all")
+    )
+
+    # NOTE: Here, I could loop over columns and improve metadata.
+    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
+    # So, for now, simply add titles and descriptions from producer.
+    for column in tb_flat.drop(columns=["country", "year"]).columns:
+        # Create metadata title (before they become snake-case).
+        tb_flat[column].metadata.title = column
+        # if column in notes:
+        #     tb_flat[column].metadata.description_from_producer = "Notes found in original USGS data:\n" + notes[column]
+
+    # Add footnotes.
+    for column, note in FOOTNOTES.items():
+        if not tb_flat[column].metadata.presentation:
+            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
+        tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
     # Format tables conveniently.
     tb_combined = tb_combined.format(["country", "year", "commodity", "sub_commodity"])
+    tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

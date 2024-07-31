@@ -1021,7 +1021,7 @@ def run(dest_dir: str) -> None:
 
     # NOTE: Here, I could loop over columns and improve metadata.
     # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
-    # So, for now, simply add descriptions from producer.
+    # So, for now, simply add titles and descriptions from producer.
     for column in tb_flat.drop(columns=["country", "year"]).columns:
         # Create metadata title (before they become snake-case).
         tb_flat[column].metadata.title = column

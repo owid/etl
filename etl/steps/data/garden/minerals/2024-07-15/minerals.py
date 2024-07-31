@@ -134,29 +134,20 @@ def run(dest_dir: str) -> None:
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
+    tb_usgs_historical_flat = ds_usgs_historical.read_table(
+        "historical_statistics_for_mineral_and_material_commodities_flat"
+    )
     tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
     tb_bgs_flat = ds_bgs.read_table("world_mineral_statistics_flat")
 
     #
     # Process data.
     #
-    # TODO: Move the pivotting part to USGS historical garden step.
-    # Select and rename columns in USGS historical data.
-    tb_usgs_historical = tb_usgs_historical.rename(columns={"unit_value_constant": "unit_value"}, errors="raise").drop(
-        columns=["unit_value_current"], errors="raise"
-    )
-
-    # Pivot USGS historical table and remove empty columns.
-    tb_usgs_historical_flat = tb_usgs_historical.pivot(
-        index=["country", "year"],
-        columns=["commodity", "sub_commodity", "unit"],
-        values=["production", "unit_value"],
-        join_column_levels_with="|",
-    ).dropna(axis=1, how="all")
-
     # Adapt USGS current flat table.
     tb_usgs_flat = adapt_flat_table(tb_flat=tb_usgs_flat)
+
+    # Adapt USGS historical flat table.
+    tb_usgs_historical_flat = adapt_flat_table(tb_flat=tb_usgs_historical_flat)
 
     # Adapt BGS flat table.
     tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
