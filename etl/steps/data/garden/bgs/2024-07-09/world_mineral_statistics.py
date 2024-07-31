@@ -15,7 +15,7 @@ CARATS_TO_TONNES = 2e-7
 # Convert million cubic meters of helium to metric tonnes.
 MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 # Convert million cubic meters of natural gas to metric tonnes.
-# TODO: Figure out if this is a good idea, otherwise keep in million cubic meters.
+# NOTE: This conversion is irrelevant, since natural gas is removed (see notes below in COMMODITY_MAPPING).
 MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES = 800
 
 # Harmonize commodity-subcommodity names.
@@ -159,8 +159,8 @@ COMMODITY_MAPPING = {
     ("Copper, mine", "Unknown"): ("Copper", "Mine production"),
     ("Copper, refined", "Unknown"): ("Copper", "Refinery production"),
     ("Copper, smelter", "Unknown"): ("Copper", "Smelter production"),
-    # TODO: Production does not include synthetic diamond, but imports and exports of "Dust" does include synthetic diamond.
-    # This should at least be mentioned in the footnotes.
+    # NOTE: It's unclear when synthetic diamond is included.
+    # Production does not seem to include it, but imports and exports of "Dust" does include synthetic diamond.
     ("Diamond", "Cut"): ("Diamond", "Cut"),
     ("Diamond", "Dust"): ("Diamond", "Dust"),
     ("Diamond", "Gem"): ("Diamond", "Gem"),
@@ -424,7 +424,9 @@ COMMODITY_MAPPING = {
     ("Molybdenum", "Oxides"): ("Molybdenum", "Oxides"),
     ("Molybdenum", "Scrap"): ("Molybdenum", "Scrap"),
     ("Molybdenum, mine", "Unknown"): ("Molybdenum", "Mine production"),
-    ("Natural gas", "Unknown"): ("Natural gas", "Unknown"),
+    # NOTE: I removed natural gas, as the units are not clear: sometimes "million cubic meters" appears, sometimes no
+    #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
+    ("Natural gas", "Unknown"): None,
     ("Nepheline syenite", "Nepheline concentrates"): ("Nepheline syenite", "Nepheline concentrates"),
     ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Nepheline-syenite"),
     ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Unknown"),
@@ -840,6 +842,7 @@ def harmonize_units(tb: Table) -> Table:
             tb.loc[mask, "value"] *= CARATS_TO_TONNES
         elif unit in ["million cubic metres"]:
             # Assert that commodity is either helium or natural gas, and convert accordingly.
+            # NOTE: I decided to remove natural gas (see notes above in the commodity mapping).
             error = "Unexpected commodity using million cubic metres."
             assert set(tb[mask]["commodity"]) == {"helium", "natural gas"}, error
             tb.loc[mask & (tb["commodity"] == "helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
