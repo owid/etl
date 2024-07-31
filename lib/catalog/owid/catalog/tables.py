@@ -976,11 +976,9 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, observed=True, **kwargs) -> "TableGroupBy":
+    def groupby(self, *args, **kwargs) -> "TableGroupBy":
         """Groupby that preserves metadata."""
-        return TableGroupBy(
-            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
-        )
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRolling":
         """Rolling operation that preserves metadata."""
@@ -1254,6 +1252,11 @@ def merge(
             "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
         )
 
+    # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
+    # It is necessary to copy metadata here to avoid mutating passed left.
+    left = left.copy(deep=False)
+    right = right.copy(deep=False)
+
     # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
     if isinstance(on, str):
         on = [on]
@@ -1276,10 +1279,8 @@ def merge(
     # Create merged table.
     tb = Table(
         pd.merge(
-            # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
-            # It is necessary to copy metadata here to avoid mutating passed left.
-            left=left.copy(deep=False),
-            right=right.copy(deep=False),
+            left=left,
+            right=right,
             how=how,
             on=on,
             left_on=left_on,

@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     # - Filling in NaNs with zeroes, for daily indicators.
     # - Filling in NaNs with the last non-NaN value, for cumulative indicators (forward filling).
     tb[["new_cases", "new_deaths"]] = tb[["new_cases", "new_deaths"]].fillna(0)
-    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].fillna(method="ffill")  # type: ignore
+    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].ffill()  # type: ignore
 
     # Main processing
     tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d")
