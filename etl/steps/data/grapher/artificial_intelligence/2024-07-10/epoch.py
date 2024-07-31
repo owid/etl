@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -38,28 +38,22 @@ def run(dest_dir: str) -> None:
     )
     idx_parameters = tb[["parameters", "year"]].fillna(0).groupby("year")["parameters"].idxmax()
 
+    # Create indicator columns
+    tb["largest_compute"] = 10
+    tb["largest_data"] = 10
+    tb["largest_parameters"] = 10
+
+    tb.loc[idx_compute, "largest_compute"] = 100
+    tb.loc[idx_data, "largest_data"] = 100
+    tb.loc[idx_parameters, "largest_parameters"] = 100
     # Create a copy of the rows with largest compute values
     max_compute_rows = tb.loc[idx_compute].copy()
 
     # Update the system name for these new rows
     max_compute_rows["system"] = "maximum compute"
-
-    # Add indicator columns for the largest compute systems
-    max_compute_rows["largest_compute"] = 10
-    max_compute_rows["largest_data"] = 10
-    max_compute_rows["largest_parameters"] = 10
-
-    # Set indicator columns to 10 for the original rows as well
-    tb["largest_compute"] = 0
-    tb["largest_data"] = 0
-    tb["largest_parameters"] = 0
-    tb.loc[idx_compute, "largest_compute"] = 10
-
     # Append the new rows to the original DataFrame
-    tb = pd.concat([tb, max_compute_rows], ignore_index=True)
+    tb = pr.concat([tb, max_compute_rows], ignore_index=True)
 
-    tb.loc[idx_data, "largest_data"] = 1
-    tb.loc[idx_parameters, "largest_parameters"] = 1
     tb = tb.drop("year", axis=1)
 
     for col in ["largest_compute", "largest_data", "largest_parameters"]:
