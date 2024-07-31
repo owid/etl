@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
+from apps.chart_sync.admin_api import AdminAPI
 from etl import config
 from etl.db import get_engine
 
@@ -194,6 +195,7 @@ def _update_variables_metadata(table: catalog.Table) -> None:
 
 def upsert_table(
     engine: Engine,
+    admin_api: AdminAPI,
     table: catalog.Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
@@ -278,6 +280,13 @@ def upsert_table(
             # commit within the lock to make sure other threads get the latest sources
             session.commit()
 
+        # pop grapher_config from variable metadata, later we send it to Admin API
+        if variable_meta.presentation and variable_meta.presentation.grapher_config:
+            grapher_config = variable_meta.presentation.grapher_config
+            variable_meta.presentation.grapher_config = None
+        else:
+            grapher_config = None
+
         db_variable = gm.Variable.from_variable_metadata(
             variable_meta,
             short_name=column_name,
@@ -312,48 +321,65 @@ def upsert_table(
         )
         session.add(db_variable)
 
-        # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
-        # have to if we used ORM instead
+        # we need to commit changes because `upload_data_and_metadata_to_r2` pulls all data from MySQL
+        # and sends it to R2
+        # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects
+        #   we have available
         session.commit()
 
-        # process data and metadata
-        var_data = dm.variable_data(df)
-        var_metadata = dm.variable_metadata(session, db_variable_id, df)
+        # grapher_config needs to be sent to Admin API because it has side effects
+        if grapher_config:
+            admin_api.put_grapher_config(db_variable_id, grapher_config)
+        # grapher_config does not exist, but it's still in the database -> delete it
+        elif not grapher_config and db_variable.grapherConfigIdETL:
+            admin_api.delete_grapher_config(db_variable_id)
 
-        var_data_str = json.dumps(var_data, default=str)
-        var_metadata_str = json.dumps(var_metadata, default=str)
-
-        checksum_data = dm.checksum_data_str(var_data_str)
-        # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
-        checksum_metadata = dm.checksum_metadata(var_metadata)
-
-        # upload them to R2
-        with ThreadPoolExecutor() as executor:
-            futures = []
-
-            if db_variable.dataChecksum != checksum_data:
-                db_variable.dataChecksum = checksum_data
-                futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
-
-            if db_variable.metadataChecksum != checksum_metadata:
-                db_variable.metadataChecksum = checksum_metadata
-                futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
-
-            # commit new checksums
-            if futures:
-                # Wait for futures to complete in case exceptions are raised
-                [f.result() for f in futures]
-
-                session.add(db_variable)
-                session.commit()
-
-        if verbose:
-            if futures:
-                log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
-            else:
-                log.info("upsert_table.skipped_upload_to_s3", size=len(table), variable_id=db_variable_id)
+        # upload data and metadata to R2
+        upload_data_and_metadata_to_r2(session, df, db_variable, verbose=verbose)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
+
+
+def upload_data_and_metadata_to_r2(
+    session: Session, df: pd.DataFrame, db_variable: gm.Variable, verbose: bool = False
+) -> None:
+    """Uploads variable data and metadata as JSONs to R2."""
+    # process data and metadata
+    var_data = dm.variable_data(df)
+    var_metadata = dm.variable_metadata(session, db_variable.id, df)
+
+    var_data_str = json.dumps(var_data, default=str)
+    var_metadata_str = json.dumps(var_metadata, default=str)
+
+    checksum_data = dm.checksum_data_str(var_data_str)
+    # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
+    checksum_metadata = dm.checksum_metadata(var_metadata)
+
+    # upload them to R2
+    with ThreadPoolExecutor() as executor:
+        futures = []
+
+        if db_variable.dataChecksum != checksum_data:
+            db_variable.dataChecksum = checksum_data
+            futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+
+        if db_variable.metadataChecksum != checksum_metadata:
+            db_variable.metadataChecksum = checksum_metadata
+            futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
+
+        # commit new checksums
+        if futures:
+            # Wait for futures to complete in case exceptions are raised
+            [f.result() for f in futures]
+
+            session.add(db_variable)
+            session.commit()
+
+    if verbose:
+        if futures:
+            log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
+        else:
+            log.info("upsert_table.skipped_upload_to_s3", size=len(df), variable_id=db_variable.id)
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:

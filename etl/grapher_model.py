@@ -929,7 +929,6 @@ class Variable(Base):
         'display': '{}',
         'columnOrder': 0,
         'originalMetadata': '{}',
-        'grapherConfigAdmin': None
     }
     """
 
@@ -973,7 +972,6 @@ class Variable(Base):
     sourceId: Mapped[Optional[int]] = mapped_column(Integer, default=None)
     shortUnit: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     originalMetadata: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-    grapherConfigAdmin: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
@@ -991,9 +989,10 @@ class Variable(Base):
     licenses: Mapped[Optional[list[dict]]] = mapped_column(JSON, default=None)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-    grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    grapherConfigIdAdmin: Mapped[Optional[bytes]] = mapped_column(BINARY(16), default=None)
+    grapherConfigIdETL: Mapped[Optional[bytes]] = mapped_column(BINARY(16), default=None)
     dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
@@ -1077,11 +1076,8 @@ class Variable(Base):
                 ds.code = self.code
             if self.originalMetadata is not None:
                 ds.originalMetadata = self.originalMetadata
-            if self.grapherConfigETL is not None:
-                ds.grapherConfigETL = self.grapherConfigETL
             if self.sort is not None:
                 ds.sort = self.sort
-            assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
 
@@ -1121,10 +1117,6 @@ class Variable(Base):
 
         if metadata.description_key:
             assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
-
-        # rename grapherConfig to grapherConfigETL
-        if "grapherConfig" in presentation_dict:
-            presentation_dict["grapherConfigETL"] = presentation_dict.pop("grapherConfig")
 
         return cls(
             shortName=short_name,
