@@ -60,7 +60,7 @@ def run(dest_dir: str) -> None:
         # Check if any year for the current country is not NaN
         if not group["released_national_strategy_on_ai"].isna().all():
             # Forward fill NaN values after "Released"
-            group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna(method="ffill")
+            group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].ffill()
 
         # Fill remaining NaN values with "Not Released"
         group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna("Not released")

@@ -72,7 +72,7 @@ def reformat_table(
     tb["aggregation"] = tb["aggregation"].replace(aggregation_names)
 
     # Fill null values in aggregation
-    tb["aggregation"] = tb["aggregation"].fillna(method="ffill")
+    tb["aggregation"] = tb["aggregation"].ffill()
 
     # Delete rows with null values in indicator
     tb = tb.dropna(subset=["indicator"]).reset_index(drop=True)
@@ -96,7 +96,7 @@ def reformat_table(
     tb["spell"] = tb.loc[~tb.year.str[:4].str.isnumeric(), "year"]
 
     # Fill null values in spell
-    tb["spell"] = tb["spell"].fillna(method="ffill")
+    tb["spell"] = tb["spell"].ffill()
 
     # Remove rows when year == spell
     tb = tb[tb["year"] != tb["spell"]]
