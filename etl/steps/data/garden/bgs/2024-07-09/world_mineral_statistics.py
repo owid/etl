@@ -1,8 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import ast
+from typing import Dict, List
 
-from owid.catalog import Table
+import pandas as pd
+from owid.catalog import Table, VariablePresentationMeta
+from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -707,6 +710,12 @@ COMMODITY_MAPPING = {
     ("Zirconium minerals", "Unknown"): ("Zirconium minerals", "Unknown"),
 }
 
+# Footnotes (that will appear in the footer of charts) to add to the flattened output table.
+FOOTNOTES = {
+    # Example:
+    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
+}
+
 # There are many historical regions with overlapping data with their successor countries.
 # Accept only overlaps on the year when the historical country stopped existing.
 ACCEPTED_OVERLAPS = [
@@ -887,6 +896,35 @@ def clean_notes(notes):
     return notes_clean
 
 
+def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+    # Create another table with the same structure, but containing notes.
+    tb_flat_notes = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=notes_columns,
+        join_column_levels_with="|",
+    )
+    tb_flat_notes = tb_flat_notes.rename(
+        columns={column: column.replace("notes_", "") for column in tb_flat_notes.columns}
+    )
+
+    # Gather all notes for each column.
+    notes_dict = {}
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
+        _notes = tb_flat_notes[column].dropna().tolist()
+        if len(_notes) > 0:
+            # Gather all notes for this column.
+            notes = sum(_notes, [])
+            # Get unique notes keeping the order.
+            notes = pd.unique(pd.Series(notes)).tolist()
+            # Join notes.
+            if len(notes) > 0:
+                notes_str = "- " + "\n- ".join(notes)
+                notes_dict[column] = notes_str
+
+    return notes_dict
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -967,10 +1005,38 @@ def run(dest_dir: str) -> None:
         tb[f"notes_{category}"] = [
             clean_notes(note) for note in tb[f"note_{category}"] + tb[f"general_notes_{category}"]
         ]
-        # Ensure the new column has metadata.
-        # To avoid ETL failing when storing the table, convert lists of notes to strings.
-        tb[f"notes_{category}"] = tb[f"notes_{category}"].copy_metadata(tb[f"note_{category}"]).astype(str)
+        # Drop unnecessary columns.
         tb = tb.drop(columns=[f"note_{category}", f"general_notes_{category}"])
+
+    # Gather all notes in a dictionary.
+    notes = gather_notes(tb, notes_columns=["notes_exports", "notes_imports", "notes_production"])
+
+    # Create a wide table.
+    tb_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=["exports", "imports", "production"],
+        join_column_levels_with="|",
+    )
+
+    # NOTE: Here, I could loop over columns and improve metadata.
+    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
+    # So, for now, simply add descriptions from producer.
+    for column in tb_flat.drop(columns=["country", "year"]).columns:
+        # Create metadata title (before they become snake-case).
+        tb_flat[column].metadata.title = column
+        if column in notes:
+            tb_flat[column].metadata.description_from_producer = "Notes found in original BGS data:\n" + notes[column]
+
+    # To avoid ETL failing when storing the table, convert lists of notes to strings (and add metadata).
+    for column in ["notes_imports", "notes_exports", "notes_production"]:
+        tb[column] = tb[column].copy_metadata(tb["production"]).astype(str)
+
+    # Add footnotes.
+    for column, note in FOOTNOTES.items():
+        if not tb_flat[column].metadata.presentation:
+            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
+        tb_flat[column].metadata.presentation.grapher_config["note"] = note
 
     # Format table conveniently.
     # NOTE: All commodities have the same unit for imports, exports and production except one:
@@ -979,12 +1045,14 @@ def run(dest_dir: str) -> None:
     # counts = tb.groupby(["commodity", "sub_commodity", "country", "year"], observed=True, as_index=False).nunique()
     # counts[counts["unit"] > 1][["commodity", "sub_commodity"]].drop_duplicates()
     tb = tb.format(["country", "year", "commodity", "sub_commodity", "unit"])
+    tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

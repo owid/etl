@@ -1105,8 +1105,10 @@ def run(dest_dir: str) -> None:
     # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
     # So, for now, simply add descriptions from producer.
     for column in tb_flat.drop(columns=["country", "year"]).columns:
+        # Create metadata title (before they become snake-case).
+        tb_flat[column].metadata.title = column
         if column in notes:
-            tb_flat[column].metadata.description_from_producer = "Notes found in USGS original data:\n" + notes[column]
+            tb_flat[column].metadata.description_from_producer = "Notes found in original USGS data:\n" + notes[column]
 
     # To avoid ETL failing when storing the table, convert lists of notes to strings (and add metadata).
     for column in ["notes_reserves", "notes_production"]:

@@ -15,14 +15,12 @@ So it seems more convenient to create wide tables, where each column has its own
 tables (on those few columns where there is overlap).
 
 """
-import ast
-from typing import Dict, List
 
-import pandas as pd
+from typing import List, Optional, Tuple
+
 from owid.catalog import Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
-from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -33,40 +31,95 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
-    # Create another table with the same structure, but containing notes.
-    tb_flat_notes = tb.pivot(
-        index=["country", "year"],
-        columns=["commodity", "sub_commodity", "unit"],
-        values=notes_columns,
-        join_column_levels_with="|",
+def adapt_flat_table(tb_flat: Table) -> Table:
+    tb_flat = tb_flat.copy()
+    # For consistency with other tables, rename columns and adapt column types.
+    tb_flat = tb_flat.rename(
+        columns={
+            column: tb_flat[column].metadata.title for column in tb_flat.columns if column not in ["country", "year"]
+        },
+        errors="raise",
     )
-    tb_flat_notes = tb_flat_notes.rename(
-        columns={column: column.replace("notes_", "") for column in tb_flat_notes.columns}
-    )
-
-    # Gather all notes for each column.
-    notes_dict = {}
-    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
-        _notes = tb_flat_notes[column].dropna().tolist()
-        if len(_notes) > 0:
-            # Gather all notes for this column.
-            notes = sum(_notes, [])
-            # Get unique notes keeping the order.
-            notes = pd.unique(pd.Series(notes)).tolist()
-            # Join notes.
-            if len(notes) > 0:
-                notes_str = "- " + "\n- ".join(notes)
-                notes_dict[column] = notes_str
-
-    return notes_dict
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns if column not in ["country", "year"]})
+    return tb_flat
 
 
-def parse_notes(tb: Table, notes_columns: List[str]) -> Table:
+def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> Tuple[Optional[str], Optional[str]]:
+    # Get notes from description_from_producer field, if given.
+    # And gather footnotes from grapher config, if given.
+    notes = None
+    footnotes = None
+    if column in tb_flat.columns:
+        notes = tb_flat[column].metadata.description_from_producer
+        if tb_flat[column].metadata.presentation.grapher_config is not None:
+            footnotes = tb_flat[column].metadata.presentation.grapher_config["note"]
+
+    return notes, footnotes
+
+
+def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
+    # Add notes to metadata.
+    combined_notes = ""
+    notes_exist = False
+    for notes in notes_list:
+        if notes is not None:
+            if notes_exist:
+                combined_notes += separator
+            combined_notes += notes
+            notes_exist = True
+
+    return combined_notes
+
+
+def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Table:
     tb = tb.copy()
-    # Parse BGS notes as lists of strings.
-    for column in notes_columns:
-        tb[column] = [notes if len(notes) > 0 else None for notes in [ast.literal_eval(x) for x in tb[column]]]
+
+    # Improve metadata of new columns.
+    for column in tb.drop(columns=["country", "year"]).columns:
+        # Extract combination from the column name.
+        metric, commodity, sub_commodity, unit = column.split("|")
+
+        # Improve metric, commodity and subcommodity names.
+        metric = metric.replace("_", " ").capitalize()
+        commodity = commodity.capitalize()
+        sub_commodity = sub_commodity.lower()
+
+        # Ensure the variable has a title.
+        tb[column].metadata.title = column
+
+        # Create a title_public.
+        title_public = f"{metric} of {commodity.lower()} ({sub_commodity.lower()})"
+        if tb[column].metadata.presentation is None:
+            tb[column].metadata.presentation = VariablePresentationMeta()
+        tb[column].metadata.presentation.title_public = title_public
+
+        # Add unit and short_unit.
+        tb[column].metadata.unit = unit
+        if unit.startswith("tonnes"):
+            # Create short unit.
+            tb[column].metadata.short_unit = "t"
+        else:
+            log.warning(f"Unexpected unit for column: {column}")
+            tb[column].metadata.short_unit = ""
+        if metric == "Unit value":
+            tb[column].metadata.unit = "constant 1998 US$ per tonne"
+            tb[column].metadata.short_unit = "$/t"
+
+        # Gather notes and footnotes from USGS' metadata.
+        notes_usgs, footnotes_usgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_usgs_flat, column=column)
+
+        # Gather notes and footnotes from BGS' metadata.
+        notes_bgs, footnotes_bgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_bgs_flat, column=column)
+
+        # Add notes to metadata.
+        combined_notes = _combine_notes(notes_list=[notes_bgs, notes_usgs], separator="\n\n")
+        if len(combined_notes) > 0:
+            tb[column].metadata.description_from_producer = combined_notes
+
+        # Add footnotes to metadata.
+        combined_footnotes = _combine_notes(notes_list=[footnotes_bgs, footnotes_usgs], separator=" ")
+        if len(combined_footnotes) > 0:
+            tb[column].metadata.presentation.grapher_config["note"] = combined_footnotes
 
     return tb
 
@@ -81,20 +134,18 @@ def run(dest_dir: str) -> None:
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_bgs = ds_bgs.read_table("world_mineral_statistics")
     tb_usgs_historical = ds_usgs_historical.read_table("historical_statistics_for_mineral_and_material_commodities")
     tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
+    tb_bgs_flat = ds_bgs.read_table("world_mineral_statistics_flat")
 
     #
     # Process data.
     #
+    # TODO: Move the pivotting part to USGS historical garden step.
     # Select and rename columns in USGS historical data.
     tb_usgs_historical = tb_usgs_historical.rename(columns={"unit_value_constant": "unit_value"}, errors="raise").drop(
         columns=["unit_value_current"], errors="raise"
     )
-
-    # Parse BGS notes as lists of strings.
-    tb_bgs = parse_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
 
     # Pivot USGS historical table and remove empty columns.
     tb_usgs_historical_flat = tb_usgs_historical.pivot(
@@ -104,29 +155,11 @@ def run(dest_dir: str) -> None:
         join_column_levels_with="|",
     ).dropna(axis=1, how="all")
 
-    # Pivot BGS table.
-    tb_bgs_flat = tb_bgs.pivot(
-        index=["country", "year"],
-        columns=["commodity", "sub_commodity", "unit"],
-        values=["exports", "imports", "production"],
-        join_column_levels_with="|",
-    )
+    # Adapt USGS current flat table.
+    tb_usgs_flat = adapt_flat_table(tb_flat=tb_usgs_flat)
 
-    # For consistency with other tables, rename USGS current columns and adapt column types.
-    tb_usgs_flat = tb_usgs_flat.rename(
-        columns={
-            column: tb_usgs_flat[column].metadata.title
-            for column in tb_usgs_flat.columns
-            if column not in ["country", "year"]
-        },
-        errors="raise",
-    )
-    tb_usgs_flat = tb_usgs_flat.astype(
-        {column: "Float64" for column in tb_usgs_flat.columns if column not in ["country", "year"]}
-    )
-
-    # Gather notes for BGS data.
-    notes_bgs = gather_notes(tb_bgs, notes_columns=["notes_exports", "notes_imports", "notes_production"])
+    # Adapt BGS flat table.
+    tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
 
     # Create a combined flat table.
     tb = combine_two_overlapping_dataframes(
@@ -160,55 +193,11 @@ def run(dest_dir: str) -> None:
     #         if _df_country["source"].nunique() >1:
     #             px.line(_df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}").show()
 
-    # Improve metadata of new columns.
-    for column in tb.drop(columns=["country", "year"]).columns:
-        metric, commodity, sub_commodity, unit = column.split("|")
-        metric = metric.replace("_", " ").capitalize()
-        commodity = commodity.capitalize()
-        sub_commodity = sub_commodity.lower()
-        title_public = f"{metric} of {commodity.lower()} ({sub_commodity.lower()})"
-        tb[column].metadata.title = column
-        if tb[column].metadata.presentation is None:
-            tb[column].metadata.presentation = VariablePresentationMeta()
-        tb[column].metadata.presentation.title_public = title_public
-        tb[column].metadata.unit = unit
-        if unit.startswith("tonnes"):
-            # Create short unit.
-            tb[column].metadata.short_unit = "t"
-        else:
-            log.warning(f"Unexpected unit for column: {column}")
-            tb[column].metadata.short_unit = ""
-        if metric == "Unit value":
-            tb[column].metadata.unit = "constant 1998 US$ per tonne"
-            tb[column].metadata.short_unit = "$/t"
-
-        # Get notes from USGS' description_from_producer field.
-        notes_usgs = None
-        footnotes_usgs = None
-        if column in tb_usgs_flat.columns:
-            notes_usgs = tb_usgs_flat[column].metadata.description_from_producer
-            if tb_usgs_flat[column].metadata.presentation.grapher_config is not None:
-                footnotes_usgs = tb_usgs_flat[column].metadata.presentation.grapher_config["note"]
-
-        # Add notes to metadata.
-        combined_notes = ""
-        if column in notes_bgs:
-            combined_notes += "Notes found in BGS original data:\n" + notes_bgs[column]
-
-        if (column in notes_bgs) and (notes_usgs is not None):
-            combined_notes += "\n\n"
-
-        if notes_usgs is not None:
-            combined_notes += notes_usgs
-
-        if len(combined_notes) > 0:
-            tb[column].metadata.description_from_producer = combined_notes
-
-        if footnotes_usgs is not None:
-            tb[column].metadata.presentation.grapher_config["note"] = footnotes_usgs
+    # Improve metadata.
+    tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)
 
     # Format combined table conveniently.
-    tb = tb.format(["country", "year"], short_name="minerals")
+    tb = tb.format(["country", "year"], short_name="minerals").astype("Float64")
 
     #
     # Save outputs.
