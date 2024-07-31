@@ -11,10 +11,7 @@ def run(dest_dir: str) -> None:
     dataset.metadata.version = "2023-01-03"
 
     table = N.garden_dataset["homicide_long_run_omm"]
-    # optionally set additional dimensions
 
-    # if your data is in long format, you can use `grapher_helpers.long_to_wide_tables`
-    # to get into wide format
     dataset.add(table)
 
     dataset.save()
