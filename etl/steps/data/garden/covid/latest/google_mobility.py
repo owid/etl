@@ -31,8 +31,10 @@ def run(dest_dir: str) -> None:
     tb = keep_national(tb)
     tb = rename_columns(tb)
     tb = smooth_indicators(tb)
+    tb = unpivot(tb)
 
-    tb = tb.format(["country", "date"])
+    # Format
+    tb = tb.format(["country", "date", "place"])
 
     #
     # Save outputs.
@@ -93,4 +95,19 @@ def smooth_indicators(tb: Table) -> Table:
     )
     tb[smoothed_cols] = tb[smoothed_cols].round(3)
 
+    return tb
+
+
+def unpivot(tb: Table) -> Table:
+    tb = tb.melt(["country", "date"], var_name="place", value_name="trend")
+    tb["place"] = tb["place"].replace(
+        {
+            "retail_and_recreation": "Retail and recreation",
+            "grocery_and_pharmacy": "Grocery and pharmacy",
+            "parks": "Parks",
+            "transit_stations": "Transit stations",
+            "workplaces": "Workplaces",
+            "residential": "Residential",
+        }
+    )
     return tb
