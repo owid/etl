@@ -25,8 +25,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    ## Convert number of days since 2020-01-21 to date
-    tb_usa = year_to_date(tb_usa)
+    ## Convert number of days since 2020-01-01 to date
+    tb_usa = year_to_date(tb_usa, zero_day="2020-01-01")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
