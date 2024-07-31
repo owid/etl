@@ -20,6 +20,15 @@ steps:
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
 
+
+  # JHU - cases and deaths
+  data://meadow/covid/latest/john_hopkins_university:
+    - snapshot://covid/latest/john_hopkins_university.csv
+  data://garden/covid/latest/john_hopkins_university:
+    - data://meadow/covid/latest/john_hopkins_university
+  data://grapher/covid/latest/john_hopkins_university:
+    - data://garden/covid/latest/john_hopkins_university
+
   ######################################
   # Mobility
   data://grapher/covid/latest/google_mobility_trends:
@@ -56,16 +65,6 @@ steps:
     - data-private://garden/covid/latest/sweden
   data-private://garden/covid/latest/sweden:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv
-  # Variants
-  data-private://grapher/covid/latest/variants:
-    - data-private://garden/covid/latest/variants
-  data-private://garden/covid/latest/variants:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
-  # Sequencing
-  data-private://grapher/covid/latest/sequencing:
-    - data-private://garden/covid/latest/sequencing
-  data-private://garden/covid/latest/sequencing:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
   # Vaccinations by age
   data-private://grapher/covid/latest/vaccinations_by_age_group:
     - data-private://garden/covid/latest/vaccinations_by_age_group
@@ -101,9 +100,19 @@ steps:
     - data://garden/covid/latest/ecdc
   data://garden/covid/latest/ecdc:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/archived/ecdc/COVID-2019%20-%20ECDC%20(2020).csv
-  # John Hopkins University
-  data-private://grapher/covid/latest/john_hopkins_university:
-    - data-private://garden/covid/latest/john_hopkins_university
-  data-private://garden/covid/latest/john_hopkins_university:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/jhu/COVID-19%20-%20Johns%20Hopkins%20University.csv
+
+###########################
+# TO BE ARCHIVED
+###########################
+  # Variants
+  data-private://grapher/covid/latest/variants:
+    - data-private://garden/covid/latest/variants
+  data-private://garden/covid/latest/variants:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
+  # Sequencing
+  data-private://grapher/covid/latest/sequencing:
+    - data-private://garden/covid/latest/sequencing
+  data-private://garden/covid/latest/sequencing:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
+
 
