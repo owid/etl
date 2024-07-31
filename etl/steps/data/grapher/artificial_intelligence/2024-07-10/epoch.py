@@ -42,6 +42,7 @@ def run(dest_dir: str) -> None:
     tb["largest_parameters"] = 0.1
 
     tb.loc[idx_compute, "largest_compute"] = 1
+    tb["system"] = tb["system"].astype(str)
     tb.loc[idx_data, "system"] = "Maximum compute"
     tb.loc[idx_data, "largest_data"] = 1
     tb.loc[idx_parameters, "largest_parameters"] = 1
