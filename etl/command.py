@@ -431,7 +431,7 @@ def run_dag(
                 # include dependencies that are in the list of steps
                 wait_for = [task_futures[str(dep)] for dep in step.dependencies if str(dep) in task_futures]
 
-                def run_step(grapher_insert_workers=config.GRAPHER_INSERT_WORKERS):
+                def run_step(step=step, grapher_insert_workers=config.GRAPHER_INSERT_WORKERS):
                     # We dynamically update `GRAPHER_INSERT_WORKERS` based on number of processes, the change in config
                     # is not propagated when Dask creates a new process. We have to set it inside each task.
                     config.GRAPHER_INSERT_WORKERS = grapher_insert_workers
