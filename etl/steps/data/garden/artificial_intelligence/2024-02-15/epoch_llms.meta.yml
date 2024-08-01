@@ -18,7 +18,7 @@ tables:
           - In recent years, AI models with billions or even trillions of parameters have been developed. These models, known as "giant models," have demonstrated state-of-the-art performance in various tasks but require substantial computational resources for training and inference. Efficiently managing and training models with a large number of parameters is an active area of research in the AI community.
         unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
 
       dataset_size__tokens:
         title: Training dataset size
@@ -28,7 +28,7 @@ tables:
           - Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
           - The size of the datasets used to train Gemini Ultra, PaLM-2, GPT-4, GPT-3.5 and code-davinci-002 models are speculative and have not been officially disclosed.
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 2
 
       mmlu_avg:
         title: MMLU avg
