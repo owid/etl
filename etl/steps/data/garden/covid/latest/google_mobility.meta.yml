@@ -20,7 +20,8 @@ tables:
     variables:
       trend:
         title: "Trend - Place: << place >>"
-        unit: ''
+        unit: '%'
+        short_unit: '%'
         description_short: |-
           <% if place == 'Grocery & pharmacy' %>
           Mobility trends for places like grocery markets, food warehouses, farmers markets, specialty food shops, drug stores, and pharmacies.
