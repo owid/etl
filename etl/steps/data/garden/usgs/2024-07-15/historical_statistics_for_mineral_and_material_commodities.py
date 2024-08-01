@@ -144,8 +144,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
 
     # Read table from meadow dataset.
-    # NOTE: Since the data has spurious footnotes, like "W", some columns were stored as strings.
-    # Later on we will remove these footnotes and store data as floats.
     tb = ds_meadow.read_table("historical_statistics_for_mineral_and_material_commodities")
 
     #

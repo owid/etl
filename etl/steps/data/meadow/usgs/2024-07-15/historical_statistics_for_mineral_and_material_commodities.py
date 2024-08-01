@@ -4,13 +4,19 @@ import re
 import tempfile
 import warnings
 from pathlib import Path
+from typing import Dict, Tuple
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
 import pandas as pd
+from docx import Document
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -18,10 +24,33 @@ paths = PathFinder(__file__)
 # Ignore UserWarnings from openpyxl, that repeatedly shows "Unknown extension is not supported and will be removed", even though the loading works well.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
+MANUALLY_EXTRACTED_TEXT = {
+    "aluminum": """
+World Production
+Data are defined as world primary aluminum production. Data are reported in the MR and MYB.
+""",
+    "vanadium": """
+World Production
+World production data are for mine production of vanadium. Data are from the MR and MYB for 1912-22, 1925, 1927-31, 1934-43, 1945-47, and 1998 to the most recent year, the CDS for 1960-77, and the MCS for 1978-84 and 1990-97. Data were not available for 1901-11, 1923-24, and 1948-59. World production was interpolated to two significant figures for 1926, 1932-33, 1944, and 1985-89. World production data for 1927-31 and 1997-99 do not contain U.S. production.
+""",
+    "tellurium": """
+World Production
+World production data relate to refinery output only. Thus, countries that produced tellurium concentrate or other impure mixtures containing tellurium from copper ores, copper concentrates, blister copper, and/or refinery residues, but did not recover or report refined tellurium, are excluded. The world production table in the MR and MYB is not totaled because of exclusion of data from major world producers, notably the former Soviet Union and the United States. In addition to the countries listed in the world production table (Canada, Japan, Peru, and the United States), Australia, Belgium, Chile, Germany, Kazakhstan, the Philippines, and Russia are known to have produced refined tellurium, but output is not reported; available information is inadequate for formulation of reliable estimates of output levels. World production estimates do not include U.S. production data for 1931 and 1976-2003 because the U.S. data are proprietary. After 2003, total world production was not available. Data are from the MR and the MYB.
+""",
+    "selenium": """World Production
+World production data represent world refinery production of selenium metal. Data were not available for 1900-37. World production estimates for 1985-1987 and 1997 to the most recent year do not include withheld U.S. production data. Data are from the MR and the MYB. Australia, Iran, Kazakhstan, Mexico, the Philippines, and Uzbekistan are known to produce refined selenium, but output is not reported, and information is inadequate for formulation of reliable production estimates. Production increase from 2011 to 2012 is as the result of the inclusion of new country data.""",
+    "feldspar": """World Production
+World production data for 1908 to the most recent year represent the quantity of feldspar that was produced annually throughout the world as reported in the MR and the MYB. World production data do not include production data for nepheline syenite.""",
+    "silver": """World Production
+World production data for 1900 to the most recent year represent the recoverable silver content of precious-metal ores that were extracted from mines throughout the world. World production data were from the MR and the MYB.""",
+}
 
-def read_data_for_all_commodities(snap: Snapshot):
+
+def read_data_for_all_commodities(snap: Snapshot) -> Tuple[Dict[str, pr.ExcelFile], Dict[str, str]]:
     # Initialize a dictionary that will gather the excel supply-demand data for each file.
     supply_demand_data = {}
+    # Initialize a dictionary that will gather the extracted text from the embedded Word documents.
+    extracted_text = {}
     # Open the zip file.
     with ZipFile(snap.path, "r") as zipf:
         # Create a temporary directory.
@@ -32,11 +61,63 @@ def read_data_for_all_commodities(snap: Snapshot):
             supply_demand_dir = temp_path / "supply_demand"
             zipf.extractall(path=temp_path)
 
-            # Iterate through the extracted files and apply process_file().
-            for file_path in supply_demand_dir.glob("*.xlsx"):
-                supply_demand_data[file_path.stem] = pr.ExcelFile(file_path)
+            # The metadata is stored in a word document attached to the main excel sheet.
+            # Save attached word document in a separate folder.
+            word_dir = temp_path / "word_documents"
 
-    return supply_demand_data
+            # Iterate through the extracted files and apply process_file().
+            for excel_path in supply_demand_dir.glob("*.xlsx"):
+                supply_demand_data[excel_path.stem] = pr.ExcelFile(excel_path)
+                extract_embedded_files_from_excel(excel_path=excel_path, output_dir=word_dir)
+                word_file = (word_dir / excel_path.stem).with_suffix(".docx")
+                if word_file.exists():
+                    # Extract text from the embedded Word document.
+                    extracted_text[excel_path.stem] = extract_text_from_word_document(word_file)
+                else:
+                    if excel_path.stem in MANUALLY_EXTRACTED_TEXT:
+                        extracted_text[excel_path.stem] = MANUALLY_EXTRACTED_TEXT[excel_path.stem]
+                    else:
+                        log.warning(
+                            f"Text from '.doc' file needs to be manually extracted for: {excel_path.stem} and added to MANUALLY_EXTRACTED_TEXT."
+                        )
+
+    return supply_demand_data, extracted_text
+
+
+def extract_embedded_files_from_excel(excel_path: Path, output_dir: Path) -> None:
+    # Ensure the output directory exists
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True)
+
+    # Open the Excel file as a zip archive
+    with ZipFile(excel_path, "r") as excel_zip:
+        # List all the files in the zip archive
+        file_list = excel_zip.namelist()
+
+        # Detect all word documents.
+        word_files = [Path(file_name) for file_name in file_list if file_name.endswith((".docx", ".doc"))]
+
+        # Ensure there is only one word document.
+        if len(word_files) != 1:
+            if excel_path.stem != "antimony":
+                log.warning(f"Expected one word document, found {len(word_files)} in: {excel_path}")
+
+        for file_name in word_files:
+            # Extract the embedded object.
+            embedded_file_path = (output_dir / excel_path.stem).with_suffix(file_name.suffix)
+            with open(embedded_file_path, "wb") as embedded_file:
+                embedded_file.write(excel_zip.read(file_name.as_posix()))
+
+
+def extract_text_from_word_document(file_path: Path) -> str:
+    # NOTE: This will only work for ".docx" files, not ".doc".
+    # Load Word document.
+    doc = Document(file_path.as_posix())
+
+    # Extract text from each paragraph
+    text = "\n".join([para.text for para in doc.paragraphs])
+
+    return text
 
 
 def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.DataFrame:
@@ -103,7 +184,7 @@ def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.
     return df
 
 
-def combine_data_for_all_commodities(supply_demand_data: dict) -> pd.DataFrame:
+def combine_data_for_all_commodities(supply_demand_data: Dict[str, pr.ExcelFile]) -> pd.DataFrame:
     # Initialize a dataframe that will combine the data for all commodities.
     combined = pd.DataFrame()
     for commodity, data in supply_demand_data.items():
@@ -126,6 +207,9 @@ def combine_data_for_all_commodities(supply_demand_data: dict) -> pd.DataFrame:
                 continue
             df = clean_sheet_data(data=data, commodity=commodity, sheet_name=sheet_name)
 
+            # For convenience (to combine with metadata), include a column with the original name of the commodity.
+            df["_commodity"] = commodity
+
             # Add the dataframe for the current commodity to the combined dataframe.
             combined = pd.concat([combined, df])
 
@@ -137,6 +221,45 @@ def combine_data_for_all_commodities(supply_demand_data: dict) -> pd.DataFrame:
     return combined
 
 
+def extract_world_production_text(text: str, header: str) -> str:
+    start_world_production = False
+    world_production_text = ""
+    for line in text.split("\n"):
+        if line.strip() == header:
+            start_world_production = True
+            # Skip title, but start storing text from the next line.
+            continue
+
+        if start_world_production:
+            world_production_text += line + "\n"
+
+        if len(line.strip()) == 0:
+            # The world production paragraph has ended.
+            start_world_production = False
+    return world_production_text
+
+
+def create_table_with_extracted_metadata(supply_demand_metadata: Dict[str, str]) -> pd.DataFrame:
+    df = pd.DataFrame()
+    for commodity, text in supply_demand_metadata.items():
+        _df = pd.DataFrame(
+            {
+                **{"commodity": [commodity]},
+                **{
+                    header: [extract_world_production_text(text, header)]
+                    for header in [
+                        "World Mine Production",
+                        "World mine production (metal content)",
+                        "World Production",
+                        "World Refinery Production",
+                    ]
+                },
+            }
+        )
+        df = pd.concat([df, _df], ignore_index=True)
+    return df
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -144,8 +267,8 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("historical_statistics_for_mineral_and_material_commodities.zip")
 
-    # Gather data (as ExcelFile objects) for all commodities.
-    supply_demand_data = read_data_for_all_commodities(snap=snap)
+    # Gather data (as ExcelFile objects) for all commodities, and metadata (extracted from the text of word documents embedded in the excel files).
+    supply_demand_data, supply_demand_metadata = read_data_for_all_commodities(snap=snap)
 
     #
     # Process data.
@@ -163,6 +286,10 @@ def run(dest_dir: str) -> None:
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     # NOTE: There are duplicated rows with different data, e.g. Nickel 2019. We'll fix it in the garden step.
     tb = tb.format(["commodity", "year"], verify_integrity=False)
+
+    # TODO: Add a column with the extracted metadata for each commodity.
+    # Extract the text related to world production from the metadata for each commodity.
+    # df_metadata = create_table_with_extracted_metadata(supply_demand_metadata=supply_demand_metadata)
 
     #
     # Save outputs.
