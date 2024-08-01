@@ -43,7 +43,7 @@ tables:
         title: Number of low-income countries
         unit: ""
         description_short: Number of countries classified as low income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Low income
         presentation:
@@ -53,7 +53,7 @@ tables:
         title: Number of lower-middle-income countries
         unit: ""
         description_short: Number of countries classified as lower-middle income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Lower-middle income
         presentation:
@@ -63,7 +63,7 @@ tables:
         title: Number of upper-middle-income countries
         unit: ""
         description_short: Number of countries classified as upper-middle income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Upper-middle income
         presentation:
@@ -73,7 +73,7 @@ tables:
         title: Number of high-income countries
         unit: ""
         description_short: Number of countries classified as high income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: High income
         presentation:
@@ -83,7 +83,7 @@ tables:
         title: Population of low-income countries
         unit: ""
         description_short: Population of countries classified as low income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Low income
         presentation:
@@ -93,7 +93,7 @@ tables:
         title: Population of lower-middle-income countries
         unit: ""
         description_short: Population of countries classified as lower-middle income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Lower-middle income
         presentation:
@@ -103,7 +103,7 @@ tables:
         title: Population of upper-middle-income countries
         unit: ""
         description_short: Population of countries classified as upper-middle income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: Upper-middle income
         presentation:
@@ -113,7 +113,7 @@ tables:
         title: Population of high-income countries
         unit: ""
         description_short: Population of countries classified as high income by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: High income
         presentation:
@@ -123,7 +123,7 @@ tables:
         title: Population of countries with no data on income classification
         unit: ""
         description_short: Population of countries with no data on income classification by the World Bank.
-        description_processing: "{definitions.desccription_processing_count_population}"
+        description_processing: "{definitions.description_processing_count_population}"
         display:
           name: No data on income classification
         presentation:
