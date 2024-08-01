@@ -250,7 +250,7 @@ tables:
           numDecimalPlaces: 0
 
       h7_vaccination_policy:
-        title: H7_Vaccination policy
+        title: Vaccination policy
         description_short: Record policies for vaccine delivery for different groups.
         description_key:
           - |-
@@ -290,7 +290,7 @@ tables:
           numDecimalPlaces: 0
 
       v2a_vaccine_availability__summary:
-        title: Vaccine Availability (summary)
+        title: Vaccine eligibility/availability (summary)
         description_short: Reports whether any categories of people are receiving vaccines.
         description_key:
           - |-
@@ -310,7 +310,7 @@ tables:
           - |-
             Blank – no data
             0 – no categories are receiving vaccines
-            numerical range – Lowest age range for ‘General’ category
+            numerical range – Lowest age range for 'General' category
         unit: ''
 
       v2c_vaccine_age_eligibility_availability_age_floor__at_risk_summary:
@@ -320,11 +320,11 @@ tables:
           - |-
             Blank – no data
             0 – no categories are receiving vaccines
-            numerical range – Lowest age range from either ‘General’ or ‘At-risk’ categories
+            numerical range – Lowest age range from either 'General' or 'At-risk' categories
         unit: ''
 
       stringency_index:
-        title: StringencyIndex_Average
+        title: Stringency index (average)
         description_short: Aggregate index that gives an overall impression of government activity. Takes only C-indicators into account.
         description_key:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
@@ -333,7 +333,7 @@ tables:
           numDecimalPlaces: 2
 
       containment_health_index:
-        title: ContainmentHealthIndex_Average
+        title: Containment health index (average)
         description_short: Aggregate index that gives an overall impression of government activity.
         description_key:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
