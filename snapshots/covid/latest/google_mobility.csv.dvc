@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, Community Mobility Reports
+    description: |-
+      As global communities responded to COVID-19, we heard from public health officials that the same type of aggregated, anonymized insights we use in products such as Google Maps would be helpful as they made critical decisions to combat COVID-19.
+
+      These Community Mobility Reports aimed to provide insights into what changed in response to policies aimed at combating COVID-19. The reports charted movement trends over time by geography, across different categories of places such as retail and recreation, groceries and pharmacies, parks, transit stations, workplaces, and residential.
+
+
+    date_published: "2022-10-15"
+
+    # Citation
+    producer: Google
+    citation_full: |-
+      Google LLC "Google COVID-19 Community Mobility Reports".
+      https://www.google.com/covid19/mobility/ Accessed: 2024-07-31.
+
+    # Files
+    url_main: https://www.google.com/covid19/mobility/
+    url_download: https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv
+    date_accessed: 2024-07-31
+
+    # License
+    license:
+      name: Google term of service
+      url: https://policies.google.com/terms
+
+outs:
+  - md5: a27e0385a64a9e858180ed0134cf2a2d
+    size: 1144240623
+    path: google_mobility.csv

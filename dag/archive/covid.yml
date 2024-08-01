@@ -4,3 +4,8 @@ steps:
     - data-private://garden/covid/latest/decoupling_metrics
   data-private://garden/covid/latest/decoupling_metrics:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Decoupling%20of%20metrics.csv
+  # Mobility
+  data://grapher/covid/latest/google_mobility_trends:
+    - data://garden/covid/latest/google_mobility_trends
+  data://garden/covid/latest/google_mobility_trends:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/Google%20Mobility%20Trends%20(2020).csv
