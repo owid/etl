@@ -285,7 +285,7 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
         how="left",
         suffixes=("_in_data", "_in_metadata"),
     )
-    different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
+    different_items = compared[compared["fao_item_in_data"].astype(str) != compared["fao_item_in_metadata"].astype(str)]
     missing_item_codes = set(items_from_data["item_code"]) - set(_tb_items["item_code"])
     if len(missing_item_codes) > 0:
         warning_message = f"{len(missing_item_codes)} item codes of {dataset_short_name} data missing in metadata. "
