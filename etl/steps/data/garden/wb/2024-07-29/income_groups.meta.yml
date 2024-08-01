@@ -98,7 +98,7 @@ tables:
         unit: ""
         description_short: Population of countries with no data on income classification by the World Bank.
         display:
-          name: No data
+          name: No data on income classification
 
   income_groups_latest:
     title: World Bank's latest income classification
