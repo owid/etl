@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = to_grapher_date(tb)
+    tb = to_grapher_date(tb, "2020-01-01")
 
     #
     # Save outputs.
