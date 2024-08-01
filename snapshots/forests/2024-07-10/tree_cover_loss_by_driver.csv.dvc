@@ -43,6 +43,6 @@ meta:
       url: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
 
 outs:
-  - md5: baa6aa6471bb5fbad42b9b817426fc5e
-    size: 416044
+  - md5: 01c816e522620d2bd81f966857c2a692
+    size: 417235
     path: tree_cover_loss_by_driver.csv
