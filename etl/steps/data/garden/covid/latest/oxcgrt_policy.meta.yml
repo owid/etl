@@ -7,6 +7,8 @@ definitions:
     processing_level: minor
     display:
       numDecimalPlaces: 0
+      yearIsDay: true
+      zeroDay: "2020-01-01"
 
 
 # Learn more about the available fields:
