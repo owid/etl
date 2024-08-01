@@ -238,9 +238,11 @@ def format_long_tables(
         else:
             countries_with_null = ["Argentina", "Chile"]
 
+        actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
+
         assert (
-            t[t["index"] == "nan"]["country"].unique().tolist() == countries_with_null
-        ), f"Null values in index are not only for {countries_with_null}."
+            actual_countries_with_null == countries_with_null
+        ), f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
 
         # Assert that the null values are only two
         assert len(t[t["index"] == "nan"]) == len(

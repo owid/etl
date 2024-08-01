@@ -77,3 +77,11 @@ steps:
   # SEDLAC 2016 - Poverty data
   data://meadow/cedlas/2024-07-31/sedlac_poverty_2016:
     - snapshot://cedlas/2024-07-31/sedlac_poverty_2016.xls
+  data://meadow/cedlas/2024-07-31/sedlac_poverty_2018:
+    - snapshot://cedlas/2024-07-31/sedlac_poverty_2018.xlsx
+
+  data://garden/cedlas/2024-07-31/sedlac_poverty_2016:
+    - data://meadow/cedlas/2024-07-31/sedlac_poverty_2016
+
+  data://garden/cedlas/2024-07-31/sedlac_poverty_2018:
+    - data://meadow/cedlas/2024-07-31/sedlac_poverty_2018

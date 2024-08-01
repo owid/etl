@@ -36,7 +36,7 @@ POVERTY_COLUMNS = {
 }
 
 # In the 2024 version there is a column (AV) that has data, but it seems to be a mistake
-POVERTY_COLUMNS_TO_DROP = ["B. Urban_Unnamed: 47_level_1_Unnamed: 47_level_2"]
+POVERTY_COLUMNS_TO_DROP = ["B. Urban_Unnamed: 48_level_1_Unnamed: 48_level_2"]
 
 COUNTRIES = [
     "Argentina",
@@ -65,7 +65,7 @@ COUNTRIES = [
     "Suriname",
 ]
 
-COUNTRY_TO_KEEP = ["Argentina"]
+COUNTRY_TO_KEEP = ["Brazil"]
 
 AGGREGATION_LEVELS = ["NATIONAL", "URBAN", "RURAL"]
 
@@ -77,7 +77,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots.
-    snap_poverty = paths.load_snapshot("sedlac_poverty_2016.xls")
+    snap_poverty = paths.load_snapshot("sedlac_poverty_2018.xls")
 
     # Load all the sheets from the snapshots.
     poverty_tables = load_tables_from_snapshot(snap_poverty, POVERTY_SHEETS)
