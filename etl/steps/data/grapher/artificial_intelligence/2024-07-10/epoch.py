@@ -48,11 +48,16 @@ def run(dest_dir: str) -> None:
     tb.loc[idx_parameters, "largest_parameters"] = 50
     # Create a copy of the rows with largest compute values
     max_compute_rows = tb.loc[idx_compute].copy()
+    max_data_rows = tb.loc[idx_data].copy()
+    max_parameters_rows = tb.loc[idx_parameters].copy()
 
     # Update the system name for these new rows
-    max_compute_rows["system"] = "maximum compute"
+    max_compute_rows["system"] = "Maximum compute"
+    max_data_rows["system"] = "Maximum data"
+    max_parameters_rows["system"] = "Maximum parameters"
+
     # Append the new rows to the original DataFrame
-    tb = pr.concat([tb, max_compute_rows], ignore_index=True)
+    tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
 
     tb = tb.drop("year", axis=1)
 
