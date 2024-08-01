@@ -35,20 +35,18 @@ def run(dest_dir: str) -> None:
             sub_commodity_dropdown.append(sub_commodity)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
-    df_graphers["Commodity Dropdown"] = commodity_dropdown
-    df_graphers["Sub-Commodity Dropdown"] = sub_commodity_dropdown
+    df_graphers["Mineral Dropdown"] = commodity_dropdown
+    df_graphers["Type Dropdown"] = sub_commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
 
-    df_graphers[
-        df_graphers.duplicated(subset=["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown"], keep=False)
-    ]
+    df_graphers[df_graphers.duplicated(subset=["Mineral Dropdown", "Type Dropdown", "Metric Dropdown"], keep=False)]
 
     # Sort rows conveniently.
-    df_graphers = df_graphers.sort_values(
-        ["Commodity Dropdown", "Sub-Commodity Dropdown", "Metric Dropdown"]
-    ).reset_index(drop=True)
+    df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Type Dropdown", "Metric Dropdown"]).reset_index(
+        drop=True
+    )
 
     # Prepare explorer metadata.
     config = {

@@ -197,6 +197,8 @@ def run(dest_dir: str) -> None:
     #     tb=tb, tb_usgs_flat=tb_usgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat, tb_bgs_flat=tb_bgs_flat
     # )
 
+    # TODO: Create share of world.
+
     # Improve metadata.
     tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)
 
