@@ -720,7 +720,7 @@ FOOTNOTES = {
 # Accept only overlaps on the year when the historical country stopped existing.
 ACCEPTED_OVERLAPS = [
     {1991: {"USSR", "Armenia"}},
-    {1991: {"USSR", "Belarus"}},
+    # {1991: {"USSR", "Belarus"}},
     {1991: {"USSR", "Russia"}},
     {1992: {"Czechia", "Czechoslovakia"}},
     {1992: {"Slovakia", "Czechoslovakia"}},
@@ -882,6 +882,14 @@ def remove_data_from_non_existing_regions(tb: Table) -> Table:
 
 def clean_notes(notes):
     notes_clean = []
+    # After creating region aggregates, some notes become nan.
+    # But in all other cases, notes are lists (either empty or filled with strings).
+    # Therefore, pd.isnull(notes) returns either a boolean or a numpy array.
+    # If it's a boolean, it means that all notes are nan (but just to be sure, also check that the boolean is True).
+    is_null = pd.isnull(notes)
+    if isinstance(is_null, bool) and is_null:
+        return notes_clean
+
     for note in notes:
         if len(note) > 1:
             if "ms excel" in note.lower():
@@ -996,6 +1004,11 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
+        countries_that_must_have_data={
+            "North America": ["United States"],
+            "Asia": ["China"],
+            "World": ["North America", "Asia"],
+        },
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )

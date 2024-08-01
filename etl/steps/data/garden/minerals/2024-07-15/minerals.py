@@ -124,6 +124,35 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
     return tb
 
 
+def inspect_overlaps(tb: Table, tb_usgs_flat: Table, tb_usgs_historical_flat: Table, tb_bgs_flat: Table) -> None:
+    import pandas as pd
+    import plotly.express as px
+
+    for column in tb.drop(columns=["country", "year"]).columns:
+        # Initialize an empty dataframe, and add data to it from whatever source has data for it.
+        _df = pd.DataFrame()
+        if column in tb_bgs_flat.columns:
+            _df = pd.concat(
+                [_df, tb_bgs_flat[["country", "year", column]].assign(**{"source": "BGS"})], ignore_index=True
+            )
+        if column in tb_usgs_flat.columns:
+            _df = pd.concat(
+                [_df, tb_usgs_flat[["country", "year", column]].assign(**{"source": "USGS current"})], ignore_index=True
+            )
+        if column in tb_usgs_historical_flat.columns:
+            _df = pd.concat(
+                [_df, tb_usgs_historical_flat[["country", "year", column]].assign(**{"source": "USGS historical"})],
+                ignore_index=True,
+            )
+        _df = _df.dropna().reset_index(drop=True)
+        for country in _df["country"].unique():
+            _df_country = _df[_df["country"] == country]
+            if _df_country["source"].nunique() > 1:
+                px.line(
+                    _df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}"
+                ).show()
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -153,36 +182,20 @@ def run(dest_dir: str) -> None:
     tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
 
     # Create a combined flat table.
+    # Firstly, combine USGS current and historical. Since the former is more up-to-date, prioritize it.
     tb = combine_two_overlapping_dataframes(
         df1=tb_usgs_flat, df2=tb_usgs_historical_flat, index_columns=["country", "year"]
     )
+    # Then, combine the result with BGS data. After inspection, it seems that, where USGS and BGS data overlap, BGS is
+    # usually more complete. All region aggregates from BGS have larger values than USGS' region aggregates (even though
+    # data for individual countries agrees reasonably well). However, the latest year is always from USGS.
+    # So, I decided to remove region aggregates from USGS, and prioritize USGS over BGS data.
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_bgs_flat, index_columns=["country", "year"])
 
-    # Uncomment for debugging purposes.
-    # for column in tb.drop(columns=["country", "year"]).columns:
-    #     if (column in tb_usgs_flat.columns) and (column in tb_usgs_historical_flat.columns):
-    #         log.info(f"Combining overlapping data from USGS current and historical data: {column}")
-    #     if (column in tb_usgs_flat.columns) and (column in tb_bgs_flat.columns):
-    #         log.info(f"Combining overlapping data from USGS current and BGS data: {column}")
-    #     if (column in tb_usgs_historical_flat.columns) and (column in tb_bgs_flat.columns):
-    #         log.info(f"Combining overlapping data from USGS historical and BGS data: {column}")
-
-    # Uncomment to visualize potential discrepancies between the three different sources of data.
-    # import plotly.express as px
-    # for column in tb.drop(columns=["country", "year"]).columns:
-    #     # Initialize an empty dataframe, and add data to it from whatever source has data for it.
-    #     _df = pd.DataFrame()
-    #     if column in tb_bgs_flat.columns:
-    #         _df = pd.concat([_df, tb_bgs_flat[["country", "year", column]].assign(**{"source": "BGS"})], ignore_index=True)
-    #     if column in tb_usgs_flat.columns:
-    #         _df = pd.concat([_df, tb_usgs_flat[["country", "year", column]].assign(**{"source": "USGS current"})], ignore_index=True)
-    #     if column in tb_usgs_historical_flat.columns:
-    #         _df = pd.concat([_df, tb_usgs_historical_flat[["country", "year", column]].assign(**{"source": "USGS historical"})], ignore_index=True)
-    #     _df = _df.dropna().reset_index(drop=True)
-    #     for country in _df["country"].unique():
-    #         _df_country = _df[_df["country"] == country]
-    #         if _df_country["source"].nunique() >1:
-    #             px.line(_df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}").show()
+    # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
+    # inspect_overlaps(
+    #     tb=tb, tb_usgs_flat=tb_usgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat, tb_bgs_flat=tb_bgs_flat
+    # )
 
     # Improve metadata.
     tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)

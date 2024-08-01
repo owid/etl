@@ -39,8 +39,8 @@ steps:
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2022.zip
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2023.zip
     - snapshot://usgs/2024-07-15/mineral_commodity_summaries_2024.zip
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    # - data://garden/regions/2023-01-01/regions
+    # - data://garden/wb/2024-03-11/income_groups
   #
   # Minerals - Minerals.
   #

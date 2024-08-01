@@ -977,8 +977,19 @@ def gather_and_process_data(data) -> pd.DataFrame:
 
 def clean_notes(notes):
     notes_clean = []
+    # After creating region aggregates, some notes become nan.
+    # But in all other cases, notes are lists (either empty or filled with strings).
+    # Therefore, pd.isnull(notes) returns either a boolean or a numpy array.
+    # If it's a boolean, it means that all notes are nan (but just to be sure, also check that the boolean is True).
+    is_null = pd.isnull(notes)
+    if isinstance(is_null, bool) and is_null:
+        return notes_clean
+
     for note in notes:
         if len(note) > 1:
+            if "ms excel" in note.lower():
+                # Skip unnecessary notes about how to download the data.
+                continue
             # Ensure each note starts with a capital letter, and ends in a single period.
             # NOTE: Using capitalize() would make all characters lower case except the first.
             note = note[0].upper() + (note[1:].replace("\xa0", " ") + ".").replace("..", ".")
@@ -1002,7 +1013,7 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
 
     # Gather all notes for each column.
     notes_dict = {}
-    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns, disable=True):
         _notes = tb_flat_notes[column].dropna().tolist()
         if len(_notes) > 0:
             # Gather all notes for this column.
@@ -1028,10 +1039,10 @@ def run(dest_dir: str) -> None:
         data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
     # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
+    # ds_regions = paths.load_dataset("regions")
 
     # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
+    # ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -1068,18 +1079,23 @@ def run(dest_dir: str) -> None:
         tb[column] = [[note] if pd.notnull(note) else [] for note in tb[column]]
 
     # Add regions to the table.
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        min_num_values_per_year=1,
-        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
-        # accepted_overlaps=ACCEPTED_OVERLAPS,
-    )
+    # NOTE: After inspection, it seems that USGS region aggregates often are significantly lower han BGS regions
+    #  aggregates (at least for those indicators where both series overlap). This indicates that USGS' regions may not
+    #  be representative enough. Therefore, it seems safer to not build region aggregates for USGS.
+    #  For more details, see garden minerals step.
+    # tb = geo.add_regions_to_table(
+    #     tb=tb,
+    #     ds_regions=ds_regions,
+    #     ds_income_groups=ds_income_groups,
+    #     min_num_values_per_year=1,
+    #     index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
+    #     countries_that_must_have_data={"North America": ["United States"], "Asia": ["China"]},
+    #     # accepted_overlaps=ACCEPTED_OVERLAPS,
+    # )
 
     # Clean notes columns (e.g. remove repeated notes).
     for column in ["notes_reserves", "notes_production"]:
-        tb[column] = [clean_notes(note) if len(note) > 0 else [] for note in tb[column]]
+        tb[column] = [clean_notes(note) for note in tb[column]]
 
     # Gather all notes in a dictionary.
     notes = gather_notes(tb, notes_columns=["notes_production", "notes_reserves"])
