@@ -1,14 +1,17 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  year_is_day: &year_is_day
+    yearIsDay: true
+    zeroDay: "2020-01-01"
   common:
+    unit: ''
     presentation:
       topic_tags:
         - COVID-19
     processing_level: minor
     display:
       numDecimalPlaces: 0
-      yearIsDay: true
-      zeroDay: "2020-01-01"
+      <<: *year_is_day
 
 
 # Learn more about the available fields:
@@ -32,7 +35,6 @@ tables:
             - 2: require closing (only some levels or categories, eg just high school, or just public schools)
             - 3: require closing all levels
             - Blank: no data
-        unit: ''
 
       c2m_workplace_closing:
         title: Workplace closing
@@ -44,7 +46,6 @@ tables:
             - 2: require closing (or work from home) for some sectors or categories of workers
             - 3: require closing (or work from home) for all-but-essential workplaces (eg grocery stores, doctors)
             - Blank: no data
-        unit: ''
 
       c3m_cancel_public_events:
         title: Cancel public events
@@ -55,7 +56,6 @@ tables:
             - 1: recommend cancelling
             - 2: require cancelling
             - Blank: no data
-        unit: ''
 
       c4m_restrictions_on_gatherings:
         title: Restrictions on gatherings
@@ -68,7 +68,6 @@ tables:
             - 3: restrictions on gatherings between 11-100 people
             - 4: restrictions on gatherings of 10 people or less
             - Blank: no data
-        unit: ''
 
       c5m_close_public_transport:
         title: Close public transport
@@ -79,7 +78,6 @@ tables:
             - 1: recommend closing (or significantly reduce volume/route/means of transport available)
             - 2: require closing (or prohibit most citizens from using it)
             - Blank: no data
-        unit: ''
 
       c6m_stay_at_home_requirements:
         title: Stay at home requirements
@@ -91,7 +89,6 @@ tables:
             - 2: require not leaving house with exceptions for daily exercise, grocery shopping, and 'essential' trips
             - 3: require not leaving house with minimal exceptions (eg allowed to leave once a week, or only one person can leave at a time, etc)
             - Blank: no data
-        unit: ''
 
       c7m_restrictions_on_internal_movement:
         title: Restrictions on internal movement
@@ -102,7 +99,6 @@ tables:
             - 1: recommend not to travel between regions/cities
             - 2: internal movement restrictions in place
             - Blank: no data
-        unit: ''
 
       c8ev_international_travel_controls:
         title: International travel controls
@@ -115,7 +111,6 @@ tables:
             - 3: ban arrivals from some regions
             - 4: ban on all regions or total border closure
             - Blank: no data
-        unit: ''
 
       # E - economic policies
       e1_income_support:
@@ -127,9 +122,6 @@ tables:
             - 1: government is replacing less than 50% of lost salary (or if a flat sum, it is less than 50% median salary)
             - 2: government is replacing 50% or more of lost salary (or if a flat sum, it is greater than 50% median salary)
             - Blank: no data
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       e2_debt_contract_relief:
         title: Debt/contract relief
@@ -139,9 +131,6 @@ tables:
             - 0: no debt/contract relief
             - 1: narrow relief, specific to one kind of contract
             - 2: broad debt/contract relief
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       e3_fiscal_measures:
         title: Fiscal measures
@@ -155,6 +144,7 @@ tables:
         short_unit: '$'
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
       e4_international_support:
         title: International support
@@ -168,6 +158,7 @@ tables:
         short_unit: '$'
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
       # H - health system policies
       h1_public_information_campaigns:
@@ -179,9 +170,6 @@ tables:
             - 1: public officials urging caution about Covid-19
             - 2: coordinated public information campaign (eg across traditional and social media)
             - Blank: no data
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       h2_testing_policy:
         title: Testing policy
@@ -193,9 +181,6 @@ tables:
             - 2: testing of anyone showing Covid-19 symptoms
             - 3: open public testing (eg "drive through" testing available to asymptomatic people)
             - Blank: no data
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       h3_contact_tracing:
         title: Contact tracing
@@ -205,9 +190,6 @@ tables:
             - 0: no contact tracing
             - 1: limited contact tracing; not done for all cases
             - 2: comprehensive contact tracing; done for all identified cases
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       h4_emergency_investment_in_healthcare:
         title: Emergency investment in healthcare
@@ -221,6 +203,7 @@ tables:
         short_unit: '$'
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
       h5_investment_in_vaccines:
         title: Investment in vaccines
@@ -235,6 +218,7 @@ tables:
         short_unit: '$'
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
       h6m_facial_coverings:
         title: Facial Coverings
@@ -246,9 +230,6 @@ tables:
             - 2: Required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible
             - 3: Required in all shared/public spaces outside the home with other people present or all situations when social distancing not possible
             - 4: Required outside the home at all times regardless of location or presence of other people
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       h7_vaccination_policy:
         title: Vaccination policy
@@ -261,9 +242,6 @@ tables:
             - 3: Availability for ALL of following: key workers/ clinically vulnerable groups (non elderly) / elderly groups
             - 4: Availability for all three plus partial additional availability (select broad groups/ages)
             - 5: Universal availability
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       # V - vaccination policies
       v2_vaccine_availability__summary:
@@ -274,9 +252,6 @@ tables:
             Blank – no data
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       v2_pregnant_people:
         title: Pregnant people
@@ -286,9 +261,6 @@ tables:
             Blank – no data
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       v2a_vaccine_availability__summary:
         title: Vaccine eligibility/availability (summary)
@@ -300,9 +272,6 @@ tables:
             - 1: vaccines are available to some categories
             - 2: vaccines are available to anyone over the age of 16 yrs
             - 3: vaccines are available to anyone over the age of 16 yrs PLUS one or both of 5-15 yrs and 0-4 yrs
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       v2b_vaccine_age_eligibility_availability_age_floor__general_population_summary:
         title: Vaccine age eligibility/availability age floor (general population summary)
@@ -322,23 +291,22 @@ tables:
             - Blank: no data
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range from either 'General' or 'At-risk' categories
-        unit: ''
 
       stringency_index:
         title: Stringency index (average)
         description_short: Aggregate index that gives an overall impression of government activity. Takes only C-indicators into account.
         description_key:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
-        unit: ''
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
       containment_health_index:
         title: Containment health index (average)
         description_short: Aggregate index that gives an overall impression of government activity.
         description_key:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
-        unit: ''
         display:
           numDecimalPlaces: 2
+          <<: *year_is_day
 
