@@ -9,6 +9,28 @@ meta:
 
       The OxCGRT systematically collected information on several different common policy responses governments took over 2020, 2021, and 2022, recorded these policies on a scale to reflect the extent of government action, and aggregates these scores into a suite of policy indices. We also collected differentiated policies data where different policies apply to people who were vaccinated and non-vaccinated.
 
+      The OxCGRT reports publicly available information on 24 policy indicators and a miscellaneous notes field of government response organised into four groups:
+
+      - C: containment and closure policies
+      - E: economic policies
+      - H: health system policies
+      - V: vaccination policies
+
+      To help make sense of the data, we have produced four indices that aggregate the data into a single number. For more details about how the indices are comprised, see the section 'Calculation of policy indices' in our documentation. Each of these indices reports a number between 0 to 100 that reflects the level of the government's response along certain dimensions:
+
+      - overall government response index (all indicators)
+      - containment and health index (all C and H indicators)
+      - stringency index (all C indicators, plus H1 which records public information campaigns)
+      - economic support index (all E indicators)
+
+      These indices are a measure of how many of the relevant policy types a government has acted upon, and to what degree. The index cannot say whether a government's policy has been implemented effectively.
+
+      Because of the complexity of the dataset, it is published across 27 CSV files. Our technical documentation (https://github.com/OxCGRT/covid-policy-dataset/blob/main/documentation_and_codebook.md) contains all the information users need to navigate and use the data.
+
+    title_snapshot: Government Response Tracker (OxCGRT)
+    description_snapshot: |-
+      This is the file type we expect most people will use. It contains 56 variables (including metadata) for 185 national jurisdictions and 210 subnational jurisdictions.
+
 
     date_published: "2023-06-21"
 
@@ -26,8 +48,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
-
 outs:
   - md5: 3c22cc4386b4659b9f62031142c11965
     size: 43837034
-    path: oxcgrt_policy.csv
+    path: oxcgrt_policy_compact.csv
