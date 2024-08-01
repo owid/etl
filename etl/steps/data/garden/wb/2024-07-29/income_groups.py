@@ -54,18 +54,6 @@ def run(dest_dir: str) -> None:
     # Drop unnecessary columns.
     tb = tb.drop(columns=["country_code"], errors="raise")
 
-    tb = add_country_counts_and_population_by_status(
-        tb=tb,
-        columns=["classification"],
-        ds_regions=ds_regions,
-        ds_population=ds_population,
-        regions=REGIONS,
-        missing_data_on_columns=False,
-    )
-
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-
     # Create an additional table for the classification of the latest year available.
     tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
 
@@ -81,8 +69,20 @@ def run(dest_dir: str) -> None:
     # Extract data only for latest release (and remove column year).
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
 
+    tb = add_country_counts_and_population_by_status(
+        tb=tb,
+        columns=["classification"],
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+        regions=REGIONS,
+        missing_data_on_columns=False,
+    )
+
     # Set an appropriate index and sort conveniently.
-    tb_latest = tb_latest.set_index(["country"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
+
+    # Set an appropriate index and sort conveniently.
+    tb_latest = tb_latest.format(["country"])
 
     #
     # Save outputs.
