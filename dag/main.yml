@@ -799,6 +799,8 @@ steps:
 
   data://garden/wb/2024-07-29/income_groups:
     - data://meadow/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
 
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
