@@ -4,7 +4,7 @@ import subprocess
 # STARTING_POINTS = ["1", "51", "101", "151", "201", "251", "301"]
 CHUNK_SIZE = 30
 starting_points = []
-for i in range(1, 321, CHUNK_SIZE):
+for i in range(0, 321, CHUNK_SIZE):
     i = str(i)
     starting_points.append(i)
 
