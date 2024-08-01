@@ -1,4 +1,11 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+
+The file comes from Table 4 in the original paper, unavailable online.
+I am creating a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1_WIBAjDLO7ufWuBFhRFr-GMl6dLgLz47-uF5EvC48ZY/edit?gid=0#gid=0
+After creating the file, run
+    python snapshots/chartbook/2024-08-01/hancock_1971_australia.py --path-to-file <path-to-file>
+"""
 
 from pathlib import Path
 
