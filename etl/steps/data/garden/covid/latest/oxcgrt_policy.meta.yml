@@ -12,10 +12,9 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: COVID-19, Government Response Tracker (OxCGRT)
   update_period_days: 0
 
-
-  title: Government Response Tracker (OxCGRT)
 tables:
   oxcgrt_policy:
     variables:
