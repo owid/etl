@@ -18,6 +18,8 @@ tables (on those few columns where there is overlap).
 
 from typing import List, Optional, Tuple
 
+import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
@@ -104,6 +106,9 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
         if metric == "Unit value":
             tb[column].metadata.unit = "constant 1998 US$ per tonne"
             tb[column].metadata.short_unit = "$/t"
+        if metric.startswith("Share "):
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
 
         # Gather notes and footnotes from USGS' metadata.
         notes_usgs, footnotes_usgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_usgs_flat, column=column)
@@ -153,6 +158,34 @@ def inspect_overlaps(tb: Table, tb_usgs_flat: Table, tb_usgs_historical_flat: Ta
                 ).show()
 
 
+def add_share_of_global_columns(tb: Table) -> Table:
+    # Create a table for global data.
+    tb_world = tb[tb["country"] == "World"].drop(columns="country").reset_index(drop=True)
+    # Replace zeros by nan (to avoid division by zero).
+    tb_world = tb_world.replace(0, pd.NA)
+    # Create a temporary table with global data for each column in the original table.
+    _tb = tb.merge(tb_world, on="year", how="left", suffixes=("", "_world_share"))
+
+    # Create a dictionary to store the new share columns, and another to store each column's metadata.
+    new_columns = {}
+    metadata = {}
+    for column in tb.columns:
+        if (column.split("|")[0] in ["exports", "imports", "production", "reserves"]) and (
+            tb_world[column].notnull().any()
+        ):
+            new_columns[f"share_of_global_{column}"] = _tb[column] / _tb[f"{column}_world_share"] * 100
+            metadata[f"share_of_global_{column}"] = tb[column].metadata
+
+    # Add the new share columns to the original table.
+    tb = pr.concat([tb, Table(new_columns)], axis=1)
+
+    for column in tb.drop(columns=["country", "year"]).columns:
+        if len(tb[column].metadata.origins) == 0:
+            tb[column].metadata = metadata[column].copy()
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -197,7 +230,8 @@ def run(dest_dir: str) -> None:
     #     tb=tb, tb_usgs_flat=tb_usgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat, tb_bgs_flat=tb_bgs_flat
     # )
 
-    # TODO: Create share of world.
+    # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
+    tb = add_share_of_global_columns(tb=tb)
 
     # Improve metadata.
     tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)
