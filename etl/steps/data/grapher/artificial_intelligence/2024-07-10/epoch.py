@@ -22,6 +22,9 @@ def run(dest_dir: str) -> None:
     #
     # Extract year from 'publication_date' and create a new 'year' column
     tb["year"] = tb["publication_date"].dt.year
+
+    # For visualization purposes I am adding the rows with the maximum values of compute, data, and parameters in each year to the table as a separate "system". I don't want to do this in garden as it'd affect other datasets that depend on this one.
+
     # Find the index of the maximum 'training_computation_petaflop', 'data', and 'parameters' in each year
     # Fill NaN values with 0 before finding the index of the maximum
     idx_compute = (
@@ -38,14 +41,6 @@ def run(dest_dir: str) -> None:
     )
     idx_parameters = tb[["parameters", "year"]].fillna(0).groupby("year")["parameters"].idxmax()
 
-    # Create indicator columns
-    tb["largest_compute"] = 10
-    tb["largest_data"] = 10
-    tb["largest_parameters"] = 10
-
-    tb.loc[idx_compute, "largest_compute"] = 50
-    tb.loc[idx_data, "largest_data"] = 50
-    tb.loc[idx_parameters, "largest_parameters"] = 50
     # Create a copy of the rows with largest compute values
     max_compute_rows = tb.loc[idx_compute].copy()
     max_data_rows = tb.loc[idx_data].copy()
@@ -56,16 +51,13 @@ def run(dest_dir: str) -> None:
     max_data_rows["system"] = "Maximum data"
     max_parameters_rows["system"] = "Maximum parameters"
 
-    # Append the new rows to the original DataFrame
+    # Append the new rows to the original Table
     tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
-
+    # Drop year as we don't need it anymore
     tb = tb.drop("year", axis=1)
 
-    for col in ["largest_compute", "largest_data", "largest_parameters"]:
-        tb[col].metadata.origins = tb["domain"].metadata.origins
-
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
     # Rename for plotting model name as country in grapher
+    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
     tb = tb.format(["country", "year"])
 
     #
