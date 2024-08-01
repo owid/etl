@@ -47,17 +47,21 @@ steps:
   data://grapher/covid/latest/google_mobility:
     - data://garden/covid/latest/google_mobility
 
+  # Government response policy
+  data://meadow/covid/latest/oxcgrt_policy:
+    - snapshot://covid/latest/oxcgrt_policy_compact.csv
+    - snapshot://covid/latest/oxcgrt_policy_vaccines.csv
+  data://garden/covid/latest/oxcgrt_policy:
+    - data://meadow/covid/latest/oxcgrt_policy
+  data://grapher/covid/latest/oxcgrt_policy:
+    - data://garden/covid/latest/oxcgrt_policy
+
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
     - data://garden/covid/latest/hospital_and_icu
   data://garden/covid/latest/hospital_and_icu:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
-  # Policy
-  data://grapher/covid/latest/government_response_oxbsg:
-    - data://garden/covid/latest/government_response_oxbsg
-  data://garden/covid/latest/government_response_oxbsg:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
   # UK
   data-private://grapher/covid/latest/uk_covid_data:
     - data-private://garden/covid/latest/uk_covid_data
@@ -122,3 +126,8 @@ steps:
     - data-private://garden/covid/latest/cases_and_deaths_who
   data-private://garden/covid/latest/cases_and_deaths_who:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv
+  # Policy
+  data://grapher/covid/latest/government_response_oxbsg:
+    - data://garden/covid/latest/government_response_oxbsg
+  data://garden/covid/latest/government_response_oxbsg:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
