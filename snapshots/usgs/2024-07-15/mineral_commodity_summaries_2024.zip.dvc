@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Mineral Commodity Summaries
+    title_snapshot: Mineral Commodity Summaries 2024
+    description: |-
+      This dataset contains world production statistics for over 88 nonfuel mineral commodities.
+    date_published: "2024-01-30"
+
+    # Citation
+    producer: United States Geological Survey Data
+    citation_full: |-
+      National Minerals Information Center, 2024, U.S. Geological Survey Mineral Commodity Summaries 2024 Data Release (ver. 2.0, March 2024): U.S. Geological Survey data release, https://doi.org/10.5066/P144BA54.
+    attribution: United States Geological Survey Data - Mineral Commodity Summaries (2024)
+    attribution_short: USGS
+
+    # Files
+    url_main: https://doi.org/10.5066/P144BA54
+    url_download: https://www.sciencebase.gov/catalog/file/get/65a6e45fd34e5af967a46749?f=__disk__9c%2F08%2Fa8%2F9c08a8bb0d04a87840f4f7f4ba489adf0d277f32
+    date_accessed: 2024-07-17
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.usgs.gov/faqs/what-usgs-products-are-already-publicly-available
+outs:
+  - md5: 50e0391cd54d5f463f52dc6e85f33c96
+    size: 412615
+    path: mineral_commodity_summaries_2024.zip

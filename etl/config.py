@@ -487,3 +487,6 @@ OWID_ENV = OWIDEnv(
         DB_HOST=DB_HOST,
     )
 )
+
+# Default path to the explorers folder.
+EXPLORERS_DIR = env.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers")

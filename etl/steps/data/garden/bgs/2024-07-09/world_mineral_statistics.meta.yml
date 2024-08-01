@@ -1,14 +1,29 @@
 definitions:
   common:
+    unit: tonnes
+    short_unit: t
+    processing_level: major
     presentation:
+      attribution_short: BGS
       topic_tags:
         - Energy
 
 dataset:
   update_period_days: 365
-
+  title: World Mineral Statistics
 
 tables:
   world_mineral_statistics:
+    title: World Mineral Statistics
     variables:
+      exports:
+        title: Exports of commodities
+      imports:
+        title: Imports of commodities
+      production:
+        title: Production of commodities
+  world_mineral_statistics_flat:
+    title: World Mineral Statistics
+    variables:
+      # Metadata is filled up programmatically.
       {}

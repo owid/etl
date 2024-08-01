@@ -837,3 +837,4 @@ include:
   - dag/forests.yml
   - dag/natural_disasters.yml
   - dag/chartbook.yml
+  - dag/minerals.yml
