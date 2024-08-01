@@ -9,15 +9,23 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
+# Define the files to be processed.
+SEDLAC_FILES = [
+    "poverty",
+    "inequality",
+    "incomes",
+]
+
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"sedlac/{SNAPSHOT_VERSION}/sedlac_poverty.xlsx")
+    for file in SEDLAC_FILES:
+        snap = Snapshot(f"sedlac/{SNAPSHOT_VERSION}/sedlac_{file}.xlsx")
 
-    # Download data from source, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload)
+        # Download data from source, add file to DVC and upload to S3.
+        snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

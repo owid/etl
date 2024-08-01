@@ -10,25 +10,25 @@ meta:
       SEDLAC allows users to monitor trends in poverty and other distributional and social indicators in the region. The dataset is available as Excel tables with information for each country/year, accompanied by graphs, maps, and reports.
 
       The Center for Distributional, Labor and Social Studies (CEDLAS) of the Universidad Nacional de La Plata, in partnership with World Bank’s Poverty and Equity Group, have developed the Socio-Economic Database for Latin America and the Caribbean (SEDLAC) with the purpose of improving the timely access to key socio-economic statistics, including indicators on poverty, inequality, income, employment, access to services, education, health, housing, social programs, and numerous demographics.
-    date_published: "2024-01-01"
-    title_snapshot: Socio-Economic Database for Latin America and the Caribbean (SEDLAC) - Inequality
+    date_published: "2016-05-01"
+    title_snapshot: Socio-Economic Database for Latin America and the Caribbean (SEDLAC) - Poverty
 
     # Citation
     producer: SEDLAC (CEDLAS and The World Bank)
     citation_full: |-
-      Socio-Economic Database for Latin America and the Caribbean (CEDLAS and The World Bank)
+      Socio-Economic Database for Latin America and the Caribbean (CEDLAS and The World Bank), 2016
     attribution_short: SEDLAC
 
     # Files
     url_main: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
-    url_download: https://www.cedlas.econo.unlp.edu.ar/wp/wp-content/uploads/2023_Act2_inequality_LAC-web.xlsx
-    date_accessed: 2024-03-08
+    date_accessed: 2024-07-31
 
     # License
     license:
       name: CC BY 4.0
       url: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
+
 outs:
-  - md5: 6357cc13d6b4db562c49c72306c164ea
-    size: 2212610
-    path: sedlac_inequality.xlsx
+  - md5: 16fa180337e5588ee0f329b06054bbe6
+    size: 3138048
+    path: sedlac_poverty_2016.xls
