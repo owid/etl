@@ -1252,11 +1252,6 @@ def merge(
             "Arguments 'left_index' and 'right_index' currently not implemented in function 'merge'."
         )
 
-    # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
-    # It is necessary to copy metadata here to avoid mutating passed left.
-    left = left.copy(deep=False)
-    right = right.copy(deep=False)
-
     # If arguments "on", "left_on", or "right_on" are given as strings, convert them to lists.
     if isinstance(on, str):
         on = [on]
@@ -1273,14 +1268,19 @@ def merge(
     else:
         lefts_rights = []
 
+    # copy to avoid warnings
+    left = left.copy(deep=False)
+    right = right.copy(deep=False)
     for left_col, right_col in lefts_rights:
         left[left_col], right[right_col] = align_categoricals(left[left_col], right[right_col])
 
     # Create merged table.
     tb = Table(
+        # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
+        # It is necessary to copy metadata here to avoid mutating passed left.
         pd.merge(
-            left=left,
-            right=right,
+            left=left.copy(deep=False),
+            right=right.copy(deep=False),
             how=how,
             on=on,
             left_on=left_on,
