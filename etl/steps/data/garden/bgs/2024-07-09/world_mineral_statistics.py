@@ -798,11 +798,10 @@ def harmonize_units(tb: Table) -> Table:
 
     # Check that, for each category-commodity-subcommodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity", "sub_commodity"], observed=True, as_index=False)
-    # TODO: Fix remaining degeneracies. Then uncomment this assertion.
-    # unit_count = group.agg({"unit": "nunique"})
-    # assert unit_count[
-    #     unit_count["unit"] > 1
-    # ].empty, "Multiple units found for the same category-commodity-subcommodity."
+    unit_count = group.agg({"unit": "nunique"})
+    assert unit_count[
+        unit_count["unit"] > 1
+    ].empty, "Multiple units found for the same category-commodity-subcommodity."
     # Given that the unit is sometimes given and sometimes not (quite arbitrarily, as mentioned in the meadow step),
     # first attempt to fill empty units from the same category-commodity-subcommodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
