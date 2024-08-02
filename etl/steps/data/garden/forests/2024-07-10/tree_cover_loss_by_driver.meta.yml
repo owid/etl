@@ -11,10 +11,17 @@ definitions:
     short_unit: ha
     processing_level: major
     description_processing: >-
-      This indicator is calculated by Our World in Data based on data from the Global Forest Watch. Time-series data of tree cover loss in areas of forest where tree canopy cover was greater than or equal to 30% in 2000 was extracted and cross-referenced with data on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108). Values may be slightly different to those shown on Global Forest Watch due to differences in the country boundaries used.
+      This indicator is extracted by Our World in Data based on data from the Global Forest Watch. Time-series data of tree cover loss in areas of forest where canopy density was greater than or equal to 30% in 2000 was extracted and cross-referenced with gridded data on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108). Individual grid cells may have more than one driver of tree cover loss, with variation over space and time. Values may be slightly different to those shown on Global Forest Watch due to differences in the country boundaries used.
     display:
       roundingMode: significantFigures
       numSignificantFigures: 3
+    origins:
+      - title: Global Forest Watch; Curtis et al.
+        date_published: "2024"
+        producer: Global Forest Watch (2024); Curtis et al. (2018)
+        citation_full: Global Forest Watch. Tree cover loss. www.globalforestwatch.org; Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. www.globalforestwatch.org.
+        url_main: https://www.globalforestwatch.org/
+        date_accessed: "2024-07-10"
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
