@@ -26,6 +26,12 @@ steps:
   data://garden/chartbook/2024-08-01/hancock_1971_australia:
     - data://meadow/chartbook/2024-08-01/hancock_1971_australia
 
+  # Gini coefficient for household gross income, Ingles (1981)
+  data://meadow/chartbook/2024-08-02/ingles_1981_australia:
+    - snapshot://chartbook/2024-08-02/ingles_1981_australia.csv
+  data://garden/chartbook/2024-08-02/ingles_1981_australia:
+    - data://meadow/chartbook/2024-08-02/ingles_1981_australia
+
   ################################################################################################
   # BRAZIL
   ################################################################################################
