@@ -65,7 +65,7 @@ COMMODITY_MAPPING = {
     ("Iron and Steel Slag", "Total"): ("Iron and Steel Slag", "Total"),
     ("Iron ore", "Total"): ("Iron ore", "Total"),
     ("Kaolin", "Total"): ("Kaolin", "Total"),
-    ("Lead", "Total"): ("Lead", "Total"),
+    ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Total"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
     ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
