@@ -76,7 +76,7 @@ COMMODITY_MAPPING = {
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
     ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous clay"),
     ("Molybdenum", "Total"): ("Molybdenum", "Total"),
-    ("Nickel", "Total"): ("Nickel", "Total"),
+    ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Total"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
     ("Peat", "Total"): ("Peat", "Total"),

@@ -134,11 +134,21 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
     return tb
 
 
-def inspect_overlaps(tb: Table, tb_usgs_flat: Table, tb_usgs_historical_flat: Table, tb_bgs_flat: Table) -> None:
+def inspect_overlaps(
+    tb: Table,
+    tb_usgs_flat: Table,
+    tb_usgs_historical_flat: Table,
+    tb_bgs_flat: Table,
+    minerals: Optional[List[str]] = None,
+) -> None:
     import pandas as pd
     import plotly.express as px
 
     for column in tb.drop(columns=["country", "year"]).columns:
+        if minerals:
+            mineral = column.split("|")[1]
+            if mineral not in minerals:
+                continue
         # Initialize an empty dataframe, and add data to it from whatever source has data for it.
         _df = pd.DataFrame()
         if column in tb_bgs_flat.columns:
@@ -232,7 +242,11 @@ def run(dest_dir: str) -> None:
 
     # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
     # inspect_overlaps(
-    #     tb=tb, tb_usgs_flat=tb_usgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat, tb_bgs_flat=tb_bgs_flat
+    #     tb=tb,
+    #     tb_usgs_flat=tb_usgs_flat,
+    #     tb_usgs_historical_flat=tb_usgs_historical_flat,
+    #     tb_bgs_flat=tb_bgs_flat,
+    #     minerals=["Nickel"],
     # )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
