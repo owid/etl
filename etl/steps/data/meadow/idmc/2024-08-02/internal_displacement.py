@@ -1,5 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -27,6 +28,10 @@ def run(dest_dir: str) -> None:
     # rename and drop columns
     tb = tb.rename(columns={"Name": "country", "Year": "year"})
     tb = tb.drop(columns=COLUMNS_TO_DROP)
+
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, warn_on_missing_countries=True, warn_on_unused_countries=True
+    )
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])

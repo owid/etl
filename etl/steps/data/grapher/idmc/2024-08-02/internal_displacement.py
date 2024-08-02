@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("internal_displacement")
 
     # Read table from garden dataset.
-    tb = ds_garden.read_table("internal_displacement")
+    tb = ds_garden["internal_displacement"]
 
     # Save outputs.
     #
