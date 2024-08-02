@@ -8,7 +8,20 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # List of regions to be used in the dataset - continents, world and income groups
-REGIONS = [reg for reg in geo.REGIONS.keys() if reg not in ["European Union (27)"]]
+REGIONS = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
+
 
 
 def run(dest_dir: str) -> None:
