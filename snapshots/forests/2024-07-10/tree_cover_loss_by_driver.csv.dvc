@@ -25,7 +25,7 @@ meta:
     date_published: "2024-05-31"
 
     # Citation
-    producer: Curtis et al. (2018); Global Forest Watch (2024)
+    producer: Curtis et al. (2018); Global Forest Watch
     citation_full: |-
       Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. www.globalforestwatch.org.; Global Forest Watch. Tree cover loss. www.globalforestwatch.org
     attribution_short: GFW
