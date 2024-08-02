@@ -1,7 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
     presentation:
       topic_tags:
         - Economic Inequality
@@ -14,7 +13,7 @@ dataset:
 
 
 tables:
-  concialdi:
+  hancock_1971_australia:
     variables:
       gini:
         title: Gini index
@@ -25,5 +24,6 @@ tables:
           title_public: Gini index
         display:
           name: Gini index
-          numDecimalPlaces: 2
-          tolerance: 1
+          numDecimalPlaces: 1
+          tolerance: 5
+

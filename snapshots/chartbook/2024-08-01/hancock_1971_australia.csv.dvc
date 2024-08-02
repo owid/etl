@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Inequality data for Australia in Hancock (1971)
+    description: |-
+      Gini coefficient from gross individual income in Australia.
+    date_published: "1971"
+
+    # Citation
+    producer: Hancock
+    citation_full: |-
+      Hancock, K, 1971, “The economics of social welfare in the 1970s”, Table 4. In H Weir, editor, Social welfare in the 1970’s, Australian Council of Social Science, Sydney.
+
+    # Files
+    url_main: https://books.google.co.uk/books/about/Social_Welfare_in_the_1970_s.html?id=ZDUxAQAAIAAJ&redir_esc=y
+    date_accessed: 2024-08-01
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://books.google.co.uk/books/about/Social_Welfare_in_the_1970_s.html?id=ZDUxAQAAIAAJ&redir_esc=y
+
+outs:
+  - md5: 464f9aeadb91637c7f85efb8d221647d
+    size: 358
+    path: hancock_1971_australia.csv

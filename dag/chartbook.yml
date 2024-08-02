@@ -18,6 +18,15 @@ steps:
     - data://meadow/cedlas/2024-07-31/sedlac_poverty_2016
 
   ################################################################################################
+  # AUSTRALIA
+  ################################################################################################
+    # Gini coefficient for individual gross income, Hancock (1971)
+  data://meadow/chartbook/2024-08-01/hancock_1971_australia:
+    - snapshot://chartbook/2024-08-01/hancock_1971_australia.csv
+  data://garden/chartbook/2024-08-01/hancock_1971_australia:
+    - data://meadow/chartbook/2024-08-01/hancock_1971_australia
+
+  ################################################################################################
   # BRAZIL
   ################################################################################################
   # SEDLAC 2018 - Poverty data
