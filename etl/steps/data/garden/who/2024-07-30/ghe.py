@@ -1,5 +1,6 @@
 """Generate GHE garden dataset"""
 
+import os
 from typing import Any, Dict
 
 import numpy as np
@@ -14,6 +15,8 @@ from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
+
+SUBSET = os.environ.get("SUBSET")
 
 # naming conventions
 paths = PathFinder(__file__)
@@ -40,12 +43,43 @@ AGE_GROUPS_RANGES = {
     "YEARS85PLUS": [85, None],
 }
 
+# rename GHE age groups to names we used in the previous version
+AGE_GROUPS_MAP = {
+    "TOTAL": "ALLAges",
+    "Y0T1": "YEARS0-1",
+    "Y1T4": "YEARS1-4",
+    "Y5T9": "YEARS5-9",
+    "Y10T14": "YEARS10-14",
+    "Y15T19": "YEARS15-19",
+    "Y20T24": "YEARS20-24",
+    "Y25T29": "YEARS25-29",
+    "Y30T34": "YEARS30-34",
+    "Y35T39": "YEARS35-39",
+    "Y40T44": "YEARS40-44",
+    "Y45T49": "YEARS45-49",
+    "Y50T54": "YEARS50-54",
+    "Y55T59": "YEARS55-59",
+    "Y60T64": "YEARS60-64",
+    "Y65T69": "YEARS65-69",
+    "Y70T74": "YEARS70-74",
+    "Y75T79": "YEARS75-79",
+    "Y80T84": "YEARS80-84",
+    "YGE_85": "YEARS85PLUS",
+}
+
 
 def run(dest_dir: str) -> None:
     # read dataset from meadow
     ds_meadow = paths.load_dataset()
-    tb = ds_meadow["ghe"].reset_index()
+    tb = ds_meadow.read_table("ghe")
     tb = tb.drop(columns="flag_level")
+
+    tb = rename_table_for_compatibility(tb)
+
+    if SUBSET:
+        required_causes = ["Drug use disorders", "Alcohol use disorders"]
+        tb = tb[tb.cause.isin(SUBSET.split(",") + required_causes)]
+
     # Load countries regions
     regions = paths.load_dataset("regions")["regions"]
     # Load WHO Standard population
@@ -78,12 +112,24 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def rename_table_for_compatibility(tb: Table) -> Table:
+    """Rename columns and labels to be compatible with the previous version of the dataset."""
+    tb.age_group = tb.age_group.map(AGE_GROUPS_MAP)
+    tb = tb.rename(
+        columns={
+            "val_dths_count_numeric": "death_count",
+            "val_dths_rate100k_numeric": "death_rate100k",
+        }
+    )
+    return tb
+
+
 def format_who_standard(who_standard: Table) -> Dict[Any, Any]:
     """
     Convert who standard age distribution into a dict and combine the over 85 age-groups
     """
-    under_85 = who_standard.loc[who_standard["age_min"] < 85]
-    over_85 = who_standard.loc[who_standard["age_min"] >= 85]
+    under_85 = who_standard.loc[who_standard["age_min"] < 85].copy()
+    over_85 = who_standard.loc[who_standard["age_min"] >= 85].copy()
     over_85["age_group"] = "YEARS85PLUS"
     over_85["age_weight"] = over_85["age_weight"].sum()
     over_85 = over_85[["age_group", "age_weight"]].drop_duplicates().reset_index(drop=True)
@@ -100,7 +146,7 @@ def format_who_standard(who_standard: Table) -> Dict[Any, Any]:
 
 def clean_data(df: Table, regions: Table, who_standard: Dict[str, float], ds_population: Dataset) -> Table:
     log.info("ghe.basic cleaning")
-    df["sex"] = df["sex"].map({"BTSX": "Both sexes", "MLE": "Male", "FMLE": "Female"})
+    df["sex"] = df["sex"].map({"TOTAL": "Both sexes", "MALE": "Male", "FEMALE": "Female"})
     df = Table(
         add_population(
             df=df,
@@ -184,9 +230,15 @@ def add_age_standardized_metric(df: Table, who_standard: Dict[str, float]) -> Ta
     assert all(df_as["multiplier"].notna())
     df_as["death_rate100k"] = df_as["death_rate100k"] * df_as["multiplier"]
     df_as["age_group"] = "Age-standardized"
-    df_as = (
-        df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum().drop(columns=["multiplier"]).reset_index()
-    )
+    df_as = df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum()
+
+    # check that all sum to 1
+    # multiplier = df_as.query("sex == 'Both sexes'").multiplier
+    # assert (multiplier > 0.99).all() and (multiplier < 1.01).all()
+
+    # drop multiplier column
+    df_as = df_as.drop(columns=["multiplier"]).reset_index()
+
     df = pr.concat([df, df_as])
     return df
 

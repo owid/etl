@@ -66,6 +66,11 @@ def add_population(
     pd.DataFrame
         Dataframe with extra column `population`.
     """
+    if sex_col:
+        assert df[sex_col].notnull().all(), f"Column {sex_col} contains missing values!"
+    if age_col:
+        assert df[age_col].notnull().all(), f"Column {age_col} contains missing values!"
+
     if ds_un_wpp is None:
         ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
         log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
