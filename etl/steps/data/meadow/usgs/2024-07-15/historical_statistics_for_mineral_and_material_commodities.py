@@ -184,9 +184,12 @@ def clean_sheet_data(data: pr.ExcelFile, commodity: str, sheet_name: str) -> pd.
     return df
 
 
-def combine_data_for_all_commodities(supply_demand_data: Dict[str, pr.ExcelFile]) -> pd.DataFrame:
+def combine_data_for_all_commodities(
+    supply_demand_data: Dict[str, pr.ExcelFile], supply_demand_metadata: Dict[str, str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Initialize a dataframe that will combine the data for all commodities.
     combined = pd.DataFrame()
+    combined_metadata = pd.DataFrame()
     for commodity, data in supply_demand_data.items():
         if commodity == "abrasives__natural__discontinued__see_garnet__industrial":
             # This file has a different format, with two tables in the same sheet.
@@ -207,57 +210,48 @@ def combine_data_for_all_commodities(supply_demand_data: Dict[str, pr.ExcelFile]
                 continue
             df = clean_sheet_data(data=data, commodity=commodity, sheet_name=sheet_name)
 
-            # For convenience (to combine with metadata), include a column with the original name of the commodity.
-            df["_commodity"] = commodity
-
             # Add the dataframe for the current commodity to the combined dataframe.
             combined = pd.concat([combined, df])
+
+            # Gather metadata for the current commodity (from the text in the word document inside the excel file).
+            metadata = supply_demand_metadata[commodity]
+            df_metadata = pd.DataFrame({"commodity": [sheet_name]})
+            for column in df.columns:
+                paragraph = extract_paragraph(text=metadata, header=column)
+                if len(paragraph) > 0:
+                    df_metadata[column] = paragraph
+            combined_metadata = pd.concat([combined_metadata, df_metadata], ignore_index=True)
 
     # Sanity check.
     assert set([column for column in combined.columns if "value" in column.lower()]) == {
         "Unit value $/t",
         "Unit value 98$/t",
     }
-    return combined
+
+    # For some reason, "Boron" appears twice in the metadata, with identical content. Drop repeated row.
+    combined_metadata = combined_metadata.drop_duplicates().reset_index(drop=True)
+
+    return combined, combined_metadata
 
 
-def extract_world_production_text(text: str, header: str) -> str:
-    start_world_production = False
-    world_production_text = ""
+def extract_paragraph(text: str, header: str) -> str:
+    start_paragraph = False
+    paragraph_text = ""
     for line in text.split("\n"):
-        if line.strip() == header:
-            start_world_production = True
+        if line.strip().lower().replace("(", "").replace(")", "").startswith(header.lower()) and (
+            len(line.strip()) < 1.2 * len(header)
+        ):
+            start_paragraph = True
             # Skip title, but start storing text from the next line.
             continue
 
-        if start_world_production:
-            world_production_text += line + "\n"
+        if start_paragraph:
+            paragraph_text += line + "\n"
 
         if len(line.strip()) == 0:
-            # The world production paragraph has ended.
-            start_world_production = False
-    return world_production_text
-
-
-def create_table_with_extracted_metadata(supply_demand_metadata: Dict[str, str]) -> pd.DataFrame:
-    df = pd.DataFrame()
-    for commodity, text in supply_demand_metadata.items():
-        _df = pd.DataFrame(
-            {
-                **{"commodity": [commodity]},
-                **{
-                    header: [extract_world_production_text(text, header)]
-                    for header in [
-                        "World Mine Production",
-                        "World mine production (metal content)",
-                        "World Production",
-                        "World Refinery Production",
-                    ]
-                },
-            }
-        )
-        df = pd.concat([df, _df], ignore_index=True)
-    return df
+            # The paragraph has ended.
+            start_paragraph = False
+    return paragraph_text.strip()
 
 
 def run(dest_dir: str) -> None:
@@ -273,8 +267,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Process and combine data for all commodities.
-    combined = combine_data_for_all_commodities(supply_demand_data=supply_demand_data)
+    # Process and combine data and extracted metadata for all commodities.
+    combined, combined_metadata = combine_data_for_all_commodities(
+        supply_demand_data=supply_demand_data, supply_demand_metadata=supply_demand_metadata
+    )
 
     # Create a table with metadata.
     tb = pr.read_from_df(data=combined, metadata=snap.to_table_metadata(), origin=snap.metadata.origin, underscore=True)
@@ -287,15 +283,19 @@ def run(dest_dir: str) -> None:
     # NOTE: There are duplicated rows with different data, e.g. Nickel 2019. We'll fix it in the garden step.
     tb = tb.format(["commodity", "year"], verify_integrity=False)
 
-    # TODO: Add a column with the extracted metadata for each commodity.
-    # Extract the text related to world production from the metadata for each commodity.
-    # df_metadata = create_table_with_extracted_metadata(supply_demand_metadata=supply_demand_metadata)
+    # Create a table with metadata for the extracted metadata.
+    tb_metadata = pr.read_from_df(
+        data=combined_metadata, metadata=snap.to_table_metadata(), origin=snap.metadata.origin, underscore=True
+    )
+    tb_metadata = tb_metadata.format(["commodity"], short_name=paths.short_name + "_metadata")
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir, tables=[tb, tb_metadata], check_variables_metadata=True, default_metadata=snap.metadata
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
