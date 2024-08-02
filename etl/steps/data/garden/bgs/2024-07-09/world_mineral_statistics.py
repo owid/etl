@@ -131,14 +131,14 @@ COMMODITY_MAPPING = {
     ("Coal", "Other coal"): ("Coal", "Other coal"),
     ("Coal", "Sub-bituminous"): ("Coal", "Sub-bituminous"),
     ("Coal", "Unknown"): ("Coal", "Unknown"),
-    ("Cobalt", "Metal & refined"): ("Cobalt", "Metal & refined"),
-    ("Cobalt", "Ore"): ("Cobalt", "Ore"),
-    ("Cobalt", "Oxide, sinter & sulfide"): ("Cobalt", "Oxide, sinter & sulfide"),
-    ("Cobalt", "Oxides"): ("Cobalt", "Oxides"),
-    ("Cobalt", "Salts"): ("Cobalt", "Salts"),
-    ("Cobalt", "Scrap"): ("Cobalt", "Scrap"),
-    ("Cobalt", "Unknown"): ("Cobalt", "Unknown"),
-    ("Cobalt", "Unwrought"): ("Cobalt", "Unwrought"),
+    ("Cobalt", "Metal & refined"): None,
+    ("Cobalt", "Ore"): None,
+    ("Cobalt", "Oxide, sinter & sulfide"): None,
+    ("Cobalt", "Oxides"): None,
+    ("Cobalt", "Salts"): None,
+    ("Cobalt", "Scrap"): None,
+    ("Cobalt", "Unknown"): None,
+    ("Cobalt", "Unwrought"): None,
     ("Cobalt, mine", "Unknown"): ("Cobalt", "Mine"),
     ("Cobalt, refined", "Unknown"): ("Cobalt", "Refinery"),
     ("Copper", "Ash and residues"): None,
@@ -732,6 +732,7 @@ UNIT_MAPPING = {
 # Their unit will be converted to "tonnes", and hence combined with USGS data.
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
+    "Cobalt",
     "Copper",
 ]
 
