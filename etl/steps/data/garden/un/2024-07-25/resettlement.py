@@ -19,8 +19,12 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow.read_table("resettlement")
 
     # group table by country and year
-    tb_origin = tb.drop(columns=["country_of_asylum"]).groupby(["country_of_origin", "year"]).sum().reset_index()
-    tb_asylum = tb.drop(columns=["country_of_origin"]).groupby(["country_of_asylum", "year"]).sum().reset_index()
+    tb_origin = (
+        tb.drop(columns=["country_of_asylum"]).groupby(["country_of_origin", "year"], observed=True).sum().reset_index()
+    )
+    tb_asylum = (
+        tb.drop(columns=["country_of_origin"]).groupby(["country_of_asylum", "year"], observed=True).sum().reset_index()
+    )
 
     # harmonize countries
     tb_origin = geo.harmonize_countries(
