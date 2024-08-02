@@ -232,3 +232,5 @@ steps:
     - data://garden/un/2024-07-16/migrant_stock
   data://meadow/idmc/2024-08-02/internal_displacement:
     - snapshot://idmc/2024-08-02/internal_displacement.xlsx
+  data://grapher/idmc/2024-08-02/internal_displacement:
+    - data://garden/idmc/2024-08-02/internal_displacement
