@@ -16,9 +16,9 @@ definitions:
       roundingMode: significantFigures
       numSignificantFigures: 3
     origins:
-      - title: Global Forest Watch; Curtis et al.
+      - title: Curtis et al.; Global Forest Watch
         date_published: "2024"
-        producer: Global Forest Watch (2024); Curtis et al. (2018)
+        producer: Curtis et al. (2018); Global Forest Watch (2024)
         citation_full: Global Forest Watch. Tree cover loss. www.globalforestwatch.org; Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. www.globalforestwatch.org.
         url_main: https://www.globalforestwatch.org/
         date_accessed: "2024-07-10"
