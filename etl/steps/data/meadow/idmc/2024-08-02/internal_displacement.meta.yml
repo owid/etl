@@ -1,0 +1,57 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+        - War & Peace
+    short_unit: ""
+  idmc_definitions:
+    internally_displaced_people: |-
+      The number of internally displaced people (IDPs) is a snapshot of the total number of people living in internal displacement at a specific point in time in a specific location. For our Global Report on Internal Displacement (GRID) and the Global Internal Displacement Database (GIDD), we make these snapshots as of the end of each year. This number includes people uprooted within a year who have not been able to return home or find another solution to displacement, plus people who have been displaced in previous years and have not found a lasting solution.
+      This figure illustrates the scale of displacement in a specific country and worldwide while also highlighting progress on solutions to internal displacement. Because the total number of IDPs includes people displaced in previous years and still living in internal displacement, the number can be higher than the number of new movements within a year.
+    internal_displacements: |-
+      An internal displacement refers to each new forced movement of a person within the borders of the country of their habitual residence recorded during the year. The same person or people can be displaced several times over a given period before finding a solution to their displacement. We count each time a person is forced to move as an internal displacement. This figure illustrates dynamics of displacement in a specific crisis.
+      Given the challenges in tracking population movements, it is difficult to determine what portion of internal displacements refer to people being displaced for the first time and what portion represents the same people being displaced a second, third, fourth or fifth time. As a result, internal displacements could include secondary or multiple displacement movements.
+      The number of internal displacements within a specific year is usually higher than the increase in the number of internally displaced people from one year to another. The number of internal displacements includes movements of newly displaced people as well as repeated and multiple movements of people already living in displacement.
+    conflict: |-
+      We track internal displacements triggered by conflict and violence [..], this includes international armed conflict, non-international armed conflict, communal violence, crime-related violence, civilian-state violence and other forms of violence. Most often, we categorize each conflict-related displacement in line with the Rule of Law in Armed Conflicts online portal by the Geneva Academy of International Humanitarian Law and Human Rights.
+    disaster: |-
+      We group movements of people triggered by disasters into two categories: weather-related and geophysical. Based on EM-DAT, the international disaster database of the Centre for Research on the Epidemiology of Disasters, we categorize displacements according to more than 20 different hazard types. Weather-related displacements, for example, include hazards such as floods, droughts, landslides, storms – including cyclones and other storms –, wildfires and extreme temperatures. Geophysical displacements include, for example, earthquakes, volcanic eruptions and landslides.
+
+
+dataset:
+  update_period_days: 365
+
+tables:
+  internal_displacement:
+    variables:
+      conflict_stock_displacement:
+        title: Internally displaced people due to conflict
+        description_short: |-
+          [Internally displaced people](#dod:internally-displaced) due to conflict. This includes all people who are currently displaced due to conflict, no matter which year they originally got displaced.
+        unit: people
+        description_from_producer: |-
+          - {definitions.idmc_definitions.internally_displaced_people}
+          - {definitions.idmc_definitions.conflict}
+      disaster_stock_displacement:
+        title: Internally displaced people due to disaster
+        description_short: |-
+          [Internally displaced people](#dod:internally-displaced) due to natural disasters. This includes all people who are currently displaced due to disasters, no matter which year they originally got displaced.
+        unit: people
+        description_from_producer: |-
+          - {definitions.idmc_definitions.internally_displaced_people}
+          - {definitions.idmc_definitions.disaster}
+      conflict_internal_displacements:
+        title: Conflict internal displacements
+        description_short: Internal displacements due to conflict. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a year and is then counted multiple times in the data.
+        unit: displacements
+        description_from_producer: |-
+          - {definitions.idmc_definitions.internal_displacements}
+          - {definitions.idmc_definitions.conflict}
+      disaster_internal_displacements:
+        title: Disaster internal displacements
+        description_short: Internal displacements due to natural disasters. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a year and is then counted multiple times in the data.
+        unit: displacements
+        description_from_producer: |-
+          - {definitions.idmc_definitions.internal_displacements}
+          - {definitions.idmc_definitions.disaster}
