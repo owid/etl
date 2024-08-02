@@ -121,7 +121,7 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
 
     # Consolidate results in country and year columns, by merging colonizer column in each row
     tb_colonized = (
-        tb_colonized.groupby(["country", "year"])
+        tb_colonized.groupby(["country", "year"], observed=True)
         .agg({"colonizer": lambda x: " - ".join(x)})
         .reset_index()
         .copy_metadata(tb)
