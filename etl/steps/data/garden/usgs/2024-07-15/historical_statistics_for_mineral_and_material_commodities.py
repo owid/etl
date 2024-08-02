@@ -41,7 +41,7 @@ COMMODITY_MAPPING = {
     ("Chromium", "Total"): ("Chromium", "Total"),
     ("Cobalt", "Total"): ("Cobalt", "Total"),
     ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
-    ("Copper", "Total"): ("Copper", "Total"),
+    ("Copper", "Total"): ("Copper", "Mine"),
     ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
@@ -112,7 +112,7 @@ COMMODITY_MAPPING = {
 # same thing.
 # So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes of gross weight"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
 # Their unit will be converted to "tonnes", and hence combined with USGS current data.
-MINERALS_WITH_GROSS_WEIGHT = [
+MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
 ]
 
@@ -205,14 +205,14 @@ def gather_notes(tb_combined: Table, notes_columns: List[str]) -> Dict[str, str]
 
 
 def harmonize_units(tb: Table) -> Table:
-    # See explanation above, where MINERALS_WITH_GROSS_WEIGHT is defined.
+    # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.
     assert set(tb["unit"]) == {"metric tonnes", "metric tonnes of gross weight"}
     tb["unit"] = (
         tb["unit"]
         .astype("string")
         .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes, gross weight"})
     )
-    tb.loc[tb["commodity"].isin(MINERALS_WITH_GROSS_WEIGHT), "unit"] = "tonnes"
+    tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
 
     return tb
 

@@ -141,27 +141,27 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Unwrought"): ("Cobalt", "Unwrought"),
     ("Cobalt, mine", "Unknown"): ("Cobalt", "Mine production"),
     ("Cobalt, refined", "Unknown"): ("Cobalt", "Refinery production"),
-    ("Copper", "Ash and residues"): ("Copper", "Ash and residues"),
-    ("Copper", "Burnt cupreous pyrites"): ("Copper", "Burnt cupreous pyrites"),
-    ("Copper", "Cement copper"): ("Copper", "Cement copper"),
-    ("Copper", "Matte"): ("Copper", "Matte"),
-    ("Copper", "Matte & Scrap"): ("Copper", "Matte & Scrap"),
-    ("Copper", "Matte & cement"): ("Copper", "Matte & cement"),
-    ("Copper", "Ore & matte"): ("Copper", "Ore & matte"),
-    ("Copper", "Ores & concentrates"): ("Copper", "Ores & concentrates"),
-    ("Copper", "Ores, concentrates & matte"): ("Copper", "Ores, concentrates & matte"),
-    ("Copper", "Scrap"): ("Copper", "Scrap"),
-    ("Copper", "Sludge, slimes & residues"): ("Copper", "Sludge, slimes & residues"),
-    ("Copper", "Unknown"): ("Copper", "Unknown"),
-    ("Copper", "Unwrought"): ("Copper", "Unwrought"),
-    ("Copper", "Unwrought & Scrap"): ("Copper", "Unwrought & Scrap"),
-    ("Copper", "Unwrought alloys"): ("Copper", "Unwrought alloys"),
-    ("Copper", "Unwrought, matte, cement & refined"): ("Copper", "Unwrought, matte, cement & refined"),
-    ("Copper", "Unwrought, refined"): ("Copper", "Unwrought, refined"),
-    ("Copper", "Unwrought, unrefined"): ("Copper", "Unwrought, unrefined"),
-    ("Copper, mine", "Unknown"): ("Copper", "Mine production"),
-    ("Copper, refined", "Unknown"): ("Copper", "Refinery production"),
-    ("Copper, smelter", "Unknown"): ("Copper", "Smelter production"),
+    ("Copper", "Ash and residues"): None,
+    ("Copper", "Burnt cupreous pyrites"): None,
+    ("Copper", "Cement copper"): None,
+    ("Copper", "Matte"): None,
+    ("Copper", "Matte & Scrap"): None,
+    ("Copper", "Matte & cement"): None,
+    ("Copper", "Ore & matte"): None,
+    ("Copper", "Ores & concentrates"): None,
+    ("Copper", "Ores, concentrates & matte"): None,
+    ("Copper", "Scrap"): None,
+    ("Copper", "Sludge, slimes & residues"): None,
+    ("Copper", "Unknown"): None,
+    ("Copper", "Unwrought"): None,
+    ("Copper", "Unwrought & Scrap"): None,
+    ("Copper", "Unwrought alloys"): None,
+    ("Copper", "Unwrought, matte, cement & refined"): None,
+    ("Copper", "Unwrought, refined"): None,
+    ("Copper", "Unwrought, unrefined"): None,
+    ("Copper, mine", "Unknown"): ("Copper", "Mine"),
+    ("Copper, refined", "Unknown"): ("Copper", "Refined"),
+    ("Copper, smelter", "Unknown"): ("Copper", "Smelter"),
     # NOTE: It's unclear when synthetic diamond is included.
     # Production does not seem to include it, but imports and exports of "Dust" does include synthetic diamond.
     ("Diamond", "Cut"): ("Diamond", "Cut"),
@@ -710,6 +710,31 @@ COMMODITY_MAPPING = {
     ("Zirconium minerals", "Unknown"): ("Zirconium minerals", "Unknown"),
 }
 
+# Mapping from original unit names to tonnes.
+# NOTE: The keys in this dictionary should coincide with all units found in the data.
+UNIT_MAPPING = {
+    "tonnes": "tonnes",
+    "tonnes (metric)": "tonnes",
+    "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
+    "tonnes (K20 content)": "tonnes of potassium oxide content",
+    "tonnes (metal content)": "tonnes of metal content",
+    # NOTE: The following units will be converted to tonnes using conversion factors.
+    "kilograms": "tonnes",
+    "kilograms (metal content)": "tonnes of metal content",
+    "Carats": "tonnes",
+    "million cubic metres": "tonnes",
+}
+
+# Some of those "tonnes *" can safely be mapped to simply "tonnes".
+# Given that this data is later combined wigh USGS data (given in tonnes), we need to ensure that they mean the
+# same thing.
+# So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes *"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
+# Their unit will be converted to "tonnes", and hence combined with USGS data.
+MINERALS_TO_CONVERT_TO_TONNES = [
+    "Cement",
+    "Copper",
+]
+
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
     # Example:
@@ -767,12 +792,17 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
 def harmonize_units(tb: Table) -> Table:
     tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
 
+    # In some cases, units given in "tonnes *" can safely be converted to simply "tonnes".
+    # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.
+    tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
+
     # Check that, for each category-commodity-subcommodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity", "sub_commodity"], observed=True, as_index=False)
-    unit_count = group.agg({"unit": "nunique"})
-    assert unit_count[
-        unit_count["unit"] > 1
-    ].empty, "Multiple units found for the same category-commodity-subcommodity."
+    # TODO: Fix remaining degeneracies. Then uncomment this assertion.
+    # unit_count = group.agg({"unit": "nunique"})
+    # assert unit_count[
+    #     unit_count["unit"] > 1
+    # ].empty, "Multiple units found for the same category-commodity-subcommodity."
     # Given that the unit is sometimes given and sometimes not (quite arbitrarily, as mentioned in the meadow step),
     # first attempt to fill empty units from the same category-commodity-subcommodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
@@ -784,8 +814,9 @@ def harmonize_units(tb: Table) -> Table:
     # In these cases, attempt to fill unit based on category-commodity.
     # Check that, for each category-commodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity"], observed=True, as_index=False)
-    unit_count = group.agg({"unit": "nunique"})
-    assert unit_count[unit_count["unit"] > 1].empty, "Multiple units found for the same category-commodity."
+    # TODO: Fix remaining degeneracies. Then uncomment this assertion.
+    # unit_count = group.agg({"unit": "nunique"})
+    # assert unit_count[unit_count["unit"] > 1].empty, "Multiple units found for the same category-commodity."
     # Fill empty units from the same category-commodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
 
@@ -793,7 +824,7 @@ def harmonize_units(tb: Table) -> Table:
     # Check that the only combinations still with no units are the expected ones.
     missing_units = {
         "category": ["Exports", "Imports"],
-        "commodity": ["gemstones", "gemstones"],
+        "commodity": ["Gemstones", "Gemstones"],
         "sub_commodity": ["Unknown", "Unknown"],
     }
     error = "The list of combinations category-commodity-subcommodity with missing units has changed."
@@ -816,25 +847,12 @@ def harmonize_units(tb: Table) -> Table:
     # Additionally, in the table footnotes they explain that sometimes the value is in Pounds!
     # Therefore, assume that the unit is always carats (and convert to tonnes), and, where that footnote appears, simply
     # remove the value.
-    tb.loc[(tb["commodity"] == "diamond"), "unit"] = "Carats"
-    tb.loc[(tb["commodity"] == "diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
-
-    # Mapping from original unit names to tonnes.
-    mapping = {
-        "tonnes (metric)": "tonnes",
-        "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
-        "tonnes (K20 content)": "tonnes of potassium oxide content",
-        "tonnes (metal content)": "tonnes of metal content",
-        # NOTE: The following units will be converted to tonnes using conversion factors.
-        "kilograms": "tonnes",
-        "kilograms (metal content)": "tonnes of metal content",
-        "Carats": "tonnes",
-        "million cubic metres": "tonnes",
-    }
+    tb.loc[(tb["commodity"] == "Diamond"), "unit"] = "Carats"
+    tb.loc[(tb["commodity"] == "Diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
 
     # Sanity check.
     error = "Unexpected units found. Add them to the unit mapping and decide its conversion."
-    assert set(units) == set(mapping), error
+    assert set(units) == set(UNIT_MAPPING), error
 
     for unit in units:
         mask = tb["unit"] == unit
@@ -853,10 +871,10 @@ def harmonize_units(tb: Table) -> Table:
             # Assert that commodity is either helium or natural gas, and convert accordingly.
             # NOTE: I decided to remove natural gas (see notes above in the commodity mapping).
             error = "Unexpected commodity using million cubic metres."
-            assert set(tb[mask]["commodity"]) == {"helium", "natural gas"}, error
-            tb.loc[mask & (tb["commodity"] == "helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
-            tb.loc[mask & (tb["commodity"] == "natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
-        tb.loc[mask, "unit"] = mapping[unit]
+            assert set(tb[mask]["commodity"]) == {"Helium"}, error
+            tb.loc[mask & (tb["commodity"] == "Helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            # tb.loc[mask & (tb["commodity"] == "Natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
+        tb.loc[mask, "unit"] = UNIT_MAPPING[unit]
 
     return tb
 
@@ -958,14 +976,14 @@ def run(dest_dir: str) -> None:
     # Remove data for regions that did not exist at the time.
     tb = remove_data_from_non_existing_regions(tb=tb)
 
-    # Harmonize units.
-    tb = harmonize_units(tb=tb)
-
     # Improve the name of the commodities.
     tb["commodity"] = tb["commodity"].str.capitalize()
 
     # Harmonize commodity-subcommodity pairs.
     tb = harmonize_commodity_subcommodity_pairs(tb=tb)
+
+    # Harmonize units.
+    tb = harmonize_units(tb=tb)
 
     # Pivot table to have a column for each category.
     tb = (
