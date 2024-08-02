@@ -40,7 +40,8 @@ tables:
         title: P90/P50 ratio (<<aggregation>>, spell <<spell>>)
         description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
         presentation:
-          title_public: P90/P50 ratio
+          title_public: Top decile as % median
+          title_variant: Gross individual weekly earnings (<<aggregation>>)
         display:
           name: P90/P50 ratio
           <<: *common-display

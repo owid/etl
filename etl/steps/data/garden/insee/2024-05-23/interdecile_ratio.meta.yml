@@ -26,7 +26,8 @@ tables:
           - Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
         description_from_producer: Data includes people from Metropolitan France until 1999, France (mainland + overseas territories) since 2000
         presentation:
-          title_public: P90/P50 ratio
+          title_public: Top decile as % median
+          title_variant: Annual net salary for full-time jobs
         display:
           name: P90/P50 ratio
           numDecimalPlaces: 1

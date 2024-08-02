@@ -27,4 +27,5 @@ tables:
           tolerance: 5
         presentation:
           title_public: Gini coefficient
+          title_variant: Household income
 
