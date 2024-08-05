@@ -1,24 +1,24 @@
 steps:
 
   # Main EPOCH dataset
-  data://meadow/artificial_intelligence/2024-07-10/epoch:
-    - snapshot://artificial_intelligence/2024-07-10/epoch.csv
-  data://garden/artificial_intelligence/2024-07-10/epoch:
-    - data://meadow/artificial_intelligence/2024-07-10/epoch
-  data://grapher/artificial_intelligence/2024-07-10/epoch:
-    - data://garden/artificial_intelligence/2024-07-10/epoch
+  data://meadow/artificial_intelligence/2024-08-05/epoch:
+    - snapshot://artificial_intelligence/2024-08-05/epoch.csv
+  data://garden/artificial_intelligence/2024-08-05/epoch:
+    - data://meadow/artificial_intelligence/2024-08-05/epoch
+  data://grapher/artificial_intelligence/2024-08-05/epoch:
+    - data://garden/artificial_intelligence/2024-08-05/epoch
 
   # EPOCH aggregates by domain
-  data://garden/artificial_intelligence/2024-07-10/epoch_aggregates_domain:
-    - data://meadow/artificial_intelligence/2024-07-10/epoch
-  data://grapher/artificial_intelligence/2024-07-10/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/2024-07-10/epoch_aggregates_domain
+  data://garden/artificial_intelligence/2024-08-05/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2024-08-05/epoch
+  data://grapher/artificial_intelligence/2024-08-05/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2024-08-05/epoch_aggregates_domain
 
   # EPOCH aggregates by researcher affiliaiton
-  data://garden/artificial_intelligence/2024-07-10/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2024-07-10/epoch
-  data://grapher/artificial_intelligence/2024-07-10/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2024-07-10/epoch_aggregates_affiliation
+  data://garden/artificial_intelligence/2024-08-05/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-08-05/epoch
+  data://grapher/artificial_intelligence/2024-08-05/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2024-08-05/epoch_aggregates_affiliation
 
   # Large Language Models and Compute (EPOCH)
   data://garden/artificial_intelligence/2024-02-15/epoch_llms:
