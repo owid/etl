@@ -9,11 +9,11 @@ definitions:
     processing_level: major
     description_processing: |-
       - The data collected by the UNHCR describes movement of refugees between individual regions. To calculate the total number of refugees in a region, we sum up the data from all origin countries. The same applies to calculating all refugees from one country of origin.
-      - To calculate the number of refugees per 1,000 people in a country, we divide the number of refugees by the total population of the country and multiply by 1,000. We use our long term population data for this calculation.
+      - To calculate the number of refugees per 1,000 people in a country, we divide the number of refugees by the total population of the country and multiply by 1,000. The population estimates come from a long-run dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
     display:
       numDecimalPlaces: 0
   description_international_protection: Other people in need of international protection refers to people who are outside their country or territory of origin, typically because they have been forcibly displaced across international borders, who have not been reported under other categories (asylum-seekers, refugees, people in refugee-like situations) but who likely need international protection, including protection against forced return, as well as access to basic services on a temporary or longer-term basis.
-  description_interally_displaced: Internally displaced persons (IDPs) are persons or groups of persons who have been forced or obliged to flee or to leave their homes or places of habitual residence, in particular as a result of, or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized State border. For the purposes of UNHCR’s statistics, this population includes only conflict-generated IDPs to whom the Office extends protection and/or assistance. The IDP population also includes people in an IDP-like situation.
+  description_internally_displaced: Internally displaced persons (IDPs) are persons or groups of persons who have been forced or obliged to flee or to leave their homes or places of habitual residence, in particular as a result of, or in order to avoid the effects of armed conflict, situations of generalized violence, violations of human rights or natural or human-made disasters, and who have not crossed an internationally recognized State border. For the purposes of UNHCR’s statistics, this population includes only conflict-generated IDPs to whom the Office extends protection and/or assistance. The IDP population also includes people in an IDP-like situation.
   description_stateless: |-
     Individuals under UNHCR’s statelessness mandate are defined under the 1954 Convention Relating to the Status of Stateless People as those not considered as nationals by any State under the operation of its law. In other words, they do not possess the nationality of any State. UNHCR statistics refer to people who fall under the organization’s statelessness mandate as those who are stateless according to this international definition. Data from some countries may also include people with undetermined nationality. These are people who lack proof of possession of any nationality and at the same time have or are regarded as having important links to more than one State. UNHCR also works with populations at risk of statelessness, but persons at risk of statelessness are not reported on under the statistical category of individuals under UNHCR’s statelessness mandate.
   description_asylum: |-
@@ -39,6 +39,9 @@ definitions:
   description_rolling_avg: |-
     Some metrics, which are reported annually, come with high levels of volatility which limits their usability.
     However, volatility and sudden changes are important signals for understanding migration due to conflict or disaster. To make these changes more understandable, while maintaining the important signals of year-to-year changes, we have re-calculated annual data as the rolling five-year average here.
+  description_refugee_general: |-
+    A refugee is defined as a person in need of international protection, being outside their country of origin, because of serious threats against which the authorities of their home country cannot or will not protect them.
+
 
 dataset:
   update_period_days: 180
@@ -50,14 +53,18 @@ tables:
       # populations by origin country
       refugees_under_unhcrs_mandate_origin:
         title: Refugees by country of origin
-        description_short: Number of [refugees](#dod:refugee) in all regions by the country of origin.  This measures the total number of refugees from the country; not the number per year.
+        description_short: Number of [refugees](#dod:refugee) in all regions by the country of origin. This measures the total number of refugees from the country; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
+        description_key:
+          - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_origin:
         title: Refugees by country of origin per 1,000 people
         description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
+        description_key:
+          - "{definitions.description_refugee_general}"
       asylum_seekers_origin:
         title: Asylum seekers by country of origin
         description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
@@ -71,7 +78,7 @@ tables:
       idps_of_concern_to_unhcr_origin:
         title: Internally displaced persons by country
         description_short: Number of [internally displaced persons (IDPs)](#dod:internally-displaced) of concern to UNHCR within a country.  This measures the total number of persons; not the number per year.
-        description_from_producer: "{definitions.description_interally_displaced}"
+        description_from_producer: "{definitions.description_internally_displaced}"
       other_people_in_need_of_international_protection_origin:
         title: Other people in need of international protection by country of origin
         description_short: Number of [other people in need of international protection](#dod:international-protection) in all regions by the country of origin. This measures the total number of persons; not the number per year.
@@ -94,12 +101,16 @@ tables:
         title: Refugees by country of residence
         description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
+        description_key:
+          - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_asylum:
         title: Refugees by country of residence per 1,000 people
         description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
+        description_key:
+          - "{definitions.description_refugee_general}"
       asylum_seekers_asylum:
         title: Asylum seekers by country of residence
         description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in. This measures the total number of asylum-seekers; not the number per year.
@@ -134,12 +145,14 @@ tables:
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
+        description_key:
+          - "{definitions.description_refugee_general}"
       returned_idpss_origin:
         title: Returned internally displaced people by country
         description_short: Number of returned [internally displaced people (IDPs)](#dod:internally-displaced) by the country of origin. Only IDPs who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_idp_return}
-          - {definitions.description_interally_displaced}
+          - {definitions.description_internally_displaced}
       resettlement_arrivals_origin:
         title: Resettlement arrivals by country of origin
         description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin.
@@ -156,6 +169,8 @@ tables:
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
+        description_key:
+          - "{definitions.description_refugee_general}"
       resettlement_arrivals_dest:
         title: Resettlement arrivals by country of resettlement
         description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of residence.
@@ -185,6 +200,8 @@ tables:
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
+        description_key:
+          - "{definitions.description_refugee_general}"
       refugees_origin_5y_avg_per_1000_pop:
         title: Refugees by country of origin per 1,000 people (5-year rolling average)
         description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.
@@ -192,6 +209,8 @@ tables:
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
+        description_key:
+          - "{definitions.description_refugee_general}"
         display:
           numDecimalPlaces: 1
       asylum_seekers_origin_5y_avg:
@@ -234,6 +253,8 @@ tables:
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
+        description_key:
+          - "{definitions.description_refugee_general}"
       refugees_asylum_5y_avg_per_1000_pop:
         title: Refugees by country of residence per 1,000 people (5-year rolling average)
         description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number arriving per year.
@@ -243,6 +264,8 @@ tables:
           - {definitions.description_rolling_avg}
         display:
           numDecimalPlaces: 1
+        description_key:
+          - "{definitions.description_refugee_general}"
       asylum_seekers_asylum_5y_avg:
         title: Asylum seekers by country of asylum (5-year rolling average)
         description_short: Number of [asylum seekers](#dod:asylumseeker) by country where they seek asylum, shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year.

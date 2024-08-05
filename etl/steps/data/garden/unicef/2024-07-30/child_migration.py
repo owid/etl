@@ -19,6 +19,22 @@ RENAME_COLUMNS = {
     "MG_UNRWA_RFGS_CNTRY_ASYLM: Refugees under UNRWA mandate, by host country: _T: Total (PS: Persons)": "refugees_under_18_unrwa_asylum",
 }
 
+TB_DATA_COLUMNS = [
+    "idps_under_18_conflict_violence",
+    "idps_under_18_disaster",
+    "idps_under_18_total",
+    "international_migrants_under_18_dest",
+    "new_idps_under_18_conflict_violence",
+    "new_idps_under_18_disaster",
+    "new_idps_under_18_total",
+    "refugees_under_18_asylum",
+    "refugees_under_18_origin",
+    "refugees_under_18_unrwa_asylum",
+    "refugees_under_18_asylum_per_1000",
+    "refugees_under_18_origin_per_1000",
+    "migrants_under_18_dest_per_1000",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -46,7 +62,7 @@ def run(dest_dir: str) -> None:
 
     # rename columns
     tb = tb.rename(columns=RENAME_COLUMNS, errors="raise")
-    # harmonize countries
+    # harmonize countries (Exclude aggregates as there are minimal data points available for aggregates and UNICEF regions are often duplicates)
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
@@ -61,6 +77,12 @@ def run(dest_dir: str) -> None:
     tb["refugees_under_18_origin_per_1000"] = tb["refugees_under_18_origin"] / tb["population"] * 1000
 
     tb["migrants_under_18_dest_per_1000"] = tb["international_migrants_under_18_dest"] / tb["population"] * 1000
+
+    # drop population column
+    tb = tb.drop(columns=["population"])
+
+    # drop duplicated (aggregated rows show up more than once)
+    tb = tb.drop_duplicates()
 
     tb = tb.format(["country", "year"])
 

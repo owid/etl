@@ -135,12 +135,13 @@ def five_year_moving_window(tb: Table, var_name: str) -> Table:
     # create table with all years in it
     tb_all_years = pr.merge(country_year_combos, tb[["country", "year", var_name]], on=["country", "year"], how="left")
     tb_all_years = tb_all_years.sort_values(["country", "year"])
-    tb_combine = Table()
+    tbs_to_combine = []
     # calculate 5-year moving average for each country
     for country in countries:
-        tb_country = tb_all_years[tb_all_years["country"] == country]
+        tb_country = tb_all_years[tb_all_years["country"] == country].copy()
         tb_country[var_name + "_5y_avg"] = tb_country[var_name].rolling(5, min_periods=1).mean()
-        tb_combine = pr.concat([tb_combine, tb_country])
+        tbs_to_combine.append(tb_country)
     # to get it back in the same order as it was in the beginning
-    tb = pr.merge(tb, tb_combine[["country", "year", var_name + "_5y_avg"]], on=["country", "year"], how="left")
+    tb_combined = pr.concat(tbs_to_combine, ignore_index=True)
+    tb = pr.merge(tb, tb_combined[["country", "year", var_name + "_5y_avg"]], on=["country", "year"], how="left")
     return tb[var_name + "_5y_avg"]

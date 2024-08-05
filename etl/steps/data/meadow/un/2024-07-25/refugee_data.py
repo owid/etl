@@ -1,7 +1,3 @@
-from zipfile import ZipFile
-
-from owid.catalog import processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,18 +10,10 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("refugee_data.zip")
-    snap_meta = snap.to_table_metadata()
-
-    zf = ZipFile(snap.path)
 
     # Load data from snapshot.
-    tb = pr.read_csv(
-        zf.open(zf.namelist()[0]),
-        metadata=snap_meta,
-        origin=snap.metadata.origin,
-        header=13,
-        na_values=["-"],
-    )
+    tb = snap.read_in_archive("population.csv", header=13, na_values=["-"])
+
     # drop duplicate country columns
     tb = tb.drop(columns=["Country of origin (ISO)", "Country of asylum (ISO)"])
 

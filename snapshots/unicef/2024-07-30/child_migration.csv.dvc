@@ -5,20 +5,19 @@ meta:
     # Data product / Snapshot
     title: Child migration
     description: |-
-      Collection of data from different sources on the topic of migration, consolidated by Unicef. The data for refugees and asylum seekers comes unpublished data of the UNHCR and is cited with permission
+      Collection of data from different sources on the topic of migration, consolidated by UNICEF. This data includes information on migrants, refugees, asylum seekers, and internally displaced children, all under 18 years old.
 
     date_published: "2021-04-01"
     version_producer: 2021
 
     # Citation
-    producer: Unicef
+    producer: UNICEF
     citation_full: |-
-      Child migration, Unicef, 2021 (https://data.unicef.org/topic/child-migration-and-displacement/migration/#data)
-    attribution_short: Unicef
+      Child migration, UNICEF, 2021 (https://data.unicef.org/topic/child-migration-and-displacement/migration/#data)
+    attribution_short: UNICEF
 
     # Files
     url_main: https://data.unicef.org/topic/child-migration-and-displacement/migration/#data
-    url_download: https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=MG&ver=1.0&dq=.MG_RFGS_CNTRY_ASYLM+MG_RFGS_CNTRY_ORIGIN+MG.Y0T17.&startPeriod=2010&endPeriod=2020
     date_accessed: 2024-07-31
 
     # License

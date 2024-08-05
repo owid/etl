@@ -54,9 +54,6 @@ def run(dest_dir: str) -> None:
     # drop unneeded columns
     tb = tb.drop(columns=["unit_multiplier", "age"])
 
-    # drop duplicated rows
-    tb = tb.drop_duplicates()
-
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "indicator", "stat_pop"])
 
