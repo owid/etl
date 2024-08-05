@@ -234,5 +234,6 @@ steps:
   # Internal displacement monitoring centre
   data://meadow/idmc/2024-08-02/internal_displacement:
     - snapshot://idmc/2024-08-02/internal_displacement.xlsx
+    - data://garden/demography/2024-07-15/population
   data://grapher/idmc/2024-08-02/internal_displacement:
     - data://meadow/idmc/2024-08-02/internal_displacement
