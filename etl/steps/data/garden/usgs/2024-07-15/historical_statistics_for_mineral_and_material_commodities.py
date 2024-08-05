@@ -21,7 +21,7 @@ paths = PathFinder(__file__)
 #  To use a subcommodity different than "Total", simply rewrite the value.
 COMMODITY_MAPPING = {
     ("Alumina", "Total"): ("Alumina", "Total"),
-    ("Aluminum", "Total"): ("Aluminum", "Total"),
+    ("Aluminum", "Total"): ("Aluminum", "Primary"),
     ("Aluminum oxide", "Total"): ("Aluminum oxide", "Total"),
     ("Aluminum-zirconium oxide", "Total"): ("Aluminum-zirconium oxide", "Total"),
     ("Antimony", "Total"): ("Antimony", "Total"),
