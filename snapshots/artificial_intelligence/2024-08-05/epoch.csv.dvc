@@ -25,13 +25,13 @@ meta:
     citation_full: "Epoch AI, ‘Parameter, Compute and Data Trends in Machine Learning’. Published online at epochai.org. Retrieved from: ‘https://epochai.org/data/epochdb/visualization’ [online resource]"
     # Files
     url_main: https://epochai.org/mlinputs/visualization
-    url_download: https://epochai.org/data/epochdb/all_systems.csv
+    url_download: https://epochai.org/data/epochdb/notable_ai_models.csv
     date_accessed: 2024-08-05
     # License
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: 61b3289cdf3e8268cd905ac00f67454f
-    size: 2232301
+  - md5: 80743bfc1877e4d116738520e5793eab
+    size: 1267330
     path: epoch.csv
