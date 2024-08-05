@@ -27,7 +27,7 @@ COLUMNS_TO_KEEP = [
 ]
 
 # NA is one because it should not affect the value when multiplying
-UNIT_MAP = {"3: Thousands": 1000, "0 :Units": 1, "NA": 1}
+UNIT_MAP = {"3: Thousands": 1000, "0 :Units": 1}
 
 
 def run(dest_dir: str) -> None:
@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns=RENAME_COLUMNS, errors="raise")
 
     # multiply by unit multiplier
-    tb["unit_multiplier"] = tb["unit_multiplier"].fillna("NA").map(UNIT_MAP)
+    tb["unit_multiplier"] = tb["unit_multiplier"].map(UNIT_MAP).fillna(1)
     tb["value"] = tb["value"].replace("<1", "0").astype("Float64") * tb["unit_multiplier"]
 
     # filter only on age 0-17

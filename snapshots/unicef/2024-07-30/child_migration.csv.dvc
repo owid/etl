@@ -8,22 +8,22 @@ meta:
       Collection of data from different sources on the topic of migration, consolidated by UNICEF. This data includes information on migrants, refugees, asylum seekers, and internally displaced children, all under 18 years old.
 
     date_published: "2021-04-01"
-    version_producer: 2021
 
     # Citation
     producer: UNICEF
     citation_full: |-
       Child migration, UNICEF, 2021 (https://data.unicef.org/topic/child-migration-and-displacement/migration/#data)
+
     attribution_short: UNICEF
 
     # Files
     url_main: https://data.unicef.org/topic/child-migration-and-displacement/migration/#data
-    date_accessed: 2024-07-31
+    date_accessed: 2024-08-05
 
     # License
     license:
       name: CC BY-NC 3.0 IGO
-      url: https://creativecommons.org/licenses/by-nc/3.0/igo/deed.en
+      url: https://data.unicef.org/topic/child-migration-and-displacement/migration/#data
 
 outs:
   - md5: c6c0f96d82e7aaccc595c2b63024f32f

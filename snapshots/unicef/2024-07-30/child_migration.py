@@ -1,8 +1,4 @@
-"""Script to create a snapshot of dataset.
-
-To import the data set you first need to download the data from the unicef website and save it to a local file. It is the Migration data set on the UNICEF data warehouse
-1. Go to https://data.unicef.org/resources/data_explorer/unicef_f/?ag=UNICEF&df=MG&ver=1.0&dq=.MG_INTNL_MG_CNTRY_DEST+MG_RFGS_CNTRY_ASYLM+MG_RFGS_CNTRY_ORIGIN+MG+MG_RFGS_CNTRY_ASYLM_PER1000+MG_RFGS_CNTRY_ASYLM_PER_USD_GNI+MG_INTERNAL_DISP_PERS+MG_NEW_INTERNAL_DISP..&startPeriod=2010&endPeriod=2020
-2. Click on the download button (top right) and select  'Full Data in CSV (long format)'."""
+"""Script to create a snapshot of dataset."""
 
 from pathlib import Path
 
