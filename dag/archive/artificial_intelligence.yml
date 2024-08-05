@@ -89,6 +89,28 @@ steps:
     - data://garden/artificial_intelligence/2024-06-03/epoch
   data://grapher/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation:
     - data://garden/artificial_intelligence/2024-06-03/epoch_aggregates_affiliation
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by country
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_countries
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by domain
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive_domain
+
+  # EPOCH dataset on Compute Intensive AI
+  data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - snapshot://artificial_intelligence/2024-06-19/epoch_compute_intensive.csv
+  data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - data://meadow/artificial_intelligence/2024-06-19/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2024-06-19/epoch_compute_intensive:
+    - data://garden/artificial_intelligence/2024-06-19/epoch_compute_intensive
+
+
 ##############################################################################################################
 
   # AI Incidents

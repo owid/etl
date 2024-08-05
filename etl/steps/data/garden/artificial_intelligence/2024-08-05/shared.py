@@ -22,8 +22,6 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     Returns:
     Table: The output Table with calculated aggregates.
     """
-    # Select the rows where the 'notability_criteria' column is not null (only consider notable systems)
-    tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
 
     # Store the origins metadata for later use
     origins = tb[agg_column].metadata.origins
