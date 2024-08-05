@@ -22,6 +22,10 @@ tables:
         title: protected_areas
         unit: ''
         description: Share of land area that is protected.
+      govt_spending:
+        title: govt_spending
+        unit: ''
+        description: Government spending on environmental protection, as a share of GDP.
       nri_index:
         title: nri_index
         unit: ''
