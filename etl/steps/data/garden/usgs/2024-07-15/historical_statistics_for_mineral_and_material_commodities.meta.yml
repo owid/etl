@@ -18,10 +18,6 @@ tables:
         title: Production
         unit: tonnes
         short_unit: t
-      unit_value_current:
-        title: Unit value (in current US dollars)
-        unit: current US$ per tonne
-        short_unit: $/t
       unit_value_constant:
         title: Unit value (in constant US dollars)
         unit: constant 1998 US$ per tonne

@@ -238,9 +238,9 @@ def extract_paragraph(text: str, header: str) -> str:
     start_paragraph = False
     paragraph_text = ""
     for line in text.split("\n"):
-        if line.strip().lower().replace("(", "").replace(")", "").startswith(header.lower()) and (
-            len(line.strip()) < 1.2 * len(header)
-        ):
+        if line.strip().lower().replace("(", "").replace(")", "").startswith(
+            header.lower().replace("(", "").replace(")", "")
+        ) and (len(line.strip()) < 1.2 * len(header)):
             start_paragraph = True
             # Skip title, but start storing text from the next line.
             continue
