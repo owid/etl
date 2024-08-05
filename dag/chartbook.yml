@@ -103,3 +103,5 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
+  data://meadow/chartbook/2024-08-05/atkinson_2008_australia:
+    - snapshot://chartbook/2024-08-05/atkinson_2008_australia.xls
