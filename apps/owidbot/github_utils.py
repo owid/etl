@@ -23,13 +23,13 @@ def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repos
     return g.get_repo(f"owid/{repo_name}")
 
 
-def get_pr(repo: github.Repository.Repository, branch_name: str) -> github.PullRequest.PullRequest:
+def get_pr(repo: github.Repository.Repository, branch_name: str) -> Optional[github.PullRequest.PullRequest]:
     # Find pull requests for the branch (assuming you're looking for open PRs)
     pulls = repo.get_pulls(state="open", sort="created", head=f"{repo.owner.login}:{branch_name}")
     pulls = list(pulls)
 
     if len(pulls) == 0:
-        raise AssertionError(f"No open PR found for branch {branch_name}")
+        return None
     elif len(pulls) > 1:
         log.warning(f"More than one open PR found for branch {branch_name}. Taking the most recent one.")
         pulls = pulls[-1:]

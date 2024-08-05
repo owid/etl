@@ -70,7 +70,8 @@ tables:
           name: <<table>> - Share of population in poverty
           <<: *common-display
         presentation:
-          title_public: <<table>> - Share of population in poverty
+          title_public: Share below <<table>>
+          title_variant: Household per capita income (<<survey>>)
 
   sedlac_no_spells:
     common:
@@ -93,5 +94,6 @@ tables:
           name: <<table>> - Share of population in poverty
           <<: *common-display
         presentation:
-          title_public: <<table>> - Share of population in poverty
+          title_public: Share below <<table>>
+          title_variant: Household per capita income
 
