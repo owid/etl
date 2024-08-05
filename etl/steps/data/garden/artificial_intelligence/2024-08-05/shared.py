@@ -1,5 +1,6 @@
 from typing import List
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -38,23 +39,22 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
 
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode(agg_column)
+    if agg_column == "organization":
+        # Clean up Google related organizations
+        deepmind_organizations = tb_exploded["organization"][tb_exploded["organization"].str.contains("DeepMind")]
+        tb_exploded.loc[tb_exploded["organization"].str.contains("DeepMind"), "organization"] = "DeepMind"
+        paths.log.info(
+            f"Organizations that were replaced with 'Deepmind': {', '.join(deepmind_organizations.unique())}"
+        )
+
+        google_organizations = tb_exploded["organization"][tb_exploded["organization"].str.contains("Google")]
+        tb_exploded.loc[tb_exploded["organization"].str.contains("Google"), "organization"] = "Google"
+
+        paths.log.info(f"Organizations that were replaced with 'Google': {', '.join(google_organizations.unique())}")
 
     # Drop duplicates where the year, system and country/domain are the same
     tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
 
-    # Replace system domains with less than 10 notable systems with 'Other'
-    if agg_column == "domain":
-        # Replace domains with less than 10 systems with 'Other'
-        domain_counts = tb_unique["domain"].value_counts()
-
-        tb_unique["domain"] = tb_unique["domain"].where(tb_unique["domain"].map(domain_counts) >= 10, "Other")
-        # Get the domains that were reclassified to 'Other'
-        reclassified_domains = domain_counts[domain_counts < 10].index.tolist()
-        domain_counts = tb_unique["domain"].value_counts()
-
-        paths.log.info(
-            f"Domains with less than 10 notable systems that were reclassified to 'Other': {', '.join(reclassified_domains)}"
-        )
     # Convert the column to category type so that the missing values will be considered as 0
     tb_unique[agg_column] = tb_unique[agg_column].astype("category")
 
@@ -66,6 +66,12 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
 
     # Calculate the cumulative count (consider all categories which will assume 0 for missing values)
     tb_agg["cumulative_count"] = tb_agg.groupby(agg_column, observed=False)["yearly_count"].cumsum()
+
+    total_counts = tb_agg.groupby("year")["yearly_count"].sum().reset_index()
+    total_counts[agg_column] = "Total"
+    total_counts["cumulative_count"] = total_counts["yearly_count"].cumsum()
+
+    tb_agg = pr.concat([tb_agg, total_counts], ignore_index=True)
 
     # Add the origins metadata to the columns
     for col in ["yearly_count", "cumulative_count"]:
