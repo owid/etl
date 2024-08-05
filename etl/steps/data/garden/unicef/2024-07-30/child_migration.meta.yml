@@ -8,6 +8,8 @@ definitions:
     unit: people
     short_unit: ""
     processing_level: minor
+    display:
+      numDecimalPlaces: 0
   unicef_descriptions:
     refugee: |-
       Person who are outside their country of nationality or habitual residence, who cannot return due to a well-founded fear of being persecuted because of their race, religion, nationality, membership of a particular social group or political opinion. This number only accounts those who have been recognized as refugees or find themselves in refugee-like situations.
@@ -62,6 +64,8 @@ tables:
         processing_level: major
         description_processing: |-
           - We divide the number of migrants by the total population of the destination country and multiply by 1000 to get the number of migrants per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+        display:
+          numDecimalPlaces: 1
       new_idps_under_18_conflict_violence:
         title: Number of newly internally displaced children younger than 18 due to conflict
         description_short: |-
@@ -93,6 +97,8 @@ tables:
         processing_level: major
         description_processing: |-
           - We divide the number of refugees by the total population of the asylum country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+        display:
+          numDecimalPlaces: 1
       refugees_under_18_origin:
         title: Number of child refugees under 18 years old by origin
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of origin. This number is the total refugee stock, so all refugees who have left the origin country and does not describe refugees leaving in this year.
@@ -106,6 +112,8 @@ tables:
         processing_level: major
         description_processing: |-
           - We divide the number of refugees by the total population of the origin country and multiply by 1000 to get the number of refugees per 1000 inhabitants. The total population comes from our long term population data, which can be explored [here](https://ourworldindata.org/explorers/population-and-demography).
+        display:
+          numDecimalPlaces: 1
       refugees_under_18_unrwa_asylum:
         title: Number of child refugees under 18 years old under UNRWA mandate
         description_short: Number of children under 18 years old who are [refugees](#dod:refugee) under [UNRWA mandate](#dod:unrwa). These are registered Palestinian refugees who live in Jordan, Lebanon, Syria, the West Bank and Gaza.
