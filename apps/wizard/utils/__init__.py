@@ -859,13 +859,17 @@ def st_toast_success(message: str) -> None:
 def as_valid_json(s):
     """Return `s` as a dictionary if applicable."""
     try:
-        # Evaluate the string using ast.literal_eval to handle mixed quotes
-        python_obj = ast.literal_eval(s)
+        # First, try to parse the string directly as JSON
+        return json.loads(s)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, use ast.literal_eval to handle mixed quotes
+            python_obj = ast.literal_eval(s)
 
-        # Convert the Python object to a JSON string and then back to a Python object
-        return json.loads(json.dumps(python_obj))
-    except (ValueError, SyntaxError):
-        return s
+            # Convert the Python object to a JSON string and then back to a Python object
+            return json.loads(json.dumps(python_obj))
+        except (ValueError, SyntaxError):
+            return s
 
 
 def as_list(s):
