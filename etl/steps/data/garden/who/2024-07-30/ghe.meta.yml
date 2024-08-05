@@ -9,7 +9,7 @@ definitions:
           {definitions.footnote}
         selectedEntityNames:
           - World
-    processing_level: minor
+    processing_level: major
   age: |-
     <% if age_group == "ALLAges" %>
     all ages

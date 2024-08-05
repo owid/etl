@@ -232,10 +232,6 @@ def add_age_standardized_metric(df: Table, who_standard: Dict[str, float]) -> Ta
     df_as["age_group"] = "Age-standardized"
     df_as = df_as.groupby(["country", "year", "cause", "age_group", "sex"]).sum()
 
-    # check that all sum to 1
-    # multiplier = df_as.query("sex == 'Both sexes'").multiplier
-    # assert (multiplier > 0.99).all() and (multiplier < 1.01).all()
-
     # drop multiplier column
     df_as = df_as.drop(columns=["multiplier"]).reset_index()
 
