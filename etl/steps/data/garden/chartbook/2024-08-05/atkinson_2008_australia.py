@@ -27,6 +27,10 @@ def run(dest_dir: str) -> None:
     tb_oecd_lms = tb_oecd_lms[["p90"]]
     tb_eeh = tb_eeh[["p90"]]
 
+    # Remove missing values
+    tb_oecd_lms = tb_oecd_lms.dropna()
+    tb_eeh = tb_eeh.dropna()
+
     #
     # Save outputs.
     #
