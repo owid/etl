@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
+from typing import Dict
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -180,18 +180,18 @@ def clean_notes(note):
     return notes_clean
 
 
-def gather_notes(tb_combined: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(tb_combined: Table) -> Dict[str, str]:
+    notes_columns = [column for column in tb_combined.columns if column.startswith("notes_")]
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = (
         tb_combined[
             ["commodity", "sub_commodity", "country", "year", "unit"]
             + [c for c in tb_combined.columns if c.startswith("notes_")]
         ]
-        .rename(columns={"notes_unit_value_constant": "notes_unit_value"}, errors="raise")
         .pivot(
             index=["country", "year"],
             columns=["commodity", "sub_commodity", "unit"],
-            values=["notes_production", "notes_unit_value"],
+            values=notes_columns,
             join_column_levels_with="|",
         )
         .dropna(axis=1, how="all")
@@ -228,6 +228,154 @@ def harmonize_units(tb: Table) -> Table:
     tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
 
     return tb
+
+
+def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
+    # Select columns for US production.
+    # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
+    # For now, we'll only keep "production".
+    tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
+    # Remove spurious footnotes like "W".
+    tb_us_production["production"] = map_series(
+        tb_us_production["production"],
+        mapping={"W": None},
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
+    ).astype({"production": float})
+    # Add notes to the table, using the extracted metadata.
+    for column in ["production"]:
+        mask = tb_metadata[column].notnull()
+        tb_metadata.loc[mask, column] = "Note on United States production: " + tb_metadata[column][mask]
+        tb_us_production = tb_us_production.merge(
+            tb_metadata[["commodity", column]].rename(
+                columns={column: f"notes_{column}" for column in tb_metadata.columns if column != "commodity"},
+                errors="ignore",
+            ),
+            on="commodity",
+            how="left",
+        )
+
+    # For now, assume "Total" subcommodity.
+    tb_us_production["sub_commodity"] = "Total"
+
+    return tb_us_production
+
+
+def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
+    # NOTE: There are 4 columns for world production, namely:
+    # * "world_mine_production" (which exists for Beryllium, Cobalt and Niobium),
+    # * "world_mine_production__metal_content" (which exists only for bismuth),
+    # * "world_refinery_production" (which exists for Bismuth and Cobalt),
+    # * "world_production" (which exists for other commodities).
+
+    # Initialize table for world production.
+    tb_world_production = Table()
+    for column in [
+        "world_production",
+        "world_mine_production",
+        "world_mine_production__metal_content",
+        "world_refinery_production",
+    ]:
+        if "mine" in column:
+            sub_commodity = "Mine"
+        elif "refinery" in column:
+            sub_commodity = "Refinery"
+        else:
+            sub_commodity = "Total"
+        _tb_production = (
+            tb[["commodity", "year", column, "unit"]]
+            .rename(columns={column: "production"}, errors="raise")
+            .assign(**{"country": "World"})
+            .assign(**{"sub_commodity": sub_commodity})
+            .astype({"production": float})
+            .dropna(subset="production")
+            .reset_index(drop=True)
+        )
+        # Add notes to the table, using the extracted metadata.
+        mask = tb_metadata[column].notnull()
+        tb_metadata.loc[mask, column] = "Note on global production: " + tb_metadata[column][mask]
+        _tb_production = _tb_production.merge(
+            tb_metadata[["commodity", column]].rename(columns={column: "notes_production"}, errors="raise"),
+            on="commodity",
+            how="left",
+        )
+        # Combine tables.
+        tb_world_production = pr.concat([tb_world_production, _tb_production], ignore_index=True)
+
+    return tb_world_production
+
+
+def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
+    # Select columns for unit value.
+    tb_unit_value = (
+        tb[["commodity", "year", "unit_value_98dollar_t"]]
+        .assign(**{"country": "World"})
+        .rename(
+            columns={"unit_value_98dollar_t": "unit_value"},
+            errors="raise",
+        )
+    )
+    # Remove spurious footnotes like "W".
+    tb_unit_value["unit_value"] = tb_unit_value["unit_value"].astype("string").replace("W", None).astype(float)
+    # Add notes to the table, using the extracted metadata.
+    tb_unit_value = tb_unit_value.merge(
+        tb_metadata[["commodity", "unit_value_98dollar_t"]].rename(
+            columns={"unit_value_98dollar_t": "notes_unit_value"}, errors="raise"
+        ),
+        on="commodity",
+        how="left",
+    )
+
+    # Drop empty rows.
+    tb_unit_value = tb_unit_value.dropna(subset=["unit_value"], how="all").reset_index(drop=True)
+
+    # Add a generic subcommodity that applies to all commodities.
+    # NOTE: This may be problematic for commodities for which there are subcommodities with different unit value series.
+    tb_unit_value["sub_commodity"] = "Apparent consumption"
+
+    # Add a unit.
+    tb_unit_value["unit"] = "constant 1998 US$ per tonne"
+
+    return tb_unit_value
+
+
+def prepare_wide_table(tb: Table) -> Table:
+    # Gather all notes in a dictionary.
+    notes = gather_notes(tb_combined=tb)
+    # Identify data columns.
+    values_columns = [
+        column
+        for column in tb.columns
+        if column not in ["country", "year", "commodity", "sub_commodity", "unit"] and not column.startswith("notes_")
+    ]
+    # Create a wide table.
+    tb_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=values_columns,
+        join_column_levels_with="|",
+    ).dropna(axis=1, how="all")
+
+    # NOTE: Here, I could loop over columns and improve metadata.
+    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
+    # So, for now, simply add titles and descriptions from producer.
+    for column in tb_flat.drop(columns=["country", "year"]).columns:
+        # Create metadata title (before they become snake-case).
+        tb_flat[column].metadata.title = column
+        if column in notes:
+            tb_flat[column].metadata.description_from_producer = (
+                "Notes found in original USGS historical data:\n" + notes[column]
+            )
+
+    # Add footnotes.
+    for column, note in FOOTNOTES.items():
+        if not tb_flat[column].metadata.presentation:
+            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
+        tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns if column not in ["country", "year"]})
+
+    return tb_flat
 
 
 def run(dest_dir: str) -> None:
@@ -280,68 +428,17 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["commodity"] == "Nickel") & (tb["year"] == 2019) & (tb["world_production"] == 2510000.0), "year"] = 2020
     ####################################################################################################################
 
-    # Select columns for US production.
-    # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
-    # For now, we'll only keep "production".
-    tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
-    # Remove spurious footnotes like "W".
-    tb_us_production["production"] = map_series(
-        tb_us_production["production"],
-        mapping={"W": None},
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=True,
-    ).astype({"production": float})
-    # Add notes to the table, using the extracted metadata.
-    for column in ["production"]:
-        mask = tb_metadata[column].notnull()
-        tb_metadata.loc[mask, column] = "Note on United States production: " + tb_metadata[column][mask]
-        tb_us_production = tb_us_production.merge(
-            tb_metadata[["commodity", column]].rename(
-                columns={column: f"notes_{column}" for column in tb_metadata.columns if column != "commodity"},
-                errors="ignore",
-            ),
-            on="commodity",
-            how="left",
-        )
+    # Prepare US production.
+    tb_us_production = prepare_us_production(tb=tb, tb_metadata=tb_metadata)
 
-    # Add columns for world production.
-    tb_combined = tb_us_production.copy()
-    # NOTE: There are 4 columns for world production, namely:
-    # * "world_mine_production" (which exists for Beryllium, Cobalt and Niobium),
-    # * "world_mine_production__metal_content" (which exists only for bismuth),
-    # * "world_refinery_production" (which exists for Bismuth and Cobalt),
-    # * "world_production" (which exists for other commodities).
-    for column in [
-        "world_production",
-        "world_mine_production",
-        "world_mine_production__metal_content",
-        "world_refinery_production",
-    ]:
-        if "mine" in column:
-            sub_commodity = "Mine"
-        elif "refinery" in column:
-            sub_commodity = "Refinery"
-        else:
-            sub_commodity = "Total"
-        _tb_production = (
-            tb[["commodity", "year", column, "unit"]]
-            .rename(columns={column: "production"}, errors="raise")
-            .assign(**{"country": "World"})
-            .assign(**{"sub_commodity": sub_commodity})
-            .astype({"production": float})
-            .dropna(subset="production")
-            .reset_index(drop=True)
-        )
-        # Add notes to the table, using the extracted metadata.
-        mask = tb_metadata[column].notnull()
-        tb_metadata.loc[mask, column] = "Note on global production: " + tb_metadata[column][mask]
-        _tb_production = _tb_production.merge(
-            tb_metadata[["commodity", column]].rename(columns={column: "notes_production"}, errors="raise"),
-            on="commodity",
-            how="left",
-        )
-        # Combine tables.
-        tb_combined = pr.concat([tb_combined, _tb_production], ignore_index=True)
+    # Prepare world production.
+    tb_world_production = prepare_world_production(tb=tb, tb_metadata=tb_metadata)
+
+    # Prepare unit value.
+    tb_unit_value = prepare_unit_value(tb=tb, tb_metadata=tb_metadata)
+
+    # Combine US and world production.
+    tb_combined = pr.concat([tb_us_production, tb_world_production], ignore_index=True)
 
     # Remove empty rows.
     tb_combined = tb_combined.dropna(subset=["production"], how="all").reset_index(drop=True)
@@ -349,95 +446,37 @@ def run(dest_dir: str) -> None:
     # Harmonize commodity-subcommodity pairs.
     tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
 
-    # Select columns for unit value.
-    tb_unit_value = (
-        tb[["commodity", "year", "unit_value_98dollar_t"]]
-        .assign(**{"country": "World"})
-        .rename(
-            columns={"unit_value_98dollar_t": "unit_value_constant"},
-            errors="raise",
-        )
-    )
-    # Remove spurious footnotes like "W".
-    tb_unit_value["unit_value_constant"] = (
-        tb_unit_value["unit_value_constant"].astype("string").replace("W", None).astype(float)
-    )
-    # Add notes to the table, using the extracted metadata.
-    tb_unit_value = tb_unit_value.merge(
-        tb_metadata[["commodity", "unit_value_98dollar_t"]].rename(
-            columns={"unit_value_98dollar_t": "notes_unit_value_constant"}, errors="raise"
-        ),
-        on="commodity",
-        how="left",
-    )
-
-    # Drop empty rows.
-    tb_unit_value = tb_unit_value.dropna(subset=["unit_value_constant"], how="all").reset_index(drop=True)
-
-    # Combine production and unit value tables.
-    tb_combined = tb_combined.merge(tb_unit_value, on=["commodity", "year", "country"], how="outer")
-
-    # There are combinations for which there is data on unit value but not on production. They will have missing unit.
-    # Assume "tonnes" for those cases (unit is irrelevant for unit value, ideally it should be in a separate table).
-    tb_combined["unit"] = tb_combined["unit"].fillna("tonnes")
-    # Also, assume "Total" subcommodity.
-    tb_combined["sub_commodity"] = tb_combined["sub_commodity"].fillna("Total")
-
-    # Remove empty rows.
-    tb_combined = tb_combined.dropna(subset=["production", "unit_value_constant"], how="all").reset_index(drop=True)
-
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for column in [column for column in tb_combined.columns if column.startswith("notes_")]:
         tb_combined[column] = tb_combined[column].apply(clean_notes)
+    for column in [column for column in tb_unit_value.columns if column.startswith("notes_")]:
+        tb_unit_value[column] = tb_unit_value[column].apply(clean_notes)
 
-    # Gather all notes in a dictionary.
-    notes = gather_notes(
-        tb_combined=tb_combined, notes_columns=[column for column in tb_combined.columns if column.startswith("notes_")]
-    )
-
-    # Create a wide table.
-    # For the wide table, select only unit value in constant USD.
-    tb_flat = (
-        tb_combined.rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
-        .pivot(
-            index=["country", "year"],
-            columns=["commodity", "sub_commodity", "unit"],
-            values=["production", "unit_value"],
-            join_column_levels_with="|",
-        )
-        .dropna(axis=1, how="all")
-    )
-
-    # NOTE: Here, I could loop over columns and improve metadata.
-    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
-    # So, for now, simply add titles and descriptions from producer.
-    for column in tb_flat.drop(columns=["country", "year"]).columns:
-        # Create metadata title (before they become snake-case).
-        tb_flat[column].metadata.title = column
-        if column in notes:
-            tb_flat[column].metadata.description_from_producer = (
-                "Notes found in original USGS historical data:\n" + notes[column]
-            )
-
-    # Add footnotes.
-    for column, note in FOOTNOTES.items():
-        if not tb_flat[column].metadata.presentation:
-            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
-        tb_flat[column].metadata.presentation.grapher_config["note"] = note
+    # Create wide tables for production and unit value.
+    tb_flat = prepare_wide_table(tb=tb_combined)
+    tb_flat_unit_value = prepare_wide_table(tb=tb_unit_value)
+    tb_flat = tb_flat.merge(tb_flat_unit_value, on=["country", "year"], how="outer")
 
     # Format tables conveniently.
+    tb_combined = tb_combined.format(
+        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
+    )
     tb_combined = tb_combined.astype(
         {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
     )
-    tb_combined = tb_combined.format(["country", "year", "commodity", "sub_commodity"])
+    tb_unit_value = tb_unit_value.format(
+        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_unit_value"
+    )
+    tb_unit_value = tb_unit_value.astype(
+        {column: "string" for column in tb_unit_value.columns if column.startswith("notes_")}
+    )
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
-    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_flat], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_unit_value, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

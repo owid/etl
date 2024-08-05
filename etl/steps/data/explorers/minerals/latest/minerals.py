@@ -36,8 +36,8 @@ def run(dest_dir: str) -> None:
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Mineral Dropdown"] = commodity_dropdown
-    df_graphers["Type Dropdown"] = sub_commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
+    df_graphers["Type Dropdown"] = sub_commodity_dropdown
 
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
-    df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Type Dropdown", "Metric Dropdown"]).reset_index(
+    df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Metric Dropdown", "Type Dropdown"]).reset_index(
         drop=True
     )
 

@@ -96,7 +96,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
             tb[column].metadata.presentation = VariablePresentationMeta()
 
         if column.startswith("share_of_global_"):
-            title_public += "as a share of the global total"
+            title_public += " as a share of the global total"
 
         tb[column].metadata.presentation.title_public = title_public
 
@@ -105,12 +105,11 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
         if unit.startswith("tonnes"):
             # Create short unit.
             tb[column].metadata.short_unit = "t"
+        elif unit == "constant 1998 US$ per tonne":
+            tb[column].metadata.short_unit = "$/t"
         else:
             log.warning(f"Unexpected unit for column: {column}")
             tb[column].metadata.short_unit = ""
-        if metric == "Unit value":
-            tb[column].metadata.unit = "constant 1998 US$ per tonne"
-            tb[column].metadata.short_unit = "$/t"
         if metric.startswith("Share "):
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"

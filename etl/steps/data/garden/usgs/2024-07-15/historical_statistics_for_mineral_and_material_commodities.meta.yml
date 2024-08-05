@@ -11,14 +11,17 @@ dataset:
   title: Historical statistics for mineral and material commodities
 
 tables:
-  historical_statistics_for_mineral_and_material_commodities:
+  historical_production:
     title: Historical statistics for mineral and material commodities
     variables:
       production:
         title: Production
         unit: tonnes
         short_unit: t
-      unit_value_constant:
+  historical_unit_value:
+    title: Historical statistics for mineral and material commodities
+    variables:
+      unit_value:
         title: Unit value (in constant US dollars)
         unit: constant 1998 US$ per tonne
         short_unit: $/t
