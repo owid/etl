@@ -1025,11 +1025,6 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
-        countries_that_must_have_data={
-            "North America": ["United States"],
-            "Asia": ["China"],
-            "World": ["North America", "Asia"],
-        },
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
         accepted_overlaps=ACCEPTED_OVERLAPS,
     )

@@ -251,6 +251,10 @@ def run(dest_dir: str) -> None:
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
     tb = add_share_of_global_columns(tb=tb)
 
+    for column in [column for column in tb.columns if column.startswith("share_")]:
+        if (tb[column] > 100).any():
+            log.warning(f"{column} maximum: {tb[column].max():.0f}%")
+
     # Improve metadata.
     tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)
 
