@@ -37,7 +37,7 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     tb[agg_column] = tb[agg_column].astype("category")
 
     # Group by year and country/domain and count the number of systems (consider all categories which will assume 0 for missing values)
-    tb_total = tb.groupby(["year", agg_column]).size().reset_index(name="yearly_count")
+    tb_total = tb.groupby(["year"]).size().reset_index(name="yearly_count")
     total_counts = tb_total.groupby("year")["yearly_count"].sum().reset_index()
     total_counts[agg_column] = "Total"
     total_counts["cumulative_count"] = total_counts["yearly_count"].cumsum()
@@ -46,6 +46,7 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     tb[agg_column] = tb[agg_column].str.split(",")
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode(agg_column)
+    tb_exploded[agg_column] = tb_exploded[agg_column].astype("category")
 
     # Drop duplicates where the year, system and country/domain are the same
     tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
@@ -60,7 +61,7 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     tb_agg["cumulative_count"] = tb_agg.groupby(agg_column, observed=False)["yearly_count"].cumsum()
 
     tb_agg = pr.concat([tb_agg, total_counts], ignore_index=True)
-
+    print(tb_agg[tb_agg[agg_column] == "Total"])
     # Add the origins metadata to the columns
     for col in ["yearly_count", "cumulative_count"]:
         tb_agg[col].metadata.origins = origins
