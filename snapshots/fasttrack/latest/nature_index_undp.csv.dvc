@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: UN Development Programme, Global Carbon Project, WWF, Poore and Nemecek (2018), and WDPA
+    title: nature_index_undp
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vREFjOvi_pQetTUwcLYXb0u4ibqXoBQUkHo6Fh5_jtABwGBtORiZEfUicnovA3ngK9ncnyhhDfObpkX/pub?output=csv
+    date_accessed: '2024-08-05'
+  name: Nature Index (UNDP Project)
+  description: ''
+  license: {}
+outs:
+  - md5: c8a90738aec1d99fd1bace45b741e767
+    size: 10516
+    path: nature_index_undp.csv

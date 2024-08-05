@@ -9,7 +9,7 @@ definitions:
       - Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.
       - Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
     presentation:
-      title_public: Share in relative poverty
+      title_variant: Equivalized disposable income (excluding capital gains)
       topic_tags:
         - Poverty
         - Economic Inequality
@@ -29,21 +29,29 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with an income below 50% of the median.
+        presentation:
+          title_public: Share below 40% median
 
       headcount_ratio_50_median:
         title: 50% of the median - Share of population in poverty
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with an income below 50% of the median.
+        presentation:
+          title_public: Share below 50% median
 
       headcount_ratio_60_median:
         title: 60% of the median - Share of population in poverty
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with an income below 60% of the median.
+        presentation:
+          title_public: Share below 60% median
 
       headcount_ratio_70_median:
         title: 70% of the median - Share of population in poverty
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with an income below 70% of the median.
+        presentation:
+          title_public: Share below 70% median

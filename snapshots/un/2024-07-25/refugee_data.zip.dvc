@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Refugee Population Statistics Database
+    description: |-
+      The database contains information about forcibly displaced populations spanning more than 70 years of statistical activities. It covers displaced populations such as refugees, asylum-seekers and internally displaced people, including their demographics. Stateless people are also included, most of who have never been displaced. The database also reflects the different types of solutions for ett displaced populations such as repatriation or resettlement.
+
+      It includes UNHCR data collected through its annual statistical activities with some data going back as far as 1951, the year UNHCR was created. 
+    date_published: "2024-06-13"
+    version_producer: 2023
+
+    # Citation
+    producer: UNHCR
+    citation_full: |-
+      Refugee Population Statistics Database, UNHCR, 2024 (https://www.unhcr.org/refugee-statistics/)
+    attribution_short: UNHCR
+
+    # Files
+    url_main: https://www.unhcr.org/refugee-statistics/download/?url=q0TpTi
+    url_download: https://api.unhcr.org/population/v1/population/?limit=20&dataset=population&displayType=totals&columns%5B%5D=refugees&columns%5B%5D=asylum_seekers&columns%5B%5D=idps&columns%5B%5D=oip&columns%5B%5D=stateless&columns%5B%5D=hst&columns%5B%5D=ooc&yearFrom=1951&yearTo=2023&coo_all=true&coa_all=true&uat=refugee-statistics%2Fbuild&download=true&_gl=1*hmdfmv*_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_ga_BHDVL2BSVK*MTcyMTkyMDU3NC40LjEuMTcyMTkyMDcxMS42MC4wLjA.*_rup_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_rup_ga_EVDQTJ4LMY*MTcyMTkyMDU3NC4zLjEuMTcyMTkyMDcxMS4zNC4wLjA.
+    date_accessed: 2024-07-25
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/terms-use-datasets
+
+outs:
+  - md5: 969822946407c5f4101b7291a8118762
+    size: 924774
+    path: refugee_data.zip

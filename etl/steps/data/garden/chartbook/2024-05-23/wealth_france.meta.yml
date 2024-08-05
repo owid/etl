@@ -8,6 +8,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Inequality
+      title_variant: Estate tax at death in France
 
 
 # Learn more about the available fields:
@@ -25,7 +26,7 @@ tables:
         short_unit: "%"
         description_short: The share of wealth owned by the richest decile (tenth of the population).
         presentation:
-          title_public: Wealth share of the richest 10%
+          title_public: Share of top 10%
         display:
           name: Wealth share of the richest 10%
           numDecimalPlaces: 1
@@ -37,7 +38,7 @@ tables:
         short_unit: "%"
         description_short: The share of wealth owned by the richest 1%.
         presentation:
-          title_public: Wealth share of the richest 1%
+          title_public: Share of top 1%
         display:
           name: Wealth share of the richest 1%
           numDecimalPlaces: 1
@@ -51,7 +52,7 @@ tables:
         presentation:
           title_public: Wealth share of the richest 0.1%
         display:
-          name: Wealth share of the richest 0.1%
+          name: Share of top 0.1%
           numDecimalPlaces: 1
           tolerance: 5
 

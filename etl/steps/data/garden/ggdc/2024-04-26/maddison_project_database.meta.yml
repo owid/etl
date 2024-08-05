@@ -10,6 +10,8 @@ definitions:
       topic_tags:
         - Economic Growth
 
+  description_key_attribution: The Maddison Project Database is based on the work of many researchers who have produced estimates of economic growth and population for individual countries. The full list of sources for this historical data is given in [the original dataset](https://dataverse.nl/api/access/datafile/421302).
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -26,6 +28,7 @@ tables:
         short_unit: $
         description_short: This data is adjusted for inflation and differences in the cost of living between countries.
         description_key:
+          - "{definitions.description_key_attribution}"
           - This GDP indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
           - This data is adjusted for inflation and for differences in the cost of living between countries.
           - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
@@ -91,6 +94,7 @@ tables:
         short_unit: $
         description_short: This data is adjusted for inflation and differences in the cost of living between countries.
         description_key:
+          - "{definitions.description_key_attribution}"
           - This GDP per capita indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
           - This data is adjusted for inflation and for differences in the cost of living between countries.
           - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
@@ -175,6 +179,8 @@ tables:
         unit: people
         short_unit: ""
         description_short: ""
+        description_key:
+          - "{definitions.description_key_attribution}"
         description_from_producer: |-
          To extend the population estimates up to 2022, we used the Conference Board's Total Economy Database (TED) and the US Census Bureau’s International Database 2022.
 
@@ -194,6 +200,8 @@ tables:
         unit: ""
         short_unit: ""
         description_short: "World regions according to Maddison Project Database."
+        description_key:
+          - "{definitions.description_key_attribution}"
         display:
           name: Region
           <<: *common-display
