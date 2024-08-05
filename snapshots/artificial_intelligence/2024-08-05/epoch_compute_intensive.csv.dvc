@@ -19,7 +19,7 @@ meta:
 
     # Files
     url_main: https://epochai.org/blog/tracking-compute-intensive-ai-models
-    url_download: https://epochai.org/data/epochdb/compute_intensive_systems.csv
+    url_download: https://epochai.org/data/epochdb/large_scale_ai_models.csv
     date_accessed: 2024-08-05
 
     # License
