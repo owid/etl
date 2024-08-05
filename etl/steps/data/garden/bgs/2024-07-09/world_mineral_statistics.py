@@ -647,13 +647,13 @@ COMMODITY_MAPPING = {
         "Tantalum & Niobium, tantalum content",
     ),
     ("Tellurium, refined", "Unknown"): ("Tellurium", "Refinery"),
-    ("Tin", "Concentrates"): ("Tin", "Concentrates"),
-    ("Tin", "Scrap"): ("Tin", "Scrap"),
-    ("Tin", "Tin-silver ore"): ("Tin", "Tin-silver ore"),
-    ("Tin", "Unwrought"): ("Tin", "Unwrought"),
-    ("Tin", "Unwrought & scrap"): ("Tin", "Unwrought & scrap"),
-    ("Tin", "Unwrought & semi-manufactures"): ("Tin", "Unwrought & semi-manufactures"),
-    ("Tin", "Unwrought alloys"): ("Tin", "Unwrought alloys"),
+    ("Tin", "Concentrates"): None,
+    ("Tin", "Scrap"): None,
+    ("Tin", "Tin-silver ore"): None,
+    ("Tin", "Unwrought"): None,
+    ("Tin", "Unwrought & scrap"): None,
+    ("Tin", "Unwrought & semi-manufactures"): None,
+    ("Tin", "Unwrought alloys"): None,
     ("Tin, mine", "Unknown"): ("Tin", "Mine"),
     ("Tin, smelter", "Unknown"): ("Tin", "Smelter"),
     ("Titanium", "Ilmenite"): ("Titanium", "Ilmenite"),
@@ -736,6 +736,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Copper",
     "Lead",
     "Nickel",
+    "Tin",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.

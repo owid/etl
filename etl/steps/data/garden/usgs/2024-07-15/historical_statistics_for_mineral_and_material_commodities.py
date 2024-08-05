@@ -96,7 +96,7 @@ COMMODITY_MAPPING = {
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
     ("Tantalum", "Total"): ("Tantalum", "Total"),
     ("Tellurium", "Total"): ("Tellurium", "Total"),
-    ("Tin", "Total"): ("Tin", "Total"),
+    ("Tin", "Total"): ("Tin", "Mine"),
     ("Titanium dioxide", "Total"): ("Titanium dioxide", "Total"),
     ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
     ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
