@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  oecd_lms:
+    variables:
+      p90:
+        title: P90/P50
+        unit: "%"
+        short_unit: "%"
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.
+        presentation:
+          title_public: Top decile as % median
+          title_variant: Gross weekly individual earnings
+        display:
+          name: Testing variable
+          numDecimalPlaces: 1
+
+  eeh:
+    variables:
+      p90:
+        title: P90/P50
+        unit: "%"
+        short_unit: "%"
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.
+        presentation:
+          title_public: Top decile as % median
+          title_variant: Gross weekly individual earnings
+        display:
+          name: Testing variable
+          numDecimalPlaces: 1

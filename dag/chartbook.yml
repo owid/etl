@@ -32,6 +32,13 @@ steps:
   data://garden/chartbook/2024-08-02/ingles_1981_australia:
     - data://meadow/chartbook/2024-08-02/ingles_1981_australia
 
+
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-05/atkinson_2008_australia:
+    - snapshot://chartbook/2024-08-05/atkinson_2008_australia.xls
+  data://garden/chartbook/2024-08-05/atkinson_2008_australia:
+    - data://meadow/chartbook/2024-08-05/atkinson_2008_australia
+
   ################################################################################################
   # BRAZIL
   ################################################################################################
