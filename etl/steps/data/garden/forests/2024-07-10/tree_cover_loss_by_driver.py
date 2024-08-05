@@ -23,7 +23,6 @@ REGIONS = [
 ]
 
 
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
