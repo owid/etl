@@ -635,6 +635,16 @@ steps:
   data://grapher/lgbt_rights/2024-06-11/criminalization_mignot:
     - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
+  # Refugee, Asylum and Migration Explorer:
+  data://explorers/migration/2024-08-05/refugees_asylum_migration:
+    - data://grapher/unicef/2024-07-30/child_migration
+    - data://grapher/un/2024-07-25/refugee_data
+    - data://grapher/un/2024-07-16/migrant_stock
+    - data://grapher/un/2024-07-12/un_wpp_full
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
+
+
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
