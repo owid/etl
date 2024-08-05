@@ -390,7 +390,7 @@ COMMODITY_MAPPING = {
     ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites (natural)", "Mine"),
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
-        "Mine production, concentrates and direct shipping ores",
+        "Mine",
     ),
     ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"): (
         "Zirconium and hafnium",

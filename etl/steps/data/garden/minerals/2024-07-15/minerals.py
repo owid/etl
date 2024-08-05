@@ -246,7 +246,7 @@ def run(dest_dir: str) -> None:
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
     #     tb_bgs_flat=tb_bgs_flat,
-    #     minerals=["Tin"],
+    #     minerals=["Zinc"],
     # )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).

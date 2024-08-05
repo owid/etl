@@ -104,7 +104,7 @@ COMMODITY_MAPPING = {
     ("Total manufactured abrasives ", "Total"): ("Manufactured abrasives ", "Total"),
     ("Tungsten", "Total"): ("Tungsten", "Total"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
-    ("Zinc", "Total"): ("Zinc", "Total"),
+    ("Zinc", "Total"): ("Zinc", "Mine"),
 }
 
 # Units can either be "metric tonnes" or "metric tonnes of gross weight".

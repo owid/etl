@@ -695,14 +695,14 @@ COMMODITY_MAPPING = {
     ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
     ("Vermiculite", "Unknown"): ("Vermiculite", "Unknown"),
     ("Wollastonite", "Unknown"): ("Wollastonite", "Unknown"),
-    ("Zinc", "Crude & refined"): ("Zinc", "Crude & refined"),
-    ("Zinc", "Ores & concentrates"): ("Zinc", "Ores & concentrates"),
-    ("Zinc", "Oxides"): ("Zinc", "Oxides"),
-    ("Zinc", "Scrap"): ("Zinc", "Scrap"),
-    ("Zinc", "Unwrought"): ("Zinc", "Unwrought"),
-    ("Zinc", "Unwrought alloys"): ("Zinc", "Unwrought alloys"),
+    ("Zinc", "Crude & refined"): None,
+    ("Zinc", "Ores & concentrates"): None,
+    ("Zinc", "Oxides"): None,
+    ("Zinc", "Scrap"): None,
+    ("Zinc", "Unwrought"): None,
+    ("Zinc", "Unwrought alloys"): None,
     ("Zinc, mine", "Unknown"): ("Zinc", "Mine"),
-    ("Zinc, slab", "Unknown"): ("Zinc", "Slab"),
+    ("Zinc, slab", "Unknown"): ("Zinc", "Refinery"),
     ("Zirconium", "Concentrates"): ("Zirconium", "Concentrates"),
     ("Zirconium", "Metal"): ("Zirconium", "Metal"),
     ("Zirconium", "Unknown"): ("Zirconium", "Unknown"),
@@ -737,6 +737,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Lead",
     "Nickel",
     "Tin",
+    "Zinc",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -817,9 +818,8 @@ def harmonize_units(tb: Table) -> Table:
     # In these cases, attempt to fill unit based on category-commodity.
     # Check that, for each category-commodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity"], observed=True, as_index=False)
-    # TODO: Fix remaining degeneracies. Then uncomment this assertion.
-    # unit_count = group.agg({"unit": "nunique"})
-    # assert unit_count[unit_count["unit"] > 1].empty, "Multiple units found for the same category-commodity."
+    unit_count = group.agg({"unit": "nunique"})
+    assert unit_count[unit_count["unit"] > 1].empty, "Multiple units found for the same category-commodity."
     # Fill empty units from the same category-commodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
 
