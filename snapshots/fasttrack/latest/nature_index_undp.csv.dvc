@@ -9,6 +9,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: 452534173262d44399feda7acdbb45c2
-    size: 11422
+  - md5: c8a90738aec1d99fd1bace45b741e767
+    size: 10516
     path: nature_index_undp.csv
