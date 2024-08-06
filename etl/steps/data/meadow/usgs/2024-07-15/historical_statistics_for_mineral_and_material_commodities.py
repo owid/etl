@@ -29,6 +29,10 @@ MANUALLY_EXTRACTED_TEXT = {
 World Production
 Data are defined as world primary aluminum production. Data are reported in the MR and MYB.
 """,
+    "chromium": """
+    World Production
+World production is an estimate of world chromite ore mine production measured in contained chromium. World production reported in gross weight was converted to contained chromium by assuming that its chromic oxide content was the same as that of chromite ore imported into the United States. Before content of chromite ore was reported, a time-averaged value was used.
+""",
     "vanadium": """
 World Production
 World production data are for mine production of vanadium. Data are from the MR and MYB for 1912-22, 1925, 1927-31, 1934-43, 1945-47, and 1998 to the most recent year, the CDS for 1960-77, and the MCS for 1978-84 and 1990-97. Data were not available for 1901-11, 1923-24, and 1948-59. World production was interpolated to two significant figures for 1926, 1932-33, 1944, and 1985-89. World production data for 1927-31 and 1997-99 do not contain U.S. production.
@@ -70,7 +74,9 @@ def read_data_for_all_commodities(snap: Snapshot) -> Tuple[Dict[str, pr.ExcelFil
                 supply_demand_data[excel_path.stem] = pr.ExcelFile(excel_path)
                 extract_embedded_files_from_excel(excel_path=excel_path, output_dir=word_dir)
                 word_file = (word_dir / excel_path.stem).with_suffix(".docx")
-                if word_file.exists():
+                # For some strange reason, chromium text is extracted properly, but the words "United States" disappear!
+                # No idea why this is happening; for now, I'll skip extraction and add the text manually.
+                if word_file.exists() and (excel_path.stem not in ["chromium"]):
                     # Extract text from the embedded Word document.
                     extracted_text[excel_path.stem] = extract_text_from_word_document(word_file)
                 else:

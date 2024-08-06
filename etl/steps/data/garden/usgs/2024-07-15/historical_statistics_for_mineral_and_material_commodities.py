@@ -38,7 +38,7 @@ COMMODITY_MAPPING = {
     ("Cadmium", "Total"): ("Cadmium", "Total"),
     ("Cement", "Total"): ("Cement", "Total"),
     ("Cesium", "Total"): ("Cesium", "Total"),
-    ("Chromium", "Total"): ("Chromium", "Total"),
+    ("Chromium", "Total"): ("Chromium", "Mine, contained chromium"),
     ("Cobalt", "Total"): ("Cobalt", "Total"),
     ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
     ("Copper", "Total"): ("Copper", "Mine"),
