@@ -85,7 +85,7 @@ COMMODITY_MAPPING = {
     ("Pig Iron", "Total"): ("Pig Iron", "Total"),
     ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
     ("Salt", "Total"): ("Salt", "Total"),
-    ("Selenium", "Total"): ("Selenium", "Total"),
+    ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Total"),
     ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
     ("Silver", "Total"): ("Silver", "Total"),
