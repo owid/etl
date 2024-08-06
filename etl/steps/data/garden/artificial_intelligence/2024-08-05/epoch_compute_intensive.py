@@ -24,34 +24,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
-    # Convert relevant columns to string type
-    columns = ["system", "domain"]
-    tb[columns] = tb[columns].astype(str)
-
-    def simplify_entry(entry):
-        """
-        Simplifies an entry of organization categories which can include many entries of Industry, Academia etc.
-        Removes duplicates, ensures all words except the first one start with a lower case letter,and joins the categories with ", " and " and " before the last one.
-        """
-        # Check for "nan"
-        if entry == "nan":
-            return "Not specified"
-
-        # Split the entry into categories, convert to set to remove duplicates
-        categories = sorted(set(entry.split(",")))
-
-        # Make sure all words except the first one start with a lower case letter
-        categories = [categories[0]] + [category.lower() for category in categories[1:]]
-
-        # Join the categories with ", " and " and " before the last one
-        if len(categories) > 1:
-            simplified_entry = ", ".join(categories[:-1]) + " and " + categories[-1] + " collaboration"
-        else:
-            simplified_entry = categories[0]
-
-        return simplified_entry
-
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15
 

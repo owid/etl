@@ -1,4 +1,4 @@
-"""Generate aggregated table for total yearly and cumulative number of notable AI systems in each country."""
+"""Generate aggregated table for total yearly and cumulative number of compute intensive AI systems in each country."""
 
 import shared as sh
 
@@ -25,7 +25,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     # Define the columns that are not needed
     unused_columns = [
         "domain",
@@ -44,6 +43,7 @@ def run(dest_dir: str) -> None:
 
     # Harmonize the country names
     tb_agg = geo.harmonize_countries(df=tb_agg, countries_file=paths.country_mapping_path)
+
     # Set the index to year and country
     tb_agg = tb_agg.format(["year", "country"])
 

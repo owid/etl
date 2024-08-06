@@ -1,4 +1,4 @@
-"""Generate aggregated table for total yearly and cumulative number of notable AI systems for each domain."""
+"""Generate aggregated table for total yearly and cumulative number of compute intensive AI systems for each domain."""
 
 import shared as sh
 
@@ -24,7 +24,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     # Define the columns that are not needed
     unused_columns = [
         "authors",
@@ -37,6 +36,7 @@ def run(dest_dir: str) -> None:
 
     # Aggregate the data by domain
     tb_agg = sh.calculate_aggregates(tb, "domain", paths.short_name, unused_columns)
+
     # Set the index to year and domain
     tb_agg = tb_agg.format(["year", "domain"])
 

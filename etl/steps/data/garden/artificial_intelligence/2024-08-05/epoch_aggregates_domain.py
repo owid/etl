@@ -25,6 +25,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
+    # Store the origins metadata for later use
+    origins = tb["domain"].metadata.origins
+
     # Define the columns that are not needed
     unused_columns = [
         "authors",
@@ -36,15 +39,11 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints",
         "notability_criteria",
     ]
+    # Drop the unused columns
+    tb = tb.drop(unused_columns, axis=1)
 
     # Select the rows where the 'notability_criteria' column is not null (only consider notable systems)
     tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
-
-    # Store the origins metadata for later use
-    origins = tb["domain"].metadata.origins
-
-    # Drop the unused columns
-    tb = tb.drop(unused_columns, axis=1)
 
     # Convert the 'publication_date' column to datetime format and extract the year
     tb["publication_date"] = pd.to_datetime(tb["publication_date"])
@@ -75,9 +74,6 @@ def run(dest_dir: str) -> None:
 
     # Group by year and country/domain and count the number of systems (consider all categories which will assume 0 for missing values)
     tb_agg = tb_unique.groupby(["year", "domain"], observed=False).size().reset_index(name="yearly_count")
-
-    # Add the origins metadata to the 'number_of_systems' column
-    tb_agg["yearly_count"].metadata.origins = origins
 
     # Calculate the cumulative count (consider all categories which will assume 0 for missing values)
     tb_agg["cumulative_count"] = tb_agg.groupby("domain", observed=False)["yearly_count"].cumsum()
