@@ -154,10 +154,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     # Keep only the columns I need
     tb_regions = tb_regions[["country", "year"] + columns_count + columns_pop]
 
-    # Merge the two tables
-    tb = pr.merge(tb, tb_regions, on=["country", "year"], how="left")
-
-    return tb
+    return tb_regions
 
 
 def add_metadata_for_aggregated_columns(column_title: str, status: str, count_or_pop: str, origins) -> VariableMeta:
