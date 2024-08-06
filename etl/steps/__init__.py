@@ -4,6 +4,7 @@
 #
 import graphlib
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -26,6 +27,8 @@ import requests
 import structlog
 import yaml
 from owid import catalog
+from owid.catalog import s3_utils
+from owid.catalog.catalogs import OWID_CATALOG_URI
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -416,6 +419,12 @@ class DataStep(Step):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        if config.PREFER_DOWNLOAD:
+            # if checksums match, download the dataset from the catalog
+            success = self._download_dataset_from_catalog()
+            if success:
+                return
+
         ds_idex_mtime = self._dataset_index_mtime()
 
         sp = self._search_path
@@ -620,6 +629,48 @@ class DataStep(Step):
                     stderr_file=ostream,
                     cwd=notebook_path.parent.as_posix(),
                 )
+
+    def _download_dataset_from_catalog(self) -> bool:
+        """Download the dataset from the catalog if the checksums match. Return True if successful."""
+        url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
+        resp = requests.get(url)
+        if not resp.ok:
+            return False
+
+        ds_meta = resp.json()
+
+        # checksums don't match, return False
+        if self.checksum_output() != ds_meta["source_checksum"]:
+            return False
+
+        r2 = s3_utils.connect_r2_cached()
+        s3_utils.download_s3_folder(f"s3://owid-catalog/{self.path}", self._dest_dir, client=r2, ignore="index.json")
+
+        """download files over HTTPS, the problem is that we don't have a list of tables to download
+        in index.json
+
+        from owid.datautils.web import download_file_from_url
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            futures = []
+
+            for fname in ("cherry_blossom.feather", "cherry_blossom.meta.json"):
+                futures.append(
+                    executor.submit(
+                        download_file_from_url,
+                        f"{OWID_CATALOG_URI}/{self.path}/{fname}",
+                        f"{self._dest_dir}/{fname}",
+                    )
+                )
+        """
+
+        # save index.json file after successful download
+        with open(self._output_dataset._index_file, "w") as ostream:
+            json.dump(ds_meta, ostream)
+
+        log.info(f"Downloaded {self.path} from catalog")
+
+        return True
 
 
 @dataclass
