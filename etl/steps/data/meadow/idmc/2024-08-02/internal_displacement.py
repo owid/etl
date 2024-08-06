@@ -50,13 +50,17 @@ def run(dest_dir: str) -> None:
     tb["total_stock_displacement"] = tb["conflict_stock_displacement"] + tb["disaster_stock_displacement"]
     tb["total_internal_displacements"] = tb["conflict_internal_displacements"] + tb["disaster_internal_displacements"]
 
-    tb["share_of_internally_displaced_pop"] = tb["total_stock_displacement"] / tb["population"] * 100
-    tb["share_of_conflict_displaced_pop"] = tb["conflict_stock_displacement"] / tb["population"] * 100
-    tb["share_of_disaster_displaced_pop"] = tb["disaster_stock_displacement"] / tb["population"] * 100
+    columns_to_calculate = [
+        ("share_of_internally_displaced_pop", "total_stock_displacement"),
+        ("share_of_conflict_displaced_pop", "conflict_stock_displacement"),
+        ("share_of_disaster_displaced_pop", "disaster_stock_displacement"),
+        ("displacements_per_100_people", "total_internal_displacements"),
+        ("conflict_displacements_per_100_people", "conflict_internal_displacements"),
+        ("disaster_displacements_per_100_people", "disaster_internal_displacements"),
+    ]
 
-    tb["displacements_per_100_people"] = tb["total_internal_displacements"] / tb["population"] * 100
-    tb["conflict_displacements_per_100_people"] = tb["conflict_internal_displacements"] / tb["population"] * 100
-    tb["disaster_displacements_per_100_people"] = tb["disaster_internal_displacements"] / tb["population"] * 100
+    for new_column, source_column in columns_to_calculate:
+        tb[new_column] = (tb[source_column] / tb["population"]) * 100
 
     tb = tb.drop(columns=["population"], errors="raise")
 
