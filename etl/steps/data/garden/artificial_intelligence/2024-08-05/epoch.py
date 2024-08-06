@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
@@ -22,6 +23,7 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
+    #
     # Filter notable systems by selecting rows where 'notability_criteria' is not nan
     tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
     tb = tb.drop("notability_criteria", axis=1)
@@ -90,7 +92,7 @@ def run(dest_dir: str) -> None:
     # Replace nans with Unspecified in each column to avoid issues when calculating sume of notable systems
     columns = ["organization_categorization", "domain", "organization"]
     tb[columns] = tb[columns].replace("nan", "Not specified")
-    # Find domains with total number of notable systems below 20
+
     # Check for multiple entries in 'domain' separated by comma
     multiple_domains = tb["domain"].str.contains(",")
     # Replace entries in 'domain' that contain a comma with 'Multiple Domains'

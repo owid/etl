@@ -1,4 +1,4 @@
-""" Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
+"""Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -19,6 +19,12 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["epoch"]
     tb = tb.reset_index()
 
+    #
+    # Process data.
+    #
+    # Store the origins metadata for later use
+    origins = tb["organization_categorization"].metadata.origins
+
     # Define the columns that are not needed
     unused_columns = [
         "days_since_1949",
@@ -27,24 +33,17 @@ def run(dest_dir: str) -> None:
         "domain",
         "training_computation_petaflop",
     ]
-    # Store the origins metadata for later use
-    origins = tb["organization_categorization"].metadata.origins
-
     # Drop the unused columns
     tb = tb.drop(unused_columns, axis=1)
 
     # Ensure 'publication_date' column type is datetime64
     assert tb["publication_date"].dtype == "datetime64[ns]", "publication_date column is not of type datetime64"
-    tb["year"] = tb["publication_date"].dt.year
 
-    # Store the origins metadata for later use
-    origins = tb["organization_categorization"].metadata.origins
+    # Extract the year from the 'publication_date' column
+    tb["year"] = tb["publication_date"].dt.year
 
     # Group by year and country and count the number of systems
     tb_agg = tb.groupby(["year", "organization_categorization"], observed=False).size().reset_index(name="yearly_count")
-
-    # Add the origins metadata to the 'number_of_systems' column
-    tb_agg["yearly_count"].metadata.origins = origins
 
     # Calculate the cumulative count
     tb_agg["cumulative_count"] = tb_agg.groupby("organization_categorization", observed=False)["yearly_count"].cumsum()
@@ -59,7 +58,9 @@ def run(dest_dir: str) -> None:
     # Set the index to year and country
     tb_agg = tb_agg.format(["year", "organization_categorization"])
 
+    #
     # Save outputs.
+    #
     ds_garden = create_dataset(dest_dir, tables=[tb_agg])
     ds_garden.save()
 
