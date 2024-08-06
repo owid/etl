@@ -44,6 +44,18 @@ steps:
   data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
     - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
 
+  # Household income and wealth, Australia, Australian Bureau of Statistics (live version)
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia:
+    - snapshot://abs/2024-08-06/household_income_and_wealth_australia.zip
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia:
+    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia
+
+  # Household income and wealth, Australia, Australian Bureau of Statistics (2017-18)
+  data://meadow/abs/2024-08-06/household_income_australia_2017_2018:
+    - snapshot://abs/2024-08-06/household_income_australia_2017_2018.xlsx
+  data://garden/abs/2024-08-06/household_income_australia_2017_2018:
+    - data://meadow/abs/2024-08-06/household_income_australia_2017_2018
+
   ################################################################################################
   # BRAZIL
   ################################################################################################
@@ -115,9 +127,3 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
-
-  # Household income and wealth, Australia, Australian Bureau of Statistics (live version)
-  data://meadow/abs/2024-08-06/household_income_and_wealth_australia:
-    - snapshot://abs/2024-08-06/household_income_and_wealth_australia.zip
-  data://garden/abs/2024-08-06/household_income_and_wealth_australia:
-    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia
