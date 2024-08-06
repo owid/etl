@@ -6,12 +6,12 @@ dataset:
 tables:
   nature_index_undp:
     variables:
-      hdi_co2_adjusted:
-        title: hdi_co2_adjusted
+      hdi_co2_index:
+        title: hdi_co2_index
         unit: ''
         description: Human Development Index adjusted for consumption-based CO2 emissions.
-      hdi_land_adjusted:
-        title: hdi_land_adjusted
+      hdi_land_index:
+        title: hdi_land_index
         unit: ''
         description: Human Development Index adjusted for agricultural land use.
       care_index:
@@ -22,10 +22,6 @@ tables:
         title: protected_areas
         unit: ''
         description: Share of land area that is protected.
-      govt_spending:
-        title: govt_spending
-        unit: ''
-        description: Government spending on environmental protection, as a share of GDP.
       nri_index:
         title: nri_index
         unit: ''
