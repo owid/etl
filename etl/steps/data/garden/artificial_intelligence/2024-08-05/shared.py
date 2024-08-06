@@ -49,6 +49,9 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode(agg_column)
 
+    # Convert the column to category type so that the missing values will be considered as 0
+    tb_exploded[agg_column] = tb_exploded[agg_column].astype("category")
+
     # Drop duplicates where the year, system and country/domain are the same
     tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
 
