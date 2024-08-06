@@ -165,10 +165,13 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
 def add_metadata_for_aggregated_columns(
     column_title: str, description_from_producer: str, status: str, count_or_pop: str, origins
 ) -> VariableMeta:
+    # Remove the unwanted part "(1=yes; 0=no)" from the column_title
+    clean_column_title = column_title.replace(" (1=yes; 0=no)", "")
+
     if count_or_pop == "count":
         meta = VariableMeta(
             title=f"{column_title} - {status.capitalize()} (Count)",
-            description_short=f"Number of countries with the status '{status}' for {column_title}.",
+            description_short=f"Number of countries with the status '{status}' for \"{clean_column_title}\".",
             description_from_producer=description_from_producer,
             unit="countries",
             short_unit="",
@@ -184,7 +187,7 @@ def add_metadata_for_aggregated_columns(
     elif count_or_pop == "pop":
         meta = VariableMeta(
             title=f"{column_title} - {status.capitalize()} (Population)",
-            description_short=f"Population of countries with the status '{status}' for {column_title}.",
+            description_short=f"Population of countries with the status '{status}' for \"{clean_column_title}\".",
             description_from_producer=description_from_producer,
             unit="persons",
             short_unit="",
