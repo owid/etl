@@ -31,6 +31,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
+    # Get the columns that have (1=yes; 0=no) in the title which can be used for calculating the country counts
     indicators_for_sums = []
     for col in tb:
         if "(1=yes; 0=no)" in tb[col].metadata.title:
