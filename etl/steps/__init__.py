@@ -921,7 +921,7 @@ class GithubStep(Step):
     version: str = "latest"
     dependencies = []
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, **kwargs) -> None:
         self.path = path
         try:
             org, repo = path.split("/")

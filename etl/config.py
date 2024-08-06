@@ -221,6 +221,7 @@ def enable_bugsnag() -> None:
 
 # Wizard config
 WIZARD_PORT = 8053
+PREFECT_PORT = 4200
 
 
 ### WIP: OWIDENV
@@ -445,6 +446,18 @@ class OWIDEnv:
             return "https://etl.owid.io/wizard/"
         else:
             return f"{self.base_site}/etl/wizard"
+
+    @property
+    def prefect_url(self) -> str:
+        """Get prefect url."""
+        # NOTE: I was trying to put Prefect UI at https://etl.owid.io/etl/prefect, but
+        # I couldn't make it work with PREFECT_API_URL. See nginx in ops for details
+        if self.env_local == "dev":
+            return f"http://localhost:{PREFECT_PORT}/flow-runs"
+        elif self.env_local == "production":
+            return "https://etl.owid.io:{PREFECT_PORT}/flow-runs"
+        else:
+            return f"{self.base_site}:{PREFECT_PORT}/flow-runs"
 
     def dataset_admin_site(self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
