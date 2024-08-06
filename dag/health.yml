@@ -679,3 +679,12 @@ steps:
   data://grapher/who/2024-07-29/icd_codes:
     - data://garden/who/2024-07-29/icd_codes
 
+
+  # WHO Mortality Database - Cancer specific
+  data://meadow/who/2024-08-06/mortality_database_cancer:
+    - snapshot://who/2024-08-06/mortality_database_cancer.csv
+  data://garden/who/2024-08-06/mortality_database_cancer:
+    - data://meadow/who/2024-08-06/mortality_database_cancer
+  data://grapher/who/2024-08-06/mortality_database_cancer:
+    - data://garden/who/2024-08-06/mortality_database_cancer
+
