@@ -574,7 +574,7 @@ steps:
   data://garden/wb/2024-06-10/gender_statistics_country_counts:
     - data://garden/wb/2024-06-10/gender_statistics
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
+    - data://garden/demography/2024-07-15/population
   data://grapher/wb/2024-06-10/gender_statistics:
     - data://garden/wb/2024-06-10/gender_statistics
   data://grapher/wb/2024-06-10/gender_statistics_country_counts:
