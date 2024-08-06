@@ -1,6 +1,6 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 import pandas as pd
-from config_dict import CONFIG_DICT  # type: ignore
+from migration_config_dict import CONFIG_DICT  # type: ignore
 
 from etl.helpers import PathFinder, create_explorer
 

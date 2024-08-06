@@ -24,6 +24,14 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow.read_table("refugee_data")
     tb_resettlement = ds_resettlement.read_table("resettlement")
 
+    # filter out data before data availability starts (s. https://www.unhcr.org/refugee-statistics/methodology/, "Data publication timeline")
+    tb["asylum_seekers"] = tb.apply(lambda x: x["asylum_seekers"] if x["year"] > 1999 else pd.NA, axis=1)
+    tb["idps_of_concern_to_unhcr"] = tb.apply(
+        lambda x: x["idps_of_concern_to_unhcr"] if x["year"] > 1992 else pd.NA, axis=1
+    )
+    tb["stateless_persons"] = tb.apply(lambda x: x["stateless_persons"] if x["year"] > 2003 else pd.NA, axis=1)
+    tb["others_of_concern"] = tb.apply(lambda x: x["others_of_concern"] if x["year"] > 2017 else pd.NA, axis=1)
+
     # group table by country_of_origin and year
     tb_origin = (
         tb.drop(columns=["country_of_asylum"]).groupby(["country_of_origin", "year"], observed=True).sum().reset_index()
