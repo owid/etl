@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
     df_graphers["Period Radio"] = period_radio
     df_graphers["Sub-Metric Radio"] = sub_metric_radio
     df_graphers["Age Radio"] = age_radio
+    df_graphers["Processing Radio"] = processing_radio
 
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
@@ -59,7 +60,9 @@ def run(dest_dir: str) -> None:
     # Sanity check.
     error = "Duplicated rows in explorer."
     assert df_graphers[
-        df_graphers.duplicated(subset=["Metric Dropdown", "Period Radio", "Sub-Metric Radio", "Age Radio"], keep=False)
+        df_graphers.duplicated(
+            subset=["Metric Dropdown", "Period Radio", "Sub-Metric Radio", "Age Radio", "Processing Radio"], keep=False
+        )
     ].empty, error
 
     # Sort rows conveniently.
