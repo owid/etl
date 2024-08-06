@@ -642,6 +642,8 @@ steps:
     - data://grapher/un/2024-07-16/migrant_stock
     - data://grapher/un/2024-07-12/un_wpp_full
     - data://grapher/worldbank_wdi/2024-05-20/wdi
+    - data://grapher/idmc/2024-08-02/internal_displacement
+
 
 
 
