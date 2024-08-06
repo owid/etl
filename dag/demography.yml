@@ -231,6 +231,13 @@ steps:
   data://grapher/un/2024-07-16/migrant_stock:
     - data://garden/un/2024-07-16/migrant_stock
 
+  # Internal displacement monitoring centre
+  data://meadow/idmc/2024-08-02/internal_displacement:
+    - snapshot://idmc/2024-08-02/internal_displacement.xlsx
+    - data://garden/demography/2024-07-15/population
+  data://grapher/idmc/2024-08-02/internal_displacement:
+    - data://meadow/idmc/2024-08-02/internal_displacement
+
   # UNHCR refugee data
   data://meadow/un/2024-07-25/refugee_data:
     - snapshot://un/2024-07-25/refugee_data.zip
