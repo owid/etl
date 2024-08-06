@@ -99,6 +99,8 @@ def run(dest_dir: str) -> None:
     #
     # Create a new explorers dataset and tsv file.
 
+    df_graphers.to_csv("/Users/tunaacisu/Data/Test/explorer.tsv", sep="\t", index=False)
+
     # TODO: add columns to the explorer once I have figured out map brackets
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
     ds_explorer.save()
