@@ -6,6 +6,10 @@ from etl.helpers import PathFinder, create_explorer
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Prefix used for "share" columns.
+# NOTE: This must coincide with the same variable as defined in the garden minerals step.
+SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+
 
 def run(dest_dir: str) -> None:
     #
@@ -27,8 +31,8 @@ def run(dest_dir: str) -> None:
     for column in tb.drop(columns=["country", "year"]).columns:
         if tb[column].notnull().any():
             metric, commodity, sub_commodity, unit = tb[column].metadata.title.split("|")
-            if metric.startswith("share_of_global_"):
-                metric = metric.replace("share_of_global_", "")
+            if metric.startswith(SHARE_OF_GLOBAL_PREFIX):
+                metric = metric.replace(SHARE_OF_GLOBAL_PREFIX, "")
                 is_share_of_global = True
             else:
                 is_share_of_global = False

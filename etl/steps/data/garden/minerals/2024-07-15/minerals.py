@@ -32,6 +32,9 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Prefix used for "share" columns.
+SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+
 
 def adapt_flat_table(tb_flat: Table) -> Table:
     tb_flat = tb_flat.copy()
@@ -51,6 +54,8 @@ def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> Tu
     # And gather footnotes from grapher config, if given.
     notes = None
     footnotes = None
+    # For "share" columns, we also want to fetch the notes of the original column.
+    column = column.replace(SHARE_OF_GLOBAL_PREFIX, "")
     if column in tb_flat.columns:
         notes = tb_flat[column].metadata.description_from_producer
         if tb_flat[column].metadata.presentation.grapher_config is not None:
@@ -73,7 +78,7 @@ def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
     return combined_notes
 
 
-def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Table:
+def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs_historical_flat: Table) -> Table:
     tb = tb.copy()
 
     # Improve metadata of new columns.
@@ -95,7 +100,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
 
-        if column.startswith("share_of_global_"):
+        if column.startswith(SHARE_OF_GLOBAL_PREFIX):
             title_public = title_public.replace("share of global ", "") + " as a share of the global total"
 
         tb[column].metadata.presentation.title_public = title_public
@@ -114,19 +119,26 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
 
-        # Gather notes and footnotes from USGS' metadata.
+        # Gather notes and footnotes from USGS' current metadata.
         notes_usgs, footnotes_usgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_usgs_flat, column=column)
+
+        # Gather notes and footnotes from USGS' historical metadata.
+        notes_usgs_historical, footnotes_usgs_historical = _gather_notes_and_footnotes_from_metadata(
+            tb_flat=tb_usgs_historical_flat, column=column
+        )
 
         # Gather notes and footnotes from BGS' metadata.
         notes_bgs, footnotes_bgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_bgs_flat, column=column)
 
         # Add notes to metadata.
-        combined_notes = _combine_notes(notes_list=[notes_bgs, notes_usgs], separator="\n\n")
+        combined_notes = _combine_notes(notes_list=[notes_bgs, notes_usgs, notes_usgs_historical], separator="\n\n")
         if len(combined_notes) > 0:
             tb[column].metadata.description_from_producer = combined_notes
 
         # Add footnotes to metadata.
-        combined_footnotes = _combine_notes(notes_list=[footnotes_bgs, footnotes_usgs], separator=" ")
+        combined_footnotes = _combine_notes(
+            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical], separator=" "
+        )
         if len(combined_footnotes) > 0:
             tb[column].metadata.presentation.grapher_config["note"] = combined_footnotes
 
@@ -187,8 +199,8 @@ def add_share_of_global_columns(tb: Table) -> Table:
         if (column.split("|")[0] in ["exports", "imports", "production", "reserves"]) and (
             tb_world[column].notnull().any()
         ):
-            new_columns[f"share_of_global_{column}"] = _tb[column] / _tb[f"{column}_world_share"] * 100
-            metadata[f"share_of_global_{column}"] = tb[column].metadata
+            new_columns[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = _tb[column] / _tb[f"{column}_world_share"] * 100
+            metadata[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = tb[column].metadata
 
     # Add the new share columns to the original table.
     tb = pr.concat([tb, Table(new_columns)], axis=1)
@@ -251,12 +263,14 @@ def run(dest_dir: str) -> None:
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
     tb = add_share_of_global_columns(tb=tb)
 
-    for column in [column for column in tb.columns if column.startswith("share_")]:
+    for column in [column for column in tb.columns if column.startswith(SHARE_OF_GLOBAL_PREFIX)]:
         if (tb[column] > 100).any():
             log.warning(f"{column} maximum: {tb[column].max():.0f}%")
 
     # Improve metadata.
-    tb = improve_metadata(tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat)
+    tb = improve_metadata(
+        tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
+    )
 
     # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals").astype("Float64")

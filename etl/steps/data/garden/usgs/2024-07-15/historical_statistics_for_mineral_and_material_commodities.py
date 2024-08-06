@@ -50,7 +50,7 @@ COMMODITY_MAPPING = {
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
     ("Fluorspar", "Total"): ("Fluorspar", "Total"),
     ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
-    ("Gallium", "Total"): ("Gallium", "Total"),
+    ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Total"),
     ("Gold", "Total"): ("Gold", "Total"),
     ("Graphite", "Total"): ("Graphite", "Total"),
