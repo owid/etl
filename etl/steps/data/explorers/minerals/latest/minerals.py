@@ -23,21 +23,31 @@ def run(dest_dir: str) -> None:
     metric_dropdown = []
     commodity_dropdown = []
     sub_commodity_dropdown = []
+    share_of_global = []
     for column in tb.drop(columns=["country", "year"]).columns:
         if tb[column].notnull().any():
             metric, commodity, sub_commodity, unit = tb[column].metadata.title.split("|")
+            if metric.startswith("share_of_global_"):
+                metric = metric.replace("share_of_global_", "")
+                is_share_of_global = True
+            else:
+                is_share_of_global = False
             metric = metric.replace("_", " ").capitalize()
             commodity = commodity.capitalize()
             sub_commodity = sub_commodity.capitalize()
+
+            # Append extracted values.
             variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
             metric_dropdown.append(metric)
             commodity_dropdown.append(commodity)
             sub_commodity_dropdown.append(f"{sub_commodity} ({unit})")
+            share_of_global.append(is_share_of_global)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Mineral Dropdown"] = commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["Type Dropdown"] = sub_commodity_dropdown
+    df_graphers["Share of global Checkbox"] = share_of_global
 
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
@@ -45,7 +55,9 @@ def run(dest_dir: str) -> None:
     # Sanity check.
     error = "Duplicated rows in explorer."
     assert df_graphers[
-        df_graphers.duplicated(subset=["Mineral Dropdown", "Type Dropdown", "Metric Dropdown"], keep=False)
+        df_graphers.duplicated(
+            subset=["Mineral Dropdown", "Type Dropdown", "Metric Dropdown", "Share of global Checkbox"], keep=False
+        )
     ].empty, error
 
     # Sort rows conveniently.

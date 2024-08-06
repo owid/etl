@@ -96,7 +96,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table) -> Tabl
             tb[column].metadata.presentation = VariablePresentationMeta()
 
         if column.startswith("share_of_global_"):
-            title_public += " as a share of the global total"
+            title_public = title_public.replace("share of global ", "") + " as a share of the global total"
 
         tb[column].metadata.presentation.title_public = title_public
 
