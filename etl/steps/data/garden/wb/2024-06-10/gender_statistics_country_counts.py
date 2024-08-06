@@ -38,6 +38,9 @@ def run(dest_dir: str) -> None:
 
     # Select only the columns of interest
     tb = tb[indicators_for_sums + ["country", "year"]]
+    # Remove rows with NaNs in specified columns only (ignoring 'country' and 'year')
+    tb = tb.dropna(subset=indicators_for_sums)
+
     # Find the minimum year
     min_year = tb["year"].min()
 
@@ -82,8 +85,10 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
         description_from_producer = tb[col].metadata.description_from_producer
         tb_regions[col] = tb_regions[col].astype(str)
         # Define the mapping dictionary
-        value_map = {"nan": "missing", "0.0": "no", "1.0": "yes"}
+        value_map = {"0.0": "no", "1.0": "yes"}
         tb_regions[col] = tb_regions[col].map(value_map)
+        # Perform the assertion to ensure there are no NaNs in these specific columns
+        assert tb[col].notna().all(), f"NaN values found in column: {col}"
 
         # Get the unique values in the column
         status_list = list(tb_regions[col].unique())
@@ -136,26 +141,6 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     tb_regions = geo.add_population_to_table(
         tb=tb_regions, ds_population=ds_population, warn_on_missing_countries=False
     )
-
-    # Calculate the missing population for each region
-    for col in columns:
-        column_title = tb[col].metadata.title
-        description_from_producer = tb[col].metadata.description_from_producer
-        # Calculate the missing population for each column, by subtracting the population of the countries with data from the total population
-        tb_regions[f"{col}_missing_pop_other_countries"] = tb_regions["population"] - tb_regions[
-            columns_pop_dict[col]
-        ].sum(axis=1)
-        tb_regions[f"{col}_missing_pop"] = (
-            tb_regions[f"{col}_missing_pop"] + tb_regions[f"{col}_missing_pop_other_countries"]
-        )
-
-        tb_regions[f"{col}_missing_pop"].metadata = add_metadata_for_aggregated_columns(
-            column_title=column_title,
-            description_from_producer=description_from_producer,
-            status="missing",
-            count_or_pop="pop",
-            origins=tb_regions[f"{col}_missing_pop"].m.origins,
-        )
 
     # Keep only the regions in the country column
     tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].copy().reset_index(drop=True)
