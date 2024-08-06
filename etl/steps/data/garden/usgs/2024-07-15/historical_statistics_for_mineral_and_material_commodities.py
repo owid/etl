@@ -70,7 +70,7 @@ COMMODITY_MAPPING = {
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
     ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
-    ("Mercury", "Total"): ("Mercury", "Total"),
+    ("Mercury", "Total"): ("Mercury", "Mine"),
     ("Metallic abrasives", "Total"): ("Metallic abrasives", "Total"),
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),

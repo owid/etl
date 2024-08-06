@@ -402,7 +402,7 @@ COMMODITY_MAPPING = {
     ("Manganese ore", "Manganese ore (ferruginous)"): None,
     ("Manganese ore", "Metallurgical"): None,
     ("Manganese ore", "Unknown"): ("Manganese", "Ores & Concentrates"),
-    ("Mercury", "Unknown"): ("Mercury", "Unknown"),
+    ("Mercury", "Unknown"): ("Mercury", "Mine"),
     ("Mica", "Block"): ("Mica", "Block"),
     ("Mica", "Condenser films"): ("Mica", "Condenser films"),
     ("Mica", "Crude"): ("Mica", "Crude"),
