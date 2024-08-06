@@ -32,7 +32,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
 
     # Create an in-memory bytes file and load the dataset
     with io.BytesIO(file_content) as memfile:
-        ds = xr.open_dataset(memfile, engine="h5netcdf").load()  # .load() ensures data is eagerly loaded
+        ds = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
 
     # Your pro
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
