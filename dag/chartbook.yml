@@ -32,12 +32,17 @@ steps:
   data://garden/chartbook/2024-08-02/ingles_1981_australia:
     - data://meadow/chartbook/2024-08-02/ingles_1981_australia
 
-
   # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
   data://meadow/chartbook/2024-08-05/atkinson_2008_australia:
     - snapshot://chartbook/2024-08-05/atkinson_2008_australia.xls
   data://garden/chartbook/2024-08-05/atkinson_2008_australia:
     - data://meadow/chartbook/2024-08-05/atkinson_2008_australia
+
+  # Wealth data from Katic and Leigh (2015)
+  data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia:
+    - snapshot://chartbook/2024-08-05/katic_leigh_2015_australia.xlsx
+  data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
+    - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
 
   ################################################################################################
   # BRAZIL
@@ -110,9 +115,3 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
-
-  # Wealth data from Katic and Leigh (2015)
-  data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia:
-    - snapshot://chartbook/2024-08-05/katic_leigh_2015_australia.xlsx
-  data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
-    - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
