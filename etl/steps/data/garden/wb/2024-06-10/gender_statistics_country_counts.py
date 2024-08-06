@@ -41,16 +41,11 @@ def run(dest_dir: str) -> None:
     # Remove rows with NaNs in specified columns only (ignoring 'country' and 'year')
     tb = tb.dropna(subset=indicators_for_sums)
 
-    # Find the minimum year
-    min_year = tb["year"].min()
-
     tb = add_country_counts_and_population_by_status(tb, ds_regions, ds_population)
 
     # Remove columns that are not needed and are in the original dataset
     columns_to_keep = [col for col in tb.columns if col not in indicators_for_sums]
     tb = tb[columns_to_keep]
-    # Filter the Table to include rows from the minimum year in the original dataset onwards
-    tb = tb[tb["year"] >= min_year]
 
     tb = tb.format(["country", "year"])
 
