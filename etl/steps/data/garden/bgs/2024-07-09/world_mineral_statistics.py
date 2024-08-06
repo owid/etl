@@ -546,14 +546,14 @@ COMMODITY_MAPPING = {
         "Sillimanite mins, chamotte, dinas earth",
     ),
     ("Sillimanite minerals", "Unknown"): ("Sillimanite minerals", "Unknown"),
-    ("Silver", "Alloys"): ("Silver", "Alloys"),
+    ("Silver", "Alloys"): None,
     ("Silver", "Metal"): ("Silver", "Metal"),
-    ("Silver", "Metal, refined"): ("Silver", "Metal, refined"),
-    ("Silver", "Metal, unrefined"): ("Silver", "Metal, unrefined"),
+    ("Silver", "Metal, refined"): None,
+    ("Silver", "Metal, unrefined"): None,
     ("Silver", "Ores & concentrates"): ("Silver", "Ores & concentrates"),
-    ("Silver", "Silver-lead bullion"): ("Silver", "Silver-lead bullion"),
-    ("Silver", "Unknown"): ("Silver", "Unknown"),
-    ("Silver", "Waste & scrap"): ("Silver", "Waste & scrap"),
+    ("Silver", "Silver-lead bullion"): None,
+    ("Silver", "Unknown"): None,
+    ("Silver", "Waste & scrap"): None,
     ("Silver, mine", "Unknown"): ("Silver", "Mine"),
     ("Sodium carbonate, natural", "Unknown"): ("Sodium carbonate", "Natural"),
     ("Steel, crude", "Unknown"): ("Steel", "Crude"),
@@ -728,6 +728,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Lead",
     "Molybdenum",
     "Nickel",
+    "Silver",
     "Tin",
     "Zinc",
 ]
@@ -791,7 +792,16 @@ def harmonize_units(tb: Table) -> Table:
 
     # In some cases, units given in "tonnes *" can safely be converted to simply "tonnes".
     # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.
-    tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
+    # But note that some of these minerals have units that need to be converted (since they are not in tonnes).
+    # Therefore, make a list of all those minerals that need to be converted later.
+    minerals_to_convert_to_tonnes_later = (
+        tb[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES) & (~tb["unit"].str.startswith("tonnes"))]["commodity"]
+        .unique()
+        .tolist()
+    )
+    tb.loc[
+        tb["commodity"].isin(set(MINERALS_TO_CONVERT_TO_TONNES) - set(minerals_to_convert_to_tonnes_later)), "unit"
+    ] = "tonnes"
 
     # Check that, for each category-commodity-subcommodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity", "sub_commodity"], observed=True, as_index=False)
@@ -870,6 +880,10 @@ def harmonize_units(tb: Table) -> Table:
             tb.loc[mask & (tb["commodity"] == "Helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
             # tb.loc[mask & (tb["commodity"] == "Natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
         tb.loc[mask, "unit"] = UNIT_MAPPING[unit]
+
+    # Handle the rest of minerals that need to be converted to "tonnes" (after applying a conversion factor).
+    # See explanation above in this function.
+    tb.loc[tb["commodity"].isin(minerals_to_convert_to_tonnes_later), "unit"] = "tonnes"
 
     return tb
 

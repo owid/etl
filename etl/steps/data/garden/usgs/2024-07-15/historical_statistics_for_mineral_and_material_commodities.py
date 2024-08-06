@@ -88,7 +88,7 @@ COMMODITY_MAPPING = {
     ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Total"),
     ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
-    ("Silver", "Total"): ("Silver", "Total"),
+    ("Silver", "Total"): ("Silver", "Mine"),
     ("Soda ash", "Total"): ("Soda ash", "Total"),
     ("Steel", "Total"): ("Steel", "Total"),
     ("Strontium", "Total"): ("Strontium", "Total"),
