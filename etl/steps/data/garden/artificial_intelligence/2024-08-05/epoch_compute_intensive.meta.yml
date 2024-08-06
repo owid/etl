@@ -10,7 +10,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  update_period_days: 180
+  update_period_days: 31
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
