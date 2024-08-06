@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Household Income and Wealth, Australia
+    description: |-
+      Key information from the Survey of Income and Housing 2019–20 including distribution of income and wealth by various household characteristics
+    date_published: "2022-04-28"
+    version_producer: 2019-20 financial year
+
+    # Citation
+    producer: Australian Bureau of Statistics
+    citation_full: |-
+      Australian Bureau of Statistics. (2019-20). Household Income and Wealth, Australia. ABS. https://www.abs.gov.au/statistics/economy/finance/household-income-and-wealth-australia/latest-release.
+    attribution_short: ABS
+
+    # Files
+    url_main: https://www.abs.gov.au/statistics/economy/finance/household-income-and-wealth-australia/latest-release
+    url_download: https://www.abs.gov.au/statistics/economy/finance/household-income-and-wealth-australia/2019-20/Download-all.zip
+    date_accessed: 2024-08-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
+
+outs:
+  - md5: 128cbc0d22d8015c7c1665c1049c5082
+    size: 7932166
+    path: household_income_and_wealth_australia.zip
