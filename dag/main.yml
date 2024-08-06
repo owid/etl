@@ -702,6 +702,7 @@ steps:
   data://garden/worldbank_wdi/2024-05-20/wdi:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
     - data://meadow/worldbank_wdi/2024-05-20/wdi
+    - data://garden/demography/2024-07-15/population
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
