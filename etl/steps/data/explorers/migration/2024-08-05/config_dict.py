@@ -1,0 +1,390 @@
+P_TOTAL = "Total"
+P_CHANGE = "Five-year change"
+P_NEW = "Annual/ New"
+
+SM_TOTAL = "Total"
+SM_SHARE = "Per capita/ Share of population"
+
+A_TOTAL = "Total"
+A_UNDER_18 = "Under 18"
+A_UNDER_15 = "Under 15"
+
+PR_RAW = "Raw data"
+PR_AVG = "Five-year average"
+
+
+METRICS = {
+    "immigrants": "International immigrants",
+    "emigrants": "International emigrants",
+    "net_migration": "Net migration number",
+    "net_migration_rate": "Net migration rate",
+    "asylum_seekers_dest": "Asylum Seekers by destination",
+    "asylum_seekers_origin": "Asylum Seekers by origin",
+    "refugees_dest": "Refugees by destination",
+    "refugees_origin": "Refugees by origin",
+    "resettlement_dest": "Resettled refugees by destination",
+    "resettlement_origin": "Resettled refugees by origin",
+    "returned_origin": "Returned refugees by origin",
+    "returned_dest": "Returned refugees by destination",
+    "internal_displ_total": "Internally displaced persons",
+    "internal_displ_conflict": "Internally displaced persons (conflict)",
+    "internal_displ_disaster": "Internally displaced persons (disaster)",
+    "remittance_gdp": "Remittances as share of GDP",
+    "remittance_cost_ib": "Cost of receiving remittances",
+    "remittance_cost_ob": "Cost of sending remittances",
+}
+
+
+CONFIG_DICT = {
+    # UNICEF values (TODO: check new idps and think about adding shares to idp data)
+    "international_migrants_under_18_dest": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "migrants_under_18_dest_per_1000": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_under_18_asylum": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_under_18_origin": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_under_18_asylum_per_1000": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_under_18_origin_per_1000": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "idps_under_18_conflict_violence": {
+        "metric": METRICS["internal_displ_conflict"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "idps_under_18_disaster": {
+        "metric": METRICS["internal_displ_disaster"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "idps_under_18_total": {
+        "metric": METRICS["internal_displ_total"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_conflict_violence": {
+        "metric": METRICS["internal_displ_conflict"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_disaster": {
+        "metric": METRICS["internal_displ_disaster"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_total": {
+        "metric": METRICS["internal_displ_total"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    # UNHCR values (TODO: think about adding stateless people, international protection, host community)
+    "refugees_under_unhcrs_mandate_origin": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "asylum_seekers_origin": {
+        "metric": METRICS["asylum_seekers_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_under_unhcrs_mandate_asylum": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "asylum_seekers_asylum": {
+        "metric": METRICS["asylum_seekers_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "returned_refugees_origin": {
+        "metric": METRICS["returned_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "resettlement_arrivals_origin": {
+        "metric": METRICS["resettlement_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "returned_refugees_dest": {
+        "metric": METRICS["returned_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "resettlement_arrivals_dest": {
+        "metric": METRICS["resettlement_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_per_1000_pop_origin": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_per_1000_pop_asylum": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "asylum_seekers_per_100k_pop_origin": {
+        "metric": METRICS["asylum_seekers_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "asylum_seekers_per_100k_pop_asylum": {
+        "metric": METRICS["asylum_seekers_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "resettlement_per_100k_origin": {
+        "metric": METRICS["resettlement_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "resettlement_per_100k_dest": {
+        "metric": METRICS["resettlement_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "refugees_origin_5y_avg": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "refugees_asylum_5y_avg": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "asylum_seekers_origin_5y_avg": {
+        "metric": METRICS["asylum_seekers_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "asylum_seekers_asylum_5y_avg": {
+        "metric": METRICS["asylum_seekers_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "refugees_origin_5y_avg_per_1000_pop": {
+        "metric": METRICS["refugees_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "refugees_asylum_5y_avg_per_1000_pop": {
+        "metric": METRICS["refugees_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "asylum_seekers_origin_5y_avg_per_100k_pop": {
+        "metric": METRICS["asylum_seekers_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "asylum_seekers_asylum_5y_avg_per_100k_pop": {
+        "metric": METRICS["asylum_seekers_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "resettlement_origin_5y_avg": {
+        "metric": METRICS["resettlement_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "resettlement_dest_5y_avg": {
+        "metric": METRICS["resettlement_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "resettlement_origin_5y_avg_per_100k_pop": {
+        "metric": METRICS["resettlement_origin"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    "resettlement_dest_5y_avg_per_100k_pop": {
+        "metric": METRICS["resettlement_dest"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_AVG,
+    },
+    # UNDESA values (TODO: 5 year change??)
+    "immigrants_all": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "emigrants_all": {
+        "metric": METRICS["emigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "immigrant_share_of_dest_population_all": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "emigrants_share_of_total_population": {
+        "metric": METRICS["emigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "immigrants_under_15": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_UNDER_15,
+        "processing_radio": PR_RAW,
+    },
+    "immigrants_under_15_per_1000_people": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_15,
+        "processing_radio": PR_RAW,
+    },
+    # UN WPP values
+    "net_migration": {
+        "metric": METRICS["net_migration"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "net_migration_rate": {
+        "metric": METRICS["net_migration_rate"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    # World Bank
+    # average remittance cost sending to country
+    "si_rmt_cost_ib_zs": {
+        "metric": METRICS["remittance_cost_ib"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    # average remittance cost sending from country
+    "si_rmt_cost_ob_zs": {
+        "metric": METRICS["remittance_cost_ob"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    # remittance as share of GDP
+    "bx_trf_pwkr_dt_gd_zs": {
+        "metric": METRICS["remittance_gdp"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+}
