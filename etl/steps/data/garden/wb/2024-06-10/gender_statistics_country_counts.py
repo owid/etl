@@ -75,6 +75,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
     for col in columns:
         column_title = tb[col].metadata.title
+        description_from_producer = tb[col].metadata.description_from_producer
         tb_regions[col] = tb_regions[col].astype(str)
         # Define the mapping dictionary
         value_map = {"nan": "missing", "0.0": "no", "1.0": "yes"}
@@ -91,12 +92,14 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
             # Add metadata for the new columns
             tb_regions[f"{col}_{status}_count"].metadata = add_metadata_for_aggregated_columns(
                 column_title=column_title,
+                description_from_producer=description_from_producer,
                 status=status,
                 count_or_pop="count",
                 origins=tb_regions[f"{col}_{status}_count"].m.origins,
             )
             tb_regions[f"{col}_{status}_pop"].metadata = add_metadata_for_aggregated_columns(
                 column_title=column_title,
+                description_from_producer=description_from_producer,
                 status=status,
                 count_or_pop="pop",
                 origins=tb_regions[f"{col}_{status}_pop"].m.origins,
@@ -133,6 +136,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     # Calculate the missing population for each region
     for col in columns:
         column_title = tb[col].metadata.title
+        description_from_producer = tb[col].metadata.description_from_producer
         # Calculate the missing population for each column, by subtracting the population of the countries with data from the total population
         tb_regions[f"{col}_missing_pop_other_countries"] = tb_regions["population"] - tb_regions[
             columns_pop_dict[col]
@@ -143,6 +147,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
 
         tb_regions[f"{col}_missing_pop"].metadata = add_metadata_for_aggregated_columns(
             column_title=column_title,
+            description_from_producer=description_from_producer,
             status="missing",
             count_or_pop="pop",
             origins=tb_regions[f"{col}_missing_pop"].m.origins,
@@ -157,11 +162,14 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     return tb_regions
 
 
-def add_metadata_for_aggregated_columns(column_title: str, status: str, count_or_pop: str, origins) -> VariableMeta:
+def add_metadata_for_aggregated_columns(
+    column_title: str, description_from_producer: str, status: str, count_or_pop: str, origins
+) -> VariableMeta:
     if count_or_pop == "count":
         meta = VariableMeta(
             title=f"{column_title} - {status.capitalize()} (Count)",
             description_short=f"Number of countries with the status '{status}' for {column_title}.",
+            description_from_producer=description_from_producer,
             unit="countries",
             short_unit="",
             sort=[],
@@ -177,6 +185,7 @@ def add_metadata_for_aggregated_columns(column_title: str, status: str, count_or
         meta = VariableMeta(
             title=f"{column_title} - {status.capitalize()} (Population)",
             description_short=f"Population of countries with the status '{status}' for {column_title}.",
+            description_from_producer=description_from_producer,
             unit="persons",
             short_unit="",
             sort=[],
