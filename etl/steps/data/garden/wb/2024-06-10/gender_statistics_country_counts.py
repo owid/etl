@@ -41,6 +41,10 @@ def run(dest_dir: str) -> None:
     tb = tb[indicators_for_sums + ["country", "year"]]
 
     tb = add_country_counts_and_population_by_status(tb, ds_regions, ds_population)
+
+    # Remove columns that are not needed and are in the original dataset
+    columns_to_keep = [col for col in tb.columns if col not in indicators_for_sums]
+    tb = tb[columns_to_keep]
     tb = tb.format(["country", "year"])
 
     #
@@ -70,6 +74,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     columns_count_dict = {columns[i]: [] for i in range(len(columns))}
     columns_pop_dict = {columns[i]: [] for i in range(len(columns))}
     for col in columns:
+        column_title = tb[col].metadata.title
         tb_regions[col] = tb_regions[col].astype(str)
         # Define the mapping dictionary
         value_map = {"nan": "missing", "0.0": "no", "1.0": "yes"}
@@ -85,10 +90,16 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
 
             # Add metadata for the new columns
             tb_regions[f"{col}_{status}_count"].metadata = add_metadata_for_aggregated_columns(
-                col=col, status=status, count_or_pop="count", origins=tb_regions[f"{col}_{status}_count"].m.origins
+                column_title=column_title,
+                status=status,
+                count_or_pop="count",
+                origins=tb_regions[f"{col}_{status}_count"].m.origins,
             )
             tb_regions[f"{col}_{status}_pop"].metadata = add_metadata_for_aggregated_columns(
-                col=col, status=status, count_or_pop="pop", origins=tb_regions[f"{col}_{status}_pop"].m.origins
+                column_title=column_title,
+                status=status,
+                count_or_pop="pop",
+                origins=tb_regions[f"{col}_{status}_pop"].m.origins,
             )
             # Add the new columns to the list
             columns_count_dict[col].append(f"{col}_{status}_count")
@@ -121,6 +132,7 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
 
     # Calculate the missing population for each region
     for col in columns:
+        column_title = tb[col].metadata.title
         # Calculate the missing population for each column, by subtracting the population of the countries with data from the total population
         tb_regions[f"{col}_missing_pop_other_countries"] = tb_regions["population"] - tb_regions[
             columns_pop_dict[col]
@@ -130,7 +142,10 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
         )
 
         tb_regions[f"{col}_missing_pop"].metadata = add_metadata_for_aggregated_columns(
-            col=col, status="missing", count_or_pop="pop", origins=tb_regions[f"{col}_missing_pop"].m.origins
+            column_title=column_title,
+            status="missing",
+            count_or_pop="pop",
+            origins=tb_regions[f"{col}_missing_pop"].m.origins,
         )
 
     # Keep only the regions in the country column
@@ -145,11 +160,11 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
     return tb
 
 
-def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str, origins) -> VariableMeta:
+def add_metadata_for_aggregated_columns(column_title: str, status: str, count_or_pop: str, origins) -> VariableMeta:
     if count_or_pop == "count":
         meta = VariableMeta(
-            title=f"{col.capitalize()} - {status.capitalize()} (Count)",
-            description_short=f"Number of countries with the status '{status}' for {col}.",
+            title=f"{column_title} - {status.capitalize()} (Count)",
+            description_short=f"Number of countries with the status '{status}' for {column_title}.",
             unit="countries",
             short_unit="",
             sort=[],
@@ -163,8 +178,8 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
     elif count_or_pop == "pop":
         meta = VariableMeta(
-            title=f"{col.capitalize()} - {status.capitalize()} (Population)",
-            description_short=f"Population of countries with the status '{status}' for {col}.",
+            title=f"{column_title} - {status.capitalize()} (Population)",
+            description_short=f"Population of countries with the status '{status}' for {column_title}.",
             unit="persons",
             short_unit="",
             sort=[],
