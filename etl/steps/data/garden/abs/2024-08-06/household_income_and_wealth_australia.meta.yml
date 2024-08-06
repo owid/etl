@@ -14,7 +14,7 @@ dataset:
 
 
 tables:
-  household_income_and_wealth_australia:
+  income:
     variables:
       gini:
         title: Gini index
@@ -24,6 +24,20 @@ tables:
         presentation:
           title_public: Gini coefficient
           title_variant: Equivalized disposable household income
+        display:
+          name: Gini index
+          numDecimalPlaces: 0
+
+  wealth:
+    variables:
+      gini:
+        title: Gini index
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality. Inequality is measured here in terms of equivalized household net wealth.
+        presentation:
+          title_public: Gini coefficient
+          title_variant: Equivalized household net wealth
         display:
           name: Gini index
           numDecimalPlaces: 0
