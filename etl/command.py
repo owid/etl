@@ -27,8 +27,7 @@ import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 from prefect.futures import PrefectFuture
-from prefect.server.schemas.core import TaskRun
-from prefect_dask import DaskTaskRunner, get_dask_client  # type: ignore
+from prefect_dask.task_runners import DaskTaskRunner
 
 from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
@@ -412,7 +411,7 @@ def run_dag(
 
 def exec_steps_prefect(steps: List[Step], workers: int) -> None:
     if workers == 1:
-        # task_runner = task_runners.SequentialTaskRunner()
+        # task_runner = prefect.task_runners.SequentialTaskRunner()
         task_runner = prefect.task_runners.ConcurrentTaskRunner()
     else:
         task_runner = DaskTaskRunner(cluster_kwargs={"n_workers": workers, "threads_per_worker": 1})
