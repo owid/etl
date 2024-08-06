@@ -53,7 +53,7 @@ COMMODITY_MAPPING = {
     ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Total"),
     ("Gold", "Total"): ("Gold", "Mine"),
-    ("Graphite", "Total"): ("Graphite", "Total"),
+    ("Graphite", "Total"): ("Graphite", "Mine"),
     ("Gypsum", "Total"): ("Gypsum", "Total"),
     ("Helium", "Total"): ("Helium", "Total"),
     ("Indium", "Total"): ("Indium", "Refinery"),
@@ -121,6 +121,7 @@ COMMODITY_MAPPING = {
 # Their unit will be converted to "tonnes", and hence combined with USGS current data.
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
+    "Graphite",
     "Lime",
 ]
 

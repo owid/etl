@@ -240,7 +240,7 @@ COMMODITY_MAPPING = {
     ("Gold", "Ores, concentrates & unrefined metal"): None,
     ("Gold", "Waste & scrap"): None,
     ("Gold, mine", "Unknown"): ("Gold", "Mine"),
-    ("Graphite", "Unknown"): ("Graphite", "Unknown"),
+    ("Graphite", "Unknown"): ("Graphite", "Mine"),
     ("Gypsum and plaster", "Anhydrite"): ("Gypsum and plaster", "Anhydrite"),
     ("Gypsum and plaster", "Calcined"): ("Gypsum and plaster", "Calcined"),
     ("Gypsum and plaster", "Crede & ground"): ("Gypsum and plaster", "Crede & ground"),

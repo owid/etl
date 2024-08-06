@@ -136,8 +136,8 @@ COMMODITY_MAPPING = {
     ),
     ("Gold", "Gold - contained content, mine production, metric tons"): ("Gold", "Mine"),
     ("Gold", "Mine production"): ("Gold", "Mine"),
-    ("Graphite (natural)", "Mine production"): ("Graphite", "Mine, natural"),
-    ("Graphite (natural)", "Mine production, graphite"): ("Graphite", "Mine, natural"),
+    ("Graphite (natural)", "Mine production"): ("Graphite", "Mine"),
+    ("Graphite (natural)", "Mine production, graphite"): ("Graphite", "Mine"),
     ("Gypsum", "Mine production"): ("Gypsum", "Mine"),
     ("Helium", "Mine production"): ("Helium", "Mine"),
     ("Helium", "Mine production, helium"): ("Helium", "Mine"),
@@ -398,8 +398,12 @@ COMMODITY_MAPPING = {
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
-    "production|Iodine|Mine|tonnes": "Mine production refers to elemental iodine.",
-    "reserves|Iodine|Mine|tonnes": "Mine production refers to elemental iodine.",
+    "production|Iodine|Mine|tonnes": "Values refer to elemental iodine.",
+    "reserves|Iodine|Mine|tonnes": "Values refer to elemental iodine.",
+    "production|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "reserves|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "imports|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "exports|Graphite|Mine|tonnes": "Values refer to natural graphite.",
 }
 
 # Dictionary of special units.
