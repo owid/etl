@@ -416,10 +416,10 @@ COMMODITY_MAPPING = {
     ("Mica", "Unknown"): ("Mica", "Unknown"),
     ("Mica", "Unmanufactured"): ("Mica", "Unmanufactured"),
     ("Mica", "Waste"): ("Mica", "Waste"),
-    ("Molybdenum", "Metal"): ("Molybdenum", "Metal"),
+    ("Molybdenum", "Metal"): ("Molybdenum", "Refinery"),
     ("Molybdenum", "Ores & concentrates"): ("Molybdenum", "Ores & concentrates"),
-    ("Molybdenum", "Oxides"): ("Molybdenum", "Oxides"),
-    ("Molybdenum", "Scrap"): ("Molybdenum", "Scrap"),
+    ("Molybdenum", "Oxides"): None,
+    ("Molybdenum", "Scrap"): None,
     ("Molybdenum, mine", "Unknown"): ("Molybdenum", "Mine"),
     # NOTE: I removed natural gas, as the units are not clear: sometimes "million cubic meters" appears, sometimes no
     #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
@@ -726,6 +726,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Cobalt",
     "Copper",
     "Lead",
+    "Molybdenum",
     "Nickel",
     "Tin",
     "Zinc",
