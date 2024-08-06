@@ -6,7 +6,7 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -605,23 +605,7 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     return series
 
 
-def _include_note(d: pd.DataFrame, column: str, note: str) -> pd.Series:
-    # Include a note in "column" (which is the column devoted for notes).
-    d = d.copy()
-    if column not in d.columns:
-        d[column] = note
-    else:
-        d[column] = d[column].fillna("")
-        d.loc[d[column].str.endswith("."), column] += " " + note
-        d.loc[
-            (d[column].str.strip().apply(len) > 0) & ~(d[column].str.endswith(".")),
-            column,
-        ] += ". " + note
-        d.loc[d[column] == "", column] = note
-    return d[column]
-
-
-def prepare_reserves_data(d: pd.DataFrame):
+def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
     d = d.copy()
     # Select columns related to reserves data.
     columns_reserves = [
@@ -636,6 +620,11 @@ def prepare_reserves_data(d: pd.DataFrame):
         assert len(_column_reserves) == 1
         column_reserves = _column_reserves[0]
         unit_reserves = "_".join(column_reserves.split("_")[1:])
+
+        # Get general notes for this column, extracted from the xml metadata.
+        notes_reserves = metadata.get(column_reserves)
+        if notes_reserves is not None:
+            d["Reserves_notes"] = [note + [notes_reserves] for note in d["Reserves_notes"]]
 
         # Clean reserves data.
         d[column_reserves] = clean_spurious_values(series=d[column_reserves])
@@ -652,7 +641,7 @@ def prepare_reserves_data(d: pd.DataFrame):
             d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
             # Add a note explaining that the data is for ore.
-            d["Reserves_notes"] = _include_note(d=d, column="Reserves_notes", note="Reserves refer to ore.")
+            d["Reserves_notes"] = [note + ["Reserves refer to ore."] for note in d["Reserves_notes"]]
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
@@ -679,7 +668,7 @@ def prepare_reserves_data(d: pd.DataFrame):
         return df_reserves
 
 
-def prepare_production_data(d: pd.DataFrame):
+def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
     d = d.copy()
 
     # Select columns related to production data.
@@ -699,6 +688,9 @@ def prepare_production_data(d: pd.DataFrame):
 
         # The year can be extracted from the last character of the column name.
         years_production = [int(column[-4:]) for column in columns_production]
+        # Adapt metadata dictionary (which has a note for each production column) to have one note for each year.
+        metadata_production = {year: metadata.get(columns_production[i]) for i, year in enumerate(years_production)}
+
         # Sanity check.
         # NOTE: If data changes in a future update, the following can be relaxed.
         assert all(
@@ -725,9 +717,7 @@ def prepare_production_data(d: pd.DataFrame):
         if unit_production == "Sponge_t":
             unit_production = "t"
             # Add a note explaining that the data is for ore.
-            d["Production_notes"] = _include_note(
-                d=d, column="Production_notes", note="Production refers to titanium sponge."
-            )
+            d["Production_notes"] = [note + ["Production refers to titanium sponge."] for note in d["Reserves_notes"]]
         if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
@@ -735,10 +725,13 @@ def prepare_production_data(d: pd.DataFrame):
         # Create a Year column and a single column for production.
         df_production = pd.DataFrame()
         for year in years_production:
-            columns_to_keep = COMMON_COLUMNS.copy()
-            if ("Production_notes" in d.columns) and (year == years_production[-1]):
-                # Include the column of production notes only once (for example, when adding data for the last year).
-                columns_to_keep += ["Production_notes"]
+            columns_to_keep = COMMON_COLUMNS.copy() + ["Production_notes"]
+
+            # Get general notes for this column, extracted from the xml metadata.
+            notes_production = metadata_production.get(year)
+            if notes_production is not None:
+                d["Production_notes"] = [note + [notes_production] for note in d["Production_notes"]]
+
             _column_production = [column for column in columns_production if str(year) in column][0]
             _df_for_year = (
                 d[columns_to_keep + [_column_production]]
@@ -894,14 +887,25 @@ def gather_and_process_data(data) -> pd.DataFrame:
             # Clean data.
             d = extract_and_clean_data_for_year_and_mineral(data=data, year=year, mineral=mineral)
 
+            # Gather metadata for the current year-mineral.
+            metadata = data[year][mineral]["metadata"]
+
+            # Combine general notes with country-year-specific notes.
+            if "Production_notes" not in d.columns:
+                d["Production_notes"] = None
+            d["Production_notes"] = [[note] if pd.notnull(note) else [] for note in d["Production_notes"]]
+            if "Reserves_notes" not in d.columns:
+                d["Reserves_notes"] = None
+            d["Reserves_notes"] = [[note] if pd.notnull(note) else [] for note in d["Reserves_notes"]]
+
             # Prepare reserves data.
-            _df_reserves = prepare_reserves_data(d=d)
+            _df_reserves = prepare_reserves_data(d=d, metadata=metadata)
 
             # For now, ignore capacity data (which appears in a few commodities).
             # columns_capacity = [column for column in d.columns if column.lower().startswith("cap_")]
 
             # Prepare production data.
-            _df_production = prepare_production_data(d=d)
+            _df_production = prepare_production_data(d=d, metadata=metadata)
 
             # Append the new data to the main dataframe.
             if _df_reserves is not None:
@@ -1072,7 +1076,7 @@ def run(dest_dir: str) -> None:
 
     # Before creating aggregates, ensure notes are lists of strings.
     for column in ["notes_reserves", "notes_production"]:
-        tb[column] = [[note] if pd.notnull(note) else [] for note in tb[column]]
+        tb[column] = [note if isinstance(note, list) else [] for note in tb[column]]
 
     # Add regions to the table.
     # NOTE: After inspection, it seems that USGS region aggregates often are significantly lower han BGS regions
