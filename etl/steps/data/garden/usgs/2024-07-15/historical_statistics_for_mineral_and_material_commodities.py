@@ -56,7 +56,7 @@ COMMODITY_MAPPING = {
     ("Graphite", "Total"): ("Graphite", "Total"),
     ("Gypsum", "Total"): ("Gypsum", "Total"),
     ("Helium", "Total"): ("Helium", "Total"),
-    ("Indium", "Total"): ("Indium", "Total"),
+    ("Indium", "Total"): ("Indium", "Refinery"),
     # NOTE: Total diamond production includes natural and synthetic diamonds.
     ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
     ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
