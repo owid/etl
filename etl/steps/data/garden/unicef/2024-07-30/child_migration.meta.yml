@@ -59,12 +59,12 @@ tables:
           - {definitions.unicef_descriptions.internally_displaced}
       international_migrants_under_18_dest:
         title: Immigrants under 18 years old by destination
-        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) by the country of destination. This number is the total migrant stock, so all migrants who are currently living in the destination country and does not describe migrants arriving in this year.
+        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) by the country of destination. This number is the total migrant stock, so all migrants who are currently living in the destination country, and does not describe migrants arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
       migrants_under_18_dest_per_1000:
         title: Immigrants under 18 years old by destination per 1000 inhabitants
-        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) per 1000 inhabitants of the destination country. This number is the total migrant stock, so all migrants who are currently living in the destination country and does not describe migrants arriving in this year.
+        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) per 1000 inhabitants of the destination country. This number is the total migrant stock, so all migrants who are currently living in the destination country, and does not describe migrants arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
         processing_level: major

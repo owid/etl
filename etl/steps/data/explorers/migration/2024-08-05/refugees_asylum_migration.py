@@ -53,6 +53,8 @@ def run(dest_dir: str) -> None:
     df_graphers["tab"] = "map"
     # set yAxis to start at 0
     df_graphers["yAxisMin"] = 0
+    # hide automatic time/ entity in chart title
+    df_graphers["hideAnnotationFieldsInTitle"] = True
 
     # Sanity check.
     error = "Duplicated rows in explorer."
