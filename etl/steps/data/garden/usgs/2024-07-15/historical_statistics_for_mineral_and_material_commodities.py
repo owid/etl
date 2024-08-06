@@ -66,7 +66,7 @@ COMMODITY_MAPPING = {
     ("Iron ore", "Total"): ("Iron ore", "Total"),
     ("Kaolin", "Total"): ("Kaolin", "Total"),
     ("Lead", "Total"): ("Lead", "Mine"),
-    ("Lime", "Total"): ("Lime", "Total"),
+    ("Lime", "Total"): ("Lime", "Plant"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
     ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
@@ -121,6 +121,7 @@ COMMODITY_MAPPING = {
 # Their unit will be converted to "tonnes", and hence combined with USGS current data.
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
+    "Lime",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
