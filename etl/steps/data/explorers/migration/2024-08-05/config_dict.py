@@ -36,7 +36,7 @@ METRICS = {
 
 
 CONFIG_DICT = {
-    # UNICEF values (TODO: check new idps and think about adding shares to idp data)
+    # UNICEF values
     "international_migrants_under_18_dest": {
         "metric": METRICS["immigrants"],
         "period_radio": P_TOTAL,
@@ -121,7 +121,49 @@ CONFIG_DICT = {
         "age_radio": A_UNDER_18,
         "processing_radio": PR_RAW,
     },
-    # UNHCR values (TODO: think about adding stateless people, international protection, host community)
+    "idps_under_18_conflict_violence_per_1000": {
+        "metric": METRICS["internal_displ_conflict"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "idps_under_18_disaster_per_1000": {
+        "metric": METRICS["internal_displ_disaster"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "idps_under_18_total_per_1000": {
+        "metric": METRICS["internal_displ_total"],
+        "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_conflict_violence_per_1000": {
+        "metric": METRICS["internal_displ_conflict"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_disaster_per_1000": {
+        "metric": METRICS["internal_displ_disaster"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    "new_idps_under_18_total_per_1000": {
+        "metric": METRICS["internal_displ_total"],
+        "period_radio": P_NEW,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_UNDER_18,
+        "processing_radio": PR_RAW,
+    },
+    # UNHCR values
     "refugees_under_unhcrs_mandate_origin": {
         "metric": METRICS["refugees_origin"],
         "period_radio": P_TOTAL,
@@ -312,9 +354,23 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
+    "immigrants_change_5_years": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_CHANGE,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
     "emigrants_all": {
         "metric": METRICS["emigrants"],
         "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_TOTAL,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "emigrants_change_5_years": {
+        "metric": METRICS["emigrants"],
+        "period_radio": P_CHANGE,
         "sub_metric_radio": SM_TOTAL,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
@@ -326,9 +382,23 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
+    "immigrants_change_5_years_per_1000": {
+        "metric": METRICS["immigrants"],
+        "period_radio": P_CHANGE,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
     "emigrants_share_of_total_population": {
         "metric": METRICS["emigrants"],
         "period_radio": P_TOTAL,
+        "sub_metric_radio": SM_SHARE,
+        "age_radio": A_TOTAL,
+        "processing_radio": PR_RAW,
+    },
+    "emigrants_change_5_years_per_1000": {
+        "metric": METRICS["emigrants"],
+        "period_radio": P_CHANGE,
         "sub_metric_radio": SM_SHARE,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
