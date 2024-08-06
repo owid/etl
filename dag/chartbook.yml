@@ -114,3 +114,5 @@ steps:
   # Wealth data from Katic and Leigh (2015)
   data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia:
     - snapshot://chartbook/2024-08-05/katic_leigh_2015_australia.xlsx
+  data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
+    - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
