@@ -28,6 +28,9 @@ def run(dest_dir: str) -> None:
     # Store the origins metadata for later use
     origins = tb["domain"].metadata.origins
 
+    # Select the rows where the 'notability_criteria' column is not null (only consider notable systems)
+    tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
+
     # Define the columns that are not needed
     unused_columns = [
         "authors",
@@ -41,9 +44,6 @@ def run(dest_dir: str) -> None:
     ]
     # Drop the unused columns
     tb = tb.drop(unused_columns, axis=1)
-
-    # Select the rows where the 'notability_criteria' column is not null (only consider notable systems)
-    tb = tb[tb["notability_criteria"].notna()].reset_index(drop=True)
 
     # Convert the 'publication_date' column to datetime format and extract the year
     tb["publication_date"] = pd.to_datetime(tb["publication_date"])
