@@ -149,14 +149,11 @@ COMMODITY_MAPPING = {
     ("Iron and steel", "Pig iron, million metric tons"): ("Iron", "Pig iron"),
     ("Iron and steel", "Raw steel"): ("Steel", "Crude"),
     ("Iron and steel", "Raw steel, million metric tons"): ("Steel", "Crude"),
-    # TODO: Handle iron.
-    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): None,
-    # TODO: Handle iron.
-    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): None,
-    # TODO: Handle iron.
-    ("Iron ore", "Mine production - Iron content"): None,
-    # TODO: Handle iron.
-    ("Iron ore", "Mine production - Usable ore"): None,
+    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): ("Iron ore", "Iron content"),
+    # Looking at the metadata notes, "usable ore" corresponds to "Crude ore".
+    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): ("Iron ore", "Crude ore"),
+    ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Iron content"),
+    ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Crude ore"),
     ("Iron oxide pigments", "Iron oxide pigments"): None,
     ("Iron oxide pigments", "Mine production"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments"): None,

@@ -237,8 +237,7 @@ COMMODITY_MAPPING = {
     ("Indium, refinery", "Unknown"): ("Indium", "Refinery"),
     ("Iodine", "Unknown"): ("Iodine", "Unknown"),
     ("Iron ore", "Burnt pyrites"): None,
-    # TODO: Handle iron.
-    ("Iron ore", "Unknown"): None,
+    ("Iron ore", "Unknown"): ("Iron ore", "Crude ore"),
     # The following is used for production of pig iron.
     ("Iron, pig", "Unknown"): ("Iron", "Pig iron"),
     ("Iron, steel and ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,

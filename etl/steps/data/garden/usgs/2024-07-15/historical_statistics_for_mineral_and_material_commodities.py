@@ -64,8 +64,7 @@ COMMODITY_MAPPING = {
     ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
-    # TODO: Handle iron.
-    ("Iron ore", "Total"): None,
+    ("Iron ore", "Total"): ("Iron ore", "Crude ore"),
     ("Kaolin", "Total"): ("Kaolin", "Total"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Plant"),
@@ -124,6 +123,7 @@ COMMODITY_MAPPING = {
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
     "Graphite",
+    "Iron ore",
     "Lime",
 ]
 
