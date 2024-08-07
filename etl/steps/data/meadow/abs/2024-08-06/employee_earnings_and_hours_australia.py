@@ -48,7 +48,11 @@ def run(dest_dir: str) -> None:
     tb_2023 = format_tables(tb=tb_2023, year=2023)
 
     # Merge all tables.
-    tb = pr.concat([tb_2006, tb_2008, tb_2010, tb_2012, tb_2014, tb_2016, tb_2018, tb_2021, tb_2023], ignore_index=True)
+    tb = pr.concat(
+        [tb_2006, tb_2008, tb_2010, tb_2012, tb_2014, tb_2016, tb_2018, tb_2021, tb_2023],
+        short_name="employee_earnings_and_hours_australia",
+        ignore_index=True,
+    )
 
     # Make indicator column lowercase.
     tb["indicator"] = tb["indicator"].str.lower()
