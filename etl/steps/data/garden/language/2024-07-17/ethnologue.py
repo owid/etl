@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     # tb_language_codes = ds_meadow["language_codes"].reset_index()
     tb_language_index = ds_meadow["language_index"].reset_index()
 
+    origins = tb_country_codes["country"].metadata.origins
     #
     tb_country_codes = tb_country_codes.drop(columns="area")
     # Process data.
@@ -35,9 +36,10 @@ def run(dest_dir: str) -> None:
     tb_languages_per_country = languages_per_country(tb_language_index, tb_country_codes)
     tb_languages_per_country["year"] = 2024
     tb_languages_per_country = tb_languages_per_country.drop(columns="countryid")
+
     # tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
     tb_languages_per_country = tb_languages_per_country.format(["country", "year"], short_name="languages_per_country")
-
+    tb_languages_per_country["n"].metadata.origins = origins
     #
     # Save outputs.
     #
