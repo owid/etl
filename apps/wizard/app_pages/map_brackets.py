@@ -110,6 +110,14 @@ def load_variable_from_id(variable_id: int):
 
 
 @st.cache_data
+def load_variable_from_catalogue_path(catalogue_path: str):
+    with Session(OWID_ENV.engine) as session:
+        variable = Variable.load_from_catalog_path(session=session, catalog_path=variable_id)
+
+    return variable
+
+
+@st.cache_data
 def load_variable_metadata(variable: Variable) -> Dict[str, Any]:
     metadata = requests.get(variable.s3_metadata_path(typ="http")).json()
 
@@ -187,10 +195,13 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 
 class MapBracketer:
-    def __init__(self, variable_id: int):
+    def __init__(self, variable_id_or_path: str):
         self.variable_id = variable_id
         # Load variable from db.
-        self.variable = load_variable_from_id(variable_id)
+        if variable_id_or_path.isnumeric():
+            self.variable = load_variable_from_id(variable_id=int(variable_id_or_path))
+        else:
+            self.variable = load_variable_from_catalogue_path(catalogue_path=variable_id_or_path)
         # Load variable data.
         self.df = load_variable_data(variable=self.variable)
         # Load variable metadata.
@@ -879,13 +890,13 @@ elif use_type == USE_TYPE_EXPLORERS:
                     explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
                 )
                 variable_ids = [
-                    variable_id
+                    str(variable_id)
                     for variable_id in variable_ids
                     if variable_id not in variable_ids_with_brackets_already_defined
                 ]
 
         # Select a variable id from a dropdown menu.
-        variable_id: int = st.selectbox(  # type: ignore
+        variable_id: str = st.selectbox(  # type: ignore
             label="Indicator id",
             options=variable_ids,
             index=0,
@@ -907,7 +918,7 @@ elif use_type == USE_TYPE_EXPLORERS:
     additional_config = explorer.get_variable_config(variable_id=variable_id)
 
     # Initialize map bracketer.
-    mb = MapBracketer(variable_id=variable_id)  # type: ignore
+    mb = MapBracketer(variable_id_or_path=variable_id)  # type: ignore
 
     edit_brackets = True
     if len(additional_config) > 0:
