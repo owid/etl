@@ -25,6 +25,6 @@ meta:
       url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
 
 outs:
-  - md5: 2af027417a314287fcb290b69040e0be
-    size: 123
+  - md5: ce7bbe94ed7dacd937c084d9bbe74af5
+    size: 128
     path: employee_earnings_and_hours_australia_2006.csv

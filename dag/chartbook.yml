@@ -128,3 +128,15 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
+
+  # P90/P50 ratio for Australia, from the Employee Earnings and Hours report (ABS)
+  data://meadow/abs/2024-08-06/employee_earnings_and_hours_australia:
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2006.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2008.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2010.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2012.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2014.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2016.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2018.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2021.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2023.xlsx
