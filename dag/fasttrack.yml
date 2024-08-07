@@ -218,3 +218,5 @@ steps:
     - snapshot://fasttrack/latest/hdi_per_land_use.csv
   data://grapher/fasttrack/latest/nature_index_undp:
     - snapshot://fasttrack/latest/nature_index_undp.csv
+  data://grapher/fasttrack/latest/co2_intensity_undp:
+    - snapshot://fasttrack/latest/co2_intensity_undp.csv
