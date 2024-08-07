@@ -991,7 +991,7 @@ class Variable(Base):
     license: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
-    grapherConfigIdAdmin: Mapped[Optional[bytes]] = mapped_column(BINARY(16), default=None)
+    grapherConfigIdAdmin: Mapped[Optional[str]] = mapped_column(VARCHAR(32), default=None)
     grapherConfigIdETL: Mapped[Optional[bytes]] = mapped_column(BINARY(16), default=None)
     dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
