@@ -40,9 +40,9 @@ COMMODITY_MAPPING = {
     ("Cesium", "Total"): ("Cesium", "Total"),
     ("Chromium", "Total"): ("Chromium", "Mine, contained chromium"),
     ("Cobalt", "Total"): ("Cobalt", "Total"),
-    ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
+    ("Construction sand and gravel", "Total"): ("Sand and gravel", "Construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
-    ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
+    ("Crushed stone", "Total"): ("Crushed stone", "Total"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
@@ -61,7 +61,7 @@ COMMODITY_MAPPING = {
     # NOTE: Total diamond production includes natural and synthetic diamonds.
     ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
     ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
-    ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
+    ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Industrial"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Crude ore"),
@@ -120,11 +120,15 @@ COMMODITY_MAPPING = {
 # same thing.
 # So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes of gross weight"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
 # Their unit will be converted to "tonnes", and hence combined with USGS current data.
+# NOTE: The names below must coincide with the original names of the commodities (before harmonizing commodity-subcommodity pairs).
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
+    "Construction sand and gravel",
     "Graphite",
+    "Industrial sand and gravel",
     "Iron ore",
     "Lime",
+    "Crushed stone",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.

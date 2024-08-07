@@ -25,9 +25,11 @@ MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES = 800
 # NOTE: This list should contain all commodity-subcommodity pairs expected in the data.
 # Set to None any commodity-subcommodity that should not be included.
 COMMODITY_MAPPING = {
-    ("Aggregates, primary", "Crushed rock"): ("Primary aggregates", "Crushed rock"),
-    ("Aggregates, primary", "Sand and gravel"): ("Primary aggregates", "Sand and gravel"),
-    ("Aggregates, primary", "Unknown"): ("Primary aggregates", "Unknown"),
+    # NOTE: When comparing with USGS' crushed stone, the numbers are very different (USGS' data for the US is larger than BGS' data for the World).
+    ("Aggregates, primary", "Crushed rock"): None,
+    # NOTE: Data for construction sand and gravel for BGS and USGS are very different.
+    ("Aggregates, primary", "Sand and gravel"): None,
+    ("Aggregates, primary", "Unknown"): None,
     ("Alumina", "Unknown"): ("Alumina", "Unknown"),
     ("Aluminium, primary", "Unknown"): ("Aluminum", "Primary"),
     ("Antimony", "Crude"): ("Antimony", "Crude"),
