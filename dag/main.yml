@@ -814,7 +814,7 @@ steps:
 
 # Ethnologue
   data://meadow/language/2024-07-17/ethnologue:
-    - snapshot://language/2024-08-01/ethnologue.zip
+    - snapshot://language/2024-07-17/ethnologue.zip
   data://garden/language/2024-07-17/ethnologue:
     - data://meadow/language/2024-07-17/ethnologue
   data://grapher/language/2024-07-17/ethnologue:

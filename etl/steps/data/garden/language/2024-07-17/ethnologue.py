@@ -66,9 +66,9 @@ def countries_per_language(tb_language_index: Table, tb_country_codes: Table, tb
 
 def languages_per_country(tb_language_index: Table, tb_country_codes: Table) -> Table:
     tb_languages_per_country = (
-        tb_language_index.groupby("countryid")["langid"].nunique().reset_index(name="n")
+        tb_language_index.groupby("countryid", observed=True)["langid"].nunique().reset_index(name="n")
     ).reset_index(drop=True)
-
+    assert tb_languages_per_country["n"].isnull().sum() == 0
     tb_languages_per_country = tb_languages_per_country.merge(tb_country_codes, on="countryid", how="left")
 
     return tb_languages_per_country
@@ -78,8 +78,8 @@ def extinct_and_living_languages_per_country(
     tb_language_index: Table, tb_language_codes: Table, tb_country_codes: Table
 ) -> Table:
     tb_extinct_living_languages = (
-        tb_language_index.merge(tb_language_codes, on=["langid", "countryid"], how="outer")
-        .groupby(["countryid", "langstatus"])
+        tb_language_index.merge(tb_language_codes, on=["langid", "countryid"], how="outer", suffixes=("", "_lang"))
+        .groupby(["countryid", "langstatus"], observed=True)
         .agg({"langid": "nunique"})
         .reset_index()
         .rename(columns={"langid": "number_of_languages"})
