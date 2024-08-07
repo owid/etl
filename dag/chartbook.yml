@@ -51,9 +51,10 @@ steps:
     - data://meadow/abs/2024-08-06/household_income_and_wealth_australia
 
   # Household income and wealth, Australia, Australian Bureau of Statistics (2017-18)
-  data://meadow/abs/2024-08-06/household_income_australia_2017_2018:
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
     - snapshot://abs/2024-08-06/household_income_australia_2017_2018.xlsx
-  data://garden/abs/2024-08-06/household_income_australia_2017_2018:
+    - snapshot://abs/2024-08-06/household_wealth_australia_2017_2018.xlsx
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
     - data://meadow/abs/2024-08-06/household_income_australia_2017_2018
 
   ################################################################################################
