@@ -192,6 +192,9 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
+# if True, commit to monkeypox repository from export step
+MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
+
 ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
@@ -494,6 +497,3 @@ OWID_ENV = OWIDEnv(
         DB_HOST=DB_HOST,
     )
 )
-
-# Default path to the explorers folder.
-EXPLORERS_DIR = env.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers")

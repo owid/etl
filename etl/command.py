@@ -6,7 +6,6 @@
 import difflib
 import itertools
 import json
-import os
 import re
 import resource
 import sys
@@ -71,11 +70,10 @@ log = structlog.get_logger()
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
 @click.option(
-    "--explorer/--no-explorer",
-    "-x/-nx",
+    "--export/--no-export",
     default=False,
     type=bool,
-    help="Write explorer tsv file to owid-content repository.",
+    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -143,7 +141,7 @@ def main_cli(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    export: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
     only: bool = False,
@@ -194,7 +192,7 @@ def main_cli(
         force=force,
         private=private,
         grapher=grapher,
-        explorer=explorer,
+        export=export,
         downstream=downstream,
         only=only,
         exclude=exclude,
@@ -226,7 +224,7 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    export: bool = False,
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
@@ -240,13 +238,7 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    if explorer:
-        # Set the global variable "EXPLORER" to True.
-        os.environ["EXPLORER"] = "1"
-        # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
-        grapher = True
-
-    dag = construct_dag(dag_path, private=private, grapher=grapher)
+    dag = construct_dag(dag_path, private=private, grapher=grapher, export=export)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -275,7 +267,7 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
+def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
@@ -284,9 +276,20 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # If --grapher is set, add steps for upserting to DB
+    # if export is not set, remove all steps
+    if not export:
+        dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
+
+    grapher_steps = _grapher_steps(dag, private)
+    # If --grapher is set, add all steps for upserting to DB
     if grapher:
-        dag.update(_grapher_steps(dag, private))
+        dag.update(grapher_steps)
+    # Otherwise just add those in dependencies
+    else:
+        for deps in list(dag.values()):
+            for dep in deps:
+                if dep.startswith("grapher://"):
+                    dag[dep] = grapher_steps[dep]
 
     return dag
 
@@ -634,8 +637,8 @@ def _check_public_private_steps(dag: DAG) -> None:
     public_steps = all_steps - private_steps
 
     # strip prefix
-    private_steps = {s.split("://")[1] for s in private_steps}
-    public_steps = {s.split("://")[1] for s in public_steps}
+    private_steps = {s.split("://")[1] for s in private_steps if not s.startswith("grapher://")}
+    public_steps = {s.split("://")[1] for s in public_steps if not s.startswith("grapher://")}
 
     common = private_steps & public_steps
     if common:

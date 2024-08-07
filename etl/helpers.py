@@ -3,7 +3,6 @@
 #  etl
 #
 
-import os
 import re
 import sys
 import tempfile
@@ -155,8 +154,8 @@ def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path])
         r"\/"
         + r"\/".join(
             [
-                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
-                "(?P<namespace>.*?)",
+                "(?P<channel>[^/]*)",
+                "(?P<namespace>[^/]*)",
                 r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
                 "(?P<short_name>.*?)",
             ]
@@ -246,7 +245,6 @@ def create_dataset(
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
-
         used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats, repack=repack)
 
@@ -444,6 +442,10 @@ class PathFinder:
         return self._dag
 
     @property
+    def step_type(self) -> str:
+        return self.f.parent.parent.parent.parent.name
+
+    @property
     def channel(self) -> CHANNEL:
         return self.f.parent.parent.parent.name  # type: ignore
 
@@ -503,6 +505,7 @@ class PathFinder:
             channel=self.channel,  # type: ignore
             namespace=self.namespace,
             version=self.version,
+            step_type=self.step_type,
         )
 
     @staticmethod
@@ -512,6 +515,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[int, str]] = None,
         is_private: Optional[bool] = False,
+        step_type: str = "data",
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
 
@@ -528,15 +532,17 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
-            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
+        if step_type == "export":
+            step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+        elif channel in CHANNEL.__args__:
+            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -549,6 +555,7 @@ class PathFinder:
             namespace=self.namespace,
             version=self.version,
             is_private=self.is_private,
+            step_type=self.step_type,
         )
 
     @staticmethod
@@ -605,6 +612,7 @@ class PathFinder:
     def get_dependency_step_name(
         self,
         short_name: str,
+        step_type: str = "data",
         channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
@@ -613,28 +621,41 @@ class PathFinder:
         """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
 
         pattern = self.create_step_name(
-            channel=channel, namespace=namespace, version=version, short_name=short_name, is_private=is_private
+            step_type=step_type,
+            channel=channel,
+            namespace=namespace,
+            version=version,
+            short_name=short_name,
+            is_private=is_private,
         )
         matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         # If no step was found and is_private was not specified, try again assuming step is private.
         if (len(matches) == 0) and (is_private is None):
             pattern = self.create_step_name(
-                channel=channel, namespace=namespace, version=version, short_name=short_name, is_private=True
+                step_type=step_type,
+                channel=channel,
+                namespace=namespace,
+                version=version,
+                short_name=short_name,
+                is_private=True,
             )
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
-        # NOTE: This was added so that explorer steps can depend on grapher://grapher steps.
-        #  But maybe it's enough if they depend on data://grapher steps (given that the --explorer flag also implies
-        #  --grapher). Consider removing.
         if (len(matches) == 0) and (channel == "grapher"):
             pattern = self.create_step_name(
-                channel="grapher", namespace=namespace, version=version, short_name=short_name, is_private=is_private
+                step_type=step_type,
+                channel="grapher",
+                namespace=namespace,
+                version=version,
+                short_name=short_name,
+                is_private=is_private,
             )
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
+            __import__("ipdb").set_trace()
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
@@ -646,6 +667,7 @@ class PathFinder:
     def load_dependency(
         self,
         short_name: str,
+        step_type: str = "data",
         channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
@@ -653,6 +675,7 @@ class PathFinder:
     ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
         """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
+            step_type=step_type,
             short_name=short_name,
             channel=channel,
             namespace=namespace,
@@ -1074,31 +1097,14 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
 
 
-class DatasetAndExplorer:
-    def __init__(self, dataset, explorer):
-        self.dataset = dataset
-        self.explorer = explorer
-
-    def save(self):
-        # Save ETL dataset to disk.
-        self.dataset.save()
-        if os.getenv("EXPLORER"):
-            log.info(f"Writing explorer tsv file: {self.explorer.name}")
-            # Write explorer tsv file to disk.
-            self.explorer.write()
-        else:
-            log.info("No tsv file will be written (to do so, run etl with the '--explorer' flag).")
-
-
 def create_explorer(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     df_columns: Optional[pd.DataFrame] = None,
-) -> DatasetAndExplorer:
+) -> Explorer:
     # Extract information about this step from dest_dir.
     channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
-
     # Initialize explorer.
     explorer = Explorer(short_name)
     # Add a comment to avoid manual edits.
@@ -1112,11 +1118,4 @@ def create_explorer(
     if df_columns is not None:
         explorer.df_columns = df_columns
 
-    # Just so that ETL doesn't break, create an empty dataset with basic metadata.
-    metadata = DatasetMeta(channel=channel, namespace=namespace, version=version, short_name=short_name)
-    dataset = catalog.Dataset.create_empty(dest_dir, metadata=metadata)
-
-    # Create a "dataset and explorer object".
-    ds_explorer = DatasetAndExplorer(dataset=dataset, explorer=explorer)
-
-    return ds_explorer
+    return explorer

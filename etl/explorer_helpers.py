@@ -1,12 +1,13 @@
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 from structlog import get_logger
 
-from etl.config import EXPLORERS_DIR
+from etl import config
 from etl.db import get_variables_data
+from etl.files import upload_file_to_server
+from etl.paths import EXPLORERS_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -41,8 +42,7 @@ class Explorer:
         # Columns table of the explorer.
         self.df_columns = pd.DataFrame([], columns=["variableId"])
 
-        # added os.environ.get("EXPLORER") as hotfix
-        if self.path.exists() and os.environ.get("EXPLORER"):
+        if self.path.exists():
             log.info(f"Loading explorer file {self.path}.")
             # Read explorer from existing file.
             self._load_content()
@@ -247,12 +247,18 @@ class Explorer:
 
         return content_has_changed
 
-    def write(self, path: Optional[Union[str, Path]] = None) -> None:
+    def save(self, path: Optional[Union[str, Path]] = None) -> None:
         if path is None:
             path = self.path
 
+        path = Path(path)
+
         # Write parsed content to file.
-        Path(path).write_text(self.generate_content())
+        path.write_text(self.generate_content())
+
+        # Upload it to staging server.
+        if config.STAGING:
+            upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
 
     def get_variable_config(self, variable_id: int) -> Dict[str, Any]:
         variable_config = {}

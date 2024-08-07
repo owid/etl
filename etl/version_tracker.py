@@ -444,7 +444,7 @@ class VersionTracker:
     def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Optional[Path]:
         """Get the path to the script of a given step."""
         # Get step attributes.
-        _, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
+        _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
         state = "active" if step in self.all_active_steps else "archive"
 
         # Create a dictionary that contains the path to a script for a given step.
@@ -452,7 +452,9 @@ class VersionTracker:
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
         path_to_script = {"active": None, "archive": None}
-        if channel == "snapshot":
+        if step_type == "export":
+            path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
+        elif channel == "snapshot":
             path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
             path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
@@ -501,7 +503,7 @@ class VersionTracker:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
             [extract_step_attributes(step).values() for step in self.all_steps],
-            columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
+            columns=["step", "step_type", "kind", "channel", "namespace", "version", "name", "identifier"],
         )
 
         # Add list of all existing versions for each step.
