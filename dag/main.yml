@@ -812,6 +812,14 @@ steps:
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
 
+# Ethnologue
+  data://meadow/language/2024-07-17/ethnologue:
+    - snapshot://language/2024-08-01/ethnologue.zip
+  data://garden/language/2024-07-17/ethnologue:
+    - data://meadow/language/2024-07-17/ethnologue
+  data://grapher/language/2024-07-17/ethnologue:
+    - data://garden/language/2024-07-17/ethnologue
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
