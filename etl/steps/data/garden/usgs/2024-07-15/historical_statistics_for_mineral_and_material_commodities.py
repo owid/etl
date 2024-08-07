@@ -58,8 +58,9 @@ COMMODITY_MAPPING = {
     ("Gypsum", "Total"): ("Gypsum", "Total"),
     ("Helium", "Total"): ("Helium", "Total"),
     ("Indium", "Total"): ("Indium", "Refinery"),
-    # NOTE: Total diamond production includes natural and synthetic diamonds.
-    ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
+    # NOTE: Industrial diamond production includes natural and synthetic diamonds.
+    #  But in USGS current data, industrial diamond production includes only natural diamond.
+    ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
     ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
     ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Industrial"),
     ("Iron Oxide Pigments", "Total"): None,
@@ -125,6 +126,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Cement",
     "Construction sand and gravel",
     "Graphite",
+    "Industrial diamond",
     "Industrial sand and gravel",
     "Iron ore",
     "Lime",
