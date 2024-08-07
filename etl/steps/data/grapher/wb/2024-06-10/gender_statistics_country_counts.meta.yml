@@ -1,0 +1,6 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: World Bank Gender Statistics (country counts)

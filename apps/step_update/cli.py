@@ -360,11 +360,6 @@ class StepUpdater:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
 
-            # Tell user how to automatically create PR
-            short_name = steps[-1].split("/")[-1].split(".")[0]
-            cmd = f'etl d draft-pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
-            log.info(f"Create PR automatically with:\n  {cmd}")
-
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.
 

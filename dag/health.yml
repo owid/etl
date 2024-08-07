@@ -689,3 +689,12 @@ steps:
     - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
+
+  # WHO Mortality Database - Cancer specific
+  data://meadow/who/2024-08-06/mortality_database_cancer:
+    - snapshot://who/2024-08-06/mortality_database_cancer.csv
+  data://garden/who/2024-08-06/mortality_database_cancer:
+    - data://meadow/who/2024-08-06/mortality_database_cancer
+  data://grapher/who/2024-08-06/mortality_database_cancer:
+    - data://garden/who/2024-08-06/mortality_database_cancer
+
