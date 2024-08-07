@@ -34,7 +34,6 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     with io.BytesIO(file_content) as memfile:
         ds = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
 
-    # Your pro
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
     # Select the 't2m' variable from the combined dataset.
@@ -72,7 +71,6 @@ def run(dest_dir: str) -> None:
 
     # Read surface temperature data from snapshot
     da = _load_data_array(snap)
-    print(da)
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
