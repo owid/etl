@@ -55,6 +55,8 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
     # hide automatic time/ entity in chart title
     df_graphers["hideAnnotationFieldsInTitle"] = True
+    # set current year als maximum year
+    df_graphers["timelineMaxTime"] = 2024
 
     # Sanity check.
     error = "Duplicated rows in explorer."
@@ -104,7 +106,7 @@ def run(dest_dir: str) -> None:
     # df_graphers.to_csv("/Users/tunaacisu/Data/Test/explorer.tsv", sep="\t", index=False)
 
     # TODO: add columns to the explorer once I have figured out map brackets
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
 
 
@@ -119,11 +121,10 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             config = CONFIG_DICT[column]
             if column in ["net_migration", "net_migration_rate"]:
                 graphers_row_dict["yVariableIds"] = [
-                    f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}" + "__sex_all__age_all__variant_medium"
+                    f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}__sex_all__age_all__variant_medium"
                 ]
             else:
                 graphers_row_dict["yVariableIds"] = [f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"]
-            graphers_row_dict["yVariableIds"] = [f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"]
             graphers_row_dict["Metric Dropdown"] = config["metric"]
             graphers_row_dict["Period Radio"] = config["period_radio"]
             graphers_row_dict["Sub-Metric Radio"] = config["sub_metric_radio"]
@@ -146,11 +147,11 @@ def create_column_rows(col_dicts, tb, ds):
 
             # net migration and net migration rate are split again in grapher by sex/ age/ variant
             if column in ["net_migration", "net_migration_rate"]:
-                col_row_dict["variableId"] = (
+                col_row_dict["catalogPath"] = (
                     f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}" + "__sex_all__age_all__variant_medium"
                 )
             else:
-                col_row_dict["variableId"] = f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
+                col_row_dict["catalogPath"] = f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
             col_row_dict["name"] = meta.title
             col_row_dict["slug"] = column
             col_row_dict["description"] = meta.description_short
