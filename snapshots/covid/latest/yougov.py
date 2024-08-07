@@ -42,13 +42,16 @@ COUNTRIES = [
     "united-states.zip",
     "vietnam.csv",
 ]
+EXTRA = [
+    "extra_mapping.csv",
+]
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    for c in COUNTRIES:
+    for c in COUNTRIES + EXTRA:
         # Create a new snapshot.
         snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/yougov_{c}")
         snap.create_snapshot(upload=upload)
