@@ -141,7 +141,7 @@ tables:
       # solutions (return, resettlement, naturalization)
       returned_refugees_origin:
         title: Returned refugees by country of origin
-        description_short: Number of returned [refugees](#dod:refugee) by the country of origin. Only refugees who returned during the calendar year are included.
+        description_short: Number of returned [refugees](#dod:refugee) by the country of origin and return. Only refugees who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
@@ -155,7 +155,7 @@ tables:
           - {definitions.description_internally_displaced}
       resettlement_arrivals_origin:
         title: Resettlement arrivals by country of origin
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin.
+        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin, which is the country the refugee originally fled from. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
       naturalisation_origin:
         title: Naturalised refugees by country of origin
@@ -165,7 +165,7 @@ tables:
           - {definitions.description_refugee}
       returned_refugees_dest:
         title: Returned refugees by country they returned from
-        description_short: Number of returned [refugees](#dod:refugee) by the country of residence. Only refugees who returned during the calendar year are included.
+        description_short: Number of returned [refugees](#dod:refugee) by the country they lived in before their return. Only refugees who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
@@ -173,21 +173,21 @@ tables:
           - "{definitions.description_refugee_general}"
       resettlement_arrivals_dest:
         title: Resettlement arrivals by country of resettlement
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of residence.
+        description_short: Newly [resettled refugees](#dod:resettlement) by the country they resettle in. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
       naturalisation_dest:
         title: Naturalised refugees by country of naturalization
-        description_short: Number of [naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of naturalization per calendar year.
+        description_short: "[Naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of naturalization per calendar year."
         description_from_producer: "{definitions.description_naturalization}"
       resettlement_per_100k_origin:
         title: Resettlement arrivals by country of origin per 100,000 people
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by country of origin, per 100,000 people living in the country of origin.
+        description_short: Newly [resettled refugees](#dod:resettlement) by country of origin, per 100,000 people living in the country of origin. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
         display:
           numDecimalPlaces: 1
       resettlement_per_100k_dest:
         title: Resettlement arrivals by country of resettlement per 100,000 people
-        description_short: Number of newly [resettled refugees](#dod:resettlement) in this country, per 100,000 people living in the settlement country.
+        description_short: Newly [resettled refugees](#dod:resettlement) in this country, per 100,000 people living in the country of settlement. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
         display:
           numDecimalPlaces: 1
@@ -195,7 +195,7 @@ tables:
       # rolling averages
       refugees_origin_5y_avg:
         title: Refugees by country of origin (5-year rolling average)
-        description_short: Number of [refugees](#dod:refugee) by country of origin, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.
+        description_short: "[Refugees](#dod:refugee) by country of origin, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year."
         description_from_producer: "{definitions.description_refugee}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -204,7 +204,7 @@ tables:
           - "{definitions.description_refugee_general}"
       refugees_origin_5y_avg_per_1000_pop:
         title: Refugees by country of origin per 1,000 people (5-year rolling average)
-        description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.
+        description_short: '[Refugees](#dod:refugee) by country of origin, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.'
         description_from_producer: "{definitions.description_refugee}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -215,14 +215,14 @@ tables:
           numDecimalPlaces: 1
       asylum_seekers_origin_5y_avg:
         title: Asylum seekers by country of origin (5-year rolling average)
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of origin, shown as the 5-year rolling average. This measures the total number of asylum seekers from the country; not the number per year.
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country of origin, shown as the 5-year rolling average. This measures the total number of asylum seekers from the country; not the number per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
       asylum_seekers_origin_5y_avg_per_100k_pop:
         title: Asylum seekers by country of origin per 100,000 people (5-year rolling average)
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of origin, per 100,000 people in that country, shown as the 5-year rolling average. This measures the total number of asylum seekers from the country; not the number per year.
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country of origin, per 100,000 people in that country, shown as the 5-year rolling average. This measures the total number of asylum seekers from the country; not the number per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -231,14 +231,14 @@ tables:
           numDecimalPlaces: 1
       resettlement_origin_5y_avg:
         title: Resettlement arrivals by country of origin (5-year rolling average)
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin, shown as the 5-year rolling average.
+        description_short: Newly [resettled refugees](#dod:resettlement) by the country which they originally fled from. Shown as the 5-year rolling average.
         description_from_producer: "{definitions.description_resettlement}"
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
       resettlement_origin_5y_avg_per_100k_pop:
         title: Resettlement arrivals by country of origin per 100,000 people (5-year rolling average)
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by country of origin, per 100,000 people living in the country of origin, shown as the 5-year rolling average.
+        description_short: Newly [resettled refugees](#dod:resettlement) by country which they originally fled from, per 100,000 people living in that country. Shown as the 5-year rolling average.
         description_from_producer: "{definitions.description_resettlement}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -248,7 +248,7 @@ tables:
 
       refugees_asylum_5y_avg:
         title: Refugees by country of residence (5-year rolling average)
-        description_short: Number of [refugees](#dod:refugee) by country of residence, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number arriving per year.
+        description_short: "[Refugees](#dod:refugee) by country of residence, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number arriving per year."
         description_from_producer: "{definitions.description_refugee}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -257,7 +257,7 @@ tables:
           - "{definitions.description_refugee_general}"
       refugees_asylum_5y_avg_per_1000_pop:
         title: Refugees by country of residence per 1,000 people (5-year rolling average)
-        description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number arriving per year.
+        description_short: "[Refugees](#dod:refugee) by country of residence, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees living in the country; not the number arriving per year."
         description_from_producer: "{definitions.description_refugee}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -268,14 +268,14 @@ tables:
           - "{definitions.description_refugee_general}"
       asylum_seekers_asylum_5y_avg:
         title: Asylum seekers by country of asylum (5-year rolling average)
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country where they seek asylum, shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year.
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
       asylum_seekers_asylum_5y_avg_per_100k_pop:
         title: Asylum seekers by country of asylum per 100,000 people (5-year rolling average)
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country where they seek asylum, per 100,000 people in that country. Here shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year.
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, per 100,000 people in that country. Here shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}
@@ -284,14 +284,14 @@ tables:
           numDecimalPlaces: 1
       resettlement_dest_5y_avg:
         title: Resettlement arrivals by country of resettlement (5-year rolling average)
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country where they are resettled. Here shown as the 5-year rolling average.
+        description_short: Newly [resettled refugees](#dod:resettlement) by the country where they resettle. Here shown as the 5-year rolling average. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
       resettlement_dest_5y_avg_per_100k_pop:
         title: Resettlement arrivals by country of asylum per 100,000 people (5-year rolling average)
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by country where they are resettled, per 100,000 people living in the country of resettlement. Here shown as the 5-year rolling average.
+        description_short: Newly [resettled refugees](#dod:resettlement) by country where they resettle, per 100,000 people living in the country of resettlement. Here shown as the 5-year rolling average. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
         description_processing: |-
           - {definitions.common.description_processing}

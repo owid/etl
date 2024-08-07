@@ -117,7 +117,12 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             graphers_row_dict = {}
 
             config = CONFIG_DICT[column]
-
+            if column in ["net_migration", "net_migration_rate"]:
+                graphers_row_dict["yVariableIds"] = [
+                    f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}" + "__sex_all__age_all__variant_medium"
+                ]
+            else:
+                graphers_row_dict["yVariableIds"] = [f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"]
             graphers_row_dict["yVariableIds"] = [f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"]
             graphers_row_dict["Metric Dropdown"] = config["metric"]
             graphers_row_dict["Period Radio"] = config["period_radio"]
@@ -139,7 +144,13 @@ def create_column_rows(col_dicts, tb, ds):
             meta = tb[column].metadata
             origin = meta.origins[0]
 
-            col_row_dict["variableId"] = f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
+            # net migration and net migration rate are split again in grapher by sex/ age/ variant
+            if column in ["net_migration", "net_migration_rate"]:
+                col_row_dict["variableId"] = (
+                    f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}" + "__sex_all__age_all__variant_medium"
+                )
+            else:
+                col_row_dict["variableId"] = f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
             col_row_dict["name"] = meta.title
             col_row_dict["slug"] = column
             col_row_dict["description"] = meta.description_short
