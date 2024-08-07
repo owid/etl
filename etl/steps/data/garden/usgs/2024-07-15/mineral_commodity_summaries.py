@@ -248,7 +248,7 @@ COMMODITY_MAPPING = {
         "Silicon",
         "Plant",
     ),
-    ("Silicon", "Plant production, silicon content of ferrosilicon"): ("Silicon", "Plant production, ferrosilicon"),
+    ("Silicon", "Plant production, silicon content of ferrosilicon"): None,
     ("Silicon", "Plant production, silicon content of ferrosilicon production"): None,
     ("Silicon", "Plant production, silicon metal"): None,
     ("Silicon", "silicon content of combined totals for ferrosilicon and silicon metal production"): (
