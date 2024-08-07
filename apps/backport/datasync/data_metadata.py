@@ -253,23 +253,17 @@ def _variable_metadata(
 
     schemaVersion = row.pop("schemaVersion")
     processingLevel = row.pop("processingLevel")
-    grapherConfigETLJson = row.pop("grapherConfigETL")
-    grapherConfigAdminJson = row.pop("grapherConfigAdmin")
     licenseJson = row.pop("license")
     descriptionKeyJson = row.pop("descriptionKey")
     sortJson = row.pop("sort")
 
     display = json.loads(displayJson)
-    grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
-    grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     license = json.loads(licenseJson) if licenseJson else None
     descriptionKey = json.loads(descriptionKeyJson) if descriptionKeyJson else None
     sort = json.loads(sortJson) if sortJson else None
 
     # group fields from flat structure into presentation field
     presentation = dict(
-        grapherConfigETL=grapherConfigETL,
-        grapherConfigAdmin=grapherConfigAdmin,
         titlePublic=row.pop("titlePublic"),
         titleVariant=row.pop("titleVariant"),
         attributionShort=row.pop("attributionShort"),

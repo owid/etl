@@ -60,7 +60,6 @@ def _variable_meta():
         "sort": None,
         "columnOrder": 0,
         "originalMetadata": None,
-        "grapherConfigAdmin": None,
         "shortName": "population_density",
         "catalogPath": "grapher/owid/latest/key_indicators/population_density#population_density",
         "dimensions": None,
@@ -68,7 +67,6 @@ def _variable_meta():
         "nonRedistributable": 0,
         "schemaVersion": 2,
         "processingLevel": "minor",
-        "grapherConfigETL": '{"title": "Population density"}',
         "license": '{"name": "License"}',
         "descriptionKey": '["Population density"]',
         "titlePublic": "Population density title",
@@ -133,7 +131,6 @@ def test_variable_metadata():
         "origins": [{"descriptionSnapshot": "Origin A"}, {"descriptionSnapshot": "Origin B"}],
         "presentation": {
             "faqs": [{"fragmentId": "test", "gdocId": "1"}],
-            "grapherConfigETL": {"title": "Population density"},
             "attributionShort": "Gapminder",
             "titlePublic": "Population density title",
             "titleVariant": "Population density variant",
@@ -243,11 +240,11 @@ def test_convert_strings_to_numeric():
 
 def test_checksum_metadata():
     meta = _variable_meta()
-    assert checksum_metadata(meta) == "3123b1b4a25809c199e19e8203507a77"
+    assert checksum_metadata(meta) == "367a0d273b3ba021f811259e0ef80b99"
 
     # change id, checksums or updatedAt shouldn't change it
     meta = _variable_meta()
     meta["id"] = 999
     meta["dataChecksum"] = 999
     meta["updatedAt"] = dt.datetime.now()
-    assert checksum_metadata(meta) == "3123b1b4a25809c199e19e8203507a77"
+    assert checksum_metadata(meta) == "367a0d273b3ba021f811259e0ef80b99"
