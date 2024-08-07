@@ -56,6 +56,43 @@ steps:
   data://grapher/covid/latest/oxcgrt_policy:
     - data://garden/covid/latest/oxcgrt_policy
 
+  # YouGov
+  data://meadow/covid/latest/yougov:
+    - snapshot://covid/latest/yougov_australia.zip.dvc
+    - snapshot://covid/latest/yougov_brazil.csv.dvc
+    - snapshot://covid/latest/yougov_canada.zip.dvc
+    - snapshot://covid/latest/yougov_china.csv.dvc
+    - snapshot://covid/latest/yougov_denmark.zip.dvc
+    - snapshot://covid/latest/yougov_finland.csv.dvc
+    - snapshot://covid/latest/yougov_france.zip.dvc
+    - snapshot://covid/latest/yougov_germany.zip.dvc
+    - snapshot://covid/latest/yougov_hong-kong.csv.dvc
+    - snapshot://covid/latest/yougov_india.csv.dvc
+    - snapshot://covid/latest/yougov_indonesia.csv.dvc
+    - snapshot://covid/latest/yougov_israel.zip.dvc
+    - snapshot://covid/latest/yougov_italy.zip.dvc
+    - snapshot://covid/latest/yougov_japan.zip.dvc
+    - snapshot://covid/latest/yougov_malaysia.csv.dvc
+    - snapshot://covid/latest/yougov_mexico.csv.dvc
+    - snapshot://covid/latest/yougov_netherlands.zip.dvc
+    - snapshot://covid/latest/yougov_norway.zip.dvc
+    - snapshot://covid/latest/yougov_philippines.csv.dvc
+    - snapshot://covid/latest/yougov_saudi-arabia.csv.dvc
+    - snapshot://covid/latest/yougov_singapore.zip.dvc
+    - snapshot://covid/latest/yougov_south-korea.csv.dvc
+    - snapshot://covid/latest/yougov_spain.zip.dvc
+    - snapshot://covid/latest/yougov_sweden.zip.dvc
+    - snapshot://covid/latest/yougov_taiwan.csv.dvc
+    - snapshot://covid/latest/yougov_thailand.csv.dvc
+    - snapshot://covid/latest/yougov_united-arab-emirates.csv.dvc
+    - snapshot://covid/latest/yougov_united-kingdom.zip.dvc
+    - snapshot://covid/latest/yougov_united-states.zip.dvc
+    - snapshot://covid/latest/yougov_vietnam.csv.dvc
+  data://garden/covid/latest/yougov:
+    - data://meadow/covid/latest/yougov
+  data://grapher/covid/latest/yougov:
+    - data://garden/covid/latest/yougov
+
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
