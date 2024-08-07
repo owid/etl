@@ -4,6 +4,11 @@ Script to create a snapshot of dataset.
 The data for this snapshot is created manually in a csv file by copying the data for the 50th (median) and the 90th percentile.
 This data is available in page 18 (all occupations) here https://www.ausstats.abs.gov.au/ausstats/subscriber.nsf/0/1E07D323FDE698C2CA2575D700188C43/$File/63060_aug%202008.pdf.
 
+I save the file in the format:
+country,year,indicator,All occupations
+Australia,2008,50th percentile (median),833.0
+Australia,2008,90th percentile,1736.0
+
 The datasets for 2010+ are available as Excel files, so there is no need to manually create the data.
 """
 
