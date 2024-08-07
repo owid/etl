@@ -284,7 +284,6 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Shot, powder, sponge, etc."): None,
     ("Iron, steel and ferro-alloys", "Silicon metal"): None,
     ("Iron, steel and ferro-alloys", "Spiegeleisen"): None,
-    # TODO: Handle iron.
     ("Iron, steel and ferro-alloys", "Sponge"): None,
     ("Iron, steel and ferro-alloys", "Sponge & powder"): None,
     ("Iron, steel and ferro-alloys", "Tin-plate scrap"): None,
@@ -754,6 +753,16 @@ def harmonize_units(tb: Table) -> Table:
     # Fill empty units from the same category-commodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
 
+    # NOTE: We decided for now to not include "Sponge". If we change our mind, we may need to uncomment the following.
+    # # Since we are mapping ("Iron, steel and ferro-alloys", "Sponge"): ("Iron", "Sponge"), this leads to imports having
+    # # no units. This may be fixed after further harmonization. If so, remove this part of the code.
+    # # If this is not fixed, then consider a different solution.
+    # error = "Something has changed in the units of Iron Sponge. Check this part of the code."
+    # assert set(
+    #     tb.loc[(tb["category"] == "Imports") & (tb["commodity"] == "Iron") & (tb["sub_commodity"] == "Sponge")]["unit"]
+    # ) == set([pd.NA]), error
+    # tb.loc[(tb["commodity"] == "Iron") & (tb["sub_commodity"] == "Sponge"), "unit"] = "tonnes"
+
     # Visually inspect category-commodity-subcommodity combinations with missing units.
     # Check that the only combinations still with no units are the expected ones.
     missing_units = {
@@ -1001,6 +1010,9 @@ def run(dest_dir: str) -> None:
         if not tb_flat[column].metadata.presentation:
             tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
         tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
+    # Drop empty columns.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     # Format table conveniently.
     # NOTE: All commodities have the same unit for imports, exports and production except one:

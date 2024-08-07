@@ -45,7 +45,7 @@ COMMODITY_MAPPING = {
     ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
-    # TODO: Handle iron.
+    # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
     ("Feldspar", "Total"): ("Feldspar", "Total"),
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
@@ -462,6 +462,9 @@ def run(dest_dir: str) -> None:
     tb_flat = prepare_wide_table(tb=tb_combined)
     tb_flat_unit_value = prepare_wide_table(tb=tb_unit_value)
     tb_flat = tb_flat.merge(tb_flat_unit_value, on=["country", "year"], how="outer")
+
+    # Drop empty columns, if any.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     # Format tables conveniently.
     tb_combined = tb_combined.format(

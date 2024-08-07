@@ -1130,6 +1130,9 @@ def run(dest_dir: str) -> None:
             tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
         tb_flat[column].metadata.presentation.grapher_config["note"] = note
 
+    # Drop empty columns, if any.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
+
     # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
