@@ -140,6 +140,8 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical], separator=" "
         )
         if len(combined_footnotes) > 0:
+            if tb[column].metadata.presentation.grapher_config is None:
+                tb[column].metadata.presentation.grapher_config = {}
             tb[column].metadata.presentation.grapher_config["note"] = combined_footnotes
 
     return tb
