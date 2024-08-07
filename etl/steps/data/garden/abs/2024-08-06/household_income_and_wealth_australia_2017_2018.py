@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("household_income_and_wealth_australia")
+    ds_meadow = paths.load_dataset("household_income_and_wealth_australia_2017_2018")
 
     # Read table from meadow dataset.
     tb_income = ds_meadow["income"].reset_index()
@@ -25,8 +25,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_income = reformat_years_and_rename(tb_income)
-    tb_wealth = reformat_years_and_rename(tb_wealth)
+    tb_income = reformat_years_and_rename(tb=tb_income, short_name="income")
+    tb_wealth = reformat_years_and_rename(tb=tb_wealth, short_name="wealth")
 
     #
     # Save outputs.
@@ -40,18 +40,40 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def reformat_years_and_rename(tb: Table) -> Table:
+def reformat_years_and_rename(tb: Table, short_name: str) -> Table:
     """
     Reformat years as integers, and rename columns.
+    Also, create spells in the case of income data.
     """
     # Reformat year, to keep only the latest year (last two characters).
+    if short_name == "income":
+        # Add an additional column identifying spells: split year into two columns, using the first parenthesis as a separator.
+        tb[["year", "spell"]] = tb["year"].str.split("(", expand=True)
+
     tb["year"] = tb["year"].str[-2:]
     tb["year"] = tb["year"].astype(int)
 
     # Add 2000 to the year if it is less than 50. Add 1900 if it is greater or equal to 50.
     tb["year"] = tb["year"].apply(lambda x: x + 2000 if x < 50 else x + 1900)
 
-    tb = tb.format(["country", "year"])
+    if short_name == "income":
+        # Additional formatting for the spell column.
+        # Fill forward missing values.
+        tb["spell"] = tb["spell"].ffill()
+
+        # Factorize spell, but restarting the count for each country
+        for country in list(tb["country"].unique()):
+            tb.loc[tb["country"] == country, "spell_number"] = (
+                tb.loc[tb["country"] == country, "spell"].factorize()[0] + 1
+            )
+
+        # Make spell_number integer.
+        tb["spell_number"] = tb["spell_number"].astype(int)
+
+        tb = tb.format(["country", "year", "spell_number"])
+
+    elif short_name == "wealth":
+        tb = tb.format(["country", "year"])
 
     # Keep the columns we want to keep.
     tb = tb[COLUMNS_TO_KEEP.keys()].rename(columns=COLUMNS_TO_KEEP)
