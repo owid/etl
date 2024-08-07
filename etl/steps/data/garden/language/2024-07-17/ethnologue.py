@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb_country_codes = tb_country_codes.drop(columns="area")
     # Process data.
     #
-    tb = geo.harmonize_countries(
+    tb_country_codes = geo.harmonize_countries(
         df=tb_country_codes,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
@@ -33,15 +33,15 @@ def run(dest_dir: str) -> None:
 
     # Calculate the total number of languages per country
     tb_languages_per_country = languages_per_country(tb_language_index, tb_country_codes)
-
-    # tb = tb.format(["country", "year"])
+    # tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
+    tb_languages_per_country = tb_languages_per_country.format(["country", "year"], short_name="languages_per_country")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb_languages_per_country], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
