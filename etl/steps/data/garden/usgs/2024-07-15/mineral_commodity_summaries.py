@@ -145,9 +145,7 @@ COMMODITY_MAPPING = {
     ("Indium", "Refinery production, indium"): ("Indium", "Refinery"),
     ("Iodine", "Mine production"): ("Iodine", "Mine"),
     ("Iodine", "Mine production, elemental iodine"): ("Iodine", "Mine"),
-    # TODO: Handle iron.
-    ("Iron and steel", "Pig iron"): None,
-    # TODO: Handle iron.
+    ("Iron and steel", "Pig iron"): ("Iron", "Pig iron"),
     ("Iron and steel", "Pig iron, million metric tons"): ("Iron", "Pig iron"),
     ("Iron and steel", "Raw steel"): ("Steel", "Crude"),
     ("Iron and steel", "Raw steel, million metric tons"): ("Steel", "Crude"),

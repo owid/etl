@@ -65,7 +65,7 @@ COMMODITY_MAPPING = {
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     # TODO: Handle iron.
-    ("Iron ore", "Total"): ("Iron", "Ore"),
+    ("Iron ore", "Total"): None,
     ("Kaolin", "Total"): ("Kaolin", "Total"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Plant"),
@@ -84,8 +84,7 @@ COMMODITY_MAPPING = {
     ("Peat", "Total"): ("Peat", "Total"),
     ("Perlite", "Total"): ("Perlite", "Total"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
-    # TODO: Handle iron.
-    ("Pig Iron", "Total"): None,
+    ("Pig Iron", "Total"): ("Iron", "Pig iron"),
     ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
     ("Salt", "Total"): ("Salt", "Total"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),

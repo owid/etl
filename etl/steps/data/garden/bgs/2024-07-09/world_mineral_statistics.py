@@ -239,8 +239,8 @@ COMMODITY_MAPPING = {
     ("Iron ore", "Burnt pyrites"): None,
     # TODO: Handle iron.
     ("Iron ore", "Unknown"): None,
-    # TODO: Handle iron.
-    ("Iron, pig", "Unknown"): None,
+    # The following is used for production of pig iron.
+    ("Iron, pig", "Unknown"): ("Iron", "Pig iron"),
     ("Iron, steel and ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,
     ("Iron, steel and ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): None,
     ("Iron, steel and ferro-alloys", "Ferro-alloys"): None,
@@ -273,8 +273,8 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Ferro-zirconium"): None,
     ("Iron, steel and ferro-alloys", "Ingots, blooms, billets"): None,
     ("Iron, steel and ferro-alloys", "Other ferro-alloys"): None,
-    # TODO: Handle iron.
-    ("Iron, steel and ferro-alloys", "Pig iron"): None,
+    # The following is used for imports and exports of pig iron.
+    ("Iron, steel and ferro-alloys", "Pig iron"): ("Iron", "Pig iron"),
     ("Iron, steel and ferro-alloys", "Pig iron & ferro-alloys"): None,
     ("Iron, steel and ferro-alloys", "Pig iron & ingots"): None,
     ("Iron, steel and ferro-alloys", "Pig iron & spiegeleisen"): None,
