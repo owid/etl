@@ -244,6 +244,10 @@ def run(dest_dir: str) -> None:
 
     # Create a combined flat table.
     # Firstly, combine USGS current and historical. Since the former is more up-to-date, prioritize it.
+    # TODO: Sometimes, when combining, the data from one of the sources is completely replaced by the other.
+    #  In such cases, it would be better if only the origins of the remaining one appear in the metadata.
+    #  This happens, e.g. for Steel production (BGS goes from 1970 to 2022, whereas USGS (historical+current) data goes
+    #  from 1943 to 2023). So the result should quote only USGS historical and current as origins.
     tb = combine_two_overlapping_dataframes(
         df1=tb_usgs_flat, df2=tb_usgs_historical_flat, index_columns=["country", "year"]
     )
@@ -259,7 +263,7 @@ def run(dest_dir: str) -> None:
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
     #     tb_bgs_flat=tb_bgs_flat,
-    #     minerals=["Graphite"],
+    #     minerals=["Iron"],
     # )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).

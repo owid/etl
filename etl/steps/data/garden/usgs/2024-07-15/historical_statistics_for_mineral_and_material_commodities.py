@@ -45,7 +45,8 @@ COMMODITY_MAPPING = {
     ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
-    ("Direct Reduced Iron", "Total"): ("Direct Reduced Iron", "Total"),
+    # TODO: Handle iron.
+    ("Direct Reduced Iron", "Total"): None,
     ("Feldspar", "Total"): ("Feldspar", "Total"),
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
     ("Fluorspar", "Total"): ("Fluorspar", "Total"),
@@ -61,9 +62,10 @@ COMMODITY_MAPPING = {
     ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
     ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
     ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
-    ("Iron Oxide Pigments", "Total"): ("Iron Oxide Pigments", "Total"),
-    ("Iron and Steel Slag", "Total"): ("Iron and Steel Slag", "Total"),
-    ("Iron ore", "Total"): ("Iron ore", "Total"),
+    ("Iron Oxide Pigments", "Total"): None,
+    ("Iron and Steel Slag", "Total"): None,
+    # TODO: Handle iron.
+    ("Iron ore", "Total"): ("Iron", "Ore"),
     ("Kaolin", "Total"): ("Kaolin", "Total"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Plant"),
@@ -82,7 +84,8 @@ COMMODITY_MAPPING = {
     ("Peat", "Total"): ("Peat", "Total"),
     ("Perlite", "Total"): ("Perlite", "Total"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
-    ("Pig Iron", "Total"): ("Pig Iron", "Total"),
+    # TODO: Handle iron.
+    ("Pig Iron", "Total"): None,
     ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
     ("Salt", "Total"): ("Salt", "Total"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),
@@ -90,7 +93,7 @@ COMMODITY_MAPPING = {
     ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
     ("Silver", "Total"): ("Silver", "Mine"),
     ("Soda ash", "Total"): ("Soda ash", "Total"),
-    ("Steel", "Total"): ("Steel", "Total"),
+    ("Steel", "Total"): ("Steel", "Crude"),
     ("Strontium", "Total"): ("Strontium", "Total"),
     ("Sulfur", "Total"): ("Sulfur", "Total"),
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
@@ -333,7 +336,7 @@ def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
 
     # Add a generic subcommodity that applies to all commodities.
     # NOTE: This may be problematic for commodities for which there are subcommodities with different unit value series.
-    tb_unit_value["sub_commodity"] = "Apparent consumption"
+    tb_unit_value["sub_commodity"] = "Total"
 
     # Add a unit.
     tb_unit_value["unit"] = "constant 1998 US$ per tonne"
@@ -447,6 +450,7 @@ def run(dest_dir: str) -> None:
 
     # Harmonize commodity-subcommodity pairs.
     tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
+    tb_unit_value = harmonize_commodity_subcommodity_pairs(tb=tb_unit_value)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for column in [column for column in tb_combined.columns if column.startswith("notes_")]:

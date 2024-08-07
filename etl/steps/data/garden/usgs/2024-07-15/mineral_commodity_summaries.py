@@ -145,32 +145,26 @@ COMMODITY_MAPPING = {
     ("Indium", "Refinery production, indium"): ("Indium", "Refinery"),
     ("Iodine", "Mine production"): ("Iodine", "Mine"),
     ("Iodine", "Mine production, elemental iodine"): ("Iodine", "Mine"),
-    ("Iron and steel", "Pig iron"): ("Iron and steel", "Pig iron"),
-    ("Iron and steel", "Pig iron, million metric tons"): ("Iron and steel", "Pig iron"),
-    ("Iron and steel", "Raw steel"): ("Iron and steel", "Raw steel"),
-    ("Iron and steel", "Raw steel, million metric tons"): ("Iron and steel", "Raw steel"),
-    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): ("Iron ore", "Mine"),
-    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): (
-        "Iron ore",
-        "Mine, usable ore",
-    ),
-    ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Mine"),
-    ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Mine, usable ore"),
-    ("Iron oxide pigments", "Iron oxide pigments"): ("Iron oxide pigments", "Mine"),
-    ("Iron oxide pigments", "Mine production"): ("Iron oxide pigments", "Mine"),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments"): ("Iron oxide pigments", "Mine"),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): (
-        "Iron oxide pigments",
-        "Mine, ocher and red iron oxide",
-    ),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): (
-        "Iron oxide pigments",
-        "Mine, ocher",
-    ),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): (
-        "Iron oxide pigments",
-        "Mine, umber",
-    ),
+    # TODO: Handle iron.
+    ("Iron and steel", "Pig iron"): None,
+    # TODO: Handle iron.
+    ("Iron and steel", "Pig iron, million metric tons"): ("Iron", "Pig iron"),
+    ("Iron and steel", "Raw steel"): ("Steel", "Crude"),
+    ("Iron and steel", "Raw steel, million metric tons"): ("Steel", "Crude"),
+    # TODO: Handle iron.
+    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): None,
+    # TODO: Handle iron.
+    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): None,
+    # TODO: Handle iron.
+    ("Iron ore", "Mine production - Iron content"): None,
+    # TODO: Handle iron.
+    ("Iron ore", "Mine production - Usable ore"): None,
+    ("Iron oxide pigments", "Iron oxide pigments"): None,
+    ("Iron oxide pigments", "Mine production"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): None,
     ("Kyanite", "Kyanite and Related Minerals"): ("Kyanite", "Mine, kyanite and related minerals"),
     ("Kyanite", "Mine production, andalusite"): ("Kyanite", "Mine, andalusite"),
     ("Kyanite", "Mine production, kyanite"): ("Kyanite", "Mine, kyanite"),
@@ -257,19 +251,16 @@ COMMODITY_MAPPING = {
     ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery"),
     ("Silicon", "Plant production, silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
-        "Plant production, ferrosilicon and silicon metal",
+        "Plant",
     ),
     ("Silicon", "Plant production, silicon content of ferrosilicon"): ("Silicon", "Plant production, ferrosilicon"),
-    ("Silicon", "Plant production, silicon content of ferrosilicon production"): (
-        "Silicon",
-        "Plant production, ferrosilicon",
-    ),
-    ("Silicon", "Plant production, silicon metal"): ("Silicon", "Plant production, silicon metal"),
+    ("Silicon", "Plant production, silicon content of ferrosilicon production"): None,
+    ("Silicon", "Plant production, silicon metal"): None,
     ("Silicon", "silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
-        "Plant production, ferrosilicon and silicon metal",
+        "Plant",
     ),
-    ("Silicon", "silicon content of ferrosilicon production"): ("Silicon", "Plant production, ferrosilicon"),
+    ("Silicon", "silicon content of ferrosilicon production"): None,
     ("Silver", "Mine production"): ("Silver", "Mine"),
     ("Silver", "Silver - mine production, contained silver - metric tons"): ("Silver", "Mine"),
     ("Silver", "mine production, silver content"): ("Silver", "Mine"),
@@ -402,6 +393,7 @@ FOOTNOTES = {
     "reserves|Iodine|Mine|tonnes": "Values refer to elemental iodine.",
     "production|Graphite|Mine|tonnes": "Values refer to natural graphite.",
     "reserves|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "production|Silicon|Plant|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
 }
 
 # Dictionary of special units.
