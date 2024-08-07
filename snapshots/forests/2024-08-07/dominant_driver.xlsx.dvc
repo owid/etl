@@ -25,7 +25,9 @@ meta:
     # Citation
     producer: Global Forest Watch
     citation_full: |-
-      Global Forest Watch. 2024. World Resources Institute. www.globalforestwatch.org.
+      - Hansen, M.C., P.V. Potapov, R. Moore, et al. 2013. "High-Resolution Global Maps of 21st-Century Forest Cover Change." Science 342: 850–53. Data available on-line from: https://glad.earthengine.app/view/global-forest-change.
+      - Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. Accessed through Global Forest Watch on 06/08/2024. www.globalforestwatch.org.
+      - Global Administrative Areas Database, version 3.6. Available at http://gadm.org/
     attribution_short: GFW
 
     # Files
