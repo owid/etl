@@ -43,11 +43,6 @@ def run(dest_dir: str) -> None:
     )
     # Some regions are broken down into smaller regions in the dataset, so we need to aggregate them here e.g. Alaska and Hawaii are recorded separately in the dataset, but the geo.harmonize_countries function renames them as United States
     tb = tb.groupby(["country", "year", "category"]).sum().reset_index()
-    tb["year"] = tb["year"].astype(int) + 2000
-    # Convert m2 to ha
-    tb["area"] = tb["area"].astype(float).div(10000)
-    tb = convert_codes_to_drivers(tb)
-
     tb = tb.pivot(index=["country", "year"], columns="category", values="area").reset_index()
     tb = geo.add_regions_to_table(
         tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS, min_num_values_per_year=1
