@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("dominant_driver.xlsx")
     tb = snap.read(sheet_name="data")
     tb = tb.drop(columns=["iso"])
-    tb = tb.rename(columns={"loss year": "year", "Driver of loss": "category"})
+    tb = tb.rename(columns={"loss year": "year", "Driver of loss": "category", "Tree cover loss (ha)": "area"})
     # Some large countries are broken down into smaller regions in the dataset, so we need to aggregate them here
     # tb = tb.groupby(["country", "loss year", "Driver of loss"]).sum().reset_index()
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
