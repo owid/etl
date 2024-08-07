@@ -8,7 +8,7 @@ definitions:
     display: &common-display
       tolerance: 5
 
-  description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a latent variable measurement model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
+  description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
 
   description_key_percentage_gdp: The military expenditure data is divided by gross domestic product (GDP) estimates obtained from a similar latent variable model, explained by the same authors in [a different article](https://journals.sagepub.com/doi/10.1177/00220027211054432).
 
