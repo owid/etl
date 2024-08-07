@@ -1,0 +1,48 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  is_public: false
+
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, sequencing
+    description: |-
+      Enabled by data from GISAID (https://gisaid.org).
+
+      CoVariants provides an overview of SARS-CoV-2 variants and mutations that are of interest.
+
+      CoVariants is a free and open source project. The content, derived data, code used to generate the data, and code that implements this web application can be found on GitHub: github.com/hodcroftlab/covariants.
+
+      The SARS-CoV-2 pandemic & research surrounding it is ongoing. Every effort is made to try to keep this repository up-to-date, but readers should take care to double-check that the information is the latest available.
+
+
+
+    date_published: "2024-07-22"
+
+    # Citation
+    producer: GISAID, via CoVariants.org
+    citation_full: |-
+      GISAID:
+      Khare, S., et al (2021) GISAID's Role in Pandemic Response. China CDC Weekly, 3(49): 1049-1051. doi: 10.46234/ccdcw2021.255  PMCID: 8668406
+
+      Elbe, S. and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID's innovative contribution to global health. Global Challenges, 1:33-46. doi:10.1002/gch2.1018  PMCID: 31565258
+
+      Shu, Y. and McCauley, J. (2017) GISAID: from vision to reality. EuroSurveillance, 22(13) doi:10.2807/1560-7917.ES.2017.22.13.30494 PMCID: PMC5388101
+
+      CoVariants:
+      Emma B. Hodcroft. 2021. "CoVariants: SARS-CoV-2 Mutations and Variants of Interest." https://covariants.org/
+
+
+    # Files
+    url_main: https://www.gisaid.org/
+    url_download: https://raw.githubusercontent.com/hodcroftlab/covariants/master/web/public/data/perCountryData.json
+    date_accessed: 2024-07-26
+
+    # License
+    license:
+      name: GISAID EpiFlu Database Access Agreement
+      url: https://gisaid.org/terms-of-use/
+outs:
+  - md5: f62b6005a21cba8e3699b7da717c2fcc
+    size: 24077591
+    path: sequence.json

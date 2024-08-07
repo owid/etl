@@ -1961,6 +1961,13 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
+      armed_forces_share_population:
+        title: Armed forces personnel (% of total population)
+        short_unit: '%'
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_processing: We estimated this indicator by dividing the total number of armed forces personnel by the total population. The population estimates come from a long-run dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
       ms_mil_xpnd_cd:
         title: Military expenditure (current USD)
         unit: current USD

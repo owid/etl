@@ -3,11 +3,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Large scale data (1:10m Cultural Vectors), Admin 0 Countries
+    title: Natural Earth - Large scale data (1:10m Cultural Vectors)
     description: |-
       There are 258 countries in the world. Greenland as separate from Denmark. Most users will want this file instead of sovereign states, though some users will want map units instead when distinguishing overseas regions of France.
 
-      Natural Earth shows [de facto](https://www.naturalearthdata.com/about/disputed-boundaries-policy/) boundaries by default according to who controls the territory, versus de jure. Optional point-of-view (POV) variants are available for several dozen countries in the next section. 
+      Natural Earth shows [de facto](https://www.naturalearthdata.com/about/disputed-boundaries-policy/) boundaries by default according to who controls the territory, versus de jure. Optional point-of-view (POV) variants are available for several dozen countries in the next section.
 
       Countries distinguish between metropolitan (homeland) and independent and semi-independent portions of sovereign states. If you want to see the dependent overseas regions broken out (like in ISO codes, see France for example), use [map units](https://www.naturalearthdata.com/downloads/10m-political-vectors/10m-admin-0-details/) instead.
 
@@ -33,7 +33,7 @@ meta:
       Natural Earth. Free vector and raster map data @ naturalearthdata.com
 
     # Files
-    url_main: 
+    url_main:
       https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/
     url_download: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip
     date_accessed: 2023-11-28

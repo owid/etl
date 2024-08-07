@@ -774,7 +774,7 @@ if submitted:
         # Create files
         generate_step(
             cookiecutter_path=utils.COOKIE_SNAPSHOT,
-            data=dict(**form.dict(), channel="snapshots"),
+            data=dict(**form.model_dump(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
         ingest_path = SNAPSHOTS_DIR / form.namespace / form.snapshot_version / (form.short_name + ".py")
@@ -816,6 +816,8 @@ if submitted:
 
             st.markdown("#### 3. Proceed to next step")
             utils.st_page_link("meadow", use_container_width=True, border=True)
+            st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
+            utils.st_page_link("express", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

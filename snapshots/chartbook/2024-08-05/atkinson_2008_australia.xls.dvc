@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Changing Distribution of Earnings in OECD Countries
+    description: |-
+      This book is about how much people earn and why the distribution of earnings has been changing over time. The gap between the top and bottom in the United States has widened significantly since 1980. Why has this happened? Is it due to new technologies? What is the role of globalization? Are there historical precedents? The book begins with the ‘race’ between technology and education, and shows that continuing technical progress does not necessarily imply a continuing rise in dispersion. It then examines the experience of twenty OECD countries over the 20th century, material presented in the form of twenty country case studies. The book breaks new ground in assembling data on the distribution of individual earnings covering much of the 20th century and drawing on a variety of under-exploited sources. The findings overturn a number of widely-held beliefs. It is not the earnings of the low paid that have been most affected by the recent changes; widening is largely due to what is happening at the top. The recent rise in earnings dispersion is not unprecedented, but should be seen as part of a longer-run history of successive compression and expansion of earnings differences.
+    date_published: "2008-05-01"
+    title_snapshot: The Changing Distribution of Earnings in OECD Countries - Australia
+    description_snapshot: |-
+      This chapter presents tables of data on Australia and an account of its increased earnings distribution. It shows that the widening of earning dispersion took place during the Golden Age of the 1950s; there was a possible reversal in the early 1970s; this was followed by renewed widening (with possibly a pause in the 1980s); widening resumed in the 1990s, and appears to have continued into this century.
+
+    # Citation
+    producer: Atkinson
+    citation_full: |-
+      Atkinson, A.B., The Changing Distribution of Earnings in OECD Countries (Oxford, 2008; online edn, Oxford Academic, 1 Sept. 2008). Appendix A, https://doi.org/10.1093/acprof:oso/9780199532438.001.0001, accessed 3 Aug. 2024.
+
+    # Files
+    url_main: https://academic.oup.com/book/38708
+    date_accessed: 2024-08-05
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://academic.oup.com/book/38708
+
+outs:
+  - md5: 437e9f10f0aa621522a9d24e5c2b2c23
+    size: 2363392
+    path: atkinson_2008_australia.xls

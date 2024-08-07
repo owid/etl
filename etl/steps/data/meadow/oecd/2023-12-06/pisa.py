@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
         tb = snap.read_excel(header=11)
 
         # Fill missing 'Year/Study' values with the previous non-missing value
-        tb["Year/Study"] = tb["Year/Study"].fillna(method="ffill")
+        tb["Year/Study"] = tb["Year/Study"].ffill()
 
         # Replace special characters indicating missing data with NaNs
         tb = tb.replace(["—", "†"], np.nan)
@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     for snap in snaps_split_by_sex:
         # Similar processing steps as for both sexes combined
         tb = snap.read_excel(header=11)
-        tb["Year/Study"] = tb["Year/Study"].fillna(method="ffill")
+        tb["Year/Study"] = tb["Year/Study"].ffill()
         tb = tb.replace(["—", "†"], np.nan)
         tb = tb.rename(
             columns={

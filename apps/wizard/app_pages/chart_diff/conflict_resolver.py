@@ -1,4 +1,3 @@
-import ast
 import json
 from copy import deepcopy
 from typing import cast
@@ -12,6 +11,7 @@ from sqlalchemy.orm import Session
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
+from apps.wizard.utils import as_list, as_valid_json
 from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
 
 log = structlog.get_logger()
@@ -109,7 +109,7 @@ class ChartDiffConflictResolver:
             options=[1, 2],
             captions=["Insert production config", "Insert staging config"],
             format_func=lambda x: ENVIRONMENT_IDS[x],
-            key=f"conflict-radio-{field['key']}",
+            key=f"conflict-radio-{field['key']}-{self.diff.chart_id}",
             horizontal=True,
             label_visibility="collapsed",
         )
@@ -125,7 +125,7 @@ class ChartDiffConflictResolver:
             placeholder=f"This field is not present in {ENVIRONMENT_IDS[choice]}!" if is_none else "",
             help="Edit the final config here. When cliking on 'Resolve conflicts', this value will be used to update the chart config.",
             disabled=is_none,
-            key=f"conflict-editor-{field['key']}",
+            key=f"conflict-editor-{field['key']}-{self.diff.chart_id}",
         )
 
     def resolve_conflicts(self, rerun: bool = False):
@@ -176,27 +176,6 @@ class ChartDiffConflictResolver:
                 # )
         if rerun:
             st.rerun()
-
-
-def as_valid_json(s):  # -> Any:
-    """Return `s` as a dictionary if applicable."""
-    # Preprocess the string to replace single quotes with double quotes
-    s = s.replace("'", '"')
-
-    try:
-        return json.loads(s)
-    except json.JSONDecodeError:
-        return s
-
-
-def as_list(s):
-    """Return `s` as a list if applicable."""
-    if isinstance(s, str):
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
-    return s
 
 
 def compare_chart_configs(c1, c2):

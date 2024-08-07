@@ -1,0 +1,29 @@
+dataset:
+  title: Nature Index (UNDP Project)
+  description: ''
+  licenses:
+    - {}
+tables:
+  nature_index_undp:
+    variables:
+      hdi_co2_index:
+        title: hdi_co2_index
+        unit: ''
+        description: Human Development Index adjusted for consumption-based CO2 emissions.
+      hdi_land_index:
+        title: hdi_land_index
+        unit: ''
+        description: Human Development Index adjusted for agricultural land use.
+      care_index:
+        title: care_index
+        unit: ''
+        description: The average of the CO2-adjusted and land-adjusted HDI values.
+      protected_areas:
+        title: protected_areas
+        unit: ''
+        description: Share of land area that is protected.
+      nri_index:
+        title: nri_index
+        unit: ''
+        description: |-
+          The Nature-Relationship Index, which is the average of the "protection index", "thriving and accessible index" and "care index".

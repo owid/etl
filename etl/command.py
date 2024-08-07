@@ -6,6 +6,7 @@
 import difflib
 import itertools
 import json
+import os
 import re
 import resource
 import sys
@@ -69,6 +70,13 @@ log = structlog.get_logger()
     default=False,
     type=bool,
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
+)
+@click.option(
+    "--explorer/--no-explorer",
+    "-x/-nx",
+    default=False,
+    type=bool,
+    help="Write explorer tsv file to owid-content repository.",
 )
 @click.option(
     "--ipdb",
@@ -142,6 +150,7 @@ def main_cli(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
+    explorer: bool = False,
     backport: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
@@ -193,6 +202,7 @@ def main_cli(
         force=force,
         private=private,
         grapher=grapher,
+        explorer=explorer,
         backport=backport,
         downstream=downstream,
         only=only,
@@ -225,6 +235,7 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
+    explorer: bool = False,
     backport: bool = False,
     downstream: bool = False,
     only: bool = False,
@@ -238,6 +249,12 @@ def main(
     """
     if grapher:
         sanity_check_db_settings()
+
+    if explorer:
+        # Set the global variable "EXPLORER" to True.
+        os.environ["EXPLORER"] = "1"
+        # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
+        grapher = True
 
     dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher)
 

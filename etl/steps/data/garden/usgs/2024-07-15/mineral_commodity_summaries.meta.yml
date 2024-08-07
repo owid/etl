@@ -1,0 +1,35 @@
+definitions:
+  common:
+    unit: tonnes
+    short_unit: t
+    processing_level: major
+    presentation:
+      attribution_short: USGS
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+  title: Mineral Commodity Summaries
+
+tables:
+  mineral_commodity_summaries:
+    title: Mineral Commodity Summaries
+    variables:
+      reserves:
+        title: Reserves of commodities
+      notes_reserves:
+        title: Technical notes on reserves data
+        unit: ""
+        short_unit: ""
+      production:
+        title: Production of commodities
+      notes_production:
+        title: Technical notes on production data
+        unit: ""
+        short_unit: ""
+  mineral_commodity_summaries_flat:
+    title: Mineral Commodity Summaries
+    variables:
+      # Metadata is filled up programmatically.
+      {}

@@ -12,7 +12,7 @@ steps:
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/wb/2024-07-29/income_groups
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -83,15 +83,6 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - WHO
-  data://meadow/homicide/2023-01-03/who_mort_db:
-    - snapshot://homicide/2023-01-03/who_mort_db.csv
-  data://garden/homicide/2023-01-03/who_mort_db:
-    - data://meadow/homicide/2023-01-03/who_mort_db
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/homicide/2023-01-03/who_mort_db:
-    - data://garden/homicide/2023-01-03/who_mort_db
-
   # Homicide - UNODC - current
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
@@ -100,13 +91,6 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-  # Homicide - OMM
-  data://garden/homicide/2023-01-03/homicide_long_run_omm:
-    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
-    - data://garden/homicide/2023-01-03/who_mort_db
-    - data://garden/homicide/2023-07-04/unodc
-  data://grapher/homicide/2023-01-03/homicide_long_run_omm:
-    - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
   #
   # UN
@@ -300,9 +284,9 @@ steps:
     - snapshot://tourism/2023-05-04/unwto.xlsx
   data://garden/tourism/2023-05-05/unwto:
     - data://meadow/tourism/2023-05-05/unwto
-    - data://garden/owid/latest/key_indicators
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/oecd/2023-06-20/ppp_exchange_rates
+    - data://garden/demography/2022-12-08/population
   data://grapher/tourism/2023-05-11/unwto:
     - data://garden/tourism/2023-05-05/unwto
   # Environment Tables Implementations
@@ -327,16 +311,9 @@ steps:
   data://garden/oecd/2023-05-19/co2_air_transport:
     - data://garden/tourism/2023-05-05/unwto
     - data://meadow/oecd/2023-05-18/co2_air_transport
+    - data://garden/demography/2022-12-08/population
   data://grapher/oecd/2023-05-19/co2_air_transport:
     - data://garden/oecd/2023-05-19/co2_air_transport
-
-  # WB income groups
-  data://meadow/wb/2023-04-30/income_groups:
-    - snapshot://wb/2023-04-30/income_groups.xlsx
-  data://garden/wb/2023-04-30/income_groups:
-    - data://meadow/wb/2023-04-30/income_groups
-  data://grapher/wb/2023-04-30/income_groups:
-    - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2024-05-02/world_economic_outlook:
@@ -594,8 +571,14 @@ steps:
     - snapshot://wb/2024-06-10/gender_statistics.feather
   data://garden/wb/2024-06-10/gender_statistics:
     - data://meadow/wb/2024-06-10/gender_statistics
+  data://garden/wb/2024-06-10/gender_statistics_country_counts:
+    - data://garden/wb/2024-06-10/gender_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
   data://grapher/wb/2024-06-10/gender_statistics:
     - data://garden/wb/2024-06-10/gender_statistics
+  data://grapher/wb/2024-06-10/gender_statistics_country_counts:
+    - data://garden/wb/2024-06-10/gender_statistics_country_counts
 
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
@@ -608,7 +591,7 @@ steps:
 
   # Missing Data - Neuropsychiatric Conditions
   data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
-    - data://garden/who/2023-08-01/mortality_database
+    - data://garden/who/2024-07-26/mortality_database
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
@@ -671,6 +654,15 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
+  data://meadow/papers/2023-10-20/anthromes_input:
+    - snapshot://papers/2023-10-20/anthromes_input.zip
+  data://meadow/papers/2023-10-20/anthromes:
+    - snapshot://papers/2023-10-20/anthromes.csv
+  data://garden/papers/2023-10-20/anthromes:
+    - data://meadow/papers/2023-10-20/anthromes
+    - data://meadow/papers/2023-10-20/anthromes_input
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
   ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
@@ -680,13 +672,9 @@ steps:
 
   ######################################################################################################################
 
-  # WB income groups
-  data://meadow/wb/2024-03-11/income_groups:
-    - snapshot://wb/2024-03-11/income_groups.xlsx
-  data://garden/wb/2024-03-11/income_groups:
-    - data://meadow/wb/2024-03-11/income_groups
-  data://grapher/wb/2024-03-11/income_groups:
-    - data://garden/wb/2024-03-11/income_groups
+  #Latitude
+  data://grapher/geography/2024-07-18/latitude:
+    - data://garden/geography/2023-11-28/nat_earth_110
 
   # Attention in Media: The Guardian
   data://meadow/news/2024-05-08/guardian_mentions:
@@ -695,6 +683,7 @@ steps:
   data://garden/news/2024-05-08/guardian_mentions:
     - data://meadow/news/2024-05-08/guardian_mentions
     - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/news/2024-05-08/guardian_mentions:
     - data://garden/news/2024-05-08/guardian_mentions
 
@@ -719,6 +708,7 @@ steps:
   data://garden/worldbank_wdi/2024-05-20/wdi:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
     - data://meadow/worldbank_wdi/2024-05-20/wdi
+    - data://garden/demography/2024-07-15/population
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -777,6 +767,51 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
+# WHO Mort DB Homicides
+  data://meadow/homicide/2024-07-30/who_mort_db:
+    - snapshot://homicide/2024-07-30/who_mort_db.csv
+  data://garden/homicide/2024-07-30/who_mort_db:
+    - data://meadow/homicide/2024-07-30/who_mort_db
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/homicide/2024-07-30/who_mort_db:
+    - data://garden/homicide/2024-07-30/who_mort_db
+
+  # Homicide - OMM
+  data://garden/homicide/2024-07-30/homicide_long_run_omm:
+    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+    - data://garden/homicide/2024-07-30/who_mort_db
+    - data://garden/homicide/2023-07-04/unodc
+  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
+    - data://garden/homicide/2024-07-30/homicide_long_run_omm
+
+# WB income groups 2023-04-30
+  data://meadow/wb/2023-04-30/income_groups:
+    - snapshot://wb/2023-04-30/income_groups.xlsx
+  data://garden/wb/2023-04-30/income_groups:
+    - data://meadow/wb/2023-04-30/income_groups
+  data://grapher/wb/2023-04-30/income_groups:
+    - data://garden/wb/2023-04-30/income_groups
+
+# WB income groups 2024-03-11
+  data://meadow/wb/2024-03-11/income_groups:
+    - snapshot://wb/2024-03-11/income_groups.xlsx
+  data://garden/wb/2024-03-11/income_groups:
+    - data://meadow/wb/2024-03-11/income_groups
+  data://grapher/wb/2024-03-11/income_groups:
+    - data://garden/wb/2024-03-11/income_groups
+
+# WB income groups 2024-07-29
+  data://meadow/wb/2024-07-29/income_groups:
+    - snapshot://wb/2024-07-29/income_groups.xlsx
+
+  data://garden/wb/2024-07-29/income_groups:
+    - data://meadow/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+
+  data://grapher/wb/2024-07-29/income_groups:
+    - data://garden/wb/2024-07-29/income_groups
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -811,3 +846,4 @@ include:
   - dag/forests.yml
   - dag/natural_disasters.yml
   - dag/chartbook.yml
+  - dag/minerals.yml

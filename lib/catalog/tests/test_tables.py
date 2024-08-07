@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from owid.catalog import tables
+from owid.catalog import VariablePresentationMeta, tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
 from owid.catalog.tables import (
@@ -20,6 +20,7 @@ from owid.catalog.tables import (
     Table,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
+    keep_metadata,
 )
 from owid.catalog.variables import Variable
 
@@ -275,7 +276,7 @@ def mock_table() -> Table:
 
 
 def test_load_csv_table_over_http() -> None:
-    Table.read_csv("http://owid-catalog.nyc3.digitaloceanspaces.com/reference/countries_regions.csv")
+    Table.read_csv("https://catalog.ourworldindata.org/reference/countries_regions.csv")
 
 
 def test_rename_columns() -> None:
@@ -848,6 +849,27 @@ def test_pivot(table_1, sources, origins) -> None:
     assert tb.metadata == table_1.metadata
 
 
+def test_pivot_metadata_propagation():
+    tb = Table(
+        pd.DataFrame(
+            {
+                "year": [2020, 2021, 2022],
+                "group": ["g1", "g1", "g1"],
+                "subgroup": ["s1", "s1", "s2"],
+                "value": [1, 2, 3],
+            }
+        )
+    )
+    tb["value"].m.presentation = VariablePresentationMeta(title_public="Value")
+    tb_p = tb.pivot(index="year", columns=["group", "subgroup"], values="value", join_column_levels_with="_")
+
+    # Set title_public for one of the variables
+    tb_p["g1_s1"].m.presentation.title_public = "Group 1, Subgroup 1"
+
+    # It should not affect the other variable
+    assert tb_p["g1_s2"].m.presentation.title_public == "Value"
+
+
 def test_get_unique_sources_from_tables(table_1, sources):
     unique_sources = get_unique_sources_from_tables([table_1, table_1])
     assert unique_sources == [
@@ -1008,7 +1030,7 @@ def test_groupby_size(table_1) -> None:
 
 
 def test_groupby_fillna(table_1) -> None:
-    gt = table_1.groupby("country").a.fillna(method="ffill")
+    gt = table_1.groupby("country").a.ffill()
     assert gt.values.tolist() == [1, 2, 3]
     assert gt.m.title == "Title of Table 1 Variable a"
     # original title hasn't changed
@@ -1125,7 +1147,7 @@ def test_ffill_with_number(table_1) -> None:
     table = table_1.copy()
     table.loc[1, "a"] = None
     # Now fill it up with a number.
-    table["a"] = table["a"].fillna(method="ffill")
+    table["a"] = table["a"].ffill()
     # The metadata of "a" should be preserved.
     assert table["a"].metadata == table_1["a"].metadata
     assert table.loc[1, "a"] == table_1.loc[0, "a"]
@@ -1145,7 +1167,7 @@ def test_bfill_with_number(table_1) -> None:
     table = table_1.copy()
     table.loc[0, "a"] = None
     # Now fill it up with a number.
-    table["a"] = table["a"].fillna(method="bfill")
+    table["a"] = table["a"].bfill()
     # The metadata of "a" should be preserved.
     assert table["a"].metadata == table_1["a"].metadata
     assert table.loc[0, "a"] == table_1.loc[1, "a"]
@@ -1154,3 +1176,46 @@ def test_bfill_with_number(table_1) -> None:
 def test_fillna_error(table_1: Table) -> None:
     with pytest.raises(ValueError):
         table_1["a"].fillna()
+
+
+def test_keep_metadata_dataframe(table_1: Table) -> None:
+    @keep_metadata
+    def rolling_sum(df: pd.DataFrame) -> pd.DataFrame:
+        return df.rolling(window=2, min_periods=1).sum()
+
+    tb = rolling_sum(table_1[["a", "b"]])
+    assert list(tb.a) == [1.0, 3.0, 5.0]
+    assert tb.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_keep_metadata_series(table_1: Table) -> None:
+    @keep_metadata
+    def to_numeric(s: pd.Series) -> pd.Series:
+        return pd.to_numeric(s)
+
+    table_1.a = to_numeric(table_1.a)
+    assert table_1.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_table_rolling(table_1: Table):
+    tb = table_1[["a", "b"]].copy()
+
+    rolling = tb.rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"
+
+
+def test_table_groupby_rolling(table_1: Table):
+    tb = table_1.copy()
+
+    rolling = tb.groupby("country").rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"

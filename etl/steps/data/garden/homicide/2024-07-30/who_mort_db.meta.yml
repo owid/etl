@@ -1,0 +1,24 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    processing_level: minor
+
+tables:
+  who_mort_db:
+    variables:
+      number:
+        title: Deaths from homicide in << sex.lower() >> in << age_group.lower() >>
+        unit: deaths
+      percentage_of_cause_specific_deaths_out_of_total_deaths:
+        title: Share of total deaths from homicide in << sex.lower() >> in << age_group.lower() >>
+        unit: "%"
+        short_unit: "%"
+      age_standardized_death_rate_per_100_000_standard_population:
+        title: Age-standardized homicide rate in << sex.lower() >> in << age_group.lower() >>
+        unit: deaths per 100,000 people
+      death_rate_per_100_000_population:
+        title: Homicide rate in << sex.lower() >> in << age_group.lower() >> per 100,000 population
+        unit: deaths per 100,000 people
+

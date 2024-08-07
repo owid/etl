@@ -1,0 +1,33 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+      attribution_short: USGS
+
+dataset:
+  update_period_days: 365
+  title: Historical statistics for mineral and material commodities
+
+tables:
+  historical_statistics_for_mineral_and_material_commodities:
+    title: Historical statistics for mineral and material commodities
+    variables:
+      production:
+        title: Production
+        unit: tonnes
+        short_unit: t
+      unit_value_current:
+        title: Unit value (in current US dollars)
+        unit: current US$ per tonne
+        short_unit: $/t
+      unit_value_constant:
+        title: Unit value (in constant US dollars)
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+  historical_statistics_for_mineral_and_material_commodities_flat:
+    title: Historical statistics for mineral and material commodities
+    variables:
+      # Metadata is filled up programmatically.
+      {}

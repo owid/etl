@@ -245,3 +245,11 @@ def test_repack_with_datetime():
     s = pd.Series([dt.datetime.today(), dt.date.today()], dtype=object)
     v = repack.repack_series(s)
     assert v.dtype.name == "category"
+
+
+def test_repack_string_type():
+    s = pd.Series(["a", "b", "c"]).astype("string")
+    assert s.dtype == "string"
+
+    v = repack.repack_series(s)
+    assert v.dtype == "category"

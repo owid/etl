@@ -1,0 +1,99 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+    description_from_producer: |-
+      We construct individual income by adding all income sources together. Whenever possible we distinguish among income from salaried work, self-employment and salaries assigned to owners. Whenever possible we compute labor income from the main activity. Individual non-labor income is divided into three categories: (i) pensions; (ii) capital and benefits; and (iii) transfers. Countries ask different questions to capture data on capital income, interests, profits, rents and dividends. For comparison purposes, we prefer to gather all these questions into a single category. The same criterion applies to transfers, although we also construct a variable that identifies those transfers made by the government, and another that captures transfers clearly associated to poverty-alleviation programs.
+      Since we are interested in capturing current income, non-current items are not included in our definition of income. The same criterion leads to the exclusion of income from the sale of some goods and assets like vehicles, houses, or stocks. We also exclude income from gifts, life insurance, gambling and inheritances.
+
+      Once we have individual income, we construct household income by adding income for all members from the household. Household per capita income is computed as the ratio between total household income and the number of members in the household. Finally, we compute adjusted household income by several equivalence scales.
+
+      _Is the implicit rent from own-housing included in the calculation of income?_
+
+      Yes, it is included. The concept of income considered in SEDLAC refers to the flow of resources obtained as remuneration towards the use of all the assets owned by an individual or household. According to this definition, income should include not only returns for the use of labor and capital, but also any other rents produced by the possession of durable goods, such as houses or cars.
+
+      Families that live in their own dwellings implicitly receive a flow of income equivalent to the market value of the service that the use of this property represents for them. This remuneration should be computed as part of household income, even though it is never recorded in a formal market.
+
+      In some surveys, owners are asked to estimate the rent they would have to pay if they had to rent the houses they occupy. The answer to this question is used to impute rents to own-housing, although issues of reliability in the answers are usually raised, in particular in areas where housing markets are not well developed.
+
+      In those surveys where this information is not available or is clearly unreliable, we increase household income of housing owners by 10%, a value that is consistent with estimates of implicit rents in the region.
+
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+
+  poverty_lines: |-
+    <% if table == "$2.15 a day" %>
+    Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+    <% elif table == "$3.65 a day" %>
+    A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.
+    <% elif table == "$6.85 a day" %>
+    A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.
+    <% elif table == "50% of median" %>
+    This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+    <%- endif -%>
+
+  ppps: |-
+    The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+
+  welfare_equivalence: |-
+    <% if table == "$2.15 a day" or table == "$3.65 a day" or table == "$6.85 a day" or table == "50% of median" or table == "Per capita income"%>
+    This is current household income per capita. "Current" means that all income sources are added, including labor income, pensions, capital and benefits and transfers. "Per capita" means that the income of each household is attributed equally to each member of the household (including children).
+    <% elif table == "Equivalized income" %>
+    This is current household income. "Current" means that all income sources are added, including labor income, pensions, capital and benefits and transfers. Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    <%- endif -%>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  sedlac:
+    common:
+      processing_level: minor
+    variables:
+      national_headcount_ratio:
+        title: <<table>> - Share of population in poverty (Spell <<survey_number>>)
+        description_short: Percentage of population living in households with an income or consumption per person below <<table.lower()>>
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Share of population in poverty
+          <<: *common-display
+        presentation:
+          title_public: Share below <<table>>
+          title_variant: Household per capita income (<<survey>>)
+
+  sedlac_no_spells:
+    common:
+      processing_level: major
+      description_processing: |-
+        Where there were multiple observations for a particular year, we selected the observation drawn from a more recent round of a survey, or, in the case of biannual surveys, the observation drawn from the second semester.
+
+        The data is originally presented in separate survey rounds for each country, given different methodologies and aggregation levels considered. For this reason, these survey rounds are not directly comparable. Due to visualization limitations, we have connected each country series. For more detailed analysis, you can check these survey rounds on the [SEDLAC dataset website](https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/).
+    variables:
+      national_headcount_ratio:
+        title: <<table>> - Share of population in poverty
+        description_short: Percentage of population living in households with an income or consumption per person below <<table.lower()>>
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Share of population in poverty
+          <<: *common-display
+        presentation:
+          title_public: Share below <<table>>
+          title_variant: Household per capita income
+

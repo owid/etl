@@ -15,7 +15,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   deaths_from_cardiovascular_diseases_vs_other:
-    title: Mortality Database
+    title: Mortality Database - Cardiovascular Diseases vs Other Causes
     variables:
         cancer_and_neoplasms:
           title: Share of deaths from cancer and neoplasms
@@ -123,7 +123,7 @@ tables:
             name: Cardiovascular diseases
             numDecimalPlaces: 1
 
-        unidentified_cause:
+        unidentified_causes:
           title: Share of deaths from unidentified causes
           unit: '%'
           short_unit: '%'

@@ -348,9 +348,23 @@ def run(dest_dir: str) -> None:
     tb_demand["demand"] *= 1000
     tb_supply["supply"] *= 1000
 
+    # Add a country column to demand.
+    tb_demand["country"] = "World"
+
+    # Add a global aggregate for supply.
+    tb_supply = pr.concat(
+        [
+            tb_supply,
+            tb_supply.groupby(["year", "mineral", "process", "case"], observed=True, as_index=False)
+            .agg({"supply": "sum"})
+            .assign(**{"country": "World"}),
+        ],
+        ignore_index=True,
+    )
+
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
-    tb_demand = tb_demand.format(["case", "scenario", "technology", "mineral", "year"])
+    tb_demand = tb_demand.format(["case", "country", "year", "mineral", "scenario", "technology"])
 
     #
     # Save outputs.

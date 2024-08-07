@@ -86,8 +86,12 @@ def run(dest_dir: str) -> None:
     # assert len(merged_df_concat_transf.index.levels) == 2 and merged_df_concat_transf.index.is_unique, "Index is not well constructed"
 
     # Add population data to the DataFrame
-    merged_df_concat_transf = geo.add_population_to_dataframe(
-        merged_df_concat, country_col="country", year_col="year", population_col="population"
+    merged_df_concat_transf = geo.add_population_to_table(
+        Table(merged_df_concat),
+        paths.load_dataset("population"),
+        country_col="country",
+        year_col="year",
+        population_col="population",
     )
     merged_df_concat_transf.set_index(["country", "year"], inplace=True)
 

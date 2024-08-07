@@ -4,26 +4,49 @@ from typing import Any, Dict, List, Optional, Union
 import pandas as pd
 from structlog import get_logger
 
-from etl.paths import BASE_DIR
+from etl.config import EXPLORERS_DIR
+from etl.db import get_variables_data
 
 # Initialize logger.
 log = get_logger()
 
-# Default path to the explorers folder.
-EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
-
 
 class Explorer:
-    """Explorer object, that lets us parse an explorer file, modify its content, and write to a tsv file.
+    """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
+
+    The only argument required is the name of the explorer file (without the path or the ".explorer.tsv" extension).
+    To access or modify the content of the explorer, simply work with the df_graphers and df_columns dataframes.
+    Then, to write the changes to the explorer file, call the write() method.
 
     NOTE: For now, this class is only adapted to indicator-based explorers!
     """
 
     def __init__(self, name: str):
         self.name = name
-        self.path = (EXPLORERS_DIR / name).with_suffix(".explorer.tsv")
-        self._load_content()
-        self._parse_content()
+        self.path = (Path(EXPLORERS_DIR) / name).with_suffix(".explorer.tsv")
+
+        # Initialize all required internal attributes.
+        # Text content of an explorer file.
+        self.content = ""
+        # Comments at the beginning of the explorer file.
+        self.comments = []
+        # Configuration of the explorer (defined at the beginning of the file).
+        self.config = {
+            "explorerTitle": self.name,
+            "isPublished": "false",
+        }
+        # Graphers table of the explorer.
+        self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
+        # Columns table of the explorer.
+        self.df_columns = pd.DataFrame([], columns=["variableId"])
+
+        if self.path.exists():
+            log.info(f"Loading explorer file {self.path}.")
+            # Read explorer from existing file.
+            self._load_content()
+            self._parse_content()
+        else:
+            log.info(f"Initializing a new explorer file {self.path} from scratch.")
 
     def _load_content(self):
         # Load content of explorer file as a string.
@@ -98,12 +121,15 @@ class Explorer:
 
         if "variableId" in df.columns:
             # Convert string variable ids to integers.
-            df["variableId"] = df["variableId"].astype(int)
+            df["variableId"] = df["variableId"].astype("Int64")
 
         if "yVariableIds" in df.columns:
-            # Convert "yVariableIds" into a list of integers.
+            # Convert "yVariableIds" into a list of integers, or strings (if they are catalog paths).
             df["yVariableIds"] = [
-                [int(variable_id) for variable_id in variable_ids.split(" ") if variable_id.isnumeric()]
+                [
+                    int(variable_id) if variable_id.isnumeric() else variable_id
+                    for variable_id in variable_ids.split(" ")
+                ]
                 for variable_ids in df["yVariableIds"]
             ]
 
@@ -118,7 +144,7 @@ class Explorer:
 
         if "colorScaleNumericMinValue" in df.columns:
             # Convert strings of numbers to floats.
-            df["colorScaleNumericMinValue"] = df["colorScaleNumericMinValue"].astype(float)
+            df["colorScaleNumericMinValue"] = df["colorScaleNumericMinValue"].replace("", None).astype(float)
 
         return df
 
@@ -130,6 +156,10 @@ class Explorer:
             return []
 
         if "yVariableIds" in df.columns:
+            if not all([isinstance(ids, list) for ids in df["yVariableIds"]]):
+                raise ValueError(
+                    "Each row in 'yVariableIds' (in the graphers dataframe) must contain a list of variable ids (or ETL paths)."
+                )
             # Convert lists of variable ids to strings.
             df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
 
@@ -140,7 +170,7 @@ class Explorer:
             ]
 
         if "variableId" in df.columns:
-            df["variableId"] = df["variableId"].astype(int)
+            df["variableId"] = df["variableId"].astype("Int64")
 
         # Convert boolean columns to strings of true, false.
         for column in df.select_dtypes(include="bool").columns:
@@ -157,8 +187,19 @@ class Explorer:
         # Any comments in a line in the middle of the explorer will be brought to the beginning.
         comments_part = self.comments
 
-        # Reconstruct the config section
-        config_part = [f"{key}\t{value}" if value else key for key, value in self.config.items()]
+        # Reconstruct the config section.
+        config_part = []
+        for key, value in self.config.items():
+            if value is not None:
+                if isinstance(value, list):
+                    # Special case that happens at least for the "selection" key, which is a list of strings.
+                    config_part_row = f"{key}\t" + "\t".join(value)
+                else:
+                    # Normal case, where value is just one item.
+                    config_part_row = f"{key}\t{value}"
+            else:
+                config_part_row = f"{key}"
+            config_part.append(config_part_row)
 
         # Reconstruct the graphers section.
         graphers_part = ["graphers"] + self._df_to_lines(df=self.df_graphers)
@@ -212,3 +253,69 @@ class Explorer:
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {variable_id}")
 
         return variable_config
+
+    def check(self) -> None:
+        # TODO: Create checks that raise warnings and errors if the explorer has formatting issue.
+        log.warning("Function not yet implemented!")
+        pass
+
+    def convert_ids_to_etl_paths(self) -> None:
+        # Gather all variable ids from the graphers and columns tables.
+        variable_ids_from_graphers = sorted(
+            [
+                variable_id
+                for variable_id in set(sum(self.df_graphers["yVariableIds"].tolist(), []))
+                if str(variable_id).isnumeric()
+            ]
+        )
+        variable_ids = variable_ids_from_graphers
+        if "variableId" in self.df_columns:
+            variable_ids_from_columns = sorted(
+                [
+                    variable_id
+                    for variable_id in set(self.df_columns["variableId"].tolist())
+                    if str(variable_id).isnumeric()
+                ]
+            )
+            variable_ids = sorted(set(variable_ids + variable_ids_from_columns))
+
+        if len(variable_ids) == 0:
+            log.warning("No variable ids found.")
+        else:
+            # Fetch the catalog paths for all required variables from database.
+            df_from_db = get_variables_data(filter={"id": variable_ids})[["id", "catalogPath"]]
+            # Warn if any variable id has no catalog path.
+            variable_ids_missing = df_from_db[df_from_db["catalogPath"].isna()]["id"].to_list()
+            if any(variable_ids_missing):
+                log.warning(f"Missing catalog paths for {len(variable_ids_missing)} variables: {variable_ids_missing}")
+                df_from_db = df_from_db.dropna(subset=["catalogPath"])
+            # Create a dictionary that maps variable ids (for all required variables) to etl paths.
+            id_to_etl_path = df_from_db.set_index("id").to_dict()["catalogPath"]
+
+        # Map variable ids to etl paths in the graphers table, whenever possible.
+        self.df_graphers["yVariableIds"] = self.df_graphers["yVariableIds"].apply(
+            lambda x: [
+                id_to_etl_path.get(variable_id) if variable_id in id_to_etl_path else variable_id for variable_id in x
+            ]
+        )
+
+        # Map variable ids to etl paths in the columns table, whenever possible.
+        # Here, I assume that, if there is a catalog path, then add it to the catalogPath column, and make the value in variableId None.
+        # And, if there is no catalog path, then keep the variableId as it is, and make catalogPath None.
+        self.df_columns["catalogPath"] = self.df_columns["variableId"].apply(
+            lambda x: id_to_etl_path.get(x) if x in id_to_etl_path else None
+        )
+        self.df_columns["variableId"] = self.df_columns["variableId"].apply(
+            lambda x: None if x in id_to_etl_path else x
+        )
+        # For convenienve, ensure the first columns are variableId and catalogPath.
+        self.df_columns = self.df_columns[
+            ["variableId", "catalogPath"]
+            + [col for col in self.df_columns.columns if col not in ["variableId", "catalogPath"]]
+        ]
+        # If there is no catalog path, remove the column.
+        if self.df_columns["catalogPath"].isna().all():
+            self.df_columns = self.df_columns.drop(columns=["catalogPath"])
+        # If there is no variableId, remove the column.
+        if self.df_columns["variableId"].isna().all():
+            self.df_columns = self.df_columns.drop(columns=["variableId"])

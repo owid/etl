@@ -1541,7 +1541,7 @@ def clean_data(
         tb=tb, ds_population=ds_population, population_col="population_with_data", warn_on_missing_countries=False
     )
 
-    # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
+    # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_table`)
     tb = tb.astype({"country": "category"})
 
     return tb

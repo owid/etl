@@ -1,0 +1,46 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Tree Cover Loss by Dominant Driver
+    description: |-
+      The tree cover loss data is a time-series of estimated tree cover loss from 2001 to 2023, at 30 m resolution, where canopy density was at least 30%. This is combined with a classification of the dominant driver of tree cover loss within each 10 km grid cell for the time period 2001-2023. Each 10km cell can be classified as one of five categories:
+
+      - Commodity-driven deforestation: Large-scale deforestation linked primarily to commercial agricultural expansion.
+
+      - Shifting agriculture: Temporary loss or permanent deforestation due to small- and medium-scale agriculture.
+
+      - Forestry: Temporary loss from plantation and natural forest harvesting, with some deforestation of primary forests.
+
+      - Wildfire: Temporary loss, does not include fire clearing for agriculture.
+
+      - Urbanization: Deforestation for expansion of urban centers.
+
+      The commodity-driven deforestation and urbanization categories represent permanent deforestation, while tree cover usually regrows in the other categories.
+
+      The data were generated using decision tree models to separate each 10 km grid cell into one of the five categories. The decision trees were created using 4,699 sample grid cells, and use metrics derived from the Hansen tree cover, tree cover gain, and tree cover loss, NASA fires, global land cover, and population count. Separate decision trees were created for each driver and each region (North America, South America, Europe, Africa, Eurasia, Southeast Asia, Oceania), for a total of 35 decision trees. The final outputs were combined into a global map, which is then overlaid with tree cover loss data to indicate the intensity of loss associated with each driver around the world.
+
+      All model code, reference samples, decision trees, and the final model are available in the Supplementary Materials of [the paper](https://www.science.org/doi/10.1126/science.aau3445).
+    date_published: "2024-05-31"
+
+    # Citation
+    producer: Curtis et al. (2018); Global Forest Watch
+    citation_full: |-
+      Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. www.globalforestwatch.org.; Global Forest Watch. Tree cover loss. www.globalforestwatch.org
+    attribution_short: GFW
+
+    # Files
+    url_main: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
+    url_download: https://www.arcgis.com/sharing/rest/content/items/ff304784a9f04ac4a45a40f60bae5b26/data
+    date_accessed: 2024-07-10
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
+
+outs:
+  - md5: 01c816e522620d2bd81f966857c2a692
+    size: 417235
+    path: tree_cover_loss_by_driver.csv
