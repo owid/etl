@@ -135,11 +135,13 @@ tables:
           tolerance: 5
 
       milex_per_mil_personnel:
-        title: Military expenditure per military personnel (constant US$)
+        title: Military expenditure per armed forces personnel (constant US$)
         unit: "constant 2022 US$"
         short_unit: "$"
         description_short: |-
           {definitions.description_short_includes} {definitions.description_short_constant_usd}
+        description_key:
+          - Armed forces personnel are active duty military personnel, including paramilitary forces if the training, organization, equipment, and control suggest they may be used to support or replace regular military forces.
         description_from_producer: |-
           Military expenditure by country, in constant (2022) US$, 1949-2023, divided by the number of military personnel.
           Figures are in US$, at constant 2022 prices and exchange rates.
@@ -155,10 +157,19 @@ tables:
           2) All world totals and most regional totals include estimates for at least one country.
           3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2022) US$. These are shown in the column to the right of the data for each region
           4) The set of countries excluded from the totals for Africa has changed compared to the previous SIPRI data release in April 2016. Therefore, the estimates for World, Africa and Sub-Saharan Africa have changed.
+
+          _Armed forces personnel_
+          Armed forces personnel are active duty military personnel, including paramilitary forces if the training, organization, equipment, and control suggest they may be used to support or replace regular military forces.
+
+          Limitations and exceptions: Data excludes personnel not on active duty, therefore it underestimates the share of the labor force working for the defense establishment. The cooperation of governments of all countries listed in “The Military Balance” has been sought by IISS and, in many cases, received. However, some data in “The Military Balance” is estimated.
+
+          Statistical concept and methodology: Military data on manpower represent quantitative assessment of the personnel strengths of the world's armed forces. The IISS collects the data from a wide variety of sources. The numbers are based on the most accurate data available to, or on the best estimate that can be made by the International Institute for Strategic Studies (IISS) at the time of its annual publication. The current WDI indicator includes active armed forces and active paramilitary (but not reservists). Armed forces personnel comprise all servicemen and women on full-time duty, including conscripts and long-term assignments from the Reserves (“Reserve” describes formations and units not fully manned or operational in peacetime, but which can be mobilized by recalling reservists in an emergency). The indicator includes paramilitary forces. The source of the data (IISS) reports armed forces and paramilitary forces separately, however these figures are added for the purpose of computing this series. Home Guard units are counted as paramilitary. The data are collected from the IISS publication “The Military Balance” and from the World Bank's World Development Indicators.
+        description_processing: |-
+          We calculated this indicator by dividing the military expenditure provided by SIPRI (in constant US$) by the number of armed forces personnel estimated by the International Institute for Strategic Studies (IISS) and published by the World Bank's World Development Indicators.
         presentation:
-          title_public: Military expenditure per military personnel
+          title_public: Military expenditure per armed forces personnel
         display:
-          name: Military expenditure per military personnel
+          name: Military expenditure per armed forces personnel
           numDecimalPlaces: 0
           tolerance: 5
 
