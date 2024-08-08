@@ -128,11 +128,6 @@ steps:
     - data-private://garden/covid/latest/vaccinations_by_manufacturer
   data-private://garden/covid/latest/vaccinations_by_manufacturer:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
-  # Vaccinations us
-  # data-private://grapher/covid/latest/vaccinations_us:
-  #   - data-private://garden/covid/latest/vaccinations_us
-  # data-private://garden/covid/latest/vaccinations_us:
-  #   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
   # Vaccinations
   data-private://grapher/covid/latest/vaccinations:
     - data-private://garden/covid/latest/vaccinations

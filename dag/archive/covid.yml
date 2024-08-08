@@ -14,3 +14,8 @@ steps:
     - data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite
   data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/YouGov-Imperial%20COVID-19%20Behavior%20Tracker,%20composite%20variables.csv
+  # Vaccinations us
+  # data-private://grapher/covid/latest/vaccinations_us:
+  #   - data-private://garden/covid/latest/vaccinations_us
+  # data-private://garden/covid/latest/vaccinations_us:
+  #   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
