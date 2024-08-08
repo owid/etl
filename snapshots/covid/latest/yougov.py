@@ -44,6 +44,7 @@ COUNTRIES = [
 ]
 EXTRA = [
     "extra_mapping.csv",
+    "composite.csv",
 ]
 
 

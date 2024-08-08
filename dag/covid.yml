@@ -89,6 +89,7 @@ steps:
     - snapshot://covid/latest/yougov_united-states.zip
     - snapshot://covid/latest/yougov_vietnam.csv
     - snapshot://covid/latest/yougov_extra_mapping.csv
+    - snapshot://covid/latest/yougov_composite.csv
   data://garden/covid/latest/yougov:
     - data://meadow/covid/latest/yougov
   data://grapher/covid/latest/yougov:

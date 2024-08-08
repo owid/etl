@@ -5,6 +5,7 @@ from typing import List
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.processing import concat
+from shared import year_to_date
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,7 +15,10 @@ paths = PathFinder(__file__)
 ENCODINGS = {
     "united-kingdom.zip": "cp1252",
 }
-DEPENDENCIES_IGNORE = ["yougov_extra_mapping.csv"]
+DEPENDENCIES_IGNORE = [
+    "yougov_extra_mapping.csv",
+    "yougov_composite.csv",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -39,6 +43,10 @@ def run(dest_dir: str) -> None:
         t = select_subset(t, tb_mapping)
         tables.append(t)
 
+    # Retrieve composite table
+    snap_composite = paths.load_snapshot("yougov_composite.csv")
+    tb_composite = snap_composite.read()
+
     #
     # Process data.
     #
@@ -48,15 +56,30 @@ def run(dest_dir: str) -> None:
     tb = parse_date(tb)
     # Drop NaNs
     tb = tb.dropna(subset=["date"])
+
     # Format
     tb["identifier"] = tb.index
     tb = tb.format(["identifier"])
+    tb_mapping = tb_mapping.format(["code_name"])
+
+    tb_composite = year_to_date(tb_composite, col_year="Year")
+    tb_composite = tb_composite.format(["country", "date"], short_name="yougov_composite")
 
     #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_mapping,
+        tb_composite,
+    ]
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
