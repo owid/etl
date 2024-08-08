@@ -3,6 +3,7 @@
 import datetime
 
 import numpy as np
+import pytz
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -201,7 +202,7 @@ def aggregate_table(tb: Table, tb_mapping: Table) -> Table:
         tb.loc[:, "date_mid"] = s_period.dt.start_time.dt.date + datetime.timedelta(days=14)
     else:
         tb.loc[:, "date_mid"] = (s_period.dt.start_time + (s_period.dt.end_time - s_period.dt.start_time) / 2).dt.date
-    today = datetime.datetime.now(datetime.UTC).date()
+    today = datetime.datetime.now(pytz.UTC).date()
     if tb["date_mid"].max() > today:
         tb.loc[:, "date_mid"] = tb["date_mid"].replace({tb["date_mid"].max(): today})
 
