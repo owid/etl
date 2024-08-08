@@ -53,6 +53,12 @@ steps:
   data://garden/cedlas/2024-07-31/sedlac_poverty_2018:
     - data://meadow/cedlas/2024-07-31/sedlac_poverty_2018
 
+  # Langoni (1972) - Income distribution estimates in Brazil (1960-1970)
+  data://meadow/chartbook/2024-08-08/langoni_1972_brazil:
+    - snapshot://chartbook/2024-08-08/langoni_1972_brazil.csv
+  data://garden/chartbook/2024-08-08/langoni_1972_brazil:
+    - data://meadow/chartbook/2024-08-08/langoni_1972_brazil
+
   ################################################################################################
   # FRANCE
   ################################################################################################
