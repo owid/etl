@@ -93,7 +93,7 @@ COMMODITY_MAPPING = {
     ("Bismuth", "Metal"): ("Bismuth", "Metal"),
     ("Bismuth", "Ores & concentrates"): ("Bismuth", "Ores & concentrates"),
     ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine"),
-    ("Borates", "Unknown"): ("Borates", "Unknown"),
+    ("Borates", "Unknown"): None,
     ("Bromine", "Compounds"): ("Bromine", "Compounds"),
     ("Bromine", "Unknown"): ("Bromine", "Unknown"),
     ("Cadmium", "Metal"): ("Cadmium", "Refinery"),

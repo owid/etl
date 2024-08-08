@@ -33,7 +33,7 @@ COMMODITY_MAPPING = {
     ("Bentonite", "Total"): ("Bentonite", "Total"),
     ("Beryllium", "Total"): ("Beryllium", "Total"),
     ("Bismuth", "Total"): ("Bismuth", "Total"),
-    ("Boron", "Total"): ("Boron", "Total"),
+    ("Boron", "Total"): ("Boron", "Mine"),
     ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Total"),
