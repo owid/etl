@@ -389,14 +389,15 @@ FOOTNOTES = {
     "production|Graphite|Mine|tonnes": "Values refer to natural graphite.",
     "reserves|Graphite|Mine|tonnes": "Values refer to natural graphite.",
     "production|Silicon|Plant|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
+    "reserves|Bauxite|Mine|tonnes": 'Values are reported as "dried bauxite equivalents".',
 }
 
 # Dictionary of special units.
 UNITS_MAPPING = {
     "production|Arsenic|Plant|tonnes": "tonnes of arsenic trioxide or calculated equivalent",
-    "production|Alumina|Refinery|tonnes": "tonnes of calcined equivalent weights",
-    "production|Bauxite|Mine|tonnes": "tonnes of dry content",
-    "reserves|Bauxite|Mine|tonnes": "tonnes of dry content",
+    # "production|Alumina|Refinery|tonnes": "tonnes of calcined equivalent weights",
+    # "production|Bauxite|Mine|tonnes": "tonnes of dry content",
+    # "reserves|Bauxite|Mine|tonnes": "tonnes of dry content",
     "production|Chromium|Mine|tonnes": "tonnes of gross weight",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
     "production|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",

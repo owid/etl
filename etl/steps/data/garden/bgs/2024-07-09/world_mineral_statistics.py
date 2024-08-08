@@ -30,8 +30,8 @@ COMMODITY_MAPPING = {
     # NOTE: Data for construction sand and gravel for BGS and USGS are very different.
     ("Aggregates, primary", "Sand and gravel"): None,
     ("Aggregates, primary", "Unknown"): None,
-    ("Alumina", "Unknown"): ("Alumina", "Unknown"),
-    ("Aluminium, primary", "Unknown"): ("Aluminum", "Primary"),
+    ("Alumina", "Unknown"): ("Alumina", "Refinery"),
+    ("Aluminium, primary", "Unknown"): ("Aluminum", "Smelter"),
     ("Antimony", "Crude"): ("Antimony", "Crude"),
     ("Antimony", "Crude & regulus"): ("Antimony", "Crude & regulus"),
     ("Antimony", "Liquated"): ("Antimony", "Liquated"),
@@ -69,24 +69,20 @@ COMMODITY_MAPPING = {
     ("Barytes", "Barytes"): ("Barite", "Unknown"),
     ("Barytes", "Unknown"): ("Barite", "Unknown"),
     ("Barytes", "Witherite"): ("Barite", "Witherite"),
-    ("Bauxite", "Unknown"): ("Bauxite", "Unknown"),
-    ("Bauxite, alumina and aluminium", "Alumina"): ("Bauxite, alumina and aluminum", "Alumina"),
-    ("Bauxite, alumina and aluminium", "Alumina hydrate"): ("Bauxite, alumina and aluminum", "Alumina hydrate"),
-    ("Bauxite, alumina and aluminium", "Bauxite"): ("Bauxite, alumina and aluminum", "Bauxite"),
-    ("Bauxite, alumina and aluminium", "Bauxite, calcined"): ("Bauxite, alumina and aluminum", "Bauxite, calcined"),
-    ("Bauxite, alumina and aluminium", "Bauxite, crude dried"): (
-        "Bauxite, alumina and aluminum",
-        "Bauxite, crude dried",
-    ),
-    ("Bauxite, alumina and aluminium", "Bauxite, dried"): ("Bauxite, alumina and aluminum", "Bauxite, dried"),
-    ("Bauxite, alumina and aluminium", "Bauxite, uncalcined"): (
-        "Bauxite, alumina and aluminum",
-        "Bauxite, uncalcined",
-    ),
-    ("Bauxite, alumina and aluminium", "Scrap"): ("Bauxite, alumina and aluminum", "Scrap"),
-    ("Bauxite, alumina and aluminium", "Unwrought"): ("Bauxite, alumina and aluminum", "Unwrought"),
-    ("Bauxite, alumina and aluminium", "Unwrought & scrap"): ("Bauxite, alumina and aluminum", "Unwrought & scrap"),
-    ("Bauxite, alumina and aluminium", "Unwrought alloys"): ("Bauxite, alumina and aluminum", "Unwrought alloys"),
+    # NOTE: The following is used for production of bauxite.
+    ("Bauxite", "Unknown"): ("Bauxite", "Mine"),
+    ("Bauxite, alumina and aluminium", "Alumina"): ("Alumina", "Refinery"),
+    ("Bauxite, alumina and aluminium", "Alumina hydrate"): None,
+    # NOTE: The following is used for imports and exports of bauxite.
+    ("Bauxite, alumina and aluminium", "Bauxite"): ("Bauxite", "Mine"),
+    ("Bauxite, alumina and aluminium", "Bauxite, calcined"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, crude dried"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, dried"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, uncalcined"): None,
+    ("Bauxite, alumina and aluminium", "Scrap"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought & scrap"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought alloys"): None,
     ("Bentonite and fuller's earth", "Attapulgite"): ("Bentonite and fuller's earth", "Attapulgite"),
     ("Bentonite and fuller's earth", "Bentonite"): ("Bentonite and fuller's earth", "Bentonite"),
     ("Bentonite and fuller's earth", "Fuller's earth"): ("Bentonite and fuller's earth", "Fuller's earth"),
@@ -635,7 +631,7 @@ COMMODITY_MAPPING = {
 UNIT_MAPPING = {
     "tonnes": "tonnes",
     "tonnes (metric)": "tonnes",
-    "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
+    # "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
     "tonnes (K20 content)": "tonnes of potassium oxide content",
     "tonnes (metal content)": "tonnes of metal content",
     # NOTE: The following units will be converted to tonnes using conversion factors.
@@ -651,6 +647,7 @@ UNIT_MAPPING = {
 # So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes *"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
 # Their unit will be converted to "tonnes", and hence combined with USGS data.
 MINERALS_TO_CONVERT_TO_TONNES = [
+    "Alumina",
     "Cement",
     "Cobalt",
     "Copper",

@@ -20,21 +20,21 @@ paths = PathFinder(__file__)
 #  Set the value to None for any commodity-subcommodity that should not be included in the output.
 #  To use a subcommodity different than "Total", simply rewrite the value.
 COMMODITY_MAPPING = {
-    ("Alumina", "Total"): ("Alumina", "Total"),
-    ("Aluminum", "Total"): ("Aluminum", "Primary"),
-    ("Aluminum oxide", "Total"): ("Aluminum oxide", "Total"),
-    ("Aluminum-zirconium oxide", "Total"): ("Aluminum-zirconium oxide", "Total"),
+    ("Alumina", "Total"): ("Alumina", "Refinery"),
+    ("Aluminum", "Total"): ("Aluminum", "Smelter"),
+    ("Aluminum oxide", "Total"): None,
+    ("Aluminum-zirconium oxide", "Total"): None,
     ("Antimony", "Total"): ("Antimony", "Total"),
     ("Arsenic", "Total"): ("Arsenic", "Total"),
     ("Asbestos", "Total"): ("Asbestos", "Total"),
     ("Ball clay", "Total"): ("Clays", "Ball clay"),
     ("Barite", "Total"): ("Barite", "Total"),
-    ("Bauxite", "Total"): ("Bauxite", "Total"),
+    ("Bauxite", "Total"): ("Bauxite", "Mine"),
     ("Bentonite", "Total"): ("Bentonite", "Total"),
     ("Beryllium", "Total"): ("Beryllium", "Total"),
     ("Bismuth", "Total"): ("Bismuth", "Total"),
     ("Boron", "Total"): ("Boron", "Total"),
-    ("Boron carbide", "Total"): ("Boron carbide", "Total"),
+    ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Total"),
     ("Cesium", "Total"): ("Cesium", "Total"),
@@ -73,7 +73,7 @@ COMMODITY_MAPPING = {
     ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
     ("Mercury", "Total"): ("Mercury", "Mine"),
-    ("Metallic abrasives", "Total"): ("Metallic abrasives", "Total"),
+    ("Metallic abrasives", "Total"): None,
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
     ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous clay"),
@@ -89,7 +89,7 @@ COMMODITY_MAPPING = {
     ("Salt", "Total"): ("Salt", "Total"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Plant"),
-    ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
+    ("Silicon carbide", "Total"): None,
     ("Silver", "Total"): ("Silver", "Mine"),
     ("Soda ash", "Total"): ("Soda ash", "Total"),
     ("Steel", "Total"): ("Steel", "Crude"),
@@ -103,7 +103,7 @@ COMMODITY_MAPPING = {
     ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
     ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
     ("Total clay", "Total"): ("Clays", "Total"),
-    ("Total manufactured abrasives ", "Total"): ("Manufactured abrasives ", "Total"),
+    ("Total manufactured abrasives ", "Total"): None,
     ("Tungsten", "Total"): ("Tungsten", "Total"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
@@ -123,6 +123,8 @@ COMMODITY_MAPPING = {
 # Their unit will be converted to "tonnes", and hence combined with USGS current data.
 # NOTE: The names below must coincide with the original names of the commodities (before harmonizing commodity-subcommodity pairs).
 MINERALS_TO_CONVERT_TO_TONNES = [
+    "Alumina",
+    "Bauxite",
     "Cement",
     "Construction sand and gravel",
     "Graphite",
@@ -133,11 +135,12 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Crushed stone",
 ]
 
-# Footnotes (that will appear in the footer of charts) to add to the flattened output table.
-FOOTNOTES = {
-    # Example:
-    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
+# Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
+FOOTNOTES_PRODUCTION = {
+    "production|Alumina|Refinery|tonnes": 'Values are reported as "quantity produced" before 1971 and as "calcined alumina equivalents" afterwards.',
+    "production|Bauxite|Mine|tonnes": 'Values are reported as "dried bauxite equivalents".',
 }
+FOOTNOTES_UNIT_VALUE = {}
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
@@ -349,7 +352,7 @@ def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
     return tb_unit_value
 
 
-def prepare_wide_table(tb: Table) -> Table:
+def prepare_wide_table(tb: Table, footnotes: Dict[str, str]) -> Table:
     # Gather all notes in a dictionary.
     notes = gather_notes(tb_combined=tb)
     # Identify data columns.
@@ -378,7 +381,7 @@ def prepare_wide_table(tb: Table) -> Table:
             )
 
     # Add footnotes.
-    for column, note in FOOTNOTES.items():
+    for column, note in footnotes.items():
         if not tb_flat[column].metadata.presentation:
             tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
         tb_flat[column].metadata.presentation.grapher_config["note"] = note
@@ -464,8 +467,8 @@ def run(dest_dir: str) -> None:
         tb_unit_value[column] = tb_unit_value[column].apply(clean_notes)
 
     # Create wide tables for production and unit value.
-    tb_flat = prepare_wide_table(tb=tb_combined)
-    tb_flat_unit_value = prepare_wide_table(tb=tb_unit_value)
+    tb_flat = prepare_wide_table(tb=tb_combined, footnotes=FOOTNOTES_PRODUCTION)
+    tb_flat_unit_value = prepare_wide_table(tb=tb_unit_value, footnotes=FOOTNOTES_UNIT_VALUE)
     tb_flat = tb_flat.merge(tb_flat_unit_value, on=["country", "year"], how="outer")
 
     # Drop empty columns, if any.
