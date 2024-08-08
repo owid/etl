@@ -23,5 +23,5 @@ meta:
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
 outs:
   - md5: 27e28b2d1f792ed04012683fb772f00a
-    size: 1560090
+    size: 725420586
     path: gbd_risk.feather
