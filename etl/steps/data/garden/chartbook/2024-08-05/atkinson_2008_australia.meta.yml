@@ -25,7 +25,7 @@ tables:
           title_public: Top decile as % median
           title_variant: Gross weekly individual earnings
         display:
-          name: Testing variable
+          name: P90/P50
           numDecimalPlaces: 1
 
   eeh:
@@ -39,5 +39,5 @@ tables:
           title_public: Top decile as % median
           title_variant: Gross weekly individual earnings
         display:
-          name: Testing variable
+          name: P90/P50
           numDecimalPlaces: 1
