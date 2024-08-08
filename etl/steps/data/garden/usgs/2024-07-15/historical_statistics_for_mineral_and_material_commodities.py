@@ -30,7 +30,8 @@ COMMODITY_MAPPING = {
     ("Ball clay", "Total"): ("Clays", "Ball clay"),
     ("Barite", "Total"): ("Barite", "Mine"),
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
-    ("Bentonite", "Total"): ("Bentonite", "Total"),
+    # NOTE: For consistency with USGS current data, rename the following.
+    ("Bentonite", "Total"): ("Clays", "Bentonite"),
     ("Beryllium", "Total"): ("Beryllium", "Total"),
     ("Bismuth", "Total"): ("Bismuth", "Total"),
     ("Boron", "Total"): ("Boron", "Mine"),
@@ -76,7 +77,7 @@ COMMODITY_MAPPING = {
     ("Metallic abrasives", "Total"): None,
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
-    ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous clay"),
+    ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous"),
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Total"),
@@ -102,7 +103,9 @@ COMMODITY_MAPPING = {
     ("Titanium dioxide", "Total"): ("Titanium dioxide", "Total"),
     ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
     ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
-    ("Total clay", "Total"): ("Clays", "Total"),
+    # NOTE: After combing data with BGS, USGS' "Total" production is smaller than the sum of all clays production.
+    #  To avoid confusion, remove this total.
+    ("Total clay", "Total"): None,
     ("Total manufactured abrasives ", "Total"): None,
     ("Tungsten", "Total"): ("Tungsten", "Total"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
@@ -126,9 +129,15 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Alumina",
     "Asbestos",
     "Barite",
+    "Ball clay",
     "Bauxite",
+    "Bentonite",
     "Cement",
+    "Clays",
     "Construction sand and gravel",
+    "Fire clay",
+    "Total clay",
+    "Miscellaneous clay",
     "Graphite",
     "Industrial diamond",
     "Industrial sand and gravel",
@@ -143,6 +152,9 @@ FOOTNOTES_PRODUCTION = {
     "production|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Barite|Mine|tonnes": "Values are reported as gross weight.",
     "production|Asbestos|Mine|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Bentonite|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Ball clay|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Fire clay|tonnes": "Values are reported as gross weight.",
 }
 FOOTNOTES_UNIT_VALUE = {}
 
