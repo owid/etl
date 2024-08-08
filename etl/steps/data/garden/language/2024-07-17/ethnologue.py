@@ -38,7 +38,9 @@ def run(dest_dir: str) -> None:
     tb_languages_per_country = tb_languages_per_country.drop(columns="countryid")
 
     # tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
-    tb_languages_per_country = tb_languages_per_country.format(["country", "year"], short_name="languages_per_country")
+    # tb_languages_per_country = tb_languages_per_country.format(["country", "year"], short_name="languages_per_country")
+    tb_languages_per_country = tb_languages_per_country.set_index(["country", "year"])
+    tb_languages_per_country.metadata.short_name = "languages_per_country"
     tb_languages_per_country["n"].metadata.origins = origins
     #
     # Save outputs.
