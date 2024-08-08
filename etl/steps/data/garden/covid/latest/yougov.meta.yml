@@ -1,9 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    display:
-      yearIsDay: true
-      zeroDay: "2020-01-21"
     presentation:
       topic_tags:
         - COVID-19
@@ -143,6 +140,8 @@ tables:
           Average response-score to question: {definitions.question_mapper}
         display:
           numDecimalPlaces: 3
+          yearIsDay: true
+          zeroDay: "2020-01-21"
       num_responses:
         title: "Question: << question >> - Number of responses"
         unit: ''
@@ -150,6 +149,8 @@ tables:
           Number of responses to question: {definitions.question_mapper}
         display:
           numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: "2020-01-21"
 
 
   yougov_composite:
@@ -157,6 +158,8 @@ tables:
     common:
       display:
         numDecimalPlaces: 2
+        yearIsDay: true
+        zeroDay: "2020-01-21"
     variables:
       people_vaccinated_per_hundred:
         title: "People vaccinated (with at least one dose)"
