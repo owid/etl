@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     for file_name, index, short_name in zip(file_names, indexes, short_names):
         with zipfile.ZipFile(snap.path, "r") as zip_ref:
             with zip_ref.open(f"Language_Code_Data_20240221/{file_name}") as file:
-                tb = pr.read_csv(file, sep="\t", dtype=str)
+                tb = pr.read_csv(file, sep="\t", dtype=str, na_values=[""], keep_default_na=False)
                 if file_name == "LanguageIndex.tab":
                     # There is one erroneous duplicate in the LanguageIndex.tab file - let's remove it here
                     duplicates = tb[tb.duplicated()]
