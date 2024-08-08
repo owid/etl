@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("gbd_drug_risk.feather")
+    snap = paths.load_snapshot("gbd_risk.feather")
 
     # Load data from snapshot.
     tb = snap.read()
