@@ -9,3 +9,8 @@ steps:
     - data://garden/covid/latest/google_mobility_trends
   data://garden/covid/latest/google_mobility_trends:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/Google%20Mobility%20Trends%20(2020).csv
+  # YouGov behaviour
+  data-private://grapher/covid/latest/yougov_imperial_behavior_tracker_composite:
+    - data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite
+  data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/YouGov-Imperial%20COVID-19%20Behavior%20Tracker,%20composite%20variables.csv

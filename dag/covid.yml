@@ -131,11 +131,6 @@ steps:
     - data-private://garden/covid/latest/vaccinations
   data-private://garden/covid/latest/vaccinations:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
-  # YouGov behaviour
-  data-private://grapher/covid/latest/yougov_imperial_behavior_tracker_composite:
-    - data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite
-  data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/YouGov-Imperial%20COVID-19%20Behavior%20Tracker,%20composite%20variables.csv
   # Testing
   data://grapher/covid/latest/testing_time_series:
     - data://garden/covid/latest/testing_time_series
