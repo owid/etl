@@ -38,13 +38,17 @@ def run(dest_dir: str) -> None:
                 is_share_of_global = False
             metric = metric.replace("_", " ").capitalize()
             commodity = commodity.capitalize()
-            sub_commodity = sub_commodity.capitalize()
+            # NOTE: Ideally, we should not show any unit in the subcommodity dropdown. See note below.
+            if unit.startswith("tonnes"):
+                sub_commodity = f"{sub_commodity.capitalize()} ({unit})"
+            else:
+                sub_commodity = f"{sub_commodity.capitalize()}"
 
             # Append extracted values.
             variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
             metric_dropdown.append(metric)
             commodity_dropdown.append(commodity)
-            sub_commodity_dropdown.append(f"{sub_commodity} ({unit})")
+            sub_commodity_dropdown.append(sub_commodity)
             share_of_global.append(is_share_of_global)
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
@@ -52,6 +56,17 @@ def run(dest_dir: str) -> None:
     df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["Type Dropdown"] = sub_commodity_dropdown
     df_graphers["Share of global Checkbox"] = share_of_global
+
+    # NOTE: Currently, most columns have "tonnes" as unit, but often there a other units like "tonnes of gross weight".
+    # I think that, ideally, all units should be "tonnes" and we should add a footnote to clarify the unit where needed.
+    # But at least, for now, remove the "(tonnes)" from the "Type Dropdown" column if all options are in "tonnes".
+    # If there are different units within the same dropdown, we keep the brackets, to avoid overwriting.
+    remove_unit_mask = df_graphers.groupby(["Mineral Dropdown", "Metric Dropdown"])["Type Dropdown"].transform(
+        lambda x: x.str.contains("(tonnes)", regex=False).all()
+    )
+    df_graphers.loc[remove_unit_mask, "Type Dropdown"] = df_graphers.loc[remove_unit_mask, "Type Dropdown"].str.replace(
+        " (tonnes)", ""
+    )
 
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True
