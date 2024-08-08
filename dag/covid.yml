@@ -95,6 +95,13 @@ steps:
   data://grapher/covid/latest/yougov:
     - data://garden/covid/latest/yougov
 
+  # US Vaccinations
+  data://meadow/covid/latest/vaccinations_us:
+    - snapshot://covid/latest/vaccinations_us.csv
+  data://garden/covid/latest/vaccinations_us:
+    - data://meadow/covid/latest/vaccinations_us
+  data://grapher/covid/latest/vaccinations_us:
+    - data://garden/covid/latest/vaccinations_us
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
@@ -122,10 +129,10 @@ steps:
   data-private://garden/covid/latest/vaccinations_by_manufacturer:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
   # Vaccinations us
-  data-private://grapher/covid/latest/vaccinations_us:
-    - data-private://garden/covid/latest/vaccinations_us
-  data-private://garden/covid/latest/vaccinations_us:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
+  # data-private://grapher/covid/latest/vaccinations_us:
+  #   - data-private://garden/covid/latest/vaccinations_us
+  # data-private://garden/covid/latest/vaccinations_us:
+  #   - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20United%20States%20vaccinations.csv
   # Vaccinations
   data-private://grapher/covid/latest/vaccinations:
     - data-private://garden/covid/latest/vaccinations
@@ -165,3 +172,4 @@ steps:
     - data://garden/covid/latest/government_response_oxbsg
   data://garden/covid/latest/government_response_oxbsg:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
+
