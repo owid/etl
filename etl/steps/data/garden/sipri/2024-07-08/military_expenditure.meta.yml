@@ -134,4 +134,32 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      milex_per_mil_personnel:
+        title: Military expenditure per military personnel (constant US$)
+        unit: "constant 2022 US$"
+        short_unit: "$"
+        description_short: |-
+          {definitions.description_short_includes} {definitions.description_short_constant_usd}
+        description_from_producer: |-
+          Military expenditure by country, in constant (2022) US$, 1949-2023, divided by the number of military personnel.
+          Figures are in US$, at constant 2022 prices and exchange rates.
+
+          {definitions.description_from_producer_military_expenditure}
+
+          _Regional estimates_
+
+          Figures do not always add up to totals because of the conventions of rounding.
+
+          Notes regarding estimates and regional coverage
+          1) The temporal coverage varies by region, based on data availability. A meaningful world total is not possible before 1988 due to the lack of data for the USSR.
+          2) All world totals and most regional totals include estimates for at least one country.
+          3) The estimates exclude certain countries due either to data being missing for too many years to make meaningful estimates, or to an absence of economic data to enable conversion to constant (2022) US$. These are shown in the column to the right of the data for each region
+          4) The set of countries excluded from the totals for Africa has changed compared to the previous SIPRI data release in April 2016. Therefore, the estimates for World, Africa and Sub-Saharan Africa have changed.
+        presentation:
+          title_public: Military expenditure per military personnel
+        display:
+          name: Military expenditure per military personnel
+          numDecimalPlaces: 0
+          tolerance: 5
+
 
