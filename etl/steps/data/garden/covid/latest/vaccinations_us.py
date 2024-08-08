@@ -4,7 +4,6 @@ import pandas as pd
 from owid.catalog import Table
 from shared import make_monotonic
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
