@@ -26,7 +26,7 @@ COMMODITY_MAPPING = {
     ("Aluminum-zirconium oxide", "Total"): None,
     ("Antimony", "Total"): ("Antimony", "Mine"),
     ("Arsenic", "Total"): ("Arsenic", "Processing"),
-    ("Asbestos", "Total"): ("Asbestos", "Total"),
+    ("Asbestos", "Total"): ("Asbestos", "Mine"),
     ("Ball clay", "Total"): ("Clays", "Ball clay"),
     ("Barite", "Total"): ("Barite", "Mine"),
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
@@ -124,6 +124,7 @@ COMMODITY_MAPPING = {
 # NOTE: The names below must coincide with the original names of the commodities (before harmonizing commodity-subcommodity pairs).
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Alumina",
+    "Asbestos",
     "Barite",
     "Bauxite",
     "Cement",
@@ -141,6 +142,7 @@ FOOTNOTES_PRODUCTION = {
     "production|Alumina|Refinery|tonnes": "Values are reported as quantity produced before 1971 and as calcined alumina equivalents afterwards.",
     "production|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Barite|Mine|tonnes": "Values are reported as gross weight.",
+    "production|Asbestos|Mine|tonnes": "Values are reported as gross weight.",
 }
 FOOTNOTES_UNIT_VALUE = {}
 
