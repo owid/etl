@@ -56,6 +56,45 @@ steps:
   data://grapher/covid/latest/oxcgrt_policy:
     - data://garden/covid/latest/oxcgrt_policy
 
+  # YouGov
+  data://meadow/covid/latest/yougov:
+    - snapshot://covid/latest/yougov_australia.zip
+    - snapshot://covid/latest/yougov_brazil.csv
+    - snapshot://covid/latest/yougov_canada.zip
+    - snapshot://covid/latest/yougov_china.csv
+    - snapshot://covid/latest/yougov_denmark.zip
+    - snapshot://covid/latest/yougov_finland.csv
+    - snapshot://covid/latest/yougov_france.zip
+    - snapshot://covid/latest/yougov_germany.zip
+    - snapshot://covid/latest/yougov_hong-kong.csv
+    - snapshot://covid/latest/yougov_india.csv
+    - snapshot://covid/latest/yougov_indonesia.csv
+    - snapshot://covid/latest/yougov_israel.zip
+    - snapshot://covid/latest/yougov_italy.zip
+    - snapshot://covid/latest/yougov_japan.zip
+    - snapshot://covid/latest/yougov_malaysia.csv
+    - snapshot://covid/latest/yougov_mexico.csv
+    - snapshot://covid/latest/yougov_netherlands.zip
+    - snapshot://covid/latest/yougov_norway.zip
+    - snapshot://covid/latest/yougov_philippines.csv
+    - snapshot://covid/latest/yougov_saudi-arabia.csv
+    - snapshot://covid/latest/yougov_singapore.zip
+    - snapshot://covid/latest/yougov_south-korea.csv
+    - snapshot://covid/latest/yougov_spain.zip
+    - snapshot://covid/latest/yougov_sweden.zip
+    - snapshot://covid/latest/yougov_taiwan.csv
+    - snapshot://covid/latest/yougov_thailand.csv
+    - snapshot://covid/latest/yougov_united-arab-emirates.csv
+    - snapshot://covid/latest/yougov_united-kingdom.zip
+    - snapshot://covid/latest/yougov_united-states.zip
+    - snapshot://covid/latest/yougov_vietnam.csv
+    - snapshot://covid/latest/yougov_extra_mapping.csv
+    - snapshot://covid/latest/yougov_composite.csv
+  data://garden/covid/latest/yougov:
+    - data://meadow/covid/latest/yougov
+  data://grapher/covid/latest/yougov:
+    - data://garden/covid/latest/yougov
+
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
@@ -92,11 +131,6 @@ steps:
     - data-private://garden/covid/latest/vaccinations
   data-private://garden/covid/latest/vaccinations:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
-  # YouGov behaviour
-  data-private://grapher/covid/latest/yougov_imperial_behavior_tracker_composite:
-    - data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite
-  data-private://garden/covid/latest/yougov_imperial_behavior_tracker_composite:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/YouGov-Imperial%20COVID-19%20Behavior%20Tracker,%20composite%20variables.csv
   # Testing
   data://grapher/covid/latest/testing_time_series:
     - data://garden/covid/latest/testing_time_series
