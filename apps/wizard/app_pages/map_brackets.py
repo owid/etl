@@ -913,6 +913,9 @@ elif use_type == USE_TYPE_EXPLORERS:
                     id_column = "variableId"
                 elif "catalogPath" in explorer.df_columns.columns:
                     id_column = "catalogPath"
+                else:
+                    st.error("Explorer file does not contain 'variableId' or 'catalogPath' column.")
+                    st.stop()
                 variable_ids_with_brackets_already_defined = set(
                     explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()][id_column]
                 )
