@@ -24,7 +24,7 @@ COMMODITY_MAPPING = {
     ("Aluminum", "Total"): ("Aluminum", "Smelter"),
     ("Aluminum oxide", "Total"): None,
     ("Aluminum-zirconium oxide", "Total"): None,
-    ("Antimony", "Total"): ("Antimony", "Total"),
+    ("Antimony", "Total"): ("Antimony", "Mine"),
     ("Arsenic", "Total"): ("Arsenic", "Total"),
     ("Asbestos", "Total"): ("Asbestos", "Total"),
     ("Ball clay", "Total"): ("Clays", "Ball clay"),

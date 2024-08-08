@@ -648,6 +648,7 @@ UNIT_MAPPING = {
 # Their unit will be converted to "tonnes", and hence combined with USGS data.
 MINERALS_TO_CONVERT_TO_TONNES = [
     "Alumina",
+    "Antimony",
     "Cement",
     "Cobalt",
     "Copper",
@@ -661,8 +662,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
-    # Example:
-    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
+    "production|Antimony|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.
