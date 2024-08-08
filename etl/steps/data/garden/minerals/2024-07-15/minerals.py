@@ -121,8 +121,14 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
                     description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
                 else:
                     description_short = "Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+            elif sub_commodity == "Smelter":
+                description_short = f"Measured in {unit}. Smelting takes raw minerals and produces metals through high-temperature processes."
         elif metric in ["Reserves", "Share of global reserves"]:
             description_short = "Mineral reserves are resources that have been evaluated and can be mined economically with current technologies."
+        elif metric == "Unit value":
+            description_short = (
+                f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
+            )
         if description_short is not None:
             tb[column].metadata.description_short = description_short
 
@@ -160,6 +166,8 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         footnotes_additional = ""
         if metric in ["Reserves", "Share of global reserves"]:
             footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
+        elif metric == "Unit value":
+            footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
 
         # Add footnotes to metadata.
         combined_footnotes = _combine_notes(
