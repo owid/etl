@@ -103,13 +103,20 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
 
         # Create a short description (that will also appear as the chart subtitle).
         description_short = None
-        if metric in ["Production", "Imports", "Exports", "Share of global production", "Share of global imports", "Share of global exports"]:
-            if (sub_commodity == "Mine"):
+        if metric in [
+            "Production",
+            "Imports",
+            "Exports",
+            "Share of global production",
+            "Share of global imports",
+            "Share of global exports",
+        ]:
+            if sub_commodity == "Mine":
                 if not metric.startswith("Share"):
                     description_short = f"Measured as mined production, in {unit}."
                 else:
                     description_short = "Measured based on mined, rather than refined, production."
-            elif (sub_commodity == "Refinery"):
+            elif sub_commodity == "Refinery":
                 if not metric.startswith("Share"):
                     description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
                 else:
