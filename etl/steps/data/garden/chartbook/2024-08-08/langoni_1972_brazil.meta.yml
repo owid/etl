@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  langoni_1972_brazil:
+    variables:
+      share_p99p100:
+        title: Income share of the richest 1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of income received by the richest 1% of the population.
+        processing_level: minor
+        presentation:
+          title_public: Share of top 1%
+          title_variant: Household income (excluding capital gains)
+        display:
+          name: Income share of the richest 1%
+          numDecimalPlaces: 1
+
