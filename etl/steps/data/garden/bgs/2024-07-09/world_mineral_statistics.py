@@ -67,7 +67,7 @@ COMMODITY_MAPPING = {
     ("Asbestos, unmanufactured", "Waste"): ("Asbestos", "Waste, unmanufactured"),
     ("Barytes", "Barium minerals"): ("Barite", "Barium minerals"),
     ("Barytes", "Barytes"): ("Barite", "Unknown"),
-    ("Barytes", "Unknown"): ("Barite", "Unknown"),
+    ("Barytes", "Unknown"): ("Barite", "Mine"),
     ("Barytes", "Witherite"): ("Barite", "Witherite"),
     # NOTE: The following is used for production of bauxite.
     ("Bauxite", "Unknown"): ("Bauxite", "Mine"),
