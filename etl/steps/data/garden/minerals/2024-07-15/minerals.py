@@ -103,16 +103,18 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
 
         # Create a short description (that will also appear as the chart subtitle).
         description_short = None
-        if metric in ["Production", "Imports", "Exports"]:
-            if (sub_commodity == "Mine") and not (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
-                description_short = f"Measured as mined production, in {unit}."
-            elif (sub_commodity == "Mine") and (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
-                description_short = "Measured based on mined, rather than refined, production."
-            elif (sub_commodity == "Refinery") and not (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
-                description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
-            elif (sub_commodity == "Refinery") and (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
-                description_short = "Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
-        elif metric == "Reserves":
+        if metric in ["Production", "Imports", "Exports", "Share of global production", "Share of global imports", "Share of global exports"]:
+            if (sub_commodity == "Mine"):
+                if not metric.startswith("Share"):
+                    description_short = f"Measured as mined production, in {unit}."
+                else:
+                    description_short = "Measured based on mined, rather than refined, production."
+            elif (sub_commodity == "Refinery"):
+                if not metric.startswith("Share"):
+                    description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                else:
+                    description_short = "Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+        elif metric in ["Reserves", "Share of global reserves"]:
             description_short = "Mineral reserves are resources that have been evaluated and can be mined economically with current technologies."
         if description_short is not None:
             tb[column].metadata.description_short = description_short
@@ -149,7 +151,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
 
         # Insert (or append) additional footnotes:
         footnotes_additional = ""
-        if metric == "Reserves":
+        if metric in ["Reserves", "Share of global reserves"]:
             footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
 
         # Add footnotes to metadata.
