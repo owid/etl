@@ -812,9 +812,9 @@ def get_index_of_var(mb, explorer):
     if "variableId" not in explorer.df_columns.columns and "catalogPath" not in explorer.df_columns.columns:
         explorer.df_columns["variableId"] = None
     # If variable configuration is already specified in the columns table, overwrite its config.
-    if mb.variable_id in set(explorer.df_columns["variableId"]):
+    if "variableId" in explorer.df_columns.columns and mb.variable_id in set(explorer.df_columns["variableId"]):
         index = explorer.df_columns.loc[explorer.df_columns["variableId"] == mb.variable_id].index.item()
-    elif mb.catalog_path in set(explorer.df_columns["catalogPath"]):
+    elif "catalogPath" in explorer.df_columns.columns and mb.catalog_path in set(explorer.df_columns["catalogPath"]):
         index = explorer.df_columns.loc[explorer.df_columns["catalogPath"] == mb.catalog_path].index.item()
     # Otherwise, add new variable to columns table.
     else:
@@ -909,8 +909,12 @@ elif use_type == USE_TYPE_EXPLORERS:
         if not include_all_variable_ids:
             if "colorScaleNumericBins" in explorer.df_columns.columns:
                 # Ignore variable_ids for which a map bracket is already defined.
+                if "variableId" in explorer.df_columns.columns:
+                    id_column = "variableId"
+                elif "catalogPath" in explorer.df_columns.columns:
+                    id_column = "catalogPath"
                 variable_ids_with_brackets_already_defined = set(
-                    explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
+                    explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()][id_column]
                 )
                 variable_ids = [
                     variable_id
