@@ -1,7 +1,7 @@
 """
 Script to create a snapshot of dataset.
 
-The file comes from the original book, available here: https://www.google.co.uk/books/edition/_/mLAl1DO7T_EC?hl=en&gbpv=0.
+The file comes from the original book, available here: https://edisciplinas.usp.br/pluginfile.php/5447307/mod_resource/content/1/Langoni%20dist%20de%20renda%20e%20desenvolvimento%20estudos%20economicos%201972.pdf.
 I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1IaA-lvbRlixYMLy5nW6xxJolaZyO4DK_0XvLQuLjJJs/edit?gid=1799504649#gid=1799504649
 After creating the file, run
     python snapshots/chartbook/2024-08-08/langoni_2005_brazil.py --path-to-file <path-to-file>
