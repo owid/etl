@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from datetime import UTC, datetime, timedelta
-from typing import Tuple
 
 import numpy as np
 from owid.catalog import Table
