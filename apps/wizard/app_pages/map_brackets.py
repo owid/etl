@@ -201,7 +201,7 @@ class MapBracketer:
         if variable_id_or_path.isnumeric():
             self.variable = load_variable_from_id(variable_id=int(variable_id_or_path))
             self.variable_id = int(variable_id_or_path)
-            self.catalog_path = self.variable.catalog_path
+            self.catalog_path = self.variable.catalogPath
             self.defined_by_id = True
         else:
             self.variable = load_variable_from_catalog_path(catalog_path=variable_id_or_path)
@@ -919,10 +919,12 @@ elif use_type == USE_TYPE_EXPLORERS:
                 ]
 
         # Select a variable id from a dropdown menu.
-        variable_id: str = st.selectbox(  # type: ignore
-            label="Indicator id",
-            options=variable_ids,
-            index=0,
+        variable_id: str = str(
+            st.selectbox(  # type: ignore
+                label="Indicator id",
+                options=variable_ids,
+                index=0,
+            )
         )
 
     # For debugging, fix the value of variable id.
@@ -939,13 +941,11 @@ elif use_type == USE_TYPE_EXPLORERS:
 
     # Load additional configuration for this variable from the explorer file, if any and initialize map bracketer.
     if variable_id.isnumeric():
-        variable_id = int(variable_id)
-        additional_config = explorer.get_variable_config(variable_id=variable_id)
-        mb = MapBracketer(variable_id_or_path=variable_id)
+        additional_config = explorer.get_variable_config(variable_id=int(variable_id))
     else:
-        catalog_path = variable_id
-        additional_config = explorer.get_variable_config_from_catalog_path(catalog_path=catalog_path)
-        mb = MapBracketer(variable_id_or_path=catalog_path)  # type: ignore
+        additional_config = explorer.get_variable_config_from_catalog_path(catalog_path=variable_id)
+
+    mb = MapBracketer(variable_id_or_path=variable_id)  # type: ignore
 
     edit_brackets = True
     if len(additional_config) > 0:

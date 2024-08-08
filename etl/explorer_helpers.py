@@ -250,6 +250,7 @@ class Explorer:
         return variable_config
 
     def get_variable_config_from_catalog_path(self, catalog_path: str) -> Dict[str, Any]:
+        variable_config = {}
         if "catalogPath" in self.df_columns:
             variable_row = self.df_columns.loc[self.df_columns["catalogPath"] == catalog_path]
 
