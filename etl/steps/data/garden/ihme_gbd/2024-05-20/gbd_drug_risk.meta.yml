@@ -108,7 +108,7 @@ dataset:
   update_period_days: 1460
   non_redistributable: true
 tables:
-  gbd_risk:
+  gbd_drug_risk:
     variables:
       value:
         title: |-
