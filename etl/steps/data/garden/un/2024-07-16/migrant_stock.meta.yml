@@ -25,22 +25,22 @@ tables:
       # Immigrant stock
       immigrants_all:
         title: Total number of international immigrants
-        description_short: The total number of people living in a given country who were born in another country. This measures the cumulative migrant stock.
+        description_short: The total number of people living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       immigrants_female:
         title: Total number of international immigrants - female
-        description_short: The total number of female people living in a given country who were born in another country. This measures the cumulative migrant stock.
+        description_short: The total number of female people living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       immigrants_male:
         title: Total number of international immigrants - male
-        description_short: The total number of male people living in a given country who were born in another country. This measures the cumulative migrant stock.
+        description_short: The total number of male people living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       # Immigrant share
       immigrant_share_of_dest_population_all:
         title: Share of the population that were born in another country
         unit: "%"
         short_unit: "%"
-        description_short: Total number of immigrants as a share of the total population. This measures the cumulative migrant stock.
+        description_short: Total number of immigrants as a share of the total population.
         description_from_producer: "{definitions.description_un.share_migrant_stock}"
         display:
           numDecimalPlaces: 1

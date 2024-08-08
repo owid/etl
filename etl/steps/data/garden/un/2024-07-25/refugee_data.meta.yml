@@ -59,7 +59,7 @@ tables:
           - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_origin:
         title: Refugees by country of origin per 1,000 people
-        description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country.
+        description_short: Number of [refugees](#dod:refugee) by country of origin, per 1,000 people in that country. This measures the total number of refugees from the country; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -71,7 +71,7 @@ tables:
         description_from_producer: "{definitions.description_asylum}"
       asylum_seekers_per_100k_pop_origin:
         title: Asylum seekers by country of origin per 100,000 people
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of origin, per 100,000 people in that country.
+        description_short: Number of [asylum seekers](#dod:asylumseeker) per 100,000 people in the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
         description_from_producer: "{definitions.description_asylum}"
         display:
           numDecimalPlaces: 1
@@ -98,14 +98,14 @@ tables:
 
       # populations by asylum country
       refugees_under_unhcrs_mandate_asylum:
-        title: Refugees by country of residence
+        title: Refugees by country of asylum
         description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_asylum:
-        title: Refugees by country of residence per 1,000 people
-        description_short: Number of [refugees](#dod:refugee) by country of residence, per 1,000 people in that country.
+        title: Refugees by country of asylum per 1,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 1,000 people in that country.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -267,15 +267,15 @@ tables:
         description_key:
           - "{definitions.description_refugee_general}"
       asylum_seekers_asylum_5y_avg:
-        title: Asylum seekers by country of asylum (5-year rolling average)
-        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year."
+        title: Asylum seekers by country of residence (5-year rolling average)
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, shown as the 5-year rolling average. This measures the total number of asylum seekers living in this country; not the number arriving per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}
           - {definitions.description_rolling_avg}
       asylum_seekers_asylum_5y_avg_per_100k_pop:
-        title: Asylum seekers by country of asylum per 100,000 people (5-year rolling average)
-        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, per 100,000 people in that country. Here shown as the 5-year rolling average. This measures the total number of asylum seekers living in the country; not the number arriving per year."
+        title: Asylum seekers by country of residence per 100,000 people (5-year rolling average)
+        description_short: "[Asylum seekers](#dod:asylumseeker) by country where they seek asylum, per 100,000 people in that country. Here shown as the 5-year rolling average. This measures the total number of asylum seekers living in this country; not the number arriving per year."
         description_from_producer: "{definitions.description_asylum}"
         description_processing: |-
           - {definitions.common.description_processing}

@@ -7,6 +7,15 @@ from etl.helpers import PathFinder, create_explorer
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# TODO: maybe add net migration/ rate here
+ADDITIONAL_DESCRIPTIONS = {
+    "net_migration": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",
+    "net_migration_rate": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country), per 1,000 people in the population.",
+    "remittance_gdp": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries.",
+    "remittance_cost_ib": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200.",
+    "remittance_cost_ob": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200. ",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -105,7 +114,6 @@ def run(dest_dir: str) -> None:
 
     # df_graphers.to_csv("/Users/tunaacisu/Data/Test/explorer.tsv", sep="\t", index=False)
 
-    # TODO: add columns to the explorer once I have figured out map brackets
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
 
@@ -145,16 +153,22 @@ def create_column_rows(col_dicts, tb, ds):
             meta = tb[column].metadata
             origin = meta.origins[0]
 
-            # net migration and net migration rate are split again in grapher by sex/ age/ variant
+            # net migration and net migration rate are split again in grapher by sex/ age/ variant - need to add this to the catalog path
             if column in ["net_migration", "net_migration_rate"]:
                 col_row_dict["catalogPath"] = (
                     f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}" + "__sex_all__age_all__variant_medium"
                 )
             else:
                 col_row_dict["catalogPath"] = f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
+
+            # some indicators don't have any/ a fitting description in the metadata: add them manually
+            if column in ADDITIONAL_DESCRIPTIONS.keys():
+                col_row_dict["description"] = ADDITIONAL_DESCRIPTIONS[column]
+            else:
+                col_row_dict["description"] = meta.description_short
+
             col_row_dict["name"] = meta.title
             col_row_dict["slug"] = column
-            col_row_dict["description"] = meta.description_short
             if meta.processing_level == "minor":
                 col_row_dict["sourceName"] = f"{origin.producer} ({origin.date_published[:4]})"
             elif meta.processing_level == "major":
@@ -169,11 +183,7 @@ def create_column_rows(col_dicts, tb, ds):
             else:
                 col_row_dict["type"] = "Numeric"
             col_row_dict["dateRetrieved"] = origin.date_accessed
-            col_row_dict["additionalInfo"] = [
-                meta.description_from_producer,
-                meta.description_key,
-                meta.description_processing,
-            ]
+            # col_row_dict["additionalInfo"] = [meta.description_from_producer, meta.description_key,meta.description_processing]
             col_row_dict["colorScaleScheme"] = "RdBu"
             col_dicts.append(col_row_dict)
 
