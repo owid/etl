@@ -679,6 +679,16 @@ steps:
   data://grapher/who/2024-07-29/icd_codes:
     - data://garden/who/2024-07-29/icd_codes
 
+  # WHO Global Health Estimates
+  data://meadow/who/2024-07-30/ghe:
+    - snapshot://who/2024-07-30/ghe.feather
+  data://garden/who/2024-07-30/ghe:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2024-07-30/ghe
+    - data://garden/un/2022-07-11/un_wpp
+    - snapshot://who/2023-07-14/standard_age_distribution.csv
+  data://grapher/who/2024-07-30/ghe:
+    - data://garden/who/2024-07-30/ghe
 
   # WHO Mortality Database - Cancer specific
   data://meadow/who/2024-08-06/mortality_database_cancer:
