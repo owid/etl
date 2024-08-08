@@ -110,9 +110,9 @@ def load_variable_from_id(variable_id: int):
 
 
 @st.cache_data
-def load_variable_from_catalogue_path(catalogue_path: str):
+def load_variable_from_catalog_path(catalog_path: str):
     with Session(OWID_ENV.engine) as session:
-        variable = Variable.load_from_catalog_path(session=session, catalog_path=variable_id)
+        variable = Variable.load_from_catalog_path(session=session, catalog_path=catalog_path)
 
     return variable
 
@@ -196,12 +196,18 @@ def dispersion(hist: Union[List[float], np.ndarray]) -> float:
 
 class MapBracketer:
     def __init__(self, variable_id_or_path: str):
-        self.variable_id = variable_id
         # Load variable from db.
+        self.variable_id_or_path = variable_id_or_path
         if variable_id_or_path.isnumeric():
             self.variable = load_variable_from_id(variable_id=int(variable_id_or_path))
+            self.variable_id = int(variable_id_or_path)
+            self.catalog_path = self.variable.catalog_path
+            self.defined_by_id = True
         else:
-            self.variable = load_variable_from_catalogue_path(catalogue_path=variable_id_or_path)
+            self.variable = load_variable_from_catalog_path(catalog_path=variable_id_or_path)
+            self.catalog_path = self.variable_id_or_path
+            self.variable_id = self.variable.id
+            self.defined_by_id = False
         # Load variable data.
         self.df = load_variable_data(variable=self.variable)
         # Load variable metadata.
@@ -752,15 +758,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
 
 
 def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
-    if "variableId" not in explorer.df_columns.columns:
-        explorer.df_columns["variableId"] = None
-
-    if mb.variable_id in set(explorer.df_columns["variableId"]):
-        # If variable configuration is already specified in the columns table, overwrite its config.
-        index = explorer.df_columns.loc[explorer.df_columns["variableId"] == mb.variable_id].index.item()
-    else:
-        # Otherwise, add new variable to columns table.
-        index = len(explorer.df_columns)
+    index = get_index_of_var(mb, explorer)
 
     # If custom brackets have been defined, update explorer.
     if "customNumericValues" in mb.chart_config["map"]["colorScale"]:
@@ -768,7 +766,10 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             # Ensure the column for map brackets exists in the columns table of the explorer.
             explorer.df_columns["colorScaleNumericBins"] = None
         # Add entry to the map brackets column for this indicator.
-        explorer.df_columns.loc[index, "variableId"] = mb.variable_id
+        if mb.defined_by_id:
+            explorer.df_columns.loc[index, "variableId"] = mb.variable_id
+        else:
+            explorer.df_columns.loc[index, "catalogPath"] = mb.catalog_path
         # Note that, to assign a list to a cell in a dataframe, the "at" method needs to be used, instead of loc.
         explorer.df_columns.at[index, "colorScaleNumericBins"] = mb.chart_config["map"]["colorScale"][
             "customNumericValues"
@@ -780,10 +781,16 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             # Ensure the column for minimum brackets exists in the columns table of the explorer.
             explorer.df_columns["colorScaleNumericMinValue"] = None
         # Add entry to the minimum bracket column for this indicator.
-        explorer.df_columns.loc[index, ["variableId", "colorScaleNumericMinValue"]] = (
-            mb.variable_id,
-            mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
-        )
+        if mb.defined_by_id:
+            explorer.df_columns.loc[index, ["variableId", "colorScaleNumericMinValue"]] = (
+                mb.variable_id,
+                mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
+            )
+        else:
+            explorer.df_columns.loc[index, ["catalogPath", "colorScaleNumericMinValue"]] = (
+                mb.catalog_path,
+                mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
+            )
     else:
         # If a minimum bracket is not defined in map bracketer, but it was in the original explorer, delete it from the latter.
         if ("colorScaleNumericMinValue" in explorer.df_columns.columns) and (
@@ -798,6 +805,22 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
     else:
         explorer.write()
         st.info(f"Successfully updated {explorer.name} explorer file.")
+
+
+def get_index_of_var(mb, explorer):
+    # get index of variable if it exists in the in columns table, otherwise add it.
+    if "variableId" not in explorer.df_columns.columns and "catalogPath" not in explorer.df_columns.columns:
+        explorer.df_columns["variableId"] = None
+    # If variable configuration is already specified in the columns table, overwrite its config.
+    if mb.variable_id in set(explorer.df_columns["variableId"]):
+        index = explorer.df_columns.loc[explorer.df_columns["variableId"] == mb.variable_id].index.item()
+    elif mb.catalog_path in set(explorer.df_columns["catalogPath"]):
+        index = explorer.df_columns.loc[explorer.df_columns["catalogPath"] == mb.catalog_path].index.item()
+    # Otherwise, add new variable to columns table.
+    else:
+        index = len(explorer.df_columns)
+
+    return index
 
 
 ########################################
@@ -874,7 +897,7 @@ elif use_type == USE_TYPE_EXPLORERS:
         # Load and parse explorer content.
         explorer = Explorer(name=explorer_name)
 
-        # Gather all variable ids of indicators with a map tab.
+        # Gather all variable ids of indicators with a map tab. In yVariableIds there can be variable ids or etl paths, so be careful going forward
         variable_ids = list(
             dict.fromkeys(sum(explorer.df_graphers[explorer.df_graphers["hasMapTab"]]["yVariableIds"].tolist(), []))
         )
@@ -890,7 +913,7 @@ elif use_type == USE_TYPE_EXPLORERS:
                     explorer.df_columns[explorer.df_columns["colorScaleNumericBins"].notnull()]["variableId"]
                 )
                 variable_ids = [
-                    str(variable_id)
+                    variable_id
                     for variable_id in variable_ids
                     if variable_id not in variable_ids_with_brackets_already_defined
                 ]
@@ -914,11 +937,15 @@ elif use_type == USE_TYPE_EXPLORERS:
     # The following fails for some reason (I haven't looked into it).
     # variable_id = 899774
 
-    # Load additional configuration for this variable from the explorer file, if any.
-    additional_config = explorer.get_variable_config(variable_id=variable_id)
-
-    # Initialize map bracketer.
-    mb = MapBracketer(variable_id_or_path=variable_id)  # type: ignore
+    # Load additional configuration for this variable from the explorer file, if any and initialize map bracketer.
+    if variable_id.isnumeric():
+        variable_id = int(variable_id)
+        additional_config = explorer.get_variable_config(variable_id=variable_id)
+        mb = MapBracketer(variable_id_or_path=variable_id)
+    else:
+        catalog_path = variable_id
+        additional_config = explorer.get_variable_config_from_catalog_path(catalog_path=catalog_path)
+        mb = MapBracketer(variable_id_or_path=catalog_path)  # type: ignore
 
     edit_brackets = True
     if len(additional_config) > 0:
