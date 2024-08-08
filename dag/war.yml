@@ -215,6 +215,7 @@ steps:
     - data://meadow/harvard/2024-07-22/global_military_spending_dataset
     - data://garden/demography/2024-07-15/population
     - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/cow/2024-07-26/national_material_capabilities
   data://grapher/harvard/2024-07-22/global_military_spending_dataset:
     - data://garden/harvard/2024-07-22/global_military_spending_dataset
 

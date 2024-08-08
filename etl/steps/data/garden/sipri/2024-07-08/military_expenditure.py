@@ -98,7 +98,7 @@ def calculate_milex_per_military_personnel(tb: Table, tb_wdi: Table) -> Table:
     tb["milex_per_mil_personnel"] = tb["constant_usd"] / tb["ms_mil_totl_p1"]
 
     # Make infinite values missing
-    tb["milex_per_mil_personnel"] = tb["milex_per_mil_personnel"].replace([np.inf, -np.inf], np.nan)
+    tb["milex_per_mil_personnel"] = tb["milex_per_mil_personnel"].replace([float("inf"), float("-inf")], float("nan"))
 
     # Drop columns
     tb = tb.drop(columns=["ms_mil_totl_p1"])
