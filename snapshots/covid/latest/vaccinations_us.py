@@ -30,7 +30,7 @@ def main(upload: bool) -> None:
     delta = end_date - start_date
     for i in range(delta.days + 1):
         # Build URL
-        current_date = (start_date + timedelta(days=i)).strftime('%Y-%m-%d')
+        current_date = (start_date + timedelta(days=i)).strftime("%Y-%m-%d")
         url = f"{BASE_URL}/cdc_data_{current_date}.csv"
 
         # Read CSV
