@@ -69,7 +69,7 @@ def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
     combined_notes = ""
     notes_exist = False
     for notes in notes_list:
-        if notes is not None:
+        if notes:
             if notes_exist:
                 combined_notes += separator
             combined_notes += notes
@@ -89,21 +89,33 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         # Improve metric, commodity and subcommodity names.
         metric = metric.replace("_", " ").capitalize()
         commodity = commodity.capitalize()
-        sub_commodity = sub_commodity.lower()
 
         # Ensure the variable has a title.
         tb[column].metadata.title = column
 
         # Create a title_public.
-        # title_public = f"{metric} of {commodity.lower()} ({sub_commodity.lower()})"
-        title_public = f"{commodity} ({sub_commodity}) {metric.lower()}"
+        title_public = f"{commodity} {metric.lower()}"
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
-
         if column.startswith(SHARE_OF_GLOBAL_PREFIX):
             title_public = title_public.replace("share of global ", "") + " as a share of the global total"
-
         tb[column].metadata.presentation.title_public = title_public
+
+        # Create a short description (that will also appear as the chart subtitle).
+        description_short = None
+        if metric in ["Production", "Imports", "Exports"]:
+            if (sub_commodity == "Mine") and not (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
+                description_short = f"Measured as mined production, in {unit}."
+            elif (sub_commodity == "Mine") and (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
+                description_short = "Measured based on mined, rather than refined, production."
+            elif (sub_commodity == "Refinery") and not (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
+                description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+            elif (sub_commodity == "Refinery") and (column.startswith(SHARE_OF_GLOBAL_PREFIX)):
+                description_short = "Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+        elif metric == "Reserves":
+            description_short = "Mineral reserves are resources that have been evaluated and can be mined economically with current technologies."
+        if description_short is not None:
+            tb[column].metadata.description_short = description_short
 
         # Add unit and short_unit.
         tb[column].metadata.unit = unit
@@ -135,9 +147,14 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         if len(combined_notes) > 0:
             tb[column].metadata.description_from_producer = combined_notes
 
+        # Insert (or append) additional footnotes:
+        footnotes_additional = ""
+        if metric == "Reserves":
+            footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
+
         # Add footnotes to metadata.
         combined_footnotes = _combine_notes(
-            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical], separator=" "
+            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical, footnotes_additional], separator=" "
         )
         if len(combined_footnotes) > 0:
             if tb[column].metadata.presentation.grapher_config is None:
