@@ -52,7 +52,10 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_languages_per_country], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb_languages_per_country, tb_lang_by_status],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
