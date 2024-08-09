@@ -157,7 +157,7 @@ def cli(
                     if diff.configs_are_equal():
                         log.info(
                             "chart_sync.skip",
-                            slug=diff.target_chart.config["slug"],
+                            slug=diff.target_chart.slug,
                             reason="identical chart already exists",
                             chart_id=chart_id,
                         )
