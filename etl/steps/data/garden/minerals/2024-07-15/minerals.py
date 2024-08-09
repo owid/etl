@@ -67,9 +67,8 @@ REGIONS = {
     "Lower-middle-income countries": {},
     "High-income countries": {},
     "European Union (27)": {},
-    # NOTE: Initially, I thought we would need to include "Other" when calculating the global total.
-    # But this could lead to double-counting. So, we will only create aggregates where there is no "Other".
-    # "World": {"additional_members": ["Other"]},
+    # NOTE: After combining USGS and BGS data, "Other" will be removed from the data before aggregating.
+    # See notes below for an explanation.
     "World": {},
 }
 
@@ -290,19 +289,32 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     # Firstly, remove "World (BGS)", which is the global aggregate that was created by us in the BGS garden step.
     tb = tb[tb["country"] != "World (BGS)"].reset_index(drop=True)
 
-    # Identify columns where there is an "Other" entity.
-    # Create region aggregates only for those columns where there is no "Other", to avoid any possible double-counting
-    # (between USGS countries that are supposed to be in "Other" and those same countries in BGS, if they exist).
-    # For columns that contain "Other", we can't have region aggregates.
-    # NOTE: We could keep the aggregates that were created for USGS only. But after inspecting them (comparing them to
-    #  BGS aggregates) they were almost always smaller, which indicates that USGS was missing data for many countries.
-    #  Therefore, there is little value in keeping the aggregates created for USGS only.
-    columns_with_other = tb[tb["country"] == "Other"].dropna(axis=1, how="all").columns
-    aggregations = {column: "sum" for column in tb.columns if column not in columns_with_other}
+    # There are 22 columns that exist both in BGS and USGS, and where USGS includes "Other".
+    # I checked if "Other" is usually small compared to the contribution of all other BGS countries, but it depends.
+    # About half of the times, "Other" is larger than the sum of all other BGS countries, and half it's smaller.
+    # for column in tb.drop(columns=["country", "year"]).columns:
+    #     if (column in tb_usgs_flat.columns) and (column in tb_bgs_flat.columns):
+    #         if (not tb_usgs_flat[tb_usgs_flat["country"] == "Other"][column].dropna().empty) and (not tb_bgs_flat[column].dropna().empty):
+    #             usgs_countries = set(tb_usgs_flat[~tb_usgs_flat["country"].isin(["Other", "World"])].dropna(subset=column)["country"])
+    #             bgs_countries = set(tb_bgs_flat[tb_bgs_flat["country"] != "World (BGS)"].dropna(subset=column)["country"])
+    #             other = bgs_countries - usgs_countries
+    #             print(len(other))
+    #             bgs_other = tb_bgs_flat[tb_bgs_flat["country"].isin(other)].groupby(["year"], observed=True, as_index=False).agg({column: "sum"})
+    #             usgs_other = tb_usgs_flat[tb_usgs_flat["country"] == "Other"].groupby(["year"], observed=True, as_index=False).agg({column: "sum"})
+    #             compared = bgs_other.merge(usgs_other, on="year", how="inner", suffixes=("_bgs", "_usgs"))
+    #             compared["ape"] = abs(compared[f"{column}_usgs"] - compared[f"{column}_bgs"]) / compared[f"{column}_bgs"] * 100
+
+    # The safest option is to remove "Other": After combining BGS and USGS, it's impossible to know which countries
+    # are included in "Other", and it can therefore be misleading.
+    # Note also that initially we created regions for both BGS and USGS, and, when comparing them, the region aggregates
+    # from USGS were almost always smaller than those in BGS. This indicates that BGS tends to have data disaggregated
+    # for more countries. This does not necessarily mean that "World" is usually smaller in USGS (it isn't).
+    # It simply means that "Other" carries an important contribution in USGS data, and it's always missing in regions.
+    # Therefore, it doesn't make much sense to keep USGS regions, or to keep "Other".
+    tb = tb[tb["country"] != "Other"].reset_index(drop=True)
     tb = geo.add_regions_to_table(
         tb=tb,
         regions=REGIONS,
-        aggregations=aggregations,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
@@ -417,9 +429,7 @@ def run(dest_dir: str) -> None:
     # )
 
     # Create region aggregates.
-    # TODO: Instead, we could simply remove "Other" where there is both BGS and USGS data.
-    #  Otherwise, regardless of the region aggregates, "Other" may sound as "all other countries", which may no longer
-    #  be the case if some of those countries in "Other" are in BGS data.
+    # NOTE: "Other" will be removed from the data (see notes inside the function).
     tb = create_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
@@ -432,10 +442,6 @@ def run(dest_dir: str) -> None:
 
     # Run sanity checks.
     run_sanity_checks(tb=tb)
-
-    # TODO: Fix the cases where shares are larger than 100%:
-    # share_of_global_production|Cobalt|Mine|tonnes maximum: 124%
-    # share_of_global_reserves|Zinc|Mine|tonnes maximum: 555%
 
     # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals").astype("Float64")
