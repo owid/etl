@@ -1,0 +1,64 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  year_is_day: &year_is_day
+    zeroDay: "2020-01-21"
+    yearIsDay: true
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    description_processing: Comparisons across countries are affected by differences in testing policies and reporting methods.
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+tables:
+  testing:
+    variables:
+      total_tests:
+        title: Cumulative total tests
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *year_is_day
+      total_tests_per_thousand:
+        title: Cumulative total per 1,000 people
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *year_is_day
+
+      new_tests:
+        title: Daily COVID-19 tests
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *year_is_day
+      new_tests_7day_smoothed:
+        title: Daily COVID-19 tests (7-day smoothed)
+        description_short: |-
+          New tests for COVID-19. For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *year_is_day
+
+      new_tests_per_thousand:
+        title: Daily COVID-19 tests per 1,000 people
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *year_is_day
+      new_tests_per_thousand_7day_smoothed:
+        title: Daily COVID-19 tests per 1,000 people (7-day smoothed)
+        description_short: |-
+          New tests for COVID-19 (7-day smoothed). For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window.
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *year_is_day
+

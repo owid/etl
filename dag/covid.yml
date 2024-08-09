@@ -102,6 +102,15 @@ steps:
     - data://meadow/covid/latest/vaccinations_us
   data://grapher/covid/latest/vaccinations_us:
     - data://garden/covid/latest/vaccinations_us
+
+  # Testing
+  data://meadow/covid/latest/testing:
+    - snapshot://covid/latest/testing.csv
+  data://garden/covid/latest/testing:
+    - data://meadow/covid/latest/testing
+  data://grapher/covid/latest/testing:
+    - data://garden/covid/latest/testing
+
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
@@ -167,4 +176,3 @@ steps:
     - data://garden/covid/latest/government_response_oxbsg
   data://garden/covid/latest/government_response_oxbsg:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
-
