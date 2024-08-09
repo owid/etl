@@ -33,7 +33,7 @@ COMMODITY_MAPPING = {
     # NOTE: For consistency with USGS current data, rename the following.
     ("Bentonite", "Total"): ("Clays", "Bentonite"),
     ("Beryllium", "Total"): ("Beryllium", "Mine"),
-    ("Bismuth", "Total"): ("Bismuth", "Total"),
+    ("Bismuth", "Total"): ("Bismuth", "Mine"),
     ("Boron", "Total"): ("Boron", "Mine"),
     ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
@@ -252,7 +252,7 @@ def harmonize_units(tb: Table) -> Table:
     tb["unit"] = (
         tb["unit"]
         .astype("string")
-        .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes, gross weight"})
+        .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes of gross weight"})
     )
     tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
 
@@ -311,6 +311,7 @@ def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
             sub_commodity = "Refinery"
         else:
             sub_commodity = "Total"
+
         _tb_production = (
             tb[["commodity", "year", column, "unit"]]
             .rename(columns={column: "production"}, errors="raise")
@@ -320,6 +321,15 @@ def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
             .dropna(subset="production")
             .reset_index(drop=True)
         )
+        if "metal_content" in column:
+            _tb_production["unit"] = "tonnes of metal content"
+        elif "refinery" in column:
+            # world_refinery_production is informed only for Bismuth and Cobalt.
+            # In the case of Bismuth, the title says "gross weight unless otherwise noted"
+            # (and nothing else is noted for world refinery production).
+            # However, in both cases, the unit is probably "tonnes of metal content".
+            _tb_production["unit"] = "tonnes of metal content"
+
         # Add notes to the table, using the extracted metadata.
         mask = tb_metadata[column].notnull()
         tb_metadata.loc[mask, column] = "Note on global production: " + tb_metadata[column][mask]

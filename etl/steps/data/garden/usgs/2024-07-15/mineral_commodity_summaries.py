@@ -401,6 +401,8 @@ UNITS_MAPPING = {
     # "production|Bauxite|Mine|tonnes": "tonnes of dry content",
     # "reserves|Bauxite|Mine|tonnes": "tonnes of dry content",
     # "production|Chromium|Mine|tonnes": "tonnes of gross weight",
+    "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
+    "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
     "production|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
     "reserves|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
