@@ -32,7 +32,7 @@ COMMODITY_MAPPING = {
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
     # NOTE: For consistency with USGS current data, rename the following.
     ("Bentonite", "Total"): ("Clays", "Bentonite"),
-    ("Beryllium", "Total"): ("Beryllium", "Total"),
+    ("Beryllium", "Total"): ("Beryllium", "Mine"),
     ("Bismuth", "Total"): ("Bismuth", "Total"),
     ("Boron", "Total"): ("Boron", "Mine"),
     ("Boron carbide", "Total"): None,

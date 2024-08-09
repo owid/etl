@@ -88,7 +88,7 @@ COMMODITY_MAPPING = {
     ("Bentonite and fuller's earth", "Fuller's earth"): ("Clays", "Fuller's earth"),
     ("Bentonite and fuller's earth", "Sepiolite"): ("Clays", "Sepiolite"),
     ("Bentonite and fuller's earth", "Unknown"): None,
-    ("Beryl", "Unknown"): ("Beryl", "Unknown"),
+    ("Beryl", "Unknown"): ("Beryl", "Mine"),
     ("Bismuth", "Compounds"): ("Bismuth", "Compounds"),
     ("Bismuth", "Metal"): ("Bismuth", "Metal"),
     ("Bismuth", "Ores & concentrates"): ("Bismuth", "Ores & concentrates"),
