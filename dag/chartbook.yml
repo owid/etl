@@ -74,6 +74,12 @@ steps:
   data://garden/chartbook/2024-08-09/love_1979_canada:
     - data://meadow/chartbook/2024-08-09/love_1979_canada
 
+  # Gini coefficient, equivalized gross family income (Wolfson, 1986)
+  data://meadow/chartbook/2024-08-09/wolfson_1986_canada:
+    - snapshot://chartbook/2024-08-09/wolfson_1986_canada.csv
+  data://garden/chartbook/2024-08-09/wolfson_1986_canada:
+    - data://meadow/chartbook/2024-08-09/wolfson_1986_canada
+
   ################################################################################################
   # FRANCE
   ################################################################################################
