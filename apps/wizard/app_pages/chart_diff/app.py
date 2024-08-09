@@ -145,7 +145,7 @@ def filter_chart_diffs():
     return False
 
 
-@st.experimental_dialog(title="Set all charts to Pending")
+@st.dialog(title="Set all charts to Pending")
 def set_chart_diffs_to_pending(engine: Engine) -> None:
     """Set approval status of all chart diffs to pending."""
     st.markdown("**Do you want to set all charts-diffs to pending?** this will loose all your progress on reviews.")
