@@ -5,9 +5,9 @@ meta:
     # Data product / Snapshot
     title: Tackling Inequalities in Brazil, China, India and South Africa
     description: |-
-      Greater integration into the world economy and important policy reforms have resulted in Brazil, China, India and South Africa becoming major actors in the globalisation process, with impressive results in terms of economic growth, social development and poverty reduction. But the benefits of stronger growth have not always been shared equally and income inequality has remained at very high levels. 
+      Greater integration into the world economy and important policy reforms have resulted in Brazil, China, India and South Africa becoming major actors in the globalisation process, with impressive results in terms of economic growth, social development and poverty reduction. But the benefits of stronger growth have not always been shared equally and income inequality has remained at very high levels.
 
-      Existing evidence suggests that the evolution of the distribution of income in these four countries is the result of many forces. These include demographic change, migration, unequal access to education, informal employment, existing regulations and their enforcement, social norms and cultural legacy. These forces are often interlinked and reinforce one another. However, as employment is the primary source of income for most households, understanding the impact of labour market outcomes is crucial.  
+      Existing evidence suggests that the evolution of the distribution of income in these four countries is the result of many forces. These include demographic change, migration, unequal access to education, informal employment, existing regulations and their enforcement, social norms and cultural legacy. These forces are often interlinked and reinforce one another. However, as employment is the primary source of income for most households, understanding the impact of labour market outcomes is crucial.
 
       This book focuses on the role of growth and employment/unemployment developments in explaining recent income inequality trends in Brazil, China, India and South Africa, and discusses the roles played by labour market and social policies in both shaping and addressing these inequalities. It includes the papers presented at the joint OECD and European Union High-Level Conference on Inequalities in Emerging Economies held in Paris in May 2010. This work is part of OECD’s ongoing dialogue and co-operation with non-member economies around the world.
     date_published: "2010-10-21"
@@ -16,9 +16,9 @@ meta:
       Data for Gini coefficient for individual earnings. From table 2.3.
 
     # Citation
-    producer: OECD
+    producer: Neri
     citation_full: |-
-      OECD (2010), Tackling Inequalities in Brazil, China, India and South Africa: The Role of Labour Market and Social Policies, Table 2.3. OECD Publishing, Paris, https://doi.org/10.1787/9789264088368-en.
+      Neri, M.C. (2010), The decade of falling income inequality and formal employment generation in Brazil , Table 2.3. In OECD (2010), Tackling Inequalities in Brazil, China, India and South Africa: The Role of Labour Market and Social Policies. OECD Publishing, Paris, https://doi.org/10.1787/9789264088368-en.
 
     # Files
     url_main: https://www.oecd-ilibrary.org/social-issues-migration-health/tackling-inequalities-in-brazil-china-india-and-south-africa-2010_9789264088368-en
