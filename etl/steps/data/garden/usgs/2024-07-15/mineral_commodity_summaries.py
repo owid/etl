@@ -1030,12 +1030,6 @@ def run(dest_dir: str) -> None:
         snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
         data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
-    # Load regions dataset.
-    # ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    # ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -1069,21 +1063,6 @@ def run(dest_dir: str) -> None:
     # Before creating aggregates, ensure notes are lists of strings.
     for column in ["notes_reserves", "notes_production"]:
         tb[column] = [note if isinstance(note, list) else [] for note in tb[column]]
-
-    # Add regions to the table.
-    # NOTE: After inspection, it seems that USGS region aggregates often are significantly lower han BGS regions
-    #  aggregates (at least for those indicators where both series overlap). This indicates that USGS' regions may not
-    #  be representative enough. Therefore, it seems safer to not build region aggregates for USGS.
-    #  For more details, see garden minerals step.
-    # tb = geo.add_regions_to_table(
-    #     tb=tb,
-    #     ds_regions=ds_regions,
-    #     ds_income_groups=ds_income_groups,
-    #     min_num_values_per_year=1,
-    #     index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
-    #     countries_that_must_have_data={"North America": ["United States"], "Asia": ["China"]},
-    #     # accepted_overlaps=ACCEPTED_OVERLAPS,
-    # )
 
     # Clean notes columns (e.g. remove repeated notes).
     for column in ["notes_reserves", "notes_production"]:

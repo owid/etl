@@ -15,25 +15,63 @@ So it seems more convenient to create wide tables, where each column has its own
 tables (on those few columns where there is overlap).
 
 """
-
+import warnings
 from typing import List, Optional, Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, VariablePresentationMeta
+from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Initialize logger.
 log = get_logger()
+
+# Ignore PerformanceWarning (that happens when finding the maximum of world data, when creating region aggregates).
+warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 # Prefix used for "share" columns.
 SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+
+# There are many historical regions with overlapping data with their successor countries.
+# Accept only overlaps on the year when the historical country stopped existing.
+ACCEPTED_OVERLAPS = [
+    {1991: {"USSR", "Armenia"}},
+    # {1991: {"USSR", "Belarus"}},
+    {1991: {"USSR", "Russia"}},
+    {1992: {"Czechia", "Czechoslovakia"}},
+    {1992: {"Slovakia", "Czechoslovakia"}},
+    {1990: {"Germany", "East Germany"}},
+    {1990: {"Germany", "West Germany"}},
+    {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
+    {1990: {"Yemen", "Yemen People's Republic"}},
+]
+
+# Create the usual regions, but also "World", which will be created by aggregating newly created continent
+# aggregates, plus "Other", which is often in USGS data and cannot be included in any other region.
+REGIONS = {
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+    "European Union (27)": {},
+    # NOTE: Initially, I thought we would need to include "Other" when calculating the global total.
+    # But this could lead to double-counting. So, we will only create aggregates where there is no "Other".
+    # "World": {"additional_members": ["Other"]},
+    "World": {},
+}
 
 
 def adapt_flat_table(tb_flat: Table) -> Table:
@@ -248,14 +286,87 @@ def add_share_of_global_columns(tb: Table) -> Table:
     return tb
 
 
+def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    # Firstly, remove "World (BGS)", which is the global aggregate that was created by us in the BGS garden step.
+    tb = tb[tb["country"] != "World (BGS)"].reset_index(drop=True)
+
+    # Identify columns where there is an "Other" entity.
+    # Create region aggregates only for those columns where there is no "Other", to avoid any possible double-counting
+    # (between USGS countries that are supposed to be in "Other" and those same countries in BGS, if they exist).
+    # For columns that contain "Other", we can't have region aggregates.
+    # NOTE: We could keep the aggregates that were created for USGS only. But after inspecting them (comparing them to
+    #  BGS aggregates) they were almost always smaller, which indicates that USGS was missing data for many countries.
+    #  Therefore, there is little value in keeping the aggregates created for USGS only.
+    columns_with_other = tb[tb["country"] == "Other"].dropna(axis=1, how="all").columns
+    aggregations = {column: "sum" for column in tb.columns if column not in columns_with_other}
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=REGIONS,
+        aggregations=aggregations,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+        keep_original_region_with_suffix=" (USGS)",
+    )
+
+    # Take the maximum between the World aggregate we just created, and the original World from USGS.
+    # Ideally, we would first gather as much data from all countries as possible, and then create the aggregate for the
+    # World. But we often have data only for the US and/or the world (from USGS).
+    # In such cases, World obviously includes data from many countries that are not disaggregated in the data.
+    # Therefore, in those cases, we want to use the original "World" instead.
+    # But in other cases, the sum of individual countries is larger than USGS's World, which could be because USGS'
+    # data does not account for all countries. In those cases, we want to use the sum of individual countries.
+    # Therefore, we take the maximum between the two.
+    # However, there is a caveat: Maybe BGS data for individual countries is inaccurate, or we are combining two
+    # indicators that mean slightly different things.
+    # To minimize this risk, we first visually inspected the data (where there was overlap between BGS and USGS).
+    # But note that the risk is still there, in cases where BGS and USGS do not overlap.
+
+    # Sanity check: The only repeated rows should be for World (namely the original and the current aggregate).
+    error = "Unexpected duplicated data."
+    world_entities = ["World", "World (USGS)"]
+    assert set(
+        tb[tb.replace("World (USGS)", "World").duplicated(subset=["country", "year"], keep=False)]["country"]
+    ) == set(world_entities), error
+    # Create a table with world data, keeping only the maximum (between the aggregate and the original USGS world data).
+    tb_world_max = (
+        tb[tb["country"].isin(world_entities)]
+        .replace("World (USGS)", "World")
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .max()
+    )
+
+    # Replace the world data in the main table with the world maximum data.
+    tb = pr.concat([tb[~tb["country"].isin(world_entities)], tb_world_max], ignore_index=True)
+    assert tb[tb.duplicated(subset=["country", "year"], keep=False)].empty, error
+
+    return tb
+
+
+def run_sanity_checks(tb: Table) -> None:
+    # Check that there are no duplicated rows.
+    assert tb[tb.duplicated(subset=["country", "year"], keep=False)].empty, "Unexpected duplicated data."
+    # Check that there are no missing values.
+    for column in [column for column in tb.columns if column.startswith(SHARE_OF_GLOBAL_PREFIX)]:
+        if (tb[column] > 100).any():
+            log.warning(f"{column} maximum: {tb[column].max():.0f}%")
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load datasets.
+    # Load minerals datasets.
     ds_bgs = paths.load_dataset("world_mineral_statistics")
     ds_usgs_historical = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read tables.
     tb_usgs_historical_flat = ds_usgs_historical.read_table(
@@ -276,6 +387,11 @@ def run(dest_dir: str) -> None:
     # Adapt BGS flat table.
     tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
 
+    # Given that "World" was created by us (to be able to visually compare BGS and USGS data), rename it.
+    # NOTE: We will rename it back to "World" just to allow for visual inspection.
+    #  Then, "World (BGS)" will be removed from the data, before creating region aggregates.
+    tb_bgs_flat["country"] = tb_bgs_flat["country"].astype("string").replace("World", "World (BGS)")
+
     # Create a combined flat table.
     # Firstly, combine USGS current and historical. Since the former is more up-to-date, prioritize it.
     # TODO: Sometimes, when combining, the data from one of the sources is completely replaced by the other.
@@ -291,26 +407,35 @@ def run(dest_dir: str) -> None:
     # So, I decided to remove region aggregates from USGS, and prioritize USGS over BGS data.
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_bgs_flat, index_columns=["country", "year"])
 
-    # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
+    # # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
     # inspect_overlaps(
     #     tb=tb,
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
-    #     tb_bgs_flat=tb_bgs_flat,
+    #     tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
     #     minerals=["Copper"],
     # )
 
+    # Create region aggregates.
+    # TODO: Instead, we could simply remove "Other" where there is both BGS and USGS data.
+    #  Otherwise, regardless of the region aggregates, "Other" may sound as "all other countries", which may no longer
+    #  be the case if some of those countries in "Other" are in BGS data.
+    tb = create_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
     tb = add_share_of_global_columns(tb=tb)
-
-    for column in [column for column in tb.columns if column.startswith(SHARE_OF_GLOBAL_PREFIX)]:
-        if (tb[column] > 100).any():
-            log.warning(f"{column} maximum: {tb[column].max():.0f}%")
 
     # Improve metadata.
     tb = improve_metadata(
         tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
     )
+
+    # Run sanity checks.
+    run_sanity_checks(tb=tb)
+
+    # TODO: Fix the cases where shares are larger than 100%:
+    # share_of_global_production|Cobalt|Mine|tonnes maximum: 124%
+    # share_of_global_reserves|Zinc|Mine|tonnes maximum: 555%
 
     # Format combined table conveniently.
     tb = tb.format(["country", "year"], short_name="minerals").astype("Float64")

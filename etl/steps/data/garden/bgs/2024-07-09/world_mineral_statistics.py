@@ -4,7 +4,7 @@ import ast
 from typing import Dict, List
 
 import pandas as pd
-from owid.catalog import Table, VariablePresentationMeta
+from owid.catalog import Dataset, Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -896,6 +896,46 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     return notes_dict
 
 
+def add_global_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    # We want to create a "World" aggregate.
+    # This is useful to later inspect how BGS global data compares to USGS.
+    # For now other regions are not important (since the data is very sparse, and
+    # therefore aggregtes will not be representative of the region).
+    # We could simply add up all countries, but we need to be aware of possible region overlaps.
+    # Therefore, I will use geo.add_regions_to_table to create all regions.
+    # It will also create an aggregate for "World" (which will be created by aggregating newly created continent
+    # aggregates).
+    # Then I will remove all other region aggregates.
+    regions = {
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        "Low-income countries": {},
+        "Upper-middle-income countries": {},
+        "Lower-middle-income countries": {},
+        "High-income countries": {},
+        "European Union (27)": {},
+        "World": {},
+    }
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=regions,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+    )
+    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
+    regions_to_remove = [region for region in regions if region != "World"]
+    tb = tb.loc[~tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -959,17 +999,8 @@ def run(dest_dir: str) -> None:
     ]:
         tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
 
-    # Add regions to the table.
-    REGIONS = {**geo.REGIONS, **{"World": {}}}
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        min_num_values_per_year=1,
-        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
-        accepted_overlaps=ACCEPTED_OVERLAPS,
-    )
+    # Add global data.
+    tb = add_global_data(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for category in ["exports", "imports", "production"]:
