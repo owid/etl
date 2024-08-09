@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["languages_per_country"]
-    tb_status = ds_garden["language_by_status"]
+    tb_status = ds_garden["languages_by_status"]
 
     #
     # Process data.
