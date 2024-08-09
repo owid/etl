@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, testing
+    description: |-
+      This data is collected by the Our World in Data team from official reports.
+
+      You can find further details in our post on COVID-19 testing, including:
+
+      - Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)
+      - Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)
+      - detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).
+
+      On 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.
+
+      The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+    date_published: "2022-06-23"
+
+    # Citation
+    producer: Official data collated by Our World in Data
+    citation_full: |-
+      Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8
+
+    # Files
+    url_main: https://github.com/owid/covid-19-data/tree/master
+    url_download: https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv
+    date_accessed: 2024-08-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
+
+outs:
+  - md5: a9a96ca0980c272b08ffa3662992eade
+    size: 17687206
+    path: testing.csv
