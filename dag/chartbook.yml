@@ -59,6 +59,12 @@ steps:
   data://garden/chartbook/2024-08-08/langoni_1972_brazil:
     - data://meadow/chartbook/2024-08-08/langoni_1972_brazil
 
+  # Gini for individual earnings from Neri in OECD (2010)
+  data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - snapshot://oecd/2024-08-08/tackling_inequalities_brazil_2010.csv
+  data://garden/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010
+
   ################################################################################################
   # FRANCE
   ################################################################################################

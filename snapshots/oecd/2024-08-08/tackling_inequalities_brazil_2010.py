@@ -1,10 +1,10 @@
 """
 Script to create a snapshot of dataset.
 
-The file comes from the original book, available here: https://edisciplinas.usp.br/pluginfile.php/5447307/mod_resource/content/1/Langoni%20dist%20de%20renda%20e%20desenvolvimento%20estudos%20economicos%201972.pdf.
-I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1IaA-lvbRlixYMLy5nW6xxJolaZyO4DK_0XvLQuLjJJs/edit?gid=1799504649#gid=1799504649
+The file comes from the original OECD publication, available here: https://www.oecd-ilibrary.org/social-issues-migration-health/tackling-inequalities-in-brazil-china-india-and-south-africa-2010_9789264088368-en.
+I use a csv file coying the data from Table 2.3 (page 67), keeping only 'date' and the last column ('gini')
 After creating the file, run
-    python snapshots/chartbook/2024-08-08/langoni_1972_brazil.py --path-to-file <path-to-file>
+    python snapshots/oecd/2024-08-08/tackling_inequalities_brazil_2010.py --path-to-file <path-to-file>
 """
 
 from pathlib import Path
@@ -22,7 +22,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"chartbook/{SNAPSHOT_VERSION}/langoni_1972_brazil.csv")
+    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/tackling_inequalities_brazil_2010.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(filename=path_to_file, upload=upload)
