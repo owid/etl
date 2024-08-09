@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -17,6 +18,12 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read_table("resettlement")
+
+    # filter out data before data availability starts (s. https://www.unhcr.org/refugee-statistics/methodology/, "Data publication timeline")
+    tb["resettlement_arrivals"] = tb.apply(lambda x: x["resettlement_arrivals"] if x["year"] > 1958 else pd.NA, axis=1)
+    tb["returned_refugees"] = tb.apply(lambda x: x["returned_refugees"] if x["year"] > 1964 else pd.NA, axis=1)
+    tb["returned_idpss"] = tb.apply(lambda x: x["returned_idpss"] if x["year"] > 1996 else pd.NA, axis=1)
+    tb["naturalisation"] = tb.apply(lambda x: x["naturalisation"] if x["year"] > 1989 else pd.NA, axis=1)
 
     # group table by country and year
     tb_origin = (
