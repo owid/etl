@@ -4,17 +4,14 @@ To get the data follow the following steps:
 
 Important - You need and account to access the data.
 
+*** This step shouldn't need to be run in future updates, it is only needed this time as the drug use data was incorrect in the original import, IHME have since corrected it so we download it here.
 * Go to: https://vizhub.healthdata.org/gbd-results/
 * In 'GBD Estimate' select 'Risk factor'
 * In Measure select 'Deaths' and 'DALYs'
 * In Metric select 'Number', 'Percent' and 'Rate'
 * In Cause select:
 #    - Total All Causes
-#    - Cardiovascular diseases
-#    - Lower respiratory infections
-#    - Diarrheal diseases
-#    - Neoplasms
-* In Risk  select 'Select all risks'
+* In Risk  select 'Drug use'
 * In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
 * In Age select:
 #    - All Ages
