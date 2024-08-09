@@ -708,3 +708,9 @@ steps:
   data://grapher/who/2024-08-06/mortality_database_cancer:
     - data://garden/who/2024-08-06/mortality_database_cancer
 
+  data://meadow/who/2024-08-07/monkeypox:
+    - snapshot://who/2024-08-07/monkeypox.csv
+  data://garden/who/2024-08-07/monkeypox:
+    - data://meadow/who/2024-08-07/monkeypox
+  data://grapher/who/2024-08-07/monkeypox:
+    - data://garden/who/2024-08-07/monkeypox
