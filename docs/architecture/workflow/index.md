@@ -73,26 +73,28 @@ The metadata in Snapshot consists mainly of one object: `meta.origin`.
 This metadata is captured in a DVC file (similar to a yaml file), which contains all the snapshot metadata fields as key-value pairs.
 
 ??? example "Example of [`snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc`](https://github.com/owid/etl/blob/master/snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc)"
-This file specifies all the upstream source file details (including link to download it, metadata fields, etc.). Filling the fields of this file requires some manual work, as we are "translating" all the information that the source provides into our snaphsot metadata format.
+
+    This file specifies all the upstream source file details (including link to download it, metadata fields, etc.). Filling the fields of this file requires some manual work, as we are "translating" all the information that the source provides into our snaphsot metadata format.
 
     ```yaml title="snapshots/animal_welfare/2023-10-24/fur_laws.xlsx.dvc"
     meta:
-    origin:
-        title: Fur banning
-        producer: Fur Free Alliance
-        citation_full: Overview national fur legislation, Fur Free Alliance (2023).
-        url_main: https://www.furfreealliance.com/fur-bans/
-        url_download: 
-        https://www.furfreealliance.com/wp-content/uploads/2023/10/Overview-national-fur-legislation.xlsx
-        date_published: '2023-10-01'
-        date_accessed: '2023-10-24'
-        license:
-        name: CC BY 4.0
+        origin:
+            title: Fur banning
+            producer: Fur Free Alliance
+            citation_full: Overview national fur legislation, Fur Free Alliance (2023).
+            url_main: https://www.furfreealliance.com/fur-bans/
+            url_download:
+            https://www.furfreealliance.com/wp-content/uploads/2023/10/Overview-national-fur-legislation.xlsx
+            date_published: '2023-10-01'
+            date_accessed: '2023-10-24'
+            license:
+            name: CC BY 4.0
+
     wdir: ../../../data/snapshots/animal_welfare/2023-10-24
     outs:
-    - md5: bb6e0f8b9a05a8d7c446be2f1d6f9613
-    size: 28585
-    path: fur_laws.xlsx
+        - md5: bb6e0f8b9a05a8d7c446be2f1d6f9613
+          size: 28585
+          path: fur_laws.xlsx
     ```
 
 ## Meadow
@@ -193,7 +195,6 @@ However, garden steps could also depend on other garden steps. This is often the
       - data://garden/un/2022-07-11/un_wpp
       - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
     ```
-
 
 An important processing step in Garden is to standardise (or harmonise) the country names. You can learn more about this in our [country standardisation guide](../../guides/harmonize-countries).
 
