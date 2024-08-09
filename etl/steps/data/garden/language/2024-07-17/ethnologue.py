@@ -36,13 +36,18 @@ def run(dest_dir: str) -> None:
     tb_languages_per_country = languages_per_country(tb_language_index, tb_country_codes)
     tb_languages_per_country["year"] = 2024
     tb_languages_per_country = tb_languages_per_country.drop(columns="countryid")
+    tb_languages_per_country = tb_languages_per_country.format(["country", "year"], shortname="languages_per_country")
+    tb_languages_per_country["n"].metadata.origins = origins
 
     tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
-    # tb_languages_per_country = tb_languages_per_country.format(["country", "year"], short_name="languages_per_country")
-    tb_languages_per_country = tb_languages_per_country.set_index(["country", "year"])
-    tb_languages_per_country.metadata.short_name = "languages_per_country"
-    tb_languages_per_country["n"].metadata.origins = origins
+    tb_lang_by_status["year"] = 2024
+    tb_lang_by_status = tb_lang_by_status.format(["country", "year"], format="language_by_status")
+    tb_lang_by_status["living"].metadata.origins = origins
+    for col in ["living", "extinct"]:
+        tb_lang_by_status[col].metadata.origins = origins
+
     #
+
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -84,7 +89,9 @@ def extinct_and_living_languages_per_country(
     tb_language_index: Table, tb_language_codes: Table, tb_country_codes: Table
 ) -> Table:
     tb_extinct_living_languages = (
-        tb_language_index.merge(tb_language_codes, on=["langid", "countryid"], how="outer", suffixes=("", "_lang"))
+        tb_language_index.merge(tb_language_codes, on=["langid"], how="outer", suffixes=("", "_lang"))
+        .drop(columns=["nametype", "name", "name_lang"])
+        .drop_duplicates()
         .groupby(["countryid", "langstatus"], observed=True)
         .agg({"langid": "nunique"})
         .reset_index()

@@ -19,3 +19,13 @@ tables:
         title: Number of languages
         unit: languages
         description_short: The number of languages (both living and extinct) that have been spoken in the country.
+  languages_by_status:
+    variables:
+      living:
+        title: Number of living languages
+        unit: languages
+        description_short: The number of languages that are still spoken in the country.
+      extinct:
+        title: Number of extinct languages
+        unit: languages
+        description_short: The number of languages that are no longer spoken in the country.
