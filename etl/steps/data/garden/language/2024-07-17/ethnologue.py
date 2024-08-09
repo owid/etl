@@ -47,13 +47,12 @@ def run(dest_dir: str) -> None:
     # countries by status living and extinct
     tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
     tb_lang_by_status["year"] = 2024
+    tb_lang_by_status["total"] = tb_lang_by_status["living"] + tb_lang_by_status["extinct"]
     tb_lang_by_status = geo.add_population_to_table(tb_lang_by_status, ds_population)
-    tb_lang_by_status["living_per_million"] = tb_lang_by_status["living"] / tb_lang_by_status["population"] * 1_000_000
-    tb_lang_by_status["extinct_per_million"] = (
-        tb_lang_by_status["extinct"] / tb_lang_by_status["population"] * 1_000_000
-    )
+    cols = ["total", "living", "extinct"]
+    for col in cols:
+        tb_lang_by_status[f"{col}_per_million"] = tb_lang_by_status[col] / tb_lang_by_status["population"] * 1_000_000
     tb_lang_by_status = tb_lang_by_status.format(["country", "year"], short_name="languages_by_status")
-    tb_lang_by_status["living"].metadata.origins = origins
     for col in tb_lang_by_status.columns:
         tb_lang_by_status[col].metadata.origins = origins
     # The number of countries per language - not sure this is super informative as we don't know the populations speaking each language

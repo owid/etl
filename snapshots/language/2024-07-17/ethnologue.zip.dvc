@@ -5,10 +5,11 @@ meta:
   origin:
     # Data product / Snapshot
     title: Ethnologue
+    description: Ethnologue is a comprehensive reference work cataloging the world’s languages, providing data on over 7,000 living languages, including their distribution, number of speakers, and classification. It serves as a key resource for linguists, educators, and researchers interested in global linguistic diversity.
     date_published: "2024-02-21"
 
     # Citation
-    producer: SIL International
+    producer: Summer Institute of Linguistics (SIL) International
     citation_full: |-
       Eberhard, David M., Gary F. Simons, and Charles D. Fennig (eds.). 2024. Ethnologue: Languages of the World. Twenty-seventh edition. Dallas, Texas: SIL International. Online version: http://www.ethnologue.com.
 
