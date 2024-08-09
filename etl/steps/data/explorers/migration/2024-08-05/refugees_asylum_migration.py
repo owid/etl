@@ -1,13 +1,18 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
+from pathlib import Path
+
 import pandas as pd
 from migration_config_dict import CONFIG_DICT  # type: ignore
+from structlog import get_logger
 
+from etl.config import EXPLORERS_DIR
+from etl.explorer_helpers import Explorer
 from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# TODO: maybe add net migration/ rate here
+
 ADDITIONAL_DESCRIPTIONS = {
     "net_migration": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",
     "net_migration_rate": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country), per 1,000 people in the population.",
@@ -15,6 +20,10 @@ ADDITIONAL_DESCRIPTIONS = {
     "remittance_cost_ib": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200.",
     "remittance_cost_ob": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200. ",
 }
+
+MAP_CONFIG_DICT = {keys: {"colorScaleScheme": "Blues", "colorScaleNumericBins": ""} for keys in CONFIG_DICT.keys()}
+
+LOG = get_logger(__name__)
 
 
 def run(dest_dir: str) -> None:
@@ -44,6 +53,18 @@ def run(dest_dir: str) -> None:
         (tb_wdi, ds_wdi),
         (tb_idmc, ds_idmc),
     ]
+
+    # try to get map brackets from old explorer
+    expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
+    if expl_path.exists():
+        old_explorer = Explorer(paths.short_name)
+        df_columns = old_explorer.df_columns
+        for _, row in df_columns.iterrows():
+            var_title = row["slug"]
+            if var_title in MAP_CONFIG_DICT.keys() and "ColorScaleNumericBins" in row.keys():
+                MAP_CONFIG_DICT[var_title]["colorScaleNumericBins"] = row["colorScaleNumericBins"]
+            if var_title in MAP_CONFIG_DICT.keys() and "ColorScaleScheme" in row.keys():
+                MAP_CONFIG_DICT[var_title]["colorScaleScheme"] = row["colorScaleScheme"]
 
     #
     # Process data.
@@ -184,7 +205,8 @@ def create_column_rows(col_dicts, tb, ds):
                 col_row_dict["type"] = "Numeric"
             col_row_dict["dateRetrieved"] = origin.date_accessed
             # col_row_dict["additionalInfo"] = [meta.description_from_producer, meta.description_key,meta.description_processing]
-            col_row_dict["colorScaleScheme"] = "RdBu"
+            col_row_dict["colorScaleScheme"] = MAP_CONFIG_DICT[column]["colorScaleScheme"]
+            col_row_dict["colorScaleNumericBins"] = MAP_CONFIG_DICT[column]["colorScaleNumericBins"]
             col_dicts.append(col_row_dict)
 
     return col_dicts
