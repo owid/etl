@@ -1,0 +1,51 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  languages_per_country:
+    variables:
+      n:
+        title: Number of languages
+        unit: languages
+        description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country.
+      languages_per_million:
+        title: Number of languages per million people
+        unit: languages per million people
+        description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country per million people.
+  languages_by_status:
+    variables:
+      total:
+        title: Total number of languages
+        unit: languages
+        description_short: The total number of languages, indigenous and non-indigenous, that have been spoken.
+      living:
+        title: Number of living languages
+        unit: languages
+        description_short: The number of languages, indigenous and non-indigenous, that is still used.
+      extinct:
+        title: Number of extinct languages
+        unit: languages
+        description_short: The number of languages that are no longer used and no one retains a sense of ethnic identity associated with them.
+      total_per_million:
+        title: Number of languages per million people
+        unit: languages per million people
+        description_short: The number of languages, indigenous and non-indigenous, that have been spoken per million people.
+      living_per_million:
+        title: Number of living languages per million people
+        unit: languages per million people
+        description_short: The number of languages, indigenous and non-indigenous, that is still used per million people.
+      extinct_per_million:
+        title: Number of extinct languages per million people
+        unit: languages per million people
+        description_short: The number of languages that are no longer used and no one retains a
