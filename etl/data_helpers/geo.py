@@ -1213,12 +1213,15 @@ def add_regions_to_table(
         # Example of accepted_overlaps:
         # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
-        all_overlaps_sorted = sorted(all_overlaps, key=lambda d: str(d))
-        accepted_overlaps_sorted = sorted(accepted_overlaps, key=lambda d: str(d))
-        if all_overlaps_sorted != accepted_overlaps_sorted:
+        accepted_not_found = [overlap for overlap in accepted_overlaps if overlap not in all_overlaps]
+        found_not_accepted = [overlap for overlap in all_overlaps if overlap not in accepted_overlaps]
+        if len(accepted_not_found):
             log.warning(
-                "Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "
-                f"Accepted overlaps: {accepted_overlaps_sorted}.\nFound overlaps: {all_overlaps_sorted}."
+                f"Known overlaps not found in the data: {accepted_not_found}. Consider removing them from 'accepted_overlaps'."
+            )
+        if len(found_not_accepted):
+            log.warning(
+                f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
             )
 
     if aggregations is None:

@@ -4,7 +4,7 @@ import ast
 from typing import Dict, List
 
 import pandas as pd
-from owid.catalog import Table, VariablePresentationMeta
+from owid.catalog import Dataset, Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -25,11 +25,13 @@ MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES = 800
 # NOTE: This list should contain all commodity-subcommodity pairs expected in the data.
 # Set to None any commodity-subcommodity that should not be included.
 COMMODITY_MAPPING = {
-    ("Aggregates, primary", "Crushed rock"): ("Primary aggregates", "Crushed rock"),
-    ("Aggregates, primary", "Sand and gravel"): ("Primary aggregates", "Sand and gravel"),
-    ("Aggregates, primary", "Unknown"): ("Primary aggregates", "Unknown"),
-    ("Alumina", "Unknown"): ("Alumina", "Unknown"),
-    ("Aluminium, primary", "Unknown"): ("Aluminum", "Primary"),
+    # NOTE: When comparing with USGS' crushed stone, the numbers are very different (USGS' data for the US is larger than BGS' data for the World).
+    ("Aggregates, primary", "Crushed rock"): None,
+    # NOTE: Data for construction sand and gravel for BGS and USGS are very different.
+    ("Aggregates, primary", "Sand and gravel"): None,
+    ("Aggregates, primary", "Unknown"): None,
+    ("Alumina", "Unknown"): ("Alumina", "Refinery"),
+    ("Aluminium, primary", "Unknown"): ("Aluminum", "Smelter"),
     ("Antimony", "Crude"): ("Antimony", "Crude"),
     ("Antimony", "Crude & regulus"): ("Antimony", "Crude & regulus"),
     ("Antimony", "Liquated"): ("Antimony", "Liquated"),
@@ -39,78 +41,74 @@ COMMODITY_MAPPING = {
     ("Antimony", "Refined & regulus"): ("Antimony", "Refined & regulus"),
     ("Antimony", "Regulus"): ("Antimony", "Regulus"),
     ("Antimony", "Sulfide"): ("Antimony", "Sulfide"),
-    ("Antimony, mine", "Unknown"): ("Antimony", "Mine production"),
-    ("Arsenic", "Metallic arsenic"): ("Arsenic", "Metallic arsenic"),
-    ("Arsenic", "Unknown"): ("Arsenic", "Unknown"),
-    ("Arsenic", "White arsenic"): ("Arsenic", "White arsenic"),
-    ("Arsenic, white", "Unknown"): ("Arsenic", "White arsenic"),
-    ("Asbestos", "Amosite"): ("Asbestos", "Amosite"),
-    ("Asbestos", "Amphibole"): ("Asbestos", "Amphibole"),
-    ("Asbestos", "Anthophyllite"): ("Asbestos", "Anthophyllite"),
-    ("Asbestos", "Chrysotile"): ("Asbestos", "Chrysotile"),
-    ("Asbestos", "Crocidolite"): ("Asbestos", "Crocidolite"),
-    ("Asbestos", "Unknown"): ("Asbestos", "Unknown"),
-    ("Asbestos, unmanufactured", "Amosite"): ("Asbestos", "Amosite, unmanufactured"),
-    ("Asbestos, unmanufactured", "Chrysotile"): ("Asbestos", "Chrysotile, unmanufactured"),
-    ("Asbestos, unmanufactured", "Crocidolite"): ("Asbestos", "Crocidolite, unmanufactured"),
+    ("Antimony, mine", "Unknown"): ("Antimony", "Mine"),
+    ("Arsenic", "Metallic arsenic"): None,
+    ("Arsenic", "Unknown"): None,
+    ("Arsenic", "White arsenic"): ("Arsenic", "Processing"),
+    ("Arsenic, white", "Unknown"): ("Arsenic", "Processing"),
+    ("Asbestos", "Amosite"): None,
+    ("Asbestos", "Amphibole"): None,
+    ("Asbestos", "Anthophyllite"): None,
+    ("Asbestos", "Chrysotile"): None,
+    ("Asbestos", "Crocidolite"): None,
+    ("Asbestos", "Unknown"): ("Asbestos", "Mine"),
+    ("Asbestos, unmanufactured", "Amosite"): None,
+    ("Asbestos, unmanufactured", "Chrysotile"): None,
+    ("Asbestos, unmanufactured", "Crocidolite"): None,
     # NOTE: In the original BGS data, there is "Asbestos, unmanufactured" with subcommodity "Other manufactured".
     #  It's unclear what this means, but I'll assume that it's a mistake and that it should be other unmanufactured.
     #  This happens, e.g. to USA 1986 imports.
-    ("Asbestos, unmanufactured", "Other manufactured"): ("Asbestos", "Other, unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured"): ("Asbestos", "Total, unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured, crude"): ("Asbestos", "Crude, unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured, fibre"): ("Asbestos", "Fibre, unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured, shorts"): ("Asbestos", "Shorts, unmanufactured"),
-    ("Asbestos, unmanufactured", "Unmanufactured, waste"): ("Asbestos", "Waste, unmanufactured"),
-    ("Asbestos, unmanufactured", "Waste"): ("Asbestos", "Waste, unmanufactured"),
+    ("Asbestos, unmanufactured", "Other manufactured"): None,
+    ("Asbestos, unmanufactured", "Unmanufactured"): ("Asbestos", "Mine"),
+    ("Asbestos, unmanufactured", "Unmanufactured, crude"): None,
+    ("Asbestos, unmanufactured", "Unmanufactured, fibre"): None,
+    ("Asbestos, unmanufactured", "Unmanufactured, shorts"): None,
+    ("Asbestos, unmanufactured", "Unmanufactured, waste"): None,
+    ("Asbestos, unmanufactured", "Waste"): None,
     ("Barytes", "Barium minerals"): ("Barite", "Barium minerals"),
     ("Barytes", "Barytes"): ("Barite", "Unknown"),
-    ("Barytes", "Unknown"): ("Barite", "Unknown"),
+    ("Barytes", "Unknown"): ("Barite", "Mine"),
     ("Barytes", "Witherite"): ("Barite", "Witherite"),
-    ("Bauxite", "Unknown"): ("Bauxite", "Unknown"),
-    ("Bauxite, alumina and aluminium", "Alumina"): ("Bauxite, alumina and aluminum", "Alumina"),
-    ("Bauxite, alumina and aluminium", "Alumina hydrate"): ("Bauxite, alumina and aluminum", "Alumina hydrate"),
-    ("Bauxite, alumina and aluminium", "Bauxite"): ("Bauxite, alumina and aluminum", "Bauxite"),
-    ("Bauxite, alumina and aluminium", "Bauxite, calcined"): ("Bauxite, alumina and aluminum", "Bauxite, calcined"),
-    ("Bauxite, alumina and aluminium", "Bauxite, crude dried"): (
-        "Bauxite, alumina and aluminum",
-        "Bauxite, crude dried",
-    ),
-    ("Bauxite, alumina and aluminium", "Bauxite, dried"): ("Bauxite, alumina and aluminum", "Bauxite, dried"),
-    ("Bauxite, alumina and aluminium", "Bauxite, uncalcined"): (
-        "Bauxite, alumina and aluminum",
-        "Bauxite, uncalcined",
-    ),
-    ("Bauxite, alumina and aluminium", "Scrap"): ("Bauxite, alumina and aluminum", "Scrap"),
-    ("Bauxite, alumina and aluminium", "Unwrought"): ("Bauxite, alumina and aluminum", "Unwrought"),
-    ("Bauxite, alumina and aluminium", "Unwrought & scrap"): ("Bauxite, alumina and aluminum", "Unwrought & scrap"),
-    ("Bauxite, alumina and aluminium", "Unwrought alloys"): ("Bauxite, alumina and aluminum", "Unwrought alloys"),
-    ("Bentonite and fuller's earth", "Attapulgite"): ("Bentonite and fuller's earth", "Attapulgite"),
-    ("Bentonite and fuller's earth", "Bentonite"): ("Bentonite and fuller's earth", "Bentonite"),
-    ("Bentonite and fuller's earth", "Fuller's earth"): ("Bentonite and fuller's earth", "Fuller's earth"),
-    ("Bentonite and fuller's earth", "Sepiolite"): ("Bentonite and fuller's earth", "Sepiolite"),
-    ("Bentonite and fuller's earth", "Unknown"): ("Bentonite and fuller's earth", "Unknown"),
-    ("Beryl", "Unknown"): ("Beryl", "Unknown"),
+    # NOTE: The following is used for production of bauxite.
+    ("Bauxite", "Unknown"): ("Bauxite", "Mine"),
+    ("Bauxite, alumina and aluminium", "Alumina"): ("Alumina", "Refinery"),
+    ("Bauxite, alumina and aluminium", "Alumina hydrate"): None,
+    # NOTE: The following is used for imports and exports of bauxite.
+    ("Bauxite, alumina and aluminium", "Bauxite"): ("Bauxite", "Mine"),
+    ("Bauxite, alumina and aluminium", "Bauxite, calcined"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, crude dried"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, dried"): None,
+    ("Bauxite, alumina and aluminium", "Bauxite, uncalcined"): None,
+    ("Bauxite, alumina and aluminium", "Scrap"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought & scrap"): None,
+    ("Bauxite, alumina and aluminium", "Unwrought alloys"): None,
+    ("Bentonite and fuller's earth", "Attapulgite"): ("Clays", "Attapulgite"),
+    ("Bentonite and fuller's earth", "Bentonite"): ("Clays", "Bentonite"),
+    ("Bentonite and fuller's earth", "Fuller's earth"): ("Clays", "Fuller's earth"),
+    ("Bentonite and fuller's earth", "Sepiolite"): ("Clays", "Sepiolite"),
+    ("Bentonite and fuller's earth", "Unknown"): None,
+    ("Beryl", "Unknown"): ("Beryl", "Mine"),
     ("Bismuth", "Compounds"): ("Bismuth", "Compounds"),
     ("Bismuth", "Metal"): ("Bismuth", "Metal"),
     ("Bismuth", "Ores & concentrates"): ("Bismuth", "Ores & concentrates"),
-    ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine production"),
-    ("Borates", "Unknown"): ("Borates", "Unknown"),
+    ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine"),
+    ("Borates", "Unknown"): None,
     ("Bromine", "Compounds"): ("Bromine", "Compounds"),
     ("Bromine", "Unknown"): ("Bromine", "Unknown"),
-    ("Cadmium", "Metal"): ("Cadmium", "Metal"),
-    ("Cadmium", "Other"): ("Cadmium", "Other"),
-    ("Cadmium", "Oxide"): ("Cadmium", "Oxide"),
-    ("Cadmium", "Sulfide"): ("Cadmium", "Sulfide"),
-    ("Cadmium", "Unknown"): ("Cadmium", "Unknown"),
-    ("Cement", "Cement clinkers"): ("Cement", "Cement, clinker"),
-    ("Cement", "Other cement"): ("Cement", "Other cement"),
-    ("Cement", "Portland cement"): ("Cement", "Portland cement"),
-    ("Cement  clinker", "Cement, clinker"): ("Cement", "Cement, clinker"),
-    ("Cement, finished", "Cement, finished"): ("Cement", "Cement, finished"),
+    ("Cadmium", "Metal"): ("Cadmium", "Refinery"),
+    ("Cadmium", "Other"): None,
+    ("Cadmium", "Oxide"): None,
+    ("Cadmium", "Sulfide"): None,
+    ("Cadmium", "Unknown"): None,
+    ("Cement", "Cement clinkers"): None,
+    ("Cement", "Other cement"): None,
+    ("Cement", "Portland cement"): None,
+    ("Cement  clinker", "Cement, clinker"): None,
+    ("Cement, finished", "Cement, finished"): None,
     ("Chromium", "Metal"): ("Chromium", "Metal"),
-    ("Chromium", "Ores & concentrates"): ("Chromium", "Ores & concentrates"),
-    ("Chromium ores and concentrates", "Unknown"): ("Chromium", "Ores & concentrates"),
+    ("Chromium", "Ores & concentrates"): None,
+    ("Chromium ores and concentrates", "Unknown"): None,
     ("Coal", "Anthracite"): ("Coal", "Anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Anthracite & Bituminous"),
     ("Coal", "Anthracite & semi-bituminous"): ("Coal", "Anthracite & semi-bituminous"),
@@ -131,116 +129,101 @@ COMMODITY_MAPPING = {
     ("Coal", "Other coal"): ("Coal", "Other coal"),
     ("Coal", "Sub-bituminous"): ("Coal", "Sub-bituminous"),
     ("Coal", "Unknown"): ("Coal", "Unknown"),
-    ("Cobalt", "Metal & refined"): ("Cobalt", "Metal & refined"),
-    ("Cobalt", "Ore"): ("Cobalt", "Ore"),
-    ("Cobalt", "Oxide, sinter & sulfide"): ("Cobalt", "Oxide, sinter & sulfide"),
-    ("Cobalt", "Oxides"): ("Cobalt", "Oxides"),
-    ("Cobalt", "Salts"): ("Cobalt", "Salts"),
-    ("Cobalt", "Scrap"): ("Cobalt", "Scrap"),
-    ("Cobalt", "Unknown"): ("Cobalt", "Unknown"),
-    ("Cobalt", "Unwrought"): ("Cobalt", "Unwrought"),
-    ("Cobalt, mine", "Unknown"): ("Cobalt", "Mine production"),
-    ("Cobalt, refined", "Unknown"): ("Cobalt", "Refinery production"),
-    ("Copper", "Ash and residues"): ("Copper", "Ash and residues"),
-    ("Copper", "Burnt cupreous pyrites"): ("Copper", "Burnt cupreous pyrites"),
-    ("Copper", "Cement copper"): ("Copper", "Cement copper"),
-    ("Copper", "Matte"): ("Copper", "Matte"),
-    ("Copper", "Matte & Scrap"): ("Copper", "Matte & Scrap"),
-    ("Copper", "Matte & cement"): ("Copper", "Matte & cement"),
-    ("Copper", "Ore & matte"): ("Copper", "Ore & matte"),
-    ("Copper", "Ores & concentrates"): ("Copper", "Ores & concentrates"),
-    ("Copper", "Ores, concentrates & matte"): ("Copper", "Ores, concentrates & matte"),
-    ("Copper", "Scrap"): ("Copper", "Scrap"),
-    ("Copper", "Sludge, slimes & residues"): ("Copper", "Sludge, slimes & residues"),
-    ("Copper", "Unknown"): ("Copper", "Unknown"),
-    ("Copper", "Unwrought"): ("Copper", "Unwrought"),
-    ("Copper", "Unwrought & Scrap"): ("Copper", "Unwrought & Scrap"),
-    ("Copper", "Unwrought alloys"): ("Copper", "Unwrought alloys"),
-    ("Copper", "Unwrought, matte, cement & refined"): ("Copper", "Unwrought, matte, cement & refined"),
-    ("Copper", "Unwrought, refined"): ("Copper", "Unwrought, refined"),
-    ("Copper", "Unwrought, unrefined"): ("Copper", "Unwrought, unrefined"),
-    ("Copper, mine", "Unknown"): ("Copper", "Mine production"),
-    ("Copper, refined", "Unknown"): ("Copper", "Refinery production"),
-    ("Copper, smelter", "Unknown"): ("Copper", "Smelter production"),
+    ("Cobalt", "Metal & refined"): None,
+    ("Cobalt", "Ore"): None,
+    ("Cobalt", "Oxide, sinter & sulfide"): None,
+    ("Cobalt", "Oxides"): None,
+    ("Cobalt", "Salts"): None,
+    ("Cobalt", "Scrap"): None,
+    ("Cobalt", "Unknown"): None,
+    ("Cobalt", "Unwrought"): None,
+    ("Cobalt, mine", "Unknown"): ("Cobalt", "Mine"),
+    ("Cobalt, refined", "Unknown"): ("Cobalt", "Refinery"),
+    ("Copper", "Ash and residues"): None,
+    ("Copper", "Burnt cupreous pyrites"): None,
+    ("Copper", "Cement copper"): None,
+    ("Copper", "Matte"): None,
+    ("Copper", "Matte & Scrap"): None,
+    ("Copper", "Matte & cement"): None,
+    ("Copper", "Ore & matte"): None,
+    ("Copper", "Ores & concentrates"): None,
+    ("Copper", "Ores, concentrates & matte"): None,
+    ("Copper", "Scrap"): None,
+    ("Copper", "Sludge, slimes & residues"): None,
+    ("Copper", "Unknown"): None,
+    ("Copper", "Unwrought"): None,
+    ("Copper", "Unwrought & Scrap"): None,
+    ("Copper", "Unwrought alloys"): None,
+    ("Copper", "Unwrought, matte, cement & refined"): None,
+    ("Copper", "Unwrought, refined"): None,
+    ("Copper", "Unwrought, unrefined"): None,
+    ("Copper, mine", "Unknown"): ("Copper", "Mine"),
+    ("Copper, refined", "Unknown"): ("Copper", "Refinery"),
+    ("Copper, smelter", "Unknown"): ("Copper", "Smelter"),
     # NOTE: It's unclear when synthetic diamond is included.
     # Production does not seem to include it, but imports and exports of "Dust" does include synthetic diamond.
-    ("Diamond", "Cut"): ("Diamond", "Cut"),
-    ("Diamond", "Dust"): ("Diamond", "Dust"),
-    ("Diamond", "Gem"): ("Diamond", "Gem"),
-    ("Diamond", "Gem, cut"): ("Diamond", "Gem, cut"),
-    ("Diamond", "Gem, rough"): ("Diamond", "Gem, rough"),
-    ("Diamond", "Industrial"): ("Diamond", "Mine production, industrial"),
-    ("Diamond", "Other"): ("Diamond", "Other"),
-    ("Diamond", "Rough"): ("Diamond", "Rough"),
-    ("Diamond", "Rough & Cut"): ("Diamond", "Rough & Cut"),
-    ("Diamond", "Unknown"): ("Diamond", "Unknown"),
-    ("Diamond", "Unsorted"): ("Diamond", "Unsorted"),
+    ("Diamond", "Cut"): None,
+    ("Diamond", "Dust"): None,
+    ("Diamond", "Gem"): None,
+    ("Diamond", "Gem, cut"): None,
+    ("Diamond", "Gem, rough"): None,
+    ("Diamond", "Industrial"): ("Diamond", "Mine, industrial"),
+    ("Diamond", "Other"): None,
+    ("Diamond", "Rough"): None,
+    ("Diamond", "Rough & Cut"): None,
+    ("Diamond", "Unknown"): None,
+    ("Diamond", "Unsorted"): None,
     ("Diatomite", "Activated diatomite"): ("Diatomite", "Activated diatomite"),
     ("Diatomite", "Moler"): ("Diatomite", "Moler"),
     ("Diatomite", "Moler bricks"): ("Diatomite", "Moler bricks"),
     ("Diatomite", "Unknown"): ("Diatomite", "Unknown"),
     ("Feldspar", "Unknown"): ("Feldspar", "Unknown"),
-    ("Ferro-alloys", "Calcium silicide"): ("Ferro-alloys", "Calcium silicide"),
-    ("Ferro-alloys", "Fe-Ti, Fe-W, Fe-Mo, Fe-V"): ("Ferro-alloys", "Fe-Ti, Fe-W, Fe-Mo, Fe-V"),
-    ("Ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): ("Ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"),
-    ("Ferro-alloys", "Ferro-Alloys (Ferro-silicon & silicon metal)"): (
-        "Ferro-alloys",
-        "Ferro-Alloys (Ferro-silicon & silicon metal)",
-    ),
-    ("Ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): (
-        "Ferro-alloys",
-        "Ferro-Si-manganese & silico-speigeleisen",
-    ),
-    ("Ferro-alloys", "Ferro-alloys"): ("Ferro-alloys", "Ferro-alloys"),
-    ("Ferro-alloys", "Ferro-aluminium"): ("Ferro-alloys", "Ferro-aluminum"),
-    ("Ferro-alloys", "Ferro-aluminium & ferro-silico-aluminium"): (
-        "Ferro-alloys",
-        "Ferro-aluminum & ferro-silico-aluminum",
-    ),
-    ("Ferro-alloys", "Ferro-calcium-silicon"): ("Ferro-alloys", "Ferro-calcium-silicon"),
-    ("Ferro-alloys", "Ferro-chrome"): ("Ferro-alloys", "Ferro-chrome"),
-    ("Ferro-alloys", "Ferro-chrome & ferro-silico-chrome"): ("Ferro-alloys", "Ferro-chrome & ferro-silico-chrome"),
-    ("Ferro-alloys", "Ferro-manganese"): ("Ferro-alloys", "Ferro-manganese"),
-    ("Ferro-alloys", "Ferro-manganese & ferro-silico-manganese"): (
-        "Ferro-alloys",
-        "Ferro-manganese & ferro-silico-manganese",
-    ),
-    ("Ferro-alloys", "Ferro-manganese & spiegeleisen"): ("Ferro-alloys", "Ferro-manganese & spiegeleisen"),
-    ("Ferro-alloys", "Ferro-molybdenum"): ("Ferro-alloys", "Ferro-molybdenum"),
-    ("Ferro-alloys", "Ferro-nickel"): ("Ferro-alloys", "Ferro-nickel"),
-    ("Ferro-alloys", "Ferro-niobium"): ("Ferro-alloys", "Ferro-niobium"),
-    ("Ferro-alloys", "Ferro-phosphorus"): ("Ferro-alloys", "Ferro-phosphorus"),
-    ("Ferro-alloys", "Ferro-rare earth"): ("Ferro-alloys", "Ferro-rare earth"),
-    ("Ferro-alloys", "Ferro-silico-calcium-aluminium"): ("Ferro-alloys", "Ferro-silico-calcium-aluminum"),
-    ("Ferro-alloys", "Ferro-silico-chrome"): ("Ferro-alloys", "Ferro-silico-chrome"),
-    ("Ferro-alloys", "Ferro-silico-magnesium"): ("Ferro-alloys", "Ferro-silico-magnesium"),
-    ("Ferro-alloys", "Ferro-silico-manganese"): ("Ferro-alloys", "Ferro-silico-manganese"),
-    ("Ferro-alloys", "Ferro-silicon"): ("Ferro-alloys", "Ferro-silicon"),
-    ("Ferro-alloys", "Ferro-titanium"): ("Ferro-alloys", "Ferro-titanium"),
-    ("Ferro-alloys", "Ferro-titanium & ferro-silico-titanium"): (
-        "Ferro-alloys",
-        "Ferro-titanium & ferro-silico-titanium",
-    ),
-    ("Ferro-alloys", "Ferro-tungsten"): ("Ferro-alloys", "Ferro-tungsten"),
-    ("Ferro-alloys", "Ferro-vanadium"): ("Ferro-alloys", "Ferro-vanadium"),
-    ("Ferro-alloys", "Other ferro-alloys"): ("Ferro-alloys", "Other ferro-alloys"),
-    ("Ferro-alloys", "Pig iron"): ("Ferro-alloys", "Pig iron"),
-    ("Ferro-alloys", "Silicon metal"): ("Ferro-alloys", "Silicon metal"),
-    ("Ferro-alloys", "Silicon pig iron"): ("Ferro-alloys", "Silicon pig iron"),
-    ("Ferro-alloys", "Spiegeleisen"): ("Ferro-alloys", "Spiegeleisen"),
+    ("Ferro-alloys", "Calcium silicide"): None,
+    ("Ferro-alloys", "Fe-Ti, Fe-W, Fe-Mo, Fe-V"): None,
+    ("Ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,
+    ("Ferro-alloys", "Ferro-Alloys (Ferro-silicon & silicon metal)"): None,
+    ("Ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): None,
+    ("Ferro-alloys", "Ferro-alloys"): None,
+    ("Ferro-alloys", "Ferro-aluminium"): None,
+    ("Ferro-alloys", "Ferro-aluminium & ferro-silico-aluminium"): None,
+    ("Ferro-alloys", "Ferro-calcium-silicon"): None,
+    ("Ferro-alloys", "Ferro-chrome"): None,
+    ("Ferro-alloys", "Ferro-chrome & ferro-silico-chrome"): None,
+    ("Ferro-alloys", "Ferro-manganese"): None,
+    ("Ferro-alloys", "Ferro-manganese & ferro-silico-manganese"): None,
+    ("Ferro-alloys", "Ferro-manganese & spiegeleisen"): None,
+    ("Ferro-alloys", "Ferro-molybdenum"): None,
+    ("Ferro-alloys", "Ferro-nickel"): None,
+    ("Ferro-alloys", "Ferro-niobium"): None,
+    ("Ferro-alloys", "Ferro-phosphorus"): None,
+    ("Ferro-alloys", "Ferro-rare earth"): None,
+    ("Ferro-alloys", "Ferro-silico-calcium-aluminium"): None,
+    ("Ferro-alloys", "Ferro-silico-chrome"): None,
+    ("Ferro-alloys", "Ferro-silico-magnesium"): None,
+    ("Ferro-alloys", "Ferro-silico-manganese"): None,
+    ("Ferro-alloys", "Ferro-silicon"): None,
+    ("Ferro-alloys", "Ferro-titanium"): None,
+    ("Ferro-alloys", "Ferro-titanium & ferro-silico-titanium"): None,
+    ("Ferro-alloys", "Ferro-tungsten"): None,
+    ("Ferro-alloys", "Ferro-vanadium"): None,
+    ("Ferro-alloys", "Other ferro-alloys"): None,
+    ("Ferro-alloys", "Pig iron"): None,
+    ("Ferro-alloys", "Silicon metal"): None,
+    ("Ferro-alloys", "Silicon pig iron"): None,
+    ("Ferro-alloys", "Spiegeleisen"): None,
     ("Fluorspar", "Unknown"): ("Fluorspar", "Unknown"),
     ("Gallium, primary", "Unknown"): ("Gallium", "Primary"),
     ("Gemstones", "Unknown"): ("Gemstones", "Unknown"),
     ("Germanium metal", "Unknown"): ("Germanium", "Metal"),
     ("Gold", "Metal"): ("Gold", "Metal"),
-    ("Gold", "Metal, other"): ("Gold", "Metal, other"),
+    ("Gold", "Metal, other"): None,
     ("Gold", "Metal, refined"): ("Gold", "Metal, refined"),
-    ("Gold", "Metal, unrefined"): ("Gold", "Metal, unrefined"),
+    ("Gold", "Metal, unrefined"): None,
     ("Gold", "Ores & concentrates"): ("Gold", "Ores & concentrates"),
-    ("Gold", "Ores, concentrates & unrefined metal"): ("Gold", "Ores, concentrates & unrefined metal"),
-    ("Gold", "Waste & scrap"): ("Gold", "Waste & scrap"),
-    ("Gold, mine", "Unknown"): ("Gold", "Mine production"),
-    ("Graphite", "Unknown"): ("Graphite", "Unknown"),
+    ("Gold", "Ores, concentrates & unrefined metal"): None,
+    ("Gold", "Waste & scrap"): None,
+    ("Gold, mine", "Unknown"): ("Gold", "Mine"),
+    ("Graphite", "Unknown"): ("Graphite", "Mine"),
     ("Gypsum and plaster", "Anhydrite"): ("Gypsum and plaster", "Anhydrite"),
     ("Gypsum and plaster", "Calcined"): ("Gypsum and plaster", "Calcined"),
     ("Gypsum and plaster", "Crede & ground"): ("Gypsum and plaster", "Crede & ground"),
@@ -249,148 +232,84 @@ COMMODITY_MAPPING = {
     ("Gypsum and plaster", "Ground & calcined"): ("Gypsum and plaster", "Ground & calcined"),
     ("Gypsum and plaster", "Unknown"): ("Gypsum and plaster", "Unknown"),
     ("Helium", "Helium"): ("Helium", "Helium"),
-    ("Indium, refinery", "Unknown"): ("Indium, refinery", "Unknown"),
+    ("Indium, refinery", "Unknown"): ("Indium", "Refinery"),
     ("Iodine", "Unknown"): ("Iodine", "Unknown"),
-    ("Iron ore", "Burnt pyrites"): ("Iron ore", "Burnt pyrites"),
-    ("Iron ore", "Unknown"): ("Iron ore", "Unknown"),
-    ("Iron, pig", "Unknown"): ("Iron, pig", "Unknown"),
-    ("Iron, steel and ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): (
-        "Iron, steel and ferro-alloys",
-        "Fe-silico-spiegeleisen & Si-Mn",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-Si-manganese & silico-speigeleisen",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-alloys"): ("Iron, steel and ferro-alloys", "Ferro-alloys"),
-    ("Iron, steel and ferro-alloys", "Ferro-aluminium"): ("Iron, steel and ferro-alloys", "Ferro-aluminum"),
-    ("Iron, steel and ferro-alloys", "Ferro-aluminium & ferro-silico-aluminium"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-aluminum & ferro-silico-aluminum",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-aluminium, Fe-Si-Al & Fe-Si-Mn-Al"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-aluminum, Fe-Si-Al & Fe-Si-Mn-Al",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-calcium-silicon"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-calcium-silicon",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-chrome"): ("Iron, steel and ferro-alloys", "Ferro-chrome"),
-    ("Iron, steel and ferro-alloys", "Ferro-chrome & ferro-silico-chrome"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-chrome & ferro-silico-chrome",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-manganese"): ("Iron, steel and ferro-alloys", "Ferro-manganese"),
-    ("Iron, steel and ferro-alloys", "Ferro-manganese & Fe-Si-Mn"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-manganese & Fe-Si-Mn",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-manganese & spiegeleisen"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-manganese & spiegeleisen",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-molybdenum"): ("Iron, steel and ferro-alloys", "Ferro-molybdenum"),
-    ("Iron, steel and ferro-alloys", "Ferro-nickel"): ("Iron, steel and ferro-alloys", "Ferro-nickel"),
-    ("Iron, steel and ferro-alloys", "Ferro-niobium"): ("Iron, steel and ferro-alloys", "Ferro-niobium"),
-    ("Iron, steel and ferro-alloys", "Ferro-niobium & ferro-niobium-tantalum"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-niobium & ferro-niobium-tantalum",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-phosphorus"): ("Iron, steel and ferro-alloys", "Ferro-phosphorus"),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-aluminium, Fe-Si-Mn-Al, Fe-Si-Al-Ca"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-silico-aluminum, Fe-Si-Mn-Al, Fe-Si-Al-Ca",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-chrome"): ("Iron, steel and ferro-alloys", "Ferro-silico-chrome"),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-magnesium"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-silico-magnesium",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-manganese"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-silico-manganese",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-manganese-aluminium"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-silico-manganese-aluminum",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-silico-zirconium"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-silico-zirconium",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-silicon"): ("Iron, steel and ferro-alloys", "Ferro-silicon"),
-    ("Iron, steel and ferro-alloys", "Ferro-titanium"): ("Iron, steel and ferro-alloys", "Ferro-titanium"),
-    ("Iron, steel and ferro-alloys", "Ferro-titanium & Fe-Si-Ti"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-titanium & Fe-Si-Ti",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-tungsten"): ("Iron, steel and ferro-alloys", "Ferro-tungsten"),
-    ("Iron, steel and ferro-alloys", "Ferro-tungsten & Fe-Si-W"): (
-        "Iron, steel and ferro-alloys",
-        "Ferro-tungsten & Fe-Si-W",
-    ),
-    ("Iron, steel and ferro-alloys", "Ferro-vanadium"): ("Iron, steel and ferro-alloys", "Ferro-vanadium"),
-    ("Iron, steel and ferro-alloys", "Ferro-zirconium"): ("Iron, steel and ferro-alloys", "Ferro-zirconium"),
-    ("Iron, steel and ferro-alloys", "Ingots, blooms, billets"): (
-        "Iron, steel and ferro-alloys",
-        "Ingots, blooms, billets",
-    ),
-    ("Iron, steel and ferro-alloys", "Other ferro-alloys"): ("Iron, steel and ferro-alloys", "Other ferro-alloys"),
-    ("Iron, steel and ferro-alloys", "Pig iron"): ("Iron, steel and ferro-alloys", "Pig iron"),
-    ("Iron, steel and ferro-alloys", "Pig iron & ferro-alloys"): (
-        "Iron, steel and ferro-alloys",
-        "Pig iron & ferro-alloys",
-    ),
-    ("Iron, steel and ferro-alloys", "Pig iron & ingots"): ("Iron, steel and ferro-alloys", "Pig iron & ingots"),
-    ("Iron, steel and ferro-alloys", "Pig iron & spiegeleisen"): (
-        "Iron, steel and ferro-alloys",
-        "Pig iron & spiegeleisen",
-    ),
-    ("Iron, steel and ferro-alloys", "Pig iron & sponge"): ("Iron, steel and ferro-alloys", "Pig iron & sponge"),
-    ("Iron, steel and ferro-alloys", "Powder"): ("Iron, steel and ferro-alloys", "Powder"),
-    ("Iron, steel and ferro-alloys", "Scrap"): ("Iron, steel and ferro-alloys", "Scrap"),
-    ("Iron, steel and ferro-alloys", "Shot, powder, sponge, etc."): (
-        "Iron, steel and ferro-alloys",
-        "Shot, powder, sponge, etc.",
-    ),
-    ("Iron, steel and ferro-alloys", "Silicon metal"): ("Iron, steel and ferro-alloys", "Silicon metal"),
-    ("Iron, steel and ferro-alloys", "Spiegeleisen"): ("Iron, steel and ferro-alloys", "Spiegeleisen"),
-    ("Iron, steel and ferro-alloys", "Sponge"): ("Iron, steel and ferro-alloys", "Sponge"),
-    ("Iron, steel and ferro-alloys", "Sponge & powder"): ("Iron, steel and ferro-alloys", "Sponge & powder"),
-    ("Iron, steel and ferro-alloys", "Tin-plate scrap"): ("Iron, steel and ferro-alloys", "Tin-plate scrap"),
+    ("Iron ore", "Burnt pyrites"): None,
+    ("Iron ore", "Unknown"): ("Iron ore", "Crude ore"),
+    # The following is used for production of pig iron.
+    ("Iron, pig", "Unknown"): ("Iron", "Pig iron"),
+    ("Iron, steel and ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-alloys"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-aluminium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-aluminium & ferro-silico-aluminium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-aluminium, Fe-Si-Al & Fe-Si-Mn-Al"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-calcium-silicon"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-chrome"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-chrome & ferro-silico-chrome"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-manganese"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-manganese & Fe-Si-Mn"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-manganese & spiegeleisen"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-molybdenum"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-nickel"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-niobium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-niobium & ferro-niobium-tantalum"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-phosphorus"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-aluminium, Fe-Si-Mn-Al, Fe-Si-Al-Ca"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-chrome"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-magnesium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-manganese"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-manganese-aluminium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silico-zirconium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-silicon"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-titanium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-titanium & Fe-Si-Ti"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-tungsten"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-tungsten & Fe-Si-W"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-vanadium"): None,
+    ("Iron, steel and ferro-alloys", "Ferro-zirconium"): None,
+    ("Iron, steel and ferro-alloys", "Ingots, blooms, billets"): None,
+    ("Iron, steel and ferro-alloys", "Other ferro-alloys"): None,
+    # The following is used for imports and exports of pig iron.
+    ("Iron, steel and ferro-alloys", "Pig iron"): ("Iron", "Pig iron"),
+    ("Iron, steel and ferro-alloys", "Pig iron & ferro-alloys"): None,
+    ("Iron, steel and ferro-alloys", "Pig iron & ingots"): None,
+    ("Iron, steel and ferro-alloys", "Pig iron & spiegeleisen"): None,
+    ("Iron, steel and ferro-alloys", "Pig iron & sponge"): None,
+    ("Iron, steel and ferro-alloys", "Powder"): None,
+    ("Iron, steel and ferro-alloys", "Scrap"): None,
+    ("Iron, steel and ferro-alloys", "Shot, powder, sponge, etc."): None,
+    ("Iron, steel and ferro-alloys", "Silicon metal"): None,
+    ("Iron, steel and ferro-alloys", "Spiegeleisen"): None,
+    ("Iron, steel and ferro-alloys", "Sponge"): None,
+    ("Iron, steel and ferro-alloys", "Sponge & powder"): None,
+    ("Iron, steel and ferro-alloys", "Tin-plate scrap"): None,
     ("Kaolin", "Unknown"): ("Kaolin", "Unknown"),
-    ("Lead", "Ores & concentrates"): ("Lead", "Ores & concentrates"),
-    ("Lead", "Refined"): ("Lead", "Refined"),
-    ("Lead", "Scrap"): ("Lead", "Scrap"),
-    ("Lead", "Unwrought"): ("Lead", "Unwrought"),
-    ("Lead", "Unwrought & scrap"): ("Lead", "Unwrought & scrap"),
-    ("Lead", "Unwrought & semi-manufactures"): ("Lead", "Unwrought & semi-manufactures"),
-    ("Lead", "Unwrought alloys"): ("Lead", "Unwrought alloys"),
-    ("Lead, mine", "Unknown"): ("Lead", "Mine production"),
-    ("Lead, refined", "Unknown"): ("Lead, refined", "Unknown"),
-    ("Lithium", "Carbonate"): ("Lithium", "Carbonate"),
-    ("Lithium", "Lithium minerals"): ("Lithium", "Lithium minerals"),
-    ("Lithium", "Lithium minerals, compounds & metal"): ("Lithium", "Lithium minerals, compounds & metal"),
-    ("Lithium", "Metal"): ("Lithium", "Metal"),
-    ("Lithium", "Oxides"): ("Lithium", "Oxides"),
-    ("Lithium minerals", "Amblygonite"): ("Lithium minerals", "Amblygonite"),
-    ("Lithium minerals", "Carbonate"): ("Lithium minerals", "Carbonate"),
-    ("Lithium minerals", "Chloride"): ("Lithium minerals", "Chloride"),
-    ("Lithium minerals", "Lepidolite"): ("Lithium minerals", "Lepidolite"),
-    ("Lithium minerals", "Lithium minerals (Carbonate -Li content)"): (
-        "Lithium minerals",
-        "Lithium minerals (Carbonate -Li content)",
-    ),
-    ("Lithium minerals", "Lithium minerals (Chloride -Li content)"): (
-        "Lithium minerals",
-        "Lithium minerals (Chloride -Li content)",
-    ),
-    ("Lithium minerals", "Lithium minerals (Li content)"): ("Lithium minerals", "Lithium minerals (Li content)"),
-    ("Lithium minerals", "Lithium minerals (hydroxide)"): ("Lithium minerals", "Lithium minerals (hydroxide)"),
-    ("Lithium minerals", "Petalite"): ("Lithium minerals", "Petalite"),
-    ("Lithium minerals", "Spodumene"): ("Lithium minerals", "Spodumene"),
-    ("Lithium minerals", "Unknown"): ("Lithium minerals", "Unknown"),
+    ("Lead", "Ores & concentrates"): None,
+    ("Lead", "Refined"): ("Lead", "Refinery"),
+    ("Lead", "Scrap"): None,
+    ("Lead", "Unwrought"): None,
+    ("Lead", "Unwrought & scrap"): None,
+    ("Lead", "Unwrought & semi-manufactures"): None,
+    ("Lead", "Unwrought alloys"): None,
+    ("Lead, mine", "Unknown"): ("Lead", "Mine"),
+    ("Lead, refined", "Unknown"): ("Lead", "Refinery"),
+    ("Lithium", "Carbonate"): None,
+    ("Lithium", "Lithium minerals"): ("Lithium", "Mine"),
+    ("Lithium", "Lithium minerals, compounds & metal"): None,
+    ("Lithium", "Metal"): ("Lithium", "Refinery"),
+    ("Lithium", "Oxides"): None,
+    ("Lithium minerals", "Amblygonite"): None,
+    ("Lithium minerals", "Carbonate"): None,
+    ("Lithium minerals", "Chloride"): None,
+    ("Lithium minerals", "Lepidolite"): None,
+    ("Lithium minerals", "Lithium minerals (Carbonate -Li content)"): None,
+    ("Lithium minerals", "Lithium minerals (Chloride -Li content)"): None,
+    ("Lithium minerals", "Lithium minerals (Li content)"): None,
+    ("Lithium minerals", "Lithium minerals (hydroxide)"): None,
+    ("Lithium minerals", "Petalite"): None,
+    ("Lithium minerals", "Spodumene"): None,
+    ("Lithium minerals", "Unknown"): None,
     ("Magnesite", "Unknown"): ("Magnesite and magnesia", "Magnesite"),
     ("Magnesite and magnesia", "Magnesia"): ("Magnesite and magnesia", "Magnesia"),
     ("Magnesite and magnesia", "Magnesite"): ("Magnesite and magnesia", "Magnesite"),
@@ -402,13 +321,13 @@ COMMODITY_MAPPING = {
     ),
     ("Magnesite and magnesia", "Unknown"): ("Magnesite and magnesia", "Unknown"),
     ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Primary"),
-    ("Manganese", "Metal"): ("Manganese", "Metal"),
+    ("Manganese", "Metal"): ("Manganese", "Refinery"),
     ("Manganese", "Ores & Concentrates"): ("Manganese", "Ores & Concentrates"),
-    ("Manganese ore", "Chemical"): ("Manganese ore", "Chemical"),
-    ("Manganese ore", "Manganese ore (ferruginous)"): ("Manganese ore", "Manganese ore (ferruginous)"),
-    ("Manganese ore", "Metallurgical"): ("Manganese ore", "Metallurgical"),
-    ("Manganese ore", "Unknown"): ("Manganese ore", "Unknown"),
-    ("Mercury", "Unknown"): ("Mercury", "Unknown"),
+    ("Manganese ore", "Chemical"): None,
+    ("Manganese ore", "Manganese ore (ferruginous)"): None,
+    ("Manganese ore", "Metallurgical"): None,
+    ("Manganese ore", "Unknown"): ("Manganese", "Ores & Concentrates"),
+    ("Mercury", "Unknown"): ("Mercury", "Mine"),
     ("Mica", "Block"): ("Mica", "Block"),
     ("Mica", "Condenser films"): ("Mica", "Condenser films"),
     ("Mica", "Crude"): ("Mica", "Crude"),
@@ -422,32 +341,32 @@ COMMODITY_MAPPING = {
     ("Mica", "Unknown"): ("Mica", "Unknown"),
     ("Mica", "Unmanufactured"): ("Mica", "Unmanufactured"),
     ("Mica", "Waste"): ("Mica", "Waste"),
-    ("Molybdenum", "Metal"): ("Molybdenum", "Metal"),
+    ("Molybdenum", "Metal"): ("Molybdenum", "Refinery"),
     ("Molybdenum", "Ores & concentrates"): ("Molybdenum", "Ores & concentrates"),
-    ("Molybdenum", "Oxides"): ("Molybdenum", "Oxides"),
-    ("Molybdenum", "Scrap"): ("Molybdenum", "Scrap"),
-    ("Molybdenum, mine", "Unknown"): ("Molybdenum", "Mine production"),
+    ("Molybdenum", "Oxides"): None,
+    ("Molybdenum", "Scrap"): None,
+    ("Molybdenum, mine", "Unknown"): ("Molybdenum", "Mine"),
     # NOTE: I removed natural gas, as the units are not clear: sometimes "million cubic meters" appears, sometimes no
     #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
     ("Natural gas", "Unknown"): None,
     ("Nepheline syenite", "Nepheline concentrates"): ("Nepheline syenite", "Nepheline concentrates"),
     ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Nepheline-syenite"),
     ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Unknown"),
-    ("Nickel", "Mattes, sinters etc"): ("Nickel", "Mattes, sinters etc"),
-    ("Nickel", "Ores & concentrates"): ("Nickel", "Ores & concentrates"),
-    ("Nickel", "Ores, concentrates & scrap"): ("Nickel", "Ores, concentrates & scrap"),
-    ("Nickel", "Ores, concentrates, mattes etc"): ("Nickel", "Ores, concentrates, mattes etc"),
-    ("Nickel", "Oxide, sinter & sulfide"): ("Nickel", "Oxide, sinter & sulfide"),
-    ("Nickel", "Oxides"): ("Nickel", "Oxides"),
-    ("Nickel", "Scrap"): ("Nickel", "Scrap"),
-    ("Nickel", "Slurry, mattes, sinters etc"): ("Nickel", "Slurry, mattes, sinters etc"),
-    ("Nickel", "Sulfide"): ("Nickel", "Sulfide"),
-    ("Nickel", "Unknown"): ("Nickel", "Unknown"),
-    ("Nickel", "Unwrought"): ("Nickel", "Unwrought"),
-    ("Nickel", "Unwrought alloys"): ("Nickel", "Unwrought alloys"),
-    ("Nickel", "Unwrought, mattes, sinters etc"): ("Nickel", "Unwrought, mattes, sinters etc"),
-    ("Nickel, mine", "Unknown"): ("Nickel", "Mine production"),
-    ("Nickel, smelter/refinery", "Sulfate"): ("Nickel", "Smelter or refinery, sulfate"),
+    ("Nickel", "Mattes, sinters etc"): None,
+    ("Nickel", "Ores & concentrates"): None,
+    ("Nickel", "Ores, concentrates & scrap"): None,
+    ("Nickel", "Ores, concentrates, mattes etc"): None,
+    ("Nickel", "Oxide, sinter & sulfide"): None,
+    ("Nickel", "Oxides"): None,
+    ("Nickel", "Scrap"): None,
+    ("Nickel", "Slurry, mattes, sinters etc"): None,
+    ("Nickel", "Sulfide"): None,
+    ("Nickel", "Unknown"): None,
+    ("Nickel", "Unwrought"): None,
+    ("Nickel", "Unwrought alloys"): None,
+    ("Nickel", "Unwrought, mattes, sinters etc"): None,
+    ("Nickel, mine", "Unknown"): ("Nickel", "Mine"),
+    ("Nickel, smelter/refinery", "Sulfate"): None,
     ("Nickel, smelter/refinery", "Unknown"): ("Nickel", "Smelter or refinery"),
     ("Perlite", "Unknown"): ("Perlite", "Unknown"),
     ("Petroleum, crude", "Unknown"): ("Petroleum", "Crude"),
@@ -468,15 +387,15 @@ COMMODITY_MAPPING = {
     ("Platinum group metals", "Ruthenium"): ("Platinum group metals", "Ruthenium"),
     ("Platinum group metals", "Sponge"): ("Platinum group metals", "Sponge"),
     ("Platinum group metals", "Waste & scrap"): ("Platinum group metals", "Waste & scrap"),
-    ("Platinum group metals, mine", "Iridium"): ("Platinum group metals", "Mine production, iridium"),
-    ("Platinum group metals, mine", "Osmiridium"): ("Platinum group metals", "Mine production, osmiridium"),
-    ("Platinum group metals, mine", "Osmium"): ("Platinum group metals", "Mine production, osmium"),
-    ("Platinum group metals, mine", "Other platinum metals"): ("Platinum group metals", "Mine production, other"),
-    ("Platinum group metals, mine", "Palladium"): ("Platinum group metals", "Mine production, palladium"),
-    ("Platinum group metals, mine", "Platinum"): ("Platinum group metals", "Mine production, platinum"),
-    ("Platinum group metals, mine", "Rhodium"): ("Platinum group metals", "Mine production, rhodium"),
-    ("Platinum group metals, mine", "Ruthenium"): ("Platinum group metals", "Mine production, ruthenium"),
-    ("Platinum group metals, mine", "Unknown"): ("Platinum group metals", "Mine production, unknown"),
+    ("Platinum group metals, mine", "Iridium"): ("Platinum group metals", "Mine, iridium"),
+    ("Platinum group metals, mine", "Osmiridium"): ("Platinum group metals", "Mine, osmiridium"),
+    ("Platinum group metals, mine", "Osmium"): ("Platinum group metals", "Mine, osmium"),
+    ("Platinum group metals, mine", "Other platinum metals"): ("Platinum group metals", "Mine, other"),
+    ("Platinum group metals, mine", "Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Platinum group metals, mine", "Platinum"): ("Platinum group metals", "Mine, platinum"),
+    ("Platinum group metals, mine", "Rhodium"): ("Platinum group metals", "Mine, rhodium"),
+    ("Platinum group metals, mine", "Ruthenium"): ("Platinum group metals", "Mine, ruthenium"),
+    ("Platinum group metals, mine", "Unknown"): ("Platinum group metals", "Mine, unknown"),
     ("Potash", "Carbonate"): ("Potash", "Carbonate"),
     ("Potash", "Caustic potash"): ("Potash", "Caustic potash"),
     ("Potash", "Chlorate"): ("Potash", "Chlorate"),
@@ -494,22 +413,19 @@ COMMODITY_MAPPING = {
     ("Potash", "Potassic salts"): ("Potash", "Potassic salts"),
     ("Potash", "Sulfide"): ("Potash", "Sulfide"),
     ("Potash", "Unknown"): ("Potash", "Unknown"),
-    ("Rare earth minerals", "Bastnaesite"): ("Rare earth minerals", "Bastnaesite"),
-    ("Rare earth minerals", "Loparite"): ("Rare earth minerals", "Loparite"),
-    ("Rare earth minerals", "Monazite"): ("Rare earth minerals", "Monazite"),
-    ("Rare earth minerals", "Unknown"): ("Rare earth minerals", "Unknown"),
-    ("Rare earth minerals", "Xenotime"): ("Rare earth minerals", "Xenotime"),
-    ("Rare earth oxides", "Unknown"): ("Rare earth oxides", "Unknown"),
-    ("Rare earths", "Cerium compounds"): ("Rare earths", "Cerium compounds"),
-    ("Rare earths", "Cerium metal"): ("Rare earths", "Cerium metal"),
-    ("Rare earths", "Ferro-cerium & other pyrophoric alloys"): (
-        "Rare earths",
-        "Ferro-cerium & other pyrophoric alloys",
-    ),
-    ("Rare earths", "Metals"): ("Rare earths", "Metals"),
+    ("Rare earth minerals", "Bastnaesite"): None,
+    ("Rare earth minerals", "Loparite"): None,
+    ("Rare earth minerals", "Monazite"): None,
+    ("Rare earth minerals", "Unknown"): ("Rare earths", "Ores & concentrates"),
+    ("Rare earth minerals", "Xenotime"): None,
+    ("Rare earth oxides", "Unknown"): None,
+    ("Rare earths", "Cerium compounds"): None,
+    ("Rare earths", "Cerium metal"): None,
+    ("Rare earths", "Ferro-cerium & other pyrophoric alloys"): None,
+    ("Rare earths", "Metals"): ("Rare earths", "Refinery"),
     ("Rare earths", "Ores & concentrates"): ("Rare earths", "Ores & concentrates"),
-    ("Rare earths", "Other rare earth compounds"): ("Rare earths", "Other rare earth compounds"),
-    ("Rare earths", "Rare earth compounds"): ("Rare earths", "Rare earth compounds"),
+    ("Rare earths", "Other rare earth compounds"): None,
+    ("Rare earths", "Rare earth compounds"): ("Rare earths", "Compounds"),
     ("Rhenium", "Unknown"): ("Rhenium", "Unknown"),
     ("Salt", "Brine salt"): ("Salt", "Brine salt"),
     ("Salt", "Brine salt & sea salt"): ("Salt", "Brine salt & sea salt"),
@@ -523,7 +439,7 @@ COMMODITY_MAPPING = {
     ("Salt", "Salt in brine"): ("Salt", "Salt in brine"),
     ("Salt", "Sea salt"): ("Salt", "Sea salt"),
     ("Salt", "Unknown"): ("Salt", "Unknown"),
-    ("Selenium, refined", "Unknown"): ("Selenium, refined", "Unknown"),
+    ("Selenium, refined", "Unknown"): ("Selenium", "Refinery"),
     ("Sillimanite minerals", "Andalusite"): ("Sillimanite minerals", "Andalusite"),
     ("Sillimanite minerals", "Andalusite & kyanite"): ("Sillimanite minerals", "Andalusite & kyanite"),
     ("Sillimanite minerals", "Kyanite"): ("Sillimanite minerals", "Kyanite"),
@@ -555,15 +471,15 @@ COMMODITY_MAPPING = {
         "Sillimanite mins, chamotte, dinas earth",
     ),
     ("Sillimanite minerals", "Unknown"): ("Sillimanite minerals", "Unknown"),
-    ("Silver", "Alloys"): ("Silver", "Alloys"),
+    ("Silver", "Alloys"): None,
     ("Silver", "Metal"): ("Silver", "Metal"),
-    ("Silver", "Metal, refined"): ("Silver", "Metal, refined"),
-    ("Silver", "Metal, unrefined"): ("Silver", "Metal, unrefined"),
+    ("Silver", "Metal, refined"): None,
+    ("Silver", "Metal, unrefined"): None,
     ("Silver", "Ores & concentrates"): ("Silver", "Ores & concentrates"),
-    ("Silver", "Silver-lead bullion"): ("Silver", "Silver-lead bullion"),
-    ("Silver", "Unknown"): ("Silver", "Unknown"),
-    ("Silver", "Waste & scrap"): ("Silver", "Waste & scrap"),
-    ("Silver, mine", "Unknown"): ("Silver", "Mine production"),
+    ("Silver", "Silver-lead bullion"): None,
+    ("Silver", "Unknown"): None,
+    ("Silver", "Waste & scrap"): None,
+    ("Silver, mine", "Unknown"): ("Silver", "Mine"),
     ("Sodium carbonate, natural", "Unknown"): ("Sodium carbonate", "Natural"),
     ("Steel, crude", "Unknown"): ("Steel", "Crude"),
     ("Strontium minerals", "Unknown"): ("Strontium minerals", "Unknown"),
@@ -571,7 +487,7 @@ COMMODITY_MAPPING = {
     ("Sulphur and pyrites", "Precipitated"): ("Sulphur and pyrites", "Precipitated"),
     ("Sulphur and pyrites", "Pyrites"): ("Sulphur and pyrites", "Pyrites"),
     ("Sulphur and pyrites", "Pyrites - cupreous"): ("Sulphur and pyrites", "Pyrites - cupreous"),
-    ("Sulphur and pyrites", "Pyrites - iron"): ("Sulphur and pyrites", "Pyrites - iron"),
+    ("Sulphur and pyrites", "Pyrites - iron"): None,
     ("Sulphur and pyrites", "Sublimed"): ("Sulphur and pyrites", "Sublimed"),
     ("Sulphur and pyrites", "Sulfur"): ("Sulphur and pyrites", "Sulfur"),
     ("Sulphur and pyrites", "Sulfur, crude"): ("Sulphur and pyrites", "Sulfur, crude"),
@@ -646,16 +562,16 @@ COMMODITY_MAPPING = {
         "Tantalum and niobium minerals",
         "Tantalum & Niobium, tantalum content",
     ),
-    ("Tellurium, refined", "Unknown"): ("Tellurium", "Refined"),
-    ("Tin", "Concentrates"): ("Tin", "Concentrates"),
-    ("Tin", "Scrap"): ("Tin", "Scrap"),
-    ("Tin", "Tin-silver ore"): ("Tin", "Tin-silver ore"),
-    ("Tin", "Unwrought"): ("Tin", "Unwrought"),
-    ("Tin", "Unwrought & scrap"): ("Tin", "Unwrought & scrap"),
-    ("Tin", "Unwrought & semi-manufactures"): ("Tin", "Unwrought & semi-manufactures"),
-    ("Tin", "Unwrought alloys"): ("Tin", "Unwrought alloys"),
-    ("Tin, mine", "Unknown"): ("Tin", "Mine production"),
-    ("Tin, smelter", "Unknown"): ("Tin", "Smelter production"),
+    ("Tellurium, refined", "Unknown"): ("Tellurium", "Refinery"),
+    ("Tin", "Concentrates"): None,
+    ("Tin", "Scrap"): None,
+    ("Tin", "Tin-silver ore"): None,
+    ("Tin", "Unwrought"): None,
+    ("Tin", "Unwrought & scrap"): None,
+    ("Tin", "Unwrought & semi-manufactures"): None,
+    ("Tin", "Unwrought alloys"): None,
+    ("Tin, mine", "Unknown"): ("Tin", "Mine"),
+    ("Tin, smelter", "Unknown"): ("Tin", "Smelter"),
     ("Titanium", "Ilmenite"): ("Titanium", "Ilmenite"),
     ("Titanium", "Leucoxene"): ("Titanium", "Leucoxene"),
     ("Titanium", "Metal"): ("Titanium", "Metal"),
@@ -684,25 +600,25 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Scheelite ores & concentrates"): ("Tungsten", "Scheelite ores & concentrates"),
     ("Tungsten", "Unknown"): ("Tungsten", "Unknown"),
     ("Tungsten", "Wolframite ores & concentrates"): ("Tungsten", "Wolframite ores & concentrates"),
-    ("Tungsten, mine", "Unknown"): ("Tungsten", "Mine production"),
+    ("Tungsten, mine", "Unknown"): ("Tungsten", "Mine"),
     ("Uranium", "Unknown"): ("Uranium", "Unknown"),
     ("Vanadium", "Lead vanadium concentrates"): ("Vanadium", "Lead vanadium concentrates"),
     ("Vanadium", "Metal"): ("Vanadium", "Metal"),
     ("Vanadium", "Ores & concentrates"): ("Vanadium", "Ores & concentrates"),
     ("Vanadium", "Pentoxide"): ("Vanadium", "Pentoxide"),
     ("Vanadium", "Vanadiferous residues"): ("Vanadium", "Vanadiferous residues"),
-    ("Vanadium", "Vanadium-titanium pig iron"): ("Vanadium", "Vanadium-titanium pig iron"),
-    ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine production"),
+    ("Vanadium", "Vanadium-titanium pig iron"): None,
+    ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
     ("Vermiculite", "Unknown"): ("Vermiculite", "Unknown"),
     ("Wollastonite", "Unknown"): ("Wollastonite", "Unknown"),
-    ("Zinc", "Crude & refined"): ("Zinc", "Crude & refined"),
-    ("Zinc", "Ores & concentrates"): ("Zinc", "Ores & concentrates"),
-    ("Zinc", "Oxides"): ("Zinc", "Oxides"),
-    ("Zinc", "Scrap"): ("Zinc", "Scrap"),
-    ("Zinc", "Unwrought"): ("Zinc", "Unwrought"),
-    ("Zinc", "Unwrought alloys"): ("Zinc", "Unwrought alloys"),
-    ("Zinc, mine", "Unknown"): ("Zinc", "Mine production"),
-    ("Zinc, slab", "Unknown"): ("Zinc", "Slab"),
+    ("Zinc", "Crude & refined"): None,
+    ("Zinc", "Ores & concentrates"): None,
+    ("Zinc", "Oxides"): None,
+    ("Zinc", "Scrap"): None,
+    ("Zinc", "Unwrought"): None,
+    ("Zinc", "Unwrought alloys"): None,
+    ("Zinc, mine", "Unknown"): ("Zinc", "Mine"),
+    ("Zinc, slab", "Unknown"): ("Zinc", "Refinery"),
     ("Zirconium", "Concentrates"): ("Zirconium", "Concentrates"),
     ("Zirconium", "Metal"): ("Zirconium", "Metal"),
     ("Zirconium", "Unknown"): ("Zirconium", "Unknown"),
@@ -710,10 +626,43 @@ COMMODITY_MAPPING = {
     ("Zirconium minerals", "Unknown"): ("Zirconium minerals", "Unknown"),
 }
 
+# Mapping from original unit names to tonnes.
+# NOTE: The keys in this dictionary should coincide with all units found in the data.
+UNIT_MAPPING = {
+    "tonnes": "tonnes",
+    "tonnes (metric)": "tonnes",
+    # "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
+    "tonnes (K20 content)": "tonnes of potassium oxide content",
+    "tonnes (metal content)": "tonnes of metal content",
+    # NOTE: The following units will be converted to tonnes using conversion factors.
+    "kilograms": "tonnes",
+    "kilograms (metal content)": "tonnes of metal content",
+    "Carats": "tonnes",
+    "million cubic metres": "tonnes",
+}
+
+# Some of those "tonnes *" can safely be mapped to simply "tonnes".
+# Given that this data is later combined wigh USGS data (given in tonnes), we need to ensure that they mean the
+# same thing.
+# So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes *"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
+# Their unit will be converted to "tonnes", and hence combined with USGS data.
+MINERALS_TO_CONVERT_TO_TONNES = [
+    "Alumina",
+    "Antimony",
+    "Cement",
+    "Cobalt",
+    "Copper",
+    "Lead",
+    "Molybdenum",
+    "Nickel",
+    "Silver",
+    "Tin",
+    "Zinc",
+]
+
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
-    # Example:
-    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
+    "production|Antimony|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.
@@ -767,6 +716,19 @@ def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
 def harmonize_units(tb: Table) -> Table:
     tb = tb.astype({"value": "Float64", "unit": "string"}).copy()
 
+    # In some cases, units given in "tonnes *" can safely be converted to simply "tonnes".
+    # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.
+    # But note that some of these minerals have units that need to be converted (since they are not in tonnes).
+    # Therefore, make a list of all those minerals that need to be converted later.
+    minerals_to_convert_to_tonnes_later = (
+        tb[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES) & (~tb["unit"].str.startswith("tonnes"))]["commodity"]
+        .unique()
+        .tolist()
+    )
+    tb.loc[
+        tb["commodity"].isin(set(MINERALS_TO_CONVERT_TO_TONNES) - set(minerals_to_convert_to_tonnes_later)), "unit"
+    ] = "tonnes"
+
     # Check that, for each category-commodity-subcommodity, there is only one unit (or none).
     group = tb.groupby(["category", "commodity", "sub_commodity"], observed=True, as_index=False)
     unit_count = group.agg({"unit": "nunique"})
@@ -789,11 +751,21 @@ def harmonize_units(tb: Table) -> Table:
     # Fill empty units from the same category-commodity combination.
     tb["unit"] = group["unit"].transform(lambda x: x.ffill().bfill())
 
+    # NOTE: We decided for now to not include "Sponge". If we change our mind, we may need to uncomment the following.
+    # # Since we are mapping ("Iron, steel and ferro-alloys", "Sponge"): ("Iron", "Sponge"), this leads to imports having
+    # # no units. This may be fixed after further harmonization. If so, remove this part of the code.
+    # # If this is not fixed, then consider a different solution.
+    # error = "Something has changed in the units of Iron Sponge. Check this part of the code."
+    # assert set(
+    #     tb.loc[(tb["category"] == "Imports") & (tb["commodity"] == "Iron") & (tb["sub_commodity"] == "Sponge")]["unit"]
+    # ) == set([pd.NA]), error
+    # tb.loc[(tb["commodity"] == "Iron") & (tb["sub_commodity"] == "Sponge"), "unit"] = "tonnes"
+
     # Visually inspect category-commodity-subcommodity combinations with missing units.
     # Check that the only combinations still with no units are the expected ones.
     missing_units = {
         "category": ["Exports", "Imports"],
-        "commodity": ["gemstones", "gemstones"],
+        "commodity": ["Gemstones", "Gemstones"],
         "sub_commodity": ["Unknown", "Unknown"],
     }
     error = "The list of combinations category-commodity-subcommodity with missing units has changed."
@@ -816,25 +788,12 @@ def harmonize_units(tb: Table) -> Table:
     # Additionally, in the table footnotes they explain that sometimes the value is in Pounds!
     # Therefore, assume that the unit is always carats (and convert to tonnes), and, where that footnote appears, simply
     # remove the value.
-    tb.loc[(tb["commodity"] == "diamond"), "unit"] = "Carats"
-    tb.loc[(tb["commodity"] == "diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
-
-    # Mapping from original unit names to tonnes.
-    mapping = {
-        "tonnes (metric)": "tonnes",
-        "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
-        "tonnes (K20 content)": "tonnes of potassium oxide content",
-        "tonnes (metal content)": "tonnes of metal content",
-        # NOTE: The following units will be converted to tonnes using conversion factors.
-        "kilograms": "tonnes",
-        "kilograms (metal content)": "tonnes of metal content",
-        "Carats": "tonnes",
-        "million cubic metres": "tonnes",
-    }
+    tb.loc[(tb["commodity"] == "Diamond"), "unit"] = "Carats"
+    tb.loc[(tb["commodity"] == "Diamond") & (tb["note"].str.lower().str.contains("pounds")), "value"] = None
 
     # Sanity check.
     error = "Unexpected units found. Add them to the unit mapping and decide its conversion."
-    assert set(units) == set(mapping), error
+    assert set(units) == set(UNIT_MAPPING), error
 
     for unit in units:
         mask = tb["unit"] == unit
@@ -853,10 +812,14 @@ def harmonize_units(tb: Table) -> Table:
             # Assert that commodity is either helium or natural gas, and convert accordingly.
             # NOTE: I decided to remove natural gas (see notes above in the commodity mapping).
             error = "Unexpected commodity using million cubic metres."
-            assert set(tb[mask]["commodity"]) == {"helium", "natural gas"}, error
-            tb.loc[mask & (tb["commodity"] == "helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
-            tb.loc[mask & (tb["commodity"] == "natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
-        tb.loc[mask, "unit"] = mapping[unit]
+            assert set(tb[mask]["commodity"]) == {"Helium"}, error
+            tb.loc[mask & (tb["commodity"] == "Helium"), "value"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
+            # tb.loc[mask & (tb["commodity"] == "Natural gas"), "value"] *= MILLION_CUBIC_METERS_OF_NATURAL_GAS_TO_TONNES
+        tb.loc[mask, "unit"] = UNIT_MAPPING[unit]
+
+    # Handle the rest of minerals that need to be converted to "tonnes" (after applying a conversion factor).
+    # See explanation above in this function.
+    tb.loc[tb["commodity"].isin(minerals_to_convert_to_tonnes_later), "unit"] = "tonnes"
 
     return tb
 
@@ -933,6 +896,46 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     return notes_dict
 
 
+def add_global_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    # We want to create a "World" aggregate.
+    # This is useful to later inspect how BGS global data compares to USGS.
+    # For now other regions are not important (since the data is very sparse, and
+    # therefore aggregtes will not be representative of the region).
+    # We could simply add up all countries, but we need to be aware of possible region overlaps.
+    # Therefore, I will use geo.add_regions_to_table to create all regions.
+    # It will also create an aggregate for "World" (which will be created by aggregating newly created continent
+    # aggregates).
+    # Then I will remove all other region aggregates.
+    regions = {
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        "Low-income countries": {},
+        "Upper-middle-income countries": {},
+        "Lower-middle-income countries": {},
+        "High-income countries": {},
+        "European Union (27)": {},
+        "World": {},
+    }
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        regions=regions,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+    )
+    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
+    regions_to_remove = [region for region in regions if region != "World"]
+    tb = tb.loc[~tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -958,14 +961,14 @@ def run(dest_dir: str) -> None:
     # Remove data for regions that did not exist at the time.
     tb = remove_data_from_non_existing_regions(tb=tb)
 
-    # Harmonize units.
-    tb = harmonize_units(tb=tb)
-
     # Improve the name of the commodities.
     tb["commodity"] = tb["commodity"].str.capitalize()
 
     # Harmonize commodity-subcommodity pairs.
     tb = harmonize_commodity_subcommodity_pairs(tb=tb)
+
+    # Harmonize units.
+    tb = harmonize_units(tb=tb)
 
     # Pivot table to have a column for each category.
     tb = (
@@ -996,22 +999,8 @@ def run(dest_dir: str) -> None:
     ]:
         tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
 
-    # Add regions to the table.
-    REGIONS = {**geo.REGIONS, **{"World": {}}}
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        regions=REGIONS,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
-        min_num_values_per_year=1,
-        countries_that_must_have_data={
-            "North America": ["United States"],
-            "Asia": ["China"],
-            "World": ["North America", "Asia"],
-        },
-        index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
-        accepted_overlaps=ACCEPTED_OVERLAPS,
-    )
+    # Add global data.
+    tb = add_global_data(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for category in ["exports", "imports", "production"]:
@@ -1050,6 +1039,9 @@ def run(dest_dir: str) -> None:
         if not tb_flat[column].metadata.presentation:
             tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
         tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
+    # Drop empty columns.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     # Format table conveniently.
     # NOTE: All commodities have the same unit for imports, exports and production except one:
