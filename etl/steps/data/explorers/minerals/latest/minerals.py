@@ -84,6 +84,16 @@ def run(dest_dir: str) -> None:
         drop=True
     )
 
+    # Choose which indicator to show by default when opening the explorer.
+    df_graphers["defaultView"] = False
+    df_graphers.loc[
+        (df_graphers["Mineral Dropdown"] == "Copper")
+        & (df_graphers["Type Dropdown"] == "Mine")
+        & (df_graphers["Metric Dropdown"] == "Production")
+        & (~df_graphers["Share of global Checkbox"]),
+        "defaultView",
+    ] = True
+
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals",
