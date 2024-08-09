@@ -819,7 +819,7 @@ steps:
     - data-private://meadow/language/2024-07-17/ethnologue
     - data://garden/demography/2024-07-15/population
   data-private://grapher/language/2024-07-17/ethnologue:
-    - data://garden/language/2024-07-17/ethnologue
+    - data-private://garden/language/2024-07-17/ethnologue
 
 include:
   - dag/open_numbers.yml
