@@ -3,7 +3,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Technological Change
+        - Uncategorized
 
 
 # Learn more about the available fields:
@@ -19,6 +19,10 @@ tables:
         title: Number of languages
         unit: languages
         description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country.
+      languages_per_million:
+        title: Number of languages per million people
+        unit: languages per million people
+        description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country per million people.
   languages_by_status:
     variables:
       living:
@@ -29,3 +33,11 @@ tables:
         title: Number of extinct languages
         unit: languages
         description_short: The number of languages that are no longer used and no one retains a sense of ethnic identity associated with them.
+      living_per_million:
+        title: Number of living languages per million people
+        unit: languages per million people
+        description_short: The number of languages, indigenous and non-indigenous, that is still used per million people.
+      extinct_per_million:
+        title: Number of extinct languages per million people
+        unit: languages per million people
+        description_short: The number of languages that are no longer used and no one retains a

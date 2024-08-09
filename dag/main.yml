@@ -817,6 +817,7 @@ steps:
     - snapshot-private://language/2024-07-17/ethnologue.zip
   data://garden/language/2024-07-17/ethnologue:
     - data://meadow/language/2024-07-17/ethnologue
+    - data://garden/demography/2024-07-15/population
   data://grapher/language/2024-07-17/ethnologue:
     - data://garden/language/2024-07-17/ethnologue
 
