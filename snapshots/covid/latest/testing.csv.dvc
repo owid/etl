@@ -23,6 +23,236 @@ meta:
     citation_full: |-
       Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8
 
+      | country                          | source_label                                                                      |
+      |:---------------------------------|:----------------------------------------------------------------------------------|
+      | Afghanistan                      | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Albania                          | Ministry of Health and Social Protection                                          |
+      | Algeria                          | Africa Centres for Disease Control and Prevention                                 |
+      | Andorra                          | Tauler COVID-19, Govern d'Andorra                                                 |
+      | Angola                           | Africa Centres for Disease Control and Prevention                                 |
+      | Anguilla                         | Ministry of Health                                                                |
+      | Antigua and Barbuda              | Ministry of Health                                                                |
+      | Argentina                        | Government of Argentina                                                           |
+      | Armenia                          | National Center for Disease Control                                               |
+      | Aruba                            | Government of Aruba                                                               |
+      | Australia                        | Australian Government Department of Health                                        |
+      | Austria                          | Federal Ministry for Social Affairs, Health, Care and Consumer Protection         |
+      | Azerbaijan                       | Cabinet of Ministers of Azerbaijan                                                |
+      | Bahamas                          | Bahamas Ministry of Health and Wellness                                           |
+      | Bahamas                          | Ministry of Health and Wellness                                                   |
+      | Bahrain                          | Ministry of Health                                                                |
+      | Bangladesh                       | Government of Bangladesh                                                          |
+      | Barbados                         | Ministry of Health                                                                |
+      | Belarus                          | Belarus Ministry of Health                                                        |
+      | Belarus                          | Government of Belarus                                                             |
+      | Belarus                          | Ministry of health                                                                |
+      | Belgium                          | Sciensano (Belgian institute for health)                                          |
+      | Belize                           | Statistical Institute of Belize                                                   |
+      | Belize                           | Ministry of Health and Wellness                                                   |
+      | Benin                            | Africa Centres for Disease Control and Prevention                                 |
+      | Bermuda                          | Government of Bermuda                                                             |
+      | Bhutan                           | Ministry of Health                                                                |
+      | Bolivia                          | Bolivia Ministry of Health                                                        |
+      | Bosnia and Herzegovina           | Ministry of Civil Affairs                                                         |
+      | Botswana                         | Botswana Presidential COVID-19 Task Force                                         |
+      | Botswana                         | Africa Centres for Disease Control and Prevention                                 |
+      | Brazil                           | Coronavírus Brasil                                                                |
+      | British Virgin Islands           | Government of the Virgin Islands                                                  |
+      | Brunei                           | Ministry of Health                                                                |
+      | Bulgaria                         | Bulgaria COVID-10 Information Portal                                              |
+      | Burkina Faso                     | Africa Centres for Disease Control and Prevention                                 |
+      | Burundi                          | Africa Centres for Disease Control and Prevention                                 |
+      | Cambodia                         | CDCMOH                                                                            |
+      | Cameroon                         | Africa Centres for Disease Control and Prevention                                 |
+      | Canada                           | Government of Canada                                                              |
+      | Cape Verde                       | Government of Cape Verde                                                          |
+      | Cayman Islands                   | Cayman Islands Government                                                         |
+      | Central African Republic         | Africa Centres for Disease Control and Prevention                                 |
+      | Chad                             | Africa Centres for Disease Control and Prevention                                 |
+      | Chile                            | Ministry of Health, via Ministry of Science GitHub repository                     |
+      | China                            | National Health Commission                                                        |
+      | China                            | Central Commission for Discipline Inspection                                      |
+      | Colombia                         | National Institute of Health                                                      |
+      | Comoros                          | Africa Centres for Disease Control and Prevention                                 |
+      | Congo                            | Africa Centres for Disease Control and Prevention                                 |
+      | Costa Rica                       | Ministry of Health                                                                |
+      | Cote d'Ivoire                    | Ministry of Health and Public Hygiene                                             |
+      | Cote d'Ivoire                    | Africa Centres for Disease Control and Prevention                                 |
+      | Croatia                          | Government of Croatia                                                             |
+      | Cuba                             | Ministry of Public Health                                                         |
+      | Curacao                          | Ministry of Health Curacao                                                        |
+      | Cyprus                           | Ministry of Health                                                                |
+      | Czechia                          | Ministry of Health                                                                |
+      | Democratic Republic of Congo     | Africa Centres for Disease Control and Prevention                                 |
+      | Denmark                          | Statens Serum Institut                                                            |
+      | Djibouti                         | Africa Centres for Disease Control and Prevention                                 |
+      | Dominica                         | Ministry of Health, Wellness and New Health Investment                            |
+      | Dominican Republic               | Ministry of Public Health and Social Assistance                                   |
+      | Ecuador                          | Ministerio de Salud Pública del Ecuador (via Ecuacovid)                           |
+      | Egypt                            | Africa Centres for Disease Control and Prevention                                 |
+      | El Salvador                      | Government of El Salvador                                                         |
+      | Equatorial Guinea                | Ministerio de Sanidad y Bienestar Social                                          |
+      | Equatorial Guinea                | Africa Centres for Disease Control and Prevention                                 |
+      | Eritrea                          | Africa Centres for Disease Control and Prevention                                 |
+      | Estonia                          | Estonian Health Board                                                             |
+      | Eswatini                         | Africa Centres for Disease Control and Prevention                                 |
+      | Ethiopia                         | Ethiopia Information Network Security Agency                                      |
+      | Ethiopia                         | Africa Centres for Disease Control and Prevention                                 |
+      | Faeroe Islands                   | The Government of the Faeroe Islands                                              |
+      | Fiji                             | Fiji Ministry of Health & Medical Services                                        |
+      | Finland                          | Finnish Department of Health and Welfare                                          |
+      | France                           | National Public Health Agency                                                     |
+      | Gabon                            | Government of Gabon                                                               |
+      | Gabon                            | Africa Centres for Disease Control and Prevention                                 |
+      | Gambia                           | Ministry of Health                                                                |
+      | Gambia                           | Africa Centres for Disease Control and Prevention                                 |
+      | Georgia                          | Government of Georgia                                                             |
+      | Germany                          | Robert Koch Institut                                                              |
+      | Ghana                            | Outbreak Response Management Situation Update                                     |
+      | Ghana                            | Africa Centres for Disease Control and Prevention                                 |
+      | Gibraltar                        | The Department of Public Health                                                   |
+      | Greece                           | National Organization of Public Health                                            |
+      | Grenada                          | Government Information Service of Grenada                                         |
+      | Guam                             | Department of Health & Human Services                                             |
+      | Guatemala                        | Ministry of Health and Social Assistance                                          |
+      | Guinea                           | Africa Centres for Disease Control and Prevention                                 |
+      | Guinea-Bissau                    | Africa Centres for Disease Control and Prevention                                 |
+      | Guyana                           | Department of Public Information                                                  |
+      | Haiti                            | Ministry of Public Health and Population                                          |
+      | Hong Kong                        | Department of Health                                                              |
+      | Hungary                          | Government of Hungary                                                             |
+      | Iceland                          | Government of Iceland                                                             |
+      | India                            | Indian Council of Medical Research                                                |
+      | Indonesia                        | Government of Indonesia                                                           |
+      | Iran                             | Ministry of Health and Medical Education                                          |
+      | Iran                             | Government of Iran                                                                |
+      | Iraq                             | Ministry of Health and Environment                                                |
+      | Iraq                             | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Ireland                          | Government of Ireland                                                             |
+      | Israel                           | Israel Ministry of Health                                                         |
+      | Italy                            | Presidency of the Council of Ministers                                            |
+      | Jamaica                          | Jamaica Ministry of Health and Wellness                                           |
+      | Japan                            | Ministry of Health, Labour and Welfare                                            |
+      | Jordan                           | Jordan Ministry of Health                                                         |
+      | Jordan                           | Ministry of Health                                                                |
+      | Kazakhstan                       | Kazakhstan National Center for Public Health                                      |
+      | Kenya                            | Kenya Ministry of Health                                                          |
+      | Kenya                            | Africa Centres for Disease Control and Prevention                                 |
+      | Kosovo                           | National Institute of Public Health of Kosovo                                     |
+      | Kuwait                           | Kuwait Ministry of Health                                                         |
+      | Kuwait                           | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Laos                             | Ministry of Health                                                                |
+      | Latvia                           | Center for Disease Prevention and Control                                         |
+      | Lebanon                          | Lebanon Ministry of Health                                                        |
+      | Lesotho                          | Africa Centres for Disease Control and Prevention                                 |
+      | Liberia                          | Africa Centres for Disease Control and Prevention                                 |
+      | Libya                            | Libya National Centre for Disease Control                                         |
+      | Liechtenstein                    | Federal Office of Public Health                                                   |
+      | Lithuania                        | Government of Lithuania                                                           |
+      | Luxembourg                       | Luxembourg Ministry of Health                                                     |
+      | Madagascar                       | Madagascar Ministry of Public Health                                              |
+      | Madagascar                       | Africa Centres for Disease Control and Prevention                                 |
+      | Malawi                           | Public Health Institute of Malawi                                                 |
+      | Malawi                           | Africa Centres for Disease Control and Prevention                                 |
+      | Malaysia                         | Malaysia Ministry of Health                                                       |
+      | Maldives                         | Maldives Ministry of Health                                                       |
+      | Maldives                         | Maldives Health Protection Agency                                                 |
+      | Mali                             | Africa Centres for Disease Control and Prevention                                 |
+      | Malta                            | COVID-19 Public Health Response Team (Ministry for Health)                        |
+      | Marshall Islands                 | Department of Health & Human Services                                             |
+      | Mauritania                       | Ministry of Health                                                                |
+      | Mauritania                       | Africa Centres for Disease Control and Prevention                                 |
+      | Mauritius                        | Africa Centres for Disease Control and Prevention                                 |
+      | Mexico                           | Health Secretary                                                                  |
+      | Moldova                          | Ministry of Health of the Republic of Moldova                                     |
+      | Mongolia                         | Ministry of Health                                                                |
+      | Morocco                          | Morocco Ministry of Health                                                        |
+      | Morocco                          | Ministry of Health                                                                |
+      | Mozambique                       | Mozambique Ministry of Health                                                     |
+      | Mozambique                       | Africa Centres for Disease Control and Prevention                                 |
+      | Myanmar                          | Ministry of Health                                                                |
+      | Namibia                          | Ministry of Health and Social Services                                            |
+      | Namibia                          | Africa Centres for Disease Control and Prevention                                 |
+      | Nepal                            | Ministry of Health and Population                                                 |
+      | Netherlands                      | Dutch National Institute for Public Health and the Environment                    |
+      | New Zealand                      | Ministry of Health                                                                |
+      | Nicaragua                        | Ministry of Health                                                                |
+      | Niger                            | Africa Centres for Disease Control and Prevention                                 |
+      | Nigeria                          | Nigeria Centre for Disease Control                                                |
+      | Nigeria                          | Africa Centres for Disease Control and Prevention                                 |
+      | North Korea                      | nan                                                                               |
+      | North Korea                      | WHO SEAR                                                                          |
+      | North Macedonia                  | Ministry of Health                                                                |
+      | Northern Mariana Islands         | Department of Health & Human Services                                             |
+      | Norway                           | Norwegian Institute of Public Health                                              |
+      | Oman                             | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Pakistan                         | Government of Pakistan                                                            |
+      | Palau                            | Ministry of Health and Human Services                                             |
+      | Palestine                        | nan                                                                               |
+      | Palestine                        | Tests carried out in the West Bank and Gaza Strip                                 |
+      | Palestine                        | Ministry of Health                                                                |
+      | Panama                           | Panama Ministry of Health                                                         |
+      | Papua New Guinea                 | Ministry of Health                                                                |
+      | Paraguay                         | Paraguay Ministry of Public Health and Social Welfare                             |
+      | Paraguay                         | Ministry of Public Health and Social Welfare                                      |
+      | Peru                             | National Institute of Health                                                      |
+      | Philippines                      | Philippines Department of Health                                                  |
+      | Poland                           | European Centre for Disease Prevention and Control (ECDC)                         |
+      | Portugal                         | Ministry of Health                                                                |
+      | Puerto Rico                      | Department of Health & Human Services                                             |
+      | Qatar                            | Qatar Ministry of Public Health                                                   |
+      | Romania                          | European Centre for Disease Prevention and Control (ECDC)                         |
+      | Russia                           | Government of the Russian Federation                                              |
+      | Rwanda                           | Rwanda Ministry of Health                                                         |
+      | Saint Kitts and Nevis            | Ministry of Health                                                                |
+      | Saint Lucia                      | Ministry of Health and Wellness                                                   |
+      | Saint Vincent and the Grenadines | Saint Vincent and the Grenadines Ministry of Health, Wellness and the Environment |
+      | Saint Vincent and the Grenadines | Ministry of Health, Wellness and the Environment                                  |
+      | Sao Tome and Principe            | Ministry of Health                                                                |
+      | Saudi Arabia                     | Ministry of Health                                                                |
+      | Senegal                          | Ministry for Health and Social Action                                             |
+      | Serbia                           | Ministry of Health                                                                |
+      | Sierra Leone                     | Africa Centres for Disease Control and Prevention                                 |
+      | Singapore                        | Ministry of Health Singapore                                                      |
+      | Slovakia                         | Ministry of Health                                                                |
+      | Slovenia                         | National Institute of Public Health                                               |
+      | Somalia                          | Africa Centres for Disease Control and Prevention                                 |
+      | South Africa                     | National Institute for Communicable Diseases (NICD)                               |
+      | South Korea                      | Korea Disease Control and prevention Agency                                       |
+      | South Sudan                      | Ministry of Health                                                                |
+      | South Sudan                      | Africa Centres for Disease Control and Prevention                                 |
+      | Spain                            | Ministry of Health                                                                |
+      | Sri Lanka                        | Sri Lanka Health Promotion Bureau                                                 |
+      | Sudan                            | Africa Centres for Disease Control and Prevention                                 |
+      | Suriname                         | Directorate National Security                                                     |
+      | Sweden                           | Swedish Public Health Agency                                                      |
+      | Switzerland                      | Federal Office of Public Health                                                   |
+      | Syria                            | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Syria                            | WHO Syrian Arab Republic                                                          |
+      | Taiwan                           | Taiwan CDC Open Data Portal                                                       |
+      | Tanzania                         | Ministry of Health                                                                |
+      | Thailand                         | Department of Medical Sciences Ministry of Public Health                          |
+      | Timor                            | Ministry of Health                                                                |
+      | Togo                             | Ministry of Health                                                                |
+      | Trinidad and Tobago              | Ministry of Health                                                                |
+      | Tunisia                          | Tunisia Ministry of Health                                                        |
+      | Turkey                           | Turkish Ministry of Health                                                        |
+      | Uganda                           | Uganda Ministry of Health                                                         |
+      | Uganda                           | Africa Centres for Disease Control and Prevention                                 |
+      | Ukraine                          | Cabinet of Ministers of Ukraine                                                   |
+      | United Arab Emirates             | UAE Federal Competitiveness and Statistics Authority                              |
+      | United Kingdom                   | Public Health England                                                             |
+      | United States                    | Department of Health & Human Services                                             |
+      | United States Virgin Islands     | Department of Health & Human Services                                             |
+      | Uruguay                          | Ministry of Public Health                                                         |
+      | Vanuatu                          | Ministry of Health                                                                |
+      | Vietnam                          | Ministry of Health of Vietnam                                                     |
+      | Western Sahara                   | Africa Centres for Disease Control and Prevention                                 |
+      | Yemen                            | WHO Regional Office for the Eastern Mediterranean                                 |
+      | Zambia                           | Government of Zambia                                                              |
+      | Zimbabwe                         | Zimbabwe Ministry of Health and Child Care                                        |
+      | Zimbabwe                         | Africa Centres for Disease Control and Prevention
+
     # Files
     url_main: https://github.com/owid/covid-19-data/tree/master
     url_download: https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv
