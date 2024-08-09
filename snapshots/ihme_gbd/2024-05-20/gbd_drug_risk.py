@@ -46,7 +46,7 @@ log = get_logger()
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 # The base url is the url given by the IHME website to download the data, with the file number and .zip removed e.g. '1.zip'
-BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/95fb79b3aa2a7a2dfacedc9d0577cb0b_files/IHME-GBD_2021_DATA-95fb79b3-"
+BASE_URL = "https://dl.healthdata.org:443/gbd-api-2021-public/8d08635a0caed3666bea7e9cdfc90786_files/IHME-GBD_2021_DATA-8d08635a-"
 NUMBER_OF_FILES = 1
 
 
@@ -54,7 +54,7 @@ NUMBER_OF_FILES = 1
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_risk.feather")
+    snap = Snapshot(f"ihme_gbd/{SNAPSHOT_VERSION}/gbd_drug_risk.feather")
     # Download data from source.
     dfs: list[pd.DataFrame] = []
     for file_number in range(1, NUMBER_OF_FILES + 1):
