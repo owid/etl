@@ -23,47 +23,46 @@ meta:
     citation_full: |-
       Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8
 
-      | country                          | source_label                                                                      |
-      |:---------------------------------|:----------------------------------------------------------------------------------|
-      | Afghanistan                      | WHO Regional Office for the Eastern Mediterranean                                 |
-      | Albania                          | Ministry of Health and Social Protection                                          |
-      | Algeria                          | Africa Centres for Disease Control and Prevention                                 |
-      | Andorra                          | Tauler COVID-19, Govern d'Andorra                                                 |
-      | Angola                           | Africa Centres for Disease Control and Prevention                                 |
-      | Anguilla                         | Ministry of Health                                                                |
-      | Antigua and Barbuda              | Ministry of Health                                                                |
-      | Argentina                        | Government of Argentina                                                           |
-      | Armenia                          | National Center for Disease Control                                               |
-      | Aruba                            | Government of Aruba                                                               |
-      | Australia                        | Australian Government Department of Health                                        |
-      | Austria                          | Federal Ministry for Social Affairs, Health, Care and Consumer Protection         |
-      | Azerbaijan                       | Cabinet of Ministers of Azerbaijan                                                |
-      | Bahamas                          | Bahamas Ministry of Health and Wellness                                           |
-      | Bahamas                          | Ministry of Health and Wellness                                                   |
-      | Bahrain                          | Ministry of Health                                                                |
-      | Bangladesh                       | Government of Bangladesh                                                          |
-      | Barbados                         | Ministry of Health                                                                |
-      | Belarus                          | Belarus Ministry of Health                                                        |
-      | Belarus                          | Government of Belarus                                                             |
-      | Belarus                          | Ministry of health                                                                |
-      | Belgium                          | Sciensano (Belgian institute for health)                                          |
-      | Belize                           | Statistical Institute of Belize                                                   |
-      | Belize                           | Ministry of Health and Wellness                                                   |
-      | Benin                            | Africa Centres for Disease Control and Prevention                                 |
-      | Bermuda                          | Government of Bermuda                                                             |
-      | Bhutan                           | Ministry of Health                                                                |
-      | Bolivia                          | Bolivia Ministry of Health                                                        |
-      | Bosnia and Herzegovina           | Ministry of Civil Affairs                                                         |
-      | Botswana                         | Botswana Presidential COVID-19 Task Force                                         |
-      | Botswana                         | Africa Centres for Disease Control and Prevention                                 |
-      | Brazil                           | Coronavírus Brasil                                                                |
-      | British Virgin Islands           | Government of the Virgin Islands                                                  |
-      | Brunei                           | Ministry of Health                                                                |
-      | Bulgaria                         | Bulgaria COVID-10 Information Portal                                              |
-      | Burkina Faso                     | Africa Centres for Disease Control and Prevention                                 |
-      | Burundi                          | Africa Centres for Disease Control and Prevention                                 |
-      | Cambodia                         | CDCMOH                                                                            |
-      | Cameroon                         | Africa Centres for Disease Control and Prevention                                 |
+      Afghanistan: WHO Regional Office for the Eastern Mediterranean
+      Albania: Ministry of Health and Social Protection
+      Algeria: Africa Centres for Disease Control and Prevention
+      Andorra: Tauler COVID-19, Govern d'Andorra
+      Angola: Africa Centres for Disease Control and Prevention
+      Anguilla: Ministry of Health
+      Antigua and Barbuda: Ministry of Health
+      Argentina: Government of Argentina
+      Armenia: National Center for Disease Control
+      Aruba: Government of Aruba
+      Australia: Australian Government Department of Health
+      Austria: Federal Ministry for Social Affairs, Health, Care and Consumer Protection
+      Azerbaijan: Cabinet of Ministers of Azerbaijan
+      Bahamas: Bahamas Ministry of Health and Wellness
+      Bahamas: Ministry of Health andWellness
+      Bahrain: Ministry of Health
+      Bangladesh: Government of Bangladesh
+      Barbados: Ministry of Health
+      Belarus: Belarus Ministry of Health
+      Belarus: Government of Belarus
+      Belarus: Ministry of health
+      Belgium: Sciensano (Belgian institute for health)
+      Belize: Statistical Institute of Belize
+      Belize: Ministry of Health and Wellness
+      Benin: Africa Centres for Disease Control and Prevention
+      Bermuda: Government of Bermuda
+      Bhutan: Ministry of Health
+      Bolivia: Bolivia Ministry of Health
+      Bosnia and Herzegovina: Ministry of Civil Affairs
+      Botswana: Botswana Presidential COVID-19 Task Force
+      Botswana: Africa Centres for Disease Control and Prevention
+      Brazil: Coronavírus Brasil
+      British Virgin Islands: Government of the Virgin Islands
+      Brunei: Ministry of Health
+      Bulgaria: Bulgaria COVID-10 Information Portal
+      Burkina Faso: Africa Centres for Disease Control and Prevention
+      Burundi: Africa Centres for Disease Control and Prevention
+      Cambodia: CDCMOH
+      Cameroon: Africa Centres for Disease Control and Prevention
+
       | Canada                           | Government of Canada                                                              |
       | Cape Verde                       | Government of Cape Verde                                                          |
       | Cayman Islands                   | Cayman Islands Government                                                         |
