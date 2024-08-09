@@ -48,7 +48,7 @@ tables:
         title: Share of the population that were born in another country - female
         unit: "%"
         short_unit: "%"
-        description_short: Total number of female immigrants as a share of the total (female) population. This measures the cumulative migrant stock.
+        description_short: Total number of female immigrants as a share of the total (female) population.
         description_from_producer: "{definitions.description_un.share_migrant_stock}"
         display:
           numDecimalPlaces: 1
@@ -56,7 +56,7 @@ tables:
         title: Share of the population that were born in another country - male
         unit: "%"
         short_unit: "%"
-        description_short: Total number of male immigrants as a share of the total (male) population. This measures the cumulative migrant stock.
+        description_short: Total number of male immigrants as a share of the total (male) population.
         description_from_producer: "{definitions.description_un.share_migrant_stock}"
         display:
           numDecimalPlaces: 1
