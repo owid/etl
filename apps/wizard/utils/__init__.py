@@ -666,7 +666,7 @@ def enable_bugsnag_for_streamlit():
     enable_bugsnag()
 
     # error_util = sys.modules["streamlit.error_util"]
-    error_util = sys.modules["streamlit.error_util.handle_uncaught_app_exception"]
+    error_util = sys.modules["streamlit.error_util"]
     original_handler = error_util.handle_uncaught_app_exception
 
     def bugsnag_handler(exception: Exception) -> None:
