@@ -45,3 +45,10 @@ tables:
           Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally on a daily basis over any periods in which no data was reported.
         unit: '%'
         short_unit: '%'
+
+      has_population_5m_and_100_cases_and_testing_data:
+        title: "Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data"
+        description_short: |-
+          Boolean value indicating if a country has had more than 100 cased in the last 21 days, has testing data and has more than 5 million population.
+        unit: ''
+

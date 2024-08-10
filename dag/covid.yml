@@ -115,6 +115,7 @@ steps:
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
+    - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/combined:
     - data://garden/covid/latest/combined
 

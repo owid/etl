@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+from shared import add_population_daily
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -18,11 +21,13 @@ def run(dest_dir: str) -> None:
     tb_tests = ds_tests["testing"].reset_index()
     tb_who = ds_who["cases_deaths"].reset_index()
 
+    # Population dataset
+    ds_population = paths.load_dataset("population")
+
     #
     # Process data.
     #
-    # Keep relevant columns, set dtypes
-    # [["country", "date", "total_tests", "new_tests_7day_smoothed"]]
+    # Set Dtypes
     tb_tests = tb_tests.astype(
         {
             "date": "datetime64[ns]",
@@ -30,7 +35,6 @@ def run(dest_dir: str) -> None:
             "new_tests_7day_smoothed": float,
         }
     )
-    # [["country", "date", "total_cases", "new_cases_7_day_avg_right"]]
     tb_cases = tb_who.astype(
         {
             "date": "datetime64[ns]",
@@ -49,6 +53,20 @@ def run(dest_dir: str) -> None:
     tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
     tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
 
+    ## Criteria: 'Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data'
+    tb = add_population_daily(tb, ds_population)
+    mask = (
+        (tb["days_since_100_total_cases"].notnull())
+        & (tb["days_since_100_total_cases"] > 21)
+        & (tb["population"] > 5_000_000)
+    )
+    tb.loc[mask, "has_population_5m_and_100_cases_and_testing_data"] = 1
+    tb.loc[~mask, "has_population_5m_and_100_cases_and_testing_data"] = 0
+    tb["has_population_5m_and_100_cases_and_testing_data"] = tb[
+        "has_population_5m_and_100_cases_and_testing_data"
+    ].copy_metadata(tb["days_since_100_total_cases"])
+    tb = tb.drop(columns="population")
+
     # Keep relevant columns
     tb = tb[
         [
@@ -58,8 +76,19 @@ def run(dest_dir: str) -> None:
             "short_term_tests_per_case",
             "short_term_positivity_rate",
             "cumulative_positivity_rate",
+            "has_population_5m_and_100_cases_and_testing_data",
         ]
     ]
+
+    # Replace infinite values
+    cols = [
+        "cumulative_tests_per_case",
+        "short_term_tests_per_case",
+        "short_term_positivity_rate",
+        "cumulative_positivity_rate",
+    ]
+    for col in cols:
+        tb[col] = tb[col].replace([np.inf, -np.inf], np.nan)
 
     # Format
     tb = tb.format(["country", "date"])
