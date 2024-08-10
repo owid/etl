@@ -31,14 +31,14 @@ tables:
         unit: 'tests per confirmed case'
 
       short_term_positivity_rate:
-        title: Total COVID-19 tests per confirmed case
+        title: COVID-19 positivity rate
         description_short: |-
           The daily number of confirmed cases divided by the daily number of tests, expressed as a percentage. Tests may refer to the number of tests performed or the number of people tested - depending on which is reported by the particular country.
         unit: '%'
         short_unit: '%'
 
       cumulative_positivity_rate:
-        title: Total COVID-19 tests per confirmed case
+        title: COVID-19 positivity rate (cumulative)
         description_short: |-
           The total number of confirmed cases to date divided by the total number of tests to date, expressed as a percentage. Tests may refer to the number of tests performed or the number of people tested - depending on which is reported by the particular country.
         description_processing:

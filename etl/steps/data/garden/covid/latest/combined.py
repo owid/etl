@@ -46,8 +46,8 @@ def run(dest_dir: str) -> None:
     tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
     tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
     ## Cases per tests
-    tb["short_term_positivity_rate"] = tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
-    tb["cumulative_positivity_rate"] = tb["total_cases"] / tb["total_tests"]
+    tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
+    tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
 
     # Keep relevant columns
     tb = tb[
