@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -47,6 +46,8 @@ def run(dest_dir: str) -> None:
     tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
     tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
     ## Cases per tests
+    tb["short_term_positivity_rate"] = tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
+    tb["cumulative_positivity_rate"] = tb["total_cases"] / tb["total_tests"]
 
     # Keep relevant columns
     tb = tb[
@@ -55,16 +56,10 @@ def run(dest_dir: str) -> None:
             "date",
             "cumulative_tests_per_case",
             "short_term_tests_per_case",
+            "short_term_positivity_rate",
+            "cumulative_positivity_rate",
         ]
     ]
-
-    # Dtypes
-    # tb = tb.astype(
-    #     {
-    #         "cumulative_tests_per_case": "Float64",
-    #         "short_term_tests_per_case": "Float64",
-    #     }
-    # )
 
     # Format
     tb = tb.format(["country", "date"])
