@@ -1,0 +1,29 @@
+definitions:
+  common:
+    display:
+      numDecimalPlaces: 1
+      yearIsDay: true
+      zeroDay: "2020-01-01"
+    processing_level: major
+
+dataset:
+  update_period_days: 0
+  title: COVID-19, combined indicators
+  description: |-
+    This dataset is built by combinining indicators of multiple COVID-19 indicators. It estimates various indicators based on relationships between others.
+
+tables:
+  testing:
+    variables:
+
+      cumulative_tests_per_case:
+        title: Total COVID-19 tests per confirmed case
+        description_short: |-
+          Total number of COVID-19 tests conducted per confirmed case.
+        unit: 'tests per confirmed case'
+
+      short_term_tests_per_case:
+        title: Daily COVID-19 tests per new confirmed case
+        unit: 'tests per confirmed case'
+        description_short: |-
+          Daily number of COVID-19 tests conducted per daily confirmed case.

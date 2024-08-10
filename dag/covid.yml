@@ -111,6 +111,13 @@ steps:
   data://grapher/covid/latest/testing:
     - data://garden/covid/latest/testing
 
+  # Combined dataset
+  data://garden/covid/latest/combined:
+    - data://garden/covid/latest/testing
+    - data://garden/covid/latest/cases_deaths
+  data://grapher/covid/latest/combined:
+    - data://garden/covid/latest/combined
+
   ######################################
   # Hospitalisations
   data://grapher/covid/latest/hospital_and_icu:
