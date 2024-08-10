@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
+from owid.catalog import Dataset, Table
 from shared import add_population_daily
 
 from etl.helpers import PathFinder, create_dataset
@@ -46,26 +47,10 @@ def run(dest_dir: str) -> None:
     tb = tb_tests.merge(tb_cases, on=["country", "date"])
 
     # Estimate indicators
-    ## Tests per cases
-    tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
-    tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
-    ## Cases per tests
-    tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
-    tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
+    tb = add_test_case_ratios(tb)
 
     ## Criteria: 'Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data'
-    tb = add_population_daily(tb, ds_population)
-    mask = (
-        (tb["days_since_100_total_cases"].notnull())
-        & (tb["days_since_100_total_cases"] > 21)
-        & (tb["population"] > 5_000_000)
-    )
-    tb.loc[mask, "has_population_5m_and_100_cases_and_testing_data"] = 1
-    tb.loc[~mask, "has_population_5m_and_100_cases_and_testing_data"] = 0
-    tb["has_population_5m_and_100_cases_and_testing_data"] = tb[
-        "has_population_5m_and_100_cases_and_testing_data"
-    ].copy_metadata(tb["days_since_100_total_cases"])
-    tb = tb.drop(columns="population")
+    tb = add_criteria(tb, ds_population)
 
     # Keep relevant columns
     tb = tb[
@@ -79,16 +64,6 @@ def run(dest_dir: str) -> None:
             "has_population_5m_and_100_cases_and_testing_data",
         ]
     ]
-
-    # Replace infinite values
-    cols = [
-        "cumulative_tests_per_case",
-        "short_term_tests_per_case",
-        "short_term_positivity_rate",
-        "cumulative_positivity_rate",
-    ]
-    for col in cols:
-        tb[col] = tb[col].replace([np.inf, -np.inf], np.nan)
 
     # Format
     tb = tb.format(["country", "date"])
@@ -105,3 +80,60 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_test_case_ratios(tb: Table) -> Table:
+    """Estimate positive rate and tests-per-case.
+
+    tests per case: num_tests / num_cases
+    positive rate (case per test): num_cases / num_tests
+
+    NOTE: all is smoothed by a 7-day rolling window average.
+    """
+    tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
+    tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
+    ## Cases per tests
+    tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
+    tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
+
+    # Replace infinite values
+    cols = [
+        "cumulative_tests_per_case",
+        "short_term_tests_per_case",
+        "short_term_positivity_rate",
+        "cumulative_positivity_rate",
+    ]
+    for col in cols:
+        tb[col] = tb[col].replace([np.inf, -np.inf], np.nan)
+
+    tb = tb.sort_values(["date"])
+    for col in cols:
+        tb[col] = (
+            tb.groupby("country", observed=True)[col]
+            .rolling(
+                window=7,
+                min_periods=1,
+                center=False,
+            )
+            .mean()
+            .reset_index(level=0, drop=True)
+        )
+
+    return tb
+
+
+def add_criteria(tb: Table, ds_population: Dataset) -> Table:
+    tb = add_population_daily(tb, ds_population)
+    mask = (
+        (tb["days_since_100_total_cases"].notnull())
+        & (tb["days_since_100_total_cases"] > 21)
+        & (tb["population"] > 5_000_000)
+    )
+    tb.loc[mask, "has_population_5m_and_100_cases_and_testing_data"] = 1
+    tb.loc[~mask, "has_population_5m_and_100_cases_and_testing_data"] = 0
+    tb["has_population_5m_and_100_cases_and_testing_data"] = tb[
+        "has_population_5m_and_100_cases_and_testing_data"
+    ].copy_metadata(tb["days_since_100_total_cases"])
+    tb = tb.drop(columns="population")
+
+    return tb
