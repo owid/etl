@@ -155,18 +155,3 @@ steps:
     - data-private://garden/covid/latest/vaccinations
   data-private://garden/covid/latest/vaccinations:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
-
-###########################
-# TO BE ARCHIVED
-###########################
-  # Cases and deaths
-  data-private://grapher/covid/latest/cases_and_deaths_who:
-    - data-private://garden/covid/latest/cases_and_deaths_who
-  data-private://garden/covid/latest/cases_and_deaths_who:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv
-  # Testing
-  data://grapher/covid/latest/testing_time_series:
-    - data://garden/covid/latest/testing_time_series
-  data://garden/covid/latest/testing_time_series:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20testing%20time%20series%20data.csv
-
