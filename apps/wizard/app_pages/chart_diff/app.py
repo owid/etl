@@ -210,7 +210,7 @@ def _show_options_filters():
             default = ["new", "config"]
         st.multiselect(
             label="Chart changes type",
-            options=["new", "data", "metadata", "config"],
+            options=["new", "data", "metadata", "config"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
             key="chart-diff-change-type",
