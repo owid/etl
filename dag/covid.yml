@@ -156,23 +156,8 @@ steps:
 ###########################
 # TO BE ARCHIVED
 ###########################
-  # Variants
-  data-private://grapher/covid/latest/variants:
-    - data-private://garden/covid/latest/variants
-  data-private://garden/covid/latest/variants:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Variants.csv
-  # Sequencing
-  data-private://grapher/covid/latest/sequencing:
-    - data-private://garden/covid/latest/sequencing
-  data-private://garden/covid/latest/sequencing:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Sequencing.csv
   # Cases and deaths
   data-private://grapher/covid/latest/cases_and_deaths_who:
     - data-private://garden/covid/latest/cases_and_deaths_who
   data-private://garden/covid/latest/cases_and_deaths_who:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/COVID-19%20Cases%20and%20deaths%20-%20WHO.csv
-  # Policy
-  data://grapher/covid/latest/government_response_oxbsg:
-    - data://garden/covid/latest/government_response_oxbsg
-  data://garden/covid/latest/government_response_oxbsg:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20Government%20Response%20(OxBSG).csv
