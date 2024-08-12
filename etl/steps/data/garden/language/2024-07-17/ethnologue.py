@@ -46,6 +46,7 @@ def run(dest_dir: str) -> None:
     for col in cols:
         tb_lang_by_status[f"{col}_per_million"] = tb_lang_by_status[col] / tb_lang_by_status["population"] * 1_000_000
     tb_lang_by_status = tb_lang_by_status.format(["country", "year"], short_name="languages_by_status")
+    tb_lang_by_status = tb_lang_by_status.drop(columns=["population"])
     for col in tb_lang_by_status.columns:
         tb_lang_by_status[col].metadata.origins = origins
     # Save outputs.
