@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Add cumulative
     cols = tb.columns.drop(["continent", "year"]).tolist()
     for col in cols:
-        tb[f"{col}_cumulative"] = tb.groupby("continent")["values"].apply(lambda x: x.fillna(0).cumsum())
+        tb[f"{col}_cumulative"] = tb.groupby("continent")[col].apply(lambda x: x.fillna(0).cumsum())
 
     # Process data.
     #
