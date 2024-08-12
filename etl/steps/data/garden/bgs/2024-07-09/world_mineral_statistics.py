@@ -667,6 +667,8 @@ FOOTNOTES = {
 
 # There are many historical regions with overlapping data with their successor countries.
 # Accept only overlaps on the year when the historical country stopped existing.
+# NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
+# create data for continents, then build an aggregate for the world, and then remove continents.
 ACCEPTED_OVERLAPS = [
     {1991: {"USSR", "Armenia"}},
     # {1991: {"USSR", "Belarus"}},
@@ -896,7 +898,7 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
     return notes_dict
 
 
-def add_global_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # We want to create a "World" aggregate.
     # This is useful to later inspect how BGS global data compares to USGS.
     # For now other regions are not important (since the data is very sparse, and
@@ -913,18 +915,12 @@ def add_global_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -
         "North America": {},
         "Oceania": {},
         "South America": {},
-        "Low-income countries": {},
-        "Upper-middle-income countries": {},
-        "Lower-middle-income countries": {},
-        "High-income countries": {},
-        "European Union (27)": {},
         "World": {},
     }
     tb = geo.add_regions_to_table(
         tb=tb,
         regions=regions,
         ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
         index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
         accepted_overlaps=ACCEPTED_OVERLAPS,
@@ -946,9 +942,6 @@ def run(dest_dir: str) -> None:
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -1000,7 +993,7 @@ def run(dest_dir: str) -> None:
         tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
 
     # Add global data.
-    tb = add_global_data(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = add_global_data(tb=tb, ds_regions=ds_regions)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
     for category in ["exports", "imports", "production"]:

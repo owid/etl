@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
             share_of_global.append(is_share_of_global)
 
             if (years.max() - years.min()) < 5:
-                # If there are only a few data points, show only the latest year (as a bar chart).
+                # If there are only a few data points, show only the latest year (as a bar chart).
                 min_year.append(years.max())
             else:
                 # Otherwise, show all years (as a line chart).

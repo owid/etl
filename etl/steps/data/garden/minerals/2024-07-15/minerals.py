@@ -53,25 +53,6 @@ ACCEPTED_OVERLAPS = [
     {1990: {"Yemen", "Yemen People's Republic"}},
 ]
 
-# Create the usual regions, but also "World", which will be created by aggregating newly created continent
-# aggregates, plus "Other", which is often in USGS data and cannot be included in any other region.
-REGIONS = {
-    "Africa": {},
-    "Asia": {},
-    "Europe": {},
-    "North America": {},
-    "Oceania": {},
-    "South America": {},
-    "Low-income countries": {},
-    "Upper-middle-income countries": {},
-    "Lower-middle-income countries": {},
-    "High-income countries": {},
-    "European Union (27)": {},
-    # NOTE: After combining USGS and BGS data, "Other" will be removed from the data before aggregating.
-    # See notes below for an explanation.
-    "World": {},
-}
-
 
 def adapt_flat_table(tb_flat: Table) -> Table:
     tb_flat = tb_flat.copy()
@@ -288,7 +269,7 @@ def add_share_of_global_columns(tb: Table) -> Table:
     return tb
 
 
-def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # Firstly, remove "World (BGS)", which is the global aggregate that was created by us in the BGS garden step.
     tb = tb[tb["country"] != "World (BGS)"].reset_index(drop=True)
 
@@ -315,15 +296,29 @@ def create_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: D
     # It simply means that "Other" carries an important contribution in USGS data, and it's always missing in regions.
     # Therefore, it doesn't make much sense to keep USGS regions, or to keep "Other".
     tb = tb[tb["country"] != "Other"].reset_index(drop=True)
+
+    # Create the usual regions, to be able to safely construct the aggregate for "World".
+    regions = {
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        "World": {},
+    }
     tb = geo.add_regions_to_table(
         tb=tb,
-        regions=REGIONS,
+        regions=regions,
         ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
         accepted_overlaps=ACCEPTED_OVERLAPS,
         keep_original_region_with_suffix=" (USGS)",
     )
+
+    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
+    regions_to_remove = [region for region in regions if region != "World"]
+    tb = tb.loc[~tb["country"].isin(regions_to_remove)].reset_index(drop=True)
 
     # Take the maximum between the World aggregate we just created, and the original World from USGS.
     # Ideally, we would first gather as much data from all countries as possible, and then create the aggregate for the
@@ -380,9 +375,6 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
 
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
     # Read tables.
     tb_usgs_historical_flat = ds_usgs_historical.read_table(
         "historical_statistics_for_mineral_and_material_commodities_flat"
@@ -433,7 +425,7 @@ def run(dest_dir: str) -> None:
 
     # Create region aggregates.
     # NOTE: "Other" will be removed from the data (see notes inside the function).
-    tb = create_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = add_global_data(tb=tb, ds_regions=ds_regions)
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
     tb = add_share_of_global_columns(tb=tb)
