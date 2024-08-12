@@ -23,3 +23,9 @@ steps:
     - data://meadow/biodiversity/2023-08-14/iucn_animal
   data://grapher/biodiversity/2023-08-14/iucn_animal:
     - data://garden/biodiversity/2023-08-14/iucn_animal
+  data://meadow/biodiversity/2024-08-12/invasive_species:
+    - snapshot://biodiversity/2024-08-12/invasive_species.xlsx
+  data://garden/biodiversity/2024-08-12/invasive_species:
+    - data://meadow/biodiversity/2024-08-12/invasive_species
+  data://grapher/biodiversity/2024-08-12/invasive_species:
+    - data://garden/biodiversity/2024-08-12/invasive_species
