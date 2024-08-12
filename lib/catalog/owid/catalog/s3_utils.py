@@ -115,7 +115,7 @@ def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False
         raise UploadError(e)
 
     if not quiet:
-        log.info("UPLOADED", f"{filename} -> {s3_url}")
+        log.info(f"UPLOADED {filename} -> {s3_url}")
 
 
 # if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
