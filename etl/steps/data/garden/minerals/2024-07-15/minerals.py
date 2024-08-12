@@ -131,7 +131,10 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         tb[column].metadata.title = column
 
         # Create a title_public.
-        title_public = f"{commodity} {metric.lower()}"
+        if sub_commodity == "Refinery":
+            title_public = f"Refined {commodity.lower()} {metric.lower()}"
+        else:
+            title_public = f"{commodity} {metric.lower()}"
         if tb[column].metadata.presentation is None:
             tb[column].metadata.presentation = VariablePresentationMeta()
         if column.startswith(SHARE_OF_GLOBAL_PREFIX):
