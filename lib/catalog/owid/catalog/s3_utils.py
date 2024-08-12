@@ -1,14 +1,18 @@
+import concurrent.futures
 import configparser
-import logging
 import os
 import threading
 from functools import lru_cache
 from os import environ as env
-from typing import Dict, Tuple
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
+import structlog
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError
+
+log = structlog.get_logger()
 
 BOTO3_CLIENT_LOCK = threading.Lock()
 
@@ -26,20 +30,77 @@ def s3_bucket_key(url: str) -> Tuple[str, str]:
     return bucket, key
 
 
-def download(s3_url: str, filename: str, quiet: bool = False) -> None:
+def list_s3_objects(s3_folder: str, client: Optional[BaseClient] = None) -> List[str]:
+    client = client or connect_r2()
+
+    bucket, key = s3_bucket_key(s3_folder)
+    continuation_token = None
+    keys = []
+
+    while True:
+        if continuation_token:
+            response = client.list_objects_v2(Bucket=bucket, Prefix=key, ContinuationToken=continuation_token)  # type: ignore
+        else:
+            response = client.list_objects_v2(Bucket=bucket, Prefix=key)  # type: ignore
+
+        if "Contents" in response:
+            keys.extend([obj["Key"] for obj in response["Contents"] if not obj["Key"].endswith("/")])
+
+        if response.get("IsTruncated"):
+            continuation_token = response.get("NextContinuationToken")
+        else:
+            break
+
+    return keys
+
+
+def download(s3_url: str, filename: str, quiet: bool = False, client: Optional[BaseClient] = None) -> None:
     """Download the file at the S3 URL to the given local filename."""
-    client = connect_r2()
+    client = client or connect_r2()
 
     bucket, key = s3_bucket_key(s3_url)
 
     try:
-        client.download_file(bucket, key, filename)
+        client.download_file(bucket, key, filename)  # type: ignore
     except ClientError as e:
-        logging.error(e)
+        log.error(e)
         raise UploadError(e)
 
     if not quiet:
-        logging.info("DOWNLOADED", f"{s3_url} -> {filename}")
+        log.info("DOWNLOADED", s3_url=s3_url, filename=filename)
+
+
+def download_s3_folder(
+    s3_folder: str,
+    local_dir: Path,
+    ignore: Optional[str] = None,
+    client: Optional[BaseClient] = None,
+    max_workers: int = 20,
+) -> None:
+    """Download all files in the given S3 folder to the local directory."""
+    client = client or connect_r2()
+
+    bucket, _ = s3_bucket_key(s3_folder)
+
+    if not local_dir.exists():
+        local_dir.mkdir(parents=True)
+
+    s3_keys = list_s3_objects(s3_folder, client=client)
+
+    if ignore:
+        s3_keys = [key for key in s3_keys if ignore not in key]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = []
+        for s3_key in s3_keys:
+            local_file_path = local_dir / Path(s3_key).name
+            futures.append(
+                executor.submit(
+                    download, f"s3://{bucket}/{s3_key}", local_file_path.as_posix(), client=client, quiet=True
+                )
+            )
+
+        concurrent.futures.wait(futures)
 
 
 def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False) -> None:
@@ -50,11 +111,11 @@ def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False
     try:
         client.upload_file(filename, bucket, key, ExtraArgs=extra_args)
     except ClientError as e:
-        logging.error(e)
+        log.error(e)
         raise UploadError(e)
 
     if not quiet:
-        logging.info("UPLOADED", f"{filename} -> {s3_url}")
+        log.info("UPLOADED", f"{filename} -> {s3_url}")
 
 
 # if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
