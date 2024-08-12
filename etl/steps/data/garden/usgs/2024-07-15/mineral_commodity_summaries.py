@@ -304,62 +304,44 @@ COMMODITY_MAPPING = {
     ("Tellurium", "Refinery production, tellurium content"): ("Tellurium", "Refinery"),
     ("Tin", "Mine production, metric tons contained tin"): ("Tin", "Mine"),
     ("Tin", "Mine production, tin content"): ("Tin", "Mine"),
-    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): (
-        "Titanium and titanium dioxide",
-        "Sponge Metal Production and Sponge and Pigment Capacity",
-    ),
-    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Yearend Operating Capacity"): (
+    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): None,
+    (
         "Titanium and titanium dioxide",
         "Sponge Metal Production and Sponge and Pigment Yearend Operating Capacity",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite and rutile"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite and rutile",
-    ),
+    ): None,
+    ("Titanium mineral concentrates", "Mine production: Ilmenite"): ("Titanium", "Ilmenite"),
+    ("Titanium mineral concentrates", "Mine production: Ilmenite (rounded)"): ("Titanium", "Ilmenite"),
+    ("Titanium mineral concentrates", "Mine production: Ilmenite and rutile"): None,
     ("Titanium mineral concentrates", "Mine production: Ilmenite, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Ilmenite",
     ),
-    ("Titanium mineral concentrates", "Mine production: rutile"): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
-    ),
+    ("Titanium mineral concentrates", "Mine production: rutile"): ("Titanium", "Rutile"),
     ("Titanium mineral concentrates", "Mine production: rutile, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
+        "Titanium",
+        "Rutile",
     ),
     ("Titanium mineral concentrates", "World total mine production: Ilmenite (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Ilmenite",
     ),
     ("Titanium mineral concentrates", "World total mine production: Ilmenite, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Ilmenite",
     ),
-    ("Titanium mineral concentrates", "World total mine production: ilmentite and rutile (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite and rutile",
-    ),
+    ("Titanium mineral concentrates", "World total mine production: ilmentite and rutile (rounded)"): None,
     (
         "Titanium mineral concentrates",
         "World total mine production: ilmentite and rutile (rounded), titanium dioxide (TiO2) content.",
-    ): ("Titanium mineral concentrates", "Mine, ilmenite and rutile"),
+    ): None,
     ("Titanium mineral concentrates", "World total mine production: rutile (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
+        "Titanium",
+        "Rutile",
     ),
     (
         "Titanium mineral concentrates",
         "World total mine production: rutile (rounded), titanium dioxide (TiO2) content.",
-    ): ("Titanium mineral concentrates", "Mine, rutile"),
+    ): ("Titanium", "Rutile"),
     ("Tungsten", "Mine production, contained tungsten"): ("Tungsten", "Mine"),
     ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine"),
     ("Vanadium", "Mine production"): ("Vanadium", "Mine"),
@@ -392,6 +374,10 @@ FOOTNOTES = {
     "reserves|Graphite|Mine|tonnes": "Values refer to natural graphite.",
     "production|Silicon|Processing|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
     "reserves|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
+    "production|Titanium|Ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "reserves|Titanium|Ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "production|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "reserves|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
 }
 
 # Dictionary of special units.
@@ -408,12 +394,12 @@ UNITS_MAPPING = {
     "reserves|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
     "production|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
     "reserves|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
-    "production|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
-    "production|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
-    "production|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
+    # "production|Titanium|Ilmenite|tonnes": "tonnes of titanium dioxide content",
+    # "reserves|Titanium|Ilmenite|tonnes": "tonnes of titanium dioxide content",
+    # "production|Titanium|Rutile|tonnes": "tonnes of titanium dioxide content",
+    # "reserves|Titanium|Rutile|tonnes": "tonnes of titanium dioxide content",
+    # "production|Titanium|Ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
+    # "reserves|Titanium|Ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
 }
 
 

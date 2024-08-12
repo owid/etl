@@ -75,7 +75,7 @@ COMMODITY_MAPPING = {
     ("Manganese", "Total"): ("Manganese", "Mine"),
     ("Mercury", "Total"): ("Mercury", "Mine"),
     ("Metallic abrasives", "Total"): None,
-    ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
+    ("Mica (natural), scrap and flake", "Total"): None,
     ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
     ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous"),
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
@@ -100,9 +100,10 @@ COMMODITY_MAPPING = {
     ("Tantalum", "Total"): ("Tantalum", "Total"),
     ("Tellurium", "Total"): ("Tellurium", "Refinery"),
     ("Tin", "Total"): ("Tin", "Mine"),
-    ("Titanium dioxide", "Total"): ("Titanium dioxide", "Total"),
-    ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
-    ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
+    # NOTE: For titanium there is no global data.
+    ("Titanium dioxide", "Total"): None,
+    ("Titanium scrap", "Total"): None,
+    ("Titanium sponge", "Total"): None,
     # NOTE: After combing data with BGS, USGS' "Total" production is smaller than the sum of all clays production.
     #  To avoid confusion, remove this total.
     ("Total clay", "Total"): None,
