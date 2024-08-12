@@ -136,16 +136,18 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
                 if not metric.startswith("Share"):
                     description_short = f"Measured as mined production, in {unit}."
                 else:
-                    description_short = "Measured based on mined, rather than refined, production."
+                    description_short = (
+                        "Measured based on mined, rather than [refined](#dod:refined-production), production."
+                    )
             elif sub_commodity == "Refinery":
                 if not metric.startswith("Share"):
-                    description_short = f"Measured in {unit}. Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                    description_short = f"Measured in {unit}. Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
                 else:
-                    description_short = "Mineral refining takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                    description_short = "Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
             elif sub_commodity == "Smelter":
-                description_short = f"Measured in {unit}. Smelting takes raw minerals and produces metals through high-temperature processes."
+                description_short = f"Measured in {unit}. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes."
         elif metric in ["Reserves", "Share of global reserves"]:
-            description_short = "Mineral reserves are resources that have been evaluated and can be mined economically with current technologies."
+            description_short = "Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies."
         elif metric == "Unit value":
             description_short = (
                 f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
