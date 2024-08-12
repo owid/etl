@@ -14,7 +14,7 @@ definitions:
         <%- endif %>
         <%- if age == '0' %>
         at birth<%- if variant != 'estimates' %>, <% endif %>
-        <%- elif '-' in age or '+' in age %>
+        <%- elif '-' in str(age) or '+' in str(age) %>
         ages << age >><%- if variant != 'estimates' %>, <% endif %>
         <%- elif age != 'all' %>
         age << age >><%- if variant != 'estimates' %>, <% endif %>
@@ -33,7 +33,7 @@ definitions:
         <%- endif %>
         <%- if age == '0' %>
         at birth
-        <%- elif '-' in age or '+' in age %>
+        <%- elif '-' in str(age) or '+' in str(age) %>
         ages << age >>
         <%- elif age != 'all' %>
         age << age >>
