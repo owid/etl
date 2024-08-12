@@ -17,8 +17,10 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read(sheet_name="ContinentalTrends")
+    origins = [snap.metadata.origin]
     taxa = ["Vascular plants", "Mammals", "Birds", "Fishes", "Insects", "Molluscs"]
     tables = []
+    # Grabbing the columns for each taxa separately and then combining them together
     for taxon in taxa:
         col_idx = tb.columns.get_loc(taxon)
         assert isinstance(col_idx, (int)), f"Value is not integer, check spelling of {taxon}"
@@ -30,10 +32,24 @@ def run(dest_dir: str) -> None:
         tables.append(tb_selected)
         # tables = pr.concat([tables, tb_selected])
     tb = pr.concat(tables)
-    # Process data.
-    #
+    melted_tb = pr.melt(
+        tb,
+        id_vars=["Year", "taxon"],
+        value_vars=["Africa", "Asia", "Oceania", "Europe", "North America"],
+        var_name="Continent",
+        value_name="Count",
+    )
+    tb = melted_tb.pivot_table(
+        index=["Year", "Continent"],
+        columns="taxon",
+        values="Count",
+    ).reset_index()
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["Year", "taxon"])
+    tb = tb.format(["year", "continent"])
+    # Adding the origins in
+    for col in tb.columns:
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.

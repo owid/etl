@@ -18,12 +18,14 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["invasive_species"].reset_index()
 
     #
+    # Add cumulative
+    cols = tb.columns.drop(["continent", "year"]).tolist()
+    for col in cols:
+        tb[f"{col}_cumulative"] = tb[col].fillna(0).cumsum()
+
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["continent", "year"])
 
     #
     # Save outputs.
