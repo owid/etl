@@ -8,7 +8,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = ['Africa','Asia', 'Europe', 'North America', 'Oceania', 'South America', 'World']
+REGIONS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America", "World"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -58,7 +59,8 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-def countries_per_region()
+
+def countries_per_region():
     return
 
 
