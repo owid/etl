@@ -4,6 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Uncategorized
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+
 
 
 # Learn more about the available fields:
