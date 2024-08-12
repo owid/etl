@@ -119,6 +119,13 @@ steps:
   data://grapher/covid/latest/combined:
     - data://garden/covid/latest/combined
 
+  # Sweden
+  data://meadow/covid/latest/sweden_covid:
+    - snapshot://covid/latest/sweden_covid.csv
+  data://garden/covid/latest/sweden_covid:
+    - data://meadow/covid/latest/sweden_covid
+  data://grapher/covid/latest/sweden_covid:
+    - data://garden/covid/latest/sweden_covid
   ######################################
   # UK
   data-private://grapher/covid/latest/uk_covid_data:
