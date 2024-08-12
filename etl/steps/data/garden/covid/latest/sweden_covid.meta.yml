@@ -24,6 +24,6 @@ tables:
         description_short: Number of daily new deaths reported in Sweden.
 
       confirmed_deaths_avg:
-        title: Confirmed deaths (daily, 7-day rolling average)
+        title: Confirmed deaths (daily, 7-day moving average)
         unit: deaths
-        description_short: Number of daily new deaths reported in Sweden.
+        description_short: Number of daily new deaths reported in Sweden. Computed as the centered 7-day moving average.
