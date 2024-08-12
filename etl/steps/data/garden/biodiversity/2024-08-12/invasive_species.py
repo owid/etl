@@ -20,24 +20,14 @@ def run(dest_dir: str) -> None:
 
     #
     # Add cumulative sum for each species
-    tables = []
     cols = tb.columns.drop(["continent", "year"]).tolist()
-    regions = tb["continent"].unique().tolist()
     for col in cols:
-        for region in regions:
-            tb_slice = tb.loc[tb["continent"] == region].copy()  # Using .copy() to avoid SettingWithCopyWarning
+        tb[f"{col}_cumulative"] = tb.groupby("continent", observed=True)[col].transform(lambda x: x.fillna(0).cumsum())
 
-            # Compute cumulative sum and assign it to a new column
-            tb_slice.loc[:, f"{col}_cumulative"] = tb_slice[col].fillna(0).cumsum()
-
-            # Append the modified slice to the tables list
-            tables.append(tb_slice)
-    tb = pr.concat(tables, ignore_index=True)
     # Process data.
     #
     tb = tb.format(["continent", "year"])
 
-    #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
