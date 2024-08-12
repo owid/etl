@@ -225,6 +225,9 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
+    elif step_type == "explorer":
+        step = ExplorerStep(path, dependencies)
+
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
 
@@ -924,7 +927,8 @@ class GrapherStep(Step):
             gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("GrapherStep should not be used as an input")
+        """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
+        return self.data_step.checksum_input()
 
     @classmethod
     def _cleanup_ghost_resources(
@@ -958,6 +962,50 @@ class GrapherStep(Step):
         # TODO: cleanup origins that are not used by any variable
 
         return success
+
+
+class ExplorerStep(Step):
+    """
+    A step which creates a TSV file and saves it into owid-content repository.
+    """
+
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.dependencies = dependencies
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"explorer://{self.path}"
+
+    @property
+    def version(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[2]
+
+    def is_dirty(self) -> bool:
+        # Always run the explorer for now. We could save the checksum to JSON or to Explorer similarly to Data step
+        return True
+
+    @property
+    def _search_path(self) -> Path:
+        return paths.STEP_DIR / "explorer" / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.DATA_DIR / self.path.lstrip("/")
+
+    def run(self) -> None:
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            if config.DEBUG:
+                DataStep._run_py_isolated(self)  # type: ignore
+            else:
+                DataStep._run_py(self)  # type: ignore
+
+    def checksum_output(self) -> str:
+        raise NotImplementedError("GrapherStep should not be used as an input")
 
 
 @dataclass
