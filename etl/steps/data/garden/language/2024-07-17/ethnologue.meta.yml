@@ -26,7 +26,7 @@ tables:
       extinct:
         title: Number of extinct languages
         unit: languages
-        description_short: The number of languages that are no longer used and no one retains a sense of ethnic identity associated with them.
+        description_short: The number of extinct languages. Extinct languages are those that were formally used but are no longer in use and no one retains a sense of ethnic identity associated with them.
       total_per_million:
         title: Number of languages per million people
         unit: languages per million people
@@ -38,4 +38,4 @@ tables:
       extinct_per_million:
         title: Number of extinct languages per million people
         unit: languages per million people
-        description_short: The number of languages that are no longer used and no one retains a
+        description_short: The number of extinct languages per million people. Extinct languages are those that were formally used but are no longer in use and no one retains a sense of ethnic identity associated with them.
