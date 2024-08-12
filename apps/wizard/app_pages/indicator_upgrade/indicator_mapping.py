@@ -185,7 +185,12 @@ def get_params(search_form):
     )
 
     # Set states
-    st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
+    if "indicator_upgrades_ignore" not in st.session_state:
+        st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
+    else:
+        st.session_state.indicator_upgrades_ignore = {
+            i.key: st.session_state["indicator_upgrades_ignore"].get(i.key, False) for i in iu
+        }
 
     return iu, indicator_id_to_display, df_data
 
@@ -254,12 +259,6 @@ def st_show_indicator_upgrades(
             indicator_id_to_display=indicator_id_to_display,
             df_data=df_data,
         )
-
-    s = st.session_state.get("indicator_upgrades_ignore")
-    st.write(s)
-    from datetime import datetime
-
-    st.write(datetime.now())
 
     return indicator_upgrades_shown
 
@@ -456,7 +455,6 @@ class IndicatorUpgradeShow:
             value=self.iu.skip,
             on_change=_set_states_checkbox,
         )
-        print(f"{self.iu.key}: skip is {self.iu.skip}")
 
     @st.dialog("Explore changes in the new indicator", width="large")  # type: ignore
     def _st_explore_indicator_modal(self, indicator_old, indicator_new, indicator_id_to_display, df=None) -> None:
