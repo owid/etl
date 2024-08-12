@@ -155,3 +155,9 @@ steps:
     - data-private://garden/covid/latest/vaccinations
   data-private://garden/covid/latest/vaccinations:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
+  data://meadow/covid/latest/sweden:
+    - snapshot://covid/latest/sweden.csv
+  data://garden/covid/latest/sweden:
+    - data://meadow/covid/latest/sweden
+  data://grapher/covid/latest/sweden:
+    - data://garden/covid/latest/sweden
