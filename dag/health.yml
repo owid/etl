@@ -713,5 +713,6 @@ steps:
   data://garden/who/2024-08-07/monkeypox:
     - data://meadow/who/2024-08-07/monkeypox
     - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/who/2024-08-07/monkeypox:
     - data://garden/who/2024-08-07/monkeypox
