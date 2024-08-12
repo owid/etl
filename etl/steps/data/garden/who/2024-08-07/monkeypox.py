@@ -7,7 +7,6 @@ import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
