@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      zeroDay: "2020-01-01"
+      yearIsDay: true
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  sweden_covid:
+    variables:
+      confirmed_deaths:
+        title: Confirmed deaths (daily)
+        unit: deaths
+        description_short: Number of daily new deaths reported in Sweden.
+
+      confirmed_deaths_avg:
+        title: Confirmed deaths (daily, 7-day rolling average)
+        unit: deaths
+        description_short: Number of daily new deaths reported in Sweden.
