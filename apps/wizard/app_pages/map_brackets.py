@@ -766,10 +766,10 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             # Ensure the column for map brackets exists in the columns table of the explorer.
             explorer.df_columns["colorScaleNumericBins"] = None
         # Add entry to the map brackets column for this indicator.
-        if mb.defined_by_id:
-            explorer.df_columns.loc[index, "variableId"] = mb.variable_id
-        else:
+        if "catalogPath" in explorer.df_columns.columns:
             explorer.df_columns.loc[index, "catalogPath"] = mb.catalog_path
+        else:
+            explorer.df_columns.loc[index, "variableId"] = mb.variable_id
         # Note that, to assign a list to a cell in a dataframe, the "at" method needs to be used, instead of loc.
         explorer.df_columns.at[index, "colorScaleNumericBins"] = mb.chart_config["map"]["colorScale"][
             "customNumericValues"
@@ -781,16 +781,28 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             # Ensure the column for minimum brackets exists in the columns table of the explorer.
             explorer.df_columns["colorScaleNumericMinValue"] = None
         # Add entry to the minimum bracket column for this indicator.
-        if mb.defined_by_id:
-            explorer.df_columns.loc[index, ["variableId", "colorScaleNumericMinValue"]] = (
-                mb.variable_id,
-                mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
-            )
-        else:
+        if "catalogPath" in explorer.df_columns.columns:
             explorer.df_columns.loc[index, ["catalogPath", "colorScaleNumericMinValue"]] = (
                 mb.catalog_path,
                 mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
             )
+        else:
+            explorer.df_columns.loc[index, ["variableId", "colorScaleNumericMinValue"]] = (
+                mb.variable_id,
+                mb.chart_config["map"]["colorScale"]["customNumericMinValue"],
+            )
+
+    if "baseColorScheme" in mb.chart_config["map"]["colorScale"]:
+        if "colorScaleScheme" not in explorer.df_columns.columns:
+            # Ensure the column for color scheme exists in the columns table of the explorer.
+            explorer.df_columns["colorScaleScheme"] = None
+        # Add entry to the color scheme column for this indicator.
+        if "catalogPath" in explorer.df_columns.columns:
+            explorer.df_columns.loc[index, "catalogPath"] = mb.catalog_path
+        else:
+            explorer.df_columns.loc[index, "variableId"] = mb.variable_id
+        explorer.df_columns.loc[index, "colorScaleScheme"] = mb.chart_config["map"]["colorScale"]["baseColorScheme"]
+
     else:
         # If a minimum bracket is not defined in map bracketer, but it was in the original explorer, delete it from the latter.
         if ("colorScaleNumericMinValue" in explorer.df_columns.columns) and (
