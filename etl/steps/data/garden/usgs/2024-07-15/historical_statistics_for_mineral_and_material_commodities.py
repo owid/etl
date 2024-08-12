@@ -48,7 +48,9 @@ COMMODITY_MAPPING = {
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
-    ("Feldspar", "Total"): ("Feldspar", "Total"),
+    # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
+    #  nepheline syenite.", whereas in USGS current it's unclear.
+    ("Feldspar", "Total"): ("Feldspar", "Mine"),
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
     ("Fluorspar", "Total"): ("Fluorspar", "Total"),
     ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
@@ -145,6 +147,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Iron ore",
     "Lime",
     "Crushed stone",
+    "Feldspar",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).

@@ -177,7 +177,7 @@ COMMODITY_MAPPING = {
     ("Diatomite", "Moler"): ("Diatomite", "Moler"),
     ("Diatomite", "Moler bricks"): ("Diatomite", "Moler bricks"),
     ("Diatomite", "Unknown"): ("Diatomite", "Unknown"),
-    ("Feldspar", "Unknown"): ("Feldspar", "Unknown"),
+    ("Feldspar", "Unknown"): ("Feldspar", "Mine"),
     ("Ferro-alloys", "Calcium silicide"): None,
     ("Ferro-alloys", "Fe-Ti, Fe-W, Fe-Mo, Fe-V"): None,
     ("Ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,

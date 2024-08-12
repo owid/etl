@@ -122,8 +122,8 @@ COMMODITY_MAPPING = {
     ("Diatomite", "Mine production"): ("Diatomite", "Mine"),
     ("Diatomite", "Mine production, diatomite"): ("Diatomite", "Mine"),
     # NOTE: In 2022, for Feldspar and nepheline syenite, the subcommodity is "Mine production", whereas in 2023 and 2024, it is "Mine production, feldspar".
-    #  Maybe 2022 also refers to only feldspar?
-    ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar and nepheline syenite", "Mine"),
+    #  It seems 2022 also refers to only feldspar (the numbers are in good agreement).
+    ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar", "Mine"),
     ("Feldspar and nepheline syenite", "Mine production, feldspar"): ("Feldspar", "Mine"),
     ("Fluorspar", "Mine production"): ("Fluorspar", "Mine"),
     ("Fluorspar", "Mine production, fluorspar"): ("Fluorspar", "Mine"),
