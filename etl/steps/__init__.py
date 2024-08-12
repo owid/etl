@@ -665,7 +665,7 @@ class DataStep(Step):
         """
 
         # save index.json file after successful download
-        with open(self._output_dataset._index_file, "w") as ostream:
+        with open(self._dest_dir / "index.json", "w") as ostream:
             json.dump(ds_meta, ostream)
 
         log.info(f"Downloaded {self.path} from catalog")
