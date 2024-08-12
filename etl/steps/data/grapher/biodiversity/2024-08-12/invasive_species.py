@@ -14,12 +14,12 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("invasive_species")
 
     # Read table from garden dataset.
-    tb = ds_garden["invasive_species"]
-
+    tb = ds_garden["invasive_species"].reset_index()
+    tb = tb.rename(columns={"continent": "country"})
     #
     # Process data.
     #
-
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #
