@@ -13,16 +13,6 @@ dataset:
 
 
 tables:
-  languages_per_country:
-    variables:
-      n:
-        title: Number of languages
-        unit: languages
-        description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country.
-      languages_per_million:
-        title: Number of languages per million people
-        unit: languages per million people
-        description_short: The number of languages, living and extinct, indigenous and non-indigenous, that have been spoken in the country per million people.
   languages_by_status:
     variables:
       total:
