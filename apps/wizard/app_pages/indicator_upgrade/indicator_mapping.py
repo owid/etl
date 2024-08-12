@@ -358,7 +358,7 @@ class IndicatorUpgradeShow:
         self.colun_layout = [10, 100, 7, 4.5]
         self.show_explore = None
 
-    # @st.fragment
+    @st.fragment
     def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
             cols = [100, 10, 10]
