@@ -28,8 +28,14 @@ def run(dest_dir: str) -> None:
     commodity_dropdown = []
     sub_commodity_dropdown = []
     share_of_global = []
+    # Given that USGS current data often has very few data points, we'll specify the minimum year in each view.
+    # This way, if there are too few data points, we'll use the latest year as the minimum year, and that way the view
+    # will become a bar chart (instead of a line chart with just a few points).
+    min_year = []
     for column in tb.drop(columns=["country", "year"]).columns:
-        if tb[column].notnull().any():
+        # Select the
+        years = tb["year"][tb[column].notnull()]
+        if len(years) > 0:
             metric, commodity, sub_commodity, unit = tb[column].metadata.title.split("|")
             if metric.startswith(SHARE_OF_GLOBAL_PREFIX):
                 metric = metric.replace(SHARE_OF_GLOBAL_PREFIX, "")
@@ -50,12 +56,20 @@ def run(dest_dir: str) -> None:
             commodity_dropdown.append(commodity)
             sub_commodity_dropdown.append(sub_commodity)
             share_of_global.append(is_share_of_global)
+
+            if (years.max() - years.min()) < 5:
+                # If there are only a few data points, show only the latest year (as a bar chart).
+                min_year.append(years.max())
+            else:
+                # Otherwise, show all years (as a line chart).
+                min_year.append(years.min())
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Mineral Dropdown"] = commodity_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["Type Dropdown"] = sub_commodity_dropdown
     df_graphers["Share of global Checkbox"] = share_of_global
+    df_graphers["minTime"] = min_year
 
     # NOTE: Currently, most columns have "tonnes" as unit, but often there a other units like "tonnes of gross weight".
     # I think that, ideally, all units should be "tonnes" and we should add a footnote to clarify the unit where needed.
