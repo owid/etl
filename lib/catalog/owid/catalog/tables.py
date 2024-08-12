@@ -5,6 +5,7 @@
 import json
 import types
 from collections import defaultdict
+from functools import wraps
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
@@ -403,6 +404,9 @@ class Table(pd.DataFrame):
                     value.name = key
                 self._fields[key] = value.metadata
                 value.update_log(operation="rename", variable=key)
+            # assign Table with a single column should work
+            elif isinstance(value, Table) and value.shape[1] == 1:
+                self._fields[key] = value.iloc[:, 0].metadata
             else:
                 self._fields[key] = VariableMeta()
 
@@ -1118,6 +1122,20 @@ class TableGroupBy:
                 )
 
         return tb
+
+    def apply(self, func: Callable[..., Any], *args, include_groups=False, **kwargs) -> "Table":
+        mem = {}
+
+        @wraps(func)
+        def f(g):
+            tb = func(g, *args, **kwargs)
+            # remember one table to use its metadata
+            if not mem:
+                mem["table"] = tb
+            return tb
+
+        df = self.groupby.apply(f, *args, include_groups=include_groups, **kwargs)
+        return _create_table(df, mem["table"].metadata, mem["table"]._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
