@@ -33,7 +33,6 @@ def run(dest_dir: str) -> None:
     tb_country_codes = geo.harmonize_countries(
         df=tb_country_codes,
         countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
     )
     tb_country_codes = add_region_to_table(ds_regions, tb_country_codes)
 
