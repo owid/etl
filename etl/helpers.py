@@ -141,6 +141,30 @@ def _validate_ordinal_variables(tab: Table, col: str) -> None:
         ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
 
 
+def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path]) -> catalog.Dataset:
+    """Set channel, namespace, version and short_name from the destination directory."""
+    pattern = (
+        r"\/"
+        + r"\/".join(
+            [
+                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
+                "(?P<namespace>.*?)",
+                r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
+                "(?P<short_name>.*?)",
+            ]
+        )
+        + "$"
+    )
+
+    match = re.search(pattern, str(dest_dir))
+    assert match, f"Could not parse path {str(dest_dir)}"
+
+    for k, v in match.groupdict().items():
+        setattr(ds.metadata, k, v)
+
+    return ds
+
+
 def create_dataset(
     dest_dir: Union[str, Path],
     tables: Iterable[catalog.Table],
@@ -176,6 +200,7 @@ def create_dataset(
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
         ds.save()
     """
+    from etl import grapher_helpers as gh
     from etl.steps.data.converters import convert_snapshot_metadata
 
     if default_metadata is None:
@@ -205,6 +230,8 @@ def create_dataset(
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
+    ds = _set_metadata_from_dest_dir(ds, dest_dir)
+
     # add tables to dataset
     used_short_names = set()
     for table in tables:
@@ -212,36 +239,23 @@ def create_dataset(
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
+
+        if ds.metadata.channel == "grapher":
+            # if a table contains `date` instead of `year`, adapt it for grapher
+            if "date" in table.all_columns and "year" not in table.all_columns:
+                if "date" in table.index.names:
+                    table = table.reset_index("date")
+                    table = gh.adapt_table_with_dates_to_grapher(table)
+                    table = table.set_index("year", append=True)
+                else:
+                    table = gh.adapt_table_with_dates_to_grapher(table)
+
         used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats, repack=repack)
-
-    # set metadata from dest_dir
-    pattern = (
-        r"\/"
-        + r"\/".join(
-            [
-                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
-                "(?P<namespace>.*?)",
-                r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
-                "(?P<short_name>.*?)",
-            ]
-        )
-        + "$"
-    )
-
-    match = re.search(pattern, str(dest_dir))
-    assert match, f"Could not parse path {str(dest_dir)}"
-
-    for k, v in match.groupdict().items():
-        setattr(ds.metadata, k, v)
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
         ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
-
-        # check that we are not using metadata inconsistent with path
-        for k, v in match.groupdict().items():
-            assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
     # another override YAML file with higher priority
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")

@@ -2,22 +2,22 @@
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
   origin:
-    # Data product / Snapshot
-    title: Global Health Observatory
+    producer: World Health Organization
+    title: Monkeypox
     description: |-
       Data on mpox is collated by the World Health Organization since 2022, and is updated as new information is reported.
 
       We fetch the latest version of the WHO data every hour, keep records up to the previous day, apply some transformations (7-day averages, per-capita adjustments, etc.), and produce a transformed version of the data, available on GitHub. This transformed data powers our Mpox Data Explorer on Our World in Data.
-    date_published: "2024-08-07"
 
     # Citation
-    producer: World Health Organization
     citation_full: |-
       Global Health Estimates 2021: Deaths by Cause, Age, Sex, by Country and by Region, 2000-2021. Geneva, World Health Organization; 2024.
+    attribution_short: WHO
 
     # Files
     url_main: https://extranet.who.int/publicemergency/
     date_accessed: 2024-08-07
+    date_published: "2024-08-07"
 
     # License
     license:
