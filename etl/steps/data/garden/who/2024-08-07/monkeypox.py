@@ -8,6 +8,7 @@ from owid.catalog import Table
 from shared import list_countries_in_region
 
 from etl.data_helpers import geo
+from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -58,11 +59,12 @@ def run(dest_dir: str) -> None:
 
 
 def clean_columns(tb: Table) -> Table:
-    return tb.loc[:, ["country", "date", "total_conf_cases", "total_conf_deaths"]].rename(
+    return tb.loc[:, ["country", "iso3", "date", "total_conf_cases", "total_conf_deaths"]].rename(
         columns={
             "date": "date",
             "total_conf_cases": "total_cases",
             "total_conf_deaths": "total_deaths",
+            "iso3": "iso_code",
         }
     )
 
@@ -91,7 +93,9 @@ def explode_dates(tb: Table) -> Table:
             for country in tb.country.unique()
         ]
     )
+    country_to_iso = tb[["country", "iso_code"]].drop_duplicates().set_index("country").iso_code
     tb = pr.merge(tb, Table(tb_range), on=["country", "date"], validate="one_to_one", how="right")
+    tb["iso_code"] = tb.country.map(country_to_iso)
     tb["report"] = tb.total_cases.notnull() | tb.total_deaths.notnull()
     return tb
 
@@ -137,15 +141,19 @@ def add_regions(tb: Table) -> Table:
 
 
 def add_population_and_countries(tb: Table) -> Table:
-    SOURCE_POPULATION = "https://github.com/owid/covid-19-data/raw/master/scripts/input/un/population_latest.csv"
-    pop = pd.read_csv(SOURCE_POPULATION, usecols=["entity", "population", "iso_code"]).rename(
-        columns={"entity": "country"}
-    )
-    missing_locs = set(tb.country) - set(pop.country)
-    if len(missing_locs) > 0:
-        raise Exception(f"Missing country(s) in population file: {missing_locs}")
-    assert tb.m.short_name
-    tb = pr.merge(tb, Table(pop), how="left", validate="many_to_one", on="country")
+    ds_population = paths.load_dataset("population")
+
+    # Use population from 2022. Using population per year results in charts with
+    # cumulative cases per million showing jumps around new year.
+    pop_2022 = ds_population["population"].xs(2022, level="year")["population"]
+    tb["population"] = tb["country"].map(pop_2022)
+
+    """match population to year
+    tb["year"] = pd.to_datetime(tb.date).dt.year
+    tb = add_population_to_table(tb, ds_population)
+    tb = tb.drop(columns=["year"])
+    """
+
     return tb
 
 
