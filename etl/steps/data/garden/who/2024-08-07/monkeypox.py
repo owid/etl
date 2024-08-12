@@ -5,14 +5,21 @@ import datetime
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from shared import list_countries_in_region
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Asia",
+    "Africa",
+    "Oceania",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -115,16 +122,15 @@ def add_world(tb: Table) -> Table:
 
 
 def add_regions(tb: Table) -> Table:
+    ds_regions = paths.load_dataset("regions")
+
     # Add region for each country
-    for region in [
-        "North America",
-        "South America",
-        "Europe",
-        "Asia",
-        "Africa",
-        "Oceania",
-    ]:
-        tb.loc[tb.country.isin(list_countries_in_region(region=region)), "region"] = region
+    for region in REGIONS_TO_ADD:
+        countries_in_region = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+        )
+        tb.loc[tb.country.isin(countries_in_region), "region"] = region
 
     # Calculate regional aggregates
     regions = (
