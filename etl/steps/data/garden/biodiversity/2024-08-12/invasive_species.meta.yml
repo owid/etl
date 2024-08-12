@@ -4,55 +4,45 @@ definitions:
     presentation:
       topic_tags:
         - Biodiversity
+    unit: species
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
 
 tables:
   invasive_species:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      birds:
+        title: Established alien bird species
+        description_short: The year in which an alien bird species is recorded as established outside of its native range for the first time.
+      fishes:
+        title: Established alien fish species
+        description_short: The year in which an alien fish species is recorded as established outside of its native range for the first time.
+      insects:
+        title: Established alien insect species
+        description_short: The year in which an alien insect species is recorded as established outside of its native range for the first time.
+      mammals:
+        title: Established alien mammal species
+        description_short: The year in which an alien mammal species is recorded as established outside of its native range for the first time.
+      molluscs:
+        title: Established alien mollusc species
+        description_short: The year in which an alien mollusc species is recorded as established outside of its native range for the first time.
+      vascular_plants:
+        title: Established alien vascular plants
+        description_short: The year in which an alien vascular plant species is recorded as established outside of its native range for the first time.
+      birds_cumulative:
+        title: Cumulative established alien bird species
+      fishes_cumulative:
+        title: Cumulative established alien fish species
+      insects_cumulative:
+        title: Cumulative established alien insect species
+      mammals_cumulative:
+        title: Cumulative established alien mammal species
+      molluscs_cumulative:
+        title: Cumulative established alien mollusc species
+      vascular_plants_cumulative:
+        title: Cumulative established alien vascular plant species
