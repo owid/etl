@@ -14,8 +14,10 @@ definitions:
         <%- endif %>
         <%- if age == '0' %>
         at birth<%- if variant != 'estimates' %>, <% endif %>
+        <%- elif (('-' in age) | ('+' in age)) %>
+        ages << age >><%- if variant != 'estimates' %>, <% endif %>
         <%- elif age != 'all' %>
-        aged << age >><%- if variant != 'estimates' %>, <% endif %>
+        age << age >><%- if variant != 'estimates' %>, <% endif %>
         <%- endif %>
         <%- if variant != 'estimates' %>
         << variant >> projection
@@ -25,14 +27,16 @@ definitions:
         <% if not (sex == 'all' and age == 'all') %>
         This only includes
         <%- if sex != 'all' %>
-          << sex >>s
+        << sex >>s
         <%- elif sex != 'all' %>
-          individuals
+        individuals
         <%- endif %>
         <%- if age == '0' %>
-          at birth
+        at birth
+        <%- elif (('-' in age) | ('+' in age)) %>
+        ages << age >>
         <%- elif age != 'all' %>
-          aged << age >>
+        age << age >>
         <%- endif %>.
         <% endif %>
 
@@ -42,10 +46,10 @@ definitions:
         <% if not (sex == 'all' and age == 'all') %>
         This only includes
         <%- if sex != 'all' %>
-          << sex >> babies<%- if variant != 'estimates' %>, and <% endif %>
+        << sex >> babies<%- if variant != 'estimates' %>, and <% endif %>
         <%- endif %>
         <%- if age != 'all' %>
-          mothers aged << age >>
+        mothers aged << age >>
         <%- endif %>.
         <% endif %>
 
@@ -215,7 +219,7 @@ tables:
           Number of deaths recorded annually, based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
         presentation:
           title_public: |-
-            Death rate, {definitions.global.dimensions.title}
+            Number of deaths, {definitions.global.dimensions.title}
 
       death_rate:
         title: Death rate
@@ -362,11 +366,11 @@ tables:
           <% set individuals = sex + ' population'%>
           <% endif %>
           <% if age == "total" %>
-          The ratio of the young << individuals >> (under age 15) and elderly << individuals >> (aged 65 and over) to the working-age population (aged 15 to 64).
+          The ratio of the young << individuals >> (under age 15) and elderly << individuals >> (ages 65 and over) to the working-age population (ages 15 to 64).
           <% elif age == "youth" %>
-          The ratio of the young << individuals >> (under age 15) to the working-age << individuals >> (aged 15 to 64).
+          The ratio of the young << individuals >> (under age 15) to the working-age << individuals >> (ages 15 to 64).
           <% else %>
-          The ratio of the elderly << individuals >> (aged 65 and over) to the working-age << individuals >> (aged 15 to 64).
+          The ratio of the elderly << individuals >> (ages 65 and over) to the working-age << individuals >> (ages 15 to 64).
           <% endif %>
         presentation:
           title_public: |-
