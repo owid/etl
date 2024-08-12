@@ -132,11 +132,6 @@ steps:
     - data-private://garden/covid/latest/uk_covid_data
   data-private://garden/covid/latest/uk_covid_data:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
-  # Sweden
-  data-private://grapher/covid/latest/sweden:
-    - data-private://garden/covid/latest/sweden
-  data-private://garden/covid/latest/sweden:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv
   # ECDC
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc
