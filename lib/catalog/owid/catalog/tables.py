@@ -1123,7 +1123,7 @@ class TableGroupBy:
 
         return tb
 
-    def apply(self, func: Callable[..., Any], *args, include_groups=False, **kwargs) -> "Table":
+    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> "Table":
         mem = {}
 
         @wraps(func)
@@ -1134,7 +1134,7 @@ class TableGroupBy:
                 mem["table"] = tb
             return tb
 
-        df = self.groupby.apply(f, *args, include_groups=include_groups, **kwargs)
+        df = self.groupby.apply(f, *args, include_groups=include_groups)
         return _create_table(df, mem["table"].metadata, mem["table"]._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
