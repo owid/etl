@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
         col_idx = tb.columns.get_loc(taxon)
         assert isinstance(col_idx, (int)), f"Value is not integer, check spelling of {taxon}"
         # Select the 0th column, the selected taxon, and the next 6 columns
-        tb_selected = tb.iloc[:, [0] + list(range(col_idx, col_idx + 5))]
+        tb_selected = tb.iloc[:, [0] + list(range(col_idx, col_idx + 6))]
         tb_selected.columns = tb_selected.iloc[0]
         tb_selected = tb_selected.drop(tb_selected.index[0]).reset_index(drop=True)
         tb_selected["taxon"] = taxon
