@@ -348,7 +348,7 @@ class IndicatorUpgradeShow:
         self.colun_layout = [10, 100, 7, 4.5]
         self.show_explore = None
 
-    @st.experimental_fragment
+    @st.fragment
     def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
             cols = [100, 10, 10]
@@ -447,7 +447,7 @@ class IndicatorUpgradeShow:
             on_change=_set_states_checkbox,
         )
 
-    @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
+    @st.dialog("Explore changes in the new indicator", width="large")  # type: ignore
     def _st_explore_indicator_modal(self, indicator_old, indicator_new, indicator_id_to_display, df=None) -> None:
         """Same as st_explore_indicator but framed in a dialog.
 
