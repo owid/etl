@@ -21,7 +21,7 @@ meta:
     # License
     license:
       name: © 2024 SIL International
-      url: https://www.ethnologue.com/codes/
+      url: https://www.ethnologue.com/codes/#terms-of-use
 
 outs:
   - md5: a2a8ffed0543c9a7a614bef70312d68c

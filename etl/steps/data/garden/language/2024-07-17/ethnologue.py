@@ -10,6 +10,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 REGIONS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
+YEAR_OF_UPDATE = 2024
 
 
 def run(dest_dir: str) -> None:
@@ -24,26 +25,27 @@ def run(dest_dir: str) -> None:
     tb_country_codes = ds_meadow["country_codes"].reset_index()
     tb_language_codes = ds_meadow["language_codes"].reset_index()
     tb_language_index = ds_meadow["language_index"].reset_index()
-
+    # Store the origins to add back to indicators later
     origins = tb_country_codes["country"].metadata.origins
     #
+    # Drop the area column as this lists continents according to SIL
     tb_country_codes = tb_country_codes.drop(columns="area")
-    # Process data.
-    #
     tb_country_codes = geo.harmonize_countries(
         df=tb_country_codes,
         countries_file=paths.country_mapping_path,
     )
+    # Add OWID continents
     tb_country_codes = add_region_to_table(ds_regions, tb_country_codes)
 
-    # countries by status living and extinct
+    # The number of living and extinct languages per entity
     tb_lang_by_status = extinct_and_living_languages_per_country(tb_language_index, tb_language_codes, tb_country_codes)
-    tb_lang_by_status["year"] = 2024
+    tb_lang_by_status["year"] = YEAR_OF_UPDATE
+    # The total number of languages
     tb_lang_by_status["total"] = tb_lang_by_status["living"] + tb_lang_by_status["extinct"]
+    # Calculate languages per million
     tb_lang_by_status = geo.add_population_to_table(tb_lang_by_status, ds_population)
-    cols = ["total", "living", "extinct"]
-    for col in cols:
-        tb_lang_by_status[f"{col}_per_million"] = tb_lang_by_status[col] / tb_lang_by_status["population"] * 1_000_000
+    tb_lang_by_status["living_per_million"] = tb_lang_by_status["living"] / tb_lang_by_status["population"] * 1_000_000
+    # Tidy up and add origins back in
     tb_lang_by_status = tb_lang_by_status.format(["country", "year"], short_name="languages_by_status")
     tb_lang_by_status = tb_lang_by_status.drop(columns=["population"])
     for col in tb_lang_by_status.columns:
@@ -88,6 +90,10 @@ def languages_per_region(tb_language_index: Table, tb_language_codes: Table, tb_
 def extinct_and_living_languages_per_country(
     tb_language_index: Table, tb_language_codes: Table, tb_country_codes: Table
 ) -> Table:
+    """
+    This function calculates the number of both extinct and living languages in each country, region and globally.
+    Regions must be calculated separately from countries to ensure a language isn't counted multiple times for each country it exists in.
+    """
     tb_extinct_living_languages = (
         tb_language_index.merge(tb_language_codes, on="langid", how="outer", suffixes=("", "_lang"))
         .drop(columns=["nametype", "name", "name_lang"])
@@ -100,9 +106,10 @@ def extinct_and_living_languages_per_country(
         .merge(tb_country_codes, on="countryid", how="left")
         .drop(columns=["countryid", "region"])
     )
-
+    # Calculating the number of extinct and living languages per region
     tb_region = languages_per_region(tb_language_index, tb_language_codes, tb_country_codes)
 
+    # Calculate the number of living and extinct languages globally
     tb_global = tb_language_codes.groupby(["langstatus"], observed=True)["langid"].nunique().reset_index()
     tb_global["country"] = "World"
     tb_global = (
