@@ -106,7 +106,7 @@ COMMODITY_MAPPING = {
     ("Cement", "Portland cement"): None,
     ("Cement  clinker", "Cement, clinker"): None,
     ("Cement, finished", "Cement, finished"): None,
-    ("Chromium", "Metal"): ("Chromium", "Metal"),
+    ("Chromium", "Metal"): ("Chromium", "Refinery"),
     ("Chromium", "Ores & concentrates"): None,
     ("Chromium ores and concentrates", "Unknown"): None,
     ("Coal", "Anthracite"): ("Coal", "Anthracite"),

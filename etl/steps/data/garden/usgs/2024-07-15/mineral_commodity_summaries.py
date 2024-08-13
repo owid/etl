@@ -378,6 +378,7 @@ FOOTNOTES = {
     "reserves|Titanium|Ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "reserves|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    # "reserves|Chromium|Mine|tonnes": "Values are reported as tonnes of gross weight.",
 }
 
 # Dictionary of special units.
@@ -386,7 +387,7 @@ UNITS_MAPPING = {
     # "production|Alumina|Refinery|tonnes": "tonnes of calcined equivalent weights",
     # "production|Bauxite|Mine|tonnes": "tonnes of dry content",
     # "reserves|Bauxite|Mine|tonnes": "tonnes of dry content",
-    # "production|Chromium|Mine|tonnes": "tonnes of gross weight",
+    "production|Chromium|Mine|tonnes": "tonnes of gross weight",
     "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
     "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",

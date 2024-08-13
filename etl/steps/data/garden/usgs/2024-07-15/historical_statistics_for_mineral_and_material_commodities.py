@@ -39,7 +39,7 @@ COMMODITY_MAPPING = {
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Processing"),
     ("Cesium", "Total"): ("Cesium", "Mine"),
-    ("Chromium", "Total"): ("Chromium", "Mine, contained chromium"),
+    ("Chromium", "Total"): ("Chromium", "Mine"),
     ("Cobalt", "Total"): ("Cobalt", "Total"),
     ("Construction sand and gravel", "Total"): ("Sand and gravel", "Construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
@@ -159,6 +159,7 @@ FOOTNOTES_PRODUCTION = {
     "production|Clays|Bentonite|tonnes": "Values are reported as gross weight.",
     "production|Clays|Ball clay|tonnes": "Values are reported as gross weight.",
     "production|Clays|Fire clay|tonnes": "Values are reported as gross weight.",
+    "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
 }
 FOOTNOTES_UNIT_VALUE = {}
 
