@@ -412,7 +412,7 @@ COMMODITY_MAPPING = {
     ("Potash", "Carbonate"): None,
     # NOTE: Only imports/exports old data.
     ("Potash", "Caustic potash"): None,
-    # NOTE: Only imports/exports old data.
+    # NOTE: Only imports/exports old data.
     ("Potash", "Chlorate"): None,
     ("Potash", "Chloride"): ("Potash", "Chloride"),
     # NOTE: Only imports old data.
@@ -421,7 +421,7 @@ COMMODITY_MAPPING = {
     ("Potash", "Fertiliser salts"): None,
     # NOTE: Only production old data.
     ("Potash", "Kainite, sylvinite"): None,
-    # NOTE: Only data prior to 2002.
+    # NOTE: Only data prior to 2002.
     ("Potash", "Nitrate"): None,
     # NOTE: Only production data prior to 1974.
     ("Potash", "Other fertiliser salts"): None,
@@ -467,36 +467,21 @@ COMMODITY_MAPPING = {
     ("Salt", "Unknown"): None,
     ("Selenium, refined", "Unknown"): ("Selenium", "Refinery"),
     ("Sillimanite minerals", "Andalusite"): ("Sillimanite minerals", "Andalusite"),
-    ("Sillimanite minerals", "Andalusite & kyanite"): ("Sillimanite minerals", "Andalusite & kyanite"),
+    ("Sillimanite minerals", "Andalusite & kyanite"): None,
     ("Sillimanite minerals", "Kyanite"): ("Sillimanite minerals", "Kyanite"),
-    ("Sillimanite minerals", "Kyanite & related minerals"): ("Sillimanite minerals", "Kyanite & related minerals"),
+    ("Sillimanite minerals", "Kyanite & related minerals"): None,
     ("Sillimanite minerals", "Mullite"): ("Sillimanite minerals", "Mullite"),
-    ("Sillimanite minerals", "Mullite, chamotte, dinas earth"): (
-        "Sillimanite minerals",
-        "Mullite, chamotte, dinas earth",
-    ),
-    ("Sillimanite minerals", "Other"): ("Sillimanite minerals", "Other"),
+    ("Sillimanite minerals", "Mullite, chamotte, dinas earth"): None,
+    ("Sillimanite minerals", "Other"): None,
     ("Sillimanite minerals", "Sillimanite"): ("Sillimanite minerals", "Sillimanite"),
     ("Sillimanite minerals", "Sillimanite minerals"): ("Sillimanite minerals", "Sillimanite minerals"),
-    ("Sillimanite minerals", "Sillimanite minerals & dinas earth"): (
-        "Sillimanite minerals",
-        "Sillimanite minerals & dinas earth",
-    ),
-    ("Sillimanite minerals", "Sillimanite minerals, calcined"): (
-        "Sillimanite minerals",
-        "Sillimanite minerals, calcined",
-    ),
-    ("Sillimanite minerals", "Sillimanite minerals, crude"): ("Sillimanite minerals", "Sillimanite minerals, crude"),
-    ("Sillimanite minerals", "Sillimanite minerals, crude & calcined"): (
-        "Sillimanite minerals",
-        "Sillimanite minerals, crude & calcined",
-    ),
-    ("Sillimanite minerals", "Sillimanite minerals, other"): ("Sillimanite minerals", "Sillimanite minerals, other"),
-    ("Sillimanite minerals", "Sillimanite mins, chamotte, dinas earth"): (
-        "Sillimanite minerals",
-        "Sillimanite mins, chamotte, dinas earth",
-    ),
-    ("Sillimanite minerals", "Unknown"): ("Sillimanite minerals", "Unknown"),
+    ("Sillimanite minerals", "Sillimanite minerals & dinas earth"): None,
+    ("Sillimanite minerals", "Sillimanite minerals, calcined"): None,
+    ("Sillimanite minerals", "Sillimanite minerals, crude"): None,
+    ("Sillimanite minerals", "Sillimanite minerals, crude & calcined"): None,
+    ("Sillimanite minerals", "Sillimanite minerals, other"): None,
+    ("Sillimanite minerals", "Sillimanite mins, chamotte, dinas earth"): None,
+    ("Sillimanite minerals", "Unknown"): None,
     ("Silver", "Alloys"): None,
     ("Silver", "Metal"): ("Silver", "Metal"),
     ("Silver", "Metal, refined"): None,
