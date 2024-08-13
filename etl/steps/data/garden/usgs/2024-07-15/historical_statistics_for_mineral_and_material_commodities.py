@@ -63,7 +63,7 @@ COMMODITY_MAPPING = {
     #  nepheline syenite.", whereas in USGS current it's unclear.
     ("Feldspar", "Total"): ("Feldspar", "Mine"),
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
-    ("Fluorspar", "Total"): ("Fluorspar", "Total"),
+    ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
     ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
     ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Total"),
@@ -158,6 +158,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Cobalt",
     "Diatomite",
     "Dimension stone",
+    "Fluorspar",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).

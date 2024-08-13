@@ -211,7 +211,7 @@ COMMODITY_MAPPING = {
     ("Ferro-alloys", "Silicon metal"): None,
     ("Ferro-alloys", "Silicon pig iron"): None,
     ("Ferro-alloys", "Spiegeleisen"): None,
-    ("Fluorspar", "Unknown"): ("Fluorspar", "Unknown"),
+    ("Fluorspar", "Unknown"): ("Fluorspar", "Mine"),
     ("Gallium, primary", "Unknown"): ("Gallium", "Primary"),
     ("Gemstones", "Unknown"): ("Gemstones", "Unknown"),
     ("Germanium metal", "Unknown"): ("Germanium", "Metal"),
