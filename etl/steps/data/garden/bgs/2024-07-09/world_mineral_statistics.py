@@ -66,7 +66,8 @@ COMMODITY_MAPPING = {
     ("Asbestos, unmanufactured", "Unmanufactured, waste"): None,
     ("Asbestos, unmanufactured", "Waste"): None,
     ("Barytes", "Barium minerals"): ("Barite", "Barium minerals"),
-    ("Barytes", "Barytes"): ("Barite", "Unknown"),
+    # NOTE: Only imports/exports data prior to 2009.
+    ("Barytes", "Barytes"): None,
     ("Barytes", "Unknown"): ("Barite", "Mine"),
     ("Barytes", "Witherite"): ("Barite", "Witherite"),
     # NOTE: The following is used for production of bauxite.
@@ -95,7 +96,7 @@ COMMODITY_MAPPING = {
     ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine"),
     ("Borates", "Unknown"): None,
     ("Bromine", "Compounds"): ("Bromine", "Compounds"),
-    ("Bromine", "Unknown"): ("Bromine", "Unknown"),
+    ("Bromine", "Unknown"): ("Bromine", "Unspecified"),
     ("Cadmium", "Metal"): ("Cadmium", "Refinery"),
     ("Cadmium", "Other"): None,
     ("Cadmium", "Oxide"): None,
@@ -361,8 +362,8 @@ COMMODITY_MAPPING = {
     #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
     ("Natural gas", "Unknown"): None,
     ("Nepheline syenite", "Nepheline concentrates"): ("Nepheline syenite", "Nepheline concentrates"),
-    ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Nepheline-syenite"),
-    ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Unknown"),
+    ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Mine"),
+    ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Mine"),
     ("Nickel", "Mattes, sinters etc"): None,
     ("Nickel", "Ores & concentrates"): None,
     ("Nickel", "Ores, concentrates & scrap"): None,
