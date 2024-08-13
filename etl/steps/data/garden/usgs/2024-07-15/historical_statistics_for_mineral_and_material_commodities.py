@@ -64,7 +64,7 @@ COMMODITY_MAPPING = {
     ("Feldspar", "Total"): ("Feldspar", "Mine"),
     ("Fire clay", "Total"): ("Clays", "Fire clay"),
     ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
-    ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
+    ("Fuller's earth", "Total"): ("Clays", "Fuller's earth"),
     ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Total"),
     ("Gold", "Total"): ("Gold", "Mine"),
@@ -159,6 +159,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Diatomite",
     "Dimension stone",
     "Fluorspar",
+    "Fuller's earth",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
