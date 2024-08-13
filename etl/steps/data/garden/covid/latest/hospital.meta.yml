@@ -28,7 +28,7 @@ tables:
     variables:
 
       daily_occupancy_hosp:
-        title: Daily ICU occupancy, per million
+        title: Daily hospital occupancy
         description_short: Number of COVID-19 patients in hospital on a given day
         unit: 'patients'
       daily_occupancy_hosp_per_1m:
@@ -59,7 +59,7 @@ tables:
           - *icu
         unit: 'patients in ICU'
       daily_occupancy_icu_per_1m:
-        title: Daily hospital occupancy, per million
+        title: Daily ICU occupancy per million
         description_short: Number of COVID-19 patients in ICU on a given day, per million people.
         description_key:
           - *icu
