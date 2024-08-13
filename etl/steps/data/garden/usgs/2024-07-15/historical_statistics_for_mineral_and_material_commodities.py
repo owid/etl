@@ -70,7 +70,7 @@ COMMODITY_MAPPING = {
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
     ("Gypsum", "Total"): ("Gypsum", "Mine"),
-    ("Helium", "Total"): ("Helium", "Total"),
+    ("Helium", "Total"): ("Helium", "Mine"),
     ("Indium", "Total"): ("Indium", "Refinery"),
     # NOTE: Industrial diamond production includes natural and synthetic diamonds.
     #  But in USGS current data, industrial diamond production includes only natural diamond.

@@ -231,7 +231,7 @@ COMMODITY_MAPPING = {
     ("Gypsum and plaster", "Crude & calcined"): None,
     ("Gypsum and plaster", "Ground & calcined"): None,
     ("Gypsum and plaster", "Unknown"): ("Gypsum", "Mine"),
-    ("Helium", "Helium"): ("Helium", "Helium"),
+    ("Helium", "Helium"): ("Helium", "Mine"),
     ("Indium, refinery", "Unknown"): ("Indium", "Refinery"),
     ("Iodine", "Unknown"): ("Iodine", "Unknown"),
     ("Iron ore", "Burnt pyrites"): None,
