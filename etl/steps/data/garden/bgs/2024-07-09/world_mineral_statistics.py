@@ -379,7 +379,7 @@ COMMODITY_MAPPING = {
     ("Nickel, mine", "Unknown"): ("Nickel", "Mine"),
     ("Nickel, smelter/refinery", "Sulfate"): None,
     ("Nickel, smelter/refinery", "Unknown"): ("Nickel", "Smelter or refinery"),
-    ("Perlite", "Unknown"): ("Perlite", "Unknown"),
+    ("Perlite", "Unknown"): ("Perlite", "Mine"),
     ("Petroleum, crude", "Unknown"): ("Petroleum", "Crude"),
     ("Phosphate rock", "Aluminium phosphate"): ("Phosphate rock", "Aluminum phosphate"),
     ("Phosphate rock", "Apatite"): ("Phosphate rock", "Apatite"),

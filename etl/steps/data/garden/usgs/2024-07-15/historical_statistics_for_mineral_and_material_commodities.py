@@ -97,8 +97,8 @@ COMMODITY_MAPPING = {
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
-    ("Peat", "Total"): ("Peat", "Total"),
-    ("Perlite", "Total"): ("Perlite", "Total"),
+    ("Peat", "Total"): ("Peat", "Mine"),
+    ("Perlite", "Total"): ("Perlite", "Mine"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
     ("Pig Iron", "Total"): ("Iron", "Pig iron"),
     ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
@@ -165,6 +165,8 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Kaolin",
     "Mica (natural), sheet",
     "Mica (natural), scrap and flake",
+    "Peat",
+    "Perlite",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
