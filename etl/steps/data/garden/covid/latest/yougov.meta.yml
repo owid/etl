@@ -126,7 +126,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
 
   title: COVID-19, Behaviour Tracker Data Hub
