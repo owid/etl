@@ -93,7 +93,7 @@ COMMODITY_MAPPING = {
     ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous"),
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
-    ("Niobium", "Total"): ("Niobium", "Total"),
+    ("Niobium", "Total"): ("Niobium", "Mine"),
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
@@ -112,7 +112,7 @@ COMMODITY_MAPPING = {
     ("Strontium", "Total"): ("Strontium", "Total"),
     ("Sulfur", "Total"): ("Sulfur", "Total"),
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
-    ("Tantalum", "Total"): ("Tantalum", "Total"),
+    ("Tantalum", "Total"): ("Tantalum", "Mine"),
     ("Tellurium", "Total"): ("Tellurium", "Refinery"),
     ("Tin", "Total"): ("Tin", "Mine"),
     # NOTE: For titanium there is no global data.
