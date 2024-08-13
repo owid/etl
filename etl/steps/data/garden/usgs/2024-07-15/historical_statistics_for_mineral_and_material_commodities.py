@@ -101,7 +101,7 @@ COMMODITY_MAPPING = {
     ("Perlite", "Total"): ("Perlite", "Mine"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
     ("Pig Iron", "Total"): ("Iron", "Pig iron"),
-    ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
+    ("Pumice and Pumicite", "Total"): ("Pumice and pumicite", "Mine"),
     ("Salt", "Total"): ("Salt", "Total"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Processing"),
@@ -168,6 +168,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Peat",
     "Perlite",
     "Phosphate rock",
+    "Pumice and Pumicite",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
