@@ -620,11 +620,13 @@ COMMODITY_MAPPING = {
     ("Zinc", "Unwrought alloys"): None,
     ("Zinc, mine", "Unknown"): ("Zinc", "Mine"),
     ("Zinc, slab", "Unknown"): ("Zinc", "Refinery"),
-    ("Zirconium", "Concentrates"): ("Zirconium", "Concentrates"),
-    ("Zirconium", "Metal"): ("Zirconium", "Metal"),
-    ("Zirconium", "Unknown"): ("Zirconium", "Unknown"),
-    ("Zirconium", "Zirconium sand"): ("Zirconium", "Zirconium sand"),
-    ("Zirconium minerals", "Unknown"): ("Zirconium minerals", "Unknown"),
+    ("Zirconium", "Concentrates"): ("Zirconium and hafnium", "Concentrates"),
+    ("Zirconium", "Metal"): ("Zirconium and hafnium", "Metal"),
+    # NOTE: Only imports/exports old data.
+    ("Zirconium", "Unknown"): None,
+    # NOTE: Only imports/exports data prior to 2003.
+    ("Zirconium", "Zirconium sand"): None,
+    ("Zirconium minerals", "Unknown"): ("Zirconium and hafnium", "Mine"),
 }
 
 # Mapping from original unit names to tonnes.

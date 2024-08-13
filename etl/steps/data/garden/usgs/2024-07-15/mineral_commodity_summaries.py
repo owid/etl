@@ -341,12 +341,12 @@ COMMODITY_MAPPING = {
     ),
     ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"): (
         "Zirconium and hafnium",
-        "Mine production, zirconium ores and zircon concentrates",
+        "Mine",
     ),
     (
         "Zirconium and hafnium",
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
-    ): ("Zirconium and hafnium", "Mine, zirconium ores and zircon concentrates"),
+    ): ("Zirconium and hafnium", "Mine"),
 }
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -363,6 +363,7 @@ FOOTNOTES = {
     "production|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "reserves|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     # "reserves|Chromium|Mine|tonnes": "Values are reported as tonnes of gross weight.",
+    # "production|Zirconium and hafnium|tonnes": "Values are reported as tonnes of gross weight of zirconium ores and zircon concentrates.",
 }
 
 # Dictionary of special units.
