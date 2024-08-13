@@ -139,6 +139,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
+          <<: *zero_day
 
       # Hospitalisations
       weekly_hospital_admissions:
