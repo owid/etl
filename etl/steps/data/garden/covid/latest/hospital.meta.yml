@@ -71,10 +71,14 @@ tables:
       weekly_admissions_icu:
         title: Weekly new ICU admissions
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days).
+        description_key:
+          - *icu
         unit: 'adpatientsmissions'
       weekly_admissions_icu_per_1m:
         title: Weekly new ICU admissions per million
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days), per million people.
+        description_key:
+          - *icu
         unit: 'patients per million people'
         display:
           numDecimalPlaces: 3
