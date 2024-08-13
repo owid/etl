@@ -41,15 +41,18 @@ SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 
 # There are many historical regions with overlapping data with their successor countries.
 # Accept only overlaps on the year when the historical country stopped existing.
+# NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
+# create data for continents, then build an aggregate for the world, and then remove continents.
+# NOTE: Some of the overlaps occur only for certain commodities.
 ACCEPTED_OVERLAPS = [
-    {1991: {"USSR", "Armenia"}},
+    # {1991: {"USSR", "Armenia"}},
     # {1991: {"USSR", "Belarus"}},
     {1991: {"USSR", "Russia"}},
     {1992: {"Czechia", "Czechoslovakia"}},
     {1992: {"Slovakia", "Czechoslovakia"}},
     {1990: {"Germany", "East Germany"}},
     {1990: {"Germany", "West Germany"}},
-    {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
+    # {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
     {1990: {"Yemen", "Yemen People's Republic"}},
 ]
 
@@ -403,10 +406,6 @@ def run(dest_dir: str) -> None:
 
     # Create a combined flat table.
     # Firstly, combine USGS current and historical. Since the former is more up-to-date, prioritize it.
-    # TODO: Sometimes, when combining, the data from one of the sources is completely replaced by the other.
-    #  In such cases, it would be better if only the origins of the remaining one appear in the metadata.
-    #  This happens, e.g. for Steel production (BGS goes from 1970 to 2022, whereas USGS (historical+current) data goes
-    #  from 1943 to 2023). So the result should quote only USGS historical and current as origins.
     tb = combine_two_overlapping_dataframes(
         df1=tb_usgs_flat, df2=tb_usgs_historical_flat, index_columns=["country", "year"]
     )
@@ -417,13 +416,13 @@ def run(dest_dir: str) -> None:
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_bgs_flat, index_columns=["country", "year"])
 
     # # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
-    inspect_overlaps(
-        tb=tb,
-        tb_usgs_flat=tb_usgs_flat,
-        tb_usgs_historical_flat=tb_usgs_historical_flat,
-        tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
-        minerals=["Pumice and pumicite"],
-    )
+    # inspect_overlaps(
+    #     tb=tb,
+    #     tb_usgs_flat=tb_usgs_flat,
+    #     tb_usgs_historical_flat=tb_usgs_historical_flat,
+    #     tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
+    #     minerals=["Salt"],
+    # )
 
     # Create region aggregates.
     # NOTE: "Other" will be removed from the data (see notes inside the function).

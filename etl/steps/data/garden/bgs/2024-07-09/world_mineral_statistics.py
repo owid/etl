@@ -439,17 +439,21 @@ COMMODITY_MAPPING = {
     ("Rare earths", "Rare earth compounds"): ("Rare earths", "Compounds"),
     ("Rhenium", "Unknown"): ("Rhenium", "Unknown"),
     ("Salt", "Brine salt"): ("Salt", "Brine salt"),
-    ("Salt", "Brine salt & sea salt"): ("Salt", "Brine salt & sea salt"),
-    ("Salt", "Common salt"): ("Salt", "Common salt"),
-    ("Salt", "Crude salt"): ("Salt", "Crude salt"),
+    ("Salt", "Brine salt & sea salt"): None,
+    # NOTE: Only available for imports before 1975.
+    ("Salt", "Common salt"): None,
+    # NOTE: Only available for imports before 1975.
+    ("Salt", "Crude salt"): None,
     ("Salt", "Evaporated salt"): ("Salt", "Evaporated salt"),
     ("Salt", "Other salt"): ("Salt", "Other salt"),
-    ("Salt", "Refined salt"): ("Salt", "Refined salt"),
+    # NOTE: Only available for imports/exports before 1975.
+    ("Salt", "Refined salt"): None,
     ("Salt", "Rock salt"): ("Salt", "Rock salt"),
-    ("Salt", "Rock salt & brine salt"): ("Salt", "Rock salt & brine salt"),
+    ("Salt", "Rock salt & brine salt"): None,
     ("Salt", "Salt in brine"): ("Salt", "Salt in brine"),
     ("Salt", "Sea salt"): ("Salt", "Sea salt"),
-    ("Salt", "Unknown"): ("Salt", "Unknown"),
+    # NOTE: Unclear what "Unknown" means, but it's significantly lower than USGS' "Mine".
+    ("Salt", "Unknown"): None,
     ("Selenium, refined", "Unknown"): ("Selenium", "Refinery"),
     ("Sillimanite minerals", "Andalusite"): ("Sillimanite minerals", "Andalusite"),
     ("Sillimanite minerals", "Andalusite & kyanite"): ("Sillimanite minerals", "Andalusite & kyanite"),
@@ -655,15 +659,16 @@ FOOTNOTES = {
 # Accept only overlaps on the year when the historical country stopped existing.
 # NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
 # create data for continents, then build an aggregate for the world, and then remove continents.
+# NOTE: Some of the overlaps occur only for certain commodities.
 ACCEPTED_OVERLAPS = [
-    {1991: {"USSR", "Armenia"}},
+    # {1991: {"USSR", "Armenia"}},
     # {1991: {"USSR", "Belarus"}},
     {1991: {"USSR", "Russia"}},
     {1992: {"Czechia", "Czechoslovakia"}},
     {1992: {"Slovakia", "Czechoslovakia"}},
     {1990: {"Germany", "East Germany"}},
     {1990: {"Germany", "West Germany"}},
-    {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
+    # {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
     {1990: {"Yemen", "Yemen People's Republic"}},
 ]
 
