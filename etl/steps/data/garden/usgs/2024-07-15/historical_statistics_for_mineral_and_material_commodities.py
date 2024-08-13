@@ -99,7 +99,7 @@ COMMODITY_MAPPING = {
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
     ("Peat", "Total"): ("Peat", "Mine"),
     ("Perlite", "Total"): ("Perlite", "Mine"),
-    ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
+    ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
     ("Pig Iron", "Total"): ("Iron", "Pig iron"),
     ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
     ("Salt", "Total"): ("Salt", "Total"),
@@ -167,6 +167,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Mica (natural), scrap and flake",
     "Peat",
     "Perlite",
+    "Phosphate rock",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).

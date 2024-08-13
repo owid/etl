@@ -385,7 +385,7 @@ COMMODITY_MAPPING = {
     ("Phosphate rock", "Apatite"): ("Phosphate rock", "Apatite"),
     ("Phosphate rock", "Calcium phosphates"): ("Phosphate rock", "Calcium phosphates"),
     ("Phosphate rock", "Guano"): ("Phosphate rock", "Guano"),
-    ("Phosphate rock", "Unknown"): ("Phosphate rock", "Unknown"),
+    ("Phosphate rock", "Unknown"): ("Phosphate rock", "Mine"),
     ("Platinum group metals", "Iridium, osmium & ruthenium"): ("Platinum group metals", "Iridium, osmium & ruthenium"),
     ("Platinum group metals", "Ores & concentrates"): ("Platinum group metals", "Ores & concentrates"),
     ("Platinum group metals", "Other platinum group metals"): ("Platinum group metals", "Other platinum group metals"),
