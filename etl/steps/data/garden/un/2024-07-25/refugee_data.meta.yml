@@ -67,7 +67,7 @@ tables:
           - "{definitions.description_refugee_general}"
       asylum_seekers_origin:
         title: Asylum seekers by country of origin
-        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
+        description_short: Number of [asylum seekers](#dod:asylumseeker), so people who have a pending application for asylum or refugee status in any country, by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
         description_from_producer: "{definitions.description_asylum}"
       asylum_seekers_per_100k_pop_origin:
         title: Asylum seekers by country of origin per 100,000 people
@@ -113,17 +113,17 @@ tables:
           - "{definitions.description_refugee_general}"
       asylum_seekers_asylum:
         title: Asylum seekers by country of residence
-        description_short: Number of [asylum seekers](#dod:asylumseeker) in all regions by the country they seek asylum in. This measures the total number of asylum-seekers; not the number per year.
+        description_short: "[Asylum seekers](#dod:asylumseeker) are people whose application for asylum or refugee status is pending at any stage in the asylum procedure. This measures the total number of asylum seekers; not the number per year."
         description_from_producer: "{definitions.description_asylum}"
       asylum_seekers_per_100k_pop_asylum:
         title: Asylum seekers by country of residence per 100,000 people
-        description_short: Number of [asylum seekers](#dod:asylumseeker) by country of residence, per 100,000 people in that country.
+        description_short: "[Asylum seekers](#dod:asylumseeker) are people whose application for asylum or refugee status is pending at any stage in the asylum procedure. This measures total asylumn seekers per 100,000 people in that country."
         description_from_producer: "{definitions.description_asylum}"
         display:
           numDecimalPlaces: 1
       other_people_in_need_of_international_protection_asylum:
         title: Other people in need of international protection by country of residence
-        description_short: Number of [other people in need of international protection](#dod:international-protection) in all regions by the country they live in. This measures the total number of persons; not the number per year.
+        description_short: Number of [other people in need of international protection](#dod:international-protection) from all regions by the country they live in. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_asylum:
         title: Stateless persons by country of residence

@@ -42,13 +42,13 @@ tables:
       idps_under_18_conflict_violence:
         title: Internally displaced children due to conflict and violence
         description_short: |-
-          Number of [internally displaced children](#dod:internally-displaced) under 18 years old, displaced due to conflict and violence. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+         Total number of [internally displaced children](#dod:internally-displaced) under 18 years old, due to conflict and violence. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_disaster:
         title: Internally displaced children due to disasters
         description_short: |-
-          Number of [internally displaced children](#dod:internally-displaced) under 18 years old, displaced due to disasters. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+          Total number of [internally displaced children](#dod:internally-displaced) under 18 years old, due to natural disasters. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_total:
@@ -59,12 +59,12 @@ tables:
           - {definitions.unicef_descriptions.internally_displaced}
       international_migrants_under_18_dest:
         title: Immigrants under 18 years old by destination
-        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) by the country of destination. This number is the total migrant stock, so all migrants who are currently living in the destination country, and does not describe migrants arriving in this year.
+        description_short: Total number of children under 18 years old who live in this country but were born in another country.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
       migrants_under_18_dest_per_1000:
         title: Immigrants under 18 years old by destination per 1000 inhabitants
-        description_short: Number of children under 18 years old who are international [immigrants](#dod:immigrant) per 1000 inhabitants of the destination country. This number is the total migrant stock, so all migrants who are currently living in the destination country, and does not describe migrants arriving in this year.
+        description_short: Total number of children under 18 years old who live in this country but were born in another country, per 1000 inhabitants of the destination country.
         description_from_producer: |-
           - {definitions.unicef_descriptions.international_migrant}
         processing_level: major
@@ -101,12 +101,12 @@ tables:
             note: "{definitions.other_descriptions.new_displacement}"
       refugees_under_18_asylum:
         title: Child refugees by country of asylum
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This number is the total refugee stock, so all refugees who are currently living in the asylum country and does not describe refugees arriving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
       refugees_under_18_asylum_per_1000:
         title: Child refugees per 1000 inhabitants of the country of asylum
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This number is the total refugee stock, so all refugees who are currently living in the asylum country and does not describe refugees arriving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
         processing_level: major
@@ -116,12 +116,12 @@ tables:
           numDecimalPlaces: 1
       refugees_under_18_origin:
         title: Child refugees by country of origin
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This number is the total refugee stock, so all refugees who have left the origin country and does not describe refugees leaving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
       refugees_under_18_origin_per_1000:
         title: Child refugees per 1000 inhabitants of the country of origin
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This number is the total refugee stock, so all refugees who have left the origin country and does not describe refugees leaving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.refugee}
         processing_level: major
@@ -140,7 +140,7 @@ tables:
       #idp shares
       idps_under_18_total_per_1000:
         title: Internally displaced children per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old per 1000 inhabitants of the country. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -150,7 +150,7 @@ tables:
           numDecimalPlaces: 1
       idps_under_18_conflict_violence_per_1000:
         title: Internally displaced children due to conflict and violence per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to conflict and violence per 1000 inhabitants of the country. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to conflict and violence per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -160,7 +160,7 @@ tables:
           numDecimalPlaces: 1
       idps_under_18_disaster_per_1000:
         title: Internally displaced children due to disasters per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to disasters per 1000 inhabitants of the country. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to disasters per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major

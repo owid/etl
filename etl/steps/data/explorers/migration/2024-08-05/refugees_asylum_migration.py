@@ -20,6 +20,11 @@ def sort_metrics(x):
     return SORTER.index(x)
 
 
+def sort_age(x):
+    age_order = ["Under 18", "Total"]
+    return age_order.index(x)
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -92,11 +97,14 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently
+    df_graphers["sort_order_metrics"] = df_graphers["Metric Dropdown"].apply(sort_metrics)
+    df_graphers["sort_order_age"] = df_graphers["Age Radio"].apply(sort_age)
     df_graphers = df_graphers.sort_values(
-        by="Metric Dropdown",
-        key=lambda x: x.apply(sort_metrics),  # type: ignore
+        by=["sort_order", "Period Radio", "Sub-Metric Radio", "sort_order_age"],
         ascending=True,
     ).reset_index(drop=True)
+
+    df_graphers = df_graphers.drop(columns=["sort_order", "sort_order_age"])
 
     # Prepare explorer metadata.
     config = {
@@ -206,12 +214,6 @@ def create_column_rows(col_dicts, tb, ds):
 
             col_row_dict["name"] = meta.title
             col_row_dict["slug"] = column
-            if meta.processing_level == "minor":
-                col_row_dict["sourceName"] = f"{origin.producer} ({origin.date_published[:4]})"
-            elif meta.processing_level == "major":
-                col_row_dict[
-                    "sourceName"
-                ] = f"Our World in Data, based on {origin.producer} ({origin.date_published[:4]})"
             col_row_dict["sourceLink"] = origin.url_main
             col_row_dict["unit"] = meta.unit
             col_row_dict["shortUnit"] = meta.short_unit

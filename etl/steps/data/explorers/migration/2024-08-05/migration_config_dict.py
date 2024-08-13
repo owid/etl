@@ -777,7 +777,7 @@ MAP_BRACKETS = {
     },
     "disaster_stock_displacement": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 3000000.0, 1640],
+        "colorScaleNumericBins": [10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 1640],
     },
     "total_stock_displacement": {
         "colorScaleScheme": "OrRd",
@@ -797,18 +797,18 @@ MAP_BRACKETS = {
     },
     "share_of_disaster_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 0.0],
     },
     "displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },
     "conflict_displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },
     "disaster_displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },
 }

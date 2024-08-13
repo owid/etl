@@ -54,13 +54,13 @@ def run(dest_dir: str) -> None:
         ("share_of_internally_displaced_pop", "total_stock_displacement"),
         ("share_of_conflict_displaced_pop", "conflict_stock_displacement"),
         ("share_of_disaster_displaced_pop", "disaster_stock_displacement"),
-        ("displacements_per_100_people", "total_internal_displacements"),
-        ("conflict_displacements_per_100_people", "conflict_internal_displacements"),
-        ("disaster_displacements_per_100_people", "disaster_internal_displacements"),
+        ("displacements_per_1000_people", "total_internal_displacements"),
+        ("conflict_displacements_per_1000_people", "conflict_internal_displacements"),
+        ("disaster_displacements_per_1000_people", "disaster_internal_displacements"),
     ]
 
     for new_column, source_column in columns_to_calculate:
-        tb[new_column] = (tb[source_column] / tb["population"]) * 100
+        tb[new_column] = (tb[source_column] / tb["population"]) * 1000
 
     tb = tb.drop(columns=["population"], errors="raise")
 
