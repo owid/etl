@@ -66,7 +66,7 @@ COMMODITY_MAPPING = {
     ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
     ("Fuller's earth", "Total"): ("Clays", "Fuller's earth"),
     ("Gallium", "Total"): ("Gallium", "Refinery"),
-    ("Germanium", "Total"): ("Germanium", "Total"),
+    ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
     ("Gypsum", "Total"): ("Gypsum", "Total"),

@@ -214,7 +214,7 @@ COMMODITY_MAPPING = {
     ("Fluorspar", "Unknown"): ("Fluorspar", "Mine"),
     ("Gallium, primary", "Unknown"): ("Gallium", "Primary"),
     ("Gemstones", "Unknown"): ("Gemstones", "Unknown"),
-    ("Germanium metal", "Unknown"): ("Germanium", "Metal"),
+    ("Germanium metal", "Unknown"): ("Germanium", "Refinery"),
     ("Gold", "Metal"): ("Gold", "Metal"),
     ("Gold", "Metal, other"): None,
     ("Gold", "Metal, refined"): ("Gold", "Metal, refined"),

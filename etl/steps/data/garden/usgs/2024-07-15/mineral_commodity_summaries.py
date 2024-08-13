@@ -131,10 +131,7 @@ COMMODITY_MAPPING = {
     ("Garnet", "Mine production"): ("Garnet", "Mine"),
     ("Gemstones", "Mine production, thousand carats of gem diamond"): ("Gemstones", "Mine"),
     ("Gemstones", "Mine production, thousand carats of gem-quality diamond"): ("Gemstones", "Mine"),
-    ("Germanium", "Primary and secondary refinery production"): (
-        "Germanium",
-        "Primary and secondary refinery",
-    ),
+    ("Germanium", "Primary and secondary refinery production"): ("Germanium", "Refinery"),
     ("Gold", "Gold - contained content, mine production, metric tons"): ("Gold", "Mine"),
     ("Gold", "Mine production"): ("Gold", "Mine"),
     ("Graphite (natural)", "Mine production"): ("Graphite", "Mine"),
