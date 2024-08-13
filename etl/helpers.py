@@ -88,10 +88,17 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     assert ds.metadata.title, "Dataset must have a title."
 
     for tab in ds:
-        assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
-        assert (
-            tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['year'].dtype}"
+        if {"year", "country"} <= set(tab.all_columns):
+            if "year" in tab.columns:
+                year = tab["year"]
+            else:
+                year = tab.index.get_level_values("year")
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+        elif {"date", "country"} <= set(tab.all_columns):
+            pass
+        else:
+            raise AssertionError("Table must have columns country and year or date.")
+
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -200,7 +207,6 @@ def create_dataset(
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
         ds.save()
     """
-    from etl import grapher_helpers as gh
     from etl.steps.data.converters import convert_snapshot_metadata
 
     if default_metadata is None:
@@ -239,17 +245,6 @@ def create_dataset(
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
-
-        if ds.metadata.channel == "grapher":
-            # if a table contains `date` instead of `year`, adapt it for grapher
-            if "date" in table.all_columns and "year" not in table.all_columns:
-                if "date" in table.index.names:
-                    table = table.reset_index("date")
-                    table = gh.adapt_table_with_dates_to_grapher(table)
-                    table = table.set_index("year", append=True)
-                else:
-                    table = gh.adapt_table_with_dates_to_grapher(table)
-
         used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats, repack=repack)
 
