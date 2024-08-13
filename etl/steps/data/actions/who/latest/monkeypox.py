@@ -1,6 +1,5 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 from apps.owidbot import github_utils as gh
-from etl import config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -21,5 +20,4 @@ def run(dest_dir: str) -> None:
         file_path="owid-monkeypox-data.csv",
         commit_message="data(mpx): automated update",
         branch="master",
-        dry_run=not config.ETL_ACTIONS_COMMIT,
     )

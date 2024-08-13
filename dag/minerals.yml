@@ -55,5 +55,5 @@ steps:
   #
   # Minerals - Minerals explorer.
   #
-  action://explorers/minerals/latest/minerals:
+  action://actions/minerals/latest/minerals:
     - data://grapher/minerals/2024-07-15/minerals

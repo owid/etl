@@ -282,3 +282,30 @@ def watch_folder(path: Path) -> Generator[Path, None, None]:
                     break
 
         last_seen = current_files
+
+
+def upload_file_to_server(local_file_path: Path, target: str) -> None:
+    """
+    Upload a local file to a remote server using scp.
+
+    :param local_file_path: Path to the local file to upload.
+    :param target: The target destination on the remote server in the format 'user@host:/remote/path'.
+                   Example: 'owid@staging-site-explorer-step:~/owid-content/explorers/'
+    """
+    # Check if the local file exists
+    if not local_file_path.is_file():
+        raise FileNotFoundError(f"The file {local_file_path} does not exist.")
+
+    # Validate the target format (basic check)
+    if "@" not in target or ":" not in target:
+        raise ValueError(f"The target '{target}' is not properly formatted. Expected format: 'user@host:/remote/path'.")
+
+    try:
+        # Construct the scp command
+        scp_command = ["scp", str(local_file_path), target]
+
+        # Execute the command
+        subprocess.run(scp_command, check=True, text=True, capture_output=True)
+        print(f"File {local_file_path} successfully uploaded to {target}")
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to upload file {local_file_path} to {target}") from e

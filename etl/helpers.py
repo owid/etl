@@ -517,7 +517,6 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[int, str]] = None,
         is_private: Optional[bool] = False,
-        step_type: Optional[str] = "data",
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
 
@@ -534,22 +533,19 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if step_type == "data":
-            if channel == "actions":
-                step_name = f"action://{channel}/{namespace}/{version}/{short_name}"
-            elif channel in CHANNEL.__args__:
-                step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-            elif channel == "snapshot":
-                # match also on snapshot short_names without extension
-                step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
-            elif channel == "walden":
-                step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
-            elif channel is None:
-                step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
-            else:
-                raise UnknownChannel
+        if channel == "actions":
+            step_name = f"action://{channel}/{namespace}/{version}/{short_name}"
+        elif channel in CHANNEL.__args__:
+            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
+        elif channel == "snapshot":
+            # match also on snapshot short_names without extension
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+        elif channel == "walden":
+            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
+        elif channel is None:
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
         else:
-            step_name = f"{step_type}://{channel}/{namespace}/{version}/{short_name}"
+            raise UnknownChannel
 
         return step_name
 
@@ -560,7 +556,6 @@ class PathFinder:
             namespace=self.namespace,
             version=self.version,
             is_private=self.is_private,
-            step_type=self.step_type,
         )
 
     @staticmethod

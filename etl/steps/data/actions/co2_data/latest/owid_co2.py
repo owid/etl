@@ -16,7 +16,6 @@ import numpy as np
 from owid.catalog import Dataset, Origin, Table
 
 from apps.owidbot import github_utils as gh
-from etl import config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -360,6 +359,5 @@ def run(dest_dir: str) -> None:
         repo_name="co2-data",
         file_path="owid-co2-data.csv",
         commit_message=":bar_chart: Automated update",
-        branch="test",
-        dry_run=False,
+        branch="master",
     )

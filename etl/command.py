@@ -6,7 +6,6 @@
 import difflib
 import itertools
 import json
-import os
 import re
 import resource
 import sys
