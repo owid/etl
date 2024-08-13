@@ -81,10 +81,10 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
                     for iu in indicator_upgrades_shown
                     if not iu.skip and iu.id_new_selected is not None
                 }
-                test = [
-                    {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
-                ]
-                st.write(test)
+                # test = [
+                #     {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
+                # ]
+                # st.write(test)
     return indicator_mapping
 
 
