@@ -2,7 +2,7 @@
 from pathlib import Path
 
 import pandas as pd
-from migration_config_dict import CONFIG_DICT, MAP_BRACKETS  # type: ignore
+from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
 from etl.config import EXPLORERS_DIR
 from etl.explorer_helpers import Explorer
@@ -11,16 +11,13 @@ from etl.helpers import PathFinder, create_explorer
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-ADDITIONAL_DESCRIPTIONS = {
-    "net_migration": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",
-    "net_migration_rate": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country), per 1,000 people in the population.",
-    "bx_trf_pwkr_dt_gd_zs": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries.",
-    "si_rmt_cost_ib_zs": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200.",
-    "si_rmt_cost_ob_zs": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200. ",
-}
-
+# whether to use existing map brackets from old explorer, if True this overrides hardcoded map brackets
 USE_EXISTING_MAP_BRACKETS = False
+
+
+# used to sort the metrics in explorer
+def sort_metrics(x):
+    return SORTER.index(x)
 
 
 def run(dest_dir: str) -> None:
@@ -91,14 +88,14 @@ def run(dest_dir: str) -> None:
     # Sanity check.
     error = "Duplicated rows in explorer."
     assert df_graphers[
-        df_graphers.duplicated(
-            subset=["Metric Dropdown", "Period Radio", "Sub-Metric Radio", "Age Radio", "Processing Radio"], keep=False
-        )
+        df_graphers.duplicated(subset=["Metric Dropdown", "Period Radio", "Sub-Metric Radio", "Age Radio"], keep=False)
     ].empty, error
 
     # Sort rows conveniently
     df_graphers = df_graphers.sort_values(
-        ["Metric Dropdown", "Period Radio", "Sub-Metric Radio", "Age Radio", "Processing Radio"]
+        by="Metric Dropdown",
+        key=lambda x: x.apply(sort_metrics),  # type: ignore
+        ascending=True,
     ).reset_index(drop=True)
 
     # Prepare explorer metadata.
@@ -150,6 +147,9 @@ def create_graphers_rows(graphers_dicts, tb, ds):
                 continue
             graphers_row_dict = {}
 
+            meta = tb[column].metadata
+            origin = meta.origins[0]
+
             config = CONFIG_DICT[column]
             if column in ["net_migration", "net_migration_rate"]:
                 graphers_row_dict["yVariableIds"] = [
@@ -161,6 +161,21 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             graphers_row_dict["Period Radio"] = config["period_radio"]
             graphers_row_dict["Sub-Metric Radio"] = config["sub_metric_radio"]
             graphers_row_dict["Age Radio"] = config["age_radio"]
+
+            if column in ADDITIONAL_DESCRIPTIONS.keys():
+                graphers_row_dict["subtitle"] = ADDITIONAL_DESCRIPTIONS[column]["description"]
+                graphers_row_dict["title"] = ADDITIONAL_DESCRIPTIONS[column]["title"]
+            else:
+                graphers_row_dict["subtitle"] = meta.description_short
+                graphers_row_dict["title"] = meta.title
+
+            if meta.processing_level == "minor":
+                graphers_row_dict["sourceDesc"] = f"{origin.producer} ({origin.date_published[:4]})"
+            elif meta.processing_level == "major":
+                graphers_row_dict[
+                    "sourceDesc"
+                ] = f"Our World in Data, based on {origin.producer} ({origin.date_published[:4]})"
+
             graphers_dicts.append(graphers_row_dict)
 
     return graphers_dicts
@@ -185,7 +200,6 @@ def create_column_rows(col_dicts, tb, ds):
 
             # some indicators don't have any/ a fitting description in the metadata: add them manually
             if column in ADDITIONAL_DESCRIPTIONS.keys():
-                print(f"Adding additional description for {column}")
                 col_row_dict["description"] = ADDITIONAL_DESCRIPTIONS[column]
             else:
                 col_row_dict["description"] = meta.description_short

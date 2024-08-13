@@ -32,6 +32,30 @@ METRICS = {
     "remittance_cost_ib": "Cost of receiving remittances",
     "remittance_cost_ob": "Cost of sending remittances",
 }
+SORTER = list(METRICS.values())
+
+ADDITIONAL_DESCRIPTIONS = {
+    "net_migration": {
+        "title": "Net migration",
+        "description": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",
+    },
+    "net_migration_rate": {
+        "title": "Net migration rate",
+        "description": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country), per 1,000 people in the population.",
+    },
+    "bx_trf_pwkr_dt_gd_zs": {
+        "title": "Remittances as share of GDP",
+        "description": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country.",
+    },
+    "si_rmt_cost_ib_zs": {
+        "title": "Average cost for sending remittances to country",
+        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. The cost is based on a single transaction of USD 200. ",
+    },
+    "si_rmt_cost_ob_zs": {
+        "title": "Average cost for sending remittances from country",
+        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. The cost is based on a single transaction of USD 200. ",
+    },
+}
 
 
 CONFIG_DICT = {
@@ -545,7 +569,7 @@ MAP_BRACKETS = {
     },
     "idps_under_18_total": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 0],
+        "colorScaleNumericBins": [100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
     },
     "international_migrants_under_18_dest": {
         "colorScaleScheme": "YlGnBu",
@@ -585,27 +609,27 @@ MAP_BRACKETS = {
     },
     "idps_under_18_total_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
     },
     "new_idps_under_18_total_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
     },
     "idps_under_18_conflict_violence_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
     },
     "idps_under_18_disaster_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
     },
     "new_idps_under_18_conflict_violence_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 0],
     },
     "new_idps_under_18_disaster_per_1000": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
     },
     "refugees_under_unhcrs_mandate_origin": {
         "colorScaleScheme": "YlOrRd",
@@ -706,7 +730,7 @@ MAP_BRACKETS = {
     },
     "emigrants_share_of_total_population": {
         "colorScaleScheme": "YlGnBu",
-        "colorScaleNumericBins": [2.0, 5.0, 10.0, 10.0, 0],
+        "colorScaleNumericBins": [2.0, 5.0, 10.0, 15.0, 0],
     },
     "net_migration": {
         "colorScaleScheme": "RdYlBu",
@@ -765,26 +789,26 @@ MAP_BRACKETS = {
     },
     "share_of_internally_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
     },
     "share_of_conflict_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
     },
     "share_of_disaster_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
     },
     "displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
     },
     "conflict_displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
     },
     "disaster_displacements_per_100_people": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
     },
 }

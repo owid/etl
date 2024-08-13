@@ -27,10 +27,16 @@ def run(dest_dir: str) -> None:
 
     # group table by country and year
     tb_origin = (
-        tb.drop(columns=["country_of_asylum"]).groupby(["country_of_origin", "year"], observed=True).sum().reset_index()
+        tb.drop(columns=["country_of_asylum"])
+        .groupby(["country_of_origin", "year"], observed=True)
+        .sum(min_count=1)
+        .reset_index()
     )
     tb_asylum = (
-        tb.drop(columns=["country_of_origin"]).groupby(["country_of_asylum", "year"], observed=True).sum().reset_index()
+        tb.drop(columns=["country_of_origin"])
+        .groupby(["country_of_asylum", "year"], observed=True)
+        .sum(min_count=1)
+        .reset_index()
     )
 
     # harmonize countries
