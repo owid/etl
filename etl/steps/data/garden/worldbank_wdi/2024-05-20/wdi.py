@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 import structlog
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
@@ -26,6 +26,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset()
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -58,6 +59,9 @@ def run(dest_dir: str) -> None:
     # validate that all columns have title
     for col in tb_garden.columns:
         assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+
+    # add armed personnel as share of population
+    tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
 
     ####################################################################################################################
 
@@ -419,3 +423,25 @@ def create_description(var: Dict[str, Any]) -> Optional[str]:
         return None
 
     return desc
+
+
+def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Add armed personnel as share of population.
+    Population data is from the OMM population dataset.
+    WDI only provides data as a share of total labor force.
+    """
+
+    tb = tb.reset_index()
+
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=True)
+
+    tb["armed_forces_share_population"] = tb["ms_mil_totl_p1"] / tb["population"] * 100
+
+    # Drop population column
+    tb = tb.drop(columns=["population"])
+
+    # Set index again
+    tb = tb.format(["country", "year"])
+
+    return tb

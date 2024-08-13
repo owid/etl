@@ -1,5 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
+
 import gzip
+import io
 import zipfile
 
 import geopandas as gpd
@@ -25,8 +27,12 @@ log = get_logger()
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
     # Load data from snapshot.
-    with gzip.open(snap.path, "r") as _file:
-        ds = xr.open_dataset(_file)
+    with gzip.open(snap.path, "rb") as file:
+        file_content = file.read()
+
+    # Create an in-memory bytes file and load the dataset
+    with io.BytesIO(file_content) as memfile:
+        ds = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
 
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.

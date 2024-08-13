@@ -28,6 +28,7 @@ tables:
           - Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
         presentation:
           title_public: Gini coefficient
+          title_variant: Equivalised disposable household income
         display:
           name: Gini coefficient
           numDecimalPlaces: 2

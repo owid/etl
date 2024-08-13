@@ -13,7 +13,7 @@ Lucas Rodes-Guirao adapted the python code for ETL.
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid as cumtrapz
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 from etl.helpers import PathFinder, create_dataset

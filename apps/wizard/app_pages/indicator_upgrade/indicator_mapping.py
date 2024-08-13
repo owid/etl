@@ -81,6 +81,10 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
                     for iu in indicator_upgrades_shown
                     if not iu.skip and iu.id_new_selected is not None
                 }
+                test = [
+                    {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
+                ]
+                st.write(test)
     return indicator_mapping
 
 
@@ -181,7 +185,12 @@ def get_params(search_form):
     )
 
     # Set states
-    st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
+    if "indicator_upgrades_ignore" not in st.session_state:
+        st.session_state.indicator_upgrades_ignore = {i.key: False for i in iu}
+    else:
+        st.session_state.indicator_upgrades_ignore = {
+            i.key: st.session_state["indicator_upgrades_ignore"].get(i.key, False) for i in iu
+        }
 
     return iu, indicator_id_to_display, df_data
 
@@ -348,7 +357,7 @@ class IndicatorUpgradeShow:
         self.colun_layout = [10, 100, 7, 4.5]
         self.show_explore = None
 
-    @st.experimental_fragment
+    @st.fragment
     def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
             cols = [100, 10, 10]
@@ -447,7 +456,7 @@ class IndicatorUpgradeShow:
             on_change=_set_states_checkbox,
         )
 
-    @st.experimental_dialog("Explore changes in the new indicator", width="large")  # type: ignore
+    @st.dialog("Explore changes in the new indicator", width="large")  # type: ignore
     def _st_explore_indicator_modal(self, indicator_old, indicator_new, indicator_id_to_display, df=None) -> None:
         """Same as st_explore_indicator but framed in a dialog.
 

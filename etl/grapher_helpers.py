@@ -74,7 +74,7 @@ def expand_dimensions(tb: catalog.Table) -> catalog.Table:
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
-    warn_null_variables: bool = True,
+    warn_null_variables: bool = False,
     trim_long_short_name: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means

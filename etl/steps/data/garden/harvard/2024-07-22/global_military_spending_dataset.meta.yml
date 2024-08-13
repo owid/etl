@@ -8,7 +8,7 @@ definitions:
     display: &common-display
       tolerance: 5
 
-  description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a latent variable measurement model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
+  description_key_methodology: This data is calculated by using nine different military expenditure data sources and combining them using a model. The model links the country-year data together and estimates a mean with a prediction interval for each observation. For more information about the methodology, see [the original article](https://journals.sagepub.com/doi/10.1177/00220027241232964).
 
   description_key_percentage_gdp: The military expenditure data is divided by gross domestic product (GDP) estimates obtained from a similar latent variable model, explained by the same authors in [a different article](https://journals.sagepub.com/doi/10.1177/00220027211054432).
 
@@ -161,4 +161,24 @@ tables:
         display:
           name: Military expenditure (% of SDP)
           numDecimalPlaces: 1
+          <<: *common-display
+
+      milex_per_military_personnel:
+        title: Military expenditure per military personnel (constant US$)
+        unit: "constant 2021 US$"
+        short_unit: "$"
+        description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
+        description_key:
+          - "{definitions.description_key_methodology}"
+          - Military personnel are troops under the command of the national government, intended for use against foreign adversaries, and held ready for combat as of January 1 of the given year.
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator by dividing the military expenditure by the [military personnel](https://ourworldindata.org/grapher/military-personnel) estimated by the Correlates of War's National Material Capabilities dataset.
+        description_from_producer: |-
+          "{definitions.description_from_producer_methodology}"
+        presentation:
+          title_public: Military expenditure per military personnel
+        display:
+          name: Military expenditure per military personnel
+          numDecimalPlaces: 0
           <<: *common-display

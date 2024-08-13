@@ -26,6 +26,7 @@ tables:
         processing_level: minor
         presentation:
           title_public: Gini coefficient
+          title_variant: Equivalised disposable household income
         display:
           name: Gini coefficient
           numDecimalPlaces: 2

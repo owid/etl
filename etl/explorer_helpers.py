@@ -156,6 +156,10 @@ class Explorer:
             return []
 
         if "yVariableIds" in df.columns:
+            if not all([isinstance(ids, list) for ids in df["yVariableIds"]]):
+                raise ValueError(
+                    "Each row in 'yVariableIds' (in the graphers dataframe) must contain a list of variable ids (or ETL paths)."
+                )
             # Convert lists of variable ids to strings.
             df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
 
