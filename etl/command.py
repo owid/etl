@@ -72,11 +72,11 @@ log = structlog.get_logger()
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
 @click.option(
-    "--explorer/--no-explorer",
-    "-x/-nx",
+    "--action/--no-action",
+    "-a/-na",
     default=False,
     type=bool,
-    help="Write explorer tsv file to owid-content repository.",
+    help="Run action steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -150,7 +150,7 @@ def main_cli(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    action: bool = False,
     backport: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
@@ -202,7 +202,7 @@ def main_cli(
         force=force,
         private=private,
         grapher=grapher,
-        explorer=explorer,
+        action=action,
         backport=backport,
         downstream=downstream,
         only=only,
@@ -235,7 +235,7 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    action: bool = False,
     backport: bool = False,
     downstream: bool = False,
     only: bool = False,
@@ -250,11 +250,7 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    if explorer:
-        # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
-        grapher = True
-
-    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher, explorer=explorer)
+    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher, action=action)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -283,7 +279,7 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool, explorer: bool) -> DAG:
+def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool, action: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
@@ -304,9 +300,9 @@ def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool, 
     if grapher:
         dag.update(_grapher_steps(dag, private))
 
-    # if explorer is not set, remove all steps
-    if not explorer:
-        dag = {step: deps for step, deps in dag.items() if not step.startswith("explorer://")}
+    # if action is not set, remove all steps
+    if not action:
+        dag = {step: deps for step, deps in dag.items() if not step.startswith("action://")}
 
     return dag
 

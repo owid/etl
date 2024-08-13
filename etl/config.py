@@ -192,6 +192,10 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
+# if True, commit from action steps
+ETL_ACTIONS_COMMIT = env.get("ETL_ACTIONS_COMMIT") in ("True", "true", "1")
+
+
 ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`

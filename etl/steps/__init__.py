@@ -225,8 +225,8 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
-    elif step_type == "explorer":
-        step = ExplorerStep(path, dependencies)
+    elif step_type == "action":
+        step = ActionStep(path, dependencies)
 
     elif step_type == "backport":
         step = BackportStep(path, dependencies)
@@ -964,9 +964,10 @@ class GrapherStep(Step):
         return success
 
 
-class ExplorerStep(Step):
+class ActionStep(DataStep):
     """
-    A step which creates a TSV file and saves it into owid-content repository.
+    A step which does an action once. For instance committing to a Github repository
+    or creating a TSV file for owid-content.
     """
 
     path: str
@@ -977,26 +978,12 @@ class ExplorerStep(Step):
         self.path = path
 
     def __str__(self) -> str:
-        return f"explorer://{self.path}"
-
-    @property
-    def version(self) -> str:
-        # channel / namspace / version / dataset
-        return self.path.split("/")[2]
-
-    def is_dirty(self) -> bool:
-        # Always run the explorer for now. We could save the checksum to JSON or to Explorer similarly to Data step
-        return True
-
-    @property
-    def _search_path(self) -> Path:
-        return paths.STEP_DIR / "explorer" / self.path
-
-    @property
-    def _dest_dir(self) -> Path:
-        return paths.DATA_DIR / self.path.lstrip("/")
+        return f"action://{self.path}"
 
     def run(self) -> None:
+        # make sure the enclosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -1004,8 +991,15 @@ class ExplorerStep(Step):
             else:
                 DataStep._run_py(self)  # type: ignore
 
+        # save checksum
+        from etl.helpers import create_dataset
+
+        ds = create_dataset(self._dest_dir, tables=[])
+        ds.metadata.source_checksum = self.checksum_input()
+        ds.save()
+
     def checksum_output(self) -> str:
-        raise NotImplementedError("GrapherStep should not be used as an input")
+        raise NotImplementedError("ActionStep should not be used as an input")
 
 
 @dataclass

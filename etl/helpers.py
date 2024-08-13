@@ -3,7 +3,6 @@
 #  etl
 #
 
-import os
 import re
 import sys
 import tempfile
@@ -535,21 +534,22 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers", "external"]:
-            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel == "snapshot":
-            # match also on snapshot short_names without extension
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
-        elif channel == "walden":
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
-        elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
+        if step_type == "data":
+            if channel == "actions":
+                step_name = f"action://{channel}/{namespace}/{version}/{short_name}"
+            elif channel in CHANNEL.__args__:
+                step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
+            elif channel == "snapshot":
+                # match also on snapshot short_names without extension
+                step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+            elif channel == "walden":
+                step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
+            elif channel is None:
+                step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers|backport://backport)/{namespace}/{version}/{short_name}$"
+            else:
+                raise UnknownChannel
         else:
-            raise UnknownChannel
-
-        # Replace "data" with the actual step type.
-        if step_type != "data":
-            step_name = "explorer://" + step_name.split("://")[1]
+            step_name = f"{step_type}://{channel}/{namespace}/{version}/{short_name}"
 
         return step_name
 

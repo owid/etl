@@ -41,7 +41,9 @@ assert PREFERRED_FORMAT in DEFAULT_FORMATS
 assert SUPPORTED_FORMATS[0] == PREFERRED_FORMAT
 
 # available channels in the catalog
-CHANNEL = Literal["garden", "meadow", "grapher", "backport", "open_numbers", "examples", "explorers", "external"]
+CHANNEL = Literal[
+    "garden", "meadow", "grapher", "backport", "open_numbers", "examples", "explorers", "external", "actions"
+]
 
 # all pandas nullable dtypes
 NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in ("", "U") for size in (8, 16, 32, 64)]

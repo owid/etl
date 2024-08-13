@@ -81,3 +81,35 @@ def github_app_access_token():
     access_token = response.json()["token"]
 
     return access_token
+
+
+def commit_file_to_github(
+    content: str,
+    repo_name: str,
+    file_path: str,
+    commit_message: str,
+    branch: str,
+    dry_run: bool = True,
+) -> None:
+    """Commit a table to a GitHub repository using the GitHub API."""
+    # Get the repository object
+    repo = get_repo(repo_name)
+
+    try:
+        # Check if the file already exists
+        contents = repo.get_contents(file_path, ref=branch)
+        # Update the file
+        if not dry_run:
+            repo.update_file(contents.path, commit_message, content, contents.sha, branch=branch)
+    except Exception as e:
+        # If the file doesn't exist, create a new file
+        if "404" in str(e):
+            if not dry_run:
+                repo.create_file(file_path, commit_message, content, branch=branch)
+        else:
+            raise e
+
+    if dry_run:
+        log.info(f"Would have committed {file_path} to {repo_name} on branch {branch}.")
+    else:
+        log.info(f"Committed {file_path} to {repo_name} on branch {branch}.")

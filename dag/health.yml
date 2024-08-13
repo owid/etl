@@ -718,3 +718,5 @@ steps:
     - data://garden/who/2024-08-07/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/2024-08-07/monkeypox
+  action://actions/who/latest/monkeypox:
+    - data://garden/who/2024-08-07/monkeypox

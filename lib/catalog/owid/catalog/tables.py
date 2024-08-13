@@ -190,13 +190,24 @@ class Table(pd.DataFrame):
 
         return table
 
-    # Mypy complaints about this not matching the defintiion of NDFrame.to_csv but I don't understand why
-    def to_csv(self, path: Any, **kwargs: Any) -> None:  # type: ignore
+    @overload
+    def to_csv(self, path: None = None, **kwargs: Any) -> str:
+        ...
+
+    @overload
+    def to_csv(self, path: Any, **kwargs: Any) -> None:
+        ...
+
+    def to_csv(self, path: Optional[Any] = None, **kwargs: Any) -> Union[None, str]:
         """
         Save this table as a csv file plus accompanying JSON metadata file.
         If the table is stored at "mytable.csv", the metadata will be at
         "mytable.meta.json".
         """
+        # return string
+        if path is None:
+            return super().to_csv(**kwargs)
+
         if not str(path).endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
