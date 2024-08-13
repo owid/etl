@@ -273,29 +273,15 @@ COMMODITY_MAPPING = {
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
     ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
-    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): (
-        "Talc and pyrophyllite",
-        "Mine production, crude and beneficiated",
-    ),
-    ("Talc and pyrophyllite", "Mine production, crude talc"): ("Talc", "Mine, crude"),
-    ("Talc and pyrophyllite", "Mine production, talc"): ("Talc", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): (
-        "Talc",
-        "Mine production, including steatite",
-    ),
+    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): None,
+    # NOTE: Talc production is larger than crude talk production.
+    ("Talc and pyrophyllite", "Mine production, crude talc"): None,
+    ("Talc and pyrophyllite", "Mine production, talc"): None,
+    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): None,
     ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite"): ("Talc and pyrophyllite", "Mine"),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): (
-        "Talc and pyrophyllite",
-        "Mine production, including crude",
-    ),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): (
-        "Talc and pyrophyllite",
-        "Mine production",
-    ),
-    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): (
-        "Talc and pyrophyllite",
-        "Mine production, unspecified talc and/or pyrophyllite",
-    ),
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): None,
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
     ("Tellurium", "Mine production"): ("Tellurium", "Mine"),

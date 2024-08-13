@@ -512,12 +512,15 @@ COMMODITY_MAPPING = {
     ("Sulphur and pyrites", "Sulfur, refined"): ("Sulfur", "Refinery"),
     ("Sulphur and pyrites", "Sulfur, sublimed & precipitated"): None,
     ("Sulphur and pyrites", "Zinc concentrates"): None,
-    ("Talc", "Agalmatolite"): ("Talc", "Agalmatolite"),
-    ("Talc", "Other"): ("Talc", "Other"),
-    ("Talc", "Pyrophyllite"): ("Talc", "Pyrophyllite"),
-    ("Talc", "Steatite"): ("Talc", "Steatite"),
-    ("Talc", "Unknown"): ("Talc", "Unknown"),
-    ("Talc", "Wonderstone (Pyrophyllite)"): ("Talc", "Wonderstone (Pyrophyllite)"),
+    # NOTE: Only production data prior to 2000.
+    ("Talc", "Agalmatolite"): None,
+    ("Talc", "Other"): None,
+    ("Talc", "Pyrophyllite"): ("Talc and pyrophyllite", "Mine, pyrophyllite"),
+    ("Talc", "Steatite"): None,
+    # NOTE: Unclear what "Unknown" means, it doesn't agree with any of USGS categories.
+    ("Talc", "Unknown"): None,
+    # NOTE: Only production data prior to 1992.
+    ("Talc", "Wonderstone (Pyrophyllite)"): None,
     ("Tantalum and niobium", "Columbite"): ("Coltan", "Columbite"),
     ("Tantalum and niobium", "Columbite & tantalite"): ("Coltan", "Columbite-tantalite"),
     ("Tantalum and niobium", "Columbite-tantalite"): ("Coltan", "Columbite-tantalite"),

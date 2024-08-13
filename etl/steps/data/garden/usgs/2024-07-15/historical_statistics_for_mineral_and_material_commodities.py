@@ -111,7 +111,7 @@ COMMODITY_MAPPING = {
     ("Steel", "Total"): ("Steel", "Crude"),
     ("Strontium", "Total"): ("Strontium", "Mine"),
     ("Sulfur", "Total"): ("Sulfur", "Processing"),
-    ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
+    ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Total"): ("Tantalum", "Mine"),
     ("Tellurium", "Total"): ("Tellurium", "Refinery"),
     ("Tin", "Total"): ("Tin", "Mine"),
@@ -171,6 +171,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Pumice and Pumicite",
     "Salt",
     "Soda ash",
+    "Talc and pyrophyllite",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
