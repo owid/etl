@@ -98,7 +98,7 @@ COMMODITY_MAPPING = {
     ("Bromine", "Production, bromine content, excluding U.S. production"): ("Bromine", "Processing"),
     ("Bromine", "Production"): ("Bromine", "Processing"),
     ("Cadmium", "Refinery production"): ("Cadmium", "Refinery"),
-    ("Cement", "Cement production, estimated"): ("Cement", "Total"),
+    ("Cement", "Cement production, estimated"): ("Cement", "Processing"),
     ("Cement", "Clinker capacity, estimated"): None,
     ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine"),
     ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine"),
