@@ -32,15 +32,26 @@ COMMODITY_MAPPING = {
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
     # NOTE: For consistency with USGS current data, rename the following.
     ("Bentonite", "Total"): ("Clays", "Bentonite"),
+    # NOTE: Extracted from "world_mine_production".
     ("Beryllium", "Total"): ("Beryllium", "Mine"),
+    ("Beryllium", "Mine"): ("Beryllium", "Mine"),
     ("Bismuth", "Total"): ("Bismuth", "Mine"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Bismuth", "Mine"): ("Bismuth", "Mine"),
+    # NOTE: Extracted from "world_refinery_production".
+    ("Bismuth", "Refinery"): ("Bismuth", "Refinery"),
     ("Boron", "Total"): ("Boron", "Mine"),
     ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Processing"),
     ("Cesium", "Total"): ("Cesium", "Mine"),
     ("Chromium", "Total"): ("Chromium", "Mine"),
-    ("Cobalt", "Total"): ("Cobalt", "Total"),
+    # NOTE: Cobalt total is only used for unit value.
+    ("Cobalt", "Total"): ("Cobalt", "Value"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Cobalt", "Mine"): ("Cobalt", "Mine"),
+    # NOTE: Extracted from "world_refinery_production".
+    ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
     ("Construction sand and gravel", "Total"): ("Sand and gravel", "Construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
     ("Crushed stone", "Total"): ("Crushed stone", "Total"),
@@ -83,6 +94,8 @@ COMMODITY_MAPPING = {
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Total"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
     ("Peat", "Total"): ("Peat", "Total"),
     ("Perlite", "Total"): ("Perlite", "Total"),
@@ -113,13 +126,6 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Total"): ("Tungsten", "Total"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
-    # Added pairs that were in "world_mine_production" and "world_refinery_production" columns.
-    ("Beryllium", "Mine"): ("Beryllium", "Mine"),
-    ("Bismuth", "Mine"): ("Bismuth", "Mine"),
-    ("Bismuth", "Refinery"): ("Bismuth", "Refinery"),
-    ("Cobalt", "Mine"): ("Cobalt", "Mine"),
-    ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
-    ("Niobium", "Mine"): ("Niobium", "Mine"),
 }
 
 # Units can either be "metric tonnes" or "metric tonnes of gross weight".
@@ -148,6 +154,8 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Lime",
     "Crushed stone",
     "Feldspar",
+    # NOTE: For Cobalt, the conversion to "tonnes" is hardcoded in "prepare_world_production" function.
+    "Cobalt",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
@@ -160,6 +168,7 @@ FOOTNOTES_PRODUCTION = {
     "production|Clays|Ball clay|tonnes": "Values are reported as gross weight.",
     "production|Clays|Fire clay|tonnes": "Values are reported as gross weight.",
     "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
+    "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
 }
 FOOTNOTES_UNIT_VALUE = {}
 
@@ -333,7 +342,9 @@ def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
             # In the case of Bismuth, the title says "gross weight unless otherwise noted"
             # (and nothing else is noted for world refinery production).
             # However, in both cases, the unit is probably "tonnes of metal content".
-            _tb_production["unit"] = "tonnes of metal content"
+            _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes of metal content"
+            # In the case of Cobalt, to harmonize with BGS data, use "tonnes" and add a footnote.
+            _tb_production.loc[_tb_production["commodity"] == "Cobalt", "unit"] = "tonnes"
 
         # Add notes to the table, using the extracted metadata.
         mask = tb_metadata[column].notnull()
