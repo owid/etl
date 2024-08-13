@@ -173,14 +173,22 @@ COMMODITY_MAPPING = {
     ("Lime", "Plant production, lime"): ("Lime", "Processing"),
     ("Lithium", "Mine production, contained lithium"): ("Lithium", "Mine"),
     ("Lithium", "Mine production, lithium content"): ("Lithium", "Mine"),
+    # NOTE: Even though the names of the sub-commodities are different in the data files, the metadata says the same
+    #  thing, which is tha "Data in thousand metric tons of contained magnesium oxide (MgO) unless otherwise noted".
+    #  Reported as magnesium content through Mineral Commodity Summaries 2016. Based on input from consumers, producers,
+    #  and others involved in the industry, reporting magnesium compound data in terms of contained magnesium oxide was
+    #  determined to be more useful than reporting in terms of magnesium content. Calculations were made using the
+    #  following magnesium oxide (MgO) contents: magnesite, 47.8%; magnesium chloride, 42.3%; magnesium hydroxide,
+    #  69.1%; and magnesium sulfate, 33.5%."
+    #  Numerically, they all are in good agreement.
     ("Magnesium compounds", "Mine production"): ("Magnesium compounds", "Mine"),
     (
         "Magnesium compounds",
         "Mine production, gross weight of magnesite (magnesium carbonate) in thousand metric tons",
-    ): ("Magnesium compounds", "Mine, magnesium carbonate"),
+    ): ("Magnesium compounds", "Mine"),
     ("Magnesium compounds", "Mine production, magnesite - contained magnesium oxide (MgO)"): (
         "Magnesium compounds",
-        "Mine, magnesium oxide",
+        "Mine",
     ),
     ("Magnesium metal", "Magnesium smelter production"): ("Magnesium metal", "Smelter"),
     ("Magnesium metal", "Smelter production"): ("Magnesium metal", "Smelter"),

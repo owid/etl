@@ -310,9 +310,10 @@ COMMODITY_MAPPING = {
     ("Lithium minerals", "Petalite"): None,
     ("Lithium minerals", "Spodumene"): None,
     ("Lithium minerals", "Unknown"): None,
-    ("Magnesite", "Unknown"): ("Magnesite and magnesia", "Magnesite"),
-    ("Magnesite and magnesia", "Magnesia"): ("Magnesite and magnesia", "Magnesia"),
-    ("Magnesite and magnesia", "Magnesite"): ("Magnesite and magnesia", "Magnesite"),
+    # NOTE: It's unclear what "Unknown" is.
+    ("Magnesite", "Unknown"): None,
+    ("Magnesite and magnesia", "Magnesia"): ("Magnesium compounds", "Magnesia"),
+    ("Magnesite and magnesia", "Magnesite"): ("Magnesium compounds", "Magnesite"),
     # NOTE: Magnesite, calcined only has data prior to 1985.
     ("Magnesite and magnesia", "Magnesite, calcined"): None,
     # NOTE: Magnesite, crude only has data prior to 1985.

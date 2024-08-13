@@ -83,7 +83,7 @@ COMMODITY_MAPPING = {
     ("Kaolin", "Total"): ("Clays", "Kaolin"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
-    ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
+    ("Magnesium compounds", "Total"): ("Magnesium compounds", "Mine"),
     ("Magnesium metal", "Total"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
     ("Mercury", "Total"): ("Mercury", "Mine"),
