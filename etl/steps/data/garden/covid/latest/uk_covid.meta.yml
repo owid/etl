@@ -38,7 +38,7 @@ tables:
           numDecimalPlaces: 3
           <<: *zero_day
       daily_cases_rate_rolling_average:
-        title: Case rate (7-day average)
+        title: Case rate (daily, 7-day average)
         description_short: Daily number of cases of COVID-19, per 100,000 people.
         description_key:
           - Reported by the date a positive specimen is taken, not the date that a case is reported. This lag in processing means the latest data shown is several days behind the current date. Due to limited testing, the number of confirmed cases is lower than the true number of infections.
@@ -67,11 +67,11 @@ tables:
           <<: *zero_day
 
       cumulative_cases:
-        title: Cases (total)
+        title: Cases (cumulative)
         description_short: Total number of cases of COVID-19.
         unit: 'cases'
       cumulative_cases_rate:
-        title: Case rate (total)
+        title: Case rate (cumulative)
         description_short: Total number of cases of COVID-19, per 100,000 people.
         unit: 'cases per 100,000 people'
         display:
@@ -110,7 +110,7 @@ tables:
           numDecimalPlaces: 2
           <<: *zero_day
       weekly_deaths_rate:
-        title: Death rate (weekly)
+        title: Death rate (7-day rolling)
         description_short: Number of deaths due to COVID-19 in the preceeding 7 days, per 100,000 people.
         unit: ''
         display:
