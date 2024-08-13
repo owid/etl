@@ -440,13 +440,13 @@ COMMODITY_MAPPING = {
     ("Rhenium", "Unknown"): ("Rhenium", "Unknown"),
     ("Salt", "Brine salt"): ("Salt", "Brine salt"),
     ("Salt", "Brine salt & sea salt"): None,
-    # NOTE: Only available for imports before 1975.
+    # NOTE: Only available for imports before 1975.
     ("Salt", "Common salt"): None,
-    # NOTE: Only available for imports before 1975.
+    # NOTE: Only available for imports before 1975.
     ("Salt", "Crude salt"): None,
     ("Salt", "Evaporated salt"): ("Salt", "Evaporated salt"),
     ("Salt", "Other salt"): ("Salt", "Other salt"),
-    # NOTE: Only available for imports/exports before 1975.
+    # NOTE: Only available for imports/exports before 1975.
     ("Salt", "Refined salt"): None,
     ("Salt", "Rock salt"): ("Salt", "Rock salt"),
     ("Salt", "Rock salt & brine salt"): None,
@@ -495,7 +495,7 @@ COMMODITY_MAPPING = {
     ("Silver", "Unknown"): None,
     ("Silver", "Waste & scrap"): None,
     ("Silver, mine", "Unknown"): ("Silver", "Mine"),
-    ("Sodium carbonate, natural", "Unknown"): ("Sodium carbonate", "Natural"),
+    ("Sodium carbonate, natural", "Unknown"): ("Soda ash", "Natural"),
     ("Steel, crude", "Unknown"): ("Steel", "Crude"),
     ("Strontium minerals", "Unknown"): ("Strontium minerals", "Unknown"),
     ("Sulphur and pyrites", "Other"): ("Sulphur and pyrites", "Other"),

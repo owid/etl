@@ -107,7 +107,7 @@ COMMODITY_MAPPING = {
     ("Silicon", "Total"): ("Silicon", "Processing"),
     ("Silicon carbide", "Total"): None,
     ("Silver", "Total"): ("Silver", "Mine"),
-    ("Soda ash", "Total"): ("Soda ash", "Total"),
+    ("Soda ash", "Total"): ("Soda ash", "Natural and synthetic"),
     ("Steel", "Total"): ("Steel", "Crude"),
     ("Strontium", "Total"): ("Strontium", "Total"),
     ("Sulfur", "Total"): ("Sulfur", "Total"),
@@ -170,6 +170,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Phosphate rock",
     "Pumice and Pumicite",
     "Salt",
+    "Soda ash",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
