@@ -271,8 +271,8 @@ COMMODITY_MAPPING = {
     ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine"),
     ("Strontium", "Mine production"): ("Strontium", "Mine"),
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
-    ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Production, all forms"),
-    ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Production, all forms"),
+    ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
+    ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
     ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): (
         "Talc and pyrophyllite",
         "Mine production, crude and beneficiated",

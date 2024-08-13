@@ -110,7 +110,7 @@ COMMODITY_MAPPING = {
     ("Soda ash", "Total"): ("Soda ash", "Natural and synthetic"),
     ("Steel", "Total"): ("Steel", "Crude"),
     ("Strontium", "Total"): ("Strontium", "Mine"),
-    ("Sulfur", "Total"): ("Sulfur", "Total"),
+    ("Sulfur", "Total"): ("Sulfur", "Processing"),
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
     ("Tantalum", "Total"): ("Tantalum", "Mine"),
     ("Tellurium", "Total"): ("Tellurium", "Refinery"),
