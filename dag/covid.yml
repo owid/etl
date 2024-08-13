@@ -126,9 +126,8 @@ steps:
     - data://meadow/covid/latest/sweden_covid
   data://grapher/covid/latest/sweden_covid:
     - data://garden/covid/latest/sweden_covid
-
   # UK
-    data://meadow/covid/latest/uk_covid:
+  data://meadow/covid/latest/uk_covid:
     - snapshot://covid/latest/uk_covid.csv
   data://garden/covid/latest/uk_covid:
     - data://meadow/covid/latest/uk_covid
