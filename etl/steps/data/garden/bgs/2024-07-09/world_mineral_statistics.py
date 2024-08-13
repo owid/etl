@@ -408,23 +408,33 @@ COMMODITY_MAPPING = {
     ("Platinum group metals, mine", "Rhodium"): ("Platinum group metals", "Mine, rhodium"),
     ("Platinum group metals, mine", "Ruthenium"): ("Platinum group metals", "Mine, ruthenium"),
     ("Platinum group metals, mine", "Unknown"): ("Platinum group metals", "Mine, unknown"),
-    ("Potash", "Carbonate"): ("Potash", "Carbonate"),
-    ("Potash", "Caustic potash"): ("Potash", "Caustic potash"),
-    ("Potash", "Chlorate"): ("Potash", "Chlorate"),
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Carbonate"): None,
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Caustic potash"): None,
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Chlorate"): None,
     ("Potash", "Chloride"): ("Potash", "Chloride"),
-    ("Potash", "Cyanide"): ("Potash", "Cyanide"),
-    ("Potash", "Fertiliser salts"): ("Potash", "Fertilizer salts"),
-    ("Potash", "Kainite, sylvinite"): ("Potash", "Kainite, sylvinite"),
-    ("Potash", "Nitrate"): ("Potash", "Nitrate"),
-    ("Potash", "Other fertiliser salts"): ("Potash", "Other fertilizer salts"),
-    ("Potash", "Other potassic chemicals"): ("Potash", "Other potassic chemicals"),
-    ("Potash", "Other potassic fertilisers"): ("Potash", "Other potassic fertilizers"),
+    # NOTE: Only imports old data.
+    ("Potash", "Cyanide"): None,
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Fertiliser salts"): None,
+    # NOTE: Only production old data.
+    ("Potash", "Kainite, sylvinite"): None,
+    # NOTE: Only data prior to 2002.
+    ("Potash", "Nitrate"): None,
+    # NOTE: Only production data prior to 1974.
+    ("Potash", "Other fertiliser salts"): None,
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Other potassic chemicals"): None,
+    ("Potash", "Other potassic fertilisers"): None,
     ("Potash", "Polyhalite"): ("Potash", "Polyhalite"),
-    ("Potash", "Potassic chemicals"): ("Potash", "Potassic chemicals"),
-    ("Potash", "Potassic fertilisers"): ("Potash", "Potassic fertilizers"),
+    # NOTE: Only imports/exports old data.
+    ("Potash", "Potassic chemicals"): None,
+    ("Potash", "Potassic fertilisers"): None,
     ("Potash", "Potassic salts"): ("Potash", "Potassic salts"),
     ("Potash", "Sulfide"): ("Potash", "Sulfide"),
-    ("Potash", "Unknown"): ("Potash", "Unknown"),
+    ("Potash", "Unknown"): ("Potash", "Unspecified"),
     ("Rare earth minerals", "Bastnaesite"): None,
     ("Rare earth minerals", "Loparite"): None,
     ("Rare earth minerals", "Monazite"): None,
@@ -636,7 +646,7 @@ UNIT_MAPPING = {
     "tonnes": "tonnes",
     "tonnes (metric)": "tonnes",
     # "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
-    "tonnes (K20 content)": "tonnes of potassium oxide content",
+    # "tonnes (K20 content)": "tonnes of potassium oxide content",
     "tonnes (metal content)": "tonnes of metal content",
     # NOTE: The following units will be converted to tonnes using conversion factors.
     "kilograms": "tonnes",
@@ -664,11 +674,20 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Zinc",
     "Tungsten",
     "Vanadium",
+    "Potash",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
     "production|Antimony|Mine|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Potash|Chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "production|Potash|Unspecified|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "production|Potash|Polyhalite|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "production|Potash|Potassic salts|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "imports|Potash|Sulfide|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "imports|Potash|Chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "exports|Potash|Sulfide|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "exports|Potash|Chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.

@@ -364,6 +364,8 @@ FOOTNOTES = {
     "reserves|Titanium|Rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     # "reserves|Chromium|Mine|tonnes": "Values are reported as tonnes of gross weight.",
     # "production|Zirconium and hafnium|tonnes": "Values are reported as tonnes of gross weight of zirconium ores and zircon concentrates.",
+    "production|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
+    "reserves|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
 }
 
 # Dictionary of special units.
@@ -376,8 +378,8 @@ UNITS_MAPPING = {
     "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
     "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
-    "production|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
-    "reserves|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
+    # "production|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
+    # "reserves|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
     "production|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
     "reserves|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
     # "production|Titanium|Ilmenite|tonnes": "tonnes of titanium dioxide content",
