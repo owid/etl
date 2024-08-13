@@ -532,3 +532,259 @@ FIVE_YEAR_AVG_METRICS = {
         "processing_radio": PR_AVG,
     },
 }
+
+
+MAP_BRACKETS = {
+    "idps_under_18_conflict_violence": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 3000000.0, 0],
+    },
+    "idps_under_18_disaster": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 0],
+    },
+    "idps_under_18_total": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 0],
+    },
+    "international_migrants_under_18_dest": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [5000.0, 10000.0, 20000.0, 50000.0, 100000.0, 200000.0, 500000.0, 1000000.0, 0],
+    },
+    "new_idps_under_18_conflict_violence": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
+    },
+    "new_idps_under_18_disaster": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
+    },
+    "new_idps_under_18_total": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
+    },
+    "refugees_under_18_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 0],
+    },
+    "refugees_under_18_origin": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 0],
+    },
+    "refugees_under_18_asylum_per_1000": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20, 0],
+    },
+    "refugees_under_18_origin_per_1000": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [0.1, 0.3, 1.0, 3.0, 10.0, 30, 100, 0],
+    },
+    "migrants_under_18_dest_per_1000": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 20.0, 0],
+    },
+    "idps_under_18_total_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "new_idps_under_18_total_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "idps_under_18_conflict_violence_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "idps_under_18_disaster_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "new_idps_under_18_conflict_violence_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "new_idps_under_18_disaster_per_1000": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [],
+    },
+    "refugees_under_unhcrs_mandate_origin": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 0],
+    },
+    "asylum_seekers_origin": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 0],
+    },
+    "refugees_under_unhcrs_mandate_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
+    },
+    "asylum_seekers_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 0],
+    },
+    "returned_refugees_origin": {
+        "colorScaleScheme": "BuGn",
+        "colorScaleNumericBins": [10.0, 100.0, 1000.0, 10000.0, 100000.0, 0],
+    },
+    "resettlement_arrivals_origin": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [10.0, 30.0, 100.0, 300.0, 1000.0, 3000.0, 10000.0, 0],
+    },
+    "returned_refugees_dest": {
+        "colorScaleScheme": "GnBu",
+        "colorScaleNumericBins": [100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 0],
+    },
+    "resettlement_arrivals_dest": {
+        "colorScaleScheme": "BuGn",
+        "colorScaleNumericBins": [30.0, 100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 0],
+    },
+    "refugees_per_1000_pop_origin": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 0],
+    },
+    "refugees_per_1000_pop_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 0],
+    },
+    "asylum_seekers_per_100k_pop_origin": {
+        "colorScaleScheme": "YlOrRd",
+        "colorScaleNumericBins": [10.0, 20.0, 50.0, 100.0, 200.0, 500.0, 0.0],
+    },
+    "asylum_seekers_per_100k_pop_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 0.0],
+    },
+    "resettlement_per_100k_origin": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 0],
+    },
+    "resettlement_per_100k_dest": {
+        "colorScaleScheme": "BuGn",
+        "colorScaleNumericBins": [0.0, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 0],
+    },
+    "immigrants_all": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [50000.0, 100000.0, 200000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0, 0],
+    },
+    "immigrant_share_of_dest_population_all": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 10.0, 20.0, 0],
+    },
+    "emigrants_all": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [100000.0, 200000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0, 10000000, 0],
+    },
+    "immigrants_change_5_years": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [-100000, -30000.0, -10000.0, -0.0, 10000.0, 30000.0, 100000.0, 300000, 1000000.0, 0],
+    },
+    "immigrants_change_5_years_per_1000": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [-10.0, -5.0, -2.0, -1.0, -0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
+    },
+    "emigrants_change_5_years": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [
+            -50000.0,
+            -20000.0,
+            -10000.0,
+            -0.0,
+            10000.0,
+            20000.0,
+            50000.0,
+            100000.0,
+            200000.0,
+            500000.0,
+            1000000.0,
+            0,
+        ],
+    },
+    "emigrants_change_5_years_per_1000": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [-10.0, -5.0, -2.0, -1.0, -0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
+    },
+    "emigrants_share_of_total_population": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [2.0, 5.0, 10.0, 10.0, 0],
+    },
+    "net_migration": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [
+            -300000.0,
+            -100000.0,
+            -30000,
+            -10000.0,
+            -0.0,
+            10000.0,
+            30000.0,
+            100000.0,
+            300000.0,
+            0,
+        ],
+    },
+    "net_migration_rate": {
+        "colorScaleScheme": "RdYlBu",
+        "colorScaleNumericBins": [-5, -2, -1, -0.5, -0.2, -0.0, 0.2, 0.5, 1, 2, 5, 10, 0],
+    },
+    "bx_trf_pwkr_dt_gd_zs": {
+        "colorScaleScheme": "BuPu",
+        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0],
+    },
+    "si_rmt_cost_ib_zs": {
+        "colorScaleScheme": "Oranges",
+        "colorScaleNumericBins": [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 0.996667],
+    },
+    "si_rmt_cost_ob_zs": {
+        "colorScaleScheme": "Oranges",
+        "colorScaleNumericBins": [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 1.943111],
+    },
+    "conflict_stock_displacement": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 3000000.0, 1640],
+    },
+    "conflict_internal_displacements": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 230],
+    },
+    "disaster_internal_displacements": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 230],
+    },
+    "disaster_stock_displacement": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 3000000.0, 1640],
+    },
+    "total_stock_displacement": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 3000000.0, 1640],
+    },
+    "total_internal_displacements": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [30000.0, 100000.0, 300000.0, 1000000.0, 0],
+    },
+    "share_of_internally_displaced_pop": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+    },
+    "share_of_conflict_displaced_pop": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+    },
+    "share_of_disaster_displaced_pop": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.1, 0.5, 1.0, 5.0, 10.0, 0.010173337],
+    },
+    "displacements_per_100_people": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+    },
+    "conflict_displacements_per_100_people": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+    },
+    "disaster_displacements_per_100_people": {
+        "colorScaleScheme": "OrRd",
+        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 0.013775683],
+    },
+}

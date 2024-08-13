@@ -2,8 +2,7 @@
 from pathlib import Path
 
 import pandas as pd
-from migration_config_dict import CONFIG_DICT  # type: ignore
-from structlog import get_logger
+from migration_config_dict import CONFIG_DICT, MAP_BRACKETS  # type: ignore
 
 from etl.config import EXPLORERS_DIR
 from etl.explorer_helpers import Explorer
@@ -16,14 +15,12 @@ paths = PathFinder(__file__)
 ADDITIONAL_DESCRIPTIONS = {
     "net_migration": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country).",
     "net_migration_rate": "The total number of [immigrants](#dod:immigrant) (people moving into a given country) minus the number of [emigrants](#dod:emigrant) (people moving out of the country), per 1,000 people in the population.",
-    "remittance_gdp": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries.",
-    "remittance_cost_ib": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200.",
-    "remittance_cost_ob": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200. ",
+    "bx_trf_pwkr_dt_gd_zs": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries.",
+    "si_rmt_cost_ib_zs": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200.",
+    "si_rmt_cost_ob_zs": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad and includes exchange rate margin, fees, and other charges. The cost of sending remittances is based on a single transaction of USD 200. ",
 }
 
-MAP_CONFIG_DICT = {keys: {"colorScaleScheme": "Blues", "colorScaleNumericBins": ""} for keys in CONFIG_DICT.keys()}
-
-LOG = get_logger(__name__)
+USE_EXISTING_MAP_BRACKETS = False
 
 
 def run(dest_dir: str) -> None:
@@ -55,16 +52,19 @@ def run(dest_dir: str) -> None:
     ]
 
     # try to get map brackets from old explorer
-    expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
-    if expl_path.exists():
-        old_explorer = Explorer(paths.short_name)
-        df_columns = old_explorer.df_columns
-        for _, row in df_columns.iterrows():
-            var_title = row["slug"]
-            if var_title in MAP_CONFIG_DICT.keys() and "ColorScaleNumericBins" in row.keys():
-                MAP_CONFIG_DICT[var_title]["colorScaleNumericBins"] = row["colorScaleNumericBins"]
-            if var_title in MAP_CONFIG_DICT.keys() and "ColorScaleScheme" in row.keys():
-                MAP_CONFIG_DICT[var_title]["colorScaleScheme"] = row["colorScaleScheme"]
+    if USE_EXISTING_MAP_BRACKETS:
+        expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
+        if expl_path.exists():
+            old_explorer = Explorer(paths.short_name)
+            df_columns = old_explorer.df_columns
+            for _, row in df_columns.iterrows():
+                var_title = row["slug"]
+                if var_title in MAP_BRACKETS.keys() and "ColorScaleNumericBins" in row.keys():
+                    MAP_BRACKETS[var_title]["colorScaleNumericBins"] = [
+                        float(bracket) for bracket in row["colorScaleNumericBins"].split(";")
+                    ]
+                if var_title in MAP_BRACKETS.keys() and "ColorScaleScheme" in row.keys():
+                    MAP_BRACKETS[var_title]["colorScaleScheme"] = row["colorScaleScheme"]
 
     #
     # Process data.
@@ -128,12 +128,15 @@ def run(dest_dir: str) -> None:
 
     df_columns["colorScaleNumericMinValue"] = 0
     df_columns["colorScaleEqualSizeBins"] = "true"
-    #
+
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
 
     # df_graphers.to_csv("/Users/tunaacisu/Data/Test/explorer.tsv", sep="\t", index=False)
+
+    # print(df_graphers)
+    # print(df_columns)
 
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
@@ -158,8 +161,6 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             graphers_row_dict["Period Radio"] = config["period_radio"]
             graphers_row_dict["Sub-Metric Radio"] = config["sub_metric_radio"]
             graphers_row_dict["Age Radio"] = config["age_radio"]
-            graphers_row_dict["Processing Radio"] = config["processing_radio"]
-
             graphers_dicts.append(graphers_row_dict)
 
     return graphers_dicts
@@ -184,6 +185,7 @@ def create_column_rows(col_dicts, tb, ds):
 
             # some indicators don't have any/ a fitting description in the metadata: add them manually
             if column in ADDITIONAL_DESCRIPTIONS.keys():
+                print(f"Adding additional description for {column}")
                 col_row_dict["description"] = ADDITIONAL_DESCRIPTIONS[column]
             else:
                 col_row_dict["description"] = meta.description_short
@@ -205,8 +207,8 @@ def create_column_rows(col_dicts, tb, ds):
                 col_row_dict["type"] = "Numeric"
             col_row_dict["retrievedDate"] = origin.date_accessed
             # col_row_dict["additionalInfo"] = [meta.description_from_producer, meta.description_key,meta.description_processing]
-            col_row_dict["colorScaleScheme"] = MAP_CONFIG_DICT[column]["colorScaleScheme"]
-            col_row_dict["colorScaleNumericBins"] = MAP_CONFIG_DICT[column]["colorScaleNumericBins"]
+            col_row_dict["colorScaleScheme"] = MAP_BRACKETS[column]["colorScaleScheme"]
+            col_row_dict["colorScaleNumericBins"] = MAP_BRACKETS[column]["colorScaleNumericBins"]
             col_dicts.append(col_row_dict)
 
     return col_dicts
