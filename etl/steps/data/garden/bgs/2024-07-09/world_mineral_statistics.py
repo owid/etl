@@ -598,9 +598,11 @@ COMMODITY_MAPPING = {
     # NOTE: The following is in good agreement with USGS production data.
     ("Tungsten, mine", "Unknown"): ("Tungsten", "Mine"),
     ("Uranium", "Unknown"): ("Uranium", "Unknown"),
-    ("Vanadium", "Lead vanadium concentrates"): ("Vanadium", "Lead vanadium concentrates"),
+    # NOTE: Only exports data prior to 1979.
+    ("Vanadium", "Lead vanadium concentrates"): None,
     ("Vanadium", "Metal"): ("Vanadium", "Metal"),
-    ("Vanadium", "Ores & concentrates"): ("Vanadium", "Ores & concentrates"),
+    # NOTE: Only imports/exports data prior to 2010.
+    ("Vanadium", "Ores & concentrates"): None,
     ("Vanadium", "Pentoxide"): ("Vanadium", "Pentoxide"),
     ("Vanadium", "Vanadiferous residues"): ("Vanadium", "Vanadiferous residues"),
     ("Vanadium", "Vanadium-titanium pig iron"): None,
@@ -655,6 +657,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Tin",
     "Zinc",
     "Tungsten",
+    "Vanadium",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
