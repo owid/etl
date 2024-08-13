@@ -580,15 +580,22 @@ COMMODITY_MAPPING = {
     ("Titanium minerals", "Rutile"): ("Titanium", "Rutile"),
     ("Titanium minerals", "Titanium slag"): None,
     ("Titanium minerals", "Unknown"): None,
-    ("Tungsten", "Ammonium paratungstate"): ("Tungsten", "Ammonium paratungstate"),
+    # NOTE: The following is for imports/exports data prior to 2003.
+    ("Tungsten", "Ammonium paratungstate"): None,
     ("Tungsten", "Carbide"): ("Tungsten", "Carbide"),
     ("Tungsten", "Metal"): ("Tungsten", "Metal"),
     ("Tungsten", "Ores & concentrates"): ("Tungsten", "Ores & concentrates"),
-    ("Tungsten", "Other tungsten ores"): ("Tungsten", "Other tungsten ores"),
-    ("Tungsten", "Powder"): ("Tungsten", "Powder"),
-    ("Tungsten", "Scheelite ores & concentrates"): ("Tungsten", "Scheelite ores & concentrates"),
-    ("Tungsten", "Unknown"): ("Tungsten", "Unknown"),
-    ("Tungsten", "Wolframite ores & concentrates"): ("Tungsten", "Wolframite ores & concentrates"),
+    # NOTE: The following is for exports data prior to 1980.
+    ("Tungsten", "Other tungsten ores"): None,
+    # NOTE: The following is for exports data prior to 1972.
+    ("Tungsten", "Powder"): None,
+    # NOTE: The following is for exports data prior to 1990.
+    ("Tungsten", "Scheelite ores & concentrates"): None,
+    # NOTE: The following is for exports data prior to 1990.
+    ("Tungsten", "Unknown"): None,
+    # NOTE: The following is for exports data prior to 1990.
+    ("Tungsten", "Wolframite ores & concentrates"): None,
+    # NOTE: The following is in good agreement with USGS production data.
     ("Tungsten, mine", "Unknown"): ("Tungsten", "Mine"),
     ("Uranium", "Unknown"): ("Uranium", "Unknown"),
     ("Vanadium", "Lead vanadium concentrates"): ("Vanadium", "Lead vanadium concentrates"),
@@ -647,6 +654,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Silver",
     "Tin",
     "Zinc",
+    "Tungsten",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.

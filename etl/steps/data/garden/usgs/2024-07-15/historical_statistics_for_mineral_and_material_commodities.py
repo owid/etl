@@ -123,7 +123,7 @@ COMMODITY_MAPPING = {
     #  To avoid confusion, remove this total.
     ("Total clay", "Total"): None,
     ("Total manufactured abrasives ", "Total"): None,
-    ("Tungsten", "Total"): ("Tungsten", "Total"),
+    ("Tungsten", "Total"): ("Tungsten", "Mine"),
     ("Vanadium", "Total"): ("Vanadium", "Total"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
 }
