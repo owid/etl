@@ -220,7 +220,7 @@ meta:
       - Zimbabwe: Zimbabwe Ministry of Health and Child Care (https://twitter.com/MoHCCZim/status/1258247862527438848); Africa Centres for Disease Control and Prevention (https://africacdc.org/covid-19/)
 
     # Files
-    url_main: https://github.com/owid/covid-19-data/tree/master
+    url_main: https://github.com/owid/covid-19-data/
     url_download: https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv
     date_accessed: 2024-08-09
 

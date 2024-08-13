@@ -1,0 +1,88 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, hospitalisations
+    date_published: "2024-08-13"
+    description: |2-
+      Our hospital & ICU data is collected from official sources and collated by Our World in Data.
+
+      On 13 August 2023, we stopped adding new datapoints to our COVID-19 hospitalisation dataset.
+
+      The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+
+    # Citation
+    producer: Official data collated by Our World in Data
+    citation_full: |-
+      Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
+
+      European Centre for Disease Prevention and Control (https://www.ecdc.europa.eu/en/publications-data/download-data-hospital-and-icu-admission-rates-and-current-occupancy-covid-19):
+      - Bulgaria
+      - Croatia
+      - Cyprus
+      - Estonia
+      - Greece
+      - Hungary
+      - Iceland
+      - Ireland
+      - Latvia
+      - Liechtenstein
+      - Lithuania
+      - Luxembourg
+      - Malta
+      - Norway
+      - Poland
+      - Romania
+      - Slovakia
+      - Slovenia
+
+      Other sources:
+      - Algeria: Ministry of Health (https://github.com/yasserkaddour/covid19-icu-data-algeria/)
+      - Argentina: Government of Argentina, via Rodrigo Maidana (https://www.argentina.gob.ar/coronavirus/informes-diarios/reportes)
+      - Australia: Official data from states via covidbaseau.com (https://covidbaseau.com)
+      - Austria: Austrian Agency for Health and Food Safety (https://covid19-dashboard.ages.at/)
+      - Belgium: Sciensano (https://epistat.sciensano.be/)
+      - Bolivia: Ministry of Health, via Sociedatos on GitHub (https://github.com/sociedatos/bo-hospitalizados_por_departamento)
+      - Canada: Government of Canada (https://health-infobase.canada.ca/covid-19/)
+      - Chile: Ministry of Health, via Ministry of Science GitHub repository (https://github.com/MinCiencia/Datos-COVID19)
+      - Czechia: Ministry of Health (https://onemocneni-aktualne.mzcr.cz/api/v2/covid-19)
+      - Denmark: Statens Serum Institut, covid19-data-denmark on GitHub (https://covid19.ssi.dk/overvagningsdata/download-fil-med-overvaagningdata, https://github.com/mok0/covid19-data-denmark)
+      - England: Government of the United Kingdom (https://coronavirus.data.gov.uk/details/healthcare)
+      - Finland: Department of Health and Welfare (https://www.thl.fi/episeuranta/tautitapaukset/coronamap.html)
+      - France: Santé publique France (https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/)
+      - Germany: Robert Koch Institute (https://github.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/)
+      - Israel: Ministry of Health (https://datadashboard.health.gov.il/COVID-19/)
+      - Italy: Ministry of Health and Higher Institute of Health (https://github.com/pcm-dpc/COVID-19, (https://covid19.infn.it/iss/)
+      - Japan: Ministry of Health, Labour and Welfare (https://www.mhlw.go.jp/stf/seisakunitsuite/newpage_00023.html)
+      - Malaysia: Ministry of Health (https://github.com/MoH-Malaysia/covid19-public)
+      - Netherlands: National Coordination Center Patient Distribution (https://lcps.nu/datafeed/)
+      - Northern_Ireland: Government of the United Kingdom (https://coronavirus.data.gov.uk/details/healthcare)
+      - Portugal: General Directorate of Health, via Data Science for Social Good Portugal (https://github.com/dssg-pt/covid19pt-data)
+      - Russia: Government of Russia (https://стопкоронавирус.рф/information/)
+      - Scotland: Government of the United Kingdom (https://coronavirus.data.gov.uk/details/healthcare)
+      - Serbia: Ministry of Health via github.com/aleksandar-jovicic/COVID19-Serbia (https://github.com/aleksandar-jovicic/COVID19-Serbia)
+      - Singapore: Ministry of Health (https://covidsitrep.moh.gov.sg/; (https://data.gov.sg/dataset/covid-19-hospital-admissions)
+      - South_Africa: National Policy Data Observatory (NPDO) at the Council for Scientific and Industrial Research (CSIR) (https://docs.google.com/spreadsheets/d/1Ln3FO3E0hz2r_kCCWM6on9Wd18wRvrkiIV-bbE2EDQ0/edit#gid=1044172863)
+      - South_Korea: "Ministry of Health and Welfare, via WWolf on GitHub (http://ncov.mohw.go.kr/en/bdBoardList.do?brdId=16&brdGubun=161&dataGubun=&ncvContSeq=&contSeq=&board_id=)
+      - Spain: Ministry of Health, Consumption and Social Welfare (https://www.sanidad.gob.es/profesionales/saludPublica/ccayes/alertasActual/nCov/capacidadAsistencial.htm)
+      - Sweden: The Swedish National Board of Health and Welfare (https://www.socialstyrelsen.se/statistik-och-data/statistik/statistik-om-covid-19/)
+      - Switzerland: Federal Office of Public Health (https://www.covid19.admin.ch/)
+      - United_Kingdom: Government of the United Kingdom (https://coronavirus.data.gov.uk/details/healthcare)
+      - United_States: U.S. Department of Health & Human Services (https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/g62h-syeh
+      - Wales: Government of the United Kingdom (https://coronavirus.data.gov.uk/details/healthcare
+
+    # Files
+    url_main: https://github.com/owid/covid-19-data/
+    url_download: https://github.com/owid/covid-19-data/raw/master/public/data/hospitalizations/covid-hospitalizations.csv
+    date_accessed: 2024-08-13
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
+
+outs:
+  - md5: 6d7ccc5023f894765360ae9719126ce3
+    size: 14185001
+    path: hospital.csv
