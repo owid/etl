@@ -56,7 +56,7 @@ COMMODITY_MAPPING = {
     ("Copper", "Total"): ("Copper", "Mine"),
     ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
     ("Diatomite", "Total"): ("Diatomite", "Mine"),
-    ("Dimension stone", "Total"): ("Dimension stone", "Total"),
+    ("Dimension stone", "Total"): ("Dimension stone", "Mine"),
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
     # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
@@ -157,6 +157,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     # NOTE: For Cobalt, the conversion to "tonnes" is hardcoded in "prepare_world_production" function.
     "Cobalt",
     "Diatomite",
+    "Dimension stone",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
