@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
 
     # Process data.
     #
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="invasive_species")
 
     # Save outputs.
     #
