@@ -11,6 +11,8 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb_garden = ds_garden["monkeypox"]
 
+    tb_garden = tb_garden.rename_axis(index={"country": "location"})
+
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, formats=["csv"])
     ds_explorer.save()

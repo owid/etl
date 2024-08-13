@@ -189,7 +189,7 @@ def derive_metrics(tb: Table) -> Table:
 
         return tb
 
-    return tb.groupby("iso_code", observed=True).apply(derive_country_metrics)
+    return tb.groupby("country", observed=True, group_keys=False).apply(derive_country_metrics)
 
 
 def filter_dates(tb: Table) -> Table:
