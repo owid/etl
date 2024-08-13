@@ -84,7 +84,7 @@ COMMODITY_MAPPING = {
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
-    ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
+    ("Magnesium metal", "Total"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
     ("Mercury", "Total"): ("Mercury", "Mine"),
     ("Metallic abrasives", "Total"): None,

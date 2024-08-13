@@ -320,7 +320,7 @@ COMMODITY_MAPPING = {
         "Magnesite, crude & calcined",
     ),
     ("Magnesite and magnesia", "Unknown"): ("Magnesite and magnesia", "Unknown"),
-    ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Primary"),
+    ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Metal"): ("Manganese", "Refinery"),
     ("Manganese", "Ores & Concentrates"): ("Manganese", "Ores & Concentrates"),
     ("Manganese ore", "Chemical"): None,
