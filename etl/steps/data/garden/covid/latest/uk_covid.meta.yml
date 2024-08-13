@@ -12,6 +12,7 @@ dataset:
   update_period_days: 0
 
 
+  title: UKHSA data dashboard
 tables:
   uk_covid:
     variables:
@@ -54,5 +55,167 @@ tables:
       #     roundingMode:
       #     numSignificantFigures:
       #
-      {}
+      weekly_cases_rolling:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      cumulative_cases:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_deaths_rolling:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      cumulative_deaths:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_deaths:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_cases:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      test_positivity_rate:
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_hospital_admissions:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      people_in_hospital:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      people_ventilated:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - COVID-19
+      cumulative_cases_rate:
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - COVID-19
+      cumulative_deaths_rate:
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_cases_rate:
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_deaths_rate:
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_cases_rolling_normalized:
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - COVID-19
+      people_in_hospital_normalized:
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - COVID-19
+      people_ventilated_normalized:
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - COVID-19
+      weekly_deaths_rolling_normalized:
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_cases_rolling_average:
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_deaths_rolling_average:
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_cases_rate_rolling_average:
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - COVID-19
+      daily_deaths_rate_rolling_average:
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - COVID-19
+      new_hospital_admissions:
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - COVID-19
+    title: UKHSA data dashboard
+    description: Data collected from UKHSA on COVID-19.
 
