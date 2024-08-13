@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  employee_earnings_and_hours_australia:
+    variables:
+      p90_p50_ratio:
+        title: P90/P50 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.
+        description_processing: We calculated this indicator by combinining data from the Australian Bureau of Statistics' Employee Earnings and Hours reports for 2006 onwards and dividing the 90th percentile of earnings by the 50th percentile and multiplying by 100.
+        processing_level: major
+        presentation:
+          title_public: Top decile as % median
+          title_variant: Gross weekly individual earnings
+        display:
+          name: Testing variable
+          numDecimalPlaces: 1
+
