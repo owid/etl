@@ -233,12 +233,12 @@ COMMODITY_MAPPING = {
     ("Rhenium", "Mine production, contained rhenium"): ("Rhenium", "Mine"),
     ("Salt", "Mine production"): ("Salt", "Mine"),
     ("Sand and gravel (industrial)", "Mine production"): (
-        "Sand and gravel",
-        "Industrial",
+        "Sand and gravel, industrial",
+        "Mine",
     ),
     ("Sand and gravel (industrial)", "Mine production, industrial sand and gravel"): (
-        "Sand and gravel",
-        "Industrial",
+        "Sand and gravel, industrial",
+        "Mine",
     ),
     ("Selenium", "Refinery production"): ("Selenium", "Refinery"),
     ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery"),
