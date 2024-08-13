@@ -54,7 +54,7 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
     ("Construction sand and gravel", "Total"): ("Sand and gravel", "Construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
-    ("Crushed stone", "Total"): ("Crushed stone", "Total"),
+    ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
     ("Diatomite", "Total"): ("Diatomite", "Total"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
