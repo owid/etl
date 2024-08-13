@@ -611,7 +611,7 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Vanadium-titanium pig iron"): None,
     ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
     ("Vermiculite", "Unknown"): ("Vermiculite", "Unknown"),
-    ("Wollastonite", "Unknown"): ("Wollastonite", "Unknown"),
+    ("Wollastonite", "Unknown"): ("Wollastonite", "Mine"),
     ("Zinc", "Crude & refined"): None,
     ("Zinc", "Ores & concentrates"): None,
     ("Zinc", "Oxides"): None,
