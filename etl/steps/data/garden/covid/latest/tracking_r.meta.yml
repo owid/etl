@@ -1,0 +1,51 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    zero_day: &zero_day
+      yearIsDay: true
+      zeroDay: 2020-01-01
+
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      numDecimalPlaces: 3
+      <<: *zero_day
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, TrackingR
+
+tables:
+  tracking_r:
+    variables:
+      r:
+        title: Reproduction rate
+        description_short:
+          Median number of new infections caused by a single infected individual. If the rate is greater than 1, the infection is able to spread in the population. If it is below 1, the number of cases occurring in the population will gradually decrease to zero.
+        unit: ''
+      ci_95_u:
+        title: Upper limit 95% credible interval
+        unit: ''
+      ci_95_l:
+        title: Lower limit 95% credible interval
+        unit: ''
+      ci_65_u:
+        title: Upper limit 65% credible interval
+        unit: ''
+      ci_65_l:
+        title: Lower limit 65% credible interval
+        unit: ''
+      days_infectious:
+        title: Serial interval for Covid-19
+        description_short: |-
+          Provides a range from 5 to 10 days. An extense discussion on the effect of changing the serial interval can be found on the paper. Recent studies find that estimates of the serial interval for COVID-19 range between 4 and 9 days (Nishiura et al.,2020b;Park et al.,2020;Sanche et al.,2020). Authors suggest using 7 days (the average of the range) as point of reference.
+        unit: 'days'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
