@@ -448,7 +448,7 @@ COMMODITY_MAPPING = {
     ("Rare earths", "Ores & concentrates"): ("Rare earths", "Ores & concentrates"),
     ("Rare earths", "Other rare earth compounds"): None,
     ("Rare earths", "Rare earth compounds"): ("Rare earths", "Compounds"),
-    ("Rhenium", "Unknown"): ("Rhenium", "Unknown"),
+    ("Rhenium", "Unknown"): ("Rhenium", "Mine"),
     ("Salt", "Brine salt"): ("Salt", "Brine salt"),
     ("Salt", "Brine salt & sea salt"): None,
     # NOTE: Only available for imports before 1975.
