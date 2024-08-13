@@ -36,7 +36,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
 
     tb = (
@@ -148,18 +149,8 @@ def add_regions(tb: Table) -> Table:
 
 def add_population_and_countries(tb: Table) -> Table:
     ds_population = paths.load_dataset("population")
-
-    # Use population from 2022. Using population per year results in charts with
-    # cumulative cases per million showing jumps around new year.
-    pop_2022 = ds_population["population"].xs(2022, level="year")["population"]
-    tb["population"] = tb["country"].map(pop_2022)
-
-    """match population to year
-    tb["year"] = pd.to_datetime(tb.date).dt.year
-    tb = add_population_to_table(tb, ds_population)
-    tb = tb.drop(columns=["year"])
-    """
-
+    tb = geo.add_population_daily(tb, ds_population)
+    tb.date = tb.date.dt.date.astype(str)
     return tb
 
 
