@@ -22,7 +22,8 @@ def run(dest_dir: str) -> None:
     tb_glob = ds_meadow["global"].reset_index()
     # Combine the global and continental datasets
     tb = pr.concat([tb_cont, tb_glob])
-    #
+    # Not clear from the paper what this group includes, and there aren't many of them so I'll drop it for now
+    tb = tb.drop(columns=["arthropods_p_p__myriapods__diplopods_etc"])
     # Add cumulative sum for each species in each region
     cols = tb.columns.drop(["country", "year"]).tolist()
     for col in cols:
