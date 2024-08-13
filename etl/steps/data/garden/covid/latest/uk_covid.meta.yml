@@ -25,11 +25,11 @@ tables:
     variables:
       # Cases
       daily_cases:
-        title: Daily cases
+        title: Cases (daily)
         description_short: Number of daily cases of COVID-19.
         unit: 'cases'
       daily_cases_rolling_average:
-        title: Daily cases (7-day average)
+        title: Cases (daily, 7-day average)
         description_short: Number of daily cases of COVID-19. Smoothed with by averaging with a 7-day rolling-window.
         description_key:
           - Due to limited testing, the number of confirmed cases is lower than the true number of infections.
