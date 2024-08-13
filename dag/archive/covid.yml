@@ -44,4 +44,8 @@ steps:
     - data://garden/covid/latest/testing_time_series
   data://garden/covid/latest/testing_time_series:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID%20testing%20time%20series%20data.csv
-
+  # Sweden
+  data-private://grapher/covid/latest/sweden:
+    - data-private://garden/covid/latest/sweden
+  data-private://garden/covid/latest/sweden:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv

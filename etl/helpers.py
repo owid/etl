@@ -88,10 +88,17 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     assert ds.metadata.title, "Dataset must have a title."
 
     for tab in ds:
-        assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
-        assert (
-            tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['year'].dtype}"
+        if {"year", "country"} <= set(tab.all_columns):
+            if "year" in tab.columns:
+                year = tab["year"]
+            else:
+                year = tab.index.get_level_values("year")
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+        elif {"date", "country"} <= set(tab.all_columns):
+            pass
+        else:
+            raise AssertionError("Table must have columns country and year or date.")
+
         for col in tab:
             if col in ("year", "country"):
                 continue
