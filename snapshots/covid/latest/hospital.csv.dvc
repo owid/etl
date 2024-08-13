@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, hospitalisations
+    date_published: "2024-08-13"
+    description: |2-
+      Our hospital & ICU data is collected from official sources and collated by Our World in Data.
+
+      On 13 August 2023, we stopped adding new datapoints to our COVID-19 hospitalisation dataset.
+
+      The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+
+    # Citation
+    producer: Official data collated by Our World in Data
+    citation_full: |-
+      Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
+
+    # Files
+    url_main: https://github.com/owid/covid-19-data/
+    url_download: https://github.com/owid/covid-19-data/raw/master/public/data/hospitalizations/covid-hospitalizations.csv
+    date_accessed: 2024-08-13
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
+
+outs:
+  - md5: 6d7ccc5023f894765360ae9719126ce3
+    size: 14185001
+    path: hospital.csv
