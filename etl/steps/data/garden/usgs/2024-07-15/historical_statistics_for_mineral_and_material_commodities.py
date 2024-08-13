@@ -69,7 +69,7 @@ COMMODITY_MAPPING = {
     ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
-    ("Gypsum", "Total"): ("Gypsum", "Total"),
+    ("Gypsum", "Total"): ("Gypsum", "Mine"),
     ("Helium", "Total"): ("Helium", "Total"),
     ("Indium", "Total"): ("Indium", "Refinery"),
     # NOTE: Industrial diamond production includes natural and synthetic diamonds.
@@ -160,6 +160,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Dimension stone",
     "Fluorspar",
     "Fuller's earth",
+    "Gypsum",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
