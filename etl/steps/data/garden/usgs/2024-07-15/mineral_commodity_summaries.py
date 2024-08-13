@@ -205,11 +205,8 @@ COMMODITY_MAPPING = {
     ("Nickel", "Mine production - nickel, metric tons contained"): ("Nickel", "Mine"),
     ("Niobium (columbium)", "Mine production"): ("Niobium", "Mine"),
     ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine"),
-    ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Plant, fixed ammonia"),
-    ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): (
-        "Nitrogen",
-        "Plant, fixed ammonia",
-    ),
+    ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
+    ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): ("Nitrogen", "Fixed ammonia"),
     ("Peat", "Mine production"): ("Peat", "Mine"),
     ("Peat", "Mine production, peat"): ("Peat", "Mine"),
     ("Perlite", "Mine production"): ("Perlite", "Mine"),

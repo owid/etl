@@ -96,7 +96,7 @@ COMMODITY_MAPPING = {
     ("Niobium", "Total"): ("Niobium", "Mine"),
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
-    ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
+    ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
     ("Peat", "Total"): ("Peat", "Total"),
     ("Perlite", "Total"): ("Perlite", "Total"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
