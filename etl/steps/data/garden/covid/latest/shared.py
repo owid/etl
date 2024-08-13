@@ -111,3 +111,32 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: O
         ), f"Missing countries don't match the expected! {countries_missing}"
 
     return tb
+
+
+def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
+    n_rows_before = len(tb)
+    dates_before = set(tb["date"])
+    tb_before = tb.copy()
+
+    tb = tb.sort_values("date")
+    metrics = ("total_vaccinations", "people_vaccinated", "people_fully_vaccinated")
+    tb[list(metrics)] = tb[list(metrics)].astype(float)
+    for metric in metrics:
+        while not tb[metric].ffill().fillna(0).is_monotonic_increasing:
+            diff = tb[metric].ffill().shift(-1) - tb[metric].ffill()
+            tb = tb.loc[(diff >= 0) | (diff.isna())]
+    dates_now = set(tb.date)
+
+    tb[list(metrics)] = tb[list(metrics)].astype("Int64")
+
+    if max_removed_rows is not None:
+        num_removed_rows = n_rows_before - len(tb)
+        if num_removed_rows > max_removed_rows:
+            dates_wrong = dates_before.difference(dates_now)
+            tb_wrong = tb_before[tb_before.date.isin(dates_wrong)]
+            raise Exception(
+                f"{num_removed_rows} rows have been removed. That is more than maximum allowed ({max_removed_rows}) by"
+                f" make_monotonic() - check the data. Check \n{tb_wrong}"  # {', '.join(sorted(dates_wrong))}"
+            )
+
+    return tb

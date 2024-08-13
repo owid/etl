@@ -1,0 +1,46 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Country-specific
+    title_snapshot: COVID-19, Behaviour Tracker Data Hub (Saudi Arabia)
+    url_download: https://github.com/YouGov-Data/covid-19-tracker/raw/master/data/saudi-arabia.csv
+
+    # Data product / Snapshot
+    title: COVID-19, Behaviour Tracker Data Hub
+    description: |-
+      This is the data repository for the Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub.
+
+      YouGov has partnered with the Institute of Global Health Innovation (IGHI) at Imperial College London to gather global insights on people’s behaviours in response to COVID-19.
+
+      It is designed to provide behavioural analysis on how different populations are responding to the pandemic, helping public health bodies in their efforts to limit the impact of the disease. Anonymised respondent level data will be available for all public health and academic institutions globally.
+
+      The questions in the survey, led by IGHI, cover data on testing, symptoms, self-isolating in response to symptoms and the ability and willingness to self-isolate if needed. It also looks at behaviours, including going outdoors, working outside the home, contact with others, hand washing and the extent of compliance with 20 common preventative measures.
+
+      The datafiles contain responses from nationally representative surveys of the general public about symptoms, testing, self-isolation, social distancing and behaviour.
+
+      Contextual data includes: gender, age, region (within country), number of people in the household, children in household, health conditions, working status and the date of the survey response. A weighting variable is also provided, typically based on age, gender and region. For obvious reasons, people with severe symptoms, people who are / have been hospitalised and some other hard to reach groups will be under-represented in the sample.
+
+      We have completed a privacy assessment and have taken steps to safeguard the anonymity of the respondents by ensuring that the survey responses and contextual data, when looked at in isolation or as a combined data set, cannot be used to re-identify the respondents. A key part of this has been the exclusion of all data may lead to a greater risk of identification. For example, in the data set ‘age’ is represented by a numeric value rather than a full date of birth, and ‘regions’ are represented areas large enough to protect privacy, but which are still statistically valuable, such as Scotland or West Midlands.
+
+      The files contain anonymised respondent level data files from surveys conducted from the 31st March 2020 to date across : Australia; Brazil; Canada; China; Denmark; Finland; France; Germany; Hong Kong; India; Indonesia; Italy; Japan; Malaysia; Mexico; Netherlands; Norway; Philippines; Saudi Arabia; Singapore; South Korea; Spain; Sweden; Taiwan; Thailand; UAE; UK; USA; Vietnam.
+    date_published: "2022-03-29"
+
+    # Citation
+    producer: Imperial College London, YouGov
+    citation_full: |-
+      Jones, Sarah P., Imperial College London Big Data Analytical Unit and YouGov Plc. 2020, Imperial College London YouGov Covid Data Hub, v1.0, YouGov Plc, April 2020
+
+    # Files
+    url_main: https://github.com/YouGov-Data/covid-19-tracker
+    date_accessed: 2024-08-07
+
+    # License
+    license:
+      name: 2020 YouGov Plc
+      url: https://yougov.co.uk/about/terms
+
+outs:
+  - md5: 4b88993cda5ebef8bf7973b37302313f
+    size: 12823408
+    path: yougov_saudi-arabia.csv

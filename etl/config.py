@@ -68,6 +68,9 @@ DEBUG = env.get("DEBUG") in ("True", "true", "1")
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
 
+# Prefer downloading datasets from catalog instead of building them
+PREFER_DOWNLOAD = env.get("PREFER_DOWNLOAD") in ("True", "true", "1")
+
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
 R2_SNAPSHOTS_PUBLIC = "owid-snapshots"

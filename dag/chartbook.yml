@@ -53,6 +53,33 @@ steps:
   data://garden/cedlas/2024-07-31/sedlac_poverty_2018:
     - data://meadow/cedlas/2024-07-31/sedlac_poverty_2018
 
+  # Langoni (1972) - Income distribution estimates in Brazil (1960-1970)
+  data://meadow/chartbook/2024-08-08/langoni_1972_brazil:
+    - snapshot://chartbook/2024-08-08/langoni_1972_brazil.csv
+  data://garden/chartbook/2024-08-08/langoni_1972_brazil:
+    - data://meadow/chartbook/2024-08-08/langoni_1972_brazil
+
+  # Gini for individual earnings from Neri in OECD (2010)
+  data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - snapshot://oecd/2024-08-08/tackling_inequalities_brazil_2010.csv
+  data://garden/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010
+
+  ################################################################################################
+  # CANADA
+  ################################################################################################
+  # Gini coefficient for gross family income for non-farm families (Love, 1979)
+  data://meadow/chartbook/2024-08-09/love_1979_canada:
+    - snapshot://chartbook/2024-08-09/love_1979_canada.csv
+  data://garden/chartbook/2024-08-09/love_1979_canada:
+    - data://meadow/chartbook/2024-08-09/love_1979_canada
+
+  # Gini coefficient, equivalized gross family income (Wolfson, 1986)
+  data://meadow/chartbook/2024-08-09/wolfson_1986_canada:
+    - snapshot://chartbook/2024-08-09/wolfson_1986_canada.csv
+  data://garden/chartbook/2024-08-09/wolfson_1986_canada:
+    - data://meadow/chartbook/2024-08-09/wolfson_1986_canada
+
   ################################################################################################
   # FRANCE
   ################################################################################################
