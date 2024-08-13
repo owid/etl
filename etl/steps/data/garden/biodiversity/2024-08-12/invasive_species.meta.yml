@@ -20,52 +20,52 @@ tables:
     variables:
       birds:
         title: First records of established alien bird species
-        description_short: The year in which a now established alien bird species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien bird species was first recorded outside of its native range.
       fishes:
         title: First records of established alien fish species
-        description_short: The year in which a now established alien fish species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien fish species was first recorded outside of its native range.
       insects:
         title: First records of established alien insect species
-        description_short: The year in which a now established alien insect species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien insect species was first recorded outside of its native range.
       mammals:
         title: First records of established alien mammal species
-        description_short: The year in which a now established alien mammal species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien mammal species was first recorded outside of its native range.
       molluscs:
         title: First records of established alien mollusc species
-        description_short: The year in which a now established alien mollusc species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien mollusc species was first recorded outside of its native range.
       vascular_plants:
         title: First records of established alien vascular plant species
-        description_short: The year in which a now established alien vascular plant species was first recorded in a continent outside of its native range for the first time.
+        description_short: The year in which a now-established alien vascular plant species was first recorded outside of its native range.
       all:
         title: First records of all established alien species
-        description_short: The year in which a now established alien species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien species was first recorded outside of its native range.
       bryophytes:
         title: First records of established alien bryophyte species
-        description_short: The year in which a now established alien bryophyte species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien bryophyte species was first recorded outside of its native range.
       algae:
         title: First records of established alien algae species
-        description_short: The year in which a now established alien algae species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien algae species was first recorded outside of its native range.
       reptiles:
         title: First records of all established alien reptile species
-        description_short: The year in which a now established alien reptile species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien reptile species was first recorded outside of its native range.
       amphibians:
         title: First records of all established alien amphibian species
-        description_short: The year in which a now established alien amphibian species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien amphibian species was first recorded outside of its native range.
       crustaceans:
         title: First records of all established alien crustacean species
-        description_short: The year in which a now established alien crustacean species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien crustacean species was first recorded outside of its native range.
       arachnids:
         title: First records of all established alien arachnid species
-        description_short: The year in which a now established alien arachnid species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien arachnid species was first recorded outside of its native range.
       invertebrates__excl__arthropods__molluscs:
         title: First records of all established alien invertabrate (excluding arthropods and mollsucs) species
-        description_short: The year in which a now established alien invertabrate (excluding arthropods and mollsucs) species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien invertabrate (excluding arthropods and mollsucs) species was first recorded outside of its native range.
       fungi:
         title: First records of all established fungi alien species
-        description_short: The year in which a now established alien fungi species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien fungi species was first recorded outside of its native range.
       bacteria_and_protozoans:
         title: First records of all established alien bacteria and protozoan species
-        description_short: The year in which a now established alien bacteria and protozoan species was first recorded in outside of its native range for the first time.
+        description_short: The year in which a now-established alien bacteria and protozoan species was first recorded outside of its native range.
       birds_cumulative:
         title: Cumulative first records of established alien bird species
       fishes_cumulative:
