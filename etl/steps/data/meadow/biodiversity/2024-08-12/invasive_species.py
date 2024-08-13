@@ -1,8 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -13,11 +15,38 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("invasive_species.xlsx")
 
-    # Load data from snapshot.
-    tb = snap.read(sheet_name="ContinentalTrends")
+    snap = paths.load_snapshot("invasive_species.xlsx")
     origins = [snap.metadata.origin]
+
+    tb_cont = snap.read(sheet_name="ContinentalTrends")
+    tb_cont = format_continental_trends(tb_cont)
+    tb_cont = tb_cont.format(["year", "continent"], short_name="continental")
+
+    tb_glob = snap.read(sheet_name="GlobalTrends")
+    tb_glob["country"] = "World"
+    tb_glob = tb_glob.format(["country", "year"], short_name="global")
+    # Adding the origins in
+    for col in tb_cont.columns:
+        tb_cont[col].metadata.origins = origins
+
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(
+        dest_dir, tables=[tb_cont, tb_glob], check_variables_metadata=True, default_metadata=snap.metadata
+    )
+
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
+
+
+def format_continental_trends(tb: Table) -> Table:
+    """
+    The data is formatted as a wide table, with merged cells in the first row for the taxa, and continents repeated for each taxa in the second row.
+    This function extracts this data into a easier to handle format.
+    """
     taxa = ["Vascular plants", "Mammals", "Birds", "Fishes", "Insects", "Molluscs"]
     tables = []
     # Grabbing the columns for each taxa separately and then combining them together
@@ -44,18 +73,4 @@ def run(dest_dir: str) -> None:
         columns="taxon",
         values="Count",
     ).reset_index()
-
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["year", "continent"])
-    # Adding the origins in
-    for col in tb.columns:
-        tb[col].metadata.origins = origins
-
-    #
-    # Save outputs.
-    #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
-
-    # Save changes in the new meadow dataset.
-    ds_meadow.save()
+    return tb
