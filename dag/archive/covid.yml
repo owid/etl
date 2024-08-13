@@ -54,3 +54,8 @@ steps:
     - data-private://garden/covid/latest/uk_covid_data
   data-private://garden/covid/latest/uk_covid_data:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
+  # Hospitalisations
+  data://grapher/covid/latest/hospital_and_icu:
+    - data://garden/covid/latest/hospital_and_icu
+  data://garden/covid/latest/hospital_and_icu:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
