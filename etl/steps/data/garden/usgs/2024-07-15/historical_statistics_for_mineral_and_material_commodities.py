@@ -75,7 +75,7 @@ COMMODITY_MAPPING = {
     # NOTE: Industrial diamond production includes natural and synthetic diamonds.
     #  But in USGS current data, industrial diamond production includes only natural diamond.
     ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
-    ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
+    ("Industrial garnet", "Total"): ("Garnet", "Mine"),
     ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Industrial"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
@@ -161,6 +161,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Fluorspar",
     "Fuller's earth",
     "Gypsum",
+    "Industrial garnet",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
