@@ -17,32 +17,32 @@ tables:
   invasive_species:
     variables:
       birds:
-        title: Established alien bird species
-        description_short: The year in which an alien bird species is recorded as established outside of its native range for the first time.
+        title: First records of established alien bird species
+        description_short: The year in which a now established alien bird species was first recorded in a continent outside of its native range for the first time.
       fishes:
-        title: Established alien fish species
-        description_short: The year in which an alien fish species is recorded as established outside of its native range for the first time.
+        title: First records of established alien fish species
+        description_short: The year in which a now established alien fish species was first recorded in a continent outside of its native range for the first time.
       insects:
-        title: Established alien insect species
-        description_short: The year in which an alien insect species is recorded as established outside of its native range for the first time.
+        title: First records of established alien insect species
+        description_short: The year in which a now established alien insect species was first recorded in a continent outside of its native range for the first time.
       mammals:
-        title: Established alien mammal species
-        description_short: The year in which an alien mammal species is recorded as established outside of its native range for the first time.
+        title: First records of established alien mammal species
+        description_short: The year in which a now established alien mammal species was first recorded in a continent outside of its native range for the first time.
       molluscs:
-        title: Established alien mollusc species
-        description_short: The year in which an alien mollusc species is recorded as established outside of its native range for the first time.
+        title: First records of established alien mollusc species
+        description_short: The year in which a now established alien mollusc species was first recorded in a continent outside of its native range for the first time.
       vascular_plants:
-        title: Established alien vascular plants
-        description_short: The year in which an alien vascular plant species is recorded as established outside of its native range for the first time.
+        title: First records of established alien vascular plant species
+        description_short: The year in which a now established alien vascular plant species was first recorded in a continent outside of its native range for the first time.
       birds_cumulative:
-        title: Cumulative established alien bird species
+        title: Cumulative first records of established alien bird species
       fishes_cumulative:
-        title: Cumulative established alien fish species
+        title: Cumulative first records of established alien fish species
       insects_cumulative:
-        title: Cumulative established alien insect species
+        title: Cumulative first records of established alien insect species
       mammals_cumulative:
-        title: Cumulative established alien mammal species
+        title: Cumulative first records of established alien mammal species
       molluscs_cumulative:
-        title: Cumulative established alien mollusc species
+        title: Cumulative first records of established alien mollusc species
       vascular_plants_cumulative:
-        title: Cumulative established alien vascular plant species
+        title: Cumulative first records of established alien vascular plant species
