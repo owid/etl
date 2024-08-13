@@ -55,7 +55,7 @@ COMMODITY_MAPPING = {
     ("Construction sand and gravel", "Total"): ("Sand and gravel", "Construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
     ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
-    ("Diatomite", "Total"): ("Diatomite", "Total"),
+    ("Diatomite", "Total"): ("Diatomite", "Mine"),
     ("Dimension stone", "Total"): ("Dimension stone", "Total"),
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
@@ -156,6 +156,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Feldspar",
     # NOTE: For Cobalt, the conversion to "tonnes" is hardcoded in "prepare_world_production" function.
     "Cobalt",
+    "Diatomite",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
