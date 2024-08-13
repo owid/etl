@@ -78,13 +78,13 @@ def run(dest_dir: str) -> None:
     df_graphers = pd.DataFrame(graphers_dicts)
 
     # Add a map tab to all indicators.
-    df_graphers["hasMapTab"] = True
+    df_graphers["hasMapTab"] = "true"
     # show map tab by default
     df_graphers["tab"] = "map"
     # set yAxis to start at 0
     df_graphers["yAxisMin"] = 0
     # hide automatic time/ entity in chart title
-    df_graphers["hideAnnotationFieldsInTitle"] = True
+    df_graphers["hideAnnotationFieldsInTitle"] = "true"
     # set current year als maximum year
     df_graphers["timelineMaxTime"] = 2024
 
@@ -127,7 +127,7 @@ def run(dest_dir: str) -> None:
     df_columns = pd.DataFrame(col_dicts)
 
     df_columns["colorScaleNumericMinValue"] = 0
-    df_columns["colorScaleEqualSizeBins"] = True
+    df_columns["colorScaleEqualSizeBins"] = "true"
     #
     # Save outputs.
     #
@@ -203,7 +203,7 @@ def create_column_rows(col_dicts, tb, ds):
                 col_row_dict["type"] = "Percentage"
             else:
                 col_row_dict["type"] = "Numeric"
-            col_row_dict["dateRetrieved"] = origin.date_accessed
+            col_row_dict["retrievedDate"] = origin.date_accessed
             # col_row_dict["additionalInfo"] = [meta.description_from_producer, meta.description_key,meta.description_processing]
             col_row_dict["colorScaleScheme"] = MAP_CONFIG_DICT[column]["colorScaleScheme"]
             col_row_dict["colorScaleNumericBins"] = MAP_CONFIG_DICT[column]["colorScaleNumericBins"]
