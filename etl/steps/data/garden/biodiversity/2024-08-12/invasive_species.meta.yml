@@ -36,6 +36,36 @@ tables:
       vascular_plants:
         title: First records of established alien vascular plant species
         description_short: The year in which a now established alien vascular plant species was first recorded in a continent outside of its native range for the first time.
+      all:
+        title: First records of all established alien species
+        description_short: The year in which a now established alien species was first recorded in outside of its native range for the first time.
+      bryophytes:
+        title: First records of established alien bryophyte species
+        description_short: The year in which a now established alien bryophyte species was first recorded in outside of its native range for the first time.
+      algae:
+        title: First records of established alien algae species
+        description_short: The year in which a now established alien algae species was first recorded in outside of its native range for the first time.
+      reptiles:
+        title: First records of all established alien reptile species
+        description_short: The year in which a now established alien reptile species was first recorded in outside of its native range for the first time.
+      amphibians:
+        title: First records of all established alien amphibian species
+        description_short: The year in which a now established alien amphibian species was first recorded in outside of its native range for the first time.
+      crustaceans:
+        title: First records of all established alien crustacean species
+        description_short: The year in which a now established alien crustacean species was first recorded in outside of its native range for the first time.
+      arachnids:
+        title: First records of all established alien arachnid species
+        description_short: The year in which a now established alien arachnid species was first recorded in outside of its native range for the first time.
+      invertebrates__excl__arthropods__molluscs:
+        title: First records of all established alien invertabrate (excluding arthropods and mollsucs) species
+        description_short: The year in which a now established alien invertabrate (excluding arthropods and mollsucs) species was first recorded in outside of its native range for the first time.
+      fungi:
+        title: First records of all established fungi alien species
+        description_short: The year in which a now established alien fungi species was first recorded in outside of its native range for the first time.
+      bacteria_and_protozoans:
+        title: First records of all established alien bacteria and protozoan species
+        description_short: The year in which a now established alien bacteria and protozoan species was first recorded in outside of its native range for the first time.
       birds_cumulative:
         title: Cumulative first records of established alien bird species
       fishes_cumulative:
@@ -48,3 +78,24 @@ tables:
         title: Cumulative first records of established alien mollusc species
       vascular_plants_cumulative:
         title: Cumulative first records of established alien vascular plant species
+      all_cumulative:
+        title: Cumulative first records of all established alien species
+      bryophytes_cumulative:
+        title: Cumulative first records of established alien bryophyte species
+      algae_cumulative:
+        title: Cumulative first records of established alien algae species
+      reptiles_cumulative:
+        title: Cumulative first records of all established alien reptile species
+      amphibians_cumulative:
+        title: Cumulative first records of all established alien amphibian species
+      crustaceans_cumulative:
+        title: Cumulative first records of all established alien crustacean species
+      arachnids_cumulative:
+        title: Cumulative first records of all established alien arachnid species
+      invertebrates__excl__arthropods__molluscs_cumulative:
+        title: Cumulative first records of all established alien invertabrate (excluding arthropods and mollsucs) species
+      fungi_cumulative:
+        title: Cumulative first records of all established fungi alien species
+      bacteria_and_protozoans_cumulative:
+        title: Cumulative first records of all established alien bacteria and protozoan species
+

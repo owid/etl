@@ -15,7 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["invasive_species"].reset_index()
-    tb = tb.rename(columns={"continent": "country"})
     #
     # Process data.
     #

@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,17 +16,21 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("invasive_species")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["invasive_species"].reset_index()
+    tb_cont = ds_meadow["continental"].reset_index()
+    tb_cont = tb_cont.rename(columns={"continent": "country"})
 
+    tb_glob = ds_meadow["global"].reset_index()
+    # Combine the global and continental datasets
+    tb = pr.concat([tb_cont, tb_glob])
     #
-    # Add cumulative sum for each species
-    cols = tb.columns.drop(["continent", "year"]).tolist()
+    # Add cumulative sum for each species in each region
+    cols = tb.columns.drop(["country", "year"]).tolist()
     for col in cols:
-        tb[f"{col}_cumulative"] = tb.groupby("continent", observed=True)[col].transform(lambda x: x.fillna(0).cumsum())
+        tb[f"{col}_cumulative"] = tb.groupby("country", observed=True)[col].transform(lambda x: x.fillna(0).cumsum())
 
     # Process data.
     #
-    tb = tb.format(["continent", "year"])
+    tb = tb.format(["country", "year"])
 
     # Save outputs.
     #
