@@ -305,7 +305,7 @@ class ChartDiffShow:
         ):
             self._show_metadata_diff_modal()
 
-    @st.experimental_dialog("Metadata differences", width="large")  # type: ignore
+    @st.dialog("Metadata differences", width="large")  # type: ignore
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
         # Sanity checks
@@ -513,7 +513,7 @@ class ChartDiffShow:
             with tab2:
                 self._show_approval_history()
 
-    @st.experimental_fragment
+    @st.fragment
     def show(self):
         """Show chart diff."""
         # Show in expander or not

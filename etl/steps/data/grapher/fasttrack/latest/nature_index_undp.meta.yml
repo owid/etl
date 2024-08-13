@@ -6,22 +6,39 @@ dataset:
 tables:
   nature_index_undp:
     variables:
-      hdi_co2_index:
-        title: hdi_co2_index
+      co2_normalised:
+        title: co2_normalised
         unit: ''
-        description: Human Development Index adjusted for consumption-based CO2 emissions.
-      hdi_land_index:
-        title: hdi_land_index
+        description: CO2 emissions per person, using consumption-based data where available. This is normalised between 0
+          and 1.
+      land_normalised:
+        title: land_normalised
         unit: ''
-        description: Human Development Index adjusted for agricultural land use.
+        description: Agricultural land use per person. This is normalised between 0 and 1.
       care_index:
         title: care_index
         unit: ''
-        description: The average of the CO2-adjusted and land-adjusted HDI values.
-      protected_areas:
-        title: protected_areas
+        description: The average of the CO2 emissions and land use index.
+      conserved_areas:
+        title: conserved_areas
         unit: ''
-        description: Share of land area that is protected.
+        description: Share of land area that is protected and conserved.
+      land_integrity_index:
+        title: land_integrity_index
+        unit: ''
+        description: Land integrity index.
+      thriving_index:
+        title: thriving_index
+        unit: ''
+        description: The average of the index for conserved areas and land integrity.
+      nature_legal_index:
+        title: nature_legal_index
+        unit: ''
+        description: An index of legal protections for nature and the environment, scaled between 0 and 1.
+      protected_index:
+        title: protected_index
+        unit: ''
+        description: An index of legal protections for nature and the environment, scaled between 0 and 1.
       nri_index:
         title: nri_index
         unit: ''
