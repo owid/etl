@@ -313,13 +313,14 @@ COMMODITY_MAPPING = {
     ("Magnesite", "Unknown"): ("Magnesite and magnesia", "Magnesite"),
     ("Magnesite and magnesia", "Magnesia"): ("Magnesite and magnesia", "Magnesia"),
     ("Magnesite and magnesia", "Magnesite"): ("Magnesite and magnesia", "Magnesite"),
-    ("Magnesite and magnesia", "Magnesite, calcined"): ("Magnesite and magnesia", "Magnesite, calcined"),
-    ("Magnesite and magnesia", "Magnesite, crude"): ("Magnesite and magnesia", "Magnesite, crude"),
-    ("Magnesite and magnesia", "Magnesite, crude & calcined"): (
-        "Magnesite and magnesia",
-        "Magnesite, crude & calcined",
-    ),
-    ("Magnesite and magnesia", "Unknown"): ("Magnesite and magnesia", "Unknown"),
+    # NOTE: Magnesite, calcined only has data prior to 1985.
+    ("Magnesite and magnesia", "Magnesite, calcined"): None,
+    # NOTE: Magnesite, crude only has data prior to 1985.
+    ("Magnesite and magnesia", "Magnesite, crude"): None,
+    # NOTE: Magnesite, crude & calcined only has data prior to 1985.
+    ("Magnesite and magnesia", "Magnesite, crude & calcined"): None,
+    # NOTE: It's unclear what "Unknown" is.
+    ("Magnesite and magnesia", "Unknown"): None,
     ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Metal"): ("Manganese", "Refinery"),
     ("Manganese", "Ores & Concentrates"): ("Manganese", "Ores & Concentrates"),
