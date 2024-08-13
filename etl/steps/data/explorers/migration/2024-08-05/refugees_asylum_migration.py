@@ -100,11 +100,11 @@ def run(dest_dir: str) -> None:
     df_graphers["sort_order_metrics"] = df_graphers["Metric Dropdown"].apply(sort_metrics)
     df_graphers["sort_order_age"] = df_graphers["Age Radio"].apply(sort_age)
     df_graphers = df_graphers.sort_values(
-        by=["sort_order", "Period Radio", "Sub-Metric Radio", "sort_order_age"],
+        by=["sort_order_metrics", "Period Radio", "Sub-Metric Radio", "sort_order_age"],
         ascending=True,
     ).reset_index(drop=True)
 
-    df_graphers = df_graphers.drop(columns=["sort_order", "sort_order_age"])
+    df_graphers = df_graphers.drop(columns=["sort_order_metrics", "sort_order_age"])
 
     # Prepare explorer metadata.
     config = {

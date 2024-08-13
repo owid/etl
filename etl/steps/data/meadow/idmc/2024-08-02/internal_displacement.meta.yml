@@ -110,7 +110,7 @@ tables:
           grapher_config:
             note: |-
               {definitions.processing_notes.footnote_displacements}
-      displacements_per_100_people:
+      displacements_per_1000_people:
         title: Internal displacements per 1000 people
         description_short: |-
           The number of internal displacements due to both conflict and disaster, per 1000 people living in the country. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders.
@@ -140,7 +140,7 @@ tables:
           grapher_config:
             note: |-
               {definitions.processing_notes.footnote_displacements}
-      conflict_displacements_per_100_people:
+      conflict_displacements_per_1000_people:
         title: Internal displacements due to conflict per 1000 people
         description_short: |-
           Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders.
@@ -168,7 +168,7 @@ tables:
           grapher_config:
             note: |-
               {definitions.processing_notes.footnote_displacements}
-      disaster_displacements_per_100_people:
+      disaster_displacements_per_1000_people:
         title: Internal displacements due to disaster per 1000 people
         description_short: |-
           Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders.
