@@ -88,8 +88,8 @@ COMMODITY_MAPPING = {
     ("Manganese", "Total"): ("Manganese", "Mine"),
     ("Mercury", "Total"): ("Mercury", "Mine"),
     ("Metallic abrasives", "Total"): None,
-    ("Mica (natural), scrap and flake", "Total"): None,
-    ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
+    ("Mica (natural), scrap and flake", "Total"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural), sheet", "Total"): ("Mica", "Mine, sheet"),
     ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous"),
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
@@ -163,6 +163,8 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Gypsum",
     "Industrial garnet",
     "Kaolin",
+    "Mica (natural), sheet",
+    "Mica (natural), scrap and flake",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).

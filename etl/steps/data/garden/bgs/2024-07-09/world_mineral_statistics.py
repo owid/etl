@@ -330,19 +330,28 @@ COMMODITY_MAPPING = {
     ("Manganese ore", "Metallurgical"): None,
     ("Manganese ore", "Unknown"): ("Manganese", "Ores & Concentrates"),
     ("Mercury", "Unknown"): ("Mercury", "Mine"),
-    ("Mica", "Block"): ("Mica", "Block"),
-    ("Mica", "Condenser films"): ("Mica", "Condenser films"),
-    ("Mica", "Crude"): ("Mica", "Crude"),
+    # NOTE: All mica data below is very sparse. Several have data until 1980, or 2002.
+    #  The sub-commodity with the largest numbers is "Unknown", so it's not clear what it means.
+    #  None of the sub-commodities seem to agree with USGS data.
+    ("Mica", "Block"): None,
+    ("Mica", "Condenser films"): None,
+    # NOTE: "Crude" only has production data, and only until 1980.
+    ("Mica", "Crude"): None,
     ("Mica", "Ground"): ("Mica", "Ground"),
-    ("Mica", "Ground & waste"): ("Mica", "Ground & waste"),
-    ("Mica", "Mica"): ("Mica", "Mica"),
-    ("Mica", "Other unmanufactured"): ("Mica", "Other unmanufactured"),
-    ("Mica", "Phlogopite"): ("Mica", "Phlogopite"),
-    ("Mica", "Sheet"): ("Mica", "Sheet"),
-    ("Mica", "Splittings"): ("Mica", "Splittings"),
-    ("Mica", "Unknown"): ("Mica", "Unknown"),
+    ("Mica", "Ground & waste"): None,
+    # NOTE: The following is ambiguous, and has only imports/exports data until 2013/2007.
+    ("Mica", "Mica"): None,
+    ("Mica", "Other unmanufactured"): None,
+    # NOTE: "Phlogopite" only has production data, and only until 1980.
+    ("Mica", "Phlogopite"): None,
+    # NOTE: "Sheet" only has production data, and only until 1980.
+    ("Mica", "Sheet"): None,
+    # NOTE: "Splittings" has only imports/exports data until 2002.
+    ("Mica", "Splittings"): None,
+    # NOTE: The following is the sub-commodity with the largest numbers, even though it's not specified what it shows.
+    ("Mica", "Unknown"): ("Mica", "Mine"),
     ("Mica", "Unmanufactured"): ("Mica", "Unmanufactured"),
-    ("Mica", "Waste"): ("Mica", "Waste"),
+    ("Mica", "Waste"): None,
     ("Molybdenum", "Metal"): ("Molybdenum", "Refinery"),
     ("Molybdenum", "Ores & concentrates"): ("Molybdenum", "Ores & concentrates"),
     ("Molybdenum", "Oxides"): None,
