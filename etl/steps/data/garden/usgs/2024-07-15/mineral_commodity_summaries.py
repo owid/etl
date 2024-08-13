@@ -105,6 +105,8 @@ COMMODITY_MAPPING = {
     ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine"),
     ("Clays", "Bentonite, mine production"): ("Clays", "Bentonite"),
     ("Clays", "Fuller's earth, mine production"): ("Clays", "Fuller's earth"),
+    # NOTE: There is good agreement between USGS current and BGS production data for Kaolin for several countries,
+    #  including the US. But for the World (and a few other countries), USGS current is significantly higher.
     ("Clays", "Kaolin, mine production"): ("Clays", "Kaolin"),
     ("Clays", "Mine poduction, Bentonite"): ("Clays", "Bentonite"),
     ("Clays", "Mine poduction, Fuller's earth"): ("Clays", "Fuller's earth"),

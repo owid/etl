@@ -284,7 +284,7 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Sponge"): None,
     ("Iron, steel and ferro-alloys", "Sponge & powder"): None,
     ("Iron, steel and ferro-alloys", "Tin-plate scrap"): None,
-    ("Kaolin", "Unknown"): ("Kaolin", "Unknown"),
+    ("Kaolin", "Unknown"): ("Clays", "Kaolin"),
     ("Lead", "Ores & concentrates"): None,
     ("Lead", "Refined"): ("Lead", "Refinery"),
     ("Lead", "Scrap"): None,

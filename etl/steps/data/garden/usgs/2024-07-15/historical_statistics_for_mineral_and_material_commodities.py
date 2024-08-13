@@ -80,7 +80,7 @@ COMMODITY_MAPPING = {
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Crude ore"),
-    ("Kaolin", "Total"): ("Kaolin", "Total"),
+    ("Kaolin", "Total"): ("Clays", "Kaolin"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
@@ -162,6 +162,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Fuller's earth",
     "Gypsum",
     "Industrial garnet",
+    "Kaolin",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
