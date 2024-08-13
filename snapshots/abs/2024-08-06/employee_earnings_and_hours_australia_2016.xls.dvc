@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Employee Earnings and Hours, Australia
+    description: |-
+      Includes earnings and hours statistics for characteristics such as industry, occupation, sex, age, full-time/part-time, and method of setting pay
+    date_published: "2017-01-19"
+    version_producer: May 2016
+    title_snapshot: Employee Earnings and Hours, Australia - Data cube 3. All employees (Reference period 2016)
+    description_snapshot: |-
+      Distribution, Deciles and quartiles of weekly total cash earnings-Age category, Method of setting pay, Employment status, Type of employee, Occupation by Sex, Industry and Sector
+
+    # Citation
+    producer: Australian Bureau of Statistics
+    citation_full: |-
+      Australian Bureau of Statistics. (2016, May). Employee Earnings and Hours, Australia. ABS. https://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/6306.0Main+Features1May%202016?OpenDocument.
+    attribution_short: ABS
+    # Files
+    url_main: https://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/6306.0Main+Features1May%202016?OpenDocument
+    url_download: https://www.abs.gov.au/AUSSTATS/subscriber.nsf/log?openagent&63060do003_201605.xls&6306.0&Data%20Cubes&63B26DD29D457FC9CA2580AC001375E6&0&May%202016&19.01.2017&Previous
+    date_accessed: 2024-08-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
+
+outs:
+  - md5: 73e13b32260a9c2deac5f975d04f02de
+    size: 290304
+    path: employee_earnings_and_hours_australia_2016.xls

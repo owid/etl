@@ -52,3 +52,7 @@ tables:
         title: Tree cover loss driven by unknown causes
         display:
           name: Unknown
+      total:
+        title: Total tree cover loss
+        display:
+          name: Total

@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  income:
+    variables:
+      gini:
+        title: Gini index
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality. Inequality is measured here in terms of income after taxes and benefits.
+        presentation:
+          title_public: Gini coefficient
+          title_variant: Equivalized disposable household income
+        display:
+          name: Gini index
+          numDecimalPlaces: 0
+
+  wealth:
+    variables:
+      gini:
+        title: Gini index
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality. Inequality is measured here in terms of equivalized household net wealth.
+        presentation:
+          title_public: Gini coefficient
+          title_variant: Equivalized household net wealth
+        display:
+          name: Gini index
+          numDecimalPlaces: 0
+

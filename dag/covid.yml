@@ -126,12 +126,15 @@ steps:
     - data://meadow/covid/latest/sweden_covid
   data://grapher/covid/latest/sweden_covid:
     - data://garden/covid/latest/sweden_covid
-  ######################################
   # UK
-  data-private://grapher/covid/latest/uk_covid_data:
-    - data-private://garden/covid/latest/uk_covid_data
-  data-private://garden/covid/latest/uk_covid_data:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
+  data://meadow/covid/latest/uk_covid:
+    - snapshot://covid/latest/uk_covid.csv
+  data://garden/covid/latest/uk_covid:
+    - data://meadow/covid/latest/uk_covid
+  data://grapher/covid/latest/uk_covid:
+    - data://garden/covid/latest/uk_covid
+
+  ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc
