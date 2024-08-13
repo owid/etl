@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     melted_tb = pr.melt(
         tb,
         id_vars=["Year", "taxon"],
-        value_vars=["Africa", "Asia", "Oceania", "Europe", "North America"],
+        value_vars=["Africa", "Asia", "Oceania", "Europe", "North America", "South America"],
         var_name="Continent",
         value_name="Count",
     )
