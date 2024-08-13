@@ -421,7 +421,7 @@ def run(dest_dir: str) -> None:
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
     #     tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
-    #     minerals=["Vermiculite"],
+    #     minerals=["Iodine"],
     # )
 
     # Create region aggregates.

@@ -128,7 +128,7 @@ COMMODITY_MAPPING = {
     ("Coal", "Other bituminous coal"): ("Coal", "Other bituminous coal"),
     ("Coal", "Other coal"): ("Coal", "Other coal"),
     ("Coal", "Sub-bituminous"): ("Coal", "Sub-bituminous"),
-    ("Coal", "Unknown"): ("Coal", "Unknown"),
+    ("Coal", "Unknown"): ("Coal", "Unspecified"),
     ("Cobalt", "Metal & refined"): None,
     ("Cobalt", "Ore"): None,
     ("Cobalt", "Oxide, sinter & sulfide"): None,
@@ -213,7 +213,7 @@ COMMODITY_MAPPING = {
     ("Ferro-alloys", "Spiegeleisen"): None,
     ("Fluorspar", "Unknown"): ("Fluorspar", "Mine"),
     ("Gallium, primary", "Unknown"): ("Gallium", "Primary"),
-    ("Gemstones", "Unknown"): ("Gemstones", "Unknown"),
+    ("Gemstones", "Unknown"): None,
     ("Germanium metal", "Unknown"): ("Germanium", "Refinery"),
     ("Gold", "Metal"): ("Gold", "Metal"),
     ("Gold", "Metal, other"): None,
@@ -233,7 +233,7 @@ COMMODITY_MAPPING = {
     ("Gypsum and plaster", "Unknown"): ("Gypsum", "Mine"),
     ("Helium", "Helium"): ("Helium", "Mine"),
     ("Indium, refinery", "Unknown"): ("Indium", "Refinery"),
-    ("Iodine", "Unknown"): ("Iodine", "Unknown"),
+    ("Iodine", "Unknown"): ("Iodine", "Mine"),
     ("Iron ore", "Burnt pyrites"): None,
     ("Iron ore", "Unknown"): ("Iron ore", "Crude ore"),
     # The following is used for production of pig iron.
@@ -772,9 +772,9 @@ def harmonize_units(tb: Table) -> Table:
     # Visually inspect category-commodity-subcommodity combinations with missing units.
     # Check that the only combinations still with no units are the expected ones.
     missing_units = {
-        "category": ["Exports", "Imports"],
-        "commodity": ["Gemstones", "Gemstones"],
-        "sub_commodity": ["Unknown", "Unknown"],
+        "category": [],
+        "commodity": [],
+        "sub_commodity": [],
     }
     error = "The list of combinations category-commodity-subcommodity with missing units has changed."
     assert (
