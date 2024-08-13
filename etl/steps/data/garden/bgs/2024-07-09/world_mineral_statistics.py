@@ -497,7 +497,7 @@ COMMODITY_MAPPING = {
     ("Silver, mine", "Unknown"): ("Silver", "Mine"),
     ("Sodium carbonate, natural", "Unknown"): ("Soda ash", "Natural"),
     ("Steel, crude", "Unknown"): ("Steel", "Crude"),
-    ("Strontium minerals", "Unknown"): ("Strontium minerals", "Unknown"),
+    ("Strontium minerals", "Unknown"): ("Strontium", "Mine"),
     ("Sulphur and pyrites", "Other"): ("Sulphur and pyrites", "Other"),
     ("Sulphur and pyrites", "Precipitated"): ("Sulphur and pyrites", "Precipitated"),
     ("Sulphur and pyrites", "Pyrites"): ("Sulphur and pyrites", "Pyrites"),
