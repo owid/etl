@@ -5,7 +5,9 @@ definitions:
       topic_tags:
         - Biodiversity
     unit: species
-
+    description_key:
+      - For global values a species may be counted multiple times, if the species was found in different regions (one first record per species and region). A region mostly refers to countries and some distinguished islands such as Hawaii, Azores or Sicily.
+      - For continental values, only the very first record of a species on a continent is considered. That is, a species has at maximum one first record per continent.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
