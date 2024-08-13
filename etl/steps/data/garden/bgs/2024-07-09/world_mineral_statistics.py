@@ -600,7 +600,7 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Wolframite ores & concentrates"): None,
     # NOTE: The following is in good agreement with USGS production data.
     ("Tungsten, mine", "Unknown"): ("Tungsten", "Mine"),
-    ("Uranium", "Unknown"): ("Uranium", "Unknown"),
+    ("Uranium", "Unknown"): ("Uranium", "Mine"),
     # NOTE: Only exports data prior to 1979.
     ("Vanadium", "Lead vanadium concentrates"): None,
     ("Vanadium", "Metal"): ("Vanadium", "Metal"),
@@ -610,7 +610,7 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Vanadiferous residues"): ("Vanadium", "Vanadiferous residues"),
     ("Vanadium", "Vanadium-titanium pig iron"): None,
     ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
-    ("Vermiculite", "Unknown"): ("Vermiculite", "Unknown"),
+    ("Vermiculite", "Unknown"): ("Vermiculite", "Mine"),
     ("Wollastonite", "Unknown"): ("Wollastonite", "Mine"),
     ("Zinc", "Crude & refined"): None,
     ("Zinc", "Ores & concentrates"): None,

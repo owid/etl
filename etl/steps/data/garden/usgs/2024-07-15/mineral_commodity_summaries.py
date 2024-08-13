@@ -333,8 +333,8 @@ COMMODITY_MAPPING = {
     ("Vermiculite", "Mine production"): ("Vermiculite", "Mine"),
     ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
     ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
-    ("Zeolites (natural)", "Mine production"): ("Zeolites (natural)", "Mine"),
-    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites (natural)", "Mine"),
+    ("Zeolites (natural)", "Mine production"): ("Zeolites, natural", "Mine"),
+    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites, natural", "Mine"),
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
         "Mine",
