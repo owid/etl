@@ -73,7 +73,7 @@ def dag_datasets_dirs(dag_path: Path) -> Set[str]:
     """Return a list of directories that contain datasets in the DAG."""
     # make sure we get as many datasets as possible to avoid deleting `backport`
     # if `--backport` flag is not used
-    dag = construct_dag(dag_path, backport=True, private=True, grapher=False)
+    dag = construct_dag(dag_path, backport=True, private=True, grapher=False, action=False)
 
     dataset_dirs = []
     for step_name in dag.keys():

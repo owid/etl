@@ -244,10 +244,6 @@ def create_dataset(
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
-<<<<<<< HEAD
-
-=======
->>>>>>> 43cb3872b (refactor: adapt table with dates to grapher)
         used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats, repack=repack)
 
