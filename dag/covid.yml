@@ -153,6 +153,18 @@ steps:
   data://grapher/covid/latest/tracking_r:
     - data://garden/covid/latest/tracking_r
 
+  # Vaccinations
+  data://meadow/covid/latest/vaccinations_global:
+    - snapshot://covid/latest/vaccinations_global.csv
+    - snapshot://covid/latest/vaccinations_global_who.csv
+  data://garden/covid/latest/vaccinations_global:
+    - data://meadow/covid/latest/vaccinations_global
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/demography/2024-07-15/population
+  data://grapher/covid/latest/vaccinations_global:
+    - data://garden/covid/latest/vaccinations_global
+
   ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
