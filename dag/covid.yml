@@ -51,6 +51,9 @@ steps:
   data://meadow/covid/latest/oxcgrt_policy:
     - snapshot://covid/latest/oxcgrt_policy_compact.csv
     - snapshot://covid/latest/oxcgrt_policy_vaccines.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2020.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2021.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
   data://garden/covid/latest/oxcgrt_policy:
     - data://meadow/covid/latest/oxcgrt_policy
   data://grapher/covid/latest/oxcgrt_policy:
@@ -111,7 +114,7 @@ steps:
   data://grapher/covid/latest/testing:
     - data://garden/covid/latest/testing
 
-  # Combined dataset
+  # Combined dataset (megafile-related indicators)
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
