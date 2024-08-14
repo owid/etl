@@ -27,9 +27,9 @@ meta:
 
       Because of the complexity of the dataset, it is published across 27 CSV files. Our technical documentation (https://github.com/OxCGRT/covid-policy-dataset/blob/main/documentation_and_codebook.md) contains all the information users need to navigate and use the data.
 
-    title_snapshot: Government Response Tracker (OxCGRT) - Compact
+    title_snapshot: Government Response Tracker (OxCGRT) - National data 2021
     description_snapshot: |-
-      This is the file type authors expect most people will use. It contains 56 variables (including metadata) for 185 national jurisdictions and 210 subnational jurisdictions.
+      This file provides maximum detail while still reporting the overall situation in each jurisdiction. Only data for 2021.
 
 
     date_published: "2023-06-21"
@@ -41,7 +41,7 @@ meta:
 
     # Files
     url_main: https://github.com/OxCGRT/covid-policy-dataset
-    url_download: https://github.com/OxCGRT/covid-policy-dataset/raw/main/data/OxCGRT_compact_national_v1.csv
+    url_download: https://github.com/OxCGRT/covid-policy-dataset/raw/main/data/OxCGRT_fullwithnotes_national_2021_v1.csv
     date_accessed: 2024-08-01
 
     # License
@@ -49,6 +49,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: 3c22cc4386b4659b9f62031142c11965
-    size: 43837034
-    path: oxcgrt_policy_compact.csv
+  - md5: 7eadf3733b8bc741ba6f2edd225d132e
+    size: 61244326
+    path: oxcgrt_policy_national_2021.csv
