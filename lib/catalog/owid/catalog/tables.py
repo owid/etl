@@ -1135,7 +1135,10 @@ class TableGroupBy:
             return tb
 
         df = self.groupby.apply(f, *args, include_groups=include_groups)
-        return _create_table(df, mem["table"].metadata, mem["table"]._fields)
+        if not mem or isinstance(mem["table"], pd.DataFrame):
+            return Table(df)
+        else:
+            return _create_table(df, mem["table"].metadata, mem["table"]._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
