@@ -75,7 +75,7 @@ tables:
       new_idps_under_18_conflict_violence:
         title: New internal displacements of children due to conflict
         description_short: |-
-          New [internal displacements](#dod:internally-displaced) of children under 18 years old, due to conflict and violence. Internal displacement describe the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders.
+          New [internal displacements](#dod:internally-displaced) of children under 18 years old, due to conflict and violence. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         presentation:
