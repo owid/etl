@@ -1,7 +1,12 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
+
 import pandas as pd
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_explorer
+
+# Initialize log.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -81,6 +86,12 @@ def run(dest_dir: str) -> None:
     df_graphers.loc[remove_unit_mask, "Type Dropdown"] = df_graphers.loc[remove_unit_mask, "Type Dropdown"].str.replace(
         " (tonnes)", ""
     )
+    # Warn if there are still mineral-metric-type combinations with multiple units.
+    multiple_units = sorted(
+        set(df_graphers[df_graphers["Type Dropdown"].str.contains("(", regex=False)]["Mineral Dropdown"])
+    )
+    if multiple_units:
+        log.warning(f"Units different from '(tonnes)' found for {multiple_units}")
 
     # Add a map tab to all indicators.
     df_graphers["hasMapTab"] = True

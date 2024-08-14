@@ -71,7 +71,9 @@ COMMODITY_MAPPING = {
     ),
     ("Beryllium", "Mine production"): ("Beryllium", "Mine"),
     ("Beryllium", "Mine production, beryllium"): ("Beryllium", "Mine"),
-    ("Bismuth", "Mine production"): ("Bismuth", "Mine"),
+    # NOTE: Bismuth mine production differs significantly from USGS historical data. It may be because USGS current
+    #  reports as gross weight and USGS historical as metal content. But for now, simply ignore USGS current.
+    ("Bismuth", "Mine production"): None,
     ("Bismuth", "Refinery production"): ("Bismuth", "Refinery"),
     # NOTE: None of the following seem to correspond to the Boron mine production from the USGS historical data.
     ("Boron", "Mine production, borates"): None,
@@ -371,13 +373,14 @@ FOOTNOTES = {
     "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
 }
 
 # Dictionary of special units.
 UNITS_MAPPING = {
     "production|Chromium|Mine|tonnes": "tonnes of gross weight",
-    "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
-    "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
+    # "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
+    # "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
 }
 

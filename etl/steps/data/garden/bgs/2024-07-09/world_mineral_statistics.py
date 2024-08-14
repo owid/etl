@@ -646,7 +646,7 @@ UNIT_MAPPING = {
     "tonnes (metric)": "tonnes",
     # "tonnes (Al2O3 content)": "tonnes of aluminum oxide content",
     # "tonnes (K20 content)": "tonnes of potassium oxide content",
-    "tonnes (metal content)": "tonnes of metal content",
+    # "tonnes (metal content)": "tonnes of metal content",
     # NOTE: The following units will be converted to tonnes using conversion factors.
     "kilograms": "tonnes",
     "kilograms (metal content)": "tonnes of metal content",
@@ -676,6 +676,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Potash",
     "Platinum group metals",
     "Uranium",
+    "Bismuth",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -693,6 +694,7 @@ FOOTNOTES = {
     "production|Platinum group metals|Mine, platinum|tonnes": "Values are reported as tonnes of metal content.",
     "production|Platinum group metals|Mine, rhodium|tonnes": "Values are reported as tonnes of metal content.",
     "production|Uranium|Mine|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.

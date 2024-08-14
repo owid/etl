@@ -172,6 +172,9 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Salt",
     "Soda ash",
     "Talc and pyrophyllite",
+    # NOTE: Bismuth is in gross weight for the US, but metal content for the World.
+    #  However, data for the US contains only nans and zeros, and will be removed later on.
+    "Bismuth",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
@@ -185,6 +188,7 @@ FOOTNOTES_PRODUCTION = {
     "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
     "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
+    "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
 FOOTNOTES_UNIT_VALUE = {}
 
@@ -353,12 +357,15 @@ def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
         )
         if "metal_content" in column:
             _tb_production["unit"] = "tonnes of metal content"
+            # Instead of changing the unit, we create a footnote.
+            _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes"
         elif "refinery" in column:
             # world_refinery_production is informed only for Bismuth and Cobalt.
             # In the case of Bismuth, the title says "gross weight unless otherwise noted"
             # (and nothing else is noted for world refinery production).
             # However, in both cases, the unit is probably "tonnes of metal content".
-            _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes of metal content"
+            # Instead of changing the unit, we create a footnote.
+            # _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes"
             # In the case of Cobalt, to harmonize with BGS data, use "tonnes" and add a footnote.
             _tb_production.loc[_tb_production["commodity"] == "Cobalt", "unit"] = "tonnes"
 
@@ -531,6 +538,12 @@ def run(dest_dir: str) -> None:
 
     # Drop empty columns, if any.
     tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
+
+    ####################################################################################################################
+    # Fix some other specific cases.
+    # Bismuth in gross weight only has data for the US, and it's all zeros.
+    tb_flat.loc[(tb_flat["country"] == "United States"), "production|Bismuth|Mine|tonnes"] = pd.NA
+    ####################################################################################################################
 
     # Format tables conveniently.
     tb_combined = tb_combined.format(
