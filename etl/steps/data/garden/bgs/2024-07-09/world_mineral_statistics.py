@@ -675,6 +675,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Vanadium",
     "Potash",
     "Platinum group metals",
+    "Uranium",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -691,7 +692,7 @@ FOOTNOTES = {
     "production|Platinum group metals|Mine, palladium|tonnes": "Values are reported as tonnes of metal content.",
     "production|Platinum group metals|Mine, platinum|tonnes": "Values are reported as tonnes of metal content.",
     "production|Platinum group metals|Mine, rhodium|tonnes": "Values are reported as tonnes of metal content.",
-    # "production|Platinum group metals|Mine, unspecified|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Uranium|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.
