@@ -7,7 +7,20 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = ["Asia", "Europe", "Africa", "Oceania", "North America", "South America"]
+# List of regions to be used in the dataset - continents, world and income groups
+REGIONS = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -19,6 +32,7 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
     tb = ds_meadow["tree_cover_loss_by_driver"].reset_index()
 
     #
@@ -35,7 +49,9 @@ def run(dest_dir: str) -> None:
     tb = convert_codes_to_drivers(tb)
 
     tb = tb.pivot(index=["country", "year"], columns="category", values="area").reset_index()
-    tb = geo.add_regions_to_table(tb, ds_regions=ds_regions, regions=REGIONS, min_num_values_per_year=1)
+    tb = geo.add_regions_to_table(
+        tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS, min_num_values_per_year=1
+    )
     tb = tb.format(["country", "year"])
 
     #

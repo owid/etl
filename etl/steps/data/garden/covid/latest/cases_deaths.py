@@ -1,10 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
+from shared import add_population_daily, fill_date_gaps
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -65,7 +64,7 @@ def run(dest_dir: str) -> None:
     # - Filling in NaNs with zeroes, for daily indicators.
     # - Filling in NaNs with the last non-NaN value, for cumulative indicators (forward filling).
     tb[["new_cases", "new_deaths"]] = tb[["new_cases", "new_deaths"]].fillna(0)
-    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].fillna(method="ffill")  # type: ignore
+    tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].ffill()  # type: ignore
 
     # Main processing
     tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d")
@@ -74,7 +73,14 @@ def run(dest_dir: str) -> None:
     ## Drop rows
     tb = discard_rows(tb)
     ## Add population
-    tb = add_population_daily(tb, ds_population)
+    tb = add_population_daily(
+        tb,
+        ds_population,
+        missing_countries={
+            "International",
+            "Pitcairn",
+        },
+    )
     ## Add regions
     tb = add_regions(tb, ds_regions, ds_income)
     ## Add period-aggregtes, doublig days
@@ -159,33 +165,6 @@ def aggregate_international(tb: Table) -> Table:
     return tb
 
 
-def fill_date_gaps(tb: Table) -> Table:
-    """Ensure dataframe has all dates.
-
-    Apparently, in the past the input data had all the dates from start to end.
-
-    Early in 2024 this stopped to be like this, maybe due to a change in how the data is reported by the WHO. Hence, we need to make sure that there are no gaps!
-    Source of change might be this: https://github.com/owid/covid-19-data/commit/ed73e7113344caffc9e445946979e1964720348b#diff-cb6c8f3daa43ff50c0cac819d63ce03bedfd4c7cf98ace02cad543a485c9513e
-
-    We do this by:
-        - Reindexing the dataframe to have all dates for all locations.
-    """
-    # Ensure date is of type date
-    tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d").astype("datetime64[ns]")
-
-    # Get set of locations
-    countries = set(tb["country"])
-    # Create index based on all locations and all dates
-    complete_dates = pd.date_range(tb["date"].min(), tb["date"].max())
-
-    # Reindex
-    tb = tb.set_index(["country", "date"])
-    new_index = pd.MultiIndex.from_product([countries, complete_dates], names=["country", "date"])
-    tb = tb.reindex(new_index).sort_index().reset_index()
-
-    return tb
-
-
 def discard_rows(tb: Table):
     """Discard outliers."""
     print("Discarding rows…")
@@ -257,14 +236,11 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
 
 
 def add_period_aggregates(tb: Table, prefix: str, periods: int):
-    # Convert Table to DataFrame
-    df = pd.DataFrame(tb)
-
     # Period-aggregate cases and deaths
     cases_colname = f"{prefix}_cases"
     deaths_colname = f"{prefix}_deaths"
-    df[[cases_colname, deaths_colname]] = (
-        df[["country", "new_cases", "new_deaths"]]
+    tb[[cases_colname, deaths_colname]] = (
+        tb[["country", "new_cases", "new_deaths"]]
         .groupby("country")[["new_cases", "new_deaths"]]
         .rolling(window=periods, min_periods=periods - 1, center=False)
         .sum()
@@ -274,8 +250,8 @@ def add_period_aggregates(tb: Table, prefix: str, periods: int):
     # Period-growth of cases and deaths
     cases_growth_colname = f"{prefix}_pct_growth_cases"
     deaths_growth_colname = f"{prefix}_pct_growth_deaths"
-    df[[cases_growth_colname, deaths_growth_colname]] = (
-        df[["country", cases_colname, deaths_colname]]
+    tb[[cases_growth_colname, deaths_growth_colname]] = (
+        tb[["country", cases_colname, deaths_colname]]
         .groupby("country")[[cases_colname, deaths_colname]]
         .pct_change(periods=periods, fill_method=None)
         .round(3)
@@ -284,17 +260,10 @@ def add_period_aggregates(tb: Table, prefix: str, periods: int):
     )
 
     # Set NaNs where the original data was NaN
-    df.loc[df["new_cases"].isnull(), cases_colname] = np.nan
-    df.loc[df["new_deaths"].isnull(), deaths_colname] = np.nan
+    tb.loc[tb["new_cases"].isnull(), cases_colname] = np.nan
+    tb.loc[tb["new_deaths"].isnull(), deaths_colname] = np.nan
 
-    # Convert dataframe to Table
-    tb_new = Table(df).copy_metadata(tb)
-    tb_new[cases_colname] = tb_new[cases_colname].copy_metadata(tb["new_cases"])
-    tb_new[deaths_colname] = tb_new[deaths_colname].copy_metadata(tb["new_deaths"])
-    tb_new[cases_growth_colname] = tb_new[cases_growth_colname].copy_metadata(tb["new_cases"])
-    tb_new[deaths_growth_colname] = tb_new[deaths_growth_colname].copy_metadata(tb["new_deaths"])
-
-    return tb_new
+    return tb
 
 
 def add_doubling_days(tb: Table) -> Table:
@@ -370,14 +339,11 @@ def add_rolling_avg(tb: Table) -> Table:
     ]
     tb = tb.copy().sort_values(by="date")
 
-    # TMP: Table -> DataFrame
-    df = pd.DataFrame(tb)
-
     for indicator in indicators:
         col = f"{indicator}_7_day_avg_right"
-        df[col] = df[indicator].astype("float")
-        df[col] = (
-            df.groupby("country")[col]
+        tb[col] = tb[indicator].astype("float")
+        tb[col] = (
+            tb.groupby("country")[col]
             .rolling(
                 window=7,
                 min_periods=6,
@@ -386,9 +352,6 @@ def add_rolling_avg(tb: Table) -> Table:
             .mean()
             .reset_index(level=0, drop=True)
         )
-
-    # TMP: DataFrame -> Table
-    tb = Table(df).copy_metadata(tb)
 
     for indicator in indicators:
         col = f"{indicator}_7_day_avg_right"
@@ -509,45 +472,3 @@ def set_dtypes(tb: Table) -> Table:
         },
     }
     return tb.astype(dtypes)
-
-
-def add_population_daily(tb: Table, ds_population: Dataset) -> Table:
-    """Add `population` column to table.
-
-    Adds population value on a daily basis (extrapolated from yearly data).
-    """
-    countries_start = set(tb["country"].unique())
-    tb_pop = make_table_population_daily(
-        ds_population=ds_population, year_min=tb["date"].dt.year.min() - 1, year_max=tb["date"].dt.year.max() + 1
-    )
-    tb = tb.merge(tb_pop, on=["country", "date"])
-    countries_end = set(tb["country"].unique())
-
-    # Check countries that went missing
-    countries_missing = countries_start - countries_end
-    assert countries_missing == {
-        "International",
-        "Pitcairn",
-    }, f"Missing countries don't match the expected! {countries_missing}"
-
-    return tb
-
-
-def make_table_population_daily(ds_population: Dataset, year_min: int, year_max: int) -> Table:
-    """Create table with daily population.
-
-    Uses linear interpolation.
-    """
-    # Load population table
-    population = ds_population.read_table("population")
-    # Filter only years of interest
-    population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
-    # Create date column
-    population["date"] = pd.to_datetime(population["year"].astype("string") + "-07-01")
-    # Keep relevant columns
-    population = population.loc[:, ["date", "country", "population"]]
-    # Add missing dates
-    population = fill_date_gaps(population)
-    # Linearly interpolate NaNs
-    population = geo.interpolate_table(population, "country", "date")
-    return cast(Table, population)

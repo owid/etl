@@ -58,6 +58,8 @@ def cli(
 
     repo = gh_utils.get_repo(repo_name)
     pr = gh_utils.get_pr(repo, branch)
+    if pr is None:
+        raise AssertionError(f"No open PR found for branch {branch}")
 
     # recalculate services
     services_body = {}

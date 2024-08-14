@@ -19,6 +19,7 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 SHEET_IDS = [
+    "1yLHJZFj1fMgZCUIhMm5vpQM9SFR7ecv7B4Vvw30HaYY",  # Country 0 - Chad
     "13Toik5IlnJv45AwCuRXjsdybLXHRXEzUgVWP_OTh5h0",  # Countries 1-100
     "1cHoD5qHc5d-0cO2H2R43yL_x5Ikay1EKAQwhxsuNqYc",  # Countries 101-200
     "1_reAU6zxRknPLkwPxtwe2se0MYBVKTAElLre4V-tlfQ",  # Countries 201-250

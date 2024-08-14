@@ -1,0 +1,111 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common_display: &common_display
+    zeroDay: "2020-01-21"
+    yearIsDay: true
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - COVID-19
+        - Global Health
+    display:
+      numDecimalPlaces: 0
+      <<: *common_display
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  non_redistributable: true
+  update_period_days: 14
+
+tables:
+  variants:
+    variables:
+
+      num_sequences:
+        title: "Number of sequenced COVID-19 genomes - Variant: << variant >>"
+        description_short: |-
+          <% if variant == 'non_who' %>
+          The number of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% elif variant == 'other' %>
+          The number of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% else %>
+          The number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <%- endif -%>
+        unit: 'sequenced genomes'
+        display:
+          name: |-
+            <% if variant == 'non_who' %>
+            Other
+            <% elif variant == 'other' %>
+            Other
+            <% else %>
+            << variant >>
+            <%- endif -%>
+          <<: *common_display
+
+      perc_sequences:
+        title: "Share of sequenced COVID-19 genomes - Variant: << variant >>"
+        description_short: |-
+          <% if variant == 'non_who' %>
+          The share of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% elif variant == 'other' %>
+          The share of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% else %>
+          The share of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <%- endif -%>
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            <% if variant == 'non_who' %>
+            Other
+            <% elif variant == 'other' %>
+            Other
+            <% else %>
+            << variant >>
+            <%- endif -%>
+          <<: *common_display
+
+
+  sequencing:
+    variables:
+
+      variant_dominant:
+        title: Dominant variant
+        description_short: |-
+          The COVID-19 variant with the highest number of sequenced genomes in the preceding two weeks. Only estimated when the number of sequences is above 30.
+        unit: ''
+
+      num_sequences:
+        title: Number of sequenced COVID-19 genomes
+        description_short: |-
+          Number of samples of COVID-19 genome that have been sequenced in the preceding two weeks to determine which mutations it has.
+        unit: 'sequenced genomes'
+
+      num_sequences_per_1m:
+        title: Number of sequenced COVID-19 genomes (per million people)
+        description_short: |-
+          Number of samples of COVID-19 genome that have been sequenced in the preceding two weeks to determine which mutations it has.
+        unit: 'sequenced genomes per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *common_display
+
+      num_sequences_cumulative:
+        title: Cumulative number of sequenced COVID-19 genomes
+        description_short: |-
+          The cumulative number of COVID-19 genomes that have been sequenced in the preceding two weeks to determine which mutations it has.
+        unit: 'sequenced genomes'
+
+      num_sequences_cumulative_per_1m:
+        title: Cumulative number of sequenced COVID-19 genomes (per million people)
+        description_short: |-
+          The cumulative number of COVID-19 genomes that have been sequenced in the preceding two weeks to determine which mutations it has.
+        unit: 'sequenced genomes per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *common_display

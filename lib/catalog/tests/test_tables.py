@@ -1030,7 +1030,7 @@ def test_groupby_size(table_1) -> None:
 
 
 def test_groupby_fillna(table_1) -> None:
-    gt = table_1.groupby("country").a.fillna(method="ffill")
+    gt = table_1.groupby("country").a.ffill()
     assert gt.values.tolist() == [1, 2, 3]
     assert gt.m.title == "Title of Table 1 Variable a"
     # original title hasn't changed
@@ -1147,7 +1147,7 @@ def test_ffill_with_number(table_1) -> None:
     table = table_1.copy()
     table.loc[1, "a"] = None
     # Now fill it up with a number.
-    table["a"] = table["a"].fillna(method="ffill")
+    table["a"] = table["a"].ffill()
     # The metadata of "a" should be preserved.
     assert table["a"].metadata == table_1["a"].metadata
     assert table.loc[1, "a"] == table_1.loc[0, "a"]
@@ -1167,7 +1167,7 @@ def test_bfill_with_number(table_1) -> None:
     table = table_1.copy()
     table.loc[0, "a"] = None
     # Now fill it up with a number.
-    table["a"] = table["a"].fillna(method="bfill")
+    table["a"] = table["a"].bfill()
     # The metadata of "a" should be preserved.
     assert table["a"].metadata == table_1["a"].metadata
     assert table.loc[0, "a"] == table_1.loc[1, "a"]
@@ -1195,3 +1195,27 @@ def test_keep_metadata_series(table_1: Table) -> None:
 
     table_1.a = to_numeric(table_1.a)
     assert table_1.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_table_rolling(table_1: Table):
+    tb = table_1[["a", "b"]].copy()
+
+    rolling = tb.rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"
+
+
+def test_table_groupby_rolling(table_1: Table):
+    tb = table_1.copy()
+
+    rolling = tb.groupby("country").rolling(window=1).sum()
+    assert rolling.a.m.title == table_1.a.m.title
+    assert rolling.b.m.title == table_1.b.m.title
+
+    # make sure we are not modifying the original table
+    rolling.a.m.title = "new"
+    assert table_1.a.m.title != "new"

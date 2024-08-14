@@ -588,3 +588,14 @@ def test_set_categories(variable_3) -> None:
     new_var = new_var.set_categories(["a", "b", "c", "d"])
     assert new_var.m.title == "Title of Variable 3"
     assert tuple(new_var.cat.categories) == ("a", "b", "c", "d")
+
+
+def test_variable_rolling(variable_1: Variable):
+    v = variable_1.copy()
+
+    rolling = v.rolling(window=1).sum()
+    assert rolling.m.title == v.m.title
+
+    # make sure we are not modifying the original table
+    rolling.m.title = "new"
+    assert v.m.title != "new"

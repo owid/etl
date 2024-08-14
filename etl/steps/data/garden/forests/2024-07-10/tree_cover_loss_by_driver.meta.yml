@@ -10,11 +10,14 @@ definitions:
     unit: hectares
     short_unit: ha
     processing_level: major
-    description_processing: >-
-      This indicator is calculated by Our World in Data based on data from the Global Forest Watch. Time-series data of tree cover loss in areas of forest where tree canopy cover was greater than or equal to 30% in 2000 was extracted and cross-referenced with data on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108). Values may be slightly different to those shown on Global Forest Watch due to differences in the country boundaries used.
+    description_processing: |-
+      - This indicator is extracted by Our World in Data based on data from the Global Forest Watch.
+      - Time-series gridded data (30m x 30m) of tree cover loss  in areas where canopy density was greater than or equal to 30% in 2000 was extracted and cross-referenced with gridded data (10km x 10km) on the dominant driver of deforestation in each area, based on [Curtis et al 2018](https://science.sciencemag.org/content/361/6407/1108).
+      - Individual grid cells may have more than one driver of tree cover loss, with variation over space and time. Values may be slightly different to those shown on Global Forest Watch due to differences in the country boundaries used.
     display:
       roundingMode: significantFigures
       numSignificantFigures: 3
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -27,26 +30,26 @@ tables:
     variables:
       commodity_driven_deforestation:
         title: Tree cover loss driven by commodity-driven deforestation
-        description_short: Tree cover loss from commodity-driven deforestation is typically large-scale deforestation linked primarily to commercial agricultural expansion.  This type of tree cover loss usually represents permanent deforestation.
+        description_short: "[Tree cover loss](#dod:tree-cover-loss) from commodity-driven deforestation is typically large-scale deforestation linked primarily to commercial agricultural expansion.  This type of tree cover loss usually represents permanent deforestation."
         display:
           name: Commodity-driven deforestation
       forestry:
         title: Tree cover loss driven by forestry
-        description_short: Tree cover loss from forestry is typically temporary loss from plantation and natural forest harvesting, with some deforestation of primary forests. This type of tree cover loss usually represents temporary loss.
+        description_short: "[Tree cover loss](#dod:tree-cover-loss)  from forestry is typically temporary loss from plantation and natural forest harvesting, with some deforestation of primary forests. This type of tree cover loss usually represents temporary loss."
         display:
           name: Forestry
       shifting_agriculture:
         title: Tree cover loss driven by shifting agriculture
-        description_short: Tree cover loss from shifting agriculture is typically temporary loss or permanent deforestation due to small- and medium-scale agriculture. This type of tree cover loss usually represents temporary loss.
+        description_short: "[Tree cover loss](#dod:tree-cover-loss)  from shifting agriculture is typically temporary loss or permanent deforestation due to small- and medium-scale agriculture. This type of tree cover loss usually represents temporary loss."
         display:
           name: Shifting agriculture
       urbanization:
         title: Tree cover loss driven by urbanization
-        description_short: Tree cover loss from urbanization is typically deforestation for expansion of urban centers. This type of tree cover loss usually represents permanent deforestation.
+        description_short: "[Tree cover loss](#dod:tree-cover-loss)  from urbanization is typically deforestation for expansion of urban centers. This type of tree cover loss usually represents permanent deforestation."
         display:
           name: Urbanization
       wildfire:
         title: Tree cover loss driven by wildfire
-        description_short: Tree cover loss from wildfire is typically temporary loss, it does not include fire clearing for agriculture. This type of tree cover loss usually represents temporary loss.
+        description_short: "[Tree cover loss](#dod:tree-cover-loss)  from wildfire is typically temporary loss, it does not include fire clearing for agriculture. This type of tree cover loss usually represents temporary loss."
         display:
           name: Wildfire

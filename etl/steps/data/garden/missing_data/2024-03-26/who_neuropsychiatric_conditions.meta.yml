@@ -35,7 +35,7 @@ tables:
         short_unit: 'people'
         unit: ''
 
-      deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages_missing:
+      death_rate_per_100_000_population_missing:
         title: Is data on deaths from neuropsychiatric conditions per 100,000 people in countries missing data
         short_unit: ''
         unit: ''

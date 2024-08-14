@@ -225,7 +225,7 @@ def format_long_tables(
 
         # Create column country by selecting the rows in countries list
         t["country"] = t.loc[t["index"].isin(countries), "index"]
-        t["country"] = t["country"].fillna(method="ffill")
+        t["country"] = t["country"].ffill()
 
         # Do the same for year
         t["year"] = t.loc[t["index"].astype(str).str[:4].str.isnumeric(), "index"]
@@ -238,9 +238,11 @@ def format_long_tables(
         else:
             countries_with_null = ["Argentina", "Chile"]
 
+        actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
+
         assert (
-            t[t["index"] == "nan"]["country"].unique().tolist() == countries_with_null
-        ), f"Null values in index are not only for {countries_with_null}."
+            actual_countries_with_null == countries_with_null
+        ), f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
 
         # Assert that the null values are only two
         assert len(t[t["index"] == "nan"]) == len(
@@ -257,7 +259,7 @@ def format_long_tables(
 
         # And for survey
         t["survey"] = t.loc[~(t["index"].isin(countries)) & ~(t["index"].astype(str).str[:4].str.isnumeric()), "index"]
-        t["survey"] = t["survey"].fillna(method="ffill")
+        t["survey"] = t["survey"].ffill()
 
         # Drop index column
         t = t.drop(columns="index")

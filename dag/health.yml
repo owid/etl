@@ -193,21 +193,6 @@ steps:
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
-  # WHO Mortality Database - 1st level causes
-  data://meadow/who/2023-08-01/mortality_database:
-    - snapshot://who/2023-08-01/mortality_database.csv
-  data://garden/who/2023-08-01/mortality_database:
-    - data://meadow/who/2023-08-01/mortality_database
-  data://grapher/who/2023-08-01/mortality_database:
-    - data://garden/who/2023-08-01/mortality_database
-
-  # WHO Mortality DB - ICD Codes
-  data://meadow/who/2023-08-04/icd_codes:
-    - snapshot://who/2023-08-04/icd_codes.zip
-  data://garden/who/2023-08-04/icd_codes:
-    - data://meadow/who/2023-08-04/icd_codes
-  data://grapher/who/2023-08-04/icd_codes:
-    - data://garden/who/2023-08-04/icd_codes
 
   # UNAIDS
   data://meadow/health/2023-08-09/unaids:
@@ -279,7 +264,7 @@ steps:
 
   # WHO Cardiovascular diseases deaths
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/who/2023-08-01/mortality_database
+    - data://garden/who/2024-07-26/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
@@ -649,4 +634,48 @@ steps:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
+
+  # Gapminder Maternal Mortality (long run dataset)
+  data://meadow/gapminder/2024-07-08/maternal_mortality:
+    - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx
+  data://garden/gapminder/2024-07-08/maternal_mortality:
+    - data://meadow/gapminder/2024-07-08/maternal_mortality
+
+  # UN MMEIG Maternal Mortality (1985-2020)
+  data://meadow/un/2024-07-08/maternal_mortality:
+    - snapshot://un/2024-07-08/maternal_mortality.zip
+  data://garden/un/2024-07-08/maternal_mortality:
+    - data://meadow/un/2024-07-08/maternal_mortality
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/un/2024-07-08/maternal_mortality:
+    - data://garden/un/2024-07-08/maternal_mortality
+
+  # Maternal Mortality long run data set (OWID OMM)
+  data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/gapminder/2024-07-08/maternal_mortality
+    - data://garden/un/2024-07-08/maternal_mortality
+    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/demography/2024-07-15/population
+  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
+    - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+
+  # WHO Mortality Database
+  data://meadow/who/2024-07-26/mortality_database:
+    - snapshot://who/2024-07-26/mortality_database.csv
+  data://garden/who/2024-07-26/mortality_database:
+    - data://meadow/who/2024-07-26/mortality_database
+  data://grapher/who/2024-07-26/mortality_database:
+    - data://garden/who/2024-07-26/mortality_database
+
+  # WHO ICD codes
+  data://meadow/who/2024-07-29/icd_codes:
+    - snapshot://who/2024-07-29/icd_codes.zip
+  data://garden/who/2024-07-29/icd_codes:
+    - data://meadow/who/2024-07-29/icd_codes
+  data://grapher/who/2024-07-29/icd_codes:
+    - data://garden/who/2024-07-29/icd_codes
 

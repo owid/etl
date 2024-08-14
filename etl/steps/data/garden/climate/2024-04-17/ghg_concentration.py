@@ -51,11 +51,7 @@ def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
         # to the dates in the data). However, we need to interpolate in case there are missing points. Otherwise all
         # points after the missing one will be nan.
         tb_with_average[f"{original_column_name}_yearly_average"] = (
-            tb_with_average[original_column_name]
-            .interpolate("linear")
-            .rolling(12)
-            .mean()
-            .copy_metadata(tb_with_average[original_column_name])
+            tb_with_average[original_column_name].interpolate("linear").rolling(12).mean()
         )
 
     # Drop empty rows.

@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Inequality
+      title_variant: Equivalised disposable household income
     processing_level: minor
   description_from_producer_inequality: |-
     The data from 1996 to 2011 are backcasted to allow a temporal comparison and may therefore differ from those published elsewhere on INSEE presenting the long series with breaks in the series in 2010 and 2012.
@@ -33,6 +34,7 @@ tables:
         description_from_producer: "{definitions.description_from_producer_inequality}"
         presentation:
           title_public: Gini coefficient
+          title_variant: Equivalised disposable household income
         display:
           name: Gini coefficient
           numDecimalPlaces: 2
@@ -98,7 +100,8 @@ tables:
           - "{definitions.description_key_equivalized_income}"
         description_from_producer: "{definitions.description_from_producer_poverty}"
         presentation:
-          title_public: Number of people below 60% of median income
+          title_public: Share below 60% median
+          title_variant: Equivalised disposable income (Patrimoine 2014-15 method)
         display:
           name: Number of people below 60% of median income
           numDecimalPlaces: 0

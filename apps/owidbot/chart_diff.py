@@ -13,6 +13,9 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
     access_token = gh_utils.github_app_access_token()
     repo = gh_utils.get_repo(repo_name, access_token=access_token)
     pr = gh_utils.get_pr(repo, branch)
+    if not pr:
+        log.warning(f"No open pull request found for branch {branch}")
+        return
 
     # Get the latest commit of the pull request
     latest_commit = pr.get_commits().reversed[0]
