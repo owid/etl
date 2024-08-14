@@ -243,7 +243,7 @@ COMMODITY_MAPPING = {
     ("Iron ore", "Burnt pyrites"): None,
     ("Iron ore", "Unknown"): ("Iron ore", "Mine, crude ore"),
     # The following is used for production of pig iron.
-    ("Iron, pig", "Unknown"): ("Iron", "Pig iron"),
+    ("Iron, pig", "Unknown"): ("Iron", "Smelter, pig iron"),
     ("Iron, steel and ferro-alloys", "Fe-silico-spiegeleisen & Si-Mn"): None,
     ("Iron, steel and ferro-alloys", "Ferro-Si-manganese & silico-speigeleisen"): None,
     ("Iron, steel and ferro-alloys", "Ferro-alloys"): None,
@@ -277,7 +277,7 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Ingots, blooms, billets"): None,
     ("Iron, steel and ferro-alloys", "Other ferro-alloys"): None,
     # The following is used for imports and exports of pig iron.
-    ("Iron, steel and ferro-alloys", "Pig iron"): ("Iron", "Pig iron"),
+    ("Iron, steel and ferro-alloys", "Pig iron"): ("Iron", "Smelter, pig iron"),
     ("Iron, steel and ferro-alloys", "Pig iron & ferro-alloys"): None,
     ("Iron, steel and ferro-alloys", "Pig iron & ingots"): None,
     ("Iron, steel and ferro-alloys", "Pig iron & spiegeleisen"): None,
@@ -506,7 +506,7 @@ COMMODITY_MAPPING = {
     ("Silver", "Waste & scrap"): None,
     ("Silver, mine", "Unknown"): ("Silver", "Mine"),
     ("Sodium carbonate, natural", "Unknown"): ("Soda ash", "Natural"),
-    ("Steel, crude", "Unknown"): ("Steel", "Crude"),
+    ("Steel, crude", "Unknown"): ("Steel", "Processing, crude"),
     ("Strontium minerals", "Unknown"): ("Strontium", "Mine"),
     # NOTE: "Sulphur and pyrites" has only imports and exports data, no production.
     #  And most categories only have data in the past (e.g. before 1990).
@@ -547,10 +547,10 @@ COMMODITY_MAPPING = {
     ("Tantalum and niobium", "Tin slags, Nb content"): None,
     ("Tantalum and niobium", "Tin slags, Ta content"): None,
     ("Tantalum and niobium", "Unknown"): None,
-    ("Tantalum and niobium minerals", "Columbite"): ("Coltan", "Columbite"),
+    ("Tantalum and niobium minerals", "Columbite"): ("Coltan", "Mine, columbite"),
     ("Tantalum and niobium minerals", "Columbite- Nb content"): None,
     ("Tantalum and niobium minerals", "Columbite- Ta content"): None,
-    ("Tantalum and niobium minerals", "Columbite-tantalite"): ("Coltan", "Columbite-tantalite"),
+    ("Tantalum and niobium minerals", "Columbite-tantalite"): ("Coltan", "Mine, columbite-tantalite"),
     ("Tantalum and niobium minerals", "Columbite-tantalite-Nb content"): None,
     ("Tantalum and niobium minerals", "Columbite-tantalite-Ta content"): None,
     ("Tantalum and niobium minerals", "Djalmaite"): None,
@@ -559,7 +559,7 @@ COMMODITY_MAPPING = {
     ("Tantalum and niobium minerals", "Pyrochlore -Nb content"): None,
     ("Tantalum and niobium minerals", "Struverite"): None,
     ("Tantalum and niobium minerals", "Struverite (Ta content)"): None,
-    ("Tantalum and niobium minerals", "Tantalite"): ("Coltan", "Tantalite"),
+    ("Tantalum and niobium minerals", "Tantalite"): ("Coltan", "Mine, tantalite"),
     ("Tantalum and niobium minerals", "Tantalite -Ta content"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Nb content)"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Ta content)"): None,
