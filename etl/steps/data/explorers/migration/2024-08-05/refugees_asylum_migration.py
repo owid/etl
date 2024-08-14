@@ -197,7 +197,7 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             elif meta.processing_level == "major":
                 graphers_row_dict[
                     "sourceDesc"
-                ] = f"Our World in Data, based on {origin.producer} ({origin.date_published[:4]})"
+                ] = f"Our World in Data based on {origin.producer} ({origin.date_published[:4]})"
 
             graphers_dicts.append(graphers_row_dict)
 

@@ -53,7 +53,7 @@ tables:
       # populations by origin country
       refugees_under_unhcrs_mandate_origin:
         title: Refugees by country of origin
-        description_short: Number of [refugees](#dod:refugee) in all regions by the country of origin. This measures the total number of refugees from the country; not the number per year.
+        description_short: Number of [refugees](#dod:refugee) by the country of origin. This measures the total number of refugees from the country; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
@@ -98,25 +98,25 @@ tables:
 
       # populations by asylum country
       refugees_under_unhcrs_mandate_asylum:
-        title: Refugees by country of asylum
-        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate in all regions by the country they live in. This measures the total number of refugees; not the number per year.
+        title: Refugees by destination
+        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate by the country they live in. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_asylum:
-        title: Refugees by country of asylum per 1,000 people
-        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 1,000 people in that country.
+        title: Refugees by destination per 1,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 1,000 people in that country. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
         description_key:
           - "{definitions.description_refugee_general}"
       asylum_seekers_asylum:
-        title: Asylum seekers by country of residence
+        title: Asylum seekers by destination
         description_short: "[Asylum seekers](#dod:asylumseeker) are people whose application for asylum or refugee status is pending at any stage in the asylum procedure. This measures the total number of asylum seekers; not the number per year."
         description_from_producer: "{definitions.description_asylum}"
       asylum_seekers_per_100k_pop_asylum:
-        title: Asylum seekers by country of residence per 100,000 people
+        title: Asylum seekers by destination per 100,000 people
         description_short: "[Asylum seekers](#dod:asylumseeker) are people whose application for asylum or refugee status is pending at any stage in the asylum procedure. This measures total asylumn seekers per 100,000 people in that country."
         description_from_producer: "{definitions.description_asylum}"
         display:

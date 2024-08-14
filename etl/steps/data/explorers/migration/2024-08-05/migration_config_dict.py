@@ -14,23 +14,23 @@ PR_AVG = "Five-year average"
 
 
 METRICS = {
-    "immigrants": "International immigrants",
     "emigrants": "International emigrants",
+    "immigrants": "International immigrants",
     "net_migration": "Net migration",
-    "asylum_seekers_dest": "Asylum Seekers by destination",
-    "asylum_seekers_origin": "Asylum Seekers by origin",
-    "refugees_dest": "Refugees by destination",
+    "asylum_seekers_origin": "Asylum seekers by origin",
+    "asylum_seekers_dest": "Asylum seekers by destination",
     "refugees_origin": "Refugees by origin",
-    "resettlement_dest": "Resettled refugees by destination",
+    "refugees_dest": "Refugees by destination",
     "resettlement_origin": "Resettled refugees by origin",
+    "resettlement_dest": "Resettled refugees by destination",
     "returned_origin": "Returned refugees by origin",
     "returned_dest": "Returned refugees by destination",
     "internal_displ_total": "Internally displaced persons",
     "internal_displ_conflict": "Internally displaced persons (conflict)",
     "internal_displ_disaster": "Internally displaced persons (disaster)",
     "remittance_gdp": "Remittances as share of GDP",
-    "remittance_cost_ib": "Cost of receiving remittances",
     "remittance_cost_ob": "Cost of sending remittances",
+    "remittance_cost_ib": "Cost of receiving remittances",
 }
 SORTER = list(METRICS.values())
 
@@ -55,9 +55,15 @@ ADDITIONAL_DESCRIPTIONS = {
         "title": "Average cost for sending remittances from country",
         "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. The cost is based on a single transaction of USD 200. ",
     },
+    "emigrants_share_of_total_population": {
+        "title": "Share of the population that have left the country",
+        "description": "",
+    },
+    "immigrant_share_of_dest_population_all": {
+        "title": "Share of the population that were born in another country",
+        "description": "",
+    },
 }
-
-
 CONFIG_DICT = {
     # UNICEF values
     "international_migrants_under_18_dest": {
@@ -217,7 +223,7 @@ CONFIG_DICT = {
     },
     "returned_refugees_origin": {
         "metric": METRICS["returned_origin"],
-        "period_radio": P_TOTAL,
+        "period_radio": P_NEW,
         "sub_metric_radio": SM_TOTAL,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
@@ -685,7 +691,7 @@ MAP_BRACKETS = {
     },
     "resettlement_per_100k_dest": {
         "colorScaleScheme": "BuGn",
-        "colorScaleNumericBins": [0.0, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 0],
+        "colorScaleNumericBins": [1.0, 3.0, 10.0, 30.0, 100.0, 0],
     },
     "immigrants_all": {
         "colorScaleScheme": "YlGnBu",

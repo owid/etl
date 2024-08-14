@@ -42,19 +42,19 @@ tables:
       idps_under_18_conflict_violence:
         title: Internally displaced children due to conflict and violence
         description_short: |-
-         Total number of [internally displaced children](#dod:internally-displaced) under 18 years old, due to conflict and violence. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+         [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_disaster:
         title: Internally displaced children due to disasters
         description_short: |-
-          Total number of [internally displaced children](#dod:internally-displaced) under 18 years old, due to natural disasters. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to natural disasters but remain within their country's borders. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       idps_under_18_total:
         title: Internally displaced children
         description_short: |-
-          Total number of [internally displaced children](#dod:internally-displaced) under 18 years old. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
+          Total [internally displaced children](#dod:internally-displaced) under 18 years old, who were forced or obliged to leave their homes but remain within their country's borders. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
       international_migrants_under_18_dest:
@@ -75,7 +75,7 @@ tables:
       new_idps_under_18_conflict_violence:
         title: New internal displacements of children due to conflict
         description_short: |-
-          [Internal displacements](#dod:internally-displaced) of children under 18 years old, during this calendar year due to conflict and violence. Displacements describe the movement of one child from their place of residence to another place within the same country due to conflict and violence.
+          New [internal displacements](#dod:internally-displaced) of children under 18 years old, due to conflict and violence. Internal displacement describe the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         presentation:
@@ -84,7 +84,7 @@ tables:
       new_idps_under_18_disaster:
         title: New internal displacements of children due to disasters
         description_short: |-
-          [Internal displacements](#dod:internally-displaced) of children under 18 years old, during this calendar year due to disasters. Displacements describe the movement of one child from their place of residence to another place within the same country due to natural disaster.
+          New [internal displacements](#dod:internally-displaced) of children under 18 years old, due to natural disasters. Internal displacement describes the movement of a child who is forced to leave their home due to natural disasters but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         presentation:
@@ -93,7 +93,7 @@ tables:
       new_idps_under_18_total:
         title: New internal displacements of children
         description_short: |-
-          Total number of [internal displacements](#dod:internally-displaced) of children under 18 years old, during this calendar year. Displacements describe the movement of one child, which has to leave their place of residence, to another place within the same country.
+          Total number of new [internal displacements](#dod:internally-displaced) of children under 18 years old. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         presentation:
@@ -140,7 +140,8 @@ tables:
       #idp shares
       idps_under_18_total_per_1000:
         title: Internally displaced children per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who were forced or obliged to leave their homes but remain within their country's borders, per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -150,7 +151,8 @@ tables:
           numDecimalPlaces: 1
       idps_under_18_conflict_violence_per_1000:
         title: Internally displaced children due to conflict and violence per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to conflict and violence per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to conflict and violence but remain within their country's borders, per 1000 inhabitants of the country. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -160,7 +162,8 @@ tables:
           numDecimalPlaces: 1
       idps_under_18_disaster_per_1000:
         title: Internally displaced children due to disasters per 1000 inhabitants
-        description_short: Number of [internally displaced children](#dod:internally-displaced) under 18 years old due to disasters per 1000 inhabitants of the country. This includes all internally displaced children in this country, not only children who got displaced in this year.
+        description_short: |-
+          [Internally displaced children](#dod:internally-displaced) under 18 years old, who had to leave their homes due to natural disasters but remain within their country's borders, per 1000 inhabitants of the country. This includes all internally displaced children in this country and should not be confused with children who got displaced in this year.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -170,7 +173,7 @@ tables:
           numDecimalPlaces: 1
       new_idps_under_18_total_per_1000:
         title: New internal displacements of children per 1000 inhabitants
-        description_short: Number of new [internally displacements](#dod:internally-displaced) of children under 18 years old per 1000 inhabitants of the country. Displacements describe the movement of one child, which has to leave their place of residence, to another place within the same country.
+        description_short: New [internally displacements](#dod:internally-displaced) of children under 18 years old, per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -183,7 +186,7 @@ tables:
             note: "{definitions.other_descriptions.new_displacement}"
       new_idps_under_18_conflict_violence_per_1000:
         title: New internal displacements of children due to conflict per 1000 inhabitants
-        description_short: Number of new [internal displacements](#dod:internally-displaced) of children under 18 years old due to conflict and violence per 1000 inhabitants of the country. Displacements describe the movement of one child, which has to leave their place of residence, to another place within the same country due to conflict and violence.
+        description_short: New [internal displacements](#dod:internally-displaced) of children under 18 years old due to conflict and violence per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
@@ -196,7 +199,7 @@ tables:
             note: "{definitions.other_descriptions.new_displacement}"
       new_idps_under_18_disaster_per_1000:
         title: New internal displacements of children due to disasters per 1000 inhabitants
-        description_short: Number of new [internal displacements](#dod:internally-displaced) of children under 18 years old due to disasters per 1000 inhabitants of the country. Displacements describe the movement of one child, which has to leave their place of residence, to another place within the same country due to natural disaster.
+        description_short: New [internal displacements](#dod:internally-displaced) of children under 18 years old due to disasters per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to natural disaster but who remains within their country's borders.
         description_from_producer: |-
           - {definitions.unicef_descriptions.internally_displaced}
         processing_level: major
