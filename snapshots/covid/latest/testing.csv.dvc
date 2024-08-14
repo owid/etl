@@ -7,12 +7,6 @@ meta:
     description: |-
       This data is collected by the Our World in Data team from official reports.
 
-      You can find further details in our post on COVID-19 testing, including:
-
-      - Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)
-      - Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)
-      - detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).
-
       On 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.
 
       The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
