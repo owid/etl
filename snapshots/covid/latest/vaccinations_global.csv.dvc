@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, vaccinations
+    description: |-
+      Country-by-country data on global COVID-19 vaccinations. We only rely on figures that are verifiable based on public official sources.
+
+      This dataset includes some subnational locations (England, Northern Ireland, Scotland, Wales, Northern Cyprus…) and international aggregates (World, continents, European Union…).
+
+      The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+    date_published: "2024-08-14"
+
+    # Citation
+    producer: Official data collated by Our World in Data
+    citation_full: |-
+      Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. A global database of COVID-19 vaccinations. Nat Hum Behav (2021). https://doi.org/10.1038/s41562-021-01122-8
+
+    # Files
+    url_main: https://github.com/owid/covid-19-data/
+    date_accessed: 2024-08-14
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
+
+outs:
+  - md5: 7db89d72d3832fd2f2c94fa9703574b4
+    size: 11885036
+    path: vaccinations_global.csv
