@@ -19,83 +19,83 @@ tables:
   invasive_species:
     variables:
       birds:
-        title: First records of established alien bird species
-        description_short: The year in which a now-established alien bird species was first recorded outside of its native range.
+        title: First records of established alien species of bird
+        description_short: The year in which an [established alien bird species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       fishes:
         title: First records of established alien fish species
-        description_short: The year in which a now-established alien fish species was first recorded outside of its native range.
+        description_short: The year in which an [established alien fish species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       insects:
         title: First records of established alien insect species
-        description_short: The year in which a now-established alien insect species was first recorded outside of its native range.
+        description_short: The year in which an [established alien insect species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       mammals:
         title: First records of established alien mammal species
-        description_short: The year in which a now-established alien mammal species was first recorded outside of its native range.
+        description_short: The year in which an [established alien mammal species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       molluscs:
         title: First records of established alien mollusc species
-        description_short: The year in which a now-established alien mollusc species was first recorded outside of its native range.
+        description_short: The year in which an [established alien mollusc species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       vascular_plants:
         title: First records of established alien vascular plant species
-        description_short: The year in which a now-established alien vascular plant species was first recorded outside of its native range.
+        description_short: The year in which an [established alien vascular plant species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       all:
         title: First records of all established alien species
-        description_short: The year in which a now-established alien species was first recorded outside of its native range.
+        description_short: The year in which an [established alien species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       bryophytes:
         title: First records of established alien bryophyte species
-        description_short: The year in which a now-established alien bryophyte species was first recorded outside of its native range.
+        description_short: The year in which an [established alien bryophyte species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       algae:
         title: First records of established alien algae species
-        description_short: The year in which a now-established alien algae species was first recorded outside of its native range.
+        description_short: The year in which an [established alien algae species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       reptiles:
         title: First records of established alien reptile species
-        description_short: The year in which a now-established alien reptile species was first recorded outside of its native range.
+        description_short: The year in which an [established alien reptile species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       amphibians:
         title: First records of established alien amphibian species
-        description_short: The year in which a now-established alien amphibian species was first recorded outside of its native range.
+        description_short: The year in which an [established alien amphibian species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       crustaceans:
         title: First records of established alien crustacean species
-        description_short: The year in which a now-established alien crustacean species was first recorded outside of its native range.
+        description_short: The year in which an [established alien crustacean species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       arachnids:
         title: First records of established alien arachnid species
-        description_short: The year in which a now-established alien arachnid species was first recorded outside of its native range.
+        description_short: The year in which an [established alien arachnid species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       invertebrates__excl__arthropods__molluscs:
         title: First records of established alien invertabrate (excluding arthropods and mollsucs) species
-        description_short: The year in which a now-established alien invertabrate (excluding arthropods and mollsucs) species was first recorded outside of its native range.
+        description_short: The year in which an [established alien invertebrate (excluding arhropods and molluscs) species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       fungi:
         title: First records of established fungi alien species
-        description_short: The year in which a now-established alien fungi species was first recorded outside of its native range.
+        description_short: The year in which an [established alien fungispecies](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       bacteria_and_protozoans:
         title: First records of established alien bacteria and protozoan species
-        description_short: The year in which a now-established alien bacteria and protozoan species was first recorded outside of its native range.
+        description_short: The year in which an [established alien bacteria and protozoan species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
       birds_cumulative:
-        title: Cumulative first records of established alien bird species
+        title: Cumulative first records of [established alien bird species](#dod:established-alien-species) of bird
       fishes_cumulative:
-        title: Cumulative first records of established alien fish species
+        title: Cumulative first records of [established alien fish species](#dod:established-alien-species)
       insects_cumulative:
-        title: Cumulative first records of established alien insect species
+        title: Cumulative first records of [established alien insect species](#dod:established-alien-species)
       mammals_cumulative:
-        title: Cumulative first records of established alien mammal species
+        title: Cumulative first records of [established alien mammal species](#dod:established-alien-species)
       molluscs_cumulative:
-        title: Cumulative first records of established alien mollusc species
+        title: Cumulative first records of [established alien mollusc species](#dod:established-alien-species)
       vascular_plants_cumulative:
-        title: Cumulative first records of established alien vascular plant species
+        title: Cumulative first records of [established alien vascular plant species](#dod:established-alien-species)
       all_cumulative:
-        title: Cumulative first records of all established alien species
+        title: Cumulative first records of all [established alien species](#dod:established-alien-species)
       bryophytes_cumulative:
-        title: Cumulative first records of established alien bryophyte species
+        title: Cumulative first records of [established alien bryophyte species](#dod:established-alien-species)
       algae_cumulative:
-        title: Cumulative first records of established alien algae species
+        title: Cumulative first records of [established alien algae species](#dod:established-alien-species)
       reptiles_cumulative:
-        title: Cumulative first records of established alien reptile species
+        title: Cumulative first records of [established alien reptile species](#dod:established-alien-species)
       amphibians_cumulative:
-        title: Cumulative first records of established alien amphibian species
+        title: Cumulative first records of [established alien amphibian species](#dod:established-alien-species)
       crustaceans_cumulative:
-        title: Cumulative first records of established alien crustacean species
+        title: Cumulative first records of [established alien crustacean species](#dod:established-alien-species)
       arachnids_cumulative:
-        title: Cumulative first records of established alien arachnid species
+        title: Cumulative first records of [established alien arachnid species](#dod:established-alien-species)
       invertebrates__excl__arthropods__molluscs_cumulative:
-        title: Cumulative first records of established alien invertabrate (excluding arthropods and mollsucs) species
+        title: Cumulative first records of [established alien invertabrate (excluding arthropods and mollsucs) species](#dod:established-alien-species)
       fungi_cumulative:
-        title: Cumulative first records of established fungi alien species
+        title: Cumulative first records of [established fungi alien species](#dod:established-alien-species)
       bacteria_and_protozoans_cumulative:
-        title: Cumulative first records of established alien bacteria and protozoan species
+        title: Cumulative first records of [established alien bacteria and protozoan species](#dod:established-alien-species)
 
