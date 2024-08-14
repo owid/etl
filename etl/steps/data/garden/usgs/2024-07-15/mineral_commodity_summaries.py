@@ -237,12 +237,12 @@ COMMODITY_MAPPING = {
     ("Rhenium", "Mine production, contained rhenium"): ("Rhenium", "Mine"),
     ("Salt", "Mine production"): ("Salt", "Mine"),
     ("Sand and gravel (industrial)", "Mine production"): (
-        "Sand and gravel, industrial",
-        "Mine",
+        "Sand and gravel",
+        "Mine, industrial",
     ),
     ("Sand and gravel (industrial)", "Mine production, industrial sand and gravel"): (
-        "Sand and gravel, industrial",
-        "Mine",
+        "Sand and gravel",
+        "Mine, industrial",
     ),
     ("Selenium", "Refinery production"): ("Selenium", "Refinery"),
     ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery"),
@@ -336,8 +336,8 @@ COMMODITY_MAPPING = {
     ("Vermiculite", "Mine production"): ("Vermiculite", "Mine"),
     ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
     ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
-    ("Zeolites (natural)", "Mine production"): ("Zeolites, natural", "Mine"),
-    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites, natural", "Mine"),
+    ("Zeolites (natural)", "Mine production"): ("Zeolites", "Mine"),
+    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites", "Mine"),
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
         "Mine",
@@ -365,12 +365,12 @@ FOOTNOTES = {
     "reserves|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "reserves|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
-    # "reserves|Chromium|Mine|tonnes": "Values are reported as tonnes of gross weight.",
-    # "production|Zirconium and hafnium|tonnes": "Values are reported as tonnes of gross weight of zirconium ores and zircon concentrates.",
     "production|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
     "reserves|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
     "production|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
+    "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
 }
 
 # Dictionary of special units.

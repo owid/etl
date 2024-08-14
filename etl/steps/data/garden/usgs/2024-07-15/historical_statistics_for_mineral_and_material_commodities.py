@@ -52,7 +52,7 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Mine"): ("Cobalt", "Mine"),
     # NOTE: Extracted from "world_refinery_production".
     ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
-    ("Construction sand and gravel", "Total"): ("Sand and gravel, construction", "Mine"),
+    ("Construction sand and gravel", "Total"): ("Sand and gravel", "Mine, construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
     ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
     ("Diatomite", "Total"): ("Diatomite", "Mine"),
@@ -76,7 +76,7 @@ COMMODITY_MAPPING = {
     #  But in USGS current data, industrial diamond production includes only natural diamond.
     ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
     ("Industrial garnet", "Total"): ("Garnet", "Mine"),
-    ("Industrial sand and gravel", "Total"): ("Sand and gravel, industrial", "Mine"),
+    ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Mine, industrial"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
