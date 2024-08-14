@@ -1,9 +1,9 @@
 P_TOTAL = "Total"
 P_CHANGE = "Five-year change"
-P_NEW = "Annual/ New"
+P_NEW = "Annual / New"
 
 SM_TOTAL = "Total"
-SM_SHARE = "Per capita/ Share of population"
+SM_SHARE = "Per capita / Share of population"
 
 A_TOTAL = "Total"
 A_UNDER_18 = "Under 18"
@@ -446,21 +446,21 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "displacements_per_100_people": {
+    "displacements_per_1000_people": {
         "metric": METRICS["internal_displ_total"],
         "period_radio": P_NEW,
         "sub_metric_radio": SM_SHARE,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "conflict_displacements_per_100_people": {
+    "conflict_displacements_per_1000_people": {
         "metric": METRICS["internal_displ_conflict"],
         "period_radio": P_NEW,
         "sub_metric_radio": SM_SHARE,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "disaster_displacements_per_100_people": {
+    "disaster_displacements_per_1000_people": {
         "metric": METRICS["internal_displ_disaster"],
         "period_radio": P_NEW,
         "sub_metric_radio": SM_SHARE,
@@ -689,7 +689,7 @@ MAP_BRACKETS = {
     },
     "immigrants_all": {
         "colorScaleScheme": "YlGnBu",
-        "colorScaleNumericBins": [50000.0, 100000.0, 200000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0, 0],
+        "colorScaleNumericBins": [100000.0, 200000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0, 10000000.0, 0],
     },
     "immigrant_share_of_dest_population_all": {
         "colorScaleScheme": "YlGnBu",
@@ -799,15 +799,15 @@ MAP_BRACKETS = {
         "colorScaleScheme": "OrRd",
         "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 0.0],
     },
-    "displacements_per_100_people": {
+    "displacements_per_1000_people": {
         "colorScaleScheme": "OrRd",
         "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },
-    "conflict_displacements_per_100_people": {
+    "conflict_displacements_per_1000_people": {
         "colorScaleScheme": "OrRd",
         "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },
-    "disaster_displacements_per_100_people": {
+    "disaster_displacements_per_1000_people": {
         "colorScaleScheme": "OrRd",
         "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 0],
     },

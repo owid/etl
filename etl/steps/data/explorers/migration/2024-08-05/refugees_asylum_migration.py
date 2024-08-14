@@ -21,8 +21,18 @@ def sort_metrics(x):
 
 
 def sort_age(x):
-    age_order = ["Under 18", "Total"]
+    age_order = ["Total", "Under 18"]
     return age_order.index(x)
+
+
+def sort_period(x):
+    period_order = ["Total", "Five-year change", "Annual / New"]
+    return period_order.index(x)
+
+
+def sort_sub_metric(x):
+    sub_metric_order = ["Total", "Per capita / Share of population"]
+    return sub_metric_order.index(x)
 
 
 def run(dest_dir: str) -> None:
@@ -99,12 +109,17 @@ def run(dest_dir: str) -> None:
     # Sort rows conveniently
     df_graphers["sort_order_metrics"] = df_graphers["Metric Dropdown"].apply(sort_metrics)
     df_graphers["sort_order_age"] = df_graphers["Age Radio"].apply(sort_age)
+    df_graphers["sort_order_period"] = df_graphers["Period Radio"].apply(sort_period)
+    df_graphers["sort_order_sub_metric"] = df_graphers["Sub-Metric Radio"].apply(sort_sub_metric)
+
     df_graphers = df_graphers.sort_values(
-        by=["sort_order_metrics", "Period Radio", "Sub-Metric Radio", "sort_order_age"],
+        by=["sort_order_metrics", "sort_order_age", "sort_order_period", "sort_order_sub_metric"],
         ascending=True,
     ).reset_index(drop=True)
 
-    df_graphers = df_graphers.drop(columns=["sort_order_metrics", "sort_order_age"])
+    df_graphers = df_graphers.drop(
+        columns=["sort_order_metrics", "sort_order_age", "sort_order_period", "sort_order_sub_metric"]
+    )
 
     # Prepare explorer metadata.
     config = {
@@ -208,7 +223,7 @@ def create_column_rows(col_dicts, tb, ds):
 
             # some indicators don't have any/ a fitting description in the metadata: add them manually
             if column in ADDITIONAL_DESCRIPTIONS.keys():
-                col_row_dict["description"] = ADDITIONAL_DESCRIPTIONS[column]
+                col_row_dict["description"] = ADDITIONAL_DESCRIPTIONS[column]["description"]
             else:
                 col_row_dict["description"] = meta.description_short
 
