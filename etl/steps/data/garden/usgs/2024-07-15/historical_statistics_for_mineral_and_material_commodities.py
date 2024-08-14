@@ -79,7 +79,7 @@ COMMODITY_MAPPING = {
     ("Industrial sand and gravel", "Total"): ("Sand and gravel, industrial", "Mine"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
-    ("Iron ore", "Total"): ("Iron ore", "Crude ore"),
+    ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
     ("Kaolin", "Total"): ("Clays", "Mine, kaolin"),
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),

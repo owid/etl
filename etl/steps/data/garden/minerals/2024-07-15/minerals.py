@@ -165,6 +165,11 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             description_short = (
                 f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
             )
+        ################################################################################################################
+        # Handle special cases.
+        if sub_commodity == "Guano":
+            description_short = "Guano is the accumulated excrement of seabirds, bats, and seals. It is rich in nitrogen, phosphate and potassium, making it valuable as a fertilizer."
+        ################################################################################################################
         if description_short is not None:
             tb[column].metadata.description_short = description_short
 
@@ -431,7 +436,7 @@ def run(dest_dir: str) -> None:
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
     #     tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
-    #     minerals=["Platinum group metals"],
+    #     minerals=["Manganese"],
     # )
 
     # Create region aggregates.
