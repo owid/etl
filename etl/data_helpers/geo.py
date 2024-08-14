@@ -3,6 +3,7 @@
 import functools
 import json
 import warnings
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Set, TypeVar, Union, cast
 
@@ -653,7 +654,11 @@ def _add_population_to_dataframe(
 
 
 def interpolate_table(
-    df: TableOrDataFrame, country_col: str, time_col: str, all_years: bool = False
+    df: TableOrDataFrame,
+    country_col: str,
+    time_col: str,
+    all_years: bool = False,
+    all_dates_per_country: bool = False,
 ) -> TableOrDataFrame:
     """Interpolate missing values in a column linearly.
 
@@ -663,23 +668,47 @@ def interpolate_table(
         Name of the column with country names.
     year_col: str
         Name of the column with years.
+    all_years: bool
+        Use the complete date range (regardless of country).
+    all_dates_per_country: bool
+        Use the complete date range for reach country. That is, the date range for a country may differ from another. The important aspect here is that no date is skipped per country. This overrules `all_years`.
     """
-    # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
-    # Optionally fill missing years linearly.
-    countries_in_data = df[country_col].unique()
-    if all_years:
-        min_year = df[time_col].min()
-        max_year = df[time_col].max()
-        years_in_data = range(min_year, max_year + 1)
+
+    def _get_complete_date_range(ds):
+        date_min = ds.min()
+        date_max = ds.max()
+        if isinstance(date_max, datetime):
+            return pd.date_range(start=date_min, end=date_max)
+        else:
+            return range(date_min, date_max + 1)
+
+    if all_dates_per_country:
+
+        def _reindex_dates(group):
+            complete_date_range = _get_complete_date_range(group["date"])
+            group = group.set_index("date").reindex(complete_date_range).reset_index().rename(columns={"index": "date"})
+            group["country"] = group["country"].ffill().bfill()  # Fill NaNs in 'country'
+            return group
+
+        # Apply the reindexing to each group
+        df = df.groupby("country").apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
     else:
-        years_in_data = df[time_col].unique()
+        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+        # Optionally fill missing years linearly.
+        countries_in_data = df[country_col].unique()
+        # Get list of year-country tuples
+        if all_years:
+            years_in_data = _get_complete_date_range(df[time_col])
+        else:
+            years_in_data = df[time_col].unique()
+        # Reindex
+        df = (
+            df.set_index([country_col, time_col])
+            .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
+            .sort_index()
+        )
 
-    df = (
-        df.set_index([country_col, time_col])
-        .reindex(pd.MultiIndex.from_product([countries_in_data, years_in_data], names=[country_col, time_col]))  # type: ignore
-        .sort_index()
-    )
-
+    # Interpolate
     df = (
         df.groupby(country_col)
         .transform(lambda x: x.interpolate(method="linear", limit_direction="both"))  # type: ignore
