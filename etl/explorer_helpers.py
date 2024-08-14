@@ -241,13 +241,24 @@ class Explorer:
         # Load configuration for a variable from the explorer columns section, if any.
         if "variableId" in self.df_columns:
             variable_row = self.df_columns.loc[self.df_columns["variableId"] == variable_id]
-
             if len(variable_row) == 1:
                 variable_config = variable_row.set_index("variableId").loc[variable_id].to_dict()
             elif len(variable_row) > 1:
                 # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {variable_id}")
 
+        return variable_config
+
+    def get_variable_config_from_catalog_path(self, catalog_path: str) -> Dict[str, Any]:
+        variable_config = {}
+        if "catalogPath" in self.df_columns:
+            variable_row = self.df_columns.loc[self.df_columns["catalogPath"] == catalog_path]
+
+            if len(variable_row) == 1:
+                variable_config = variable_row.set_index("catalogPath").loc[catalog_path].to_dict()
+            elif len(variable_row) > 1:
+                # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
+                log.error(f"Explorer 'columns' table contains multiple rows for variable {catalog_path}")
         return variable_config
 
     def check(self) -> None:
