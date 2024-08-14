@@ -46,25 +46,25 @@ tables:
         title: First records of established alien algae species
         description_short: The year in which a now-established alien algae species was first recorded outside of its native range.
       reptiles:
-        title: First records of all established alien reptile species
+        title: First records of established alien reptile species
         description_short: The year in which a now-established alien reptile species was first recorded outside of its native range.
       amphibians:
-        title: First records of all established alien amphibian species
+        title: First records of established alien amphibian species
         description_short: The year in which a now-established alien amphibian species was first recorded outside of its native range.
       crustaceans:
-        title: First records of all established alien crustacean species
+        title: First records of established alien crustacean species
         description_short: The year in which a now-established alien crustacean species was first recorded outside of its native range.
       arachnids:
-        title: First records of all established alien arachnid species
+        title: First records of established alien arachnid species
         description_short: The year in which a now-established alien arachnid species was first recorded outside of its native range.
       invertebrates__excl__arthropods__molluscs:
-        title: First records of all established alien invertabrate (excluding arthropods and mollsucs) species
+        title: First records of established alien invertabrate (excluding arthropods and mollsucs) species
         description_short: The year in which a now-established alien invertabrate (excluding arthropods and mollsucs) species was first recorded outside of its native range.
       fungi:
-        title: First records of all established fungi alien species
+        title: First records of established fungi alien species
         description_short: The year in which a now-established alien fungi species was first recorded outside of its native range.
       bacteria_and_protozoans:
-        title: First records of all established alien bacteria and protozoan species
+        title: First records of established alien bacteria and protozoan species
         description_short: The year in which a now-established alien bacteria and protozoan species was first recorded outside of its native range.
       birds_cumulative:
         title: Cumulative first records of established alien bird species
@@ -85,17 +85,17 @@ tables:
       algae_cumulative:
         title: Cumulative first records of established alien algae species
       reptiles_cumulative:
-        title: Cumulative first records of all established alien reptile species
+        title: Cumulative first records of established alien reptile species
       amphibians_cumulative:
-        title: Cumulative first records of all established alien amphibian species
+        title: Cumulative first records of established alien amphibian species
       crustaceans_cumulative:
-        title: Cumulative first records of all established alien crustacean species
+        title: Cumulative first records of established alien crustacean species
       arachnids_cumulative:
-        title: Cumulative first records of all established alien arachnid species
+        title: Cumulative first records of established alien arachnid species
       invertebrates__excl__arthropods__molluscs_cumulative:
-        title: Cumulative first records of all established alien invertabrate (excluding arthropods and mollsucs) species
+        title: Cumulative first records of established alien invertabrate (excluding arthropods and mollsucs) species
       fungi_cumulative:
-        title: Cumulative first records of all established fungi alien species
+        title: Cumulative first records of established fungi alien species
       bacteria_and_protozoans_cumulative:
-        title: Cumulative first records of all established alien bacteria and protozoan species
+        title: Cumulative first records of established alien bacteria and protozoan species
 
