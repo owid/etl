@@ -117,6 +117,14 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         # Create a title_public.
         if sub_commodity == "Refinery":
             title_public = f"Refined {commodity.lower()} {metric.lower()}"
+        elif sub_commodity.startswith("Refinery, "):
+            _sub_commodity = sub_commodity.split(", ")[-1]
+            title_public = f"Refined {commodity.lower()} ({_sub_commodity}) {metric.lower()}"
+        elif sub_commodity == "Mine":
+            title_public = f"{commodity} {metric.lower()}"
+        elif sub_commodity.startswith("Mine, "):
+            _sub_commodity = sub_commodity.split(", ")[-1]
+            title_public = f"{commodity} ({_sub_commodity}) {metric.lower()}"
         else:
             title_public = f"{commodity} {metric.lower()}"
         if tb[column].metadata.presentation is None:
@@ -135,20 +143,22 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             "Share of global imports",
             "Share of global exports",
         ]:
-            if sub_commodity == "Mine":
+            if sub_commodity.startswith("Mine"):
                 if not metric.startswith("Share"):
                     description_short = f"Measured as mined production, in {unit}."
                 else:
                     description_short = (
                         "Measured based on mined, rather than [refined](#dod:refined-production), production."
                     )
-            elif sub_commodity == "Refinery":
+            elif sub_commodity.startswith("Refinery"):
                 if not metric.startswith("Share"):
                     description_short = f"Measured in {unit}. Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
                 else:
                     description_short = "Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
-            elif sub_commodity == "Smelter":
+            elif sub_commodity.startswith("Smelter"):
                 description_short = f"Measured in {unit}. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes."
+            elif sub_commodity.startswith("Processing"):
+                description_short = "Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes."
         elif metric in ["Reserves", "Share of global reserves"]:
             description_short = "Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies."
         elif metric == "Unit value":
@@ -421,7 +431,7 @@ def run(dest_dir: str) -> None:
     #     tb_usgs_flat=tb_usgs_flat,
     #     tb_usgs_historical_flat=tb_usgs_historical_flat,
     #     tb_bgs_flat=tb_bgs_flat.replace("World (BGS)", "World"),
-    #     minerals=["Rhenium"],
+    #     minerals=["Platinum group metals"],
     # )
 
     # Create region aggregates.

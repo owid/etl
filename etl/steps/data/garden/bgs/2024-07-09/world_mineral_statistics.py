@@ -213,7 +213,7 @@ COMMODITY_MAPPING = {
     ("Ferro-alloys", "Silicon pig iron"): None,
     ("Ferro-alloys", "Spiegeleisen"): None,
     ("Fluorspar", "Unknown"): ("Fluorspar", "Mine"),
-    ("Gallium, primary", "Unknown"): ("Gallium", "Primary"),
+    ("Gallium, primary", "Unknown"): ("Gallium", "Processing"),
     ("Gemstones", "Unknown"): None,
     ("Germanium metal", "Unknown"): ("Germanium", "Refinery"),
     ("Gold", "Metal"): ("Gold", "Metal"),
@@ -379,7 +379,7 @@ COMMODITY_MAPPING = {
     ("Nickel", "Unwrought, mattes, sinters etc"): None,
     ("Nickel, mine", "Unknown"): ("Nickel", "Mine"),
     ("Nickel, smelter/refinery", "Sulfate"): None,
-    ("Nickel, smelter/refinery", "Unknown"): ("Nickel", "Smelter or refinery"),
+    ("Nickel, smelter/refinery", "Unknown"): ("Nickel", "Processing"),
     ("Perlite", "Unknown"): ("Perlite", "Mine"),
     ("Petroleum, crude", "Unknown"): ("Petroleum", "Crude"),
     ("Phosphate rock", "Aluminium phosphate"): ("Phosphate rock", "Aluminum phosphate"),
@@ -387,27 +387,35 @@ COMMODITY_MAPPING = {
     ("Phosphate rock", "Calcium phosphates"): ("Phosphate rock", "Calcium phosphates"),
     ("Phosphate rock", "Guano"): ("Phosphate rock", "Guano"),
     ("Phosphate rock", "Unknown"): ("Phosphate rock", "Mine"),
-    ("Platinum group metals", "Iridium, osmium & ruthenium"): ("Platinum group metals", "Iridium, osmium & ruthenium"),
-    ("Platinum group metals", "Ores & concentrates"): ("Platinum group metals", "Ores & concentrates"),
+    # NOTE: Only imports old data.
+    ("Platinum group metals", "Iridium, osmium & ruthenium"): None,
+    # NOTE: Only imports/exports old data.
+    ("Platinum group metals", "Ores & concentrates"): None,
     ("Platinum group metals", "Other platinum group metals"): ("Platinum group metals", "Other platinum group metals"),
     ("Platinum group metals", "Other platinum metals"): ("Platinum group metals", "Other platinum metals"),
     ("Platinum group metals", "Palladium"): ("Platinum group metals", "Palladium"),
     ("Platinum group metals", "Platinum"): ("Platinum group metals", "Platinum"),
     ("Platinum group metals", "Platinum & platinum metals"): ("Platinum group metals", "Platinum & platinum metals"),
-    ("Platinum group metals", "Platinum metals"): ("Platinum group metals", "Platinum metals"),
-    ("Platinum group metals", "Rhodium"): ("Platinum group metals", "Rhodium"),
-    ("Platinum group metals", "Ruthenium"): ("Platinum group metals", "Ruthenium"),
-    ("Platinum group metals", "Sponge"): ("Platinum group metals", "Sponge"),
+    # NOTE: Only imports/exports old data.
+    ("Platinum group metals", "Platinum metals"): None,
+    # NOTE: Only imports old data.
+    ("Platinum group metals", "Rhodium"): None,
+    # NOTE: Only imports old data.
+    ("Platinum group metals", "Ruthenium"): None,
+    # NOTE: Only imports old data.
+    ("Platinum group metals", "Sponge"): None,
     ("Platinum group metals", "Waste & scrap"): None,
     ("Platinum group metals, mine", "Iridium"): ("Platinum group metals", "Mine, iridium"),
-    ("Platinum group metals, mine", "Osmiridium"): ("Platinum group metals", "Mine, osmiridium"),
-    ("Platinum group metals, mine", "Osmium"): ("Platinum group metals", "Mine, osmium"),
+    # NOTE: Old data.
+    ("Platinum group metals, mine", "Osmiridium"): None,
+    # NOTE: Old data.
+    ("Platinum group metals, mine", "Osmium"): None,
     ("Platinum group metals, mine", "Other platinum metals"): ("Platinum group metals", "Mine, other"),
     ("Platinum group metals, mine", "Palladium"): ("Platinum group metals", "Mine, palladium"),
     ("Platinum group metals, mine", "Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Platinum group metals, mine", "Rhodium"): ("Platinum group metals", "Mine, rhodium"),
     ("Platinum group metals, mine", "Ruthenium"): ("Platinum group metals", "Mine, ruthenium"),
-    ("Platinum group metals, mine", "Unknown"): ("Platinum group metals", "Mine, unknown"),
+    ("Platinum group metals, mine", "Unknown"): None,
     # NOTE: Only imports/exports old data.
     ("Potash", "Carbonate"): None,
     # NOTE: Only imports/exports old data.
@@ -660,6 +668,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     "Tungsten",
     "Vanadium",
     "Potash",
+    "Platinum group metals",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
@@ -673,6 +682,12 @@ FOOTNOTES = {
     "imports|Potash|Chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
     "exports|Potash|Sulfide|tonnes": "Values are reported as tonnes of potassium oxide content.",
     "exports|Potash|Chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    "production|Platinum group metals|Mine, iridium|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Platinum group metals|Mine, other|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Platinum group metals|Mine, palladium|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Platinum group metals|Mine, platinum|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Platinum group metals|Mine, rhodium|tonnes": "Values are reported as tonnes of metal content.",
+    # "production|Platinum group metals|Mine, unspecified|tonnes": "Values are reported as tonnes of metal content.",
 }
 
 # There are many historical regions with overlapping data with their successor countries.
