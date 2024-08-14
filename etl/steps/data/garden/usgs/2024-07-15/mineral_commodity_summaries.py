@@ -102,9 +102,11 @@ COMMODITY_MAPPING = {
     ("Cadmium", "Refinery production"): ("Cadmium", "Refinery"),
     ("Cement", "Cement production, estimated"): ("Cement", "Processing"),
     ("Cement", "Clinker capacity, estimated"): None,
-    ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine"),
-    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine"),
-    ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine"),
+    # NOTE: USGS current data for chromium is odd: It is either significantly larger or significantly smaller than USGS
+    #  historical data, and changes abruptly from one year to another. For now, ignore.
+    ("Chromium", "Mine production, marketable chromite ore"): None,
+    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): None,
+    ("Chromium", "Mne production, marketable chromite ore, gross weight"): None,
     ("Clays", "Bentonite, mine production"): ("Clays", "Mine, bentonite"),
     ("Clays", "Fuller's earth, mine production"): ("Clays", "Mine, fuller's earth"),
     # NOTE: There is good agreement between USGS current and BGS production data for Kaolin for several countries,
@@ -378,10 +380,10 @@ FOOTNOTES = {
 
 # Dictionary of special units.
 UNITS_MAPPING = {
-    "production|Chromium|Mine|tonnes": "tonnes of gross weight",
+    # "production|Chromium|Mine|tonnes": "tonnes of gross weight",
     # "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
     # "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
-    "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
+    # "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
 }
 
 
