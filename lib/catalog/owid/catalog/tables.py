@@ -1135,7 +1135,7 @@ class TableGroupBy:
             return tb
 
         df = self.groupby.apply(f, *args, include_groups=include_groups)
-        if not mem or isinstance(mem["table"], pd.DataFrame):
+        if not mem or type(mem["table"]) == pd.DataFrame:
             return Table(df)
         else:
             return _create_table(df, mem["table"].metadata, mem["table"]._fields)
