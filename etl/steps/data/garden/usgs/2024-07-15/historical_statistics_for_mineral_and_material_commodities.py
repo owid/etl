@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
+from typing import Dict
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -20,101 +20,186 @@ paths = PathFinder(__file__)
 #  Set the value to None for any commodity-subcommodity that should not be included in the output.
 #  To use a subcommodity different than "Total", simply rewrite the value.
 COMMODITY_MAPPING = {
-    ("Alumina", "Total"): ("Alumina", "Total"),
-    ("Aluminum", "Total"): ("Aluminum", "Total"),
-    ("Aluminum oxide", "Total"): ("Aluminum oxide", "Total"),
-    ("Aluminum-zirconium oxide", "Total"): ("Aluminum-zirconium oxide", "Total"),
-    ("Antimony", "Total"): ("Antimony", "Total"),
-    ("Arsenic", "Total"): ("Arsenic", "Total"),
-    ("Asbestos", "Total"): ("Asbestos", "Total"),
-    ("Ball clay", "Total"): ("Clays", "Ball clay"),
-    ("Barite", "Total"): ("Barite", "Total"),
-    ("Bauxite", "Total"): ("Bauxite", "Total"),
-    ("Bentonite", "Total"): ("Bentonite", "Total"),
-    ("Beryllium", "Total"): ("Beryllium", "Total"),
-    ("Bismuth", "Total"): ("Bismuth", "Total"),
-    ("Boron", "Total"): ("Boron", "Total"),
-    ("Boron carbide", "Total"): ("Boron carbide", "Total"),
-    ("Cadmium", "Total"): ("Cadmium", "Total"),
-    ("Cement", "Total"): ("Cement", "Total"),
-    ("Cesium", "Total"): ("Cesium", "Total"),
-    ("Chromium", "Total"): ("Chromium", "Total"),
-    ("Cobalt", "Total"): ("Cobalt", "Total"),
-    ("Construction sand and gravel", "Total"): ("Primary aggregates", "Construction sand and gravel"),
-    ("Copper", "Total"): ("Copper", "Total"),
-    ("Crushed stone", "Total"): ("Primary aggregates", "Crushed rock"),
-    ("Diatomite", "Total"): ("Diatomite", "Total"),
-    ("Dimension stone", "Total"): ("Dimension stone", "Total"),
-    ("Direct Reduced Iron", "Total"): ("Direct Reduced Iron", "Total"),
-    ("Feldspar", "Total"): ("Feldspar", "Total"),
-    ("Fire clay", "Total"): ("Clays", "Fire clay"),
-    ("Fluorspar", "Total"): ("Fluorspar", "Total"),
-    ("Fuller's earth", "Total"): ("Fuller's earth", "Total"),
-    ("Gallium", "Total"): ("Gallium", "Total"),
-    ("Germanium", "Total"): ("Germanium", "Total"),
-    ("Gold", "Total"): ("Gold", "Total"),
-    ("Graphite", "Total"): ("Graphite", "Total"),
-    ("Gypsum", "Total"): ("Gypsum", "Total"),
-    ("Helium", "Total"): ("Helium", "Total"),
-    ("Indium", "Total"): ("Indium", "Total"),
-    # NOTE: Total diamond production includes natural and synthetic diamonds.
-    ("Industrial diamond", "Total"): ("Diamond", "Total, industrial"),
-    ("Industrial garnet", "Total"): ("Industrial garnet", "Total"),
-    ("Industrial sand and gravel", "Total"): ("Primary aggregates", "Industrial sand and gravel"),
-    ("Iron Oxide Pigments", "Total"): ("Iron Oxide Pigments", "Total"),
-    ("Iron and Steel Slag", "Total"): ("Iron and Steel Slag", "Total"),
-    ("Iron ore", "Total"): ("Iron ore", "Total"),
-    ("Kaolin", "Total"): ("Kaolin", "Total"),
-    ("Lead", "Total"): ("Lead", "Total"),
-    ("Lime", "Total"): ("Lime", "Total"),
-    ("Magnesium compounds", "Total"): ("Magnesium compounds", "Total"),
-    ("Magnesium metal", "Total"): ("Magnesium metal", "Primary"),
-    ("Manganese", "Total"): ("Manganese", "Total"),
-    ("Mercury", "Total"): ("Mercury", "Total"),
-    ("Metallic abrasives", "Total"): ("Metallic abrasives", "Total"),
-    ("Mica (natural), scrap and flake", "Total"): ("Mica", "Natural, scrap and flake"),
-    ("Mica (natural), sheet", "Total"): ("Mica", "Natural, sheet"),
-    ("Miscellaneous clay", "Total"): ("Clays", "Miscellaneous clay"),
-    ("Molybdenum", "Total"): ("Molybdenum", "Total"),
-    ("Nickel", "Total"): ("Nickel", "Total"),
-    ("Niobium", "Total"): ("Niobium", "Total"),
-    ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Total, fixed ammonia"),
-    ("Peat", "Total"): ("Peat", "Total"),
-    ("Perlite", "Total"): ("Perlite", "Total"),
-    ("Phosphate rock", "Total"): ("Phosphate rock", "Total"),
-    ("Pig Iron", "Total"): ("Pig Iron", "Total"),
-    ("Pumice and Pumicite", "Total"): ("Pumice and Pumicite", "Total"),
-    ("Salt", "Total"): ("Salt", "Total"),
-    ("Selenium", "Total"): ("Selenium", "Total"),
-    ("Silicon", "Total"): ("Silicon", "Total"),
-    ("Silicon carbide", "Total"): ("Silicon carbide", "Total"),
-    ("Silver", "Total"): ("Silver", "Total"),
-    ("Soda ash", "Total"): ("Soda ash", "Total"),
-    ("Steel", "Total"): ("Steel", "Total"),
-    ("Strontium", "Total"): ("Strontium", "Total"),
-    ("Sulfur", "Total"): ("Sulfur", "Total"),
-    ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Total"),
-    ("Tantalum", "Total"): ("Tantalum", "Total"),
-    ("Tellurium", "Total"): ("Tellurium", "Total"),
-    ("Tin", "Total"): ("Tin", "Total"),
-    ("Titanium dioxide", "Total"): ("Titanium dioxide", "Total"),
-    ("Titanium scrap", "Total"): ("Titanium scrap", "Total"),
-    ("Titanium sponge", "Total"): ("Titanium sponge", "Total"),
-    ("Total clay", "Total"): ("Clays", "Total"),
-    ("Total manufactured abrasives ", "Total"): ("Manufactured abrasives ", "Total"),
-    ("Tungsten", "Total"): ("Tungsten", "Total"),
-    ("Vanadium", "Total"): ("Vanadium", "Total"),
-    ("Zinc", "Total"): ("Zinc", "Total"),
+    ("Alumina", "Total"): ("Alumina", "Refinery"),
+    ("Aluminum", "Total"): ("Aluminum", "Smelter"),
+    ("Aluminum oxide", "Total"): None,
+    ("Aluminum-zirconium oxide", "Total"): None,
+    ("Antimony", "Total"): ("Antimony", "Mine"),
+    ("Arsenic", "Total"): ("Arsenic", "Processing"),
+    ("Asbestos", "Total"): ("Asbestos", "Mine"),
+    ("Ball clay", "Total"): ("Clays", "Mine, ball clay"),
+    ("Barite", "Total"): ("Barite", "Mine"),
+    ("Bauxite", "Total"): ("Bauxite", "Mine"),
+    # NOTE: For consistency with USGS current data, rename the following.
+    ("Bentonite", "Total"): ("Clays", "Mine, bentonite"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Beryllium", "Total"): ("Beryllium", "Mine"),
+    ("Beryllium", "Mine"): ("Beryllium", "Mine"),
+    ("Bismuth", "Total"): ("Bismuth", "Mine"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Bismuth", "Mine"): ("Bismuth", "Mine"),
+    # NOTE: Extracted from "world_refinery_production".
+    ("Bismuth", "Refinery"): ("Bismuth", "Refinery"),
+    ("Boron", "Total"): ("Boron", "Mine"),
+    ("Boron carbide", "Total"): None,
+    ("Cadmium", "Total"): ("Cadmium", "Refinery"),
+    ("Cement", "Total"): ("Cement", "Processing"),
+    ("Cesium", "Total"): ("Cesium", "Mine"),
+    ("Chromium", "Total"): ("Chromium", "Mine"),
+    # NOTE: Cobalt total is only used for unit value.
+    ("Cobalt", "Total"): ("Cobalt", "Value"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Cobalt", "Mine"): ("Cobalt", "Mine"),
+    # NOTE: Extracted from "world_refinery_production".
+    ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
+    ("Construction sand and gravel", "Total"): ("Sand and gravel", "Mine, construction"),
+    ("Copper", "Total"): ("Copper", "Mine"),
+    ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
+    ("Diatomite", "Total"): ("Diatomite", "Mine"),
+    ("Dimension stone", "Total"): ("Dimension stone", "Mine"),
+    # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
+    ("Direct Reduced Iron", "Total"): None,
+    # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
+    #  nepheline syenite.", whereas in USGS current it's unclear.
+    ("Feldspar", "Total"): ("Feldspar", "Mine"),
+    ("Fire clay", "Total"): ("Clays", "Mine, fire clay"),
+    ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
+    ("Fuller's earth", "Total"): ("Clays", "Mine, fuller's earth"),
+    ("Gallium", "Total"): ("Gallium", "Refinery"),
+    ("Germanium", "Total"): ("Germanium", "Refinery"),
+    ("Gold", "Total"): ("Gold", "Mine"),
+    ("Graphite", "Total"): ("Graphite", "Mine"),
+    ("Gypsum", "Total"): ("Gypsum", "Mine"),
+    ("Helium", "Total"): ("Helium", "Mine"),
+    ("Indium", "Total"): ("Indium", "Refinery"),
+    # NOTE: Industrial diamond production includes natural and synthetic diamonds.
+    #  But in USGS current data, industrial diamond production includes only natural diamond.
+    ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
+    ("Industrial garnet", "Total"): ("Garnet", "Mine"),
+    ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Mine, industrial"),
+    ("Iron Oxide Pigments", "Total"): None,
+    ("Iron and Steel Slag", "Total"): None,
+    ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
+    ("Kaolin", "Total"): ("Clays", "Mine, kaolin"),
+    ("Lead", "Total"): ("Lead", "Mine"),
+    ("Lime", "Total"): ("Lime", "Processing"),
+    ("Magnesium compounds", "Total"): ("Magnesium compounds", "Mine"),
+    ("Magnesium metal", "Total"): ("Magnesium metal", "Smelter"),
+    ("Manganese", "Total"): ("Manganese", "Mine"),
+    ("Mercury", "Total"): ("Mercury", "Mine"),
+    ("Metallic abrasives", "Total"): None,
+    ("Mica (natural), scrap and flake", "Total"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural), sheet", "Total"): ("Mica", "Mine, sheet"),
+    ("Miscellaneous clay", "Total"): ("Clays", "Mine, miscellaneous"),
+    ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
+    ("Nickel", "Total"): ("Nickel", "Mine"),
+    ("Niobium", "Total"): ("Niobium", "Mine"),
+    # NOTE: Extracted from "world_mine_production".
+    ("Niobium", "Mine"): ("Niobium", "Mine"),
+    ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
+    ("Peat", "Total"): ("Peat", "Mine"),
+    ("Perlite", "Total"): ("Perlite", "Mine"),
+    ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
+    ("Pig Iron", "Total"): ("Iron", "Smelter, pig iron"),
+    ("Pumice and Pumicite", "Total"): ("Pumice and pumicite", "Mine"),
+    ("Salt", "Total"): ("Salt", "Mine"),
+    ("Selenium", "Total"): ("Selenium", "Refinery"),
+    ("Silicon", "Total"): ("Silicon", "Processing"),
+    ("Silicon carbide", "Total"): None,
+    ("Silver", "Total"): ("Silver", "Mine"),
+    ("Soda ash", "Total"): ("Soda ash", "Natural and synthetic"),
+    ("Steel", "Total"): ("Steel", "Processing, crude"),
+    ("Strontium", "Total"): ("Strontium", "Mine"),
+    ("Sulfur", "Total"): ("Sulfur", "Processing"),
+    ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Mine"),
+    ("Tantalum", "Total"): ("Tantalum", "Mine"),
+    ("Tellurium", "Total"): ("Tellurium", "Refinery"),
+    ("Tin", "Total"): ("Tin", "Mine"),
+    # NOTE: For titanium there is no global data.
+    ("Titanium dioxide", "Total"): None,
+    ("Titanium scrap", "Total"): None,
+    ("Titanium sponge", "Total"): None,
+    # NOTE: After combing data with BGS, USGS' "Total" production is smaller than the sum of all clays production.
+    #  To avoid confusion, remove this total.
+    ("Total clay", "Total"): None,
+    ("Total manufactured abrasives ", "Total"): None,
+    ("Tungsten", "Total"): ("Tungsten", "Mine"),
+    ("Vanadium", "Total"): ("Vanadium", "Mine"),
+    ("Zinc", "Total"): ("Zinc", "Mine"),
 }
 
-# Footnotes (that will appear in the footer of charts) to add to the flattened output table.
-FOOTNOTES = {
-    # Example:
-    # 'production|Tungsten|Powder|tonnes': "Tungsten includes...",
+# Units can either be "metric tonnes" or "metric tonnes of gross weight".
+# Since this data is later on combined with USGS current data (given in tonnes), we need to ensure that they mean the
+# same thing.
+# So, to be conservative, go to the explorer and inspect those minerals that come as "tonnes of gross weight"; compare them to the USGS current data (given in "tonnes"); if they are in reasonable agreement, add them to the following list.
+# Their unit will be converted to "tonnes", and hence combined with USGS current data.
+# NOTE: The names below must coincide with the original names of the commodities (before harmonizing commodity-subcommodity pairs).
+MINERALS_TO_CONVERT_TO_TONNES = [
+    "Alumina",
+    "Asbestos",
+    "Barite",
+    "Ball clay",
+    "Bauxite",
+    "Bentonite",
+    "Cement",
+    "Clays",
+    "Construction sand and gravel",
+    "Fire clay",
+    "Total clay",
+    "Miscellaneous clay",
+    "Graphite",
+    "Industrial diamond",
+    "Industrial sand and gravel",
+    "Iron ore",
+    "Lime",
+    "Crushed stone",
+    "Feldspar",
+    # NOTE: For Cobalt, the conversion to "tonnes" is hardcoded in "prepare_world_production" function.
+    "Cobalt",
+    "Diatomite",
+    "Dimension stone",
+    "Fluorspar",
+    "Fuller's earth",
+    "Gypsum",
+    "Industrial garnet",
+    "Kaolin",
+    "Mica (natural), sheet",
+    "Mica (natural), scrap and flake",
+    "Peat",
+    "Perlite",
+    "Phosphate rock",
+    "Pumice and Pumicite",
+    "Salt",
+    "Soda ash",
+    "Talc and pyrophyllite",
+    # NOTE: Bismuth is in gross weight for the US, but metal content for the World.
+    #  However, data for the US contains only nans and zeros, and will be removed later on.
+    "Bismuth",
+]
+
+# Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
+FOOTNOTES_PRODUCTION = {
+    "production|Alumina|Refinery|tonnes": "Values are reported as quantity produced before 1971 and as calcined alumina equivalents afterwards.",
+    "production|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
+    "production|Barite|Mine|tonnes": "Values are reported as gross weight.",
+    "production|Asbestos|Mine|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
+    "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
+    "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
+    "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
+    "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
+FOOTNOTES_UNIT_VALUE = {}
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
+    # Assume "Total" for all those missing subcommodities (e.g. for the US).
+    tb["sub_commodity"] = tb["sub_commodity"].fillna("Total")
+    missing_mappings = set(
+        [tuple(pair) for pair in tb[["commodity", "sub_commodity"]].drop_duplicates().values.tolist()]
+    ) - set(COMMODITY_MAPPING)
+    assert len(missing_mappings) == 0, f"Missing mappings: {missing_mappings}"
     tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
     for pair_old, pair_new in COMMODITY_MAPPING.items():
         if pair_old == pair_new:
@@ -158,18 +243,18 @@ def clean_notes(note):
     return notes_clean
 
 
-def gather_notes(tb_combined: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(tb_combined: Table) -> Dict[str, str]:
+    notes_columns = [column for column in tb_combined.columns if column.startswith("notes_")]
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = (
         tb_combined[
             ["commodity", "sub_commodity", "country", "year", "unit"]
             + [c for c in tb_combined.columns if c.startswith("notes_")]
         ]
-        .rename(columns={"notes_unit_value_constant": "notes_unit_value"}, errors="raise")
         .pivot(
             index=["country", "year"],
             columns=["commodity", "sub_commodity", "unit"],
-            values=["notes_production", "notes_unit_value"],
+            values=notes_columns,
             join_column_levels_with="|",
         )
         .dropna(axis=1, how="all")
@@ -195,6 +280,182 @@ def gather_notes(tb_combined: Table, notes_columns: List[str]) -> Dict[str, str]
     return notes_dict
 
 
+def harmonize_units(tb: Table) -> Table:
+    # See explanation above, where MINERALS_TO_CONVERT_TO_TONNES is defined.
+    assert set(tb["unit"]) == {"metric tonnes", "metric tonnes of gross weight"}
+    tb["unit"] = (
+        tb["unit"]
+        .astype("string")
+        .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes of gross weight"})
+    )
+    tb.loc[tb["commodity"].isin(MINERALS_TO_CONVERT_TO_TONNES), "unit"] = "tonnes"
+
+    return tb
+
+
+def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
+    # Select columns for US production.
+    # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
+    # For now, we'll only keep "production".
+    tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
+    # Remove spurious footnotes like "W".
+    tb_us_production["production"] = map_series(
+        tb_us_production["production"],
+        mapping={"W": None},
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
+    ).astype({"production": float})
+    # Add notes to the table, using the extracted metadata.
+    for column in ["production"]:
+        mask = tb_metadata[column].notnull()
+        tb_metadata.loc[mask, column] = "Note on United States production: " + tb_metadata[column][mask]
+        tb_us_production = tb_us_production.merge(
+            tb_metadata[["commodity", column]].rename(
+                columns={column: f"notes_{column}" for column in tb_metadata.columns if column != "commodity"},
+                errors="ignore",
+            ),
+            on="commodity",
+            how="left",
+        )
+
+    # For now, assume "Total" subcommodity.
+    tb_us_production["sub_commodity"] = "Total"
+
+    return tb_us_production
+
+
+def prepare_world_production(tb: Table, tb_metadata: Table) -> Table:
+    # NOTE: There are 4 columns for world production, namely:
+    # * "world_mine_production" (which exists for Beryllium, Cobalt and Niobium),
+    # * "world_mine_production__metal_content" (which exists only for bismuth),
+    # * "world_refinery_production" (which exists for Bismuth and Cobalt),
+    # * "world_production" (which exists for other commodities).
+
+    # Initialize table for world production.
+    tb_world_production = Table()
+    for column in [
+        "world_production",
+        "world_mine_production",
+        "world_mine_production__metal_content",
+        "world_refinery_production",
+    ]:
+        if "mine" in column:
+            sub_commodity = "Mine"
+        elif "refinery" in column:
+            sub_commodity = "Refinery"
+        else:
+            sub_commodity = "Total"
+
+        _tb_production = (
+            tb[["commodity", "year", column, "unit"]]
+            .rename(columns={column: "production"}, errors="raise")
+            .assign(**{"country": "World"})
+            .assign(**{"sub_commodity": sub_commodity})
+            .astype({"production": float})
+            .dropna(subset="production")
+            .reset_index(drop=True)
+        )
+        if "metal_content" in column:
+            _tb_production["unit"] = "tonnes of metal content"
+            # Instead of changing the unit, we create a footnote.
+            _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes"
+        elif "refinery" in column:
+            # world_refinery_production is informed only for Bismuth and Cobalt.
+            # In the case of Bismuth, the title says "gross weight unless otherwise noted"
+            # (and nothing else is noted for world refinery production).
+            # However, in both cases, the unit is probably "tonnes of metal content".
+            # Instead of changing the unit, we create a footnote.
+            # _tb_production.loc[_tb_production["commodity"] == "Bismuth", "unit"] = "tonnes"
+            # In the case of Cobalt, to harmonize with BGS data, use "tonnes" and add a footnote.
+            _tb_production.loc[_tb_production["commodity"] == "Cobalt", "unit"] = "tonnes"
+
+        # Add notes to the table, using the extracted metadata.
+        mask = tb_metadata[column].notnull()
+        tb_metadata.loc[mask, column] = "Note on global production: " + tb_metadata[column][mask]
+        _tb_production = _tb_production.merge(
+            tb_metadata[["commodity", column]].rename(columns={column: "notes_production"}, errors="raise"),
+            on="commodity",
+            how="left",
+        )
+        # Combine tables.
+        tb_world_production = pr.concat([tb_world_production, _tb_production], ignore_index=True)
+
+    return tb_world_production
+
+
+def prepare_unit_value(tb: Table, tb_metadata: Table) -> Table:
+    # Select columns for unit value.
+    tb_unit_value = (
+        tb[["commodity", "year", "unit_value_98dollar_t"]]
+        .assign(**{"country": "World"})
+        .rename(
+            columns={"unit_value_98dollar_t": "unit_value"},
+            errors="raise",
+        )
+    )
+    # Remove spurious footnotes like "W".
+    tb_unit_value["unit_value"] = tb_unit_value["unit_value"].astype("string").replace("W", None).astype(float)
+    # Add notes to the table, using the extracted metadata.
+    tb_unit_value = tb_unit_value.merge(
+        tb_metadata[["commodity", "unit_value_98dollar_t"]].rename(
+            columns={"unit_value_98dollar_t": "notes_unit_value"}, errors="raise"
+        ),
+        on="commodity",
+        how="left",
+    )
+
+    # Drop empty rows.
+    tb_unit_value = tb_unit_value.dropna(subset=["unit_value"], how="all").reset_index(drop=True)
+
+    # Add a generic subcommodity that applies to all commodities.
+    # NOTE: This may be problematic for commodities for which there are subcommodities with different unit value series.
+    tb_unit_value["sub_commodity"] = "Total"
+
+    # Add a unit.
+    tb_unit_value["unit"] = "constant 1998 US$ per tonne"
+
+    return tb_unit_value
+
+
+def prepare_wide_table(tb: Table, footnotes: Dict[str, str]) -> Table:
+    # Gather all notes in a dictionary.
+    notes = gather_notes(tb_combined=tb)
+    # Identify data columns.
+    values_columns = [
+        column
+        for column in tb.columns
+        if column not in ["country", "year", "commodity", "sub_commodity", "unit"] and not column.startswith("notes_")
+    ]
+    # Create a wide table.
+    tb_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["commodity", "sub_commodity", "unit"],
+        values=values_columns,
+        join_column_levels_with="|",
+    ).dropna(axis=1, how="all")
+
+    # NOTE: Here, I could loop over columns and improve metadata.
+    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
+    # So, for now, simply add titles and descriptions from producer.
+    for column in tb_flat.drop(columns=["country", "year"]).columns:
+        # Create metadata title (before they become snake-case).
+        tb_flat[column].metadata.title = column
+        if column in notes:
+            tb_flat[column].metadata.description_from_producer = (
+                "Notes found in original USGS historical data:\n" + notes[column]
+            )
+
+    # Add footnotes.
+    for column, note in footnotes.items():
+        if not tb_flat[column].metadata.presentation:
+            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
+        tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns if column not in ["country", "year"]})
+
+    return tb_flat
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -212,12 +473,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize units.
-    assert set(tb["unit"]) == {"metric tonnes", "metric tonnes of gross weight"}
-    tb["unit"] = (
-        tb["unit"]
-        .astype("string")
-        .replace({"metric tonnes": "tonnes", "metric tonnes of gross weight": "tonnes, gross weight"})
-    )
+    tb = harmonize_units(tb=tb)
 
     # Remove duplicated rows that have exactly the same data.
     # NOTE: Most columns were called "World Production", but others were called "World Mine Production" (and similar).
@@ -229,7 +485,6 @@ def run(dest_dir: str) -> None:
             "production",
             "world_production",
             "unit",
-            "unit_value_dollar_t",
             "unit_value_98dollar_t",
         ]
     ).reset_index(drop=True)
@@ -251,149 +506,65 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["commodity"] == "Nickel") & (tb["year"] == 2019) & (tb["world_production"] == 2510000.0), "year"] = 2020
     ####################################################################################################################
 
-    # Select columns for US production.
-    # NOTE: There are several other columns for production (e.g. "primary_production", "secondary_production", etc.).
-    # For now, we'll only keep "production".
-    tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
-    # Remove spurious footnotes like "W".
-    tb_us_production["production"] = map_series(
-        tb_us_production["production"],
-        mapping={"W": None},
-        warn_on_missing_mappings=False,
-        warn_on_unused_mappings=True,
-    ).astype({"production": float})
-    # Add notes to the table, using the extracted metadata.
-    for column in ["production"]:
-        mask = tb_metadata[column].notnull()
-        tb_metadata.loc[mask, column] = "Note on United States production: " + tb_metadata[column][mask]
-        tb_us_production = tb_us_production.merge(
-            tb_metadata[["commodity", column]].rename(
-                columns={column: f"{column}_notes" for column in tb_metadata.columns if column != "commodity"},
-                errors="ignore",
-            ),
-            on="commodity",
-            how="left",
-        )
+    # Prepare US production.
+    tb_us_production = prepare_us_production(tb=tb, tb_metadata=tb_metadata)
 
-    # Select columns for world production.
-    # NOTE: There are 4 columns for world production, namely "world_production", "world_mine_production",
-    # "world_mine_production__metal_content", and "world_refinery_production".
-    # For now, we'll only keep "world_production".
-    tb_world_production = (
-        tb[["commodity", "year", "world_production", "unit"]]
-        .rename(columns={"world_production": "production"}, errors="raise")
-        .assign(**{"country": "World"})
-        .astype({"production": float})
-    )
-    # Add notes to the table, using the extracted metadata.
-    mask = tb_metadata["world_production"].notnull()
-    tb_metadata.loc[mask, "world_production"] = "Note on global production: " + tb_metadata["world_production"][mask]
-    tb_world_production = tb_world_production.merge(
-        tb_metadata[["commodity", "world_production"]].rename(
-            columns={"world_production": "production_notes" for column in tb_metadata.columns if column != "commodity"},
-            errors="ignore",
-        ),
-        on="commodity",
-        how="left",
-    )
+    # Prepare world production.
+    tb_world_production = prepare_world_production(tb=tb, tb_metadata=tb_metadata)
 
-    # Select columns for unit value.
-    tb_unit_value = (
-        tb[["commodity", "year", "unit_value_dollar_t", "unit_value_98dollar_t"]]
-        .assign(**{"country": "World"})
-        .rename(
-            columns={"unit_value_dollar_t": "unit_value_current", "unit_value_98dollar_t": "unit_value_constant"},
-            errors="raise",
-        )
-    )
-    # Remove spurious footnotes like "W".
-    for column in ["unit_value_current", "unit_value_constant"]:
-        tb_unit_value[column] = tb_unit_value[column].astype("string").replace("W", None).astype(float)
-    # Add notes to the table, using the extracted metadata.
-    tb_unit_value = tb_unit_value.merge(
-        tb_metadata[["commodity", "unit_value_dollar_t", "unit_value_98dollar_t"]].rename(
-            columns={
-                "unit_value_dollar_t": "unit_value_current_notes",
-                "unit_value_98dollar_t": "unit_value_constant_notes",
-            },
-            errors="ignore",
-        ),
-        on="commodity",
-        how="left",
-    )
+    # Prepare unit value.
+    tb_unit_value = prepare_unit_value(tb=tb, tb_metadata=tb_metadata)
 
-    # Combine tables.
+    # Combine US and world production.
     tb_combined = pr.concat([tb_us_production, tb_world_production], ignore_index=True)
-    tb_combined = tb_combined.merge(tb_unit_value, on=["commodity", "year", "country"], how="outer")
 
     # Remove empty rows.
-    tb_combined = tb_combined.dropna(
-        subset=["production", "unit_value_current", "unit_value_constant"], how="all"
-    ).reset_index(drop=True)
+    tb_combined = tb_combined.dropna(subset=["production"], how="all").reset_index(drop=True)
 
     # Harmonize commodity-subcommodity pairs.
-    # To begin with, assume subcommodity "Total" for all minerals, and then rewrite when needed (using the dictionary
-    # COMMODITY_MAPPING defined above).
-    tb_combined["sub_commodity"] = "Total"
     tb_combined = harmonize_commodity_subcommodity_pairs(tb=tb_combined)
+    tb_unit_value = harmonize_commodity_subcommodity_pairs(tb=tb_unit_value)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
-    for column in [column for column in tb_combined.columns if "_notes" in column]:
-        new_column = f"notes_{column.replace('_notes', '')}"
-        tb_combined[new_column] = [clean_notes(note) for note in tb_combined[column]]
-        tb_combined[new_column] = tb_combined[new_column].copy_metadata(tb_combined[column])
-        # Drop unnecessary columns.
-        tb_combined = tb_combined.drop(columns=[column])
+    for column in [column for column in tb_combined.columns if column.startswith("notes_")]:
+        tb_combined[column] = tb_combined[column].apply(clean_notes)
+    for column in [column for column in tb_unit_value.columns if column.startswith("notes_")]:
+        tb_unit_value[column] = tb_unit_value[column].apply(clean_notes)
 
-    # Gather all notes in a dictionary.
-    notes = gather_notes(
-        tb_combined=tb_combined, notes_columns=[column for column in tb_combined.columns if column.startswith("notes_")]
-    )
+    # Create wide tables for production and unit value.
+    tb_flat = prepare_wide_table(tb=tb_combined, footnotes=FOOTNOTES_PRODUCTION)
+    tb_flat_unit_value = prepare_wide_table(tb=tb_unit_value, footnotes=FOOTNOTES_UNIT_VALUE)
+    tb_flat = tb_flat.merge(tb_flat_unit_value, on=["country", "year"], how="outer")
 
-    # Create a wide table.
-    # For the wide table, select only unit value in constant USD.
-    tb_flat = (
-        tb_combined.rename(columns={"unit_value_constant": "unit_value"}, errors="raise")
-        .drop(columns=["unit_value_current"], errors="raise")
-        .pivot(
-            index=["country", "year"],
-            columns=["commodity", "sub_commodity", "unit"],
-            values=["production", "unit_value"],
-            join_column_levels_with="|",
-        )
-        .dropna(axis=1, how="all")
-    )
+    # Drop empty columns, if any.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
-    # NOTE: Here, I could loop over columns and improve metadata.
-    # However, for convenience (since this step is not used separately), this will be done in the garden minerals step.
-    # So, for now, simply add titles and descriptions from producer.
-    for column in tb_flat.drop(columns=["country", "year"]).columns:
-        # Create metadata title (before they become snake-case).
-        tb_flat[column].metadata.title = column
-        if column in notes:
-            tb_flat[column].metadata.description_from_producer = (
-                "Notes found in original USGS historical data:\n" + notes[column]
-            )
-
-    # Add footnotes.
-    for column, note in FOOTNOTES.items():
-        if not tb_flat[column].metadata.presentation:
-            tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
-        tb_flat[column].metadata.presentation.grapher_config["note"] = note
+    ####################################################################################################################
+    # Fix some other specific cases.
+    # Bismuth in gross weight only has data for the US, and it's all zeros.
+    tb_flat.loc[(tb_flat["country"] == "United States"), "production|Bismuth|Mine|tonnes"] = pd.NA
+    ####################################################################################################################
 
     # Format tables conveniently.
+    tb_combined = tb_combined.format(
+        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
+    )
     tb_combined = tb_combined.astype(
         {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
     )
-    tb_combined = tb_combined.format(["country", "year", "commodity", "sub_commodity"])
+    tb_unit_value = tb_unit_value.format(
+        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_unit_value"
+    )
+    tb_unit_value = tb_unit_value.astype(
+        {column: "string" for column in tb_unit_value.columns if column.startswith("notes_")}
+    )
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
-    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_flat], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_unit_value, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
