@@ -375,18 +375,10 @@ FOOTNOTES = {
 
 # Dictionary of special units.
 UNITS_MAPPING = {
-    # "production|Arsenic|Processing|tonnes": "tonnes of arsenic trioxide or calculated equivalent",
-    # "production|Alumina|Refinery|tonnes": "tonnes of calcined equivalent weights",
-    # "production|Bauxite|Mine|tonnes": "tonnes of dry content",
-    # "reserves|Bauxite|Mine|tonnes": "tonnes of dry content",
     "production|Chromium|Mine|tonnes": "tonnes of gross weight",
     "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
     "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
     "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
-    # "production|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
-    # "reserves|Potash|Mine|tonnes": "tonnes of potassium oxide equivalent",
-    # "production|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
-    # "reserves|Rare earths|Mine|tonnes": "tonnes of rare-earth-oxide equivalent",
 }
 
 
