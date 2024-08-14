@@ -859,7 +859,7 @@ def st_toast_success(message: str) -> None:
 
 
 def default_converter(o):
-    if isinstance(o, type(np.int64)):  # ignore
+    if isinstance(o, np.integer):  # ignore
         return int(o)
     else:
         raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
