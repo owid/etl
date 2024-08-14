@@ -119,6 +119,12 @@ steps:
   data://garden/statistics_canada/2024-08-09/relative_poverty:
     - data://meadow/statistics_canada/2024-08-09/relative_poverty
 
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-14/atkinson_2008_canada:
+    - snapshot://chartbook/2024-08-14/atkinson_2008_canada.xls
+  data://garden/chartbook/2024-08-14/atkinson_2008_canada:
+    - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
+
   ################################################################################################
   # FRANCE
   ################################################################################################
