@@ -1,0 +1,54 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Government Response Tracker (OxCGRT)
+    description: |-
+      The Oxford Covid-19 Government Response Tracker (OxCGRT) collected information on which pandemic response measures were enacted by governments, and when. During the pandemic this helped decision-makers and citizens understand governmental responses in a consistent way, aiding efforts to fight the pandemic. Now that covid-19 is no longer designated a public health emergency of international concern, the data can be used for research purposes and to prepare for future pandemics.
+
+      The OxCGRT systematically collected information on several different common policy responses governments took over 2020, 2021, and 2022, recorded these policies on a scale to reflect the extent of government action, and aggregates these scores into a suite of policy indices. We also collected differentiated policies data where different policies apply to people who were vaccinated and non-vaccinated.
+
+      The OxCGRT reports publicly available information on 24 policy indicators and a miscellaneous notes field of government response organised into four groups:
+
+      - C: containment and closure policies
+      - E: economic policies
+      - H: health system policies
+      - V: vaccination policies
+
+      To help make sense of the data, we have produced four indices that aggregate the data into a single number. For more details about how the indices are comprised, see the section 'Calculation of policy indices' in our documentation. Each of these indices reports a number between 0 to 100 that reflects the level of the government's response along certain dimensions:
+
+      - overall government response index (all indicators)
+      - containment and health index (all C and H indicators)
+      - stringency index (all C indicators, plus H1 which records public information campaigns)
+      - economic support index (all E indicators)
+
+      These indices are a measure of how many of the relevant policy types a government has acted upon, and to what degree. The index cannot say whether a government's policy has been implemented effectively.
+
+      Because of the complexity of the dataset, it is published across 27 CSV files. Our technical documentation (https://github.com/OxCGRT/covid-policy-dataset/blob/main/documentation_and_codebook.md) contains all the information users need to navigate and use the data.
+
+    title_snapshot: Government Response Tracker (OxCGRT) - National data 2021
+    description_snapshot: |-
+      This file provides maximum detail while still reporting the overall situation in each jurisdiction. Only data for 2021.
+
+
+    date_published: "2023-06-21"
+
+    # Citation
+    producer: Blavatnik School of Government, University of Oxford
+    citation_full: |-
+      Thomas Hale, Noam Angrist, Rafael Goldszmidt, Beatriz Kira, Anna Petherick, Toby Phillips, Samuel Webster, Emily Cameron-Blake, Laura Hallas, Saptarshi Majumdar, and Helen Tatlow. (2021). “A global panel database of pandemic policies (Oxford COVID-19 Government Response Tracker).” Nature Human Behaviour. https://doi.org/10.1038/s41562-021-01079-8
+
+    # Files
+    url_main: https://github.com/OxCGRT/covid-policy-dataset
+    url_download: https://github.com/OxCGRT/covid-policy-dataset/raw/main/data/OxCGRT_fullwithnotes_national_2021_v1.csv
+    date_accessed: 2024-08-01
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 7eadf3733b8bc741ba6f2edd225d132e
+    size: 61244326
+    path: oxcgrt_policy_national_2021.csv

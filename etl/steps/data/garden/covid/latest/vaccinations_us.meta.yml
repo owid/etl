@@ -1,113 +1,115 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  display_zero_day: &display_zero_day
+    zeroDay: 2020-01-01
+    yearIsDay: true
+  common:
+
+    display:
+        numDecimalPlaces: 0
+        <<: *display_zero_day
+    presentation:
+      topic_tags:
+        - COVID-19
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: COVID-19 - United States vaccinations
-  description: >-
-    Data on vaccinations against COVID-19, collected from the data updated daily
-    by the United States Centers for Disease
-    Control and Prevention.
+  update_period_days: 365
 
 
-    You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
-  sources:
-  - name: Centers for Disease Control and Prevention – Last updated {TODAY}
-    url: https://covid.cdc.gov/covid-data-tracker/#vaccinations
-    published_by: Centers for Disease Control and Prevention – Last updated 2 November
-      2022 (Eastern Time)
+  title: COVID-19, Vaccinations (United States)
 tables:
   vaccinations_us:
     variables:
-      daily_vaccinations:
-        title: daily_vaccinations
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      daily_vaccinations_per_million:
-        title: daily_vaccinations_per_million
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      daily_vaccinations_raw:
-        title: daily_vaccinations_raw
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      distributed_per_hundred:
-        title: distributed_per_hundred
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      people_fully_vaccinated:
-        title: people_fully_vaccinated
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      people_fully_vaccinated_per_hundred:
-        title: people_fully_vaccinated_per_hundred
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      people_vaccinated:
-        title: people_vaccinated
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      people_vaccinated_per_hundred:
-        title: people_vaccinated_per_hundred
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      share_doses_used:
-        title: share_doses_used
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
-      total_boosters:
-        title: total_boosters
-        unit: ''
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-      total_boosters_per_hundred:
-        title: total_boosters_per_hundred
-        unit: ''
-        display:
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-      total_distributed:
-        title: total_distributed
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
+
       total_vaccinations:
-        title: total_vaccinations
-        unit: ''
-        display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
+        title: Total vaccinations
+        unit: doses
+        description_short: Cumularive number of COVID-19 vaccination doses administered.
+        description_processing: All doses, including boosters, are counted individually.
       total_vaccinations_per_hundred:
-        title: total_vaccinations_per_hundred
-        unit: ''
+        title: Total vaccinations (per 100 people)
+        unit: 'doses per 100 people'
+        description_short: Cumularive number of COVID-19 vaccination doses administered, per 100 people.
+        description_processing: All doses, including boosters, are counted individually.
         display:
-          includeInTable: true
-          yearIsDay: true
-          zeroDay: '2021-01-01'
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+
+      total_distributed:
+        title: Total doses distributed
+        unit: 'doses'
+        description_short: Cumulative counts of COVID-19 vaccine doses reported to Operation Warp Speed as delivered.
+      distributed_per_hundred:
+        title: Total doses distributed (per 100 people)
+        unit: 'doses per 100 people'
+        description_short: Cumulative counts of COVID-19 vaccine doses reported to Operation Warp Speed as delivered, per 100 people.
+        display:
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+
+      people_vaccinated:
+        title: People vaccinated
+        description_short: Total number of people who received at least one vaccine dose.
+        unit: 'people'
+      people_vaccinated_per_hundred:
+        title: People vaccinated (per 100 people)
+        description_short: Share of people who received at least one vaccine dose.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+
+      people_fully_vaccinated:
+        title: People fully vaccinated
+        description_short: Total number of people who received all doses prescribed by the vaccination protocol.
+        unit: 'people'
+      people_fully_vaccinated_per_hundred:
+        title: People fully vaccinated (per 100 people)
+        description_short: Share of people who received all doses prescribed by the vaccination protocol.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+
+      total_boosters:
+        title: Total booster doses administered
+        unit: 'doses'
+      total_boosters_per_hundred:
+        title: Total booster doses administered (per 100 people)
+        unit: 'doses per 100 people'
+        display:
+          numDecimalPlaces: 3
+          <<: *display_zero_day
+
+      daily_vaccinations:
+        title: Daily doses administered (7-day rolling average)
+        description_short: All doses, including boosters, are counted individually. 7-day rolling average.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+      daily_vaccinations_raw:
+        title: Daily doses administered
+        description_short: All doses, including boosters, are counted individually.
+        unit: 'doses'
+      daily_vaccinations_per_million:
+        title: Daily doses administered (per million people)
+        description_short: All doses, including boosters, are counted individually, per million people
+        unit: 'doses per million people'
+        display:
+          numDecimalPlaces: 2
+          <<: *display_zero_day
+
+      share_doses_used:
+        title: Share of doses used
+        description_short: Share of distributed vaccination doses that have been administered/used in the population. Distributed figures represent those reported to Operation Warp Speed as delivered.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          <<: *display_zero_day

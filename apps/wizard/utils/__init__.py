@@ -10,6 +10,7 @@ TODO: Should probably re-order this file and split it into multiple files.
     Also, can imagine apps/wizard/ being renamed to just wizard/, and stuff other than wizard should be either (i) deleted or (ii) migrated elsewhere in etl/.
 """
 import argparse
+import ast
 import datetime as dt
 import json
 import os
@@ -664,8 +665,9 @@ def enable_bugsnag_for_streamlit():
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
     enable_bugsnag()
+
     # error_util = sys.modules["streamlit.error_util"]
-    error_util = sys.modules["streamlit.runtime.scriptrunner.script_runner"]
+    error_util = sys.modules["streamlit.error_util"]
     original_handler = error_util.handle_uncaught_app_exception
 
     def bugsnag_handler(exception: Exception) -> None:
@@ -861,3 +863,29 @@ def default_converter(o):
         return int(o)
     else:
         raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
+
+def as_valid_json(s):
+    """Return `s` as a dictionary if applicable."""
+    try:
+        # First, try to parse the string directly as JSON
+        return json.loads(s)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, use ast.literal_eval to handle mixed quotes
+            python_obj = ast.literal_eval(s)
+
+            # Convert the Python object to a JSON string and then back to a Python object
+            return json.loads(json.dumps(python_obj))
+        except (ValueError, SyntaxError):
+            return s
+
+
+def as_list(s):
+    """Return `s` as a list if applicable."""
+    if isinstance(s, str):
+        try:
+            return ast.literal_eval(s)
+        except (ValueError, SyntaxError):
+            return s
+    return s

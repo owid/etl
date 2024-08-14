@@ -25,7 +25,7 @@ tables:
           title_public: Share of top 1%
           title_variant: Household net wealth
         display:
-          name: Testing variable
+          name: Wealth share of the richest 1%
           numDecimalPlaces: 1
 
 

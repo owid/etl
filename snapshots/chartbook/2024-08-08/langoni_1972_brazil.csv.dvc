@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Income share of the top 1% by Langoni (1972)
+    date_published: "1972"
+
+    # Citation
+    producer: Langoni
+    citation_full: |-
+      Langoni, C.G.(1972). Distribuição da renda e desenvolvimento econômico do Brasil [Income distribution and economic development in Brazil]. Table 2 and 4.
+
+    # Files
+    url_main: https://edisciplinas.usp.br/pluginfile.php/5447307/mod_resource/content/1/Langoni%20dist%20de%20renda%20e%20desenvolvimento%20estudos%20economicos%201972.pdf
+    date_accessed: 2024-08-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://edisciplinas.usp.br/pluginfile.php/5447307/mod_resource/content/1/Langoni%20dist%20de%20renda%20e%20desenvolvimento%20estudos%20economicos%201972.pdf
+
+outs:
+  - md5: 22bc85f35b43b73a001e97105de043de
+    size: 61
+    path: langoni_1972_brazil.csv

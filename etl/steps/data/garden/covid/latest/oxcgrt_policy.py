@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["oxcgrt_policy_compact"].reset_index()
     tb_vax = ds_meadow["oxcgrt_policy_vaccines"].reset_index()
+    tb_stringency = ds_meadow["oxcgrt_policy_stringency"].reset_index()
 
     #
     # Process data.
@@ -27,14 +28,20 @@ def run(dest_dir: str) -> None:
     tb = tb.loc[tb["regioncode"].isnull()].drop(columns="regioncode")
     # Merge tables
     tb = tb.merge(tb_vax, how="outer", on=["countryname", "date"], validate="one_to_one")
+    tb = tb.merge(tb_stringency, how="outer")
     # Column renaming
     tb = tb.rename(
         columns={
             "countryname": "country",
             "stringencyindex_average": "stringency_index",
+            "stringencyindex_vaccinated": "stringency_index_vax",
+            "stringencyindex_nonvaccinated": "stringency_index_nonvax",
+            "stringencyindex_weightedaverage": "stringency_index_weighted_average",
             "containmenthealthindex_average": "containment_health_index",
         }
     )
+    tb = tb.drop(columns=["stringencyindex_simpleaverage"])
+
     # Harmonize
     tb = geo.harmonize_countries(
         df=tb,
