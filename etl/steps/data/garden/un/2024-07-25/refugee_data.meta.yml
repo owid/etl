@@ -4,6 +4,8 @@ definitions:
       topic_tags:
         - Migration
         - War & Peace
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
     unit: people
     short_unit: ""
     processing_level: major

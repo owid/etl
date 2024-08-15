@@ -5,6 +5,8 @@ definitions:
         - Migration
         - War & Peace
         - Natural Disasters
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
     processing_level: minor #minor for raw data, major for processed data
     unit: people
   idmc_definitions:
@@ -35,18 +37,18 @@ tables:
       total_stock_displacement:
         title: Internally displaced people
         description_short: |-
-          Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or disaster and have not crossed an internationally-recognized state border. This includes all people who are currently displaced and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or [disaster](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         unit: people
         short_unit: ""
         description_from_producer: |-
           - {definitions.idmc_definitions.internally_displaced_people}
           - {definitions.idmc_definitions.conflict}
           - {definitions.idmc_definitions.disaster}
-        description_processing: This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to natural disasters.
+        description_processing: This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
       share_of_internally_displaced_pop:
         title: Internally displaced people per 1000 inhabitants
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or disaster and have not crossed an internationally-recognized state border. This includes all people who are currently displaced and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or [disaster](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced.
         description_from_producer: |-
           - {definitions.idmc_definitions.internally_displaced_people}
           - {definitions.idmc_definitions.conflict}
@@ -54,11 +56,11 @@ tables:
         processing_level: major
         description_processing: |-
           - {definitions.processing_notes.population_share}
-          - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to natural disasters.
+          - This figure is the sum of the number of people displaced due to conflict and violence and the number of people displaced due to disasters.
       conflict_stock_displacement:
         title: Internally displaced people due to conflict
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an internationally-recognized state border. This includes all people who are currently displaced due to conflict and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to conflict and violence and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
         unit: people
         short_unit: ""
         description_from_producer: |-
@@ -67,7 +69,7 @@ tables:
       share_of_conflict_displaced_pop:
         title: Internally displaced people due to conflict per 1000 inhabitants
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or disaster and have not crossed an internationally-recognized state border. This includes all people who are currently displaced due to conflict and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes because of violence or [disaster](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
         description_from_producer: |-
           - {definitions.idmc_definitions.internally_displaced_people}
           - {definitions.idmc_definitions.conflict}
@@ -77,7 +79,7 @@ tables:
       disaster_stock_displacement:
         title: Internally displaced people due to disaster
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to natural disasters and have not crossed an internationally-recognized state border. This includes all people who are currently displaced due to disasters and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
         unit: people
         short_unit: ""
         description_from_producer: |-
@@ -86,7 +88,7 @@ tables:
       share_of_disaster_displaced_pop:
         title: Internally displaced people due to disaster per 1000 inhabitants
         description_short: |-
-          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to natural disasters and have not crossed an internationally-recognized state border. This includes all people who are currently displaced due to disasters and should not be confused with people who got displaced in this year.
+          [Internally displaced people](#dod:internally-displaced) had to leave their homes due to [disasters](#dod:idmc-disaster) and have not crossed an international state border. This counts all individuals who are currently displaced, regardless of how many times they have been displaced
         description_from_producer: |-
           - {definitions.idmc_definitions.internally_displaced_people}
           - {definitions.idmc_definitions.disaster}
@@ -98,22 +100,18 @@ tables:
       total_internal_displacements:
         title: Total internal displacements
         description_short: |-
-          Internal displacements due to both conflict and violence and natural disaster. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders.
+          Internal displacements due to both conflict and violence and [disaster](#dod:idmc-disaster). Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
           - {definitions.idmc_definitions.internal_displacements}
           - {definitions.idmc_definitions.conflict}
           - {definitions.idmc_definitions.disaster}
-        description_processing: This figure is the sum of displacements due to conflict and violence and the displacements due to natural disasters.
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}
+        description_processing: This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
       displacements_per_1000_people:
         title: Internal displacements per 1000 people
         description_short: |-
-          Internal displacements due to both conflict and disaster, per 1000 people living in the country. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders.
+          Internal displacements due to both conflict and [disaster](#dod:idmc-disaster), per 1000 people living in the country. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -123,27 +121,19 @@ tables:
         processing_level: major
         description_processing: |-
           - {definitions.processing_notes.population_share}
-          - This figure is the sum of displacements due to conflict and violence and the displacements due to natural disasters.
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}
+          - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
       conflict_internal_displacements:
         title: Internal displacements due to conflict
-        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders.
+        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
           - {definitions.idmc_definitions.internal_displacements}
           - {definitions.idmc_definitions.conflict}
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}
       conflict_displacements_per_1000_people:
         title: Internal displacements due to conflict per 1000 people
         description_short: |-
-          Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders.
+          Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -152,26 +142,18 @@ tables:
         processing_level: major
         description_processing: |-
           - {definitions.processing_notes.population_share}
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}
       disaster_internal_displacements:
         title: Internal displacements due to disaster
-        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to natural disaster but who remains within their country's borders.
+        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
           - {definitions.idmc_definitions.internal_displacements}
           - {definitions.idmc_definitions.disaster}
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}
       disaster_displacements_per_1000_people:
         title: Internal displacements due to disaster per 1000 people
         description_short: |-
-          Internal displacement describes the movement of a person who is forced to leave their home due to natural disaster but who remains within their country's borders.
+          Internal displacement describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -180,7 +162,3 @@ tables:
         processing_level: major
         description_processing: |-
           - {definitions.processing_notes.population_share}
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.processing_notes.footnote_displacements}

@@ -11,7 +11,7 @@ from etl.helpers import PathFinder, create_explorer
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# whether to use existing map brackets from old explorer, if True this overrides hardcoded map brackets
+# whether to use existing map brackets from old explorer, if True existing map brackets are used & prioritized, if False map brackets from MAP_BRACKETS override existing
 USE_EXISTING_MAP_BRACKETS = False
 
 
@@ -180,6 +180,7 @@ def create_graphers_rows(graphers_dicts, tb, ds):
                 ]
             else:
                 graphers_row_dict["yVariableIds"] = [f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"]
+
             graphers_row_dict["Metric Dropdown"] = config["metric"]
             graphers_row_dict["Period Radio"] = config["period_radio"]
             graphers_row_dict["Sub-Metric Radio"] = config["sub_metric_radio"]

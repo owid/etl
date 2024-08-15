@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Migration
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
     processing_level: minor #minor for most indicators, major for data that has been manipulated (e.g. 5 year change, share of child migrants)
     unit: ""
     short_unit: ""
@@ -63,19 +65,19 @@ tables:
       # Emigrant stock
       emigrants_all:
         title: Total number of emigrants
-        description_short: The total number of people who have left the country
+        description_short: The total number of people that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       emigrants_female:
         title: Total number of emigrants - female
-        description_short: The total number of female people who have left the country
+        description_short: The total number of female people that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       emigrants_male:
         title: Total number of emigrants - male
-        description_short: The total number of male people who have left the country
+        description_short: The total number of male people that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
       # Emigrant share
       emigrants_share_of_total_population:
-        title: Share of the population that have left the country
+        title: Share of the population that were born in this country but now live in another country.
         unit: "%"
         short_unit: "%"
         description_short: The total number of people that have left the country, as a share of the current population.
