@@ -59,15 +59,23 @@ def run(dest_dir: str) -> None:
     tb["max_params"] = "Other"
     tb["max_data"] = "Other"
 
-    tb.loc[idx_compute, "max_compute"] = "Maximum compute"
-    tb.loc[idx_parameters, "max_params"] = "Maximum parameters"
-    tb.loc[idx_data, "max_data"] = "Maximum data"
+    # Find rows where the system is "Maximum compute"
+    max_compute_system_rows = tb[tb["system"] == "Maximum compute"]
+
+    # Find rows where the system is "Maximum data"
+    max_data_system_rows = tb[tb["system"] == "Maximum data"]
+
+    # Find rows where the system is "Maximum parameters"
+    max_parameters_system_rows = tb[tb["system"] == "Maximum parameters"]
+
+    tb.loc[max_compute_system_rows, "max_compute"] = "Maximum compute"
+    tb.loc[max_parameters_system_rows, "max_params"] = "Maximum parameters"
+    tb.loc[max_data_system_rows, "max_data"] = "Maximum data"
 
     for col in ["max_compute", "max_params", "max_data"]:
         tb[col].metadata.origins = tb["system"].metadata.origins
 
     # Drop year as we don't need it anymore
-
     tb = tb.drop("year", axis=1)
 
     # Rename for plotting model name as country in grapher
