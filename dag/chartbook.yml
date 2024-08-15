@@ -44,6 +44,33 @@ steps:
   data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
     - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
 
+  # Household income and wealth, Australia, Australian Bureau of Statistics (live version)
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia:
+    - snapshot://abs/2024-08-06/household_income_and_wealth_australia.zip
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia:
+    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia
+
+  # Household income and wealth, Australia, Australian Bureau of Statistics (2017-18)
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
+    - snapshot://abs/2024-08-06/household_income_australia_2017_2018.xlsx
+    - snapshot://abs/2024-08-06/household_wealth_australia_2017_2018.xlsx
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
+    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia_2017_2018
+
+  # P90/P50 ratio for Australia, from the Employee Earnings and Hours report (ABS)
+  data://meadow/abs/2024-08-06/employee_earnings_and_hours_australia:
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2006.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2008.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2010.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2012.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2014.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2016.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2018.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2021.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2023.xlsx
+  data://garden/abs/2024-08-06/employee_earnings_and_hours_australia:
+    - data://meadow/abs/2024-08-06/employee_earnings_and_hours_australia
+
   ################################################################################################
   # BRAZIL
   ################################################################################################
@@ -79,6 +106,24 @@ steps:
     - snapshot://chartbook/2024-08-09/wolfson_1986_canada.csv
   data://garden/chartbook/2024-08-09/wolfson_1986_canada:
     - data://meadow/chartbook/2024-08-09/wolfson_1986_canada
+
+  # Gini coefficients from Statistics Canada (live)
+  data://meadow/statistics_canada/2024-08-09/gini_coefficients:
+    - snapshot://statistics_canada/2024-08-09/gini_coefficients.csv
+  data://garden/statistics_canada/2024-08-09/gini_coefficients:
+    - data://meadow/statistics_canada/2024-08-09/gini_coefficients
+
+  # Relative poverty data from Statistics Canada (live)
+  data://meadow/statistics_canada/2024-08-09/relative_poverty:
+    - snapshot://statistics_canada/2024-08-09/relative_poverty.csv
+  data://garden/statistics_canada/2024-08-09/relative_poverty:
+    - data://meadow/statistics_canada/2024-08-09/relative_poverty
+
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-14/atkinson_2008_canada:
+    - snapshot://chartbook/2024-08-14/atkinson_2008_canada.xls
+  data://garden/chartbook/2024-08-14/atkinson_2008_canada:
+    - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
 
   ################################################################################################
   # FRANCE

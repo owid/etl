@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Low income statistics by age, sex and economic family type
+    description: |-
+      Source: Centre for Income and Socioeconomic Well-being Statistics, Statistics Canada
+    date_published: "2024-04-26"
+    title_snapshot: Low income statistics by age, sex and economic family type - All persons, after tax
+    description_snapshot: |-
+      Data selected at the country level, all persons, after tax, and the share in poverty.
+
+    # Citation
+    producer: Statistics Canada
+    citation_full: |-
+      Statistics Canada. Table 11-10-0135-01  Low income statistics by age, sex and economic family type. DOI: https://doi.org/10.25318/1110013501-eng
+
+    # Files
+    url_main: https://www150.statcan.gc.ca/t1/tbl1/en/cv!recreate.action?pid=1110013501&selectedNodeIds=2D1,3D1,4D2&checkedLevels=0D1&refPeriods=19760101,20220101&dimensionLayouts=layout2,layout2,layout2,layout2,layout3&vectorDisplay=false
+    date_accessed: 2024-08-09
+
+    # License
+    license:
+      name: Statistics Canada Open License
+      url: https://www.statcan.gc.ca/en/reference/licence
+
+outs:
+  - md5: 82ef5f1f501ec80942ec2da263844c4a
+    size: 8972
+    path: relative_poverty.csv

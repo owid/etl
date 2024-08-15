@@ -1,0 +1,79 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Mpox (monkeypox)
+    display:
+      zeroDay: '2021-01-01'
+      yearIsDay: true
+
+dataset:
+  update_period_days: 365
+
+tables:
+  monkeypox:
+    variables:
+      total_cases:
+        title: Total confirmed cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      total_deaths:
+        title: Total confirmed deaths
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+      new_cases:
+        title: New confirmed cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      new_deaths:
+        title: New confirmed deaths
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+      new_cases_smoothed:
+        title: New confirmed cases (7-day smoothed)
+        unit: cases
+        display:
+          numDecimalPlaces: 2
+      new_deaths_smoothed:
+        title: New confirmed deaths (7-day smoothed)
+        unit: deaths
+        display:
+          numDecimalPlaces: 2
+      new_cases_per_million:
+        title: New confirmed cases per million
+        unit: cases per million
+        display:
+          numDecimalPlaces: 3
+      total_cases_per_million:
+        title: Total confirmed cases per million
+        unit: cases per million
+        display:
+          numDecimalPlaces: 3
+      new_cases_smoothed_per_million:
+        title: New confirmed cases per million (7-day smoothed)
+        unit: cases per million
+        display:
+          numDecimalPlaces: 3
+      new_deaths_per_million:
+        title: New confirmed deaths per million
+        unit: deaths per million
+        display:
+          numDecimalPlaces: 3
+      total_deaths_per_million:
+        title: Total confirmed deaths per million
+        unit: deaths per million
+        display:
+          numDecimalPlaces: 3
+      new_deaths_smoothed_per_million:
+        title: New confirmed deaths per million (7-day smoothed)
+        unit: deaths per million
+        display:
+          numDecimalPlaces: 3
+      iso_code:
+        title: ISO code
+        unit: ''

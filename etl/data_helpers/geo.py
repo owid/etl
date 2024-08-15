@@ -1213,12 +1213,15 @@ def add_regions_to_table(
         # Example of accepted_overlaps:
         # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
-        all_overlaps_sorted = sorted(all_overlaps, key=lambda d: str(d))
-        accepted_overlaps_sorted = sorted(accepted_overlaps, key=lambda d: str(d))
-        if all_overlaps_sorted != accepted_overlaps_sorted:
+        accepted_not_found = [overlap for overlap in accepted_overlaps if overlap not in all_overlaps]
+        found_not_accepted = [overlap for overlap in all_overlaps if overlap not in accepted_overlaps]
+        if len(accepted_not_found):
             log.warning(
-                "Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "
-                f"Accepted overlaps: {accepted_overlaps_sorted}.\nFound overlaps: {all_overlaps_sorted}."
+                f"Known overlaps not found in the data: {accepted_not_found}. Consider removing them from 'accepted_overlaps'."
+            )
+        if len(found_not_accepted):
+            log.warning(
+                f"Unknown overlaps found in the data: {found_not_accepted}. Consider adding them to 'accepted_overlaps'."
             )
 
     if aggregations is None:
@@ -1291,3 +1294,65 @@ def add_regions_to_table(
         return Table(df_with_regions).copy_metadata(tb)
     else:
         return df_with_regions  # type: ignore
+
+
+def fill_date_gaps(tb: Table) -> Table:
+    """Ensure dataframe has all dates. We do this by reindexing the dataframe to have all dates for all locations."""
+    # Ensure date is of type date
+    tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d").astype("datetime64[ns]")
+
+    # Get set of locations
+    countries = set(tb["country"])
+    # Create index based on all locations and all dates
+    complete_dates = pd.date_range(tb["date"].min(), tb["date"].max())
+
+    # Reindex
+    tb = tb.set_index(["country", "date"])
+    new_index = pd.MultiIndex.from_product([countries, complete_dates], names=["country", "date"])
+    tb = tb.reindex(new_index).sort_index().reset_index()
+
+    return tb
+
+
+def make_table_population_daily(ds_population: Dataset, year_min: int, year_max: int) -> Table:
+    """Create table with daily population.
+
+    Uses linear interpolation.
+    """
+    # Load population table
+    population = ds_population.read_table("population")
+    # Filter only years of interest
+    population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
+    # Create date column
+    population["date"] = pd.to_datetime(population["year"].astype("string") + "-07-01")
+    # Keep relevant columns
+    population = population.loc[:, ["date", "country", "population"]]
+    # Add missing dates
+    population = fill_date_gaps(population)
+    # Linearly interpolate NaNs
+    population = interpolate_table(population, "country", "date")
+    return cast(Table, population)
+
+
+def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
+    """Add `population` column to table.
+
+    Adds population value on a daily basis (extrapolated from yearly data).
+    """
+    tb["date"] = pd.to_datetime(tb["date"])
+
+    countries_start = set(tb["country"].unique())
+    tb_pop = make_table_population_daily(
+        ds_population=ds_population, year_min=tb["date"].dt.year.min() - 1, year_max=tb["date"].dt.year.max() + 1
+    )
+    tb = tb.merge(tb_pop, on=["country", "date"])
+    countries_end = set(tb["country"].unique())
+
+    # Check countries that went missing
+    if missing_countries is not None:
+        countries_missing = countries_start - countries_end
+        assert (
+            countries_missing == missing_countries
+        ), f"Missing countries don't match the expected! {countries_missing}"
+
+    return tb

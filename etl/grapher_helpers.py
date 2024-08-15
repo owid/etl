@@ -534,11 +534,17 @@ def _adapt_table_for_grapher(
     ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
 
     # Remember original dimensions
-    dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
+    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", country_col)]
 
     # Reset index unless we have default index
     if table.index.names != [None]:
         table = table.reset_index()
+
+    # If a table contains `date` instead of `year`, adapt it for grapher
+    if "date" in table.columns:
+        # NOTE: this can be relaxed if we ever need it
+        assert "year" not in table.columns, "Table cannot have both `date` and `year` columns."
+        table = adapt_table_with_dates_to_grapher(table)
 
     assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."

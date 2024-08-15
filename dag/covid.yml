@@ -51,6 +51,9 @@ steps:
   data://meadow/covid/latest/oxcgrt_policy:
     - snapshot://covid/latest/oxcgrt_policy_compact.csv
     - snapshot://covid/latest/oxcgrt_policy_vaccines.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2020.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2021.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
   data://garden/covid/latest/oxcgrt_policy:
     - data://meadow/covid/latest/oxcgrt_policy
   data://grapher/covid/latest/oxcgrt_policy:
@@ -111,7 +114,7 @@ steps:
   data://grapher/covid/latest/testing:
     - data://garden/covid/latest/testing
 
-  # Combined dataset
+  # Combined dataset (megafile-related indicators)
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
@@ -126,22 +129,36 @@ steps:
     - data://meadow/covid/latest/sweden_covid
   data://grapher/covid/latest/sweden_covid:
     - data://garden/covid/latest/sweden_covid
-  ######################################
   # UK
-  data-private://grapher/covid/latest/uk_covid_data:
-    - data-private://garden/covid/latest/uk_covid_data
-  data-private://garden/covid/latest/uk_covid_data:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
+  data://meadow/covid/latest/uk_covid:
+    - snapshot://covid/latest/uk_covid.csv
+  data://garden/covid/latest/uk_covid:
+    - data://meadow/covid/latest/uk_covid
+  data://grapher/covid/latest/uk_covid:
+    - data://garden/covid/latest/uk_covid
+
+  # Hospitalisations
+  data://meadow/covid/latest/hospital:
+    - snapshot://covid/latest/hospital.csv
+  data://garden/covid/latest/hospital:
+    - data://meadow/covid/latest/hospital
+  data://grapher/covid/latest/hospital:
+    - data://garden/covid/latest/hospital
+
+  # Reproduction rate
+  data://meadow/covid/latest/tracking_r:
+    - snapshot://covid/latest/tracking_r.csv
+  data://garden/covid/latest/tracking_r:
+    - data://meadow/covid/latest/tracking_r
+  data://grapher/covid/latest/tracking_r:
+    - data://garden/covid/latest/tracking_r
+
+  ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc
   data://garden/covid/latest/ecdc:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/archived/ecdc/COVID-2019%20-%20ECDC%20(2020).csv
-  # Hospitalisations
-  data://grapher/covid/latest/hospital_and_icu:
-    - data://garden/covid/latest/hospital_and_icu
-  data://garden/covid/latest/hospital_and_icu:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
   # Vaccinations by age
   data-private://grapher/covid/latest/vaccinations_by_age_group:
     - data-private://garden/covid/latest/vaccinations_by_age_group

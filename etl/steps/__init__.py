@@ -876,7 +876,7 @@ class GrapherStep(Step):
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
                     cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
-                    cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
+                    cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
                 table = gh._adapt_table_for_grapher(table, engine)
