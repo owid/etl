@@ -3,6 +3,7 @@ from typing import Optional, Set, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.processing import concat
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -103,10 +104,9 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
 
     # load popultion from catalog
     tb_pop = ds_population["population"].reset_index()
-    tb_pop = tb_pop[tb_pop["year"] == year]
-    tb = tb.merge(tb_pop[["country", "population"]], on=["country"])
+    tb_pop = tb_pop.loc[tb_pop["year"] == year, ["country", "population"]]
 
-    # hardcoded ones
+    # add hardcoded population
     country_population = {
         "England": 57_112_500,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/enpop/pop
         "Wales": 3_132_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/wapop/pop
@@ -115,8 +115,11 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
         "Scotland": 5_447_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/scpop/pop
         "Pitcairn": 45,  # https://www.bbc.com/news/uk-56923016
     }
-    for country, population in country_population.items():
-        tb.loc[tb["country"] == country, "population"] = population
+    tb_hc = Table.from_records([{"country": c, "population": p} for c, p in country_population.items()])
+    tb_pop = concat([tb_pop, tb_hc], ignore_index=True)
+
+    # merge
+    tb = tb.merge(tb_pop[["country", "population"]], on=["country"])
 
     # save final countries (to compare w initial)
     countries_end = set(tb["country"].unique())
@@ -126,7 +129,7 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
         countries_missing = countries_start - countries_end
         assert (
             countries_missing == missing_countries
-        ), f"Missing countries don't match the expected! {countries_missing}"
+        ), f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
 
     return tb
 
