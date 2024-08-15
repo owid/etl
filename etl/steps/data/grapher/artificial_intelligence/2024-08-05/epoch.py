@@ -24,55 +24,16 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["publication_date"].dt.year
 
     # For visualization purposes I am adding the rows with the maximum values of compute, data, and parameters in each year to the table as a separate "system". I don't want to do this in garden as it'd affect other datasets that depend on this one.
+    columns = {
+        "training_computation_petaflop": "compute",
+        "training_dataset_size__datapoints": "data",
+        "parameters": "params",
+    }
+    # Apply the function for compute, data, and parameters
+    for column, label in columns.items():
+        tb = find_max_label_and_concat(tb, column, label)
 
-    # Find the index of the maximum 'training_computation_petaflop', 'data', and 'parameters' in each year
-    # Fill NaN values with 0 before finding the index of the maximum
-    idx_compute = (
-        tb[["training_computation_petaflop", "year"]]
-        .fillna(0)
-        .groupby("year")["training_computation_petaflop"]
-        .idxmax()
-    )
-    idx_data = (
-        tb[["training_dataset_size__datapoints", "year"]]
-        .fillna(0)
-        .groupby("year")["training_dataset_size__datapoints"]
-        .idxmax()
-    )
-    idx_parameters = tb[["parameters", "year"]].fillna(0).groupby("year")["parameters"].idxmax()
-
-    # Create a copy of the rows with largest compute values
-    max_compute_rows = tb.loc[idx_compute].copy()
-    max_data_rows = tb.loc[idx_data].copy()
-    max_parameters_rows = tb.loc[idx_parameters].copy()
-
-    # Update the system name for these new rows
-    max_compute_rows["system"] = "Maximum compute"
-    max_data_rows["system"] = "Maximum data"
-    max_parameters_rows["system"] = "Maximum parameters"
-
-    # Append the new rows to the original Table
-    tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
-
-    # Create color coding for maximum compute, parameters, and data
-    tb["max_compute"] = "Other"
-    tb["max_params"] = "Other"
-    tb["max_data"] = "Other"
-
-    # Find rows where the system is "Maximum compute"
-    max_compute_system_rows = tb["system"] == "Maximum compute"
-
-    # Find rows where the system is "Maximum data"
-    max_data_system_rows = tb["system"] == "Maximum data"
-
-    # Find rows where the system is "Maximum parameters"
-    max_parameters_system_rows = tb["system"] == "Maximum parameters"
-
-    # Update the columns with the respective labels
-    tb.loc[max_compute_system_rows, "max_compute"] = "Maximum compute"
-    tb.loc[max_parameters_system_rows, "max_params"] = "Maximum parameters"
-    tb.loc[max_data_system_rows, "max_data"] = "Maximum data"
-
+    # Update metadata
     for col in ["max_compute", "max_params", "max_data"]:
         tb[col].metadata.origins = tb["system"].metadata.origins
 
@@ -98,3 +59,38 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
+
+
+def find_max_label_and_concat(tb, column, label):
+    """
+    Find maximum values for a given column per year, label them, and add summary rows.
+
+    This function:
+    1. Identifies rows with maximum values for the specified column in each year.
+    2. Labels these maximum value rows in a new column using their original system names.
+    3. Creates new summary rows for these maximum values.
+    4. Adds these new summary rows to the original table.
+
+    Note:
+    - Creates a new column named f"max_{label}" to indicate maximum values.
+    - Preserves original data and system names.
+    - Adds new summary rows with "system" set to f"Maximum {label}".
+    """
+    # Find indices of maximum values for each year
+    idx = tb[[column, "year"]].fillna(0).groupby("year")[column].idxmax()
+
+    # Initialize the max column with "Other"
+    tb[f"max_{label}"] = "Other"
+
+    # Label the maximum rows with their original system names
+    tb.loc[idx, f"max_{label}"] = tb.loc[idx, "system"]
+
+    # Create new rows for maximum values
+    max_rows = tb.loc[idx].copy()
+    max_rows["system"] = f"Maximum {label}"
+    max_rows[f"max_{label}"] = f"Maximum {label}"
+
+    # Concatenate new rows to the original table
+    tb = pr.concat([tb, max_rows], ignore_index=True)
+
+    return tb
