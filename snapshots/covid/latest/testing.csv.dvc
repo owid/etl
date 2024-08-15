@@ -18,6 +18,7 @@ meta:
       Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8
 
 
+      The data has been obtained from different sources depending on the country:
 
       - Afghanistan: WHO Regional Office for the Eastern Mediterranean (http://www.emro.who.int/images/stories/coronavirus/covid-sitrep-28.pdf)
       - Albania: Ministry of Health and Social Protection (https://shendetesia.gov.al/koronavirusi-mshms-asnje-rast-i-konfirmuar-ne-shqiperi/)
