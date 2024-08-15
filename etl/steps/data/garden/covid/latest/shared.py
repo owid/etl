@@ -3,6 +3,7 @@ from typing import Optional, Set, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
+from owid.catalog.processing import concat
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -91,6 +92,50 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     return cast(Table, population)
 
 
+def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
+    """Add `population` column to table.
+
+    Adds population value on a daily basis (extrapolated from yearly data).
+    """
+    year = 2022
+
+    # save initial countries
+    countries_start = set(tb["country"].unique())
+
+    # load popultion from catalog
+    tb_pop = ds_population["population"].reset_index()
+    tb_pop = tb_pop.loc[tb_pop["year"] == year, ["country", "population"]].rename(
+        columns={"population": "population_2022"}
+    )
+
+    # add hardcoded population
+    country_population = {
+        "England": 57_112_500,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/enpop/pop
+        "Wales": 3_132_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/wapop/pop
+        "Northern Cyprus": 391_000,  # https://www.state.gov/reports/2022-report-on-international-religious-freedom/cyprus/area-administered-by-turkish-cypriots/#:~:text=According%20to%20a%20statement%20from,no%20data%20on%20religious%20affiliation.
+        "Northern Ireland": 1_910_500,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/nipop/pop
+        "Scotland": 5_447_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/scpop/pop
+        "Pitcairn": 45,  # https://www.bbc.com/news/uk-56923016
+    }
+    tb_hc = Table.from_records([{"country": c, "population_2022": p} for c, p in country_population.items()])
+    tb_pop = concat([tb_pop, tb_hc], ignore_index=True)
+
+    # merge
+    tb = tb.merge(tb_pop[["country", "population_2022"]], on=["country"])
+
+    # save final countries (to compare w initial)
+    countries_end = set(tb["country"].unique())
+
+    # Check countries that went missing
+    if missing_countries is not None:
+        countries_missing = countries_start - countries_end
+        assert (
+            countries_missing == missing_countries
+        ), f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
+
+    return tb
+
+
 def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
     """Add `population` column to table.
 
@@ -139,4 +184,59 @@ def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
                 f" make_monotonic() - check the data. Check \n{tb_wrong}"  # {', '.join(sorted(dates_wrong))}"
             )
 
+    return tb
+
+
+def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_regions: bool = False) -> Table:
+    regions = {
+        # Standard continents
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        # Income groups
+        "Low-income countries": {},
+        "Lower-middle-income countries": {},
+        "Upper-middle-income countries": {},
+        "High-income countries": {},
+        # Special regions
+        "European Union (27)": {},
+        "World excl. China": {
+            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+            "excluded_members": ["China"],
+        },
+        "World excl. China and South Korea": {
+            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+            "excluded_members": ["China", "South Korea"],
+        },
+        "World excl. China, South Korea, Japan and Singapore": {
+            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+            "excluded_members": ["China", "South Korea", "Japan", "Singapore"],
+        },
+        "Asia excl. China": {
+            "additional_regions": ["Asia"],
+            "excluded_members": ["China"],
+        },
+    }
+    # Regions
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions,
+        ds_income,
+        year_col="date",
+        regions=regions,
+    )
+    # World
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions,
+        ds_income,
+        year_col="date",
+        regions={"World": {}},
+    )
+    # Filter only regions if specified
+    if keep_only_regions:
+        tb = tb.loc[tb["country"].isin(set(regions) | {"World"})]
     return tb
