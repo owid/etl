@@ -126,6 +126,17 @@ def run(dest_dir: str) -> None:
         "selection": ["World", "United States", "China"],
     }
 
+    # To begin with, create linear map brackets between 0% and 100% for "share" columns.
+    # NOTE: This should be executed only the first time, to have something to start with. Then comment this code, and
+    #  continue improving map brackets using the Map Bracketer tool.
+    # NOTE: When running these lines, add df_columns as an argument in create_explorer.
+    # share_columns = sorted(set(sum(df_graphers[df_graphers["Share of global Checkbox"]]["yVariableIds"].tolist(), [])))
+    # df_columns = pd.DataFrame({"catalogPath": share_columns})
+    # df_columns["colorScaleNumericBins"] = [
+    #     [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0] for column in share_columns
+    # ]
+    # df_columns["colorScaleScheme"] = "BuGn"
+
     #
     # Save outputs.
     #
