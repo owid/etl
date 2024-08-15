@@ -56,7 +56,9 @@ def run(dest_dir: str) -> None:
             else:
                 sub_commodity = f"{sub_commodity.capitalize()}"
 
-            if metric == "Unit value":
+            # Metric "Unit value" should not have a map tab.
+            # Also, imports and exports tend to have very sparse data. For now, remove their map tabs.
+            if metric in ["Imports", "Exports", "Unit value"]:
                 has_map_tab = False
             else:
                 has_map_tab = True
@@ -64,8 +66,12 @@ def run(dest_dir: str) -> None:
             ############################################################################################################
             # Manually remove the map tab where it is not useful.
             if column in [
-                "share_of_global_exports_andalusite_mine_tonnes",
-                "share_of_global_exports_antimony_crude__and__regulus_tonnes",
+                "production_cesium_mine_tonnes",
+                "production_chromium_mine_tonnes",
+                "production_diamond_mine_and_synthetic__industrial_tonnes",
+                "reserves_kyanite_mine__kyanite_and_sillimanite_tonnes",
+                "production_soda_ash_synthetic_tonnes",
+                "reserves_zeolites_mine_tonnes",
             ]:
                 has_map_tab = False
             ############################################################################################################
@@ -144,7 +150,17 @@ def run(dest_dir: str) -> None:
     # NOTE: This should be executed only the first time, to have something to start with. Then comment this code, and
     #  continue improving map brackets using the Map Bracketer tool.
     # NOTE: When running these lines, add df_columns as an argument in create_explorer.
-    # share_columns = sorted(set(sum(df_graphers[df_graphers["Share of global Checkbox"]]["yVariableIds"].tolist(), [])))
+    # share_columns = sorted(
+    #     set(
+    #         sum(
+    #             df_graphers[
+    #                 (df_graphers["Metric Dropdown"].isin(["Production", "Reserves"]))
+    #                 & (df_graphers["Share of global Checkbox"])
+    #             ]["yVariableIds"].tolist(),
+    #             [],
+    #         )
+    #     )
+    # )
     # df_columns = pd.DataFrame({"catalogPath": share_columns})
     # df_columns["colorScaleNumericBins"] = [
     #     [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0] for column in share_columns
