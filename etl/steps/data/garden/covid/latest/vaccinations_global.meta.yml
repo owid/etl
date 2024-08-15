@@ -55,6 +55,36 @@ tables:
           numDecimalPlaces: 0
           <<: *zero_day
 
+      total_vaccinations_interpolated:
+        title: COVID-19 doses (cumulative, interpolated)
+        description_short: Total number of COVID-19 vaccination doses administered. Linearly interpolated values.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_vaccinated_interpolated:
+        title: People vaccinated (cumulative, interpolated)
+        description_short: Total number of people who received at least one vaccine dose. Linearly interpolated values.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_fully_vaccinated_interpolated:
+        title: People fully vaccinated (cumulative, interpolated)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol. Linearly interpolated values.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      total_boosters_interpolated:
+        title: Booster doses (cumulative, interpolated)
+        description_short: |-
+          Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol). Linearly interpolated values.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+
       daily_vaccinations:
         title: COVID-19 doses (daily)
         description_short: New COVID-19 vaccination doses administered (only calculated for consecutive days).
@@ -115,3 +145,49 @@ tables:
         unit: boosters
 
 
+
+      rolling_vaccinations_6m:
+        title: COVID-19 doses (last 6 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 6 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_6m_per_hundred:
+        title: COVID-19 doses (last 6 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 6 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita
+      rolling_vaccinations_9m:
+        title: COVID-19 doses (last 9 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 9 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_9m_per_hundred:
+        title: COVID-19 doses (last 9 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 9 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita
+      rolling_vaccinations_12m:
+        title: COVID-19 doses (last 12 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 12 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_12m_per_hundred:
+        title: COVID-19 doses (last 12 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 12 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita

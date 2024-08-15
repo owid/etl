@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
+from typing import List, cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
@@ -75,6 +75,12 @@ def run(dest_dir: str) -> None:
     # Share of boosters
     tb = add_booster_share(tb)
 
+    # Add interpolation of cumultive indicators
+    tb = add_interp_cum_indicators(tb)
+
+    # Add rolling indicators
+    tb = add_rolling_indicators(tb)
+
     # Sanity checks
     sanity_checks(tb)
 
@@ -83,6 +89,8 @@ def run(dest_dir: str) -> None:
         columns=[
             "new_vaccinations_interpolated",
             "new_people_vaccinated_interpolated",
+            "population",
+            "population_2022",
         ]
     )
 
@@ -179,6 +187,19 @@ def add_regional_aggregates(tb: Table, ds_regions: Dataset, ds_income: Dataset) 
     return tb
 
 
+def _interp_ffill_fillna(tb: Table, columns: List[str], entity_col: str = "country", time_col: str = "date") -> Table:
+    tb = interpolate_table(
+        df=tb.loc[:, columns + [entity_col, time_col]],
+        entity_col=entity_col,
+        time_col=time_col,
+        time_mode="none",
+    )
+
+    tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # type: ignore
+
+    return tb
+
+
 def _prepare_table_for_aggregates(tb: Table) -> Table:
     """Prepare table for region-aggregate values.
 
@@ -193,16 +214,9 @@ def _prepare_table_for_aggregates(tb: Table) -> Table:
         "people_fully_vaccinated",
         "total_boosters",
     ]
-    tb_agg_1 = interpolate_table(
-        df=tb_agg[cols_ffill + cols_index],
-        entity_col="country",
-        time_col="date",
-        time_mode="none",
-    )
+    tb_agg_1 = _interp_ffill_fillna(tb_agg, cols_ffill, "country", "date")
 
-    tb_agg_1.loc[:, cols_ffill] = tb_agg_1.groupby("country")[cols_ffill].ffill().fillna(0)
-
-    # daily metrics: zero fill
+    # daily metrics: zero-fill
     cols_0fill = [
         "new_vaccinations",
         "new_vaccinations_interpolated",
@@ -214,8 +228,8 @@ def _prepare_table_for_aggregates(tb: Table) -> Table:
     tb_agg_2.loc[:, cols_0fill] = tb_agg_2.groupby("country")[cols_0fill].fillna(0)
 
     # population
-    tb_agg_3 = tb_agg[["population"] + cols_index]
-    tb_agg_3.loc[:, "population"] = tb_agg_3.groupby("country")["population"].ffill().bfill()
+    tb_agg_3 = tb_agg[["population_2022"] + cols_index]
+    tb_agg_3.loc[:, "population_2022"] = tb_agg_3.groupby("country")["population_2022"].ffill().bfill()
 
     # Merge
     tb_agg = tb_agg_1.merge(tb_agg_2, on=["country", "date"], validate="one_to_one")
@@ -235,12 +249,9 @@ def add_per_capita(tb: Table) -> Table:
     ]
     per_1m = ["new_vaccinations_smoothed"]
     for col in per_100:
-        tb[f"{col}_per_hundred"] = tb[col] * 100 / tb["population"]
+        tb[f"{col}_per_hundred"] = tb[col] * 100 / tb["population_2022"]
     for col in per_1m:
-        tb[f"{col}_per_million"] = tb[col] * 1_000_000 / tb["population"]
-
-    # drop population
-    tb = tb.drop(columns="population")
+        tb[f"{col}_per_million"] = tb[col] * 1_000_000 / tb["population_2022"]
 
     return tb
 
@@ -291,4 +302,39 @@ def add_booster_share(tb: Table) -> Table:
     assert (
         tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1
     ), "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    return tb
+
+
+def add_interp_cum_indicators(tb: Table) -> Table:
+    """Add interpolation of cumulative indicators.
+
+    Interpolate values to replace NaNs. Then, propagate latest values to replace following NaNs. Remaining NaNs are assigned zero (likely at the beginning).
+
+    TODO: do this before add_regions. Seems a bit redundant with that.
+    """
+    columns = [
+        "total_vaccinations",
+        "people_vaccinated",
+        "people_fully_vaccinated",
+        "total_boosters",
+    ]
+    tb_interp = _interp_ffill_fillna(tb, columns, "country", "date")
+
+    # merge
+    tb = tb.merge(tb_interp, on=["country", "date"], suffixes=("", "_interpolated"), how="left")
+    return tb
+
+
+def add_rolling_indicators(tb: Table) -> Table:
+    """Add total doses in the last 6, 9 and 12 months."""
+    last_known_date = tb.loc[tb["total_vaccinations"].notnull(), "date"].max()
+    for n_months in (6, 9, 12):
+        n_days = round(365.2425 * n_months / 12)
+        tb[f"rolling_vaccinations_{n_months}m"] = (
+            tb["total_vaccinations_interpolated"].diff().rolling(n_days, min_periods=1).sum()
+        )
+        tb.loc[tb["date"] > last_known_date, f"rolling_vaccinations_{n_months}m"] = np.nan
+        tb[f"rolling_vaccinations_{n_months}m_per_hundred"] = (
+            tb[f"rolling_vaccinations_{n_months}m"] * 100 / tb["population_2022"]
+        )
     return tb
