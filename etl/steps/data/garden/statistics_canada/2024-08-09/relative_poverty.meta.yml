@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+        - Poverty
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  relative_poverty:
+    variables:
+      headcount_ratio_50_median:
+        title: Share below 50% median (after-tax income)
+        unit: "%"
+        short_unit: "%"
+        description_short: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+        presentation:
+          title_public: Share below 50% median
+          title_variant: Equivalized after-tax household income
+        display:
+          name: Share below 50% median (after-tax income)
+          numDecimalPlaces: 1
+          tolerance: 5
