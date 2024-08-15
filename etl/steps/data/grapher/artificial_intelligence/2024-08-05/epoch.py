@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
         tb = find_max_label_and_concat(tb, column, label)
 
     # Update metadata
-    for col in ["max_compute", "max_params", "max_data"]:
+    for col in ["max_compute", "max_parameters", "max_data"]:
         tb[col].metadata.origins = tb["system"].metadata.origins
 
     # Drop year as we don't need it anymore
