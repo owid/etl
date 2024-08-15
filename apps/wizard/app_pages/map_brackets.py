@@ -31,8 +31,8 @@ log = get_logger()
 
 # Default path to the explorers folder.
 EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
-EXPLORER_NAME_DEFAULT = "natural-disasters-temp"
-# EXPLORER_NAME_DEFAULT = "animal-welfare"
+# EXPLORER_NAME_DEFAULT = "natural-disasters-temp"
+EXPLORER_NAME_DEFAULT = "minerals"
 
 # Maximum number of brackets allowed in a chart.
 MAX_NUM_BRACKETS = 10
@@ -46,6 +46,9 @@ SMALLEST_NUMBER_DEFAULT = 0.01
 # Default minimum and maximum percentiles to consider when defining brackets.
 MIN_PERCENTILE = 5
 MAX_PERCENTILE = 95
+
+# True to display the instances (country, year and value) where the maximum values in the data occur.
+DISPLAY_MAXIMUM_INSTANCES = True
 
 # Labels of the different bracket types.
 BRACKET_LABELS = {
@@ -213,7 +216,9 @@ class MapBracketer:
         # Load variable metadata.
         self.metadata = load_variable_metadata(variable=self.variable)
         # Load regions to entity id mapping.
-        self.regions_to_id = load_mappable_regions_and_ids(df=self.df)
+        self.region_to_id = load_mappable_regions_and_ids(df=self.df)
+        # For convenience, create the reverse dictionary too.
+        self.id_to_region = {v: k for k, v in self.region_to_id.items()}
         # Create a chart config.
         self.chart_config = create_default_chart_config_for_variable(metadata=self.metadata)
         # Define a flag that, if True, the brackets will be decided based on the latest year only.
@@ -248,7 +253,7 @@ class MapBracketer:
     ):
         if reload_data_values:
             # Select only regions that appear in grapher maps.
-            data_mask = self.df["entities"].isin(self.regions_to_id.values())
+            data_mask = self.df["entities"].isin(self.region_to_id.values())
             if self.latest_year:
                 # Focus on the values of the latest year.
                 data_mask &= self.df["years"] == self.df["years"].max()
@@ -846,6 +851,21 @@ def get_index_of_var(mb, explorer):
     return index
 
 
+# Display where the maximum values are reached.
+def _create_maximum_instances_message(mb: MapBracketer) -> str:
+    maximum_instances_to_show = 3
+    maximum_at = mb.df[mb.df["values"] == mb.max_value][["entities", "years", "values"]].drop_duplicates()
+    maximum_at_string = "Maximum value at: " + ", ".join(
+        [
+            f"{mb.id_to_region[entity]}-{year} ({value:.2e})"
+            for entity, year, value in maximum_at.values[0:maximum_instances_to_show]
+        ]
+    )
+    if len(maximum_at) > maximum_instances_to_show:
+        maximum_at_string += f"... ({len(maximum_at)} instances)."
+    return maximum_at_string
+
+
 ########################################
 # TITLE and DESCRIPTION
 ########################################
@@ -997,6 +1017,9 @@ elif use_type == USE_TYPE_EXPLORERS:
             key_grapher = EXPLORER_TO_GRAPHER_KEYS.get(key_explorer, key_explorer)
             # Update values in "map" with the additional configuration.
             mb.chart_config["map"]["colorScale"][key_grapher] = value
+
+    if DISPLAY_MAXIMUM_INSTANCES:
+        st.info(_create_maximum_instances_message(mb))
 
     # Display the chart.
     chart_html(chart_config=mb.chart_config, owid_env=OWID_ENV, height=540)
