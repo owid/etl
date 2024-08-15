@@ -170,11 +170,23 @@ class Explorer:
             ]
 
         if "variableId" in df.columns:
-            df["variableId"] = df["variableId"].astype("Int64")
+            if df["variableId"].isnull().all():
+                # Remove column if it contains only nan.
+                df = df.drop(columns=["variableId"])
+            else:
+                # Otherwise, ensure it's made of integers (and possibly nans).
+                df["variableId"] = df["variableId"].astype("Int64")
 
         # Convert boolean columns to strings of true, false.
         for column in df.select_dtypes(include="bool").columns:
             df[column] = df[column].astype(str).str.lower()
+
+        # For convenience, ensure the first columns are index columns (yVariableIds, variableId and/or catalogPath).
+        index_columns = ["yVariableIds", "catalogPath", "variableId"]
+        df = df[
+            [col for col in index_columns if col in df.columns]
+            + [col for col in df.columns if col not in index_columns]
+        ]
 
         df_tsv = df.to_csv(sep="\t", index=False)
         lines = ["\t" + line.rstrip() if len(line) > 0 else "" for line in df_tsv.split("\n")]  # type: ignore
@@ -292,6 +304,7 @@ class Explorer:
 
         if len(variable_ids) == 0:
             log.warning("No variable ids found.")
+            id_to_etl_path = dict()
         else:
             # Fetch the catalog paths for all required variables from database.
             df_from_db = get_variables_data(filter={"id": variable_ids})[["id", "catalogPath"]]
@@ -319,11 +332,6 @@ class Explorer:
         self.df_columns["variableId"] = self.df_columns["variableId"].apply(
             lambda x: None if x in id_to_etl_path else x
         )
-        # For convenienve, ensure the first columns are variableId and catalogPath.
-        self.df_columns = self.df_columns[
-            ["variableId", "catalogPath"]
-            + [col for col in self.df_columns.columns if col not in ["variableId", "catalogPath"]]
-        ]
         # If there is no catalog path, remove the column.
         if self.df_columns["catalogPath"].isna().all():
             self.df_columns = self.df_columns.drop(columns=["catalogPath"])

@@ -125,6 +125,18 @@ steps:
   data://garden/chartbook/2024-08-14/atkinson_2008_canada:
     - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
 
+  # Decile ratios for gross income from OECD Data Explorer (live, multiple countries)
+  data://meadow/oecd/2024-08-15/decile_ratios:
+    - snapshot://oecd/2024-08-15/decile_ratios.csv
+  data://garden/oecd/2024-08-15/decile_ratios:
+    - data://meadow/oecd/2024-08-15/decile_ratios
+
+   # Wealth share of the top 1% (Davies, Di Matteo, 2020)
+  data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada:
+    - snapshot://chartbook/2024-08-15/davies_di_matteo_2020_canada.csv
+  data://garden/chartbook/2024-08-15/davies_di_matteo_2020_canada:
+    - data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada
+
   ################################################################################################
   # FRANCE
   ################################################################################################

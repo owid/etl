@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Decile ratios of gross earnings
+    description: |-
+      This dataset contains three earnings-dispersion measures - ratio of 9th-to-1st, 9th-to-5th and 5th-to-1st - where 9th, fifth 5th (median) and 1st deciles are upper-earnings decile limits, unless otherwise indicated, of gross earnings of full-time dependent employees.
+    date_published: "2024-07-26"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024). OECD Data Explorer. Decile ratios of gross earnings.
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CEmployment%23JOB%23%7CBenefits%252C%20earnings%20and%20wages%23JOB_BW%23&pg=0&fc=Topic&bp=true&snb=21&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_EARNINGS%40DEC_I&df[ag]=OECD.ELS.SAE&df[vs]=1.0&dq=......_T&pd=2005%2C&to[TIME_PERIOD]=false
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_EARNINGS@DEC_I,1.0/......_T?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2024-08-15
+
+    # License
+    license:
+      name: OECD Terms of Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+
+outs:
+  - md5: 5b1130cbe5f589b13acdbb9c2f170c9c
+    size: 793245
+    path: decile_ratios.csv

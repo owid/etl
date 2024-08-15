@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     commodity_dropdown = []
     sub_commodity_dropdown = []
     share_of_global = []
+    map_tab = []
     # Given that USGS current data often has very few data points, we'll specify the minimum year in each view.
     # This way, if there are too few data points, we'll use the latest year as the minimum year, and that way the view
     # will become a bar chart (instead of a line chart with just a few points).
@@ -55,12 +56,33 @@ def run(dest_dir: str) -> None:
             else:
                 sub_commodity = f"{sub_commodity.capitalize()}"
 
+            # Metric "Unit value" should not have a map tab.
+            # Also, imports and exports tend to have very sparse data. For now, remove their map tabs.
+            if metric in ["Imports", "Exports", "Unit value"]:
+                has_map_tab = False
+            else:
+                has_map_tab = True
+
+            ############################################################################################################
+            # Manually remove the map tab where it is not useful.
+            if column in [
+                "production_cesium_mine_tonnes",
+                "production_chromium_mine_tonnes",
+                "production_diamond_mine_and_synthetic__industrial_tonnes",
+                "reserves_kyanite_mine__kyanite_and_sillimanite_tonnes",
+                "production_soda_ash_synthetic_tonnes",
+                "reserves_zeolites_mine_tonnes",
+            ]:
+                has_map_tab = False
+            ############################################################################################################
+
             # Append extracted values.
             variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
             metric_dropdown.append(metric)
             commodity_dropdown.append(commodity)
             sub_commodity_dropdown.append(sub_commodity)
             share_of_global.append(is_share_of_global)
+            map_tab.append(has_map_tab)
 
             if (years.max() - years.min()) < 5:
                 # If there are only a few data points, show only the latest year (as a bar chart).
@@ -75,6 +97,7 @@ def run(dest_dir: str) -> None:
     df_graphers["Type Dropdown"] = sub_commodity_dropdown
     df_graphers["Share of global Checkbox"] = share_of_global
     df_graphers["minTime"] = min_year
+    df_graphers["hasMapTab"] = map_tab
 
     # NOTE: Currently, most columns have "tonnes" as unit, but often there a other units like "tonnes of gross weight".
     # I think that, ideally, all units should be "tonnes" and we should add a footnote to clarify the unit where needed.
@@ -92,9 +115,6 @@ def run(dest_dir: str) -> None:
     )
     if multiple_units:
         log.warning(f"Units different from '(tonnes)' found for {multiple_units}")
-
-    # Add a map tab to all indicators.
-    df_graphers["hasMapTab"] = True
 
     # Sanity check.
     error = "Duplicated rows in explorer."
@@ -123,8 +143,29 @@ def run(dest_dir: str) -> None:
     config = {
         "explorerTitle": "Minerals",
         "explorerSubtitle": "Explore the amount of minerals that are produced, imported, and exported.",
-        "selection": ["World", "United States", "China"],
+        "selection": ["World", "Australia", "Chile", "China", "United States"],
     }
+
+    # To begin with, create linear map brackets between 0% and 100% for "share" columns.
+    # NOTE: This should be executed only the first time, to have something to start with. Then comment this code, and
+    #  continue improving map brackets using the Map Bracketer tool.
+    # NOTE: When running these lines, add df_columns as an argument in create_explorer.
+    # share_columns = sorted(
+    #     set(
+    #         sum(
+    #             df_graphers[
+    #                 (df_graphers["Metric Dropdown"].isin(["Production", "Reserves"]))
+    #                 & (df_graphers["Share of global Checkbox"])
+    #             ]["yVariableIds"].tolist(),
+    #             [],
+    #         )
+    #     )
+    # )
+    # df_columns = pd.DataFrame({"catalogPath": share_columns})
+    # df_columns["colorScaleNumericBins"] = [
+    #     [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0] for column in share_columns
+    # ]
+    # df_columns["colorScaleScheme"] = "BuGn"
 
     #
     # Save outputs.
