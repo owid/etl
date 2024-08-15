@@ -54,20 +54,21 @@ def run(dest_dir: str) -> None:
     # Append the new rows to the original Table
     tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
 
-    # Create colour coding for maximum compute, paramters and data
+    # Create color coding for maximum compute, parameters, and data
     tb["max_compute"] = "Other"
     tb["max_params"] = "Other"
     tb["max_data"] = "Other"
 
     # Find rows where the system is "Maximum compute"
-    max_compute_system_rows = tb[tb["system"] == "Maximum compute"]
+    max_compute_system_rows = tb["system"] == "Maximum compute"
 
     # Find rows where the system is "Maximum data"
-    max_data_system_rows = tb[tb["system"] == "Maximum data"]
+    max_data_system_rows = tb["system"] == "Maximum data"
 
     # Find rows where the system is "Maximum parameters"
-    max_parameters_system_rows = tb[tb["system"] == "Maximum parameters"]
+    max_parameters_system_rows = tb["system"] == "Maximum parameters"
 
+    # Update the columns with the respective labels
     tb.loc[max_compute_system_rows, "max_compute"] = "Maximum compute"
     tb.loc[max_parameters_system_rows, "max_params"] = "Maximum parameters"
     tb.loc[max_data_system_rows, "max_data"] = "Maximum data"
