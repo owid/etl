@@ -55,13 +55,16 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
 
     # Create colour coding for maximum compute, paramters and data
-    tb["max_compute"] = 0
-    tb["max_params"] = 0
-    tb["max_data"] = 0
+    tb["max_compute"] = "Other"
+    tb["max_params"] = "Other"
+    tb["max_data"] = "Other"
 
-    tb.loc[idx_compute, "max_compute"] = 1
-    tb.loc[idx_parameters, "max_params"] = 1
-    tb.loc[idx_data, "max_data"] = 1
+    tb.loc[idx_compute, "max_compute"] = "Maximum compute"
+    tb.loc[idx_parameters, "max_params"] = "Maximum parameters"
+    tb.loc[idx_data, "max_data"] = "Maximum data"
+
+    for col in ["max_compute", "max_params", "max_data"]:
+        tb[col].metadata.origins = tb["system"].metadata.origins
 
     # Drop year as we don't need it anymore
 
