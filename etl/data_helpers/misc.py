@@ -13,7 +13,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 
 import math
 from datetime import datetime
-from typing import Any, List, Literal, Optional, Set, TypeVar, Union
+from typing import Any, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import pandas as pd
 import plotly.express as px
@@ -79,7 +79,7 @@ def interpolate_table(
         df = expand_time_column(df, entity_col, time_col, time_mode)
 
     # Set index
-    df = df.set_index([entity_col, time_col]).sort_index()
+    df = cast(TableOrDataFrame, df.set_index([entity_col, time_col]).sort_index())
 
     # Interpolate
     df = (
@@ -142,7 +142,7 @@ def expand_time_column(
             .sort_index()
         )
 
-    df = df.reset_index()
+    df = cast(TableOrDataFrame, df.reset_index())
     return df
 
 
