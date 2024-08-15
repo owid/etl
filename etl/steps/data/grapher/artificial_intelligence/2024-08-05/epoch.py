@@ -53,7 +53,18 @@ def run(dest_dir: str) -> None:
 
     # Append the new rows to the original Table
     tb = pr.concat([tb, max_compute_rows, max_data_rows, max_parameters_rows], ignore_index=True)
+
+    # Create colour coding for maximum compute, paramters and data
+    tb["max_compute"] = 0
+    tb["max_params"] = 0
+    tb["max_data"] = 0
+
+    tb.loc[idx_compute, "max_compute"] = 1
+    tb.loc[idx_parameters, "max_params"] = 1
+    tb.loc[idx_data, "max_data"] = 1
+
     # Drop year as we don't need it anymore
+
     tb = tb.drop("year", axis=1)
 
     # Rename for plotting model name as country in grapher
