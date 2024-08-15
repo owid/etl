@@ -128,6 +128,11 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
+    df_graphers["Metric Dropdown"] = pd.Categorical(
+        df_graphers["Metric Dropdown"],
+        categories=["Production", "Reserves", "Unit value", "Imports", "Exports"],
+        ordered=True,
+    )
     df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Metric Dropdown", "Type Dropdown"]).reset_index(
         drop=True
     )
