@@ -250,6 +250,7 @@ def add_people_unvaccinated(tb: Table, ds_population: Dataset) -> Table:
     tb = add_population_daily(tb, ds_population)
     tb["people_unvaccinated"] = tb["population"] - tb["people_vaccinated"]
     tb.loc[tb["people_unvaccinated"] < 0, "people_unvaccinated"] = 0
+    tb["people_unvaccinated"].m.presentation.attribution = None
     return tb
 
 
