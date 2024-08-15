@@ -872,13 +872,10 @@ def _create_maximum_instances_message(mb: MapBracketer) -> str:
     maximum_instances_to_show = 3
     # Select rows in the data with the maximum value, and select only mappable regions.
     maximum_at = mb.df[(mb.df["values"] == mb.max_value) & (mb.df["entities"].isin(mb.id_to_region))][
-        ["entities", "years", "values"]
+        ["entities", "years"]
     ].drop_duplicates()
-    maximum_at_string = "Maximum value at: " + ", ".join(
-        [
-            f"{mb.id_to_region[entity]}-{int(year)} ({pretty_print_number(value)})"
-            for entity, year, value in maximum_at.values[0:maximum_instances_to_show]
-        ]
+    maximum_at_string = f"Maximum value ({pretty_print_number(mb.max_value)}) at: " + ", ".join(
+        [f"{mb.id_to_region[entity]}-{int(year)}" for entity, year in maximum_at.values[0:maximum_instances_to_show]]
     )
     if len(maximum_at) > maximum_instances_to_show:
         maximum_at_string += f"... ({len(maximum_at)} instances)."
