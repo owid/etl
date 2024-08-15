@@ -99,6 +99,9 @@ def run(dest_dir: str) -> None:
     df_graphers["minTime"] = min_year
     df_graphers["hasMapTab"] = map_tab
 
+    # Impose that all line charts start at zero.
+    df_graphers["yAxisMin"] = 0
+
     # NOTE: Currently, most columns have "tonnes" as unit, but often there a other units like "tonnes of gross weight".
     # I think that, ideally, all units should be "tonnes" and we should add a footnote to clarify the unit where needed.
     # But at least, for now, remove the "(tonnes)" from the "Type Dropdown" column if all options are in "tonnes".
