@@ -138,6 +138,15 @@ steps:
     - data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada
 
   ################################################################################################
+  # FINLAND
+  ################################################################################################
+  # Ginis in Jantti et al (2010) (Atkinson and Piketty, 2010)
+  data://meadow/chartbook/2024-08-15/jantti_2010_finland:
+    - snapshot://chartbook/2024-08-15/jantti_2010_finland.csv
+  data://garden/chartbook/2024-08-15/jantti_2010_finland:
+    - data://meadow/chartbook/2024-08-15/jantti_2010_finland
+
+  ################################################################################################
   # FRANCE
   ################################################################################################
   # Inequality data from France (INSEE)
