@@ -68,8 +68,7 @@ tables:
         title: COVID-19 doses (daily, 7-day average, per million people)
         description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
         unit: 'doses per million people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
 
       daily_people_vaccinated_smoothed:
         title: People vaccinated (7-day average)
@@ -79,33 +78,34 @@ tables:
         title: People vaccinated (7-day average, per million people)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
         unit: 'people per hundred people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
 
 
       total_vaccinations_per_hundred:
         title: COVID-19 doses (total, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
         unit: 'doses per hundred people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
       people_vaccinated_per_hundred:
         title: People vaccinated (total, per hundred)
         description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
         unit: 'people per hundred people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
       people_fully_vaccinated_per_hundred:
         title: People fully vaccinated (total, per hundred)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
         unit: 'people per hundred people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
       total_boosters_per_hundred:
         title: Booster doses (total, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
         unit: 'doses per hundred people'
-        description_key:
-          - *per_capita
+        description_processing: *per_capita
+
+      people_unvaccinated:
+        title: Unvaccinated people (cumulative)
+        description_short: Total number of people who have not received any vaccine dose.
+        unit: people
+        description_processing: This indicator is derived from the country population in a given day. Daily population estimates are obtained by linearly interpolating the year-estimtes by UN WPP.
 
 
