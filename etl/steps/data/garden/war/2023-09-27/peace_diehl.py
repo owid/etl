@@ -329,8 +329,8 @@ def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
     tb_regions["number_country_pairs"] = (
         tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
     ).astype(int)
-    tb_no_rel = tb_regions.groupby("year", as_index=False).apply(_get_intercontinental_pairs)
-    tb_no_rel = Table(tb_no_rel).rename(columns={None: "number_country_pairs"})
+    tb_no_rel = pd.DataFrame(tb_regions).groupby("year", as_index=False).apply(func=_get_intercontinental_pairs)
+    tb_no_rel = Table(tb_no_rel, metadata=tb_regions.metadata).rename(columns={None: "number_country_pairs"})
     tb_no_rel["region"] = "Inter-continental"
     tb_regions = pr.concat([tb_regions, tb_no_rel]).rename(columns={"region": "country"})
 
