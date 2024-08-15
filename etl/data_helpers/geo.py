@@ -660,6 +660,10 @@ def interpolate_table(
     all_years: bool = False,
     all_dates_per_country: bool = False,
 ) -> TableOrDataFrame:
+    ####################################################################################################################
+    # WARNING: This function is deprecated. Use `etl.data_helpers.misc.interpolate_table` instead.
+    ####################################################################################################################
+
     """Interpolate missing values in a column linearly.
 
     df: Table or DataFrame
@@ -687,11 +691,11 @@ def interpolate_table(
         def _reindex_dates(group):
             complete_date_range = _get_complete_date_range(group["date"])
             group = group.set_index("date").reindex(complete_date_range).reset_index().rename(columns={"index": "date"})
-            group["country"] = group["country"].ffill().bfill()  # Fill NaNs in 'country'
+            group[country_col] = group[country_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
         # Apply the reindexing to each group
-        df = df.groupby("country").apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+        df = df.groupby(country_col).apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
     else:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.

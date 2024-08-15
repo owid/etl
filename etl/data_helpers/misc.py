@@ -12,13 +12,16 @@ should probably be moved to owid-datautils. However this can be time consuming a
 """
 
 import math
-from typing import Any, List, Optional, Set, Union
+from datetime import datetime
+from typing import Any, List, Literal, Optional, Set, TypeVar, Union
 
 import pandas as pd
 import plotly.express as px
 from owid.catalog import License, Origin, Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
+
+TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
@@ -49,6 +52,98 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
         raise ValueError(
             f"Values {values_missing} in column `{column_name}` missing, check if they were removed from source!"
         )
+
+
+def interpolate_table(
+    df: TableOrDataFrame,
+    entity_col: str,
+    time_col: str,
+    time_mode: Literal["full_range", "full_range_entity", "reduced", "none"] = "full_range",
+    method: str = "linear",
+    limit_direction: str = "both",
+) -> TableOrDataFrame:
+    """Interpolate missing values in a column linearly.
+
+    df: Table or DataFrame
+        Should contain three columns: country, year, and the column to be interpolated.
+    entity_col: str
+        Name of the column with entity names (typically for countries).
+    time_col: str
+        Name of the column with years.
+    mode: str
+        How to compelte time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
+    """
+
+    if time_mode != "none":
+        # Expand time
+        df = expand_time_column(df, entity_col, time_col, time_mode)
+
+    # Set index
+    df = df.set_index([entity_col, time_col]).sort_index()
+
+    # Interpolate
+    df = (
+        df.groupby(entity_col)
+        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction))  # type: ignore
+        .reset_index()
+    )
+
+    return df
+
+
+def expand_time_column(
+    df: TableOrDataFrame,
+    entity_col: str,
+    time_col: str,
+    mode: Literal["full_range", "full_range_entity", "reduced"] = "full_range",
+) -> TableOrDataFrame:
+    """Add rows to complete the timeseries.
+
+    You can complete the timeseries in various ways, by changing the value of `mode`
+
+        - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the data.
+        - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
+        - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
+    """
+
+    def _get_complete_date_range(ds):
+        date_min = ds.min()
+        date_max = ds.max()
+        if isinstance(date_max, datetime):
+            return pd.date_range(start=date_min, end=date_max)
+        else:
+            return range(date_min, date_max + 1)
+
+    assert mode in {"full_range_entity", "full_range", "reduced"}, f"Wrong value for `mode` {mode}!"
+
+    if mode == "full_range_entity":
+
+        def _reindex_dates(group):
+            complete_date_range = _get_complete_date_range(group["date"])
+            group = group.set_index("date").reindex(complete_date_range).reset_index().rename(columns={"index": "date"})
+            group["country"] = group["country"].ffill().bfill()  # Fill NaNs in 'country'
+            return group
+
+        # Apply the reindexing to each group
+        df = df.groupby("country").apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+    else:
+        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+        # Optionally fill missing years linearly.
+        countries_in_data = df[entity_col].unique()
+        # Get list of year-country tuples
+        if mode == "full_range":
+            date_values = _get_complete_date_range(df[time_col])
+        elif mode == "reduced":
+            date_values = df[time_col].unique()
+        # Reindex
+        df = (
+            df.set_index([entity_col, time_col])
+            .reindex(pd.MultiIndex.from_product([countries_in_data, date_values], names=[entity_col, time_col]))  # type: ignore
+            .sort_index()
+        )
+
+    df = df.reset_index()
+    return df
 
 
 ########################################################################################################################
