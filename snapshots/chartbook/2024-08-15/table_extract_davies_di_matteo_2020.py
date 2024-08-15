@@ -6,10 +6,10 @@ The table will probably not be updated, but in that case you need to follow thes
     1. Download the latest version from https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1111%2Froiw.12453&file=roiw12453-sup-0001-AppendixA.pdf.
     2. Copy the file to this directory.
     3. Change the pages in the function extract table_from_pdf I call in the run function.
-    4. Clean the CSV file by keeping these columns: year,top_0_1,top_0_5,top_1
-    4. Run this script.
-    5. Run the snapshot:
-        python snapshots/chartbook/{version}/davies_di_matteo_2020_canada.py --path-to-file snapshots/chartbook/{version}/table1.csv
+    5. Clean the CSV file by keeping these columns: year,top_0_1,top_0_5,top_1
+    6. Run this script.
+    7. Run the snapshot:
+        python snapshots/chartbook/{version}/davies_di_matteo_2020_canada.py --path-to-file snapshots/chartbook/{version}/davies_di_matteo_2020.csv
 """
 
 from pathlib import Path

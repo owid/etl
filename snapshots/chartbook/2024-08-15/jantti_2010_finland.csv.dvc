@@ -1,0 +1,41 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Top Incomes. A Global Perspective
+    description: |-
+      A rapidly growing area of economic research investigates the top of the income distribution using data from income tax records. In Top Incomes: A Global Perspective New York Times best-selling author Thomas Piketty and noted member of the Conseil d'Analyse Economique, A. B. Atkinson brings together studies of top incomes for twelve countries from around the world, including China, India, Japan, Argentina and Indonesia. Together with the first volume, published in 2007, the studies cover twenty two countries. They have a long time span, the earliest data relating to 1875 (for Norway), allowing recent developments to be placed in historical perspective. The volume describes in detail the source data and the methods employed. It will be an invaluable reference source for researchers in the field. Individual country chapters deal with the specific nature of the data for each of the countries, and describe the long-term evolution of top income shares.
+
+      In the countries as a whole, dramatic changes have taken place at the top of the income distribution. Over the first part of the century, top income shares fell markedly. This largely took the form of a reduction in capital incomes. The different authors examine the impact of the First and Second World Wars, contrasting countries that were and were not engaged. They consider the impact of depressions and banking crises, and pay particular attention to the impact of progressive taxation.
+
+      In the last 30 years, the shares of top incomes have increased markedly in the US and other Anglo-Saxon countries, reflecting the increased dispersion of earnings. The volume includes statistics on the much-discussed top pay and bonuses, providing a global perspective that discusses important differences between countries such as the lesser increase in Continental Europe. This book, together with volume 1, documents this interesting development and explores the underlying causes. The findings are brought together in a final summary chapter by Atkinson, Piketty and Saez.
+    date_published: "2010-05-26"
+    title_snapshot: Top Incomes. A Global Perspective - Trends in Top Income Shares in Finland
+    description_snapshot: >-
+      This chapter provides new evidence about the evolution of top incomes in
+      Finland based both on tabulated income tax data for 1920–2003 and on microdata over the period 1966–2004. The chapter shows how the proportion of
+      income earned by the very richest 1 per cent has changed over time. We find a
+      U-shaped pattern of the income share of top 1 per cent over the period from the
+      beginning of 1960 to 2004. The results bring out clearly how the major equalization from the beginning of 1960 to the mid 1990s has been reversed, taking the
+      shares of top income groups back to levels of inequality or even higher found over
+      forty years ago.
+
+    # Citation
+    producer: Jäntti et al.
+    citation_full: |-
+      Jäntti, M., Riihelä, M., Sullström, R., and Tuomala, M. (2010). Trends in Top Income Shares in Finland. In Atkinson, A. B., & Piketty, T. (Eds.). Top Incomes. A Global Perspective. OUP Oxford.
+
+    # Files
+    url_main: http://piketty.pse.ens.fr/fichiers/AtkinsonPiketty2010.pdf
+    date_accessed: 2024-08-15
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://global.oup.com/academic/product/top-incomes-9780199286898?cc=us&lang=en&
+
+outs:
+  - md5: e7d63e9b856d2839cac7478ecce1991c
+    size: 1688
+    path: jantti_2010_finland.csv
