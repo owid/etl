@@ -263,6 +263,7 @@ class MapBracketer:
             self.min_value = self.values.min()
             self.max_value = self.values.max()
             if self.min_value == self.max_value:
+                st.warning(f"Consider setting hasMapTab False for {mb.variable_id_or_path}")
                 raise EqualMinimumAndMaximumValues()
 
         if reload_openness:
@@ -851,13 +852,31 @@ def get_index_of_var(mb, explorer):
     return index
 
 
+def pretty_print_number(number: float) -> str:
+    # Print numbers using scientific notation only when it's convenient.
+    if number > 1e6:
+        number_string = f"{number:.2e}"
+    elif 0 < abs(number) < 0.01:
+        number_string = f"{number:.2e}"
+    else:
+        if number == int(number):
+            number_string = str(int(number))
+        else:
+            number_string = str(number)
+
+    return number_string
+
+
 # Display where the maximum values are reached.
 def _create_maximum_instances_message(mb: MapBracketer) -> str:
     maximum_instances_to_show = 3
-    maximum_at = mb.df[mb.df["values"] == mb.max_value][["entities", "years", "values"]].drop_duplicates()
+    # Select rows in the data with the maximum value, and select only mappable regions.
+    maximum_at = mb.df[(mb.df["values"] == mb.max_value) & (mb.df["entities"].isin(mb.id_to_region))][
+        ["entities", "years", "values"]
+    ].drop_duplicates()
     maximum_at_string = "Maximum value at: " + ", ".join(
         [
-            f"{mb.id_to_region[entity]}-{year} ({value:.2e})"
+            f"{mb.id_to_region[entity]}-{int(year)} ({pretty_print_number(value)})"
             for entity, year, value in maximum_at.values[0:maximum_instances_to_show]
         ]
     )
