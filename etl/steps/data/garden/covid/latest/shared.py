@@ -104,7 +104,9 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
 
     # load popultion from catalog
     tb_pop = ds_population["population"].reset_index()
-    tb_pop = tb_pop.loc[tb_pop["year"] == year, ["country", "population"]]
+    tb_pop = tb_pop.loc[tb_pop["year"] == year, ["country", "population"]].rename(
+        columns={"population": "population_2022"}
+    )
 
     # add hardcoded population
     country_population = {
@@ -115,11 +117,11 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
         "Scotland": 5_447_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/scpop/pop
         "Pitcairn": 45,  # https://www.bbc.com/news/uk-56923016
     }
-    tb_hc = Table.from_records([{"country": c, "population": p} for c, p in country_population.items()])
+    tb_hc = Table.from_records([{"country": c, "population_2022": p} for c, p in country_population.items()])
     tb_pop = concat([tb_pop, tb_hc], ignore_index=True)
 
     # merge
-    tb = tb.merge(tb_pop[["country", "population"]], on=["country"])
+    tb = tb.merge(tb_pop[["country", "population_2022"]], on=["country"])
 
     # save final countries (to compare w initial)
     countries_end = set(tb["country"].unique())

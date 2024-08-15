@@ -127,13 +127,13 @@ def add_criteria(tb: Table, ds_population: Dataset) -> Table:
     mask = (
         (tb["days_since_100_total_cases"].notnull())
         & (tb["days_since_100_total_cases"] >= 21)
-        & (tb["population"] >= 5_000_000)
+        & (tb["population_2022"] >= 5_000_000)
     )
     tb["has_population_5m_and_100_cases_and_testing_data"] = 0
     tb.loc[mask, "has_population_5m_and_100_cases_and_testing_data"] = 1
     tb["has_population_5m_and_100_cases_and_testing_data"] = tb[
         "has_population_5m_and_100_cases_and_testing_data"
     ].copy_metadata(tb["days_since_100_total_cases"])
-    tb = tb.drop(columns="population")
+    tb = tb.drop(columns="population_2022")
 
     return tb

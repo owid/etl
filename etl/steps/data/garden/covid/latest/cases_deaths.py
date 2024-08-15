@@ -97,7 +97,7 @@ def run(dest_dir: str) -> None:
     ## Add Exemplars indicators
     tb = add_exemplars(tb)
     ## Drop population
-    tb = tb.drop(columns=["population"])
+    tb = tb.drop(columns=["population_2022"])
     ## Dtypes
     tb = set_dtypes(tb)
 
@@ -261,7 +261,7 @@ def add_per_capita(tb: Table) -> Table:
     """Add per-million-capita indicators."""
     paths.log.info("Add per-capita indicators…")
     # Fix population value for France (Should not include overseas territories for the WHO)
-    tb.loc[tb["country"] == "France", "population"] -= 2e6
+    tb.loc[tb["country"] == "France", "population_2022"] -= 2e6
     # Estimate per-million-capita indicator variants
     indicators = [
         "new_cases",
@@ -274,7 +274,7 @@ def add_per_capita(tb: Table) -> Table:
         "biweekly_deaths",
     ]
     for indicator in indicators:
-        tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population"] / 1_000_000)
+        tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population_2022"] / 1_000_000)
     return tb
 
 
@@ -374,7 +374,7 @@ def add_exemplars(tb: Table):
 
     # Inject days since 100th case IF population ≥ 5M
     def mapper_days_since(row):
-        if pd.notnull(row["population"]) and row["population"] >= 5e6:
+        if pd.notnull(row["population_2022"]) and row["population_2022"] >= 5e6:
             return row["days_since_100_total_cases"]
         return pd.NA
 

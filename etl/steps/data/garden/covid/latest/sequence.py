@@ -398,8 +398,8 @@ def add_variant_totals(tb: Table) -> Table:
 def add_per_capita(tb: Table, ds_population: Dataset) -> Table:
     """Get per-capita values."""
     tb = add_population_2022(tb, ds_population)
-    tb["num_sequences_per_1M"] = 1000000 * tb["num_sequences"] / tb["population"]
-    tb = tb.drop(columns=["population"])
+    tb["num_sequences_per_1M"] = 1000000 * tb["num_sequences"] / tb["population_2022"]
+    tb = tb.drop(columns=["population_2022"])
     return tb
 
 
