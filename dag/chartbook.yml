@@ -125,6 +125,12 @@ steps:
   data://garden/chartbook/2024-08-14/atkinson_2008_canada:
     - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
 
+  # Decile ratios for gross income from OECD Data Explorer (live, multiple countries)
+  data://meadow/oecd/2024-08-15/decile_ratios:
+    - snapshot://oecd/2024-08-15/decile_ratios.csv
+  data://garden/oecd/2024-08-15/decile_ratios:
+    - data://meadow/oecd/2024-08-15/decile_ratios
+
   ################################################################################################
   # FRANCE
   ################################################################################################
