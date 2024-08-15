@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
         "training_dataset_size__datapoints": "data",
         "parameters": "params",
     }
-    # Apply the function for compute, data, and parameters
+    # Find maximum values for a given column (compute, data, params) per year, label them, and add summary rows.
     for column, label in columns.items():
         tb = find_max_label_and_concat(tb, column, label)
 
