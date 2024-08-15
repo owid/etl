@@ -3,7 +3,7 @@ The data has been obtained from covid-19-data repository.
 
 Run the lines from https://github.com/owid/covid-19-data/blob/d8fae5631e2130270532951400fa449a9b20d00b/scripts/src/cowidev/cmd/vax/generate/utils.py#L712-L734, and export df_vaccinations.
 """
-
+from datetime import date
 from pathlib import Path
 from typing import cast
 
@@ -41,8 +41,22 @@ def main(path_to_file: str, upload: bool) -> None:
         df = pd.concat([df_current, df])
         df = df.drop_duplicates()
 
+        if not df.equals(df_current):
+            snap = modify_metadata(snap)
+
     ### Push
     snap.create_snapshot(data=df, upload=upload)
+
+
+def modify_metadata(snap: Snapshot) -> Snapshot:
+    """Modify metadata"""
+    # Get access date
+    snap.metadata.origin.date_accessed = date.today()  # type: ignore
+    # Set publication date
+    snap.metadata.origin.publication_date = date.today()  # type: ignore
+    # Save
+    snap.metadata.save()
+    return snap
 
 
 if __name__ == "__main__":
