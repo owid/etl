@@ -2,8 +2,8 @@
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
-from shared import add_population_daily, fill_date_gaps
+from owid.catalog import Table
+from shared import add_popultion_2022, add_regions, fill_date_gaps
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -73,12 +73,11 @@ def run(dest_dir: str) -> None:
     ## Drop rows
     tb = discard_rows(tb)
     ## Add population
-    tb = add_population_daily(
+    tb = add_popultion_2022(
         tb,
         ds_population,
         missing_countries={
             "International",
-            "Pitcairn",
         },
     )
     ## Add regions
@@ -183,55 +182,6 @@ def discard_rows(tb: Table):
     # Sort (legacy)
     tb = tb.sort_values(["country", "date"])
 
-    return tb
-
-
-def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Table:
-    tb = geo.add_regions_to_table(
-        tb,
-        ds_regions,
-        ds_income,
-        year_col="date",
-        regions={
-            # Standard continents
-            "Africa": {},
-            "Asia": {},
-            "Europe": {},
-            "North America": {},
-            "Oceania": {},
-            "South America": {},
-            # Income groups
-            "Low-income countries": {},
-            "Lower-middle-income countries": {},
-            "Upper-middle-income countries": {},
-            "High-income countries": {},
-            # Special regions
-            "European Union (27)": {},
-            "World excl. China": {
-                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-                "excluded_members": ["China"],
-            },
-            "World excl. China and South Korea": {
-                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-                "excluded_members": ["China", "South Korea"],
-            },
-            "World excl. China, South Korea, Japan and Singapore": {
-                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-                "excluded_members": ["China", "South Korea", "Japan", "Singapore"],
-            },
-            "Asia excl. China": {
-                "additional_regions": ["Asia"],
-                "excluded_members": ["China"],
-            },
-        },
-    )
-    tb = geo.add_regions_to_table(
-        tb,
-        ds_regions,
-        ds_income,
-        year_col="date",
-        regions={"World": {}},
-    )
     return tb
 
 

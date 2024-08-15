@@ -5,7 +5,7 @@ from datetime import timedelta
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import add_population_daily
+from shared import add_population_2022
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -397,7 +397,7 @@ def add_variant_totals(tb: Table) -> Table:
 
 def add_per_capita(tb: Table, ds_population: Dataset) -> Table:
     """Get per-capita values."""
-    tb = add_population_daily(tb, ds_population)
+    tb = add_population_2022(tb, ds_population)
     tb["num_sequences_per_1M"] = 1000000 * tb["num_sequences"] / tb["population"]
     tb = tb.drop(columns=["population"])
     return tb

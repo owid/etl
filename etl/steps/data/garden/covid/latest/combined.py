@@ -2,7 +2,7 @@
 
 import numpy as np
 from owid.catalog import Dataset, Table
-from shared import add_population_daily
+from shared import add_population_2022
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -123,7 +123,7 @@ def add_test_case_ratios(tb: Table) -> Table:
 
 
 def add_criteria(tb: Table, ds_population: Dataset) -> Table:
-    tb = add_population_daily(tb, ds_population)
+    tb = add_population_2022(tb, ds_population)
     mask = (
         (tb["days_since_100_total_cases"].notnull())
         & (tb["days_since_100_total_cases"] >= 21)
