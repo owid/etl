@@ -766,10 +766,21 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
             # Ensure the column for map brackets exists in the columns table of the explorer.
             explorer.df_columns["colorScaleNumericBins"] = None
         # Add entry to the map brackets column for this indicator.
-        if "catalogPath" in explorer.df_columns.columns:
-            explorer.df_columns.loc[index, "catalogPath"] = mb.catalog_path
-        else:
+        # NOTE: We should move towards using only catalogPath instead of variableId.
+        if (
+            (not explorer.df_columns.empty)
+            and ("variableId" in explorer.df_columns.columns)
+            and ("catalogPath" not in explorer.df_columns.columns)
+        ):
+            st.warning("Converting explorer to use catalogPath instead of variableId")
+            explorer.convert_ids_to_etl_paths()
+        # Add a variableId only if there is no catalogPath.
+        if pd.isnull(mb.catalog_path):
+            st.warning("No catalog path found for current variable. Storing a variableId in explorer.")
             explorer.df_columns.loc[index, "variableId"] = mb.variable_id
+        else:
+            explorer.df_columns.loc[index, "catalogPath"] = mb.catalog_path
+
         # Note that, to assign a list to a cell in a dataframe, the "at" method needs to be used, instead of loc.
         explorer.df_columns.at[index, "colorScaleNumericBins"] = mb.chart_config["map"]["colorScale"][
             "customNumericValues"
