@@ -91,6 +91,5 @@ def find_max_label_and_concat(tb, column, label):
 
     # Concatenate new rows to the original table
     tb = pr.concat([tb, max_rows], ignore_index=True)
-    print(tb)
 
     return tb
