@@ -161,7 +161,10 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             description_short = "Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies."
         elif metric == "Unit value":
             description_short = (
-                f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
+                # f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
+                # As suggested by Marcel, the change in USD is quite significant since 1998, so it is worth mentioning
+                # the unit in the subtitle, rather than the footnote.
+                f"Value of 1 tonne of {commodity.lower()}, in constant 1998 US$ per tonne."
             )
         ################################################################################################################
         # Handle special cases.
@@ -206,7 +209,8 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         if metric in ["Reserves", "Share of global reserves"]:
             footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
         elif metric == "Unit value":
-            footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
+            # footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
+            footnotes_additional += "This data is adjusted for inflation."
         elif metric in ["Imports", "Exports", "Share of global imports", "Share of global exports"]:
             footnotes_additional += (
                 "After 2002, data is limited to Europe and Turkey; after 2018, only UK data is available."
