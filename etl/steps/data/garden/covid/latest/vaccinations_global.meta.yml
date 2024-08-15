@@ -1,58 +1,97 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  others:
+    zero_day: &zero_day
+      zeroDay: 2020-01-01
+      yearIsDay: true
   common:
     presentation:
       topic_tags:
         - COVID-19
+    processing_level: major
+    display:
+      numDecimalPlaces: 2
+      <<: *zero_day
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
-
+  update_period_days: 0
+  title: COVID-19, vaccinations
 
 tables:
   vaccinations_global:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      total_vaccinations:
+        title: COVID-19 doses (cumulative)
+        description_short: Total number of COVID-19 vaccination doses administered.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_vaccinated:
+        title: People vaccinated (cumulative)
+        description_short: Total number of people who received at least one vaccine dose.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_fully_vaccinated:
+        title: People fully vaccinated (cumulative)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      total_boosters:
+        title: Booster doses (cumulative)
+        description_short: |-
+          Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol).
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+
+      new_vaccinations:
+        title: COVID-19 doses (daily)
+        description_short: New COVID-19 vaccination doses administered (only calculated for consecutive days).
+        unit: 'doses'
+      new_vaccinations_smoothed:
+        title: COVID-19 doses (daily, 7-day average)
+        description_short: |-
+          New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window
+        unit: 'people'
+      new_vaccinations_smoothed_per_million:
+        title: COVID-19 doses (daily, 7-day average, per million people)
+        description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
+        unit: 'doses per million people'
+
+      new_people_vaccinated_smoothed:
+        title: People vaccinated (7-day average)
+        description_short: Daily number of people receiving their first vaccine dose (7-day smoothed).
+        unit: 'people'
+      new_people_vaccinated_smoothed_per_hundred:
+        title: People vaccinated (7-day average, per million people)
+        description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
+        unit: 'people per hundred people'
+
+
+      total_vaccinations_per_hundred:
+        title: COVID-19 doses (total, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
+        unit: 'doses per hundred people'
+      people_vaccinated_per_hundred:
+        title: People vaccinated (total, per hundred)
+        description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
+        unit: 'people per hundred people'
+      people_fully_vaccinated_per_hundred:
+        title: People fully vaccinated (total, per hundred)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
+        unit: 'people per hundred people'
+      total_boosters_per_hundred:
+        title: Booster doses (total, per hundred)
+        description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
+        unit: 'doses per hundred people'
+
 

@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
-from shared import add_population_2022, add_regions
+from shared import add_population_2022, add_population_daily, add_regions
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column, interpolate_table
@@ -61,23 +61,24 @@ def run(dest_dir: str) -> None:
     tb = add_population_2022(
         tb=tb,
         ds_population=ds_population,
-        missing_countries={
-            "Pitcairn",
-            "England",
-            "Wales",
-            "Northern Cyprus",
-            "Northern Ireland",
-            "Scotland",
-        },
     )
 
     # Aggregate
     tb = add_regional_aggregates(tb, ds_regions, ds_income)
 
     # Per capita
-    tb_pop = ds_population["population"].reset_index()
-    tb_pop = tb_pop[tb_pop["year"] == 2022]
-    tb = tb.merge(tb_pop[["country", "population"]], on=["country"], how="left")
+    tb = add_per_capita(tb)
+
+    # Sanity checks
+    sanity_checks(tb)
+
+    # Drop columns
+    tb = tb.drop(
+        columns=[
+            "new_vaccinations_interpolated",
+            "new_people_vaccinated_interpolated",
+        ]
+    )
 
     # Format
     tb = tb.format(["country", "date"])
@@ -204,3 +205,47 @@ def _prepare_table_for_aggregates(tb: Table) -> Table:
     tb_agg = tb_agg.merge(tb_agg_3, on=["country", "date"], validate="one_to_one")
 
     return cast(Table, tb_agg)
+
+
+def add_per_capita(tb: Table) -> Table:
+    """Add per-capita metrics"""
+    per_100 = [
+        "total_vaccinations",
+        "people_vaccinated",
+        "people_fully_vaccinated",
+        "total_boosters",
+        "new_people_vaccinated_smoothed",
+    ]
+    per_1m = ["new_vaccinations_smoothed"]
+    for col in per_100:
+        tb[f"{col}_per_hundred"] = tb[col] * 100 / tb["population"]
+    for col in per_1m:
+        tb[f"{col}_per_million"] = tb[col] * 1_000_000 / tb["population"]
+
+    # drop population
+    tb = tb.drop(columns="population")
+
+    return tb
+
+
+def add_people_unvaccinated(tb: Table, ds_population: Dataset) -> Table:
+    """Get un-vaccinated people."""
+    tb = add_population_daily(tb, ds_population)
+    tb["people_unvaccinated"] = tb["population"] - tb["people_vaccinated"]
+    tb.loc[tb["people_unvaccinated"] < 0, "people_unvaccinated"] = 0
+    return tb
+
+
+def sanity_checks(tb: Table) -> None:
+    """Minor sanity checks on indicator figures."""
+    # Config
+    skip_countries = ["Pitcairn"]
+    # Sanity checks
+    df_to_check = tb.loc[~tb["country"].isin(skip_countries)]
+    if not (df_to_check["total_vaccinations"].dropna() >= 0).all():
+        raise ValueError("Negative values found! Check values in `total_vaccinations`.")
+    if not (df_to_check["new_vaccinations_smoothed"].dropna() >= 0).all():
+        raise ValueError("Negative values found! Check values in `new_vaccinations_smoothed`.")
+    if not (msk := (x := df_to_check["new_vaccinations_smoothed_per_million"].dropna()) <= 120000).all():
+        example = df_to_check.loc[x[~msk].index, ["date", "location", "new_vaccinations_smoothed_per_million"]]
+        raise ValueError(f"Huge values found! Check values in `new_vaccinations_smoothed_per_million`: \n{example}")
