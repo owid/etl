@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from shared import add_popultion_2022, add_regions, fill_date_gaps
+from shared import add_population_2022, add_regions, fill_date_gaps
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     ## Drop rows
     tb = discard_rows(tb)
     ## Add population
-    tb = add_popultion_2022(
+    tb = add_population_2022(
         tb,
         ds_population,
         missing_countries={
