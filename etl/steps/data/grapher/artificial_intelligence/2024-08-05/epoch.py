@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     columns = {
         "training_computation_petaflop": "compute",
         "training_dataset_size__datapoints": "data",
-        "parameters": "params",
+        "parameters": "parameters",
     }
     # Find maximum values for a given column (compute, data, params) per year, label them, and add summary rows.
     for column, label in columns.items():

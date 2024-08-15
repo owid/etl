@@ -13,6 +13,6 @@ tables:
         title: Maximum compute
       max_data:
         title: Maximum data
-      max_params:
+      max_parameters:
         title: Maximum parameters
 
