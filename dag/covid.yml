@@ -165,6 +165,10 @@ steps:
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global
 
+  # Explorer
+  data://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+
   ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
