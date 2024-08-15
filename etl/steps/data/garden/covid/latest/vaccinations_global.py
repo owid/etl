@@ -69,6 +69,9 @@ def run(dest_dir: str) -> None:
     # Per capita
     tb = add_per_capita(tb)
 
+    # Add unvaccinated
+    tb = add_people_unvaccinated(tb, ds_population)
+
     # Sanity checks
     sanity_checks(tb)
 
@@ -78,6 +81,17 @@ def run(dest_dir: str) -> None:
             "new_vaccinations_interpolated",
             "new_people_vaccinated_interpolated",
         ]
+    )
+
+    # Rename
+    tb = tb.rename(
+        columns={
+            "new_vaccinations": "daily_vaccinations",
+            "new_vaccinations_smoothed": "daily_vaccinations_smoothed",
+            "new_vaccinations_smoothed_per_million": "daily_vaccinations_smoothed_per_million",
+            "new_people_vaccinated_smoothed": "daily_people_vaccinated_smoothed",
+            "new_people_vaccinated_smoothed_per_hundred": "daily_people_vaccinated_smoothed_per_hundred",
+        }
     )
 
     # Format

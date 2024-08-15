@@ -2,7 +2,7 @@
 definitions:
   others:
     zero_day: &zero_day
-      zeroDay: 2020-01-01
+      zeroDay: 2020-01-21
       yearIsDay: true
     per_capita: &per_capita |-
       Per-capita values have been estimated by using the population in 2022 as a reference.
@@ -55,27 +55,27 @@ tables:
           numDecimalPlaces: 0
           <<: *zero_day
 
-      new_vaccinations:
+      daily_vaccinations:
         title: COVID-19 doses (daily)
         description_short: New COVID-19 vaccination doses administered (only calculated for consecutive days).
         unit: 'doses'
-      new_vaccinations_smoothed:
+      daily_vaccinations_smoothed:
         title: COVID-19 doses (daily, 7-day average)
         description_short: |-
           New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window
         unit: 'people'
-      new_vaccinations_smoothed_per_million:
+      daily_vaccinations_smoothed_per_million:
         title: COVID-19 doses (daily, 7-day average, per million people)
         description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
         unit: 'doses per million people'
         description_key:
           - *per_capita
 
-      new_people_vaccinated_smoothed:
+      daily_people_vaccinated_smoothed:
         title: People vaccinated (7-day average)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed).
         unit: 'people'
-      new_people_vaccinated_smoothed_per_hundred:
+      daily_people_vaccinated_smoothed_per_hundred:
         title: People vaccinated (7-day average, per million people)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
         unit: 'people per hundred people'
