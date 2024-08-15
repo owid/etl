@@ -144,12 +144,10 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             "Share of global exports",
         ]:
             if sub_commodity.startswith("Mine"):
-                if not metric.startswith("Share"):
-                    description_short = f"Measured as mined production, in {unit}."
+                if metric.startswith("Share"):
+                    description_short = "Based on mined, rather than [refined](#dod:refined-production), production."
                 else:
-                    description_short = (
-                        "Measured based on mined, rather than [refined](#dod:refined-production), production."
-                    )
+                    description_short = f"Based on mined, rather than [refined](#dod:refined-production), production. Measured in {unit}."
             elif sub_commodity.startswith("Refinery"):
                 if not metric.startswith("Share"):
                     description_short = f"Measured in {unit}. Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
@@ -209,6 +207,10 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
         elif metric == "Unit value":
             footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
+        elif metric in ["Imports", "Exports", "Share of global imports", "Share of global exports"]:
+            footnotes_additional += (
+                "After 2002, data is limited to Europe and Turkey; after 2018, only UK data is available."
+            )
 
         # Add footnotes to metadata.
         combined_footnotes = _combine_notes(
@@ -370,6 +372,12 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # Replace the world data in the main table with the world maximum data.
     tb = pr.concat([tb[~tb["country"].isin(world_entities)], tb_world_max], ignore_index=True)
     assert tb[tb.duplicated(subset=["country", "year"], keep=False)].empty, error
+
+    # Imports and exports data from BGS contain only data for Europe and Turkey from 2002, and only UK data from 2018.
+    # Therefore, it only makes sense to have global imports/exports data until 2002.
+    # See more details in the BGS garden step.
+    imports_exports_columns = [column for column in tb.columns if column.startswith(("imports", "exports"))]
+    tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), imports_exports_columns] = None
 
     return tb
 

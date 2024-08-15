@@ -983,7 +983,7 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
         ["United Kingdom", "World"]
     ), error
     # Therefore, it only makes sense to have global imports/exports data until 2002.
-    tb.loc[(tb["year"] > 2002), ["imports", "exports"]] = None
+    tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), ["imports", "exports"]] = None
 
     return tb
 
