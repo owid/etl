@@ -72,6 +72,9 @@ def run(dest_dir: str) -> None:
     # Add unvaccinated
     tb = add_people_unvaccinated(tb, ds_population)
 
+    # Share of boosters
+    tb = add_booster_share(tb)
+
     # Sanity checks
     sanity_checks(tb)
 
@@ -263,3 +266,28 @@ def sanity_checks(tb: Table) -> None:
     if not (msk := (x := df_to_check["new_vaccinations_smoothed_per_million"].dropna()) <= 120000).all():
         example = df_to_check.loc[x[~msk].index, ["date", "location", "new_vaccinations_smoothed_per_million"]]
         raise ValueError(f"Huge values found! Check values in `new_vaccinations_smoothed_per_million`: \n{example}")
+
+
+def add_booster_share(tb: Table) -> Table:
+    shape_before = tb.shape
+    global_boosters = tb.loc[tb["country"] == "World"][
+        ["country", "date", "total_vaccinations", "total_boosters"]
+    ].sort_values("date")
+    global_boosters[["total_vaccinations", "total_boosters"]] = global_boosters[
+        ["total_vaccinations", "total_boosters"]
+    ].astype(float)
+    global_boosters["share_of_boosters"] = (
+        (
+            (global_boosters["total_boosters"] - global_boosters["total_boosters"].shift(1))
+            / (global_boosters["total_vaccinations"] - global_boosters["total_vaccinations"].shift(1))
+        )
+        .rolling(14)
+        .mean()
+        .round(4)
+    )
+    global_boosters = global_boosters.drop(columns=["total_vaccinations", "total_boosters"])
+    tb = tb.merge(global_boosters, how="left", on=["country", "date"], validate="one_to_one")
+    assert (
+        tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1
+    ), "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    return tb

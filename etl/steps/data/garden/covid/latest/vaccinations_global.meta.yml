@@ -71,33 +71,33 @@ tables:
         description_processing: *per_capita
 
       daily_people_vaccinated_smoothed:
-        title: People vaccinated (7-day average)
+        title: People vaccinated (daily, 7-day average)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed).
         unit: 'people'
       daily_people_vaccinated_smoothed_per_hundred:
-        title: People vaccinated (7-day average, per million people)
+        title: People vaccinated (daily, 7-day average, per million people)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
         unit: 'people per hundred people'
         description_processing: *per_capita
 
 
       total_vaccinations_per_hundred:
-        title: COVID-19 doses (total, per hundred)
+        title: COVID-19 doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
         unit: 'doses per hundred people'
         description_processing: *per_capita
       people_vaccinated_per_hundred:
-        title: People vaccinated (total, per hundred)
+        title: People vaccinated (cumulative, per hundred)
         description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
         unit: 'people per hundred people'
         description_processing: *per_capita
       people_fully_vaccinated_per_hundred:
-        title: People fully vaccinated (total, per hundred)
+        title: People fully vaccinated (cumulative, per hundred)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
         unit: 'people per hundred people'
         description_processing: *per_capita
       total_boosters_per_hundred:
-        title: Booster doses (total, per hundred)
+        title: Booster doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
         unit: 'doses per hundred people'
         description_processing: *per_capita
@@ -107,5 +107,11 @@ tables:
         description_short: Total number of people who have not received any vaccine dose.
         unit: people
         description_processing: This indicator is derived from the country population in a given day. Daily population estimates are obtained by linearly interpolating the year-estimtes by UN WPP.
+
+      share_of_boosters:
+        title: Share of daily COVID-19 doses that are boosters
+        description_short: |-
+          14-day rolling average. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
+        unit: boosters
 
 
