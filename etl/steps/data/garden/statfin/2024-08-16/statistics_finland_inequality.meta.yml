@@ -41,3 +41,16 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
+      share_p90p100:
+        title: Wealth share of top 10%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of wealth owned by the richest 10% of the population.
+        presentation:
+          title_public: Share of top 10%
+          title_variant: Individual net wealth
+        display:
+          name: Wealth share of top 10%
+          numDecimalPlaces: 1
+          tolerance: 5
+
