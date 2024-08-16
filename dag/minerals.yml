@@ -42,18 +42,17 @@ steps:
   # Minerals - Minerals.
   #
   # Compilation of minerals data from different origins.
-  data://garden/minerals/2024-07-15/minerals:
+  data://garden/minerals/2024-08-16/minerals:
     - data://garden/bgs/2024-07-09/world_mineral_statistics
     - data://garden/usgs/2024-07-15/historical_statistics_for_mineral_and_material_commodities
     - data://garden/usgs/2024-07-15/mineral_commodity_summaries
-    - data://garden/regions/2023-01-01/regions
   #
   # Minerals - Minerals.
   #
-  data://grapher/minerals/2024-07-15/minerals:
-    - data://garden/minerals/2024-07-15/minerals
+  data://grapher/minerals/2024-08-16/minerals:
+    - data://garden/minerals/2024-08-16/minerals
   #
   # Minerals - Minerals explorer.
   #
   data://explorers/minerals/latest/minerals:
-    - data://grapher/minerals/2024-07-15/minerals
+    - data://grapher/minerals/2024-08-16/minerals

@@ -252,3 +252,4 @@ include:
   - dag/archive/fasttrack.yml
   - dag/archive/climate.yml
   - dag/archive/environment.yml
+  - dag/archive/minerals.yml

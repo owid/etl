@@ -1,0 +1,372 @@
+"""Compilation of minerals data from different origins.
+
+Currently, the three sources of minerals data are:
+* From BGS we extract imports, exports, and production.
+* From USGS (current) we extract production and reserves.
+* From USGS (historical) we extract production and unit value.
+
+"""
+import warnings
+from typing import List, Optional, Tuple
+
+import owid.catalog.processing as pr
+import pandas as pd
+from owid.catalog import Table, VariablePresentationMeta
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from structlog import get_logger
+
+from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
+
+# Ignore PerformanceWarning (that happens when finding the maximum of world data, when creating region aggregates).
+warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# Prefix used for "share" columns.
+SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+
+# There are many historical regions with overlapping data with their successor countries.
+# Accept only overlaps on the year when the historical country stopped existing.
+# NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
+# create data for continents, then build an aggregate for the world, and then remove continents.
+# NOTE: Some of the overlaps occur only for certain commodities.
+ACCEPTED_OVERLAPS = [
+    # {1991: {"USSR", "Armenia"}},
+    # {1991: {"USSR", "Belarus"}},
+    {1991: {"USSR", "Russia"}},
+    {1992: {"Czechia", "Czechoslovakia"}},
+    {1992: {"Slovakia", "Czechoslovakia"}},
+    {1990: {"Germany", "East Germany"}},
+    {1990: {"Germany", "West Germany"}},
+    # {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
+    {1990: {"Yemen", "Yemen People's Republic"}},
+]
+
+
+def adapt_flat_table(tb_flat: Table) -> Table:
+    tb_flat = tb_flat.copy()
+    # For consistency with other tables, rename columns and adapt column types.
+    tb_flat = tb_flat.rename(
+        columns={
+            column: tb_flat[column].metadata.title for column in tb_flat.columns if column not in ["country", "year"]
+        },
+        errors="raise",
+    )
+    tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns if column not in ["country", "year"]})
+    return tb_flat
+
+
+def _gather_notes_and_footnotes_from_metadata(tb_flat: Table, column: str) -> Tuple[Optional[str], Optional[str]]:
+    # Get notes from description_from_producer field, if given.
+    # And gather footnotes from grapher config, if given.
+    notes = None
+    footnotes = None
+    # For "share" columns, we also want to fetch the notes of the original column.
+    column = column.replace(SHARE_OF_GLOBAL_PREFIX, "")
+    if column in tb_flat.columns:
+        notes = tb_flat[column].metadata.description_from_producer
+        if tb_flat[column].metadata.presentation.grapher_config is not None:
+            footnotes = tb_flat[column].metadata.presentation.grapher_config["note"]
+
+    return notes, footnotes
+
+
+def _combine_notes(notes_list: List[Optional[str]], separator: str) -> str:
+    # Add notes to metadata.
+    combined_notes = ""
+    notes_exist = False
+    for notes in notes_list:
+        if notes:
+            if notes_exist:
+                combined_notes += separator
+            combined_notes += notes
+            notes_exist = True
+
+    return combined_notes
+
+
+def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs_historical_flat: Table) -> Table:
+    tb = tb.copy()
+
+    # Improve metadata of new columns.
+    for column in tb.drop(columns=["country", "year"]).columns:
+        # Extract combination from the column name.
+        metric, commodity, sub_commodity, unit = column.split("|")
+
+        # Improve metric, commodity and subcommodity names.
+        metric = metric.replace("_", " ").capitalize()
+        commodity = commodity.capitalize()
+
+        # Ensure the variable has a title.
+        tb[column].metadata.title = column
+
+        # Create a title_public.
+        if sub_commodity == "Refinery":
+            title_public = f"Refined {commodity.lower()} {metric.lower()}"
+        elif sub_commodity.startswith("Refinery, "):
+            _sub_commodity = sub_commodity.split(", ")[-1]
+            title_public = f"Refined {commodity.lower()} ({_sub_commodity}) {metric.lower()}"
+        elif sub_commodity == "Mine":
+            title_public = f"{commodity} {metric.lower()}"
+        elif sub_commodity.startswith("Mine, "):
+            _sub_commodity = sub_commodity.split(", ")[-1]
+            title_public = f"{commodity} ({_sub_commodity}) {metric.lower()}"
+        else:
+            title_public = f"{commodity} {metric.lower()}"
+        if tb[column].metadata.presentation is None:
+            tb[column].metadata.presentation = VariablePresentationMeta()
+        if column.startswith(SHARE_OF_GLOBAL_PREFIX):
+            title_public = title_public.replace("share of global ", "") + " as a share of the global total"
+        tb[column].metadata.presentation.title_public = title_public
+
+        # Create a short description (that will also appear as the chart subtitle).
+        description_short = None
+        if metric in [
+            "Production",
+            "Imports",
+            "Exports",
+            "Share of global production",
+            "Share of global imports",
+            "Share of global exports",
+        ]:
+            if sub_commodity.startswith("Mine"):
+                if metric.startswith("Share"):
+                    description_short = "Based on mined, rather than [refined](#dod:refined-production), production."
+                else:
+                    description_short = f"Based on mined, rather than [refined](#dod:refined-production), production. Measured in {unit}."
+            elif sub_commodity.startswith("Refinery"):
+                if not metric.startswith("Share"):
+                    description_short = f"Measured in {unit}. Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                else:
+                    description_short = "Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+            elif sub_commodity.startswith("Smelter"):
+                description_short = f"Measured in {unit}. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes."
+            elif sub_commodity.startswith("Processing"):
+                description_short = "Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes."
+        elif metric in ["Reserves", "Share of global reserves"]:
+            description_short = "Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies."
+        elif metric == "Unit value":
+            description_short = (
+                # f"Value of 1 tonne of {commodity.lower()}, in US dollars per tonne, adjusted for inflation."
+                # As suggested by Marcel, the change in USD is quite significant since 1998, so it is worth mentioning
+                # the unit in the subtitle, rather than the footnote.
+                f"Value of 1 tonne of {commodity.lower()}, in constant 1998 US$ per tonne."
+            )
+        ################################################################################################################
+        # Handle special cases.
+        if sub_commodity == "Guano":
+            description_short = "Guano is the accumulated excrement of seabirds, bats, and seals. It is rich in nitrogen, phosphate and potassium, making it valuable as a fertilizer."
+        ################################################################################################################
+        if description_short is not None:
+            tb[column].metadata.description_short = description_short
+
+        # Add unit and short_unit.
+        tb[column].metadata.unit = unit
+        if unit.startswith("tonnes"):
+            # Create short unit.
+            tb[column].metadata.short_unit = "t"
+        elif unit == "constant 1998 US$ per tonne":
+            tb[column].metadata.short_unit = "$/t"
+        else:
+            log.warning(f"Unexpected unit for column: {column}")
+            tb[column].metadata.short_unit = ""
+        if metric.startswith("Share "):
+            tb[column].metadata.unit = "%"
+            tb[column].metadata.short_unit = "%"
+
+        # Gather notes and footnotes from USGS' current metadata.
+        notes_usgs, footnotes_usgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_usgs_flat, column=column)
+
+        # Gather notes and footnotes from USGS' historical metadata.
+        notes_usgs_historical, footnotes_usgs_historical = _gather_notes_and_footnotes_from_metadata(
+            tb_flat=tb_usgs_historical_flat, column=column
+        )
+
+        # Gather notes and footnotes from BGS' metadata.
+        notes_bgs, footnotes_bgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_bgs_flat, column=column)
+
+        # Add notes to metadata.
+        combined_notes = _combine_notes(notes_list=[notes_bgs, notes_usgs, notes_usgs_historical], separator="\n\n")
+        if len(combined_notes) > 0:
+            tb[column].metadata.description_from_producer = combined_notes
+
+        # Insert (or append) additional footnotes:
+        footnotes_additional = ""
+        if metric in ["Reserves", "Share of global reserves"]:
+            footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
+        elif metric == "Unit value":
+            # footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
+            footnotes_additional += "This data is adjusted for inflation."
+        elif metric in ["Imports", "Exports", "Share of global imports", "Share of global exports"]:
+            footnotes_additional += (
+                "After 2002, data is limited to Europe and Turkey; after 2018, only UK data is available."
+            )
+
+        # Add footnotes to metadata.
+        combined_footnotes = _combine_notes(
+            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical, footnotes_additional], separator=" "
+        )
+        if len(combined_footnotes) > 0:
+            if tb[column].metadata.presentation.grapher_config is None:
+                tb[column].metadata.presentation.grapher_config = {}
+            tb[column].metadata.presentation.grapher_config["note"] = combined_footnotes
+
+    return tb
+
+
+def inspect_overlaps(
+    tb: Table,
+    tb_usgs_flat: Table,
+    tb_usgs_historical_flat: Table,
+    minerals: Optional[List[str]] = None,
+) -> None:
+    import pandas as pd
+    import plotly.express as px
+
+    for column in tb.drop(columns=["country", "year"]).columns:
+        if minerals:
+            mineral = column.split("|")[1]
+            if mineral not in minerals:
+                continue
+        # Initialize an empty dataframe, and add data to it from whatever source has data for it.
+        _df = pd.DataFrame()
+        if column in tb_usgs_flat.columns:
+            _df = pd.concat(
+                [_df, tb_usgs_flat[["country", "year", column]].assign(**{"source": "USGS current"})], ignore_index=True
+            )
+        if column in tb_usgs_historical_flat.columns:
+            _df = pd.concat(
+                [_df, tb_usgs_historical_flat[["country", "year", column]].assign(**{"source": "USGS historical"})],
+                ignore_index=True,
+            )
+        _df = _df.dropna().reset_index(drop=True)
+        for country in _df["country"].unique():
+            _df_country = _df[_df["country"] == country]
+            if _df_country["source"].nunique() > 1:
+                px.line(
+                    _df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}"
+                ).show()
+
+
+def add_share_of_global_columns(tb: Table) -> Table:
+    # Create a table for global data.
+    tb_world = tb[tb["country"] == "World"].drop(columns="country").reset_index(drop=True)
+    # Replace zeros by nan (to avoid division by zero).
+    tb_world = tb_world.replace(0, pd.NA)
+    # Create a temporary table with global data for each column in the original table.
+    _tb = tb.merge(tb_world, on="year", how="left", suffixes=("", "_world_share"))
+
+    # Create a dictionary to store the new share columns, and another to store each column's metadata.
+    new_columns = {}
+    metadata = {}
+    for column in tb.columns:
+        if (column.split("|")[0] in ["production", "reserves"]) and (tb_world[column].notnull().any()):
+            new_columns[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = _tb[column] / _tb[f"{column}_world_share"] * 100
+            metadata[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = tb[column].metadata
+
+    # Add the new share columns to the original table.
+    tb = pr.concat([tb, Table(new_columns)], axis=1)
+
+    for column in tb.drop(columns=["country", "year"]).columns:
+        if len(tb[column].metadata.origins) == 0:
+            tb[column].metadata = metadata[column].copy()
+
+    return tb
+
+
+def run_sanity_checks(tb: Table) -> None:
+    # Check that there are no duplicated rows.
+    assert tb[tb.duplicated(subset=["country", "year"], keep=False)].empty, "Unexpected duplicated data."
+    # Check that there are no missing values.
+    for column in [column for column in tb.columns if column.startswith(SHARE_OF_GLOBAL_PREFIX)]:
+        if (tb[column] > 100).any():
+            log.warning(f"{column} maximum: {tb[column].max():.0f}%")
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load minerals datasets.
+    ds_bgs = paths.load_dataset("world_mineral_statistics")
+    ds_usgs_historical = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
+    ds_usgs = paths.load_dataset("mineral_commodity_summaries")
+
+    # Read tables.
+    tb_usgs_historical_flat = ds_usgs_historical.read_table(
+        "historical_statistics_for_mineral_and_material_commodities_flat"
+    )
+    tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
+    tb_bgs_flat = ds_bgs.read_table("world_mineral_statistics_flat")
+
+    #
+    # Process data.
+    #
+    # Adapt USGS current flat table.
+    tb_usgs_flat = adapt_flat_table(tb_flat=tb_usgs_flat)
+
+    # Adapt USGS historical flat table.
+    tb_usgs_historical_flat = adapt_flat_table(tb_flat=tb_usgs_historical_flat)
+
+    # Adapt BGS flat table.
+    tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
+
+    # Create a combined flat table.
+    # Firstly, combine USGS current and historical. Since the former is more up-to-date, prioritize it.
+    tb = combine_two_overlapping_dataframes(
+        df1=tb_usgs_flat, df2=tb_usgs_historical_flat, index_columns=["country", "year"]
+    )
+
+    # # Uncomment for debugging purposes, to compare the data from different origins where they overlap.
+    # inspect_overlaps(
+    #     tb=tb,
+    #     tb_usgs_flat=tb_usgs_flat,
+    #     tb_usgs_historical_flat=tb_usgs_historical_flat,
+    #     minerals=["Boron"],
+    # )
+
+    # Given that "World" was created by us (to be able to visually compare BGS and USGS data), drop it it.
+    tb_bgs_flat = tb_bgs_flat[tb_bgs_flat["country"] != "World"].reset_index(drop=True)
+    # Imports/exports data in BGS is very sparse and problematic.
+    # Additionally, combining BGS and USGS data is tricky and causes many issues.
+    # So, for now, we will only use BGS production data for those columns for which there is no USGS data.
+    # Therefore, we do not combine individual indicators of BGS and USGS.
+    bgs_only_columns = [c for c in (set(tb_bgs_flat.columns) - set(tb.columns)) if "production" in c]
+    tb_bgs_flat = tb_bgs_flat[["country", "year"] + bgs_only_columns].reset_index(drop=True)
+
+    # Combine BGS and USGS data (ensuring there is no overlap within the same indicator).
+    tb = tb.merge(tb_bgs_flat, on=["country", "year"], how="outer")
+
+    # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
+    tb = add_share_of_global_columns(tb=tb)
+
+    # Improve metadata.
+    tb = improve_metadata(
+        tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
+    )
+
+    # Run sanity checks.
+    run_sanity_checks(tb=tb)
+
+    # Uncomment for debugging.
+    # columns_to_inspect = [
+    #     "reserves|Zinc|Mine|tonnes",
+    # ]
+    # for column in columns_to_inspect:
+    #     print(column)
+    #     print(tb[column].metadata.description_from_producer)
+    #     px.line(tb[["country", "year", column]].dropna(), x="year", y=column, color="country", markers=True, title=column).show()
+
+    # Format combined table conveniently.
+    tb = tb.format(["country", "year"], short_name="minerals").astype("Float64")
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden.save()
