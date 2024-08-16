@@ -1,0 +1,34 @@
+meta:
+  source:
+    name: NASA Exoplanet Archive (2023)
+    description: |-
+      This dataset makes use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program.
+
+      Transit method: If a planet crosses (or transits) in front of its parent star's disk, then the star's observed brightness drops by a small amount. The amount by which the star dims depends on its size and the planet's size, among other factors.
+
+      Radial velocity (or Doppler method): As a planet orbits a star, the star also moves in its small orbit around the system's center of mass. Variations in the star's radial velocity—the speed with which it moves towards or away from Earth—can be detected from displacements in the star's spectral lines due to the Doppler effect.
+
+      Microlensing: Microlensing occurs when the gravitational field of a star acts like a lens, magnifying the light of a distant background star. Planets orbiting the lensing star can cause detectable anomalies in the magnification as it varies over time.
+
+      Details on other methods of discovery are available on Wikipedia: https://en.wikipedia.org/wiki/Exoplanet#Detection_methods
+    url: https://exoplanetarchive.ipac.caltech.edu/index.html
+    source_data_url: |-
+      https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+distinct+pl_name,disc_year,discoverymethod+from+ps&format=csv
+    date_accessed: 2023-06-09
+    publication_year: 2023
+    published_by: |-
+      NASA Exoplanet Archive, operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program
+  name: Exoplanets (NASA, 2023)
+  description: |-
+    This dataset makes use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program.
+
+    Transit method: If a planet crosses (or transits) in front of its parent star's disk, then the star's observed brightness drops by a small amount. The amount by which the star dims depends on its size and the planet's size, among other factors.
+
+    Radial velocity (or Doppler method): As a planet orbits a star, the star also moves in its small orbit around the system's center of mass. Variations in the star's radial velocity—the speed with which it moves towards or away from Earth—can be detected from displacements in the star's spectral lines due to the Doppler effect.
+
+    Microlensing: Microlensing occurs when the gravitational field of a star acts like a lens, magnifying the light of a distant background star. Planets orbiting the lensing star can cause detectable anomalies in the magnification as it varies over time.
+
+    Details on other methods of discovery are available on Wikipedia: https://en.wikipedia.org/wiki/Exoplanet#Detection_methods
+  license:
+    name: Public domain
+    url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
