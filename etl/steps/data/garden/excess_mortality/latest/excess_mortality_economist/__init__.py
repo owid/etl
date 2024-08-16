@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb = cast(Table, tb.drop(columns=["known_excess_deaths"]))
 
     # Set index
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
