@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load minerals grapher dataset and read its main table.
+    # Load grapher datasets for all migration data
     ds_unicef = paths.load_dataset("child_migration")
     ds_unhcr = paths.load_dataset("refugee_data")
     ds_undesa = paths.load_dataset("migrant_stock")
@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
         (tb_idmc, ds_idmc),
     ]
 
-    # try to get map brackets from old explorer
+    # try to get map brackets from old explorer - only if USE_EXISTING_MAP_BRACKETS is True
     if USE_EXISTING_MAP_BRACKETS:
         expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
         if expl_path.exists():
@@ -150,14 +150,6 @@ def run(dest_dir: str) -> None:
     df_columns["colorScaleEqualSizeBins"] = "true"
 
     # Save outputs.
-    #
-    # Create a new explorers dataset and tsv file.
-
-    # df_graphers.to_csv("/Users/tunaacisu/Data/Test/explorer.tsv", sep="\t", index=False)
-
-    # print(df_graphers)
-    # print(df_columns)
-
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
 
@@ -238,7 +230,6 @@ def create_column_rows(col_dicts, tb, ds):
             else:
                 col_row_dict["type"] = "Numeric"
             col_row_dict["retrievedDate"] = origin.date_accessed
-            # col_row_dict["additionalInfo"] = [meta.description_from_producer, meta.description_key,meta.description_processing]
             col_row_dict["colorScaleScheme"] = MAP_BRACKETS[column]["colorScaleScheme"]
             col_row_dict["colorScaleNumericBins"] = MAP_BRACKETS[column]["colorScaleNumericBins"]
             col_dicts.append(col_row_dict)

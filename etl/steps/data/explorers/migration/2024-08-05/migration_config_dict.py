@@ -841,15 +841,15 @@ MAP_BRACKETS = {
     },
     "share_of_internally_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 0.0],
     },
     "share_of_conflict_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 0.0],
+        "colorScaleNumericBins": [1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0, 0.0],
     },
     "share_of_disaster_displaced_pop": {
         "colorScaleScheme": "OrRd",
-        "colorScaleNumericBins": [0.1, 0.2, 0.5, 1.0, 2.0, 0.0],
+        "colorScaleNumericBins": [0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 0.0],
     },
     "displacements_per_1000_people": {
         "colorScaleScheme": "OrRd",
