@@ -1123,7 +1123,7 @@ class TableGroupBy:
 
         return tb
 
-    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> "Table":
+    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Union["Table", "Variable"]:
         mem = {}
 
         @wraps(func)
@@ -1135,10 +1135,29 @@ class TableGroupBy:
             return tb
 
         df = self.groupby.apply(f, *args, include_groups=include_groups)
-        if not mem or type(mem["table"]) == pd.DataFrame:
+        if not mem:
             return Table(df)
-        else:
+        elif type(mem["table"]) == pd.DataFrame:
+            return _create_table(df, self.metadata, self._fields)
+        elif type(mem["table"]) == pd.Series:
+            if isinstance(df, Table):
+                return _create_table(df, self.metadata, self._fields)
+            else:
+                return Variable(df)
+        elif isinstance(mem["table"], Table):
             return _create_table(df, mem["table"].metadata, mem["table"]._fields)
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, variables.Variable):
+            df.metadata = mem["table"].metadata
+            return df
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, Table):
+            # func returns Variable
+            out = _create_table(df, self.metadata, self._fields)
+            if mem["table"].name:
+                out[mem["table"].name].metadata = mem["table"].metadata
+            return out
+        else:
+            # func returns a scalar, output is a Table
+            return _create_table(df, self.metadata, self._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)

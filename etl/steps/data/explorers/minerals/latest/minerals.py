@@ -99,6 +99,9 @@ def run(dest_dir: str) -> None:
     df_graphers["minTime"] = min_year
     df_graphers["hasMapTab"] = map_tab
 
+    # Impose that all line charts start at zero.
+    df_graphers["yAxisMin"] = 0
+
     # NOTE: Currently, most columns have "tonnes" as unit, but often there a other units like "tonnes of gross weight".
     # I think that, ideally, all units should be "tonnes" and we should add a footnote to clarify the unit where needed.
     # But at least, for now, remove the "(tonnes)" from the "Type Dropdown" column if all options are in "tonnes".
@@ -125,6 +128,11 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
+    df_graphers["Metric Dropdown"] = pd.Categorical(
+        df_graphers["Metric Dropdown"],
+        categories=["Production", "Reserves", "Unit value", "Imports", "Exports"],
+        ordered=True,
+    )
     df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Metric Dropdown", "Type Dropdown"]).reset_index(
         drop=True
     )
