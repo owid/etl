@@ -170,6 +170,10 @@ def add_metadata(tb: Table, metadata_tb: Table):
             meta.processing = "minor"
             meta.display = {}
 
+            # Changing the producer name for the variables that come fron the WBL as requested by the source
+            if metadata["source"] == "World Bank: Women, Business and the Law. https://wbl.worldbank.org/":
+                meta.origins[0].producer = "World Bank - Women, Business and the Law"
+
             # Convert the 'name' variable to lowercase to make text matching easier
             name_lower = tb[column].title.lower()
 
