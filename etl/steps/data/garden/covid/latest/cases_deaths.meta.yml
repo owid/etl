@@ -31,7 +31,13 @@ tables:
         unit: 'cases'
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 cases TEST
+            subtitle: Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            type: LineChart
 
       total_cases:
         title: Total confirmed cases of COVID-19
