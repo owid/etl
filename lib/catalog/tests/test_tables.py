@@ -1009,13 +1009,43 @@ def test_groupby_agg(table_1) -> None:
     assert gt.min_a.m.title == "Title of Table 1 Variable a"
 
 
-def test_groupby_apply(table_1) -> None:
+def test_groupby_apply_table(table_1) -> None:
     def func(tb):
         return tb[["a"]].rename(columns={"a": "c"})
 
     tb = table_1.groupby("country").apply(func)
     assert tb.columns.tolist() == ["c"]
     assert tb.c.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_apply_variable(table_1) -> None:
+    def func(tb):
+        return tb["a"] + 1
+
+    a_ser = pd.DataFrame(table_1).groupby("country").apply(func)
+    a_var = table_1.groupby("country").apply(func)
+    assert a_ser.equals(pd.Series(a_var))
+    assert a_var.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_apply_variable_2(table_1) -> None:
+    def func(tb):
+        return Variable({"c": 1})
+
+    df_out = pd.DataFrame(table_1).groupby("country", as_index=False).apply(func)
+    tb_out = table_1.groupby("country", as_index=False).apply(func)
+    assert df_out.equals(pd.DataFrame(tb_out))
+    assert tb_out.country.m.title == "Country Title"
+
+
+def test_groupby_apply_constant(table_1) -> None:
+    def func(tb):
+        return 1
+
+    df_out = pd.DataFrame(table_1).groupby("country", as_index=False).apply(func)
+    tb_out = table_1.groupby("country", as_index=False).apply(func)
+    assert df_out.equals(pd.DataFrame(tb_out))
+    assert tb_out.country.m.title == "Country Title"
 
 
 def test_groupby_count(table_1) -> None:
