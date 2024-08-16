@@ -836,7 +836,6 @@ include:
   - dag/migrated.yml
   - dag/biodiversity.yml
   - dag/health.yml
-  - dag/excess_mortality.yml
   - dag/environment.yml
   - dag/agriculture.yml
   - dag/space.yml
