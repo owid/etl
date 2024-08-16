@@ -169,8 +169,9 @@ def add_metadata(tb: Table, metadata_tb: Table):
             meta.title = name
             meta.processing = "minor"
             meta.display = {}
-            if metadata["source"] != "":
-                meta.origins[0].producer = metadata["source"]
+
+            if metadata["source"] == "World Bank: Women, Business and the Law. https://wbl.worldbank.org/":
+                meta.origins[0].producer = "World Bank - Women, Business and the Law"
 
             # Convert the 'name' variable to lowercase to make text matching easier
             name_lower = tb[column].title.lower()
