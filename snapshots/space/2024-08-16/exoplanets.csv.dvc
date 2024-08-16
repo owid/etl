@@ -1,6 +1,6 @@
 meta:
   source:
-    name: NASA Exoplanet Archive (2023)
+    name: NASA Exoplanet Archive (2024)
     description: |-
       This dataset makes use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program.
 
@@ -14,11 +14,11 @@ meta:
     url: https://exoplanetarchive.ipac.caltech.edu/index.html
     source_data_url: |-
       https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+distinct+pl_name,disc_year,discoverymethod+from+ps&format=csv
-    date_accessed: 2023-06-09
-    publication_year: 2023
+    date_accessed: 2024-08-16
+    publication_year: 2024
     published_by: |-
       NASA Exoplanet Archive, operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program
-  name: Exoplanets (NASA, 2023)
+  name: Exoplanets (NASA, 2024)
   description: |-
     This dataset makes use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program.
 
@@ -32,3 +32,7 @@ meta:
   license:
     name: Public domain
     url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
+outs:
+  - md5: b987687752e529d6efcb1fdef008ae4d
+    size: 180014
+    path: exoplanets.csv

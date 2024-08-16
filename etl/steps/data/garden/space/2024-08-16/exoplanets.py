@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("exoplanets"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["exoplanets"]
+    tb = ds_meadow["exoplanets"].reset_index()
 
     #
     # Process data.
@@ -58,8 +58,10 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns="N")
 
     # Rename columns
-    tb = tb.rename(columns={"discoverymethod": "entity", "disc_year": "year"}).reset_index(drop=True)
+    tb = tb.rename(columns={"discoverymethod": "country", "disc_year": "year"}).reset_index(drop=True)
     tb.metadata.short_name = "exoplanets"
+
+    tb = tb.set_index(["year", "country"], verify_integrity=True)
 
     #
     # Save outputs.
