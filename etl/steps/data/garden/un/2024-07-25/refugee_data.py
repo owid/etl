@@ -100,6 +100,11 @@ def run(dest_dir: str) -> None:
     tb["resettlement_per_100k_origin"] = tb["resettlement_arrivals_origin"] / tb["population"] * 100_000
     tb["resettlement_per_100k_dest"] = tb["resettlement_arrivals_dest"] / tb["population"] * 100_000
 
+    tb["returned_idpss_origin_per_1000"] = tb["returned_idpss_origin"] / tb["population"] * 1000
+
+    tb["stateless_persons_origin_per_100k"] = tb["stateless_persons_origin"] / tb["population"] * 100_000
+    tb["stateless_persons_asylum_per_100k"] = tb["stateless_persons_asylum"] / tb["population"] * 100_000
+
     # calculate five-year moving averages
     tb["refugees_origin_5y_avg"] = five_year_moving_window(tb, "refugees_under_unhcrs_mandate_origin")
     tb["refugees_origin_5y_avg_per_1000_pop"] = tb["refugees_origin_5y_avg"] / tb["population"] * 1000

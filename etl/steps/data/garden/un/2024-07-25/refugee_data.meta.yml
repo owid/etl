@@ -87,8 +87,14 @@ tables:
         description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_origin:
         title: Stateless persons by country of origin
-        description_short: Number of [stateless persons](#dod:stateless) by the country of origin. This measures the total number of stateless people; not the number per year.
+        description_short: Number of [stateless persons](#dod:stateless) from this country.
         description_from_producer: "{definitions.description_stateless}"
+      stateless_persons_origin_per_100k:
+        title: Stateless persons per 100,000 people in the country of origin
+        description_short: Number of [stateless persons](#dod:stateless) per 100,000 inhabitants in the country of origin.
+        description_from_producer: "{definitions.description_stateless}"
+        display:
+          numDecimalPlaces: 1
       host_community_origin:
         title: People in host communities by country of origin
         description_short: Number of people in [host communities](#dod:host-community) by the country of origin.
@@ -129,8 +135,14 @@ tables:
         description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_asylum:
         title: Stateless persons by country of residence
-        description_short: Number of [stateless persons](#dod:stateless) by the country they live in. This measures the total number of stateless people; not the number per year.
+        description_short: Number of [stateless persons](#dod:stateless) by the country they live in.
         description_from_producer: "{definitions.description_stateless}"
+      stateless_persons_asylum_per_100k:
+        title: Stateless persons per 100,000 people in the country of residence
+        description_short: Number of [stateless persons](#dod:stateless), per 100,000 inhabitants of the country they live in.
+        description_from_producer: "{definitions.description_stateless}"
+        display:
+          numDecimalPlaces: 1
       host_community_asylum:
         title: People in host communities by country of residence
         description_short: Number of people in [host communities](#dod:host-community) in this country.
@@ -151,10 +163,20 @@ tables:
           - "{definitions.description_refugee_general}"
       returned_idpss_origin:
         title: Returned internally displaced people by country
-        description_short: Number of returned [internally displaced people (IDPs)](#dod:internally-displaced) by the country of origin. Only IDPs who returned during the calendar year are included.
+        description_short: |-
+          [Internally displaced people (IDPs)](#dod:internally-displaced) who returned to their home (region) by the country of origin. Only IDPs who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_idp_return}
           - {definitions.description_internally_displaced}
+      returned_idpss_origin_per_1000:
+        title: Returned internally displaced people by country per 1,000 people
+        description_short: |-
+          [Internally displaced people (IDPs)](#dod:internally-displaced) who returned to their home (region), per 1,000 inhabitants of the country of origin. Only IDPs who returned during the calendar year are included.
+        description_from_producer: |-
+          - {definitions.description_idp_return}
+          - {definitions.description_internally_displaced}
+        display:
+          numDecimalPlaces: 1
       resettlement_arrivals_origin:
         title: Resettlement arrivals by country of origin
         description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin, which is the country the refugee originally fled from. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.

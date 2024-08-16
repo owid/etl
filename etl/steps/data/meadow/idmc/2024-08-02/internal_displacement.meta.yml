@@ -100,7 +100,7 @@ tables:
       total_internal_displacements:
         title: Total internal displacements
         description_short: |-
-          Internal displacements due to both conflict and violence and [disaster](#dod:idmc-disaster). Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacements](#dod:displacements) due to both conflict and violence and [disaster](#dod:idmc-disaster). Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -111,7 +111,7 @@ tables:
       displacements_per_1000_people:
         title: Internal displacements per 1000 people
         description_short: |-
-          Internal displacements due to both conflict and [disaster](#dod:idmc-disaster), per 1000 people living in the country. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacements](#dod:displacements) due to both conflict and [disaster](#dod:idmc-disaster), per 1000 people living in the country. Internal displacement describes the movement of a person who is forced to leave their home but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -124,7 +124,8 @@ tables:
           - This figure is the sum of displacements due to conflict and violence and the displacements due to disasters.
       conflict_internal_displacements:
         title: Internal displacements due to conflict
-        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+        description_short: |-
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -133,7 +134,7 @@ tables:
       conflict_displacements_per_1000_people:
         title: Internal displacements due to conflict per 1000 people
         description_short: |-
-          Internal displacement describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to conflict and violence but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -144,7 +145,8 @@ tables:
           - {definitions.processing_notes.population_share}
       disaster_internal_displacements:
         title: Internal displacements due to disaster
-        description_short: Internal displacement describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+        description_short: |-
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
@@ -153,7 +155,7 @@ tables:
       disaster_displacements_per_1000_people:
         title: Internal displacements due to disaster per 1000 people
         description_short: |-
-          Internal displacement describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
+          [Internal displacement](#dod:displacements) describes the movement of a person who is forced to leave their home due to [disaster](#dod:idmc-disaster) but who remains within their country's borders. One person can be displaced multiple times within a calendar year and is then counted multiple times in the data.
         unit: displacements
         short_unit: ""
         description_from_producer: |-
