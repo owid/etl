@@ -1,0 +1,60 @@
+config:
+  options:
+    - type: dropdown
+      name: Metric
+    - type: dropdown
+      name: Interval
+    - type: checkbox
+      name: Relative to population
+
+views:
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
+    options:
+      - Confirmed deaths
+      - 7-day rolling average
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Cumulative
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+    options:
+      - Confirmed deaths
+      - Cumulative
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_7_day_avg_right
+    options:
+      - Confirmed deaths
+      - 7-day rolling average
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths
+    options:
+      - Confirmed deaths
+      - New per day
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million
+    options:
+      - Confirmed deaths
+      - New per day
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths
+    options:
+      - Confirmed deaths
+      - Weekly
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Weekly
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths
+    options:
+      - Confirmed deaths
+      - Biweekly
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Biweekly
+      - True

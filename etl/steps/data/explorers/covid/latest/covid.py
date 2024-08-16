@@ -1,56 +1,52 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
 import pandas as pd
+import yaml
 
 from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-METRIC_DEATHS = {
-    "title": "Confirmed deaths",
-    "rows": {
-        "new_deaths_per_million_7_day_avg_right": {"interval": "7-day rolling average", "relative": True},
-        "total_deaths_per_million": {"interval": "Cumulative", "relative": True},
-        "total_deaths": {"interval": "Cumulative", "relative": False},
-        "new_deaths_7_day_avg_right": {"interval": "7-day rolling average", "relative": False},
-        "new_deaths": {"interval": "New per day", "relative": False},
-        "new_deaths_per_million": {"interval": "New per day", "relative": True},
-        "weekly_deaths": {"interval": "Weekly", "relative": False},
-        "weekly_deaths_per_million": {"interval": "Weekly", "relative": True},
-        "biweekly_deaths": {"interval": "Biweekly", "relative": False},
-        "biweekly_deaths_per_million": {"interval": "Biweekly", "relative": True},
-    },
+
+OPTION_TYPES = {
+    "dropdown": "Dropdown",
+    "checkbox": "Checkbox",
 }
-# missing
-# - avg_right = smoothed?
-# - total_deaths_last12m, total_deaths_last12m_per_million
-# - weekly_deaths_change
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load minerals grapher dataset and read its main table.
-    ds = paths.load_dataset("cases_deaths")
-    tb = ds.read_table("cases_deaths")
+    # Load graphers config from YAML
+    with open(f"{paths.directory}/covid.graphers.yml", "r") as file:
+        graphers = yaml.safe_load(file)
+
+    graphers_config = graphers["config"]
+    graphers_views = graphers["views"]
+
+    option_names = [f"{option['name']} {OPTION_TYPES.get(option['type'])}" for option in graphers_config["options"]]
+
+    # Load necessry tables
+    # ds = paths.load_dataset("cases_deaths")
+    # tb = ds.read_table("cases_deaths")
+
+    # Read all tables
+    # tables = {}
 
     #
     # Process data.
     #
     # Prepare graphers table of explorer.
-    variable_ids = []
-    dropdown_metric = []
-    dropdown_interval = []
-    checkbox_relative = []
 
-    metric_name = METRIC_DEATHS["title"]
-    for column, params in METRIC_DEATHS["rows"].items():
-        # Append extracted values.
-        variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
-        dropdown_metric.append(metric_name)
-        dropdown_interval.append(params["interval"])
-        checkbox_relative.append(params["relative"])
+    records = []
+    for view in graphers_views:
+        record = {
+            "yVariableIds": view["indicator"],
+            **{name: option for name, option in zip(option_names, view["options"])},
+        }
+
+        records.append(record)
 
     # Prepare explorer metadata.
     config = {
@@ -72,11 +68,7 @@ def run(dest_dir: str) -> None:
     }
 
     # Build graphers
-    df_graphers = pd.DataFrame()
-    df_graphers["yVariableIds"] = variable_ids
-    df_graphers["Metric Dropdown"] = dropdown_metric
-    df_graphers["Interval Dropdown"] = dropdown_interval
-    df_graphers["Relative to Population Checkbox"] = checkbox_relative
+    df_graphers = pd.DataFrame.from_records(records)
 
     #
     # Save outputs.
