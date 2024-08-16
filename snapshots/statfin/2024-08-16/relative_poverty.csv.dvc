@@ -26,3 +26,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://stat.fi/org/lainsaadanto/copyright_en.html
+outs:
+  - md5: 71d7a6b1563aa35c84488ee033307932
+    size: 3195
+    path: relative_poverty.csv
