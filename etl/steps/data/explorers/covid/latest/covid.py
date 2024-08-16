@@ -18,18 +18,16 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load graphers config from YAML
-    with open(f"{paths.directory}/covid.graphers.yml", "r") as file:
-        graphers = yaml.safe_load(file)
-
-    graphers_config = graphers["config"]
-    graphers_views = graphers["views"]
-
-    option_names = [f"{option['name']} {OPTION_TYPES.get(option['type'])}" for option in graphers_config["options"]]
+    # Load grapher config from YAML
+    with open(f"{paths.directory}/covid.config.yml", "r") as file:
+        config = yaml.safe_load(file)
+    header = config["config"]
+    grapher_views = config["views"]
+    grapher_options = config["options"]
 
     # Load necessry tables
-    # ds = paths.load_dataset("cases_deaths")
-    # tb = ds.read_table("cases_deaths")
+    ds = paths.load_dataset("cases_deaths")
+    tb = ds.read_table("cases_deaths")
 
     # Read all tables
     # tables = {}
@@ -37,42 +35,51 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Prepare graphers table of explorer.
+    # Prepare grapher table of explorer.
 
     records = []
-    for view in graphers_views:
+    for view in grapher_views:
+        options = bake_options(grapher_options, view["options"])
+        var_ids = bake_ids(view["indicator"])
         record = {
-            "yVariableIds": view["indicator"],
-            **{name: option for name, option in zip(option_names, view["options"])},
+            "yVariableIds": var_ids,
+            **options,
         }
+
+        # optional
 
         records.append(record)
 
-    # Prepare explorer metadata.
-    config = {
-        "explorerTitle": "COVID-19",
-        "explorerSubtitle": "Explore global data on COVID-19.",
-        "selection": [
-            "United States",
-            "Brazil",
-            "Japan",
-            "Germany",
-        ],
-        "downloadDataLink": "https://github.com/owid/covid-19-data/tree/master/public/data",
-        "subNavId": "coronavirus",
-        "subNavCurrentId": "data-explorer-2",
-        "wpBlockId": 43869,
-        "hasMapTab": "true",
-        "yAxisMin": 0,
-        "thumbnail": "https://ourworldindata.org/coronavirus-data-explorer.png",
-    }
-
-    # Build graphers
-    df_graphers = pd.DataFrame.from_records(records)
+    # Build grapher
+    df_grapher = pd.DataFrame.from_records(records)
 
     #
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = create_explorer(dest_dir=dest_dir, config=header, df_graphers=df_grapher)
     ds_explorer.save()
+
+
+def bake_options(graphers_options, view_options):
+    # inputs:
+    # grapher_options, view_options
+
+    dix = {}
+    for i, option in enumerate(graphers_options):
+        title = f"{option['name']} {OPTION_TYPES.get(option['type'])}"
+        if i >= len(view_options):
+            if "default" not in option:
+                raise Exception(f"Value for option {option['name']} not given, and there is no default!")
+            dix[title] = option["default"]
+        else:
+            dix[title] = view_options[i]
+    return dix
+
+
+def bake_ids(var_ids):
+    if isinstance(var_ids, str):
+        return [var_ids]
+    elif isinstance(var_ids, list):
+        return var_ids
+    raise TypeError("Variable ID should either be a string or a list of strings.")

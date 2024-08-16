@@ -1,0 +1,150 @@
+config:
+  explorerTitle: "COVID-19"
+  explorerSubtitle: "Explore global data on COVID-19."
+  selection:
+    - United States
+    - Brazil
+    - Japan
+    - Germany
+  downloadDataLink: "https://github.com/owid/covid-19-data/tree/master/public/data"
+  subNavId: "coronavirus"
+  subNavCurrentId: "data-explorer-2"
+  wpBlockId: 43869
+  hasMapTab: "true"
+  yAxisMin: 0
+  thumbnail: "https://ourworldindata.org/coronavirus-data-explorer.png"
+
+options:
+  - type: dropdown
+    name: Metric
+  - type: dropdown
+    name: Interval
+  - type: checkbox
+    name: Relative to population
+    default: False
+
+views:
+  #######################
+  # Deaths
+  #######################
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
+    options:
+      - Confirmed deaths
+      - 7-day rolling average
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Cumulative
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+    options:
+      - Confirmed deaths
+      - Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_7_day_avg_right
+    options:
+      - Confirmed deaths
+      - 7-day rolling average
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths
+    options:
+      - Confirmed deaths
+      - New per day
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million
+    options:
+      - Confirmed deaths
+      - New per day
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths
+    options:
+      - Confirmed deaths
+      - Weekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Weekly
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths
+    options:
+      - Confirmed deaths
+      - Biweekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Biweekly
+      - True
+
+  #######################
+  # Cases
+  #######################
+  # 7-day smooth
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right
+    options:
+      - Confirmed cases
+      - 7-day rolling average
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
+    options:
+      - Confirmed cases
+      - 7-day rolling average
+      - True
+  # Daily
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_cases
+    options:
+      - Confirmed cases
+      - New per day
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million
+    options:
+      - Confirmed cases
+      - New per day
+      - True
+  # Weekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases
+    options:
+      - Confirmed cases
+      - Weekly
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_cases_per_million
+    options:
+      - Confirmed cases
+      - Weekly
+      - True
+  # Biweekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases
+    options:
+      - Confirmed cases
+      - Biweeekly
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases_per_million
+    options:
+      - Confirmed cases
+      - Biweeekly
+      - True
+  # Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases
+    options:
+      - Confirmed cases
+      - Cumulative
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases_per_million
+    options:
+      - Confirmed cases
+      - Cumulative
+      - True
+
+  #######################
+  # Cases and Deaths
+  #######################
+  - indicator:
+      - grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
+      - grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
+    options:
+      - Cases and deaths
+      - 7-day rolling average
+      - True
+
+# MISSING
+# Deaths: total_deaths_last12m_per_million, total_deaths_last12m, weekly_deaths_change, biweekly_deaths_change (gt_0?)
+# Cases: weekly_cases_change, biweekly_cases_change (gt_0?)
+
