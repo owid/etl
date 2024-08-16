@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import ast
+import json
 from typing import Dict, List
 
 import pandas as pd
@@ -961,6 +962,28 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
     regions_to_remove = [region for region in regions if region != "World"]
     tb = tb.loc[~tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    # We noticed that imports/exports data have:
+    # * Only data for European countries (and Turkey) from 2003 onwards. Check this:
+    regions = ds_regions["regions"]
+    europe = regions.loc[json.loads(regions[regions["name"] == "Europe"]["members"].item())]["name"].unique().tolist()
+    error = "Expected only European countries (including Turkey) imports/exports data after 2002."
+    assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
+        set(europe) | set(["United Kingdom", "Turkey", "World"])
+    ), error
+    assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
+        set(europe) | set(["United Kingdom", "Turkey", "World"])
+    ), error
+    # * Only UK data from 2019 onwards. Check this:
+    error = "Expected only UK imports/exports data after 2018."
+    assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
+        ["United Kingdom", "World"]
+    ), error
+    assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
+        ["United Kingdom", "World"]
+    ), error
+    # Therefore, it only makes sense to have global imports/exports data until 2002.
+    tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), ["imports", "exports"]] = None
 
     return tb
 
