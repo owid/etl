@@ -146,7 +146,7 @@ steps:
   data://garden/chartbook/2024-08-15/jantti_2010_finland:
     - data://meadow/chartbook/2024-08-15/jantti_2010_finland
 
-  # Gini and relative poverty from Statistics Finland (live)
+  # Gini, relative poverty and wealth share from Statistics Finland (live)
   data://meadow/statfin/2024-08-16/statistics_finland_inequality:
     - snapshot://statfin/2024-08-16/gini_coefficient.csv
     - snapshot://statfin/2024-08-16/relative_poverty.csv
