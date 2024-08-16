@@ -9,6 +9,11 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
+# Go to https://www.space-track.org and log in
+# Go to Query Builder
+# Use the following parameters: Class = gp, Order by = OBJECT_ID, Format = CSV
+# Click on BUILD QUERY then RUN QUERY to download the CSV
+
 
 @click.command()
 @click.option(

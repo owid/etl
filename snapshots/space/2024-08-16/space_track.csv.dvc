@@ -1,6 +1,6 @@
 meta:
   source:
-    name: United States Space Force (2023)
+    name: United States Space Force (2024)
     description: |-
       This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
 
@@ -8,10 +8,10 @@ meta:
 
       In our charts, low Earth orbit is defined by a periapsis altitude below 2,000 kilometers; medium Earth orbit between 2,000 and 35,586 kilometers; geostationary orbit between 35,586 and 35,986 kilometers; high Earth orbit above 35,986 kilometers.
     url: https://www.space-track.org/
-    date_accessed: 2023-06-09
-    publication_year: 2023
+    date_accessed: 2024-08-16
+    publication_year: 2024
     published_by: 18th Space Defense Squadron, United States Space Force
-  name: Number of objects in space (United States Space Force, 2023)
+  name: Number of objects in space (United States Space Force, 2024)
   description: |-
     This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
 
@@ -19,5 +19,9 @@ meta:
 
     In our charts, low Earth orbit is defined by a periapsis altitude below 2,000 kilometers; medium Earth orbit between 2,000 and 35,586 kilometers; geostationary orbit between 35,586 and 35,986 kilometers; high Earth orbit above 35,986 kilometers.
   license:
-    name: Space-Track.org  User Agreement
+    name: Space-Track.org User Agreement
     url: https://www.space-track.org/documentation#user_agree
+outs:
+  - md5: 6c8472d731b17b1adb9dae1e04c510e1
+    size: 34167655
+    path: space_track.csv
