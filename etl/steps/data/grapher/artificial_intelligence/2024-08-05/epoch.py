@@ -76,20 +76,14 @@ def find_max_label_and_concat(tb, column, label):
     - Preserves original data and system names.
     - Adds new summary rows with "system" set to f"Maximum {label}".
     """
-    # Find indices of maximum values for each year
     idx = tb[[column, "year"]].fillna(0).groupby("year")[column].idxmax()
 
-    # Initialize the max column with "Other"
     tb[f"max_{label}"] = "Other"
-
-    # Label the maximum rows as "Maximum {label}"
     tb.loc[idx, f"max_{label}"] = f"Maximum {label}"
 
-    # Create new rows for maximum values
     max_rows = tb.loc[idx].copy()
     max_rows["system"] = f"Maximum {label}"
 
-    # Concatenate new rows to the original table
     tb = pr.concat([tb, max_rows], ignore_index=True)
 
     return tb
