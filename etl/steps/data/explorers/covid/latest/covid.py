@@ -21,6 +21,10 @@ RELATED = {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
+    "Cases and deaths": {
+        "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
+        "link": "https://ourworldindata.org/covid-jhu-who",
+    },
     "Case fatality rate": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",

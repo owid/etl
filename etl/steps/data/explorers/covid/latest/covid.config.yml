@@ -27,15 +27,7 @@ views:
   #######################
   # Deaths
   #######################
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
-    options:
-      - Confirmed deaths
-      - Cumulative
-      - True
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
-    options:
-      - Confirmed deaths
-      - Cumulative
+  # 7-day smooth
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
     options:
       - Confirmed deaths
@@ -45,15 +37,7 @@ views:
     options:
       - Confirmed deaths
       - 7-day rolling average
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths
-    options:
-      - Confirmed deaths
-      - Weekly
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths_per_million
-    options:
-      - Confirmed deaths
-      - Weekly
-      - True
+  # Daily
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths
     options:
       - Confirmed deaths
@@ -64,6 +48,21 @@ views:
       - Confirmed deaths
       - New per day
       - True
+  # Weekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths
+    options:
+      - Confirmed deaths
+      - Weekly
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Weekly
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_pct_growth_deaths
+    options:
+      - Confirmed deaths
+      - Weekly change
+  # Biweekly
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths
     options:
       - Confirmed deaths
@@ -73,6 +72,20 @@ views:
       - Confirmed deaths
       - Biweekly
       - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_pct_growth_deaths
+    options:
+      - Confirmed deaths
+      - Biweekly change
+  # Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Cumulative
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+    options:
+      - Confirmed deaths
+      - Cumulative
 
   #######################
   # Cases
@@ -110,6 +123,10 @@ views:
       - Confirmed cases
       - Weekly
       - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_pct_growth_cases
+    options:
+      - Confirmed deaths
+      - Weekly change
   # Biweekly
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases
     options:
@@ -121,6 +138,10 @@ views:
       - Confirmed cases
       - Biweeekly
       - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_pct_growth_cases
+    options:
+      - Confirmed deaths
+      - Biweekly change
   # Cumulative
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases
     options:
@@ -145,7 +166,19 @@ views:
       - True
     title: Daily new confirmed COVID-19 cases & deaths per million people
 
+  #######################
+  # CFR
+  #######################
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#cfr
+    options:
+      - Case fatality rate
+      - Cumulative
+
+  # - indicator: grapher/covid/latest/cases_deaths/cases_deaths#cfr_short_term
+  #   options:
+  #     - Case fatality rate
+  #     - 7-day rolling average
 # MISSING
-# Deaths: total_deaths_last12m_per_million, total_deaths_last12m, weekly_deaths_change, biweekly_deaths_change (gt_0?)
-# Cases: weekly_cases_change, biweekly_cases_change (gt_0?)
+# Deaths: total_deaths_last12m_per_million, total_deaths_last12m
+# CFR: cfr_short_term
 
