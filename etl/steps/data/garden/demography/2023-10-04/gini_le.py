@@ -58,6 +58,7 @@ def run(dest_dir: str) -> None:
 
     # Estimates
     tb = tb.groupby(["location", "year", "sex"], as_index=False).apply(gini_from_mx)
+    tb.life_expectancy_gini.m.origins = origins
 
     # Rename columns
     paths.log.info("gini_le: rename columns")
@@ -70,9 +71,6 @@ def run(dest_dir: str) -> None:
     # Update metadata
     paths.log.info("gini_le: metadata")
     tb.metadata.short_name = paths.short_name
-    # Propagate origins metadata (unsure why this has not been propagated?)
-    for col in tb.columns:
-        tb[col].metadata.origins = origins
 
     #
     # Save outputs.

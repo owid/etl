@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: StatFin - Statistics on living conditions
+    description: |-
+      The statistics on living conditions describe the living conditions of households and persons by population group on different topics, such as the risk of poverty or social exclusion, perceived health and well-being, economic situation and housing.
+
+      The statistics on living conditions is prepared annually from statistical data set based on a sample survey.  Besides the statistics on living conditions, data from it is produced for income distribution statistics and a separate data set for EU statistical office, Eurostat’s international, comparative Statistics on Income and Living Conditions (EU-SILC).
+
+      The statistical data set is compiled in accordance with the EU frame regulation in force concerning social statistics (EU) 1700/2019 (in 2003–2020 (EU) 1177/2003) and with implementation regulations (e.g. (EU) 2019/2242) concerning EU Statistics on Income and Living Conditions (EU-SILC).
+    date_published: "2024-03-28"
+    title_snapshot: StatFin - Statistics on living conditions - 13wk -- Household population's risk of poverty indicators by age and sex
+
+    # Citation
+    producer: Statistics Finland
+    citation_full: |-
+      Statistics Finland (2024), Statistics on living conditions - 13wk -- Household population's risk of poverty indicators by age and sex.
+
+    # Files
+    url_main: https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/StatFin__eot/statfin_eot_pxt_13wk.px/
+    date_accessed: 2024-08-16
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://stat.fi/org/lainsaadanto/copyright_en.html
+outs:
+  - md5: 71d7a6b1563aa35c84488ee033307932
+    size: 3195
+    path: relative_poverty.csv

@@ -83,7 +83,14 @@ def checksum_dict(d: Dict[str, Any]) -> str:
 
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
-    "Return the md5 hex digest of the file without using cache."
+    """Return the md5 hex digest of the file without using cache.
+
+    Python 3.11 has a built-in function for this. It could be rewritten as
+    ```
+    with open(filename, "rb") as f:
+        return hashlib.file_digest(f, "md5").hexdigest()
+    ```
+    """
     chunk_size = 2**20
     _hash = hashlib.md5()
     with open(filename, "rb") as istream:
