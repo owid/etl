@@ -150,6 +150,7 @@ steps:
   data://meadow/statfin/2024-08-16/statistics_finland_inequality:
     - snapshot://statfin/2024-08-16/gini_coefficient.csv
     - snapshot://statfin/2024-08-16/relative_poverty.csv
+    - snapshot://statfin/2024-08-16/share_wealth.csv
   data://garden/statfin/2024-08-16/statistics_finland_inequality:
     - data://meadow/statfin/2024-08-16/statistics_finland_inequality
 
