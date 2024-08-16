@@ -29,8 +29,7 @@ METRICS = {
     "internal_displ_conflict": "Internally displaced persons (conflict)",
     "internal_displ_disaster": "Internally displaced persons (disaster)",
     "returned_idps": "Returned internally displaced persons",
-    "stateless_persons_origin": "Stateless persons by origin",
-    "stateless_persons_asylum": "Stateless persons by destination",
+    "stateless_persons_asylum": "Stateless persons by residence",
     "remittance_gdp": "Remittances as share of GDP",
     "remittance_cost_ob": "Cost of sending remittances",
     "remittance_cost_ib": "Cost of receiving remittances",
@@ -266,24 +265,10 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "stateless_persons_origin": {
-        "metric": METRICS["stateless_persons_origin"],
-        "period_radio": P_TOTAL,
-        "sub_metric_radio": SM_TOTAL,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
     "stateless_persons_asylum": {
         "metric": METRICS["stateless_persons_asylum"],
         "period_radio": P_TOTAL,
         "sub_metric_radio": SM_TOTAL,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
-    "stateless_persons_origin_per_100k": {
-        "metric": METRICS["stateless_persons_origin"],
-        "period_radio": P_TOTAL,
-        "sub_metric_radio": SM_SHARE,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
@@ -698,6 +683,10 @@ MAP_BRACKETS = {
         "colorScaleScheme": "YlGnBu",
         "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 0],
     },
+    "returned_idpss_origin": {
+        "colorScaleScheme": "BuGn",
+        "colorScaleNumericBins": [1000.0, 10000.0, 100000.0, 1000000.0, 0],
+    },
     "returned_refugees_origin": {
         "colorScaleScheme": "BuGn",
         "colorScaleNumericBins": [10.0, 100.0, 1000.0, 10000.0, 100000.0, 0],
@@ -713,6 +702,10 @@ MAP_BRACKETS = {
     "resettlement_arrivals_dest": {
         "colorScaleScheme": "BuGn",
         "colorScaleNumericBins": [30.0, 100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 0],
+    },
+    "stateless_persons_asylum": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [10.0, 100.0, 300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 0],
     },
     "refugees_per_1000_pop_origin": {
         "colorScaleScheme": "YlOrRd",
@@ -730,6 +723,10 @@ MAP_BRACKETS = {
         "colorScaleScheme": "YlGnBu",
         "colorScaleNumericBins": [1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 0.0],
     },
+    "returned_idpss_origin_per_1000": {
+        "colorScaleScheme": "BuGn",
+        "colorScaleNumericBins": [0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
+    },
     "resettlement_per_100k_origin": {
         "colorScaleScheme": "YlGnBu",
         "colorScaleNumericBins": [0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 0],
@@ -737,6 +734,10 @@ MAP_BRACKETS = {
     "resettlement_per_100k_dest": {
         "colorScaleScheme": "BuGn",
         "colorScaleNumericBins": [1.0, 3.0, 10.0, 30.0, 100.0, 0],
+    },
+    "stateless_persons_asylum_per_100k": {
+        "colorScaleScheme": "YlGnBu",
+        "colorScaleNumericBins": [0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 300.0, 1000.0, 0],
     },
     "immigrants_all": {
         "colorScaleScheme": "YlGnBu",
