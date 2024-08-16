@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: StatFin - Income distribution statistics
+    description: |-
+      The income distribution statistics describe the structure and distribution of households' and household-dwelling units' income by population group and region in Finland. The statistics are compiled annually and their data content is based on international recommendations (OECD (2013) OECD Framework for Statistics on the Distribution of Household Income, Consumption and Wealth. OECD Publishing; UNECE (2011) Canberra Group Handbook on Household Income Statistics, Second edition 2011). The income distribution statistics comprehensibly describe households' disposable monetary income, which is the primary income concept of the income distribution statistics. Another main income concept is factor income, i.e. wages and salaries, entrepreneurial and property income, current transfers received, as well as current transfers paid. Several indicators are produced based on the statistics, the main being the Gini coefficient describing income differentials, the average and median of households' and household-dwelling units' income, and the relative at-risk-of-poverty rate.
+
+      The total data on income distribution are entirely register-based data on the income of persons and household-dwelling units covering the entire population and they enable compilation of statistics according to detailed classifications, especially regionally. They are the primary national data source for describing income differentials by population group and regional income. The time series data of the total data have been compiled in a comparable manner starting from 1995.
+
+      The sample data are internationally comparable and they are available from 1966 onwards. The sample data are formed in compliance with the Regulation on ESS EU-SILC statistics (Regulation (EC) No 1177/2003 of the European Parliament and of the Council). Due to limitations related to representativeness, the sample data are not suitable for detailed income distribution examinations between regions or population groups. On the other hand, the sample data utilise classifications and background data, in accordance with which data are not included in the total data. The most important of these classifications is socio-economic group.
+    date_published: "2023-12-19"
+    title_snapshot: StatFin - Income distribution statistics - 11x3 -- Gini coefficients and other income inequality measures
+    description_snapshot: |-
+      The Gini index takes a value of 0 if everyone receives the same amount of income, and a value of 100 if one income recipient receives all the income. The higher the Gini coefficient, the greater the income disparities.
+
+      Data from the years 1986-1994 are from the sample-based income distribution survey, and from 1966-1981 from the Household Budget Survey. Since 1995, the primary source of data has been the full population entirely register-based dataset of the income distribution statistics.
+
+    # Citation
+    producer: Statistics Finland
+    citation_full: |-
+      Statistics Finland (2023), Income distribution statistics - 11x3 -- Gini coefficients and other income inequality measures.
+
+    # Files
+    url_main: https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/StatFin__tjt/statfin_tjt_pxt_11x3.px
+    date_accessed: 2024-08-16
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://stat.fi/org/lainsaadanto/copyright_en.html
+
+outs:
+  - md5: 5e5dc07ffb406db6e5c861e06e371287
+    size: 1598
+    path: gini_coefficient.csv
