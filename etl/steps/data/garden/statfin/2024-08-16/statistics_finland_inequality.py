@@ -18,6 +18,12 @@ RELATIVE_POVERTY_COLUMNS = {
     "at_risk_of_poverty_rate__threshold_60_pct_of_median": "relative_poverty",
 }
 
+WEALTH_COLUMNS = {
+    "year": "year",
+    "net_wealth_mean_per_all_households_all_households": "mean",
+    "net_wealth_mean_per_all_households_x__wealthiest": "p90p100",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -29,11 +35,13 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_gini = ds_meadow["gini_coefficient"].reset_index()
     tb_rel = ds_meadow["relative_poverty"].reset_index()
+    tb_wealth = ds_meadow["share_wealth"].reset_index()
 
     #
     # Process data.
     #
-    tb = merge_tables_and_format(tb_gini, tb_rel)
+    tb = merge_tables_and_format(tb_gini, tb_rel, tb_wealth)
+    tb = calculate_wealth_share(tb)
     #
     # Save outputs.
     #
@@ -46,21 +54,36 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def merge_tables_and_format(tb_gini: Table, tb_rel: Table) -> Table:
+def merge_tables_and_format(tb_gini: Table, tb_rel: Table, tb_wealth: Table) -> Table:
     """
     Merge gini and relative poverty tables, delete unnecessary columns, and format the table.
     """
     # Keep necessary columns and rename them.
     tb_gini = tb_gini[GINI_COLUMNS.keys()].rename(columns=GINI_COLUMNS)
     tb_rel = tb_rel[RELATIVE_POVERTY_COLUMNS.keys()].rename(columns=RELATIVE_POVERTY_COLUMNS)
+    tb_wealth = tb_wealth[WEALTH_COLUMNS.keys()].rename(columns=WEALTH_COLUMNS)
 
     # Merge tables.
-    tb = pr.merge(tb_gini, tb_rel, on=["year"], how="outer", short_name=paths.short_name)
+    tb = pr.multi_merge([tb_gini, tb_rel, tb_wealth], on=["year"], how="outer", short_name=paths.short_name)
 
     # Add country column.
     tb["country"] = "Finland"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
+
+    return tb
+
+
+def calculate_wealth_share(tb: Table) -> Table:
+    """
+    Calculate the share of wealth held by the top 10% of the population.
+    This is done by multiplying the mean by the size group (0.1) and dividing by the mean at the top 10%.
+    """
+
+    tb["share_p90p100"] = tb["p90p100"] * 0.1 / tb["mean"] * 100
+
+    # Remove unnecessary columns.
+    tb = tb.drop(columns=["mean", "p90p100"])
 
     return tb

@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: StatFin - Households' assets
+    description: |-
+      Statistics on households’ assets describe total amount, structure and distribution of wealth among different population groups. Data are published at household and person levels. Household-level data are published around every three years and person-level data about once a year.
+    date_published: "2021-08-06"
+    title_snapshot: StatFin - Households' assets -  136z -- Assets, liabilities and income of households by net wealth decile group in
+    description_snapshot: |-
+      The figures for 1987-2004, 2009, 2013 and 2016-2019 are not fully comparable with each other. The method of the statistics changed significantly in 2009.
+
+      Median and quartiles are conditional on owning the asset. Mean is average over all households.
+
+      Net wealth. Includes all assets collected for the survey in each statistical year.
+
+      Data coverage varies and is not directly comparable over time.
+
+    # Citation
+    producer: Statistics Finland
+    citation_full: |-
+      Statistics Finland (2021), Households' assets -  136z -- Assets, liabilities and income of households by net wealth decile group in.
+
+    # Files
+    url_main: https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/StatFin__vtutk/statfin_vtutk_pxt_136z.px/
+    date_accessed: 2024-08-16
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://stat.fi/org/lainsaadanto/copyright_en.html
+
+outs:
+  - md5: 297f02a5f03e9b25b58e2e73ccd761da
+    size: 308
+    path: share_wealth.csv
