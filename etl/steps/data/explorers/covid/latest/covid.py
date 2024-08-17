@@ -68,8 +68,8 @@ def run(dest_dir: str) -> None:
     grapher_options = config["options"]
 
     # Load necessry tables
-    ds = paths.load_dataset("cases_deaths")
-    tb = ds.read_table("cases_deaths")
+    # ds = paths.load_dataset("cases_deaths")
+    # tb = ds.read_table("cases_deaths")
 
     # Read all tables
     # tables = {}
