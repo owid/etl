@@ -1,5 +1,4 @@
 steps:
-
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
     - snapshot-private://covid/latest/sequence.json
@@ -19,7 +18,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
-
 
   # JHU - cases and deaths
   data://meadow/covid/latest/john_hopkins_university:
@@ -168,6 +166,8 @@ steps:
   # Explorer
   data://explorers/covid/latest/covid:
     - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
 
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:

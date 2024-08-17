@@ -165,6 +165,80 @@ views:
       - 7-day rolling average
       - True
     title: Daily new confirmed COVID-19 cases & deaths per million people
+    subtitle: 7-day rolling average. Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
+    hasMapTab: False
+
+  #######################
+  # Hospital patients
+  #######################
+  - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_hosp
+    options:
+      - Hospital patients
+      - Daily
+
+  - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_hosp_per_1m
+    options:
+      - Hospital patients
+      - Daily
+      - True
+
+  #######################
+  # Hospital admissions
+  #######################
+  - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_hosp
+    options:
+      - Hospital admissions
+      - Weekly
+
+  - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_hosp_per_1m
+    options:
+      - Hospital admissions
+      - Weekly
+      - True
+
+  #######################
+  # ICU patients
+  #######################
+  - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_icu
+    options:
+      - ICU patients
+      - Daily
+
+  - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_icu_per_1m
+    options:
+      - ICU patients
+      - Daily
+      - True
+
+  #######################
+  # ICU admissions
+  #######################
+  - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_icu
+    options:
+      - ICU patients
+      - Weekly
+
+  - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_icu_per_1m
+    options:
+      - ICU patients
+      - Weekly
+      - True
+
+  #######################
+  # Cases, hospital admissions, ICU patients, and deaths
+  #######################
+  - indicator:
+      - grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
+      - grapher/covid/latest/hospital/hospital#weekly_admissions_hosp_per_1m
+      - grapher/covid/latest/hospital/hospital#weekly_admissions_icu_per_1m
+      - grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
+    options:
+      - Cases, hospital admissions, ICU patients, and deaths
+      - 7-day rolling average
+      - True
+    title: Confirmed COVID-19 cases, deaths, hospital admissions, and patients in ICU per million people
+    subtitle: Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
+    hasMapTab: False
 
   #######################
   # CFR
@@ -174,11 +248,114 @@ views:
       - Case fatality rate
       - Cumulative
 
-  # - indicator: grapher/covid/latest/cases_deaths/cases_deaths#cfr_short_term
-  #   options:
-  #     - Case fatality rate
-  #     - 7-day rolling average
+  #######################
+  # Vaccine doses
+  #######################
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations
+    options:
+      - Vaccine doses
+      - Cumulative
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred
+    options:
+      - Vaccine doses
+      - Cumulative
+      - True
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#daily_vaccinations_smoothed
+    options:
+      - Vaccine doses
+      - 7-day rolling average
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#daily_vaccinations_smoothed_per_million
+    options:
+      - Vaccine doses
+      - 7-day rolling average
+      - True
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#daily_vaccinations
+    options:
+      - Vaccine doses
+      - New per day
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_6m
+    options:
+      - Vaccine doses
+      - 6-month rolling total
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_6m_per_hundred
+    options:
+      - Vaccine doses
+      - 6-month rolling total
+      - True
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_9m
+    options:
+      - Vaccine doses
+      - 9-month rolling total
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_9m_per_hundred
+    options:
+      - Vaccine doses
+      - 9-month rolling total
+      - True
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_12m
+    options:
+      - Vaccine doses
+      - 12-month rolling total
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#rolling_vaccinations_12m_per_hundred
+    options:
+      - Vaccine doses
+      - 12-month rolling total
+      - True
+
+  #######################
+  # Vaccine booster doses
+  #######################
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#total_boosters
+    options:
+      - Vaccine booster doses
+      - Cumulative
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#total_boosters_per_hundred
+    options:
+      - Vaccine booster doses
+      - Cumulative
+      - True
+
+  #######################
+  # Vaccine doses (by type)
+  #######################
+  # TODO
+
+  #######################
+  # People vaccinated
+  #######################
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#people_vaccinated
+    options:
+      - People vaccinated
+      - Cumulative
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#people_vaccinated_per_hundred
+    options:
+      - People vaccinated
+      - Cumulative
+      - True
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#daily_people_vaccinated_smoothed
+    options:
+      - People vaccinated
+      - 7-day rolling average
+
+  - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#daily_people_vaccinated_smoothed_per_hundred
+    options:
+      - People vaccinated
+      - 7-day rolling average
+      - True
 # MISSING
 # Deaths: total_deaths_last12m_per_million, total_deaths_last12m
 # CFR: cfr_short_term
+# Vax: total_no_boosters
 

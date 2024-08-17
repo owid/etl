@@ -15,7 +15,6 @@ definitions:
       numDecimalPlaces: 2
       <<: *zero_day
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -28,109 +27,197 @@ tables:
       total_vaccinations:
         title: COVID-19 doses (cumulative)
         description_short: Total number of COVID-19 vaccination doses administered.
-        unit: 'doses'
+        unit: "doses"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: COVID-19 vaccine doses administered
+            subtitle: All doses, including boosters, are counted individually.
       people_vaccinated:
         title: People vaccinated (cumulative)
         description_short: Total number of people who received at least one vaccine dose.
-        unit: 'people'
+        unit: "people"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Number of people who received at least one dose of COVID-19 vaccine
+            subtitle: Total number of people who received at least one vaccine dose.
       people_fully_vaccinated:
         title: People fully vaccinated (cumulative)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol.
-        unit: 'people'
+        unit: "people"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
       total_boosters:
         title: Booster doses (cumulative)
         description_short: |-
           Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol).
-        unit: 'doses'
+        unit: "doses"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: COVID-19 vaccine boosters administered
+            subtitle: Total number of vaccine booster doses administered. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
 
       total_vaccinations_interpolated:
         title: COVID-19 doses (cumulative, interpolated)
         description_short: Total number of COVID-19 vaccination doses administered. Linearly interpolated values.
-        unit: 'doses'
+        unit: "doses"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
       people_vaccinated_interpolated:
         title: People vaccinated (cumulative, interpolated)
         description_short: Total number of people who received at least one vaccine dose. Linearly interpolated values.
-        unit: 'people'
+        unit: "people"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
       people_fully_vaccinated_interpolated:
         title: People fully vaccinated (cumulative, interpolated)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol. Linearly interpolated values.
-        unit: 'people'
+        unit: "people"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
       total_boosters_interpolated:
         title: Booster doses (cumulative, interpolated)
         description_short: |-
           Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol). Linearly interpolated values.
-        unit: 'doses'
+        unit: "doses"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *zero_day
 
       daily_vaccinations:
         title: COVID-19 doses (daily)
         description_short: New COVID-19 vaccination doses administered (only calculated for consecutive days).
-        unit: 'doses'
+        unit: "doses"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Daily COVID-19 vaccine doses administered
+            subtitle: All doses, including boosters, are counted individually.
       daily_vaccinations_smoothed:
         title: COVID-19 doses (daily, 7-day average)
         description_short: |-
           New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window
-        unit: 'people'
+        unit: "people"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Daily COVID-19 vaccine doses administered
+            subtitle: 7-day rolling average. All doses, including boosters, are counted individually.
       daily_vaccinations_smoothed_per_million:
         title: COVID-19 doses (daily, 7-day average, per million people)
         description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
-        unit: 'doses per million people'
+        unit: "doses per million people"
         description_processing: *per_capita
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Daily COVID-19 vaccine doses administered per 100 people
+            subtitle: 7-day rolling average. All doses, including boosters, are counted individually.
 
       daily_people_vaccinated_smoothed:
         title: People vaccinated (daily, 7-day average)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed).
-        unit: 'people'
+        unit: "people"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Daily number of people receiving a first COVID-19 vaccine dose
+            subtitle: 7-day rolling average
       daily_people_vaccinated_smoothed_per_hundred:
         title: People vaccinated (daily, 7-day average, per million people)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
-        unit: 'people per hundred people'
+        unit: "people per hundred people"
         description_processing: *per_capita
-
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Daily share of the population receiving a first COVID-19 vaccine dose
+            subtitle: 7-day rolling average
 
       total_vaccinations_per_hundred:
         title: COVID-19 doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
-        unit: 'doses per hundred people'
+        unit: "doses per hundred people"
         description_processing: *per_capita
+        display:
+          numDecimalPlaces: 2
+          tolerance: 9999
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: COVID-19 vaccine doses administered per 100 people
+            subtitle: All doses, including boosters, are counted individually.
+
       people_vaccinated_per_hundred:
         title: People vaccinated (cumulative, per hundred)
         description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
-        unit: 'people per hundred people'
+        unit: "people per hundred people"
         description_processing: *per_capita
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Share of people who received at least one dose of COVID-19 vaccine
+            subtitle: Total number of people who received at least one vaccine dose, divided by the total population of the country.
       people_fully_vaccinated_per_hundred:
         title: People fully vaccinated (cumulative, per hundred)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
-        unit: 'people per hundred people'
+        unit: "people per hundred people"
         description_processing: *per_capita
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
       total_boosters_per_hundred:
         title: Booster doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
-        unit: 'doses per hundred people'
+        unit: "doses per hundred people"
         description_processing: *per_capita
+        display:
+          numDecimalPlaces: 2
+          tolerance: 14
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: COVID-19 vaccine boosters administered per 100 people
+            subtitle: Total number of vaccine booster doses administered, divided by the total population of the country. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
 
       people_unvaccinated:
         title: Unvaccinated people (cumulative)
@@ -144,22 +231,30 @@ tables:
           14-day rolling average. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
         unit: boosters
 
-
-
       rolling_vaccinations_6m:
         title: COVID-19 doses (last 6 months)
         description_short: Total number of COVID-19 vaccination doses administered in the last 6 months.
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 6 months?
+            subtitle: The value shown for each date is the total number of vaccine doses administered in the 6 months preceding that date. All doses, including boosters, are counted individually.
       rolling_vaccinations_6m_per_hundred:
         title: COVID-19 doses (last 6 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 6 months, per hundred people.
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 6 months?
+            subtitle: Per 100 people in the population. The value shown for each date is the total number of vaccine doses administered in the 6 months preceding that date. All doses, including boosters, are counted individually.
         description_processing: *per_capita
       rolling_vaccinations_9m:
         title: COVID-19 doses (last 9 months)
@@ -167,27 +262,47 @@ tables:
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 9 months?
+            subtitle: The value shown for each date is the total number of vaccine doses administered in the 9 months preceding that date. All doses, including boosters, are counted individually.
       rolling_vaccinations_9m_per_hundred:
         title: COVID-19 doses (last 9 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 9 months, per hundred people.
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
         description_processing: *per_capita
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 9 months?
+            subtitle: Per 100 people in the population. The value shown for each date is the total number of vaccine doses administered in the 9 months preceding that date. All doses, including boosters, are counted individually.
       rolling_vaccinations_12m:
         title: COVID-19 doses (last 12 months)
         description_short: Total number of COVID-19 vaccination doses administered in the last 12 months.
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 12 months?
+            subtitle: The value shown for each date is the total number of vaccine doses administered in the 12 months preceding that date. All doses, including boosters, are counted individually.
       rolling_vaccinations_12m_per_hundred:
         title: COVID-19 doses (last 12 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 12 months, per hundred people.
         unit: doses
         display:
           numDecimalPlaces: 0
+          tolerance: 14
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: How many COVID-19 vaccine doses were administered in the previous 12 months?
+            subtitle: Per 100 people in the population. The value shown for each date is the total number of vaccine doses administered in the 12 months preceding that date. All doses, including boosters, are counted individually.
         description_processing: *per_capita
