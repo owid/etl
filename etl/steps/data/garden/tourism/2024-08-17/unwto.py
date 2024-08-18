@@ -14,7 +14,7 @@ paths = PathFinder(__file__)
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
 # Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+FRAC_ALLOWED_NANS_PER_YEAR = 0.999
 # Define accepted overlaps
 ACCEPTED_OVERLAPS = [
     {year: {"Serbia and Montenegro", "Serbia"} for year in range(1995, 2023)},
