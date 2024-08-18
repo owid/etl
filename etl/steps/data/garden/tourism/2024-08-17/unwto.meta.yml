@@ -254,15 +254,15 @@ tables:
         unit: '%'
 
       business_personal_ratio:
-        title: Business and professional visitors as a share of all international visitors
-        unit: '%'
+        title: Ratio of business and professional visitors to personal visitors
+        unit: ratio
 
       inbound_outbound_tourism:
-        title: Inbound and outbound tourism
+        title: Inbound to outbound travel ratio
         unit: ratio
 
       same_day_tourist_ratio:
-        title: Same-day visitors as a share of all international visitors
+        title: Same-day visitors to overnight tourists ratio
         unit: ratio
 
       in_tour_arrivals_ovn_vis_tourists_per_1000:
