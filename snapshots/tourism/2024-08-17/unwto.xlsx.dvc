@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: 145 key tourism statistics
+    description: |-
+      The United Nations World Tourism Organization (UNWTO) collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation), Outbound Tourism (including Departures and Tourism expenditure in other countries), Tourism Industries (such as Accommodation in hotels and similar establishments), and Employment (including the number of employees in tourism industries).
+    date_published: "2024-01-31"
+
+    # Citation
+    producer: UNWTO
+    citation_full: |-
+      World Tourism Organization (2024), 145 Key Tourism Statistics, UNWTO, Madrid:
+      https://www.unwto.org/tourism-statistics/key-tourism-statistics [17-08-2024].
+
+    # Files
+    url_main: https://www.unwto.org/tourism-statistics/key-tourism-statistics
+    url_download: https://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2024-07/unwto-all-data-download_2022.xlsx
+    date_accessed: 2024-08-17
+
+    # License
+    license:
+      name: © UNWTO
+
+outs:
+  - md5: 38c3a175d10dc91e07c815f58668f4cf
+    size: 3617309
+    path: unwto.xlsx

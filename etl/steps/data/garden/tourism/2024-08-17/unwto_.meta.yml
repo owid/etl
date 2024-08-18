@@ -1,0 +1,298 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+  desc_key_arrivals: &desc_key_arrivals
+      - When an individual visits a country multiple times within a year, each visit is counted as a separate arrival.
+      - Similarly, if a person travels to multiple countries during a single trip, their arrival in each country is recorded individually.
+      - As a result, the number of arrivals does not necessarily reflect the number of individuals traveling, as one person can generate multiple arrivals.
+      - Note that before 2006, the US counted same-day trips from Canada only. After 2006, day trips from Mexico were also included.
+  descr_key_domestic: &descr_key_domestic
+      -  A domestic tourism trip refers to the travel of a visitor from the time of leaving their usual residence until they return.
+      -  When an individual travels domestically multiple times within a year, each journey is counted as a separate trip.
+  descr_key_purpose: &descr_key_purpose
+      - The main purpose of a trip is defined as the purpose in the absence of which the trip would not have taken place.
+      - Visits for personal reasons include holidays, leisure, and recreation; visiting friends and relatives; education and training; health and medical care; religion/pilgrimages; shopping; transit; and other miscellaneous reasons.
+  desc_key_departures: &desc_key_departures
+      - Tourist departures data track the movement of locals who travel abroad and come back on the same day.
+      - When an individual leaves its residence country multiple times within a year, each visit is counted as a separate departure.
+      - As a result, the number of departures does not necessarily reflect the number of individuals traveling, as one person can generate multiple departures.
+  desc_key_exp: &desc_key_exp
+      - Expenditures associated with international visitors are traditionally categorized under the travel item of the Balance of Payments (BOP). For inbound tourism, these expenses are recorded as "credits" in the BOP and referred to as "travel receipts".
+      - It's important to note that BOP estimates also include expenditures related to other types of travelers, such as long-term students, patients, border workers, and seasonal workers, which can be substantial in some countries.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  unwto:
+    variables:
+      in_tour_arrivals_of_which_cruise_pass:
+        title: Inbound arrivals of cruise passengers
+        unit: arrivals
+        description_key: *desc_key_arrivals
+
+      in_tour_arrivals_ovn_vis_tourists:
+        title: Inbound arrivals of tourists
+        unit: arrivals
+        description_short: Trips by people who arrive from abroad and stay overnight.
+        description_key: *desc_key_arrivals
+
+      in_tour_arrivals_same_day_vis_excur:
+        title: Inbound arrivals of same-day visitors
+        unit: arrivals
+        description_short: Trips by people who arrive from abroad and return home on the same day.
+        description_key: *desc_key_arrivals
+
+      in_tour_arrivals_total:
+        title: Inbound arrivals of all visitors
+        unit: arrivals
+        description_key: *desc_key_arrivals
+
+      dom_tour_accom_hotels_and_similar_estab_guests:
+        title: Domestic tourists staying in hotels and similar establishments
+        unit: guests
+
+      dom_tour_accom_hotels_and_similar_estab_ovn:
+        title: Domestic overnight stays in hotels and similar establishments
+        unit: nights
+
+      dom_tour_accom_total_guests:
+        title: Domestic tourists staying in all types of accommodation
+        unit: guests
+
+      dom_tour_accom_total_ovn:
+        title: Domestic overnight stays in all types of accommodation
+        unit: nights
+
+      dom_tour_trips_ovn_vis_tourists:
+        title: Domestic trips by overnight tourists
+        unit: trips
+
+      dom_tour_trips_same_day_vis_excur:
+        title: Domestic trips by same-day visitors
+        unit: trips
+
+      dom_tour_trips_total:
+        title: Domestic trips by all visitors
+        unit: trips
+
+      employment_accom_services_for_vis_hotels_and_similar_estab:
+        title: Employment in accommodation services for visitors
+        unit: persons
+
+      employment_food_and_beverage_serving_act:
+        title: Employment in food and beverage serving activities
+        unit: persons
+
+      employment_other_accom_services:
+        title: Employment in other accommodation services
+        unit: persons
+
+      employment_other_tour_ind:
+        title: Employment in other tourism industries
+        unit: persons
+
+      employment_passenger_trans:
+        title: Employment in passenger transport
+        unit: persons
+
+      employment_travel_agencies_and_other_reservatio_services_act:
+        title: Employment in travel agencies and other reservation services
+        unit: persons
+
+      employment_total:
+        title: Total employment in tourism industries
+        unit: persons
+
+      in_tour_accom_hotels_and_similar_estab_guests:
+        title: International tourists staying in hotels and similar establishments
+        unit: guests
+
+      in_tour_accom_hotels_and_similar_estab_ovn:
+        title: International overnight stays in hotels and similar establishments
+        unit: nights
+
+      in_tour_accom_total_guests:
+        title: International tourists staying in all types of accommodation
+        unit: guests
+
+      in_tour_accom_total_ovn:
+        title: International overnight stays in all types of accommodation
+        unit: nights
+
+      in_tour_exp_passenger_transport:
+        title: International expenditure on passenger transport
+        unit: US dollars
+
+      in_tour_exp_travel:
+        title: International expenditure on travel
+        unit: US dollars
+
+      in_tour_exp_the_country:
+        title: International expenditure in the country
+        unit: US dollars
+
+      in_tour_purpose_business_and_prof:
+        title: International tourists visiting for business and professional purposes
+        unit: arrivals
+
+      in_tour_purpose_personal:
+        title: International tourists visiting for personal purposes
+        unit: arrivals
+
+      in_tour_purpose_total:
+        title: International tourists visiting for all purposes
+        unit: arrivals
+
+      in_tour_regions_of_which_nat_res_abroad:
+        title: International tourists visiting natural and rural areas abroad
+        unit: arrivals
+
+      in_tour_regions_africa:
+        title: International tourists visiting from Africa
+        unit: arrivals
+
+      in_tour_regions_americas:
+        title: International tourists visiting from the Americas
+        unit: arrivals
+
+      in_tour_regions_east_asia_and_the_pacific:
+        title: International tourists visiting from East Asia and the Pacific
+        unit: arrivals
+
+      in_tour_regions_europe:
+        title: International tourists visiting from Europe
+        unit: arrivals
+
+      in_tour_regions_middle_east:
+        title: International tourists visiting from the Middle East
+        unit: arrivals
+
+      in_tour_regions_other_not_class:
+        title: International tourists visiting from other regions not classified
+        unit: arrivals
+
+      in_tour_regions_south_asia:
+        title: International tourists visiting from South Asia
+        unit: arrivals
+
+      in_tour_regions_total:
+        title: International tourists visiting from all regions
+        unit: arrivals
+
+      in_tour_transport_air:
+        title: International tourists arriving by air
+        unit: arrivals
+
+      in_tour_transport_land:
+        title: International tourists arriving by land
+        unit: arrivals
+      in_tour_transport_water:
+        title: International tourists arriving by water
+        unit: arrivals
+
+      in_tour_transport_total:
+        title: International tourists arriving by all modes of transport
+        unit: arrivals
+
+      out_tour_departures_ovn_vis_tourists:
+        title: Outbound departures of overnight tourists
+        unit: departures
+
+      out_tour_departures_same_day_vis_excur:
+        title: Outbound departures of same-day visitors
+        unit: departures
+
+      out_tour_departures_total:
+        title: Outbound departures of all visitors
+        unit: departures
+
+      out_tour_exp_passenger_transport:
+        title: Outbound expenditure on passenger transport
+        unit: US dollars
+
+      out_tour_exp_travel:
+        title: Outbound expenditure on travel
+        unit: US dollars
+
+      out_tour_exp_in_other_countries:
+        title: Outbound expenditure in other countries
+        unit: US dollars
+
+      tour_ind_avail_cap_bed_places_per_1000_inhabitans:
+        title: Tourism industry availability capacity of bed places per 1000 inhabitants
+        unit: bed places per 1000 inhabitants
+
+      tour_ind_avg_length_of_stay:
+        title: Tourism industry average length of stay
+        unit: nights
+
+      tour_ind_num_of_bed_places:
+        title: Tourism industry number of bed places
+        unit: bed places
+
+      tour_ind_num_of_estab:
+        title: Tourism industry number of establishments
+        unit: establishments
+
+      tour_ind_num_of_rooms:
+        title: Tourism industry number of rooms
+        unit: rooms
+
+      tour_ind_occ_rate_bed_places:
+        title: Tourism industry occupancy rate of bed places
+        unit: '%'
+        short_unit: '%'
+
+      tour_ind_occ_rate_rooms:
+        title: Tourism industry occupancy rate of rooms
+        unit: '%'
+
+      business_personal_ratio:
+        title: Business and professional visitors as a share of all international visitors
+        unit: '%'
+
+      inbound_outbound_tourism:
+        title: Inbound and outbound tourism
+        unit: ratio
+
+      same_day_tourist_ratio:
+        title: Same-day visitors as a share of all international visitors
+        unit: ratio
+
+      in_tour_arrivals_ovn_vis_tourists_per_1000:
+        title: Inbound arrivals of tourists per 1000 inhabitants
+        unit: arrivals per 1000 inhabitants
+
+      in_tour_arrivals_same_day_vis_excur_per_1000:
+        title: Inbound arrivals of same-day visitors per 1000 inhabitants
+        unit: arrivals per 1000 inhabitants
+
+      dom_tour_trips_ovn_vis_tourists_per_1000:
+        title: Domestic trips by overnight tourists per 1000 inhabitants
+        unit: trips per 1000 inhabitants
+
+      dom_tour_trips_same_day_vis_excur_per_1000:
+        title: Domestic trips by same-day visitors per 1000 inhabitants
+        unit: trips per 1000 inhabitants
+
+      employment_food_and_beverage_serving_act_per_1000:
+        title: Employment in food and beverage serving activities per 1000 inhabitants
+        unit: persons per 1000 inhabitants
+
+      employment_total_per_1000:
+        title: Total employment in tourism industries per 1000 inhabitants
+        unit: persons per 1000 inhabitants
+
+      inbound_tourism_by_region:
+        title: Inbound tourism by region
+        unit: arrivals
+        description_key:
+          - The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence.
+          - However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
+
