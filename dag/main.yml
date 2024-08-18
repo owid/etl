@@ -856,3 +856,4 @@ include:
   - dag/natural_disasters.yml
   - dag/chartbook.yml
   - dag/minerals.yml
+  - dag/tourism.yml
