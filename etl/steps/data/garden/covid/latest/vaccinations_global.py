@@ -333,14 +333,29 @@ def add_rolling_indicators(tb: Table) -> Table:
     """Add total doses in the last 6, 9 and 12 months."""
     # Make sure all dates are present
     assert tb.groupby("country").date.diff().dt.days.max() == 1, "Some dates are missing!"
-    last_known_date = tb.loc[tb["total_vaccinations"].notnull(), "date"].max()
+
+    tb = tb.sort_values(["country", "date"])
+    tb = tb.set_index("date")
     for n_months in (6, 9, 12):
-        n_days = round(365.2425 * n_months / 12)
+        # n_days = round(number=365.2425 * n_months / 12)
+        # tb[f"rolling_vaccinations_{n_months}m"] = (
+        #     tb.groupby("country")["new_vaccinations_interpolated"].rolling(n_days, min_periods=1).sum()
+        # )
         tb[f"rolling_vaccinations_{n_months}m"] = (
-            tb.groupby("country")["total_vaccinations_interpolated"].diff().rolling(n_days, min_periods=1).sum()
+            tb.groupby("country")["new_vaccinations_interpolated"]
+            .rolling("180D", min_periods=1)
+            .sum()
+            .reset_index(0, drop=True)  # type: ignore
         )
-        tb.loc[tb["date"] > last_known_date, f"rolling_vaccinations_{n_months}m"] = np.nan
+        # Per capita
         tb[f"rolling_vaccinations_{n_months}m_per_hundred"] = (
             tb[f"rolling_vaccinations_{n_months}m"] * 100 / tb["population_2022"]
         )
+
+    tb = tb.reset_index()
+    # Filter dates w/o data
+    tb_date_max = tb.dropna(subset=["total_vaccinations"]).groupby("country")["date"].max()
+    tb = tb.merge(tb_date_max.to_frame().reset_index(), on="country", suffixes=("", "_max"))
+    tb = tb.loc[tb["date"] <= tb["date_max"]]
+    tb = tb.drop(columns=["date_max"])
     return tb
