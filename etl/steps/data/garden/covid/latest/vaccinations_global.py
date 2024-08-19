@@ -337,13 +337,13 @@ def add_rolling_indicators(tb: Table) -> Table:
     tb = tb.sort_values(["country", "date"])
     tb = tb.set_index("date")
     for n_months in (6, 9, 12):
-        # n_days = round(number=365.2425 * n_months / 12)
+        n_days = round(number=365.2425 * n_months / 12)
         # tb[f"rolling_vaccinations_{n_months}m"] = (
         #     tb.groupby("country")["new_vaccinations_interpolated"].rolling(n_days, min_periods=1).sum()
         # )
         tb[f"rolling_vaccinations_{n_months}m"] = (
             tb.groupby("country")["new_vaccinations_interpolated"]
-            .rolling("180D", min_periods=1)
+            .rolling(f"{n_days}D", min_periods=1)
             .sum()
             .reset_index(0, drop=True)  # type: ignore
         )
