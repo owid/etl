@@ -154,6 +154,12 @@ steps:
   data://garden/statfin/2024-08-16/statistics_finland_inequality:
     - data://meadow/statfin/2024-08-16/statistics_finland_inequality
 
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-16/atkinson_2008_finland:
+    - snapshot://chartbook/2024-08-16/atkinson_2008_finland.xls
+  data://garden/chartbook/2024-08-16/atkinson_2008_finland:
+    - data://meadow/chartbook/2024-08-16/atkinson_2008_finland
+
   ################################################################################################
   # FRANCE
   ################################################################################################
