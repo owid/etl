@@ -46,6 +46,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+          name: Positive test rate
           tolerance: 10
           <<: *zero_day
         presentation:

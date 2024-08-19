@@ -242,6 +242,7 @@ tables:
         display:
           numDecimalPlaces: 3
           tolerance: 10
+          name: New tests (per 1,000)
           <<: *display_common
         presentation:
           grapher_config:
