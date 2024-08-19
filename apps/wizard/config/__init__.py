@@ -2,7 +2,6 @@
 
 It basically reads the configuration from .wizard.yml and renders the home page and other details.
 """
-from typing import Literal
 
 import yaml
 

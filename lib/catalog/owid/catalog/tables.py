@@ -910,6 +910,9 @@ class Table(pd.DataFrame):
     def assign(self, *args, **kwargs) -> "Table":
         return super().assign(*args, **kwargs)  # type: ignore
 
+    def reorder_levels(self, *args, **kwargs) -> "Table":
+        return super().reorder_levels(*args, **kwargs)  # type: ignore
+
     @staticmethod
     def _update_log(tb: "Table", other: Union[Scalar, Series, variables.Variable, "Table"], operation: str) -> None:  # type: ignore
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
@@ -1032,10 +1035,6 @@ class Table(pd.DataFrame):
         """Calling Table.from_records returns a Table, but does not call __init__ and misses metadata."""
         df = super().from_records(*args, **kwargs)
         return Table(df)
-
-    @classmethod
-    def reorder_levels(cls, *args, **kwargs) -> "Table":
-        return Table(super().reorder_levels(*args, **kwargs))
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:

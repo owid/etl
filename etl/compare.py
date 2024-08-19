@@ -141,7 +141,11 @@ def etl_catalog(
     """
     try:
         remote_df = catalog.find_latest(
-            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version  # type: ignore[reportArgumentType]
+            table=table,
+            namespace=namespace,
+            dataset=dataset,
+            channels=[channel],
+            version=version,  # type: ignore[reportArgumentType]
         )
     except Exception as e:
         if debug:
