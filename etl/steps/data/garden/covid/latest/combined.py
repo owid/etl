@@ -90,11 +90,15 @@ def add_test_case_ratios(tb: Table) -> Table:
 
     NOTE: all is smoothed by a 7-day rolling window average.
     """
+    ## Tests per cases
     tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
     tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
     ## Cases per tests
     tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
     tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
+
+    ## Replace too-high values with NaNs
+    tb.loc[tb["short_term_positivity_rate"] > 95, "short_term_positivity_rate"] = np.nan
 
     # Replace infinite values
     cols = [
