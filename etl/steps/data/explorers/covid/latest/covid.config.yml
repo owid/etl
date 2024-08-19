@@ -226,22 +226,22 @@ views:
       - True
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#weekly_pct_growth_cases
     options:
-      - Confirmed deaths
+      - Confirmed cases
       - Weekly change
   # Biweekly
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases
     options:
       - Confirmed cases
-      - Biweeekly
+      - Biweekly
       - False
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_cases_per_million
     options:
       - Confirmed cases
-      - Biweeekly
+      - Biweekly
       - True
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_pct_growth_cases
     options:
-      - Confirmed deaths
+      - Confirmed cases
       - Biweekly change
   # Cumulative
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases
@@ -278,12 +278,14 @@ views:
     options:
       - Hospital patients
       - Daily
+    subtitle: " "
 
   - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_hosp_per_1m
     options:
       - Hospital patients
       - Daily
       - True
+    subtitle: " "
 
   #######################
   # Hospital admissions
@@ -306,24 +308,25 @@ views:
     options:
       - ICU patients
       - Daily
+    subtitle: " "
 
   - indicator: grapher/covid/latest/hospital/hospital#daily_occupancy_icu_per_1m
     options:
       - ICU patients
       - Daily
       - True
+    subtitle: " "
 
   #######################
   # ICU admissions
   #######################
   - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_icu
     options:
-      - ICU patients
+      - ICU admissions
       - Weekly
-
   - indicator: grapher/covid/latest/hospital/hospital#weekly_admissions_icu_per_1m
     options:
-      - ICU patients
+      - ICU admissions
       - Weekly
       - True
 
@@ -470,7 +473,7 @@ views:
 
   - indicator: grapher/covid/latest/vaccinations_global/vaccinations_global#people_fully_vaccinated_per_hundred
     options:
-      - Vaccine booster doses
+      - People fully vaccinated
       - Cumulative
       - True
 
@@ -533,28 +536,26 @@ views:
       - grapher/covid/latest/sequence/variants#perc_sequences__variant_beta
       - grapher/covid/latest/sequence/variants#perc_sequences__variant_gamma
       - grapher/covid/latest/sequence/variants#perc_sequences__variant_delta
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__ba
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__bq_1
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__xbb
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__ch_1_1
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__eg_5_1
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__hk_3
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__jn
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_omicron__kp_3
-      - grapher/covid/latest/sequence/variants#num_sequences__variant_non_relevant
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__ba
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__bq_1
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__xbb
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__ch_1_1
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__eg_5_1
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__hk_3
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__jn
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_omicron__kp_3
+      - grapher/covid/latest/sequence/variants#perc_sequences__variant_non_relevant
     options:
       - Variants
       - Biweekly
     title: SARS-CoV-2 sequences by variant
     subtitle: The share of analyzed sequences in the preceding two weeks that correspond to each variant group.
     hasMapTab: False
-    selectedFacetStrategy: metric
-    facetYDomain: independent
     sortBy: column
     sortColumnSlug: Omicron
     hideTotalValueLabel: True
     type: StackedDiscreteBar
-
+    note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
   #######################
   # Omicron variant (share)
   #######################
@@ -564,13 +565,14 @@ views:
       - Biweekly
     title: Share of SARS-CoV-2 sequences that are the omicron variant
     subtitle: Share of omicron variant in all analyzed sequences in the preceding two weeks.
+    timelineMinTime: 600
 
   #######################
   # Delta variant (share)
   #######################
   - indicator: grapher/covid/latest/sequence/variants#perc_sequences__variant_delta
     options:
-      - Omicron variant (share)
+      - Delta variant (share)
       - Biweekly
     title: Share of SARS-CoV-2 sequences that are the delta variant
     subtitle: Share of delta variant in all analyzed sequences in the last two weeks.
@@ -587,7 +589,8 @@ views:
       - Daily
     title: "COVID-19: Stringency Index"
     subtitle: The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest).
-
+    selectedFacetStrategy: metric
+    facetYDomain: independent
   #######################
   # Reproduction rate
   #######################

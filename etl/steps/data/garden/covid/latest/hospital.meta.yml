@@ -86,6 +86,7 @@ tables:
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU)
+            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
       daily_occupancy_icu_per_1m:
         title: Daily ICU occupancy per million
         description_short: Number of COVID-19 patients in ICU on a given day, per million people.
@@ -100,6 +101,7 @@ tables:
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU) per million people
+            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
 
       weekly_admissions_icu:
         title: Weekly new ICU admissions
@@ -115,6 +117,7 @@ tables:
           grapher_config:
             title: Weekly new ICU admissions for COVID-19
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
+            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
       weekly_admissions_icu_per_1m:
         title: Weekly new ICU admissions per million
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days), per million people.
@@ -129,3 +132,4 @@ tables:
           grapher_config:
             title: Weekly new ICU admissions for COVID-19 per million people
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
+            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).

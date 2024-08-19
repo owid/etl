@@ -378,7 +378,7 @@ tables:
         presentation:
           grapher_config:
             title: Case fatality rate of COVID-19
-            subtitle: The case fatality rate (CFR) is the ratio between confirmed deaths and confirmed cases. The CFR can be a poor measure of the mortality risk of the disease. We explain this in detail at https://OurWorldInData.org/mortality-risk-covid
+            subtitle: The case fatality rate (CFR) is the ratio between confirmed deaths and confirmed cases. The CFR can be a poor measure of the mortality risk of the disease.
       cfr_100_cases:
         title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
         unit: "%"

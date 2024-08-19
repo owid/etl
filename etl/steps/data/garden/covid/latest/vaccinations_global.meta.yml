@@ -60,6 +60,7 @@ tables:
           grapher_config:
             title: Number of people who completed the initial COVID-19 vaccination protocol
             subtitle: Total number of people who received all doses prescribed by the initial vaccination protocol.
+            note: Alternative definitions of a full vaccination, e.g. having been infected with SARS-CoV-2 and having 1 dose of a 2-dose protocol, are ignored to maximize comparability between countries.
       total_boosters:
         title: Booster doses (cumulative)
         description_short: |-
@@ -144,7 +145,7 @@ tables:
           <<: *zero_day
         presentation:
           grapher_config:
-            title: Daily COVID-19 vaccine doses administered per 100 people
+            title: Daily COVID-19 vaccine doses administered per million people
             subtitle: 7-day rolling average. All doses, including boosters, are counted individually.
 
       daily_people_vaccinated_smoothed:
@@ -162,7 +163,7 @@ tables:
       daily_people_vaccinated_smoothed_per_hundred:
         title: People vaccinated (daily, 7-day average, per million people)
         description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
-        unit: "people per hundred people"
+        unit: "%"
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
@@ -181,6 +182,7 @@ tables:
         display:
           numDecimalPlaces: 2
           tolerance: 9999
+          name: Vaccine doses (per 100)
           <<: *zero_day
         presentation:
           grapher_config:
@@ -190,11 +192,13 @@ tables:
       people_vaccinated_per_hundred:
         title: People vaccinated (cumulative, per hundred)
         description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
-        unit: "people per hundred people"
+        unit: "%"
+        short_unit: "%"
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
           tolerance: 9999
+          name: Share of people with at least one dose
           <<: *zero_day
         presentation:
           grapher_config:
@@ -203,16 +207,19 @@ tables:
       people_fully_vaccinated_per_hundred:
         title: People fully vaccinated (cumulative, per hundred)
         description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
-        unit: "people per hundred people"
+        unit: "%"
+        short_unit: "%"
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
           tolerance: 9999
+          name: Share of people with a complete initial protocol
           <<: *zero_day
         presentation:
           grapher_config:
             title: Share of people who completed the initial COVID-19 vaccination protocol
             subtitle: Total number of people who received all doses prescribed by the initial vaccination protocol, divided by the total population of the country.
+            note: Alternative definitions of a full vaccination, e.g. having been infected with SARS-CoV-2 and having 1 dose of a 2-dose protocol, are ignored to maximize comparability between countries.
       total_boosters_per_hundred:
         title: Booster doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
@@ -221,6 +228,7 @@ tables:
         display:
           numDecimalPlaces: 2
           tolerance: 9999
+          name: Booster doses (per 100)
           <<: *zero_day
         presentation:
           grapher_config:
@@ -254,7 +262,7 @@ tables:
       rolling_vaccinations_6m_per_hundred:
         title: COVID-19 doses (last 6 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 6 months, per hundred people.
-        unit: doses
+        unit: "%"
         display:
           numDecimalPlaces: 0
           tolerance: 14
@@ -279,7 +287,7 @@ tables:
       rolling_vaccinations_9m_per_hundred:
         title: COVID-19 doses (last 9 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 9 months, per hundred people.
-        unit: doses
+        unit: "%"
         display:
           numDecimalPlaces: 0
           tolerance: 14
@@ -304,7 +312,7 @@ tables:
       rolling_vaccinations_12m_per_hundred:
         title: COVID-19 doses (last 12 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 12 months, per hundred people.
-        unit: doses
+        unit: "%"
         display:
           numDecimalPlaces: 0
           tolerance: 14

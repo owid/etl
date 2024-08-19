@@ -13,7 +13,6 @@ definitions:
       numDecimalPlaces: 0
       <<: *common_display
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -23,7 +22,6 @@ dataset:
 tables:
   variants:
     variables:
-
       num_sequences:
         title: "Number of sequenced COVID-19 genomes - Variant: << variant >>"
         description_short: |-
@@ -34,8 +32,9 @@ tables:
           <% else %>
           The number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>
-        unit: 'sequenced genomes'
+        unit: "sequenced genomes"
         display:
+          tolerance: 28
           name: |-
             <% if variant == 'non_who' %>
             Other
@@ -56,10 +55,11 @@ tables:
           <% else %>
           The share of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
+          tolerance: 28
           name: |-
             <% if variant == 'non_who' %>
             Other
@@ -69,28 +69,29 @@ tables:
             << variant >>
             <%- endif -%>
           <<: *common_display
-
+        presentation:
+          grapher_config:
+            note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
 
   sequencing:
     variables:
-
       variant_dominant:
         title: Dominant variant
         description_short: |-
           The COVID-19 variant with the highest number of sequenced genomes in the preceding two weeks. Only estimated when the number of sequences is above 30.
-        unit: ''
+        unit: ""
 
       num_sequences:
         title: Number of sequenced COVID-19 genomes
         description_short: |-
           Number of samples of COVID-19 genome that have been sequenced in the preceding two weeks to determine which mutations it has.
-        unit: 'sequenced genomes'
+        unit: "sequenced genomes"
 
       num_sequences_per_1m:
         title: Number of sequenced COVID-19 genomes (per million people)
         description_short: |-
           Number of samples of COVID-19 genome that have been sequenced in the preceding two weeks to determine which mutations it has.
-        unit: 'sequenced genomes per million people'
+        unit: "sequenced genomes per million people"
         display:
           numDecimalPlaces: 3
           <<: *common_display
@@ -99,13 +100,13 @@ tables:
         title: Cumulative number of sequenced COVID-19 genomes
         description_short: |-
           The cumulative number of COVID-19 genomes that have been sequenced in the preceding two weeks to determine which mutations it has.
-        unit: 'sequenced genomes'
+        unit: "sequenced genomes"
 
       num_sequences_cumulative_per_1m:
         title: Cumulative number of sequenced COVID-19 genomes (per million people)
         description_short: |-
           The cumulative number of COVID-19 genomes that have been sequenced in the preceding two weeks to determine which mutations it has.
-        unit: 'sequenced genomes per million people'
+        unit: "sequenced genomes per million people"
         display:
           numDecimalPlaces: 3
           <<: *common_display
