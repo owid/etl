@@ -331,11 +331,13 @@ def add_interp_cum_indicators(tb: Table) -> Table:
 
 def add_rolling_indicators(tb: Table) -> Table:
     """Add total doses in the last 6, 9 and 12 months."""
+    # Make sure all dates are present
+    assert tb.groupby("country").date.diff().dt.days.max() == 1, "Some dates are missing!"
     last_known_date = tb.loc[tb["total_vaccinations"].notnull(), "date"].max()
     for n_months in (6, 9, 12):
         n_days = round(365.2425 * n_months / 12)
         tb[f"rolling_vaccinations_{n_months}m"] = (
-            tb["total_vaccinations_interpolated"].diff().rolling(n_days, min_periods=1).sum()
+            tb.groupby("country")["total_vaccinations_interpolated"].diff().rolling(n_days, min_periods=1).sum()
         )
         tb.loc[tb["date"] > last_known_date, f"rolling_vaccinations_{n_months}m"] = np.nan
         tb[f"rolling_vaccinations_{n_months}m_per_hundred"] = (
