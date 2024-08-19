@@ -1152,7 +1152,7 @@ class TableGroupBy:
         elif isinstance(mem["table"], variables.Variable) and isinstance(df, Table):
             # func returns Variable
             out = _create_table(df, self.metadata, self._fields)
-            if mem["table"].name:
+            if mem["table"].name and mem["table"].name in out.columns:
                 out[mem["table"].name].metadata = mem["table"].metadata
             return out
         else:
