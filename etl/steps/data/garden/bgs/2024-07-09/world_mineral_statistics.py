@@ -701,7 +701,9 @@ FOOTNOTES = {
 # There are many historical regions with overlapping data with their successor countries.
 # Accept only overlaps on the year when the historical country stopped existing.
 # NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
-# create data for continents, then build an aggregate for the world, and then remove continents.
+#  create data for continents, then build an aggregate for the world, and then remove continents.
+#  World data aggregated in this step will be used in the garden minerals step to compare it with the World data given
+#  by USGS. But the World data created in this step will then be removed and not shown in the minerals explorer.
 # NOTE: Some of the overlaps occur only for certain commodities.
 ACCEPTED_OVERLAPS = [
     # {1991: {"USSR", "Armenia"}},
