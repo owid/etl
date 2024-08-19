@@ -69,6 +69,7 @@ tables:
         display:
           numDecimalPlaces: 0
           tolerance: 9999
+          name: Booster doses
           <<: *zero_day
         presentation:
           grapher_config:
@@ -106,6 +107,23 @@ tables:
         unit: "doses"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
+          name: Booster doses
+          <<: *zero_day
+      total_vaccinations_no_boosters_interpolated:
+        title: Initial doses (cumulative, interpolated)
+        description_short: Total number of inital doses. Total number of COVID-19 vaccination intial doses administered (doses administered as prescribed by the initial vaccination protocol).
+        unit: doses
+        display:
+          name: Initial protocol doses
+          tolerance: 9999
+          <<: *zero_day
+      total_vaccinations_no_boosters_per_hundred_interpolated:
+        title: Initial doses (cumulative, interpolated, per hundred)
+        description_short: Total number of inital doses. Total number of COVID-19 vaccination intial doses administered (doses administered as prescribed by the initial vaccination protocol).
+        unit: doses
+        display:
+          name: Initial protocol doses (per 100)
           tolerance: 9999
           <<: *zero_day
 
@@ -245,7 +263,7 @@ tables:
         title: Share of daily COVID-19 doses that are boosters
         description_short: |-
           14-day rolling average. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
-        unit: boosters
+        unit: ""
 
       rolling_vaccinations_6m:
         title: COVID-19 doses (last 6 months)
@@ -262,7 +280,7 @@ tables:
       rolling_vaccinations_6m_per_hundred:
         title: COVID-19 doses (last 6 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 6 months, per hundred people.
-        unit: "%"
+        unit: "doses per hundred people"
         display:
           numDecimalPlaces: 0
           tolerance: 14
@@ -287,7 +305,7 @@ tables:
       rolling_vaccinations_9m_per_hundred:
         title: COVID-19 doses (last 9 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 9 months, per hundred people.
-        unit: "%"
+        unit: "doses per hundred people"
         display:
           numDecimalPlaces: 0
           tolerance: 14
@@ -312,7 +330,7 @@ tables:
       rolling_vaccinations_12m_per_hundred:
         title: COVID-19 doses (last 12 months, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered in the last 12 months, per hundred people.
-        unit: "%"
+        unit: "doses per hundred people"
         display:
           numDecimalPlaces: 0
           tolerance: 14

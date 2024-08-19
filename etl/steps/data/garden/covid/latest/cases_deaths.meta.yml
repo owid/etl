@@ -383,3 +383,17 @@ tables:
         title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
         unit: "%"
         short_unit: "%"
+      cfr_short_term:
+        title: Case fatality rate of COVID-19 (short-term, %)
+        description_processing: |-
+          We compute number of deaths divided by number of cases 10 days before.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 2
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Moving-average case fatality rate of COVID-19
+            subtitle: The case fatality rate (CFR) is the ratio between confirmed deaths and confirmed cases. Our rolling-average CFR is calculated as the ratio between the 7-day average number of deaths and the 7-day average number of cases 10 days earlier.

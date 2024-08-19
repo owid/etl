@@ -78,6 +78,9 @@ def run(dest_dir: str) -> None:
     # Add interpolation of cumultive indicators
     tb = add_interp_cum_indicators(tb)
 
+    # Add 'no-boosters'
+    tb = add_no_boosters(tb)
+
     # Add rolling indicators
     tb = add_rolling_indicators(tb)
 
@@ -266,6 +269,17 @@ def add_people_unvaccinated(tb: Table, ds_population: Dataset) -> Table:
     tb["people_unvaccinated"] = tb["population"] - tb["people_vaccinated"]
     tb.loc[tb["people_unvaccinated"] < 0, "people_unvaccinated"] = 0
     tb["people_unvaccinated"].m.presentation.attribution = None
+    return tb
+
+
+def add_no_boosters(tb: Table) -> Table:
+    """Get number of doses that are not boosters."""
+    tb["total_vaccinations_no_boosters_interpolated"] = (
+        tb["total_vaccinations_interpolated"] - tb["total_boosters_interpolated"]
+    )
+    tb["total_vaccinations_no_boosters_per_hundred_interpolated"] = (
+        tb["total_vaccinations_per_hundred"] - tb["total_boosters_per_hundred"]
+    )
     return tb
 
 

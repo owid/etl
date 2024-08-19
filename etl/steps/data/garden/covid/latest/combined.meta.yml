@@ -67,3 +67,13 @@ tables:
         description_short: |-
           Boolean value indicating if a country has had more than 100 cased in the last 21 days, has testing data and has more than 5 million population.
         unit: ""
+
+      share_cases_sequenced:
+        title: Share of cases that are sequenced
+        description_short: Share of confirmed cases for which the genome of the virus has been sequenced to determine which mutations it has.
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            title: Share of confirmed COVID-19 cases sequenced
+            subtitle: Share of confirmed cases for which the genome of the virus has been sequenced to determine which mutations it has.

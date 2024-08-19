@@ -327,9 +327,25 @@ def add_cfr(tb: Table) -> Table:
     tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1)
     tb["cfr_100_cases"] = tb["cfr_100_cases"].copy_metadata(tb["cfr"])
 
+    # short-term CFR
+    cfr_day_shift = 10  # We compute number of deaths divided by number of cases `cfr_day_shift` days before.
+    tb = tb.sort_values("date")
+    shifted_cases = tb.groupby("country")["new_cases_7_day_avg_right"].shift(cfr_day_shift)
+    tb["cfr_short_term"] = 100 * (tb["new_deaths_7_day_avg_right"].div(shifted_cases))
+
+    tb.loc[
+        (tb["cfr_short_term"] < 0) | (tb["cfr_short_term"] > 10) | (tb["date"].astype(str) < "2020-09-01"),
+        "cfr_short_term",
+    ] = np.nan
+
     # Replace inf
-    tb["cfr"] = tb["cfr"].replace([np.inf, -np.inf], pd.NA)
-    tb["cfr_100_cases"] = tb["cfr_100_cases"].replace([np.inf, -np.inf], pd.NA)
+    cols = [
+        "cfr",
+        "cfr_100_cases",
+        "cfr_short_term",
+    ]
+    for col in cols:
+        tb[col] = tb[col].replace([np.inf, -np.inf], pd.NA)
     return tb
 
 
