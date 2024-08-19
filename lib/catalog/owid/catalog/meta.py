@@ -35,7 +35,7 @@ class MetaBase:
         """Hash that uniquely identifies an object (without needing frozen dataclass)."""
         return _hash_any(self)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: Self) -> bool:  # type: ignore
         if not isinstance(other, self.__class__):
             return False
         return self.__hash__() == other.__hash__()
@@ -141,7 +141,7 @@ class Origin(MetaBase):
     # Date when the dataset was accessed
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
-    date_published: Optional[YearDateLatest] = None
+    date_published: Optional[Union[YearDateLatest, str]] = None
     # License of the dataset
     license: Optional[License] = None
 

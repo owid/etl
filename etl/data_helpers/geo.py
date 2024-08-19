@@ -5,7 +5,7 @@ import json
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Dict, Hashable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -848,7 +848,8 @@ def add_gdp_to_table(
 def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: str = "members") -> Table:
     # Subregion type can be "members" or "successors" (or in principle also "related").
     # Get the main table from the regions dataset.
-    tb_regions = ds_regions["regions"][["name", subregion_type]]
+    tb_regions = ds_regions["regions"]
+    tb_regions = tb_regions.loc[:, ["name", subregion_type]]
 
     # Get a mapping from code to region name.
     mapping = tb_regions["name"].to_dict()
@@ -1002,7 +1003,7 @@ def list_members_of_region(
 def detect_overlapping_regions(
     df: TableOrDataFrame,
     index_columns: List[str],
-    regions_and_members: Dict[str, List[str]],
+    regions_and_members: Dict[Hashable, List[str]],
     country_col: str = "country",
     year_col: str = "year",
     ignore_overlaps_of_zeros: bool = True,

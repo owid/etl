@@ -106,7 +106,7 @@ for section in WIZARD_CONFIG["sections"]:
         _aliases.append(app["alias"])
 ## Add aliases from etl steps and 'all'
 _aliases = tuple(_aliases + list(WIZARD_CONFIG["etl"]["steps"].keys()) + ["all"])
-WIZARD_PHASES = Literal[_aliases]  # type: ignore
+WIZARD_PHASES = _aliases
 
 # Get all pages by alias
 _pages = [ww for w in WIZARD_CONFIG["sections"] for ww in w["apps"]]

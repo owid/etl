@@ -10,6 +10,7 @@ import pandas as pd
 import rich
 from dotenv import dotenv_values
 from owid import catalog
+from owid.catalog import CHANNEL
 from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
@@ -116,7 +117,7 @@ def diff_print(
 @click.pass_context
 def etl_catalog(
     ctx: click.core.Context,
-    channel: str,
+    channel: CHANNEL,
     namespace: str,
     dataset: str,
     table: str,
