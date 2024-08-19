@@ -1,7 +1,7 @@
 """Compilation of minerals data from different origins.
 
 Currently, the three sources of minerals data are:
-* From BGS we extract imports, exports, and production.
+* From BGS we extract production (and disregard imports/exports, which are very sparse).
 * From USGS (current) we extract production and reserves.
 * From USGS (historical) we extract production and unit value.
 
@@ -157,7 +157,6 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 # The following list contains all columns where USGS (current and historical) overlaps with BGS.
 # NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
 #  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
-
 # TODO: Consider keeping "World (BGS)" just for run sanity checks and then remove it. This we we will detect >100% shares.
 
 
@@ -239,14 +238,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
 
         # Create a short description (that will also appear as the chart subtitle).
         description_short = None
-        if metric in [
-            "Production",
-            "Imports",
-            "Exports",
-            "Share of global production",
-            "Share of global imports",
-            "Share of global exports",
-        ]:
+        if metric in ["Production", "Share of global production"]:
             if sub_commodity.startswith("Mine"):
                 if metric.startswith("Share"):
                     description_short = "Based on mined, rather than [refined](#dod:refined-production), production."
@@ -315,10 +307,6 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         elif metric == "Unit value":
             # footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
             footnotes_additional += "This data is adjusted for inflation."
-        elif metric in ["Imports", "Exports", "Share of global imports", "Share of global exports"]:
-            footnotes_additional += (
-                "After 2002, data is limited to Europe and Turkey; after 2018, only UK data is available."
-            )
 
         # Add footnotes to metadata.
         combined_footnotes = _combine_notes(
@@ -391,9 +379,7 @@ def add_share_of_global_columns(tb: Table) -> Table:
     new_columns = {}
     metadata = {}
     for column in tb.columns:
-        if (column.split("|")[0] in ["exports", "imports", "production", "reserves"]) and (
-            tb_world[column].notnull().any()
-        ):
+        if (column.split("|")[0] in ["production", "reserves"]) and (tb_world[column].notnull().any()):
             new_columns[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = _tb[column] / _tb[f"{column}_world_share"] * 100
             metadata[f"{SHARE_OF_GLOBAL_PREFIX}{column}"] = tb[column].metadata
 
@@ -499,6 +485,12 @@ def run(dest_dir: str) -> None:
 
     # Adapt BGS flat table.
     tb_bgs_flat = adapt_flat_table(tb_flat=tb_bgs_flat)
+
+    # Given that BGS imports/exports data is very sparse (from 2002 it includes only European countries and Turkey, and
+    # from 2018 it includes only UK), remove those columns.
+    tb_bgs_flat = tb_bgs_flat.drop(
+        columns=[column for column in tb_bgs_flat.columns if column.startswith(("imports", "exports"))]
+    )
 
     # Combine all sources of data.
     tb = combine_data(
