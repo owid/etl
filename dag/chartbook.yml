@@ -160,6 +160,12 @@ steps:
   data://garden/chartbook/2024-08-16/atkinson_2008_finland:
     - data://meadow/chartbook/2024-08-16/atkinson_2008_finland
 
+  # Relative poverty from Riihelä et al. (2003)
+  data://meadow/chartbook/2024-08-19/riihela_et_al_2003_finland:
+    - snapshot://chartbook/2024-08-19/riihela_et_al_2003_finland.csv
+  data://garden/chartbook/2024-08-19/riihela_et_al_2003_finland:
+    - data://meadow/chartbook/2024-08-19/riihela_et_al_2003_finland
+
   ################################################################################################
   # FRANCE
   ################################################################################################
