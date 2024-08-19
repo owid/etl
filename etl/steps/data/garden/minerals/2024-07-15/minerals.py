@@ -134,22 +134,31 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Strontium|Mine|tonnes",
     # Significant global disagreement.
     # 'production|Tellurium|Refinery|tonnes',
+    # Reasonable agreement, except for certain years, which leads to >100% shares.
+    # "production|Tin|Mine|tonnes",
+    # Significant global disagreement.
+    # 'production|Titanium|Mine, ilmenite|tonnes',
+    # Reasonable global agreement, but noisy data.
+    "production|Titanium|Mine, rutile|tonnes",
+    # Reasonable global agreement, except for recent years, where shares can probably be >100%.
+    # TODO: Consider discarding.
+    "production|Tungsten|Mine|tonnes",
+    # Reasonable global agreement. Noisy data.
+    "production|Vanadium|Mine|tonnes",
+    # Reasonable global agreement. Noisy data.
+    "production|Vermiculite|Mine|tonnes",
+    # Reasonable global agreement, except for certain countries: Mexico.
+    "production|Wollastonite|Mine|tonnes",
+    # Reasonable global agreement, except for certain countries: Mexico (big peak in 2021), India (big peak in 2021).
+    "production|Zinc|Mine|tonnes",
+    # Reasonable global agreement, except for certain countries: China, Sierra Leone.
+    "production|Zirconium and hafnium|Mine|tonnes",
 ]
 # The following list contains all columns where USGS (current and historical) overlaps with BGS.
-# It is obtained by doing:
-# (set(tb_usgs_flat.columns) | set(tb_usgs_flat)) & set(tb_bgs_flat)
-# TODO: Visually inspect all of them and then move them to COMBINE_..., leaving uncommented the ones where there is reasonable agreement.
-COMBINE_BGS_AND_USGS_COLUMNS = [
-    # 'production|Tin|Mine|tonnes',
-    # 'production|Titanium|Mine, ilmenite|tonnes',
-    # 'production|Titanium|Mine, rutile|tonnes',
-    # 'production|Tungsten|Mine|tonnes',
-    # 'production|Vanadium|Mine|tonnes',
-    # 'production|Vermiculite|Mine|tonnes',
-    # 'production|Wollastonite|Mine|tonnes',
-    # 'production|Zinc|Mine|tonnes',
-    # 'production|Zirconium and hafnium|Mine|tonnes',
-]
+# NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
+#  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
+
+# TODO: Consider keeping "World (BGS)" just for run sanity checks and then remove it. This we we will detect >100% shares.
 
 
 def adapt_flat_table(tb_flat: Table) -> Table:
@@ -497,7 +506,7 @@ def run(dest_dir: str) -> None:
         tb_usgs_historical_flat=tb_usgs_historical_flat,
         tb_bgs_flat=tb_bgs_flat,
         # NOTE: Uncomment to visually inspect columns where BGS and USGS data are combined.
-        columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
+        # columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
     )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
