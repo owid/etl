@@ -166,7 +166,7 @@ def main(upload: bool) -> None:
     # Combine both fires and emissions data into a final DataFrame.
     df_final = pd.concat([dfs_fires, dfs_emissions])
     # Save the final DataFrame to the specified file path in the snapshot.
-    df_to_file(df_final, file_path=snap.path)
+    df_to_file(df_final, file_path=snap.path)  # type: ignore[reportArgumentType]
 
     # Add date_accessed
     snap = modify_metadata(snap)

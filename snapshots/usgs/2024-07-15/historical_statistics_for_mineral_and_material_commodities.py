@@ -132,12 +132,12 @@ def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
         for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Downloading files"):
             if row["supply_demand_url"] != "NA":
                 download_file_from_url(
-                    url=row["supply_demand_url"], local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx"
+                    url=row["supply_demand_url"], local_path=supply_demand_dir / f"{underscore(row['commodity'])}.xlsx"  # type: ignore[reportArgumentType]
                 )
 
             if row["end_use_url"] != "NA":
                 download_file_from_url(
-                    url=row["end_use_url"], local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx"
+                    url=row["end_use_url"], local_path=end_use_dir / f"{underscore(row['commodity'])}.xlsx"  # type: ignore[reportArgumentType]
                 )
 
         # Create the zip file at the snapshot path.
