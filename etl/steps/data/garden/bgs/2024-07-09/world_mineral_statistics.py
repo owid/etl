@@ -1021,6 +1021,15 @@ def run(dest_dir: str) -> None:
     # Harmonize units.
     tb = harmonize_units(tb=tb)
 
+    ####################################################################################################################
+    # Fix some known issues in the data.
+    # Molybdenum, mine for the US between 1970 and 1976 is significantly larger than in USGS.
+    # And BGS notes on 1977 say "Break in series". So I will remove those points prior to 1977.
+    tb.loc[(tb["country"] == "United States") & (tb["year"] < 1977) & (tb["category"] == "Production"), "value"] = None
+    # Similarly, there is a big dip in 1977 for Turkey, with a "Break in series" note.
+    tb.loc[(tb["country"] == "Turkey") & (tb["year"] < 1977) & (tb["category"] == "Production"), "value"] = None
+    ####################################################################################################################
+
     # Pivot table to have a column for each category.
     tb = (
         tb.pivot(
