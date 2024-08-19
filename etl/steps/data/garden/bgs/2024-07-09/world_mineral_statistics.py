@@ -90,14 +90,16 @@ COMMODITY_MAPPING = {
     ("Bentonite and fuller's earth", "Fuller's earth"): ("Clays", "Mine, fuller's earth"),
     ("Bentonite and fuller's earth", "Sepiolite"): ("Clays", "Mine, sepiolite"),
     ("Bentonite and fuller's earth", "Unknown"): None,
-    ("Beryl", "Unknown"): ("Beryl", "Mine"),
+    # NOTE: Beryl data may have a data issue: The biggest producer is Namibia, which goes from 15 in 1993 to 15000 in
+    #  2021. Discard for now.
+    ("Beryl", "Unknown"): None,
     ("Bismuth", "Compounds"): ("Bismuth", "Compounds"),
     ("Bismuth", "Metal"): ("Bismuth", "Metal"),
     ("Bismuth", "Ores & concentrates"): ("Bismuth", "Ores & concentrates"),
     ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine"),
     ("Borates", "Unknown"): None,
     ("Bromine", "Compounds"): ("Bromine", "Compounds"),
-    ("Bromine", "Unknown"): ("Bromine", "Unspecified"),
+    ("Bromine", "Unknown"): ("Bromine", "Processing"),
     ("Cadmium", "Metal"): ("Cadmium", "Refinery"),
     ("Cadmium", "Other"): None,
     ("Cadmium", "Oxide"): None,

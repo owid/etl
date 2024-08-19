@@ -58,6 +58,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonable global agreement, although not for certain countries: China, Russia.
     # NOTE: Big drop in Greece 1976 in BGS data, but it has no footnotes. It could be that two zeros where missing? Unclear.
     "production|Bauxite|Mine|tonnes",
+    # BGS global data is significantly larger than USGS.
+    # "production|Bromine|Processing|tonnes",
     # Reasonable global agreement, although not for certain countries: Denmark, Iran.
     "production|Clays|Mine, bentonite|tonnes",
     # Big global disagreement.
@@ -158,6 +160,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 # NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
 #  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
 # TODO: Consider keeping "World (BGS)" just for run sanity checks and then remove it. This we we will detect >100% shares.
+# COMBINE_BGS_AND_USGS_COLUMNS = [
+# ]
 
 
 def adapt_flat_table(tb_flat: Table) -> Table:
