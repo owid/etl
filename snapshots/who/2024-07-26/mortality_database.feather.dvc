@@ -30,6 +30,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: fc30da3369f3d18fde5ea4163b8e6a53
-    size: 1078620449
-    path: mortality_database.csv
+  - md5: ad3bd695a6c1f6d357dbce3748b4713b
+    size: 56963906
+    path: mortality_database.feather
