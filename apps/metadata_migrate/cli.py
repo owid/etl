@@ -339,7 +339,7 @@ def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[Li
         log.warning(
             f"missing publication_date and publication_year in source, using date_accessed: {origin.date_accessed}"
         )
-        origin.date_published = origin.date_accessed
+        origin.date_published = origin.date_accessed  # type: ignore
     return origin
 
 

@@ -153,6 +153,7 @@ exclude = [
     "playground/",
     ".cachedir/",
     ".cache/",
+    "etl/steps",
 ]
 
 [tool.pytest.ini_options]
