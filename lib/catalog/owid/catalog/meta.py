@@ -141,7 +141,7 @@ class Origin(MetaBase):
     # Date when the dataset was accessed
     date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
-    date_published: Optional[Union[YearDateLatest, str]] = None
+    date_published: Optional[YearDateLatest] = None
     # License of the dataset
     license: Optional[License] = None
 
