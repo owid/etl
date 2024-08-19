@@ -21,10 +21,11 @@ from typing import List, Optional, Tuple
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
-from owid.catalog import Table, VariablePresentationMeta
+from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Initialize logger.
@@ -38,6 +39,13 @@ paths = PathFinder(__file__)
 
 # Prefix used for "share" columns.
 SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+
+# We use World data from USGS.
+# We will also aggregate all other data to create an "aggregated world" for sanity check purposes (and then remove it).
+# If this aggregated world is larger than USGS' World by more a certain percentage, raise an error.
+# Define that percentage.
+DEVIATION_MAX_ACCEPTED = 15
+
 
 # Given that BGS and USGS data often have big discrepancies, we will combine columns only after inspection.
 # Specifically, we check that the World aggregate of BGS (constructed in the BGS garden step) coincides reasonably
@@ -105,16 +113,14 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Lead|Mine|tonnes",
     # Reasonable global agreement, although not for certain countries: Turkey, Russia.
     "production|Magnesium metal|Smelter|tonnes",
-    # Reasonable global agreement, although not for certain countries: Tajikistan.
+    # Reasonable global agreement, except for certain years, e.g. 2002, where share is >150%. Disagreement for countries: Tajikistan.
     "production|Mercury|Mine|tonnes",
-    # Reasonable global agreement, although not for certain countries: Armenia, Iran, Mexico.
-    # NOTE: between 1970 and 1970, BGS is significantly lower than USGS. This may be because US data was removed.
-    #  And US data was removed in the BGS garden step (see explanation there).
+    # Reasonable global agreement, except for certain years, and also not for certain countries: Armenia, Iran, Mexico.
     "production|Molybdenum|Mine|tonnes",
     # Reasonable global agreement, although not for certain years.
     "production|Nickel|Mine|tonnes",
-    # Significant global disagreement.
-    "production|Perlite|Mine|tonnes",
+    # Significant global disagreement, leading to world shares of 191%.
+    # "production|Perlite|Mine|tonnes",
     # Reasonably good agreement, except between 1970 and 1976, where BGS is significantly lower. Noisy data.
     # Also, disagreement for certain countries: Turkey, Syria, Peru, Egypt, Australia.
     "production|Phosphate rock|Mine|tonnes",
@@ -132,8 +138,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonably good agreement, except for Iran in 2020, which is an outlier in BGS data (it may be an error).
     # This outlier is fixed after combining with USGS data.
     "production|Steel|Processing, crude|tonnes",
-    # Reasonable agreement, except for certain years. Noisy data.
-    "production|Strontium|Mine|tonnes",
+    # Reasonable agreement, except for certain years, e.g. 2012, where shares reach 160%. Noisy data.
+    # "production|Strontium|Mine|tonnes",
     # Significant global disagreement.
     # 'production|Tellurium|Refinery|tonnes',
     # Reasonable agreement, except for certain years, which leads to >100% shares.
@@ -145,8 +151,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonable global agreement, except for recent years, where shares can probably be >100%.
     # TODO: Consider discarding.
     "production|Tungsten|Mine|tonnes",
-    # Reasonable global agreement. Noisy data.
-    "production|Vanadium|Mine|tonnes",
+    # Reasonable global agreement, except for some years, e.g. 2002, where share becomes 143%. Noisy data.
+    # "production|Vanadium|Mine|tonnes",
     # Reasonable global agreement. Noisy data.
     "production|Vermiculite|Mine|tonnes",
     # Reasonable global agreement, except for certain countries: Mexico.
@@ -397,8 +403,51 @@ def add_share_of_global_columns(tb: Table) -> Table:
     return tb
 
 
+def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
+    # Add up the contribution from all countries and compare it to USGS' original "World".
+    tb = add_global_data(tb=tb, ds_regions=ds_regions)
+    tb["country"] = tb["country"].replace("World", "World aggregated").replace("World (original)", "World")
+    _tb = tb[(tb["country"].isin(["World", "World aggregated"]))].reset_index(drop=True)
+    _tb_pivot = _tb.pivot(
+        index=["year"],
+        columns="country",
+        values=_tb.drop(columns=["country", "year"]).columns,
+        join_column_levels_with="_",
+    )
+    for column in [column for column in _tb.columns if column.startswith("production")]:
+        original_column = f"{column}_World"
+        aggregated_column = f"{column}_World aggregated"
+        # We accept that the aggregated global data often does not add up to 100%, since we lack data for all countries.
+        # (For example, historical USGS data is only given for US and World).
+        # But we should not accept that the aggregated global data is larger than the World by more than a certain
+        # deviation.
+        deviation = 100 * (_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column])
+        if deviation.isnull().all():
+            continue
+        deviation_max = deviation.dropna().max()
+        years_with_deviation = _tb_pivot[deviation > DEVIATION_MAX_ACCEPTED]["year"].tolist()
+        # Raise an error if the maximum deviation of the aggregated world data (above the original world data) is larger
+        # than 15%.
+        # NOTE: Some of these individual peaks have been tackled above, by simply removing all BGS data.
+        # NOTE: An alternative way to detect outliers would be to impose, e.g. maximum deviation > 10% with MAPE > 10%.
+        mape = (
+            (100 * abs(_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column]))
+            .dropna()
+            .mean()
+        )
+        if deviation_max > DEVIATION_MAX_ACCEPTED:
+            log.error(
+                f"Aggregated data exceeds World data by {deviation_max:.0f}% in {years_with_deviation} (MAPE: {mape:.0f}%) for: {column}"
+            )
+            px.line(_tb, x="year", y=column, color="country", markers=True, title=column).show()
+
+
 def combine_data(
-    tb_usgs_flat: Table, tb_usgs_historical_flat: Table, tb_bgs_flat: Table, columns_to_plot: Optional[List[str]] = None
+    tb_usgs_flat: Table,
+    tb_usgs_historical_flat: Table,
+    tb_bgs_flat: Table,
+    ds_regions: Dataset,
+    columns_to_plot: Optional[List[str]] = None,
 ) -> Table:
     # Compare the data from different origins where they overlap.
     inspect_overlaps(
@@ -450,13 +499,72 @@ def combine_data(
         tb_usgs_combined_flat.drop(columns=COMBINE_BGS_AND_USGS_COLUMNS), on=["country", "year"], how="outer"
     )
 
+    ####################################################################################################################
+    # Remove individual data points where the aggregated world data is significantly larger than the original World aggregate.
+    # NOTE: We do this only in cases where this happens in just specific points, and the overall deviation between BGS
+    # and USGS is not too high.
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1990, 1993, 1998, 1999, 2001, 2002, 2003])),
+        "production|Mercury|Mine|tonnes",
+    ] = None
+    tb.loc[(tb["country"] != "World") & (tb["year"].isin([1997, 2010])), "production|Barite|Mine|tonnes"] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1972, 1973, 1975])), "production|Fluorspar|Mine|tonnes"
+    ] = None
+    ####################################################################################################################
+
+    # Sanity check: Raise an error if the aggregate of all data is significantly larger than the original "World" given
+    # by USGS.
+    _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
+
     return tb
+
+
+def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
+    _tb = tb.copy()
+    # We want to create a "World" aggregate, just for sanity checks:
+    # * We will ensure there are no overlaps between historical and successor regions.
+    # * We will ensure that the given "World" agrees with the sum of all countries (within a certain error).
+
+    # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
+    accepted_overlaps = [
+        {1991: {"USSR", "Russia"}},
+        {1992: {"Czechia", "Czechoslovakia"}},
+        {1992: {"Slovakia", "Czechoslovakia"}},
+        {1990: {"Germany", "East Germany"}},
+        {1990: {"Germany", "West Germany"}},
+        {1990: {"Yemen", "Yemen People's Republic"}},
+    ]
+    # Regions to create.
+    # NOTE: We only need "World", but we need other regions to construct it.
+    regions = {
+        "Africa": {},
+        "Asia": {},
+        "Europe": {},
+        "North America": {},
+        "Oceania": {},
+        "South America": {},
+        "World": {"additional_members": ["Other"]},
+    }
+    _tb = geo.add_regions_to_table(
+        tb=_tb,
+        regions=regions,
+        ds_regions=ds_regions,
+        min_num_values_per_year=1,
+        accepted_overlaps=accepted_overlaps,
+        keep_original_region_with_suffix=" (original)",
+    )
+    # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
+    regions_to_remove = [region for region in regions if region not in ["World", "World (original)"]]
+    _tb = _tb.loc[~_tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    return _tb
 
 
 def run_sanity_checks(tb: Table) -> None:
     # Check that there are no duplicated rows.
     assert tb[tb.duplicated(subset=["country", "year"], keep=False)].empty, "Unexpected duplicated data."
-    # Check that there are no missing values.
+    # Check that all share columns are <100%.
     for column in [column for column in tb.columns if column.startswith(SHARE_OF_GLOBAL_PREFIX)]:
         if (tb[column] > 100).any():
             log.warning(f"{column} maximum: {tb[column].max():.0f}%")
@@ -477,6 +585,10 @@ def run(dest_dir: str) -> None:
     )
     tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
     tb_bgs_flat = ds_bgs.read_table("world_mineral_statistics_flat")
+
+    # Load regions dataset.
+    # NOTE: It will only be used for sanity checks.
+    ds_regions = paths.load_dataset("regions")
 
     #
     # Process data.
@@ -501,6 +613,7 @@ def run(dest_dir: str) -> None:
         tb_usgs_flat=tb_usgs_flat,
         tb_usgs_historical_flat=tb_usgs_historical_flat,
         tb_bgs_flat=tb_bgs_flat,
+        ds_regions=ds_regions,
         # NOTE: Uncomment to visually inspect columns where BGS and USGS data are combined.
         # columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
     )
