@@ -306,6 +306,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
+          name: Vaccinated
+          tolerance: 14
+          color: "#008860"
           <<: *year_is_day
 
       stringency_index_nonvax:
@@ -315,6 +318,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
+          name: Non-vaccinated
+          color: "#932834"
+          tolerance: 14
           <<: *year_is_day
 
       stringency_index_weighted_average:
@@ -324,7 +330,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
-          tolerance: 10
+          name: Weighted average of vaccinated and non-vaccinated
+          color: "#4C5C78"
+          tolerance: 14
           <<: *year_is_day
 
       containment_health_index:

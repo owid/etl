@@ -589,7 +589,7 @@ views:
       - Daily
     title: "COVID-19: Stringency Index"
     subtitle: The stringency index is a composite measure based on nine response indicators including school closures, workplace closures, and travel bans, rescaled to a value from 0 to 100 (100 = strictest).
-    selectedFacetStrategy: metric
+    selectedFacetStrategy: entity
     facetYDomain: independent
   #######################
   # Reproduction rate
@@ -640,7 +640,7 @@ views:
   #######################
   - indicator: grapher/covid/latest/combined/combined#short_term_tests_per_case
     options:
-      - Tests
+      - Tests per case
       - 7-day rolling average
 
   #######################
