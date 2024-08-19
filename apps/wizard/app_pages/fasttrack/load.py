@@ -208,7 +208,7 @@ def parse_metadata_from_csv(
         date_published=str(dt.date.today()),  # type: ignore
     )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # type: ignore
 
 
 ###################################
@@ -294,7 +294,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     # short_name is not used anymore
     source.pop("short_name", None)
 
-    return Source(**source)
+    return Source(**source)  # type: ignore[reportCallIssue]
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:

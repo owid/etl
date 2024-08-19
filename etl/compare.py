@@ -141,7 +141,7 @@ def etl_catalog(
     """
     try:
         remote_df = catalog.find_latest(
-            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
+            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version  # type: ignore[reportArgumentType]
         )
     except Exception as e:
         if debug:
@@ -158,7 +158,7 @@ def etl_catalog(
                 namespace=namespace,
                 dataset=dataset,
                 channel=cast(catalog.CHANNEL, channel),
-                version=version,
+                version=version,  # type: ignore[reportArgumentType]
             )
         except ValueError as e:
             # try again after reindexing
@@ -169,7 +169,7 @@ def etl_catalog(
                     namespace=namespace,
                     dataset=dataset,
                     channel=cast(catalog.CHANNEL, channel),
-                    version=version,
+                    version=version,  # type: ignore[reportArgumentType]
                 )
             else:
                 raise e

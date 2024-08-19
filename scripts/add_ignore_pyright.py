@@ -1,6 +1,11 @@
 import json
 import sys
 
+"""Usage:
+
+poetry run pyright owid tests --outputjson | python ../../scripts/add_ignore_pyright.py
+"""
+
 
 def add_type_ignore_to_lines(file_path, line_number, rule):
     """Reads a file, adds # type: ignore to the specified line, and writes it back."""

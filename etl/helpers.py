@@ -672,7 +672,7 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
-        return dataset
+        return dataset  # type: ignore[reportReturnType]
 
     def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""

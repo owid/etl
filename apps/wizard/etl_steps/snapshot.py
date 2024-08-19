@@ -101,7 +101,7 @@ class SnapshotForm(utils.StepForm):
     license_url: str
     license_name: str
 
-    def __init__(self: Self, **data: str | int) -> None:
+    def __init__(self: Self, **data: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct form."""
         # Change name for certain fields (and remove old ones)
         data["license_url"] = data["origin.license.url"]
@@ -177,7 +177,7 @@ class SnapshotForm(utils.StepForm):
             self.errors["origin.attribution_custom"] = "Please introduce the name of the custom attribute!"
 
     @property
-    def metadata(self: Self) -> Dict[str, Any]:
+    def metadata(self: Self) -> Dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
         """Define metadata for easy YAML-export."""
         license_field = {
             "name": self.license_name,

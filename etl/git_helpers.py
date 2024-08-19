@@ -48,9 +48,9 @@ class GithubRepo:
         if not dest_dir.is_dir():
             dest_dir.parent.mkdir(parents=True, exist_ok=True)
             if shallow:
-                sh.git("clone", "--depth=1", self.github_url, dest_dir.as_posix(), _fg=True)
+                sh.git("clone", "--depth=1", self.github_url, dest_dir.as_posix(), _fg=True)  # type: ignore[reportCallIssue]
             else:
-                sh.git("clone", self.github_url, dest_dir.as_posix(), _fg=True)
+                sh.git("clone", self.github_url, dest_dir.as_posix(), _fg=True)  # type: ignore[reportCallIssue]
         else:
             self.update_and_reset()
 
@@ -85,7 +85,7 @@ class GithubRepo:
         "Execute a git command in the context of this repo."
         return cast(
             str,
-            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),
+            sh.git("--no-pager", *args, _cwd=self.cache_dir.as_posix(), **kwargs).stdout.decode("utf8").strip(),  # type: ignore[reportCallIssue]
         )
 
     def is_up_to_date(self) -> bool:

@@ -470,7 +470,7 @@ def map_series(
         missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
         if missing.any():
             # Replace those nans by their original values.
-            series_mapped.loc[missing] = series[missing]
+            series_mapped.loc[missing] = series[missing]  # type: ignore[reportCallIssue]
 
     if warn_on_missing_mappings:
         unmapped = set(series) - set(mapping)

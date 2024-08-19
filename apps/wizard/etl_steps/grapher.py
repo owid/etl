@@ -59,7 +59,7 @@ class GrapherForm(utils.StepForm):
     dag_file: str
     is_private: bool
 
-    def __init__(self: Self, **data: str | bool) -> None:
+    def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
 
