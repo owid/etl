@@ -226,9 +226,12 @@ COMMODITY_MAPPING = {
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Potash", "Mine production"): ("Potash", "Mine"),
     ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine"),
-    ("Pumice and pumicite", "Mine production"): ("Pumice and pumicite", "Mine"),
-    ("Pumice and pumicite", "Mine production, puice and pumicite"): ("Pumice and pumicite", "Mine"),
-    ("Pumice and pumicite", "Mine production, pumice and pumicite"): ("Pumice and pumicite", "Mine"),
+    # NOTE: The following could be mapped to ("Pumice and pumicite", "Mine").
+    # However, the resulting World aggregate is significantly larger than from USGS historical.
+    # This is possibly caused by a sudden increase in production in Turkey in 2022 and 2023, found in the 2024 file.
+    ("Pumice and pumicite", "Mine production"): None,
+    ("Pumice and pumicite", "Mine production, puice and pumicite"): None,
+    ("Pumice and pumicite", "Mine production, pumice and pumicite"): None,
     ("Rare earths", "Mine production, metric tons of rare-earth-oxide (REO) equivalent"): (
         "Rare earths",
         "Mine",

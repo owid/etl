@@ -608,6 +608,13 @@ def run(dest_dir: str) -> None:
         (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1913, 1914, 1921, 1922])),
         "production|Vanadium|Mine|tonnes",
     ] = None
+
+    # There is a big dip in global Magnesium metal in 1974, because of missing US data.
+    # A similar thing happens in 1999.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1974, 1999])),
+        "production|Magnesium metal|Smelter|tonnes",
+    ] = None
     ####################################################################################################################
 
     # Format tables conveniently.

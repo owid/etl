@@ -1027,9 +1027,22 @@ def run(dest_dir: str) -> None:
     # Fix some known issues in the data.
     # Molybdenum, mine for the US between 1970 and 1976 is significantly larger than in USGS.
     # And BGS notes on 1977 say "Break in series". So I will remove those points prior to 1977.
-    tb.loc[(tb["country"] == "United States") & (tb["year"] < 1977) & (tb["category"] == "Production"), "value"] = None
-    # Similarly, there is a big dip in 1977 for Turkey, with a "Break in series" note.
-    tb.loc[(tb["country"] == "Turkey") & (tb["year"] < 1977) & (tb["category"] == "Production"), "value"] = None
+    # A similar thing happens for Turkey and the USSR.
+    # Even after removing these, BGS data is larger than USGS' World. So, simply remove all points prior to 1977.
+    tb.loc[
+        (tb["commodity"] == "Molybdenum")
+        # & (tb["country"].isin(["United States", "Turkey", "USSR"]))
+        & (tb["year"] < 1977)
+        & (tb["category"] == "Production"),
+        "value",
+    ] = None
+
+    # A similar issue happens with tugsten.
+    tb.loc[
+        (tb["commodity"] == "Tungsten") & (tb["year"] < 1977) & (tb["category"] == "Production"),
+        "value",
+    ] = None
+
     ####################################################################################################################
 
     # Pivot table to have a column for each category.
