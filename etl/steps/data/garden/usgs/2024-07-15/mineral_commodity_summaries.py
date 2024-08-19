@@ -1086,6 +1086,12 @@ def run(dest_dir: str) -> None:
     # Corrections to USGS current data.
     # Zinc mine reserves in Australia in 2022 is unreasonably high, much larger than the world.
     tb_flat.loc[(tb_flat["country"] == "Australia") & (tb_flat["year"] == 2022), "reserves|Zinc|Mine|tonnes"] = None
+
+    # Asbestos mine production in Kazakhstan 2020, data says "27400", but in BGS, it is "227400", which is much more
+    # reasonable, looking at prior and posterior data. So it looks like an error in the data. Remove that point.
+    tb_flat.loc[
+        (tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"
+    ] = None
     ####################################################################################################################
 
     # Format tables conveniently.
