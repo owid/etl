@@ -78,6 +78,7 @@ def run(dest_dir: str) -> None:
         "in_tour_arrivals_same_day_vis_excur",
         "out_tour_departures_ovn_vis_tourists",
         "dom_tour_trips_ovn_vis_tourists",
+        "dom_tour_trips_same_day_vis_excur",
         "employment_food_and_beverage_serving_act",
         "employment_total",
     ]
