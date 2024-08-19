@@ -88,11 +88,14 @@ def convert_to_percentage(tb: Table) -> Table:
         "Deaths per 1000 children aged 10": "Deaths per 100 children aged 10",
         "Deaths per 1000 children aged 15": "Deaths per 100 children aged 15",
         "Deaths per 1000 children aged 20": "Deaths per 100 children aged 20",
-        "Stillbirths per 1000 births": "Stillbirths per 100 births",
+        "Stillbirths per 1,000 total births": "Stillbirths per 100 births",
     }
     # Dividing values of selected rows by 10
 
     selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
+    assert all(
+        key in tb["unit_of_measure"].values for key in rate_conversions.keys()
+    ), "Not all keys are in tb['unit_of_measure']"
     tb.loc[selected_rows, ["obs_value", "lower_bound", "upper_bound"]] = tb.loc[
         selected_rows, ["obs_value", "lower_bound", "upper_bound"]
     ].div(10)
