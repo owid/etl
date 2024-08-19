@@ -43,8 +43,99 @@ SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 # Specifically, we check that the World aggregate of BGS (constructed in the BGS garden step) coincides reasonably
 # well with the World data given in USGS data.
 COMBINE_BGS_AND_USGS_COLUMNS = [
+    "production|Alumina|Refinery|tonnes",
+    "production|Aluminum|Smelter|tonnes",
+    "production|Andalusite|Mine|tonnes",
+    # Reasonable agreement overall, but disagreement during certain periods, leading to >100% shares of global.
+    # TODO: This should be investigated.
+    # 'production|Antimony|Mine|tonnes',
+    # Somewhat in agreement, but very noisy.
+    # 'production|Arsenic|Processing|tonnes',
+    # Good agreement after 2012, but prior to that, USGS is significantly larger.
+    # "production|Asbestos|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: Mexico.
+    "production|Barite|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: China, Russia.
+    # NOTE: Big drop in Greece 1976 in BGS data, but it has no footnotes. It could be that two zeros where missing? Unclear.
+    "production|Bauxite|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: Denmark, Iran.
+    "production|Clays|Mine, bentonite|tonnes",
+    # Big global disagreement.
+    "production|Clays|Mine, fuller's earth|tonnes",
+    # Big global disagreement.
+    "production|Clays|Mine, kaolin|tonnes",
+    # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
+    # TODO: This should be investigated.
+    # 'production|Cobalt|Mine|tonnes',
     "production|Copper|Mine|tonnes",
     "production|Copper|Refinery|tonnes",
+    # BGS and USGS data are informed on very separated year ranges. It's not possible to assess their agreement.
+    # 'production|Diamond|Mine, industrial|tonnes',
+    # BGS global data is significantly lower than USGS.
+    # 'production|Diatomite|Mine|tonnes',
+    # BGS global data is significantly larger than USGS.
+    # 'production|Feldspar|Mine|tonnes',
+    # Reasonable global agreement, although not for certain countries: Mongolia, Morocco, Pakistan.
+    "production|Fluorspar|Mine|tonnes",
+    "production|Gallium|Processing|tonnes",
+    # Significant global disagreement, leading to >100% shares of global.
+    # 'production|Germanium|Refinery|tonnes',
+    # Reasonable global agreement, although not for certain countries: Argentina, Brazil, Kazakhstan, Mali, Mexico, Papua New Guinea, Sudan.
+    "production|Gold|Mine|tonnes",
+    # Significant global disagreement, leading to >100% shares of global.
+    # TODO: This should be investigated.
+    # 'production|Graphite|Mine|tonnes',
+    # Significant global disagreement during certain years.
+    # 'production|Gypsum|Mine|tonnes',
+    # Significant global disagreement during certain years.
+    # TODO: This should be investigated.
+    # 'production|Helium|Mine|tonnes',
+    # Significant global disagreement, noisy data.
+    # 'production|Indium|Refinery|tonnes',
+    "production|Iodine|Mine|tonnes",
+    # Significant global disagreement during a large range of years.
+    # 'production|Iron ore|Mine, crude ore|tonnes',
+    # BGS global data is consistently larger than USGS since 1992, and also for Mexico, Iran, India.
+    # 'production|Iron|Smelter, pig iron|tonnes',
+    # BGS noisy data, and from USGS only US is informed.
+    "production|Kyanite|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: Turkey, Iran.
+    "production|Lead|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: Turkey, Russia.
+    "production|Magnesium metal|Smelter|tonnes",
+    # Reasonable global agreement, although not for certain countries: Tajikistan.
+    "production|Mercury|Mine|tonnes",
+    # Reasonable global agreement, although not for certain countries: Armenia, Iran, Mexico.
+    # NOTE: between 1970 and 1970, BGS is significantly lower than USGS. This may be because US data was removed.
+    #  And US data was removed in the BGS garden step (see explanation there).
+    "production|Molybdenum|Mine|tonnes",
+]
+# The following list contains all columns where USGS (current and historical) overlaps with BGS.
+# It is obtained by doing:
+# (set(tb_usgs_flat.columns) | set(tb_usgs_flat)) & set(tb_bgs_flat)
+# TODO: Visually inspect all of them and then move them to COMBINE_..., leaving uncommented the ones where there is reasonable agreement.
+COMBINE_BGS_AND_USGS_COLUMNS = [
+    # 'production|Nickel|Mine|tonnes',
+    # 'production|Perlite|Mine|tonnes',
+    # 'production|Phosphate rock|Mine|tonnes',
+    # 'production|Platinum group metals|Mine, palladium|tonnes',
+    # 'production|Platinum group metals|Mine, platinum|tonnes',
+    # 'production|Rhenium|Mine|tonnes',
+    # 'production|Selenium|Refinery|tonnes',
+    # 'production|Silver|Mine|tonnes',
+    # 'production|Soda ash|Natural|tonnes',
+    # 'production|Steel|Processing, crude|tonnes',
+    # 'production|Strontium|Mine|tonnes',
+    # 'production|Tellurium|Refinery|tonnes',
+    # 'production|Tin|Mine|tonnes',
+    # 'production|Titanium|Mine, ilmenite|tonnes',
+    # 'production|Titanium|Mine, rutile|tonnes',
+    # 'production|Tungsten|Mine|tonnes',
+    # 'production|Vanadium|Mine|tonnes',
+    # 'production|Vermiculite|Mine|tonnes',
+    # 'production|Wollastonite|Mine|tonnes',
+    # 'production|Zinc|Mine|tonnes',
+    # 'production|Zirconium and hafnium|Mine|tonnes',
 ]
 
 
@@ -256,7 +347,13 @@ def inspect_overlaps(
             _df_country = _df[_df["country"] == country]
             if _df_country["source"].nunique() > 1:
                 px.line(
-                    _df_country, x="year", y=column, color="source", markers=True, title=f"{column} - {country}"
+                    _df_country,
+                    x="year",
+                    y=column,
+                    color="source",
+                    markers=True,
+                    title=f"{column} - {country}",
+                    range_y=[0, None],
                 ).show()
 
 
@@ -387,7 +484,7 @@ def run(dest_dir: str) -> None:
         tb_usgs_historical_flat=tb_usgs_historical_flat,
         tb_bgs_flat=tb_bgs_flat,
         # NOTE: Uncomment to visually inspect columns where BGS and USGS data are combined.
-        # columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
+        columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
     )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
