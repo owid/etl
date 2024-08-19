@@ -109,24 +109,37 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # NOTE: between 1970 and 1970, BGS is significantly lower than USGS. This may be because US data was removed.
     #  And US data was removed in the BGS garden step (see explanation there).
     "production|Molybdenum|Mine|tonnes",
+    # Reasonable global agreement, although not for certain years.
+    "production|Nickel|Mine|tonnes",
+    # Significant global disagreement.
+    "production|Perlite|Mine|tonnes",
+    # Reasonably good agreement, except between 1970 and 1976, where BGS is significantly lower. Noisy data.
+    # Also, disagreement for certain countries: Turkey, Syria, Peru, Egypt, Australia.
+    "production|Phosphate rock|Mine|tonnes",
+    "production|Platinum group metals|Mine, palladium|tonnes",
+    "production|Platinum group metals|Mine, platinum|tonnes",
+    # Significant global disagreement.
+    # 'production|Rhenium|Mine|tonnes',
+    # Significant global disagreement.
+    # 'production|Selenium|Refinery|tonnes',
+    # Reasonably good agreement, except for recent years.
+    # Also, significant disagreement for certain countries: Poland, Mexico, Kazakhstan.
+    "production|Silver|Mine|tonnes",
+    # Significant global disagreement, leading to >100% shares of global.
+    # 'production|Soda ash|Natural|tonnes',
+    # Reasonably good agreement, except for Iran in 2020, which is an outlier in BGS data (it may be an error).
+    # This outlier is fixed after combining with USGS data.
+    "production|Steel|Processing, crude|tonnes",
+    # Reasonable agreement, except for certain years. Noisy data.
+    "production|Strontium|Mine|tonnes",
+    # Significant global disagreement.
+    # 'production|Tellurium|Refinery|tonnes',
 ]
 # The following list contains all columns where USGS (current and historical) overlaps with BGS.
 # It is obtained by doing:
 # (set(tb_usgs_flat.columns) | set(tb_usgs_flat)) & set(tb_bgs_flat)
 # TODO: Visually inspect all of them and then move them to COMBINE_..., leaving uncommented the ones where there is reasonable agreement.
 COMBINE_BGS_AND_USGS_COLUMNS = [
-    # 'production|Nickel|Mine|tonnes',
-    # 'production|Perlite|Mine|tonnes',
-    # 'production|Phosphate rock|Mine|tonnes',
-    # 'production|Platinum group metals|Mine, palladium|tonnes',
-    # 'production|Platinum group metals|Mine, platinum|tonnes',
-    # 'production|Rhenium|Mine|tonnes',
-    # 'production|Selenium|Refinery|tonnes',
-    # 'production|Silver|Mine|tonnes',
-    # 'production|Soda ash|Natural|tonnes',
-    # 'production|Steel|Processing, crude|tonnes',
-    # 'production|Strontium|Mine|tonnes',
-    # 'production|Tellurium|Refinery|tonnes',
     # 'production|Tin|Mine|tonnes',
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # 'production|Titanium|Mine, rutile|tonnes',
