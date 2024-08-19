@@ -1,10 +1,10 @@
 """
 Script to create a snapshot of dataset.
 
-The file comes from the original paper, available online here https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1475-4991.1986.tb00545.x.
-I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1zxuxAXriOrp0x_dxklVbULKGqG3fEOGBkouUNWx7AY8/edit?gid=1521965312#gid=1521965312
+The file comes from the original paper, available online here https://trepo.tuni.fi/handle/10024/65466.
+I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1ZakjK-hP6s4tLJZCEFjR7NVVqTkb6AXwgpvfpSwsT-I/edit?gid=1888715824#gid=1888715824
 After creating the file, run
-    python snapshots/chartbook/2024-08-09/wolfson_1986_canada.py --path-to-file <path-to-file>
+    python snapshots/chartbook/2024-08-19/riihela_et_al_2003_finland.py --path-to-file <path-to-file>
 """
 
 from pathlib import Path
@@ -22,7 +22,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"chartbook/{SNAPSHOT_VERSION}/wolfson_1986_canada.csv")
+    snap = Snapshot(f"chartbook/{SNAPSHOT_VERSION}/riihela_et_al_2003_finland.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(filename=path_to_file, upload=upload)
