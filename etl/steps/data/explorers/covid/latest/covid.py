@@ -117,7 +117,11 @@ def run(dest_dir: str) -> None:
         ]
         for field in fields_optional:
             if field in view:
-                record[field] = view[field]
+                if isinstance(view[field], bool):
+                    v = str(view[field]).lower()
+                    record[field] = v
+                else:
+                    record[field] = view[field]
 
         # Add record
         records.append(record)

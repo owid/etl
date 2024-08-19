@@ -164,10 +164,17 @@ steps:
     - data://garden/covid/latest/vaccinations_global
 
   # Explorer
-  data://explorers/covid/latest/covid:
+  data-private://explorers/covid/latest/covid:
     - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
 
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:

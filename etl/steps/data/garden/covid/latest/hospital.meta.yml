@@ -64,6 +64,7 @@ tables:
         description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days), per million people
         unit: "patients per million people"
         display:
+          name: Hospital admissions (per 1M)
           numDecimalPlaces: 3
           tolerance: 15
           <<: *zero_day
@@ -92,6 +93,7 @@ tables:
           - *icu
         unit: "patients per million people"
         display:
+          name: Patients in ICU (per 1M)
           numDecimalPlaces: 3
           tolerance: 15
           <<: *zero_day

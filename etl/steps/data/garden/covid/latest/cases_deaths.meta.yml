@@ -92,6 +92,11 @@ tables:
         title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
         unit: "cases per million people"
         description_processing: *daily_population
+        display:
+          name: New cases (per 1M)
+          numDecimalPlaces: 3
+          tolerance: 14
+          <<: *common_display
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 cases per million people
@@ -261,6 +266,11 @@ tables:
         title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
         unit: "deaths per million people"
         description_processing: *daily_population
+        display:
+          name: New deaths (per 1M)
+          numDecimalPlaces: 3
+          tolerance: 14
+          <<: *common_display
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths per million people

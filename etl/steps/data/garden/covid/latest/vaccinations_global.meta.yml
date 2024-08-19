@@ -56,6 +56,10 @@ tables:
           numDecimalPlaces: 0
           tolerance: 9999
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Number of people who completed the initial COVID-19 vaccination protocol
+            subtitle: Total number of people who received all doses prescribed by the initial vaccination protocol.
       total_boosters:
         title: Booster doses (cumulative)
         description_short: |-
@@ -190,7 +194,7 @@ tables:
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
-          tolerance: 14
+          tolerance: 9999
           <<: *zero_day
         presentation:
           grapher_config:
@@ -203,8 +207,12 @@ tables:
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
-          tolerance: 14
+          tolerance: 9999
           <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Share of people who completed the initial COVID-19 vaccination protocol
+            subtitle: Total number of people who received all doses prescribed by the initial vaccination protocol, divided by the total population of the country.
       total_boosters_per_hundred:
         title: Booster doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
@@ -212,7 +220,7 @@ tables:
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2
-          tolerance: 14
+          tolerance: 9999
           <<: *zero_day
         presentation:
           grapher_config:
