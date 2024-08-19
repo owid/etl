@@ -1082,6 +1082,12 @@ def run(dest_dir: str) -> None:
     # Drop empty columns, if any.
     tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
+    ####################################################################################################################
+    # Corrections to USGS current data.
+    # Zinc mine reserves in Australia in 2022 is unreasonably high, much larger than the world.
+    tb_flat.loc[(tb_flat["country"] == "Australia") & (tb_flat["year"] == 2022), "reserves|Zinc|Mine|tonnes"] = None
+    ####################################################################################################################
+
     # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")

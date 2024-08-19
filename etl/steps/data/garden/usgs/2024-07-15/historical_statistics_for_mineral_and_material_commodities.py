@@ -543,15 +543,80 @@ def run(dest_dir: str) -> None:
     # Fix some other specific cases.
     # Bismuth in gross weight only has data for the US, and it's all zeros.
     tb_flat.loc[(tb_flat["country"] == "United States"), "production|Bismuth|Mine|tonnes"] = pd.NA
+
+    # Boron mine production data is in gross weight.
+    # However, between 1964 and 1975, it is reported as boron oxide content.
+    # Apart from creating spurious jumps in the data, this causes the US to have a larger production than the world.
+    tb_flat.loc[
+        (tb_flat["country"] == "World")
+        & (tb_flat["year"].isin([1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975])),
+        "production|Boron|Mine|tonnes",
+    ] = None
+    # Also, data from 2006 onwards excludes the US (as US data is "withheld").
+    tb_flat.loc[(tb_flat["country"] == "World") & (tb_flat["year"] >= 2006), "production|Boron|Mine|tonnes"] = None
+
+    # Diatomite mine production data between 1913 and 1918 for US is slightly larger than for the World.
+    # There are notes mentioning that US production around that time was incomplete, so I'll remove all those points.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"]))
+        & (tb_flat["year"].isin([1913, 1914, 1915, 1916, 1917, 1918])),
+        "production|Diatomite|Mine|tonnes",
+    ] = None
+
+    # Helium mine production for the US is larger than the World on specific years.
+    # I understand that these issues are within the uncertainty, and that most production the time came from the US.
+    # So I'll simply remove those points where US > World.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"])) & (tb_flat["year"].isin([1990, 1994])),
+        "production|Helium|Mine|tonnes",
+    ] = None
+
+    # A similar thing happens to Mica mine production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"]))
+        & (tb_flat["year"].isin([1938, 1940, 1941, 1945, 1947, 1949])),
+        "production|Mica|Mine, scrap and flake|tonnes",
+    ] = None
+
+    # A similar thing happens to Sulfur processing production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"])) & (tb_flat["year"].isin([1920])),
+        "production|Sulfur|Processing|tonnes",
+    ] = None
+
+    # Tellurium refinery production is very incomplete, as pointed out in the notes.
+    # Specifically, a large range of years exclude US data because of proprietary data.
+    # To be conservative, remove all those years.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"] >= 1976) & (tb_flat["year"] <= 2003),
+        "production|Tellurium|Refinery|tonnes",
+    ] = None
+    # Also, in some other years in the past, US production was larger than World production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1930, 1933])),
+        "production|Tellurium|Refinery|tonnes",
+    ] = None
+
+    # Vanadium mine production does not include US production in a range of years.
+    # Remove those years.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1927, 1928, 1929, 1930, 1931, 1997, 1998, 1999])),
+        "production|Vanadium|Mine|tonnes",
+    ] = None
+    # Also, in some other years in the past, US production was larger than World production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1913, 1914, 1921, 1922])),
+        "production|Vanadium|Mine|tonnes",
+    ] = None
     ####################################################################################################################
 
     # Format tables conveniently.
-    tb_combined = tb_combined.format(
-        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
-    )
-    tb_combined = tb_combined.astype(
-        {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
-    )
+    # tb_combined = tb_combined.format(
+    #     ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
+    # )
+    # tb_combined = tb_combined.astype(
+    #     {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
+    # )
     tb_unit_value = tb_unit_value.format(
         ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_unit_value"
     )
@@ -564,7 +629,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_unit_value, tb_flat], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_unit_value, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
