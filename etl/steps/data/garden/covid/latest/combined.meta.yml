@@ -15,7 +15,7 @@ dataset:
     This dataset is built by combinining indicators of multiple COVID-19 indicators. It estimates various indicators based on relationships between others.
 
 tables:
-  testing:
+  combined:
     variables:
       short_term_tests_per_case:
         title: Daily COVID-19 tests per new confirmed case

@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Format
-    tb = tb.format(["country", "date"])
+    tb = tb.format(["country", "date"], short_name="combined")
 
     #
     # Save outputs.
