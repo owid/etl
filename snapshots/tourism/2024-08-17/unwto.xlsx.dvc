@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: 145 key tourism statistics
     description: |-
-      The United Nations World Tourism Organization (UNWTO) collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation), Outbound Tourism (including Departures and Tourism expenditure in other countries), Tourism Industries (such as Accommodation in hotels and similar establishments), and Employment (including the number of employees in tourism industries).
+      The United Nations World Tourism Organization (UNWTO) collects data from countries through annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008) standard, a framework approved by the United Nations. The data covers various aspects of tourism, such as inbound tourism (including arrivals by region, main purpose, and mode of transport, as well as accommodation and tourism expenditure in the country), domestic Tourism (including trips and accommodation), outbound tourism (including departures and tourism expenditure in other countries), tourism industries (such as accommodation in hotels and similar establishments), and employment (including the number of employees in tourism industries).
     date_published: "2024-01-31"
 
     # Citation
@@ -21,7 +21,7 @@ meta:
 
     # License
     license:
-      name: © UNWTO
+      name:  © UNWTO, 92844/14/23
 
 outs:
   - md5: 38c3a175d10dc91e07c815f58668f4cf
