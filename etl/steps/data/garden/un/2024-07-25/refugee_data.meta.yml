@@ -67,6 +67,14 @@ tables:
           numDecimalPlaces: 1
         description_key:
           - "{definitions.description_refugee_general}"
+      refugees_per_100k_pop_origin:
+        title: Refugees by country of origin per 100,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of origin, per 100,000 people in that country. This measures the total number of refugees from the country; not the number per year.
+        description_from_producer: "{definitions.description_refugee}"
+        display:
+          numDecimalPlaces: 1
+        description_key:
+          - "{definitions.description_refugee_general}"
       asylum_seekers_origin:
         title: Asylum seekers by country of origin
         description_short: Number of [asylum seekers](#dod:asylumseeker), so people who have a pending application for asylum or refugee status in any country, by the country of origin. This measures the total number of asylum seekers from the country; not the number per year.
@@ -114,6 +122,14 @@ tables:
       refugees_per_1000_pop_asylum:
         title: Refugees by destination per 1,000 people
         description_short: Number of [refugees](#dod:refugee) by country of asylum, per 1,000 people in that country. This measures the total number of refugees; not the number per year.
+        description_from_producer: "{definitions.description_refugee}"
+        display:
+          numDecimalPlaces: 1
+        description_key:
+          - "{definitions.description_refugee_general}"
+      refugees_per_100k_pop_asylum:
+        title: Refugees by destination per 100,000 people
+        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 100,000 people in that country. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1

@@ -721,7 +721,7 @@ MAP_BRACKETS = {
     },
     "asylum_seekers_per_100k_pop_asylum": {
         "colorScaleScheme": "YlGnBu",
-        "colorScaleNumericBins": [1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 0.0],
+        "colorScaleNumericBins": [1.0, 3.0, 10.0, 30.0, 100.0, 300.0, 1000.0, 0.0],
     },
     "returned_idpss_origin_per_1000": {
         "colorScaleScheme": "BuGn",

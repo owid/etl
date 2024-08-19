@@ -94,6 +94,10 @@ def run(dest_dir: str) -> None:
     tb["refugees_per_1000_pop_origin"] = tb["refugees_under_unhcrs_mandate_origin"] / tb["population"] * 1000
     tb["refugees_per_1000_pop_asylum"] = tb["refugees_under_unhcrs_mandate_asylum"] / tb["population"] * 1000
 
+    # for sdg indicators add per 100k population
+    tb["refugees_per_100k_pop_origin"] = tb["refugees_under_unhcrs_mandate_origin"] / tb["population"] * 100_000
+    tb["refugees_per_100k_pop_asylum"] = tb["refugees_under_unhcrs_mandate_asylum"] / tb["population"] * 100_000
+
     tb["asylum_seekers_per_100k_pop_origin"] = tb["asylum_seekers_origin"] / tb["population"] * 100_000
     tb["asylum_seekers_per_100k_pop_asylum"] = tb["asylum_seekers_asylum"] / tb["population"] * 100_000
 
