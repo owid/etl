@@ -118,7 +118,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("wvs_trust.csv")
+    snap = paths.load_snapshot("wvs_trust.csv")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
