@@ -17,6 +17,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["monkeypox"].reset_index()
     # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
     country_mask = tb["country"] == "Democratic Republic of Congo"
+    tb["annotation"] = ""
     for col in tb.columns:
         if "deaths" in col:
             # Update the annotation column for matching rows
