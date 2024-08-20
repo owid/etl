@@ -24,7 +24,8 @@ def run(dest_dir: str) -> None:
                 tb.loc[country_mask, "annotation"]
                 + "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
             )
-    #
+
+    tb = tb.format(["country", "date"])
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
