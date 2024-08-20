@@ -1016,7 +1016,7 @@ def aggregate_coal(tb: Table) -> Table:
     #     px.line(compare, x="year", y="value", color="sub_commodity", markers=True, title=country).show()
 
     # Select coal production data.
-    tb_coal = tb[(tb["category"] == "Production") & (tb["commodity"]=="Coal")]
+    tb_coal = tb[(tb["category"] == "Production") & (tb["commodity"] == "Coal")]
 
     # Create a series with the sum of all coal data per country-year.
     tb_coal_sum = tb_coal.groupby(["country", "year"], observed=True, as_index=False).agg({"value": "sum"})
@@ -1033,20 +1033,64 @@ def aggregate_coal(tb: Table) -> Table:
     #         px.line(compare[compare["country"] == country], x="year", y="value", color="source", markers=True, title=country).show()
 
     # Concatenate the old data (removing the disaggregated coal data) with the aggregated coal data.
-    tb_coal_sum = tb_coal_sum.assign(**{"category": "Production", "commodity": "Coal", "sub_commodity": "Mine", "unit": "tonnes"})
+    tb_coal_sum = tb_coal_sum.assign(
+        **{"category": "Production", "commodity": "Coal", "sub_commodity": "Mine", "unit": "tonnes"}
+    )
     tb = pr.concat([tb.drop(tb_coal.index), tb_coal_sum], ignore_index=True)
 
     ####################################################################################################################
     # Remove some spurious values after visual inspection (comparing with the Statistical Review).
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Germany") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Czechia") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Slovakia") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Mexico") & (tb["year"] == 2019) & (tb["commodity"] == "Coal"), "value"] = None
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Pakistan") & (tb["year"] == 1997) & (tb["commodity"] == "Coal"), "value"] = None
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "United Kingdom") & (tb["year"] == 1986) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Germany")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Czechia")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Slovakia")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Mexico")
+        & (tb["year"] == 2019)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Pakistan")
+        & (tb["year"] == 1997)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "United Kingdom")
+        & (tb["year"] == 1986)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
     # For Russia, 2018, 2019, 2020 and 2021 are much higher than the rest, and then 2022 drops in BGS data.
     # This does not happen in the Statistical Review, so it looks spurious.
-    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Russia") & (tb["year"].isin([2018, 2019, 2020, 2021, 2022])) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Russia")
+        & (tb["year"].isin([2018, 2019, 2020, 2021, 2022]))
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
     ####################################################################################################################
 
     return tb

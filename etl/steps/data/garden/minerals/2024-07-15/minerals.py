@@ -556,7 +556,9 @@ def combine_data(
     _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
 
     # It would be useful to have a global total for Coal and Petroleum, which come from BGS and are quite complete.
-    tb_global = tb[tb["country"]=="World (BGS)"][["country", "year", "production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]].reset_index(drop=True)
+    tb_global = tb[tb["country"] == "World (BGS)"][
+        ["country", "year", "production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]
+    ].reset_index(drop=True)
     tb_global["country"] = tb_global["country"].replace("World (BGS)", "World")
 
     # For all other indicators, remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
