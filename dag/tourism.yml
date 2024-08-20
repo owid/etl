@@ -6,7 +6,6 @@ steps:
   data://garden/tourism/2024-08-17/unwto:
     - data://meadow/tourism/2024-08-17/unwto
     - data://garden/demography/2024-07-15/population
-    - data://garden/regions/2023-01-01/regions
     - data://garden/oecd/2024-08-19/ppp_exchange_rates
     - data://garden/bls/2024-05-16/us_consumer_prices
     - data://garden/worldbank_wdi/2024-05-20/wdi  # includes inflation data for every country up to 2022

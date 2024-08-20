@@ -10,18 +10,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-# Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
-
-# Define fraction of allowed NaNs per year
-FRAC_ALLOWED_NANS_PER_YEAR = 0.999
-# Define accepted overlaps
-ACCEPTED_OVERLAPS = [
-    {year: {"Serbia and Montenegro", "Serbia"} for year in range(1995, 2023)},
-    {year: {"Montenegro", "Serbia and Montenegro"} for year in range(1995, 2023)},
-]
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -29,7 +17,6 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("unwto")
     ds_population = paths.load_dataset("population")
-    ds_regions = paths.load_dataset("regions")
 
     ds_us_cpi = paths.load_dataset("us_consumer_prices")
     ds_exchange_rates = paths.load_dataset("ppp_exchange_rates")
@@ -106,13 +93,6 @@ def run(dest_dir: str) -> None:
 
     tb_regions_sum = tb[region_columns + ["year"]].groupby("year").sum().reset_index()
 
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        ds_regions=ds_regions,
-        regions=REGIONS,
-        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
-        accepted_overlaps=ACCEPTED_OVERLAPS,
-    )
     # Rename the columns
     rename_mapping = {
         "in_tour_regions_africa": "Africa (UNWTO)",
