@@ -91,6 +91,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
     # "production|Cobalt|Mine|tonnes",
+    "production|Cobalt|Refinery|tonnes",
     "production|Copper|Mine|tonnes",
     "production|Copper|Refinery|tonnes",
     # BGS and USGS data are informed on very separated year ranges. It's not possible to assess their agreement.
@@ -541,6 +542,10 @@ def combine_data(
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([2008, 2021])),
         "production|Magnesium metal|Smelter|tonnes",
+    ] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1992])),
+        "production|Cobalt|Refinery|tonnes",
     ] = None
 
     ####################################################################################################################
