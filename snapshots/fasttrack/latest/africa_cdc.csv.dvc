@@ -17,6 +17,6 @@ meta:
   license:
     name: © All rights reserved Africa CDC
 outs:
-  - md5: f858bfe6b8f28653a3fecf0fd3656c68
-    size: 1808
+  - md5: 36e233362700df501428f2d28bbf3f8c
+    size: 1730
     path: africa_cdc.csv
