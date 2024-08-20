@@ -35,17 +35,47 @@ definitions:
       - "#fdae61"
       - "#f46d43"
       - "#d73027"
-
-all_licenses:
-  - license_hmd: &license-hmd
-      name: Creative Commons BY 4.0
-      url: https://www.mortality.org/Data/UserAgreement
-  - license_wmd: &license-wmd
-      name: MIT License
-      url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
-  - license_xm_kk: &license-xm_kk
-      name: GPL-3.0
-      url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
+  origins:
+    hmd: &origin_hmd
+      title: "Human Mortality Database"
+      producer: Human Mortality Database
+      date_published: "2024"
+      url_main: "https://www.mortality.org"
+      license:
+        name: Creative Commons BY 4.0
+        url: https://www.mortality.org/Data/UserAgreement
+      date_accessed: "2024-08-20"
+      citation_full: |-
+        HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
+    wmd: &origin_wmd
+      title: "World Mortality Database"
+      producer: World Mortality Database
+      date_published: "2024"
+      url_main: "https://github.com/akarlinsky/world_mortality"
+      license:
+        name: MIT License
+        url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
+      date_accessed: "2024-08-20"
+      citation_full: |-
+        Karlinsky & Kobak 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+    xm_kk: &origin_kk
+      title: "Excess mortality during the COVID-19 pandemic"
+      producer: Karlinsky & Kobak
+      date_published: "2024"
+      url_main: "https://github.com/dkobak/excess-mortality"
+      license:
+        name: GPL-3.0
+        url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
+      date_accessed: "2024-08-20"
+      citation_full: |-
+        Karlinsky & Kobak, 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset. eLife 10:e69336. https://elifesciences.org/articles/69336.
+  common:
+    origins:
+      - *origin_hmd
+      - *origin_wmd
+    description_key:
+      - All-cause mortality data is from the Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD). Both sources are updated weekly.
+      - "We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in this spreadsheet: https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing."
 
 dataset:
   title: Excess Mortality (various sources)
@@ -62,13 +92,9 @@ dataset:
 
     For important issues and caveats to understand when interpreting excess mortality data, see our excess mortality page at https://ourworldindata.org/excess-mortality-covid.
 
-    For a more detailed description of the HMD data, including week date definitions, the coverage (of individuals, locations, and time), whether dates are for death occurrence or registration, the original national source information, and important caveats, see the HMD metadata file at https://www.mortality.org/Public/STMF_DOC/STMFmetadata.pdf.
+    For a more detailed description_short of the HMD data, including week date definitions, the coverage (of individuals, locations, and time), whether dates are for death occurrence or registration, the original national source information, and important caveats, see the HMD metadata file at https://www.mortality.org/Public/STMF_DOC/STMFmetadata.pdf.
 
-    For a more detailed description of the WMD data, including original source information, see their GitHub page at https://github.com/akarlinsky/world_mortality.
-  licenses:
-    - *license-hmd
-    - *license-wmd
-    - *license-xm_kk
+    For a more detailed description_short of the WMD data, including original source information, see their GitHub page at https://github.com/akarlinsky/world_mortality.
 
 tables:
   excess_mortality:
@@ -79,109 +105,73 @@ tables:
         # title: Excess mortality P-scores (5-year average baseline, all ages)
         unit: "%"
         short_unit: "%"
-        description: P-scores using 5-year average baseline for all ages.
+        description_short: P-scores using 5-year average baseline for all ages.
         display:
           name: Excess mortality P-scores, 5-year average baseline, all ages
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       p_avg_0_14:
         title: p_avg_0_14
         # title: Excess mortality P-scores (5-year average baseline, 0–14)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 0–14.
+        description_short: P-scores using projected baseline for ages 0–14.
         display:
           name: Ages 0–14
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       p_avg_15_64:
         title: p_avg_15_64
         # title: Excess mortality P-scores (5-year average baseline, 15–64)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 15–64
+        description_short: P-scores using projected baseline for ages 15–64
         display:
           name: Ages 15–64
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       p_avg_65_74:
         title: p_avg_65_74
         # title: Excess mortality P-scores (5-year average baseline, 65–74)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 65–74.
+        description_short: P-scores using projected baseline for ages 65–74.
         display:
           name: Ages 65–74
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       p_avg_75_84:
         title: p_avg_75_84
         # title: Excess mortality P-scores (5-year average baseline, 75–84)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 75–84.
+        description_short: P-scores using projected baseline for ages 75–84.
         display:
           name: Ages 75–84
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       p_avg_85p:
         title: p_avg_85p
         # title: Excess mortality P-scores (5-year average baseline, 85+)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 85 and above.
+        description_short: P-scores using projected baseline for ages 85 and above.
         display:
           name: Ages 85+
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
 
       # p_proj_*
       p_proj_all_ages:
@@ -189,7 +179,7 @@ tables:
         # title: Excess mortality P-scores (projected baseline, all ages)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for all ages
+        description_short: P-scores using projected baseline for all ages
         display:
           name: Excess mortality P-scores, projected baseline, all ages.
           includeInTable: true
@@ -197,14 +187,10 @@ tables:
           zeroDay: 2020-01-01
           tolerance: 30
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Deaths from all causes compared to projection based on previous years"
@@ -217,419 +203,283 @@ tables:
         # title: Excess mortality P-scores (projected baseline, 0–14)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 0–14.
+        description_short: P-scores using projected baseline for ages 0–14.
         display:
           name: Ages 0–14
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       p_proj_15_64:
         title: p_proj_15_64
         # title: Excess mortality P-scores (projected baseline, 15–64)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 15–64.
+        description_short: P-scores using projected baseline for ages 15–64.
         display:
           name: Ages 15–64
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       p_proj_65_74:
         title: p_proj_65_74
         # title: Excess mortality P-scores (projected baseline, 65–74)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 65–74.
+        description_short: P-scores using projected baseline for ages 65–74.
         display:
           name: Ages 65–74
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       p_proj_75_84:
         title: p_proj_75_84
         # title: Excess mortality P-scores (projected baseline, 75–84)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 75–84.
+        description_short: P-scores using projected baseline for ages 75–84.
         display:
           name: Ages 75–84
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       p_proj_85p:
         title: p_proj_85p
         # title: Excess mortality P-scores (projected baseline, 85+)
         unit: "%"
         short_unit: "%"
-        description: P-scores using projected baseline for ages 85 and above.
+        description_short: P-scores using projected baseline for ages 85 and above.
         display:
           name: Ages 85+
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
 
       # deaths_*_all_ages
       deaths_2010_all_ages:
         title: deaths_2010_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2010.
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2010.
       deaths_2011_all_ages:
         title: deaths_2011_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2011.
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2011.
       deaths_2012_all_ages:
         title: deaths_2012_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2012.
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2012.
       deaths_2013_all_ages:
         title: deaths_2013_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2013.
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2013.
       deaths_2014_all_ages:
         title: deaths_2014_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2014.
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: World Mortality Dataset (2024)
-          - name: Human Mortality Database (2024)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2014.
       deaths_2015_all_ages:
         title: deaths_2015_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2015.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2015.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2016_all_ages:
         title: deaths_2016_all_ages
         # title: Number of deaths (weekly or monthly, 2016)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2016.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2016.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2017_all_ages:
         title: deaths_2017_all_ages
         # title: Number of deaths (weekly or monthly, 2017)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2017.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2017.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2018_all_ages:
         title: deaths_2018_all_ages
         # title: Number of deaths (weekly or monthly, 2018)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2018.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2018.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2019_all_ages:
         title: deaths_2019_all_ages
         # title: Number of deaths (weekly or monthly, 2019)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2019.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2019.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2020.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2020.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2021_all_ages:
         title: deaths_2021_all_ages
         # title: Number of deaths (weekly or monthly, 2021)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2021.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2021.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2022_all_ages:
         title: deaths_2022_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2022.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2022.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2023_all_ages:
         title: deaths_2023_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2023.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2023.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_2024_all_ages:
         title: deaths_2024_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
-        unit: ""
-        description: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)
-        unit: ""
-        description: Reported number of weekly or monthly deaths from all causes for all ages since 2020.
+        unit: "deaths"
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages since 2020.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
 
       # other metrics
       excess_proj_all_ages:
         title: excess_proj_all_ages
         # title: Excess deaths (projected, all ages)
-        unit: ""
-        description: The number of excess deaths; calculated as reported deaths minus projected deaths.
+        unit: "deaths"
+        description_short: The number of excess deaths; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       excess_per_million_proj_all_ages:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
         unit: ""
-        description: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths
+        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       average_deaths_2015_2019_all_ages:
         title: average_deaths_2015_2019_all_ages
         # title: Average number of deaths (2015–2019, all ages)
         unit: ""
-        description: The average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
+        description_short: The average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
       projected_deaths_since_2020_all_ages:
         title: projected_deaths_since_2020_all_ages
         # title: Projected number of deaths (2020–2022, all ages)
         unit: ""
-        description: Projected number of weekly or monthly deaths from all causes for all ages for since 2020.
+        description_short: Projected number of weekly or monthly deaths from all causes for all ages for since 2020.
         display:
           name: Projected, 2020
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
           numDecimalPlaces: 0
-        licenses:
-          - *license-xm_kk
-        sources:
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_kk
       cum_excess_proj_all_ages:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description: The cumulative number of excess deaths; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
@@ -653,21 +503,19 @@ tables:
         title: cum_proj_deaths_all_ages
         # title: Cumulative number of deaths (projected, all ages)
         unit: ""
-        description: The cumulative number of projected deaths; cumulated starting 1 January 2020
+        description_short: The cumulative number of projected deaths; cumulated starting 1 January 2020
         display:
           includeInTable: true
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-xm_kk
-        sources:
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_kk
       cum_p_proj_all_ages:
         title: cum_p_proj_all_ages
         # title: Cumulative p-score (projected, all ages)
         unit: "%"
         short_unit: "%"
-        description: Cumulative P-scores using projected baseline for all ages
+        description_short: Cumulative P-scores using projected baseline for all ages
         display:
           name: Excess mortality cumulative P-scores, projected baseline, all ages
           numDecimalPlaces: 0
@@ -675,14 +523,10 @@ tables:
           tolerance: 30
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative deaths from all causes compared to projection based on previous years"
@@ -694,21 +538,17 @@ tables:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
@@ -731,52 +571,40 @@ tables:
       time:
         title: Time
         unit: ""
-        description: The week or month number in the year
+        description_short: The week or month number in the year
         display:
           includeInTable: true
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
       time_unit:
         title: Time unit
         unit: ""
-        description: Denotes whether the “time” column values are weekly or monthly
+        description_short: Denotes whether the “time” column values are weekly or monthly
         display:
           includeInTable: true
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
 
       # Last 12 months
       cum_excess_proj_all_ages_last12m:
         title: cum_excess_proj_all_ages_last12m
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description: The cumulative number of excess deaths in the last 12 months.
+        description_short: The cumulative number of excess deaths in the last 12 months.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
-        sources:
-          - name: Human Mortality Database (2024)
-          - name: World Mortality Dataset (2024)
-          - name: Karlinsky and Kobak (2021)
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
@@ -800,17 +628,17 @@ tables:
         title: cum_excess_per_million_proj_all_ages_last12m
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description: The cumulative number of excess deaths per million people in the population, in the last 12 months.
+        description_short: The cumulative number of excess deaths per million people in the population, in the last 12 months.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
           yearIsDay: true
           zeroDay: 2020-01-01
-        licenses:
-          - *license-hmd
-          - *license-wmd
-          - *license-xm_kk
+        origins:
+          - *origin_hmd
+          - *origin_wmd
+          - *origin_kk
         sources:
           - name: Human Mortality Database (2024)
           - name: World Mortality Dataset (2024)
