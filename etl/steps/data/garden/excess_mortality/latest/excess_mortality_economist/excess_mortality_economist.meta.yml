@@ -21,8 +21,8 @@ definitions:
         citation_full: |-
           The Economist and Solstad, S. (corresponding author), 2021. The pandemic's true death toll. [online] The Economist. Available at: https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates [Accessed {TODAY}]. First published in the article "Counting the dead", The Economist, issue 20, 2021.
         url_main: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model
-        date_accessed: "{TODAY}"
-        date_published: "{TODAY}"
+        date_accessed: "2024-08-20"
+        date_published: "2024"
 
 dataset:
   title: COVID-19, Excess Mortality
