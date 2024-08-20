@@ -494,7 +494,8 @@ COMMODITY_MAPPING = {
     ("Sillimanite minerals", "Mullite"): None,
     ("Sillimanite minerals", "Mullite, chamotte, dinas earth"): None,
     ("Sillimanite minerals", "Other"): None,
-    ("Sillimanite minerals", "Sillimanite"): ("Sillimanite", "Mine"),
+    # NOTE: The following could be mapped to ("Sillimanite", "Mine"), but it has very sparse data, and it's not included in USGS data.
+    ("Sillimanite minerals", "Sillimanite"): None,
     ("Sillimanite minerals", "Sillimanite minerals"): None,
     ("Sillimanite minerals", "Sillimanite minerals & dinas earth"): None,
     ("Sillimanite minerals", "Sillimanite minerals, calcined"): None,
