@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Merge tables.
-    tb = pr.merge(tb_gini, tb_relative_poverty, on=["country", "year"], how="outer")
+    tb = pr.merge(tb_gini, tb_relative_poverty, on=["country", "year"], how="outer", short_name=paths.short_name)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
