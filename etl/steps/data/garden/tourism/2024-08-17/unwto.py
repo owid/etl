@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -130,23 +131,43 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi):
+def adjust_inflation_cost_of_living(tb: Table, tb_us_cpi: Table, tb_exchange_rates: Table, tb_all_cpi: Table):
+    """
+    Adjusts the inbound and outbound tourism expenditure for inflation and cost of living.
+    Inbound expenditure is adjusted for local inflation and purchasing power parity.
+    Outbound expenditure is adjusted for U.S. inflation.
+
+    Args:
+        tb (Table): The main dataframe containing the tourism data.
+        tb_us_cpi (Table): The dataframe containing the U.S. CPI data (U.S. Bureau of Labor Statistics).
+        tb_exchange_rates (Table): The dataframe containing the exchange rate data (OECD).
+        tb_all_cpi (Table): The dataframe containing the CPI data for all countrie (WDI).
+
+    """
+    # Calculate the U.S. CPI adjustment factor for 2021
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
     tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["all_items"] / cpi_2021
+
+    # Filter the U.S. CPI data to just the 2021 values
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
+
+    # Merge the main Table with the 2021 U.S. CPI data
     tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="left")
 
-    tb_cpi_inv["outbound_exp_us_cpi_adjust"] = tb_cpi_inv["out_tour_exp_travel"] / (tb_cpi_inv["cpi_adj_2021"])
+    # Adjust the outbound expenditure for U.S. CPI
+    tb_cpi_inv["outbound_exp_us_cpi_adjust"] = tb_cpi_inv["out_tour_exp_travel"] / tb_cpi_inv["cpi_adj_2021"]
+
+    # Drop the temporary 'cpi_adj_2021' column
     tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
 
-    # Merge expenditure, inflation and exchange rates
+    # Merge the Tables for expenditure, inflation across the world, and exchange rates
     tb = pr.merge(tb_cpi_inv, tb_all_cpi, on=["country", "year"], how="left")
     tb = pr.merge(tb, tb_exchange_rates, on=["country", "year"], how="left")
 
-    # Filter the dataframe for year 2021
+    # Filter the Table for the year 2021
     tb_2021 = tb[tb["year"] == 2021]
 
-    # Merge the 2021 values with the original dataframe based on the 'country' column
+    # Merge the 2021 values with the original Table
     tb = pr.merge(
         tb,
         tb_2021[["country", "fp_cpi_totl", "purchasing_power_parities_for_household_final_consumption_expenditure"]],
@@ -154,14 +175,15 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
         suffixes=("", "_2021"),
     )
 
-    # CPI from 2021 instead of 2010
+    # Normalize the CPI to 2021 values
     tb["fp_cpi_totl_normalized"] = 100 * tb["fp_cpi_totl"] / tb["fp_cpi_totl_2021"]
 
-    # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
+    # Adjust the inbound expenditure for local inflation and purchasing power parity
     tb["inbound_ppp_cpi_adj_2021"] = (
         100 * (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["fp_cpi_totl_normalized"]
     ) / tb["purchasing_power_parities_for_household_final_consumption_expenditure_2021"]
 
+    # Drop unnecessary columns
     tb = tb.drop(
         [
             "fp_cpi_totl",
@@ -176,6 +198,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
         ],
         axis=1,
     )
+
     return tb
 
 
