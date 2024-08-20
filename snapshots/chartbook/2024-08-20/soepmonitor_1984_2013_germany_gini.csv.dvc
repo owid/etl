@@ -33,4 +33,4 @@ meta:
 outs:
   - md5: 9880a9d89464779b7fae848a631a88c6
     size: 578
-    path: soepmonitor_1984_1983_germany_gini.csv
+    path: soepmonitor_1984_2013_germany_gini.csv

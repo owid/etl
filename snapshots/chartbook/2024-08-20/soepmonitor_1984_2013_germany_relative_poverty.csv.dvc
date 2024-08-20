@@ -33,4 +33,4 @@ meta:
 outs:
   - md5: 54d956399ff94c88ac54ca5c4553bfd9
     size: 590
-    path: soepmonitor_1984_1983_germany_relative_poverty.csv
+    path: soepmonitor_1984_2013_germany_relative_poverty.csv
