@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: national currency per US dollar
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ppp_exchange_rates:
+    variables:
+      exchange_rates__average:
+        title: Average exchange rate
+
+      exchange_rates__end_of_period:
+        title: End of period exchange rate
+
+      purchasing_power_parities_for_gdp:
+        title: Purchasing power parities for GDP
+
+      purchasing_power_parities_for_actual_individual_consumption:
+        title: Purchasing power parities for actual individual consumption
+
+      purchasing_power_parities_for_household_final_consumption_expenditure:
+        title: Purchasing power parities for household final consumption expenditure

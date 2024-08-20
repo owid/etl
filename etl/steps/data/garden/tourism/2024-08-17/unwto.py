@@ -31,8 +31,15 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
 
-    # Read table from meadow dataset.
+    ds_us_cpi = paths.load_dataset("us_consumer_prices")
+    ds_exchange_rates = paths.load_dataset("ppp_exchange_rates")
+    ds_garden = paths.load_dataset("gender_statistics")
+
+    # Read table from meadow dataset and the datasets used for adjusting for inflation and cost of living
     tb = ds_meadow["unwto"].reset_index()
+    tb_us_cpi = ds_us_cpi["us_consumer_prices"].reset_index()
+    tb_exchange_rates = ds_exchange_rates["ppp_exchange_rates"].reset_index()
+    tb_all_cpi = ds_garden["gender_statistics"]["fp_cpi_totl_zg"].reset_index()
 
     #
     # Process data.
@@ -128,6 +135,8 @@ def run(dest_dir: str) -> None:
     # Add origins to the new column
     tb["inbound_tourism_by_region"].metadata.origins = tb["in_tour_regions_africa"].metadata.origins
 
+    # Adjust inbound and outbound expenditure for inflation and cost of living
+    tb = adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi)
     tb = tb.format(["country", "year"])
 
     #
@@ -140,6 +149,62 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi):
+    cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
+    tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["all_items"] / cpi_2021
+    tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
+    tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="inner")
+
+    tb_cpi_inv["outbound_exp_us_cpi_adjust"] = 100 * tb_cpi_inv["out_tour_exp_travel"] / (tb_cpi_inv["cpi_adj_2021"])
+    tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
+
+    # TO DO : Convert back to exchange rates, adjust exchange rates for inflation and then convert back to PPP
+    tb = pr.merge(
+        tb_cpi_inv,
+        tb_exchange_rates[
+            [
+                "country",
+                "year",
+                "purchasing_power_parities_for_actual_individual_consumption",
+                "exchange_rates__average",
+            ]
+        ],
+        on=["country", "year"],
+        how="left",
+    )
+    tb = pr.merge(
+        tb,
+        tb_all_cpi,
+        on=["country", "year"],
+        how="left",
+    )
+
+    # Get the CPI value for the year 2021
+    cpi_all_2021 = tb.loc[tb["year"] == 2021, "fp_cpi_totl_zg"].values[0]
+
+    # Adjust CPI values relative to 2021
+    tb["cpi_adj_2021"] = 100 * tb["fp_cpi_totl_zg"] / cpi_all_2021
+
+    # Get the PPP value for actual individual consumption for 2021
+    ppp_2021 = tb.loc[tb["year"] == 2021, "purchasing_power_parities_for_actual_individual_consumption"].values[0]
+
+    # Convert inbound expenditure to local currency, adjust for local inflation, and convert back to international dollars
+    tb["inbound_ppp_cpi_adj_2021"] = (
+        100 * (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["cpi_adj_2021"]
+    ) / ppp_2021
+    tb = tb.drop(
+        [
+            "fp_cpi_totl_zg",
+            "cpi_adj_2021",
+            "purchasing_power_parities_for_actual_individual_consumption",
+            "exchange_rates__average",
+        ],
+        axis=1,
+    )
+
+    return tb
 
 
 def shorten_column_names(columns):

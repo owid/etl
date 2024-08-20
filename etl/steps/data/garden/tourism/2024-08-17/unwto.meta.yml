@@ -172,10 +172,16 @@ tables:
       in_tour_exp_travel:
         title: International expenditure on travel
         unit: US dollars
+        presentation:
+          grapher_config:
+            note: *note_exp
 
       in_tour_exp_the_country:
         title: International expenditure in the country
         unit: US dollars
+        presentation:
+          grapher_config:
+            note: *note_exp
 
       in_tour_purpose_business_and_prof:
         title: International trips for business and professional reasons
@@ -191,57 +197,85 @@ tables:
       in_tour_purpose_total:
         title: International tourists visiting for all purposes
         unit: arrivals
+        description_key: *descr_key_purpose
 
       in_tour_regions_of_which_nat_res_abroad:
-        title: International tourists visiting natural and rural areas abroad
+        title: International tourists visiting that otherwise reside abroad
         unit: arrivals
+        description_key: *desc_key_arrivals
 
       in_tour_regions_africa:
         title: International tourists visiting from Africa
         unit: arrivals
+        description_short: Number of trips by people who arrive from Africa.
+        description_key: *desc_key_arrivals
+
 
       in_tour_regions_americas:
         title: International tourists visiting from the Americas
         unit: arrivals
+        description_short: Number of trips by people who arrive from the Americas.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_east_asia_and_the_pacific:
         title: International tourists visiting from East Asia and the Pacific
         unit: arrivals
+        description_short: Number of trips by people who arrive from East Asia and the Pacific.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_europe:
         title: International tourists visiting from Europe
         unit: arrivals
+        description_short: Number of trips by people who arrive from Europe.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_middle_east:
         title: International tourists visiting from the Middle East
         unit: arrivals
+        description_short: Number of trips by people who arrive from the Middle East.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_other_not_class:
         title: International tourists visiting from other regions not classified
         unit: arrivals
+        description_short: Number of trips by people who arrive from regions not classified.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_south_asia:
         title: International tourists visiting from South Asia
         unit: arrivals
+        description_short: Number of trips by people who arrive from South Asia.
+        description_key: *desc_key_arrivals
 
       in_tour_regions_total:
         title: International tourists visiting from all regions
         unit: arrivals
+        description_short: Number of trips by people who arrive from all regions.
+        description_key: *desc_key_arrivals
 
       in_tour_transport_air:
         title: International tourists arriving by air
         unit: arrivals
+        description_short: Number of trips by people who arrive by air.
+        description_key: *desc_key_arrivals
 
       in_tour_transport_land:
         title: International tourists arriving by land
         unit: arrivals
+        description_short: Number of trips by people who arrive by land.
+        description_key: *desc_key_arrivals
+
       in_tour_transport_water:
         title: International tourists arriving by water
         unit: arrivals
+        description_short: Number of trips by people who arrive by water.
+        description_key: *desc_key_arrivals
 
       in_tour_transport_total:
         title: International tourists arriving by all modes of transport
         unit: arrivals
+        description_short: Number of trips by people who arrive by all modes of transport.
+        description_key: *desc_key_arrivals
 
       out_tour_departures_ovn_vis_tourists:
         title: International tourist trips
@@ -252,23 +286,34 @@ tables:
       out_tour_departures_same_day_vis_excur:
         title: Outbound departures of same-day visitors
         unit: departures
+        description_key: *desc_key_departures
 
       out_tour_departures_total:
         title: Outbound departures of all visitors
         unit: departures
+        description_key: *desc_key_departures
 
       out_tour_exp_passenger_transport:
         title: Outbound expenditure on passenger transport
         unit: US dollars
+        presentation:
+          grapher_config:
+            note: *note_exp
 
       out_tour_exp_travel:
         title: Outbound expenditure on travel
         unit: US dollars
         description_key: *desc_key_exp
+        presentation:
+          grapher_config:
+            note: *note_exp
 
       out_tour_exp_in_other_countries:
         title: International tourist expenditure abroad
         unit: US dollars
+        presentation:
+          grapher_config:
+            note: *note_exp
 
       tour_ind_avg_length_of_stay:
         title: Average length of stay of international visitors
@@ -448,3 +493,34 @@ tables:
           - *desc_key_arrivals
           - The underlying premise behind this indicator is that the country linked to the arrival should correspond to the individual's country of residence.
           - However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
+
+      outbound_exp_us_cpi_adjust:
+        title: Outbound expenditure adjusted for US consumer price index
+        unit: constant 2021 US$
+        description_key:
+          - *desc_key_exp
+          - When reporting a time series of expenditure, comparing observations across time without adjusting for inflation may not yield meaningful results. This is because prices change over time due to factors such as inflation.
+          - In order to enable comparisons across different time periods, it is necessary to consider the impact of price changes.
+          - In the context of this indicator, where there is no breakdown of the destinations where tourists spend their money on travel activities, the data has been adjusted for inflation using the US Consumer Price Index (CPI).
+        description_short: This data is expressed in constant US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
+        presentation:
+          grapher_config:
+            note: This data is expressed in constant 2021 US$. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+
+      inbound_ppp_cpi_adj_2021:
+        title: Inbound expenditure adjusted for purchasing power parity and US consumer price index
+        unit: international-$ in 2021 prices
+        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_processing: The purchasing power parity (PPP) and consumer price index (CPI) are used to adjust the expenditure data for inflation and purchasing power differences. This adjustment allows for a more accurate comparison of expenditure data across different years and countries.
+        description_key:
+          - *desc_key_exp
+          - In the context of this specific indicator, adjustments have been made to account for inflation and differences in the cost of living in the destination countries where tourists spend their money.
+          - To achieve this, the expenditure data has been converted from US dollars to the local currency of each respective country.
+          - The inflation adjustment is based on the Consumer Price Index (CPI) for the year 2021 specific to each country.
+          - Finally, the data is expressed in international 2021 US dollars, enabling consistent and comparable analysis across different destinations and time periods.
+          - Following the adjustment, in countries where the cost of living is lower, the adjusted total expenditure will reflect a higher value.
+          - This indicates that tourist money holds greater purchasing power in terms of acquiring goods and services, allowing tourists to obtain more with their expenditures in these destinations.
+
+        presentation:
+          grapher_config:
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
