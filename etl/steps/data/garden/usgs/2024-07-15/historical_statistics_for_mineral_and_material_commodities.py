@@ -44,7 +44,8 @@ COMMODITY_MAPPING = {
     ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Processing"),
-    ("Cesium", "Total"): ("Cesium", "Mine"),
+    # NOTE: The following could be mapped to ("Cesium", "Mine"), but it has only global data until 1977.
+    ("Cesium", "Total"): None,
     ("Chromium", "Total"): ("Chromium", "Mine"),
     # NOTE: Cobalt total is only used for unit value.
     ("Cobalt", "Total"): ("Cobalt", "Value"),
