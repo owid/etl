@@ -44,7 +44,7 @@ SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 # We will also aggregate all other data to create an "aggregated world" for sanity check purposes (and then remove it).
 # If this aggregated world is larger than USGS' World by more a certain percentage, raise an error.
 # Define that percentage.
-DEVIATION_MAX_ACCEPTED = 15
+DEVIATION_MAX_ACCEPTED = 10
 
 
 # Given that BGS and USGS data often have big discrepancies, we will combine columns only after inspection.
@@ -98,8 +98,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Significant global disagreement during certain years.
     # 'production|Gypsum|Mine|tonnes',
     # Significant global disagreement during certain years.
-    # TODO: This should be investigated.
-    # 'production|Helium|Mine|tonnes',
+    # Here, it seems that the first years of BGS are very incomplete, leading to a World aggregate significantly lower than USGS' World.
+    "production|Helium|Mine|tonnes",
     # Significant global disagreement, noisy data.
     # 'production|Indium|Refinery|tonnes',
     "production|Iodine|Mine|tonnes",
@@ -117,8 +117,9 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Mercury|Mine|tonnes",
     # Reasonable global agreement, except for certain years, and also not for certain countries: Armenia, Iran, Mexico.
     "production|Molybdenum|Mine|tonnes",
-    # Reasonable global agreement, although not for certain years.
-    "production|Nickel|Mine|tonnes",
+    # Reasonable global agreement, but not for certain years, especially 2013.
+    # TODO: This should be investigated.
+    # "production|Nickel|Mine|tonnes",
     # Significant global disagreement, leading to world shares of 191%.
     # "production|Perlite|Mine|tonnes",
     # Reasonably good agreement, except between 1970 and 1976, where BGS is significantly lower. Noisy data.
@@ -148,8 +149,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # Reasonable global agreement, but noisy data.
     "production|Titanium|Mine, rutile|tonnes",
-    # Reasonable global agreement, except for recent years, where shares can probably be >100%.
-    # TODO: Consider discarding.
+    # Reasonable global agreement, except for recent years.
     "production|Tungsten|Mine|tonnes",
     # Reasonable global agreement, except for some years, e.g. 2002, where share becomes 143%. Noisy data.
     # "production|Vanadium|Mine|tonnes",
@@ -166,8 +166,9 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 # NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
 #  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
 # TODO: Consider keeping "World (BGS)" just for run sanity checks and then remove it. This we we will detect >100% shares.
-# COMBINE_BGS_AND_USGS_COLUMNS = [
-# ]
+PLOT_TO_COMPARE_DATA_SOURCES = [
+    # 'production|Helium|Mine|tonnes',
+]
 
 
 def adapt_flat_table(tb_flat: Table) -> Table:
@@ -504,13 +505,25 @@ def combine_data(
     # NOTE: We do this only in cases where this happens in just specific points, and the overall deviation between BGS
     # and USGS is not too high.
     tb.loc[
-        (tb["country"] != "World") & (tb["year"].isin([1990, 1993, 1998, 1999, 2001, 2002, 2003])),
+        (tb["country"] != "World") & (tb["year"].isin([1990, 1993, 1998, 1999, 2001, 2002, 2003, 2007])),
         "production|Mercury|Mine|tonnes",
     ] = None
-    tb.loc[(tb["country"] != "World") & (tb["year"].isin([1997, 2010])), "production|Barite|Mine|tonnes"] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1997, 2006, 2008, 2010, 2011])), "production|Barite|Mine|tonnes"
+    ] = None
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([1972, 1973, 1975])), "production|Fluorspar|Mine|tonnes"
     ] = None
+    tb.loc[(tb["country"] != "World") & (tb["year"] < 1975), "production|Gold|Mine|tonnes"] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([2014])),
+        "production|Lead|Mine|tonnes",
+    ] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([2008, 2021])),
+        "production|Magnesium metal|Smelter|tonnes",
+    ] = None
+
     ####################################################################################################################
 
     # Sanity check: Raise an error if the aggregate of all data is significantly larger than the original "World" given
@@ -525,6 +538,7 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # We want to create a "World" aggregate, just for sanity checks:
     # * We will ensure there are no overlaps between historical and successor regions.
     # * We will ensure that the given "World" agrees with the sum of all countries (within a certain error).
+    # NOTE: This "World aggregate" will be ignored after sanity checks (and we will keep the original USGS' "World").
 
     # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
     accepted_overlaps = [
@@ -614,8 +628,7 @@ def run(dest_dir: str) -> None:
         tb_usgs_historical_flat=tb_usgs_historical_flat,
         tb_bgs_flat=tb_bgs_flat,
         ds_regions=ds_regions,
-        # NOTE: Uncomment to visually inspect columns where BGS and USGS data are combined.
-        # columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS,
+        columns_to_plot=PLOT_TO_COMPARE_DATA_SOURCES,
     )
 
     # Create columns for share of world (i.e. production, import, exports and reserves as a share of global).
