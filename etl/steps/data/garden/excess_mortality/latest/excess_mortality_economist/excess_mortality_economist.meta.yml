@@ -37,16 +37,19 @@ tables:
         display:
           <<: *common_display
           name: Central estimate
+          color: "#B13507"
       cumulative_estimated_daily_excess_deaths_ci_95_bot:
         title: Cumulative excess deaths (95% CI, lower bound)
         unit: "deaths"
         display:
+          color: "#DDB09E"
           <<: *common_display
           name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top:
         title: Cumulative excess deaths (95% CI, upper bound)
         unit: "deaths"
         display:
+          color: "#DDB09E"
           <<: *common_display
           name: Upper bound
 
