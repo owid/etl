@@ -33,12 +33,13 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert messy columns to string.
-    for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
+    # for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
+    for col in ("aother_subtype_details",):
         ix = tb[col].notnull()
         tb.loc[ix, col] = tb.loc[ix, col].astype("str")
 
     # Clean up columns.
-    tb["iso_week"] = tb["iso_week"].replace({"NOTDEFINED": None}).astype(float).astype("Int64")
+    # tb["iso_week"] = tb["iso_week"].replace({"NOTDEFINED": None}).astype(float).astype("Int64")
 
     #
     # Save outputs.

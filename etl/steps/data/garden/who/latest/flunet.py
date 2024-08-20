@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
@@ -128,16 +128,6 @@ def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
     Summing each column and skipping NAs so there is a column of combined values
     """
     flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere"])
-
-    df = df[
-        (df.country == "New Caledonia")
-        & (df.date == "2005-05-16")
-        & (df.hemisphere == "SH")
-        & (df.origin_source == "NOTDEFINED")
-    ]
-
-    print(df.T)
-    __import__("ipdb").set_trace()
 
     df_piv = df.pivot(index=["country", "hemisphere", "date"], columns="origin_source").reset_index()
 
