@@ -72,6 +72,13 @@ tables:
         presentation:
           grapher_config:
             note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                baseColorScheme: Reds
 
   sequencing:
     variables:
