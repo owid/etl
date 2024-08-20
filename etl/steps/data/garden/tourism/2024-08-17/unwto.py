@@ -57,15 +57,14 @@ def run(dest_dir: str) -> None:
         if col not in matching_columns + ["country", "year"]:
             tb[col] = tb[col] * 1000
 
-    # Shortern column names
-    tb.columns = shorten_column_names(tb.columns)
-
     # Find expenditure columns that are in US million and convert
     prefixes_us_dollars = ["inbound_tourism_expenditure", "outbound_tourism_expenditure"]
     matching_columns = [col for col in tb.columns if any(col.startswith(prefix) for prefix in prefixes_us_dollars)]
 
     for col in matching_columns:
         tb[col] = tb[col] * 1e6
+    # Shortern column names
+    tb.columns = shorten_column_names(tb.columns)
 
     # Calculate the business/personal ratio column
     tb["business_personal_ratio"] = tb["in_tour_purpose_business_and_prof"] / tb["in_tour_purpose_personal"]
