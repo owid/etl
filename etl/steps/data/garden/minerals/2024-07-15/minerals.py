@@ -49,6 +49,18 @@ SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 # Define that percentage.
 DEVIATION_MAX_ACCEPTED = 10
 
+# List of known deviations that should not raise an error.
+# The content should be (entity, column, list of years), where entity is either "World (BGS)" or "World (aggregated)".
+# Add to this list specific peaks in BGS data that will be overwritten by more recent USGS data.
+ACCEPTED_DEVIATIONS = [
+    ("World (BGS)", "production|Iodine|Mine|tonnes", [2020, 2022]),
+    ("World (BGS)", "production|Zinc|Mine|tonnes", [2021]),
+    ("World (BGS)", "production|Wollastonite|Mine|tonnes", [2022]),
+    ("World (BGS)", "production|Tungsten|Mine|tonnes", [2020, 2021, 2022]),
+    ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
+    ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
+    ("World (BGS)", "production|Mercury|Mine|tonnes", [2022]),
+]
 
 # Given that BGS and USGS data often have big discrepancies, we will combine columns only after inspection.
 # Specifically, we check that the World aggregate of BGS (constructed in the BGS garden step) coincides reasonably
@@ -440,12 +452,20 @@ def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
                 .dropna()
                 .mean()
             )
-            if deviation_max > DEVIATION_MAX_ACCEPTED:
-                # TODO: Create a list of exceptions to not warn about.
+            if (deviation_max > DEVIATION_MAX_ACCEPTED) and (
+                (entity_to_compare, column, years_with_deviation) not in ACCEPTED_DEVIATIONS
+            ):
                 log.error(
                     f"{entity_to_compare} exceeds World (USGS) data by {deviation_max:.0f}% in {years_with_deviation} (MAPE: {mape:.0f}%) for: {column}"
                 )
-                px.line(_tb, x="year", y=column, color="country", markers=True, title=column).show()
+                px.line(
+                    _tb,
+                    x="year",
+                    y=column,
+                    color="country",
+                    markers=True,
+                    title=f"{column} - Deviation up to {deviation_max:.0f}% {years_with_deviation} (MAPE: {mape:.0f}%)",
+                ).show()
 
 
 def combine_data(
