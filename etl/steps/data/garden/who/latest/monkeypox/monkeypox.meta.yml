@@ -4,9 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Mpox (monkeypox)
-    display:
-      zeroDay: '2021-01-01'
-      yearIsDay: true
 
 dataset:
   update_period_days: 365
