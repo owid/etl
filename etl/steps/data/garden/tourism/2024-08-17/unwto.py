@@ -154,14 +154,14 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
     tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["all_items"] / cpi_2021
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
-    tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="inner")
+    tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="left")
 
     tb_cpi_inv["outbound_exp_us_cpi_adjust"] = tb_cpi_inv["out_tour_exp_travel"] / (tb_cpi_inv["cpi_adj_2021"])
     tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
 
     # Merge expenditure, inflation and exchange rates
-    tb = pr.merge(tb_cpi_inv, tb_all_cpi, on=["country", "year"], how="inner")
-    tb = pr.merge(tb, tb_exchange_rates, on=["country", "year"], how="inner")
+    tb = pr.merge(tb_cpi_inv, tb_all_cpi, on=["country", "year"], how="left")
+    tb = pr.merge(tb, tb_exchange_rates, on=["country", "year"], how="left")
 
     # Filter the dataframe for year 2021
     tb_2021 = tb[tb["year"] == 2021]
