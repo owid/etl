@@ -262,12 +262,15 @@ def pct_change_to_doubling_days(pct_change, periods):
 
 
 def add_per_capita(tb: Table) -> Table:
-    """Add per-million-capita indicators."""
+    """Add per-capita indicators.
+
+    Adds mostly per-million-people indicators. Also, per-100k variants.
+    """
     paths.log.info("Add per-capita indicators…")
     # Fix population value for France (Should not include overseas territories for the WHO)
     tb.loc[tb["country"] == "France", "population_2022"] -= 2e6
     # Estimate per-million-capita indicator variants
-    indicators = [
+    indicators_1m = [
         "new_cases",
         "new_deaths",
         "total_cases",
@@ -277,8 +280,14 @@ def add_per_capita(tb: Table) -> Table:
         "biweekly_cases",
         "biweekly_deaths",
     ]
-    for indicator in indicators:
+    indicators_100k = [
+        "total_deaths",
+        "new_deaths",
+    ]
+    for indicator in indicators_1m:
         tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population_2022"] / 1_000_000)
+    for indicator in indicators_100k:
+        tb[f"{indicator}_per_100k"] = tb[indicator] / (tb["population_2022"] / 1_000_000)
     return tb
 
 
@@ -290,6 +299,7 @@ def add_rolling_avg(tb: Table) -> Table:
         "new_deaths",
         "new_cases_per_million",
         "new_deaths_per_million",
+        "new_deaths_per_100k",
     ]
     tb = tb.copy().sort_values(by="date")
 

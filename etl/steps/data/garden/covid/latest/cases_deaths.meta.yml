@@ -228,6 +228,20 @@ tables:
           numDecimalPlaces: 3
           tolerance: 9999
           <<: *common_display
+      total_deaths_per_100k:
+        title: "Total confirmed deaths due to COVID-19 per 100,000 people"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths per 100,000 people
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          <<: *common_display
 
       ## Daily
       new_deaths:
@@ -253,6 +267,12 @@ tables:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths per million people
             subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+      new_deaths_per_100k:
+        title: "Daily new confirmed deaths due to COVID-19 per 100,000 people"
+        description_short: |-
+          New deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
 
       ## Daily (smoothed)
       new_deaths_7_day_avg_right:
@@ -275,6 +295,15 @@ tables:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths per million people
             subtitle: 7-day rolling average. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+      new_deaths_per_100k_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 per 100,000 people (rolling 7-day average, right-aligned)"
+        unit: "deaths per 100,000 people"
+        description_processing: *daily_population
+        display:
+          name: New deaths (per 100,000)
+          numDecimalPlaces: 3
+          tolerance: 14
+          <<: *common_display
 
       ## Days since
       days_since_5_total_deaths:
