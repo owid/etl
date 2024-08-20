@@ -494,6 +494,7 @@ def combine_data(
     # Create a temporary combined table of BGS and USGS data.
     # Keep the "World" that was aggregated with BGS data as "World (BGS)" just for sanity checks.
     # This will be removed after sanity checks are completed.
+    # NOTE: The only global data from BGS that will be kept is coal and petroleum production.
     tb_bgs_flat["country"] = tb_bgs_flat["country"].astype("string").replace("World", "World (BGS)")
     tb_bgs_and_usgs = combine_two_overlapping_dataframes(
         df1=tb_usgs_combined_flat, df2=tb_bgs_flat, index_columns=["country", "year"]
@@ -554,8 +555,24 @@ def combine_data(
     # by USGS.
     _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
 
-    # Remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
+    # It would be useful to have a global total for Coal and Petroleum, which come from BGS and are quite complete.
+    tb_global = tb[tb["country"]=="World (BGS)"][["country", "year", "production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]].reset_index(drop=True)
+    tb_global["country"] = tb_global["country"].replace("World (BGS)", "World")
+
+    # For all other indicators, remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
     tb = tb[tb["country"] != "World (BGS)"].reset_index(drop=True)
+    tb = combine_two_overlapping_dataframes(tb, tb_global, index_columns=["country", "year"])
+
+    # # Visually compare the resulting Coal and Oil global data with the ones from the Statistical Review of World Energy.
+    # from etl.paths import DATA_DIR
+    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read_table("statistical_review_of_world_energy")
+    # tb_sr = tb_sr[tb_sr["country"]=="World"][["country", "year", 'coal_production_mt', 'oil_production_mt']].rename(columns={"coal_production_mt": "production|Coal|Mine|tonnes", "oil_production_mt": "production|Petroleum|Crude|tonnes"})
+    # tb_sr[["production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]] *= 1e6
+    # for column in ["production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]:
+    #     compare = pr.concat([tb_sr.assign(**{"source": "EI"}), tb_global[["country", "year", column]].assign(**{"source": "BGS"})], ignore_index=True)
+    #     px.line(compare, x="year", y=column, color="source", markers=True, title=column).show()
+
+    # Indeed, the aggregated global coal and petroleum production obtained from BGS data is reasonable agreement with the Statistical Review.
 
     return tb
 
