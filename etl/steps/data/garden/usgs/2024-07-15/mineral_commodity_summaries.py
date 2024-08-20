@@ -386,6 +386,7 @@ FOOTNOTES = {
     "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
+    "reserves|Platinum group metals|Mine, platinum|tonnes": "Reserves include all platinum group metals.",
 }
 
 # Dictionary of special units.
