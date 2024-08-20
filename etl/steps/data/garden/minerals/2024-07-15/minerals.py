@@ -70,7 +70,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Aluminum|Smelter|tonnes",
     # Reasonable agreement overall, but disagreement during certain periods, leading to >100% shares of global.
     # TODO: This should be investigated.
-    # 'production|Antimony|Mine|tonnes',
+    # "production|Antimony|Mine|tonnes",
     # Somewhat in agreement, but very noisy.
     # 'production|Arsenic|Processing|tonnes',
     # Good agreement after 2012, but prior to that, USGS is significantly larger.
@@ -90,7 +90,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Clays|Mine, kaolin|tonnes",
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
-    # 'production|Cobalt|Mine|tonnes',
+    # "production|Cobalt|Mine|tonnes",
     "production|Copper|Mine|tonnes",
     "production|Copper|Refinery|tonnes",
     # BGS and USGS data are informed on very separated year ranges. It's not possible to assess their agreement.
@@ -108,7 +108,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Gold|Mine|tonnes",
     # Significant global disagreement, leading to >100% shares of global.
     # TODO: This should be investigated.
-    # 'production|Graphite|Mine|tonnes',
+    # "production|Graphite|Mine|tonnes",
     # Significant global disagreement during certain years.
     # 'production|Gypsum|Mine|tonnes',
     # Significant global disagreement during certain years.
@@ -423,11 +423,15 @@ def add_share_of_global_columns(tb: Table) -> Table:
 
 
 def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
+    world_usgs_label = "World (USGS)"
+    world_agg_label = "World (aggregated)"
+    # The following should coincide with the one defined in combine_data.
+    world_bgs_label = "World (BGS)"
     # Add up the contribution from all countries and compare it to USGS' original "World".
     tb = _add_global_data_for_comparison(tb=tb, ds_regions=ds_regions)
-    tb["country"] = tb["country"].replace("World", "World (aggregated)").replace("World (original)", "World")
-    for entity_to_compare in ["World (aggregated)", "World (BGS)"]:
-        _tb = tb[(tb["country"].isin(["World", entity_to_compare]))].reset_index(drop=True)
+    tb["country"] = tb["country"].replace("World", world_agg_label).replace("World (original)", world_usgs_label)
+    for entity_to_compare in [world_agg_label, world_bgs_label]:
+        _tb = tb[(tb["country"].isin([world_usgs_label, entity_to_compare]))].reset_index(drop=True)
         _tb_pivot = _tb.pivot(
             index=["year"],
             columns="country",
@@ -435,7 +439,7 @@ def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
             join_column_levels_with="_",
         )
         for column in [column for column in _tb.columns if column.startswith("production")]:
-            original_column = f"{column}_World"
+            original_column = f"{column}_{world_usgs_label}"
             aggregated_column = f"{column}_{entity_to_compare}"
             # We accept that the aggregated global data often does not add up to 100%, since we lack data for all countries.
             # (For example, historical USGS data is only given for US and World).
@@ -458,17 +462,9 @@ def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
             if (deviation_max > DEVIATION_MAX_ACCEPTED) and (
                 (entity_to_compare, column, years_with_deviation) not in ACCEPTED_DEVIATIONS
             ):
-                log.error(
-                    f"{entity_to_compare} exceeds World (USGS) data by {deviation_max:.0f}% in {years_with_deviation} (MAPE: {mape:.0f}%) for: {column}"
-                )
-                px.line(
-                    _tb,
-                    x="year",
-                    y=column,
-                    color="country",
-                    markers=True,
-                    title=f"{column} - Deviation up to {deviation_max:.0f}% {years_with_deviation} (MAPE: {mape:.0f}%)",
-                ).show()
+                message = f"{column}: {entity_to_compare} exceeds {world_usgs_label} by up to {deviation_max:.0f}% (MAPE: {mape:.0f}%)"
+                log.error(message + f" on {years_with_deviation}")
+                px.line(_tb, x="year", y=column, color="country", markers=True, title=message).show()
 
 
 def combine_data(
