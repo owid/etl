@@ -327,16 +327,22 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
             tb[column].metadata.description_from_producer = combined_notes
 
         # Insert (or append) additional footnotes:
-        footnotes_additional = ""
+        footnotes_additional = []
         if metric in ["Reserves", "Share of global reserves"]:
-            footnotes_additional += "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
+            footnotes_additional.append(
+                "Reserves can increase over time as new mineral deposits are discovered and others become economically feasible to extract."
+            )
         elif metric == "Unit value":
             # footnotes_additional += "This data is expressed in constant 1998 US$ per tonne."
-            footnotes_additional += "This data is adjusted for inflation."
+            footnotes_additional.append("This data is adjusted for inflation.")
+        if column in COMBINE_BGS_AND_USGS_COLUMNS:
+            footnotes_additional.append(
+                "The sum of all countries may exceed World data on certain years (by up to 10%), due to discrepancies between data sources."
+            )
 
         # Add footnotes to metadata.
         combined_footnotes = _combine_notes(
-            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical, footnotes_additional], separator=" "
+            notes_list=[footnotes_bgs, footnotes_usgs, footnotes_usgs_historical] + footnotes_additional, separator=" "
         )
         if len(combined_footnotes) > 0:
             if tb[column].metadata.presentation.grapher_config is None:
