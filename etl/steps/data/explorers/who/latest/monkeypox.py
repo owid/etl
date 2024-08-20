@@ -3,6 +3,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("monkeypox")
