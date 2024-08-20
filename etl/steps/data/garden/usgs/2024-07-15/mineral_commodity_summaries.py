@@ -520,6 +520,10 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         # whatever reason not in any of the "notes" columns).
         # For simplicity, simply remove this row.
         d = d[d["Reserves_kt"].str.lower() != "included with ilmenite"].reset_index(drop=True)
+    if (year == 2023) & (mineral == "VANADIUM"):
+        # Reserves column is called "Reserves_t", however, the numbers clearly show kilotonnes.
+        # See that the world reserves in this file are 26000 tonnes, wheres in the file for 2024 they are 19 million tonnes.
+        d = d.rename(columns={"Reserves_t": "Reserves_kt"}, errors="raise")
 
     ############################################################################################################
 
