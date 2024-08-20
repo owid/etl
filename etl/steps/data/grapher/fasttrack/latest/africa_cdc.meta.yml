@@ -1,0 +1,16 @@
+dataset:
+  title: Africa CDC Epidemic Intelligence Weekly Reports
+  description: |-
+    Epidemic Intelligence Weekly Reports, are a source of real-time updates on priority events of concern on the continent. The narrative brought to you focuses on three main areas: the epidemiological situation, event assessment (risk assessment and geoscope) and public health interventions by the affected Member State, partners, and Africa CDC.
+  licenses:
+    - name: © All rights reserved Africa CDC
+tables:
+  africa_cdc:
+    variables:
+      suspected_cases_cumulative:
+        title: Suspected cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          Suspected cases are those which are likely to be mpox based on symptoms, but the infection has not been confirmed by a laboratory.
