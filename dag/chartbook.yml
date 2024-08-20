@@ -246,3 +246,7 @@ steps:
     - snapshot://chartbook/2024-08-19/roine_waldenstrom_2015.csv
   data://garden/chartbook/2024-08-19/roine_waldenstrom_2015:
     - data://meadow/chartbook/2024-08-19/roine_waldenstrom_2015
+  #  SOEPmonitor data (1984-2013)
+  data://meadow/chartbook/2024-08-20/soepmonitor_1984_2013_germany:
+    - snapshot://chartbook/2024-08-20/soepmonitor_1984_2013_germany_gini.csv
+    - snapshot://chartbook/2024-08-20/soepmonitor_1984_2013_germany_relative_poverty.csv
