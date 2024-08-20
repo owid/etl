@@ -36,6 +36,7 @@ from sqlalchemy.engine import Engine
 
 from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
+from etl.config import TLS_VERIFY
 from etl.db import get_engine
 from etl.snapshot import Snapshot
 
@@ -633,7 +634,7 @@ class DataStep(Step):
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
         url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
-        resp = requests.get(url)
+        resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
 
@@ -997,7 +998,7 @@ class GithubStep(Step):
 
 
 def get_etag(url: str) -> str:
-    resp = requests.head(url)
+    resp = requests.head(url, verify=TLS_VERIFY)
     resp.raise_for_status()
     return cast(str, resp.headers["ETag"])
 
