@@ -33,13 +33,13 @@ def run(dest_dir: str) -> None:
 
     ds_us_cpi = paths.load_dataset("us_consumer_prices")
     ds_exchange_rates = paths.load_dataset("ppp_exchange_rates")
-    ds_garden = paths.load_dataset("gender_statistics")
+    ds_garden = paths.load_dataset("wdi")
 
     # Read table from meadow dataset and the datasets used for adjusting for inflation and cost of living
     tb = ds_meadow["unwto"].reset_index()
     tb_us_cpi = ds_us_cpi["us_consumer_prices"].reset_index()
     tb_exchange_rates = ds_exchange_rates["ppp_exchange_rates"].reset_index()
-    tb_all_cpi = ds_garden["gender_statistics"]["fp_cpi_totl_zg"].reset_index()
+    tb_all_cpi = ds_garden["wdi"]["fp_cpi_totl"].reset_index()
 
     #
     # Process data.
@@ -165,18 +165,17 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
 
     # Filter the dataframe for year 2021
     tb_2021 = tb[tb["year"] == 2021]
-    print(tb.columns)
 
     # Merge the 2021 values with the original dataframe based on the 'country' column
     tb = pr.merge(
         tb,
-        tb_2021[["country", "fp_cpi_totl_zg", "purchasing_power_parities_for_household_final_consumption_expenditure"]],
+        tb_2021[["country", "fp_cpi_totl", "purchasing_power_parities_for_household_final_consumption_expenditure"]],
         on="country",
         suffixes=("", "_2021"),
     )
 
     # CPI from 2021 instead of 2010
-    tb["fp_cpi_totl_normalized"] = 100 * tb["fp_cpi_totl_zg"] / tb["fp_cpi_totl_zg_2021"]
+    tb["fp_cpi_totl_normalized"] = 100 * tb["fp_cpi_totl"] / tb["fp_cpi_totl_2021"]
 
     # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
     tb["inbound_ppp_cpi_adj_2021"] = (
@@ -185,13 +184,13 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
 
     tb = tb.drop(
         [
-            "fp_cpi_totl_zg",
+            "fp_cpi_totl",
             "exchange_rates__average",
             "exchange_rates__end_of_period",
             "purchasing_power_parities_for_gdp",
             "purchasing_power_parities_for_actual_individual_consumption",
             "purchasing_power_parities_for_household_final_consumption_expenditure",
-            "fp_cpi_totl_zg_2021",
+            "fp_cpi_totl_2021",
             "purchasing_power_parities_for_household_final_consumption_expenditure_2021",
             "fp_cpi_totl_normalized",
         ],
