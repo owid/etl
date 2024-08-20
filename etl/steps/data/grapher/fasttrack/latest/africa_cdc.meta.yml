@@ -8,9 +8,9 @@ tables:
   africa_cdc:
     variables:
       suspected_cases_cumulative:
-        title: Suspected mpox cases
+        title: Cumulative suspected mpox cases
         unit: cases
         display:
           numDecimalPlaces: 0
         description: |-
-          Suspected cases are those which are likely to be mpox based on symptoms, but the infection has not been confirmed by a laboratory.
+          Suspected mpox cases are those which are likely to be mpox based on symptoms, but the infection has not been confirmed by a laboratory.
