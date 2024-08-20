@@ -4,6 +4,7 @@ import ast
 import json
 from typing import Dict, List
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from tqdm.auto import tqdm
@@ -113,6 +114,7 @@ COMMODITY_MAPPING = {
     ("Chromium", "Metal"): ("Chromium", "Refinery"),
     ("Chromium", "Ores & concentrates"): None,
     ("Chromium ores and concentrates", "Unknown"): None,
+    # NOTE: All subcommodities of coal production will be summed up into one.
     ("Coal", "Anthracite"): ("Coal", "Mine, anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Mine, anthracite & Bituminous"),
     # NOTE: Old data.
@@ -130,7 +132,9 @@ COMMODITY_MAPPING = {
     ("Coal", "Briquettes"): None,
     ("Coal", "Brown coal"): ("Coal", "Mine, brown coal"),
     ("Coal", "Brown coal & lignite"): ("Coal", "Mine, brown coal & lignite"),
-    ("Coal", "Coal"): ("Coal", "Mine, coal"),
+    # NOTE: The following sounds like it could be a total, but it's not. It is complementary to all other coal subtypes.
+    # Therefore, we will combine all coal subtypes into one (and check that there is no double-counting).
+    ("Coal", "Coal"): ("Coal", "Mine, other"),
     ("Coal", "Coking coal"): ("Coal", "Mine, coking coal"),
     ("Coal", "Hard coal"): ("Coal", "Mine, hard coal"),
     ("Coal", "Lignite"): ("Coal", "Mine, lignite"),
@@ -997,6 +1001,57 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     return tb
 
 
+def aggregate_coal(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # Check that categories like "Mine, brown coal & lignite" are not the combination of "Mine, brown coal" and "Mine, lignite".
+    # Indeed, such pairs never overlap. So, we can safely add up all coal contributions into one total category.
+
+    # import plotly.express as px
+    # coal_agg = tb[(tb["category"]=="Production")&(tb["commodity"]=="Coal")].groupby(["country", "year"], observed=True, as_index=False).agg({"value": "sum"})
+    # for country in sorted(set(coal_agg["country"])):
+    #     _coal_disagg = tb[(tb["country"]==country)&(tb["category"]=="Production")&(tb["commodity"]=="Coal")]
+    #     _coal_agg = coal_agg[coal_agg["country"]==country].assign(**{"sub_commodity": "SUM"})
+    #     compare = pd.concat([_coal_disagg, _coal_agg], ignore_index=True)
+    #     px.line(compare, x="year", y="value", color="sub_commodity", markers=True, title=country).show()
+
+    # Select coal production data.
+    tb_coal = tb[(tb["category"] == "Production") & (tb["commodity"]=="Coal")]
+
+    # Create a series with the sum of all coal data per country-year.
+    tb_coal_sum = tb_coal.groupby(["country", "year"], observed=True, as_index=False).agg({"value": "sum"})
+
+    # Visually compare the resulting series with the one from the Statistical Review of World Energy.
+    # from etl.paths import DATA_DIR
+    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read_table("statistical_review_of_world_energy")
+    # tb_sr = tb_sr[["country", "year", 'coal_production_mt']].rename(columns={"coal_production_mt": "value"})
+    # tb_sr["value"] *= 1e6
+    # compare = pr.concat([tb_sr.assign(**{"source": "EI"}), tb_coal_sum.assign(**{"source": "BGS"})], ignore_index=True)
+    # for country in sorted(set(compare["country"])):
+    #     _compare = compare[compare["country"] == country]
+    #     if len(_compare["source"].unique()) == 2:
+    #         px.line(compare[compare["country"] == country], x="year", y="value", color="source", markers=True, title=country).show()
+
+    # Concatenate the old data (removing the disaggregated coal data) with the aggregated coal data.
+    tb_coal_sum = tb_coal_sum.assign(**{"category": "Production", "commodity": "Coal", "sub_commodity": "Mine", "unit": "tonnes"})
+    tb = pr.concat([tb.drop(tb_coal.index), tb_coal_sum], ignore_index=True)
+
+    ####################################################################################################################
+    # Remove some spurious values after visual inspection (comparing with the Statistical Review).
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Germany") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Czechia") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Slovakia") & (tb["year"] == 1992) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Mexico") & (tb["year"] == 2019) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Pakistan") & (tb["year"] == 1997) & (tb["commodity"] == "Coal"), "value"] = None
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "United Kingdom") & (tb["year"] == 1986) & (tb["commodity"] == "Coal"), "value"] = None
+    # For Russia, 2018, 2019, 2020 and 2021 are much higher than the rest, and then 2022 drops in BGS data.
+    # This does not happen in the Statistical Review, so it looks spurious.
+    tb.loc[(tb["category"]=="Production") & (tb["country"] == "Russia") & (tb["year"].isin([2018, 2019, 2020, 2021, 2022])) & (tb["commodity"] == "Coal"), "value"] = None
+    ####################################################################################################################
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -1049,6 +1104,9 @@ def run(dest_dir: str) -> None:
     ] = None
 
     ####################################################################################################################
+
+    # Combine all subcommodities of coal production, and fix some issues.
+    tb = aggregate_coal(tb=tb)
 
     # Pivot table to have a column for each category.
     tb = (
