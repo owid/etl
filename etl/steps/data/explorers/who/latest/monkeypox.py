@@ -5,7 +5,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    # Load garden dataset.
+    # Load garden dataset
     ds_garden = paths.load_dataset("monkeypox")
 
     # Read table from garden dataset.
