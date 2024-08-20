@@ -370,8 +370,10 @@ COMMODITY_MAPPING = {
     #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
     ("Natural gas", "Unknown"): None,
     ("Nepheline syenite", "Nepheline concentrates"): None,
-    ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Mine"),
-    ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Mine"),
+    # NOTE: The following could be mapped to ("Nepheline syenite", "Mine"), but it has very sparse and noisy data for just a few countries.
+    ("Nepheline syenite", "Nepheline-syenite"): None,
+    # NOTE: The following could be mapped to ("Nepheline syenite", "Mine"), but it has very sparse and noisy data for just a few countries.
+    ("Nepheline syenite", "Unknown"): None,
     ("Nickel", "Mattes, sinters etc"): None,
     ("Nickel", "Ores & concentrates"): None,
     ("Nickel", "Ores, concentrates & scrap"): None,
