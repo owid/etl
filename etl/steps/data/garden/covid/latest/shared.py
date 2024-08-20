@@ -1,6 +1,7 @@
 import datetime as dt
 from typing import Optional, Set, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
@@ -239,4 +240,30 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_re
     # Filter only regions if specified
     if keep_only_regions:
         tb = tb.loc[tb["country"].isin(set(regions) | {"World"})]
+    return tb
+
+
+def add_last12m_to_metric(tb: Table, column_metric: str, column_country: str = "country") -> Table:
+    """Add last 12 month data for an indicator."""
+    column_metric_12m = f"{column_metric}_last12m"
+
+    # Get only last 12 month of data
+    date_cutoff = dt.datetime.now() - dt.timedelta(days=365.2425)
+
+    # Get metric value 12 months ago
+    tb_tmp = (
+        tb.loc[tb["date"] > date_cutoff]
+        .dropna(subset=[column_metric])
+        .sort_values([column_country, "date"])
+        .drop_duplicates(column_country)[[column_country, column_metric]]
+        .rename(columns={column_metric: column_metric_12m})
+    )
+
+    # Compute the difference, obtain last12m metric
+    tb = tb.merge(tb_tmp, on=[column_country], how="left")
+    tb[column_metric_12m] = tb[column_metric] - tb[column_metric_12m]
+
+    # Assign NaN to >1 year old data
+    tb[column_metric_12m].loc[tb["date"] < date_cutoff] = np.nan
+
     return tb

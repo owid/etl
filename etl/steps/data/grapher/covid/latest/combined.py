@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("combined")
 
     # Read table from garden dataset.
-    tb = ds_garden["testing"]
+    tb = ds_garden["combined"]
 
     #
     # Process data.

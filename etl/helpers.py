@@ -34,6 +34,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.config import TLS_VERIFY
 from etl.explorer_helpers import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
@@ -49,7 +50,7 @@ def downloaded(url: str) -> Iterator[str]:
     import requests
 
     with tempfile.NamedTemporaryFile() as tmp:
-        with requests.get(url, stream=True) as r:
+        with requests.get(url, stream=True, verify=TLS_VERIFY) as r:
             r.raise_for_status()
             chunk_size = 2**16  # 64k
             for chunk in r.iter_content(chunk_size=chunk_size):
@@ -70,7 +71,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     import requests
 
     url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
-    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"})
+    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, verify=TLS_VERIFY)
     if resp.status_code != 200:
         raise Exception(f"got {resp.status_code} from {url}")
 

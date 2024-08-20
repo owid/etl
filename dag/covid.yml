@@ -1,5 +1,4 @@
 steps:
-
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
     - snapshot-private://covid/latest/sequence.json
@@ -19,7 +18,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
-
 
   # JHU - cases and deaths
   data://meadow/covid/latest/john_hopkins_university:
@@ -118,6 +116,7 @@ steps:
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/sequence
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/combined:
     - data://garden/covid/latest/combined
@@ -165,6 +164,19 @@ steps:
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global
 
+  # Explorer
+  data-private://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:
     - snapshot://excess_mortality/latest/hmd_stmf.csv
@@ -200,7 +212,6 @@ steps:
     - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/output-for-interactive/by_location_full_data.csv
   data://garden/excess_mortality/latest/excess_mortality_economist:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
-    - data://garden/regions/2023-01-01/regions
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
 

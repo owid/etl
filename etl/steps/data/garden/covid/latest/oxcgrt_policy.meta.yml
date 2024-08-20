@@ -4,7 +4,7 @@ definitions:
     yearIsDay: true
     zeroDay: "2020-01-01"
   common:
-    unit: ''
+    unit: ""
     presentation:
       topic_tags:
         - COVID-19
@@ -12,7 +12,6 @@ definitions:
     display:
       numDecimalPlaces: 0
       <<: *year_is_day
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -23,7 +22,6 @@ dataset:
 tables:
   oxcgrt_policy:
     variables:
-
       # C - containment and closure policies
       c1m_school_closing:
         title: School closing
@@ -140,8 +138,8 @@ tables:
             Record monetary value in USD of fiscal stimuli, includes any spending or tax cuts NOT included in `International support`, `Emergency investment in healthcare` or `Investment in vaccines`.
             - 0: no new spending that day
             - Blank: no data
-        unit: '$'
-        short_unit: '$'
+        unit: "$"
+        short_unit: "$"
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
@@ -154,8 +152,8 @@ tables:
             Record monetary value in USD.
             - 0: no new spending that day
             - Blank: no data
-        unit: '$'
-        short_unit: '$'
+        unit: "$"
+        short_unit: "$"
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
@@ -199,8 +197,8 @@ tables:
             Record monetary value in USD
             - 0: no new spending that day
             - Blank: no data
-        unit: '$'
-        short_unit: '$'
+        unit: "$"
+        short_unit: "$"
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
@@ -214,8 +212,8 @@ tables:
             - 0: no new spending that day
             - Blank: no data
 
-        unit: '$'
-        short_unit: '$'
+        unit: "$"
+        short_unit: "$"
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
@@ -281,7 +279,7 @@ tables:
             - Blank: no data
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range for 'General' category
-        unit: ''
+        unit: ""
 
       v2c_vaccine_age_eligibility_availability_age_floor__at_risk_summary:
         title: Vaccine age eligibility/availability age floor (at risk summary)
@@ -308,6 +306,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
+          name: Vaccinated
+          tolerance: 14
+          color: "#008860"
           <<: *year_is_day
 
       stringency_index_nonvax:
@@ -317,6 +318,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
+          name: Non-vaccinated
+          color: "#932834"
+          tolerance: 14
           <<: *year_is_day
 
       stringency_index_weighted_average:
@@ -326,6 +330,9 @@ tables:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:
           numDecimalPlaces: 2
+          name: Weighted average of vaccinated and non-vaccinated
+          color: "#4C5C78"
+          tolerance: 14
           <<: *year_is_day
 
       containment_health_index:
@@ -336,4 +343,3 @@ tables:
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
-

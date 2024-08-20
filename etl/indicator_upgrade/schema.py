@@ -5,6 +5,8 @@ import requests
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
 
+from etl.config import TLS_VERIFY
+
 # Version of the schema
 SCHEMA_VERSION = "003"
 # Logger
@@ -29,8 +31,7 @@ def get_schema_chart_config() -> Dict[str, Any]:
     # with open(path, "r") as f:
     #     return json.load(f)
     return requests.get(
-        f"https://files.ourworldindata.org/schemas/grapher-schema.{SCHEMA_VERSION}.json",
-        timeout=20,
+        f"https://files.ourworldindata.org/schemas/grapher-schema.{SCHEMA_VERSION}.json", timeout=20, verify=TLS_VERIFY
     ).json()
 
 
