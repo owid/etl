@@ -12,6 +12,7 @@ from process import process_df
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 
 log = get_logger()
 
@@ -48,6 +49,10 @@ def run(dest_dir: str) -> None:
     df = process_df(df)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
+
+    # Last 12 months
+    tb_garden = add_last12m_to_metric(tb_garden, "cum_excess_proj_all_ages", column_country="entity")
+    tb_garden = add_last12m_to_metric(tb_garden, "cum_excess_per_million_proj_all_ages", column_country="entity")
 
     # Format
     tb_garden = tb_garden.format(["entity", "date"])

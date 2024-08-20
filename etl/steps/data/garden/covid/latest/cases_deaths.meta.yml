@@ -412,6 +412,24 @@ tables:
           name: Confirmed COVID-19 deaths
           tolerance: 9999
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths in the last 12 months
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+      total_deaths_per_million_last12m:
+        title: "Total confirmed deaths due to COVID-19 per million people (last 12 months)"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per million people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths per million people in the last 12 months
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          <<: *common_display
       total_deaths_per_100k_last12m:
         title: "Total confirmed deaths due to COVID-19 per 100,000 people (last 12 months)"
         description_short: |-

@@ -99,8 +99,7 @@ def run(dest_dir: str) -> None:
     ## Drop population
     tb = tb.drop(columns=["population_2022"])
     # Add last 12 months of data
-    tb = add_last12m_to_metric(tb, "total_deaths")
-    tb = add_last12m_to_metric(tb, "total_deaths_per_100k")
+    tb = add_last12m_values(tb)
     ## Dtypes
     tb = set_dtypes(tb)
 
@@ -416,6 +415,18 @@ def add_exemplars(tb: Table):
         tb["days_since_100_total_cases"]
     )
 
+    return tb
+
+
+def add_last12m_values(tb: Table) -> Table:
+    """Add last 12 month data."""
+    columns = [
+        "total_deaths",
+        "total_deaths_per_100k",
+        "total_deaths_per_million",
+    ]
+    for col in columns:
+        tb = add_last12m_to_metric(tb, col)
     return tb
 
 

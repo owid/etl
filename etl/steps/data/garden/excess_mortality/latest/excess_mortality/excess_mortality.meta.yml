@@ -683,3 +683,51 @@ tables:
           - name: Human Mortality Database (2024)
           - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
+
+      # Last 12 months
+      cum_excess_proj_all_ages_last12m:
+        title: cum_excess_proj_all_ages_last12m
+        # title: Cumulative excess of deaths (projected, all ages)
+        unit: ""
+        description: The cumulative number of excess deaths in the last 12 months.
+        display:
+          numDecimalPlaces: 0
+          includeInTable: true
+          tolerance: 30
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
+          - name: Karlinsky and Kobak (2021)
+        presentation:
+          grapher_config:
+            title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
+            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+      cum_excess_per_million_proj_all_ages_last12m:
+        title: cum_excess_per_million_proj_all_ages_last12m
+        # title: Cumulative excess deaths per million people (projected, all ages)
+        unit: ""
+        description: The cumulative number of excess deaths per million people in the population, in the last 12 months.
+        display:
+          numDecimalPlaces: 0
+          includeInTable: true
+          tolerance: 30
+          yearIsDay: true
+          zeroDay: 2020-01-01
+        licenses:
+          - *license-hmd
+          - *license-wmd
+          - *license-xm_kk
+        sources:
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
+          - name: Karlinsky and Kobak (2021)
+        presentation:
+          grapher_config:
+            title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
+            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.

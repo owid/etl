@@ -243,7 +243,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_re
     return tb
 
 
-def add_last12m_to_metric(tb: Table, column_metric: str) -> Table:
+def add_last12m_to_metric(tb: Table, column_metric: str, column_country: str = "country") -> Table:
     """Add last 12 month data for an indicator."""
     column_metric_12m = f"{column_metric}_last12m"
 
@@ -254,13 +254,13 @@ def add_last12m_to_metric(tb: Table, column_metric: str) -> Table:
     tb_tmp = (
         tb.loc[tb["date"] > date_cutoff]
         .dropna(subset=[column_metric])
-        .sort_values(["country", "date"])
-        .drop_duplicates("country")[["country", column_metric]]
+        .sort_values([column_country, "date"])
+        .drop_duplicates(column_country)[[column_country, column_metric]]
         .rename(columns={column_metric: column_metric_12m})
     )
 
     # Compute the difference, obtain last12m metric
-    tb = tb.merge(tb_tmp, on=["country"], how="left")
+    tb = tb.merge(tb_tmp, on=[column_country], how="left")
     tb[column_metric_12m] = tb[column_metric] - tb[column_metric_12m]
 
     # Assign NaN to >1 year old data
