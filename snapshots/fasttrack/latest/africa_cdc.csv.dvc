@@ -7,7 +7,7 @@ meta:
     attribution_short: Africa CDC
     url_main: https://africacdc.org/thematic-area/surveillance-and-disease-intelligence/africa-cdc-weekly-event-based-surveillance/
     url_download: |-
-      gAAAAABmxJP9preY65d1xBcpwo87u3D7KFmoMLZV-crt87erPFqvO9YDOL6JwNOorVyGbndFaKMb3CJW3D27bZd8UeM21ug9VHAdZDXXa5YZA3bN6ZrZiD9IawJkZHMTHkWjo3pcmrFPrb0zupEZ_B4SFHOVzuub28WpE4ol4g3frNvXTQlVVTnO1WlgRFAiXPYrQP203xrS2z-HcffsoC1J8nzC_Mnhxg==
+      gAAAAABmxJRtvEqui8KLVT89jhW4OO87g6pJhkhV3zhgibkPDJ5OiarUqd0GvWKxXMPr3T835MC2NhF8GINJoXR1yedNguiSlYJCaAhlCch_44_jk2nqg3AiM7_OcFQNJEkwxw6SrYppo5MLQkH2cxoowegPHuaLPEae4oGAktlIijxouIZtAf0pkKYPBABWHlQYio9o5WTk8R1XCXvec1nZZmqa7IX14Q==
     date_accessed: '2024-08-20'
     date_published: '2024-08-16'
     license:
@@ -19,6 +19,6 @@ meta:
     name: © All rights reserved Africa CDC
   is_public: false
 outs:
-  - md5: 7395d652699b8a0d793198dd041dbade
-    size: 1907
+  - md5: f858bfe6b8f28653a3fecf0fd3656c68
+    size: 1808
     path: africa_cdc.csv

@@ -8,7 +8,7 @@ tables:
   africa_cdc:
     variables:
       suspected_cases_cumulative:
-        title: Suspected cases
+        title: Suspected mpox cases
         unit: cases
         display:
           numDecimalPlaces: 0
