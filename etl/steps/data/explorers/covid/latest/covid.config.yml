@@ -158,15 +158,15 @@ views:
   # Deaths
   #######################
   # Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+    options:
+      - Confirmed deaths
+      - Cumulative
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
     options:
       - Confirmed deaths
       - Cumulative
       - True
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
-    options:
-      - Confirmed deaths
-      - Cumulative
   # Cumulative (last 12 months)
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_last12m
     options:
