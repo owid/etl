@@ -13,6 +13,7 @@ config:
   hasMapTab: "true"
   yAxisMin: 0
   thumbnail: "https://ourworldindata.org/coronavirus-data-explorer.png"
+  isPublished: "true"
 
 options:
   - type: dropdown
