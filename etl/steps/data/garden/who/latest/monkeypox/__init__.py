@@ -59,8 +59,7 @@ def run(dest_dir: str) -> None:
     country_mask = tb_both["country"] == "Democratic Republic of Congo"
     tb_both["annotation"] = ""
     tb_both.loc[country_mask, "annotation"] = (
-        tb_both.loc[country_mask, "annotation"]
-        + "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
+        tb_both.loc[country_mask, "annotation"] + "Includes only confirmed deaths as reported by WHO"
     )
     tb_both["annotation"].metadata.origins = origins
     tb_both = tb_both.format(["country", "date"])
