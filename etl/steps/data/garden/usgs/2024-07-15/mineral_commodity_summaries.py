@@ -376,11 +376,12 @@ FOOTNOTES = {
     "production|Silicon|Processing|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
     "reserves|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    # "production|Titanium|Sponge|tonnes": "Values refer to titanium sponge.",
     "reserves|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "reserves|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
-    "reserves|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
+    "reserves|Potash|Mine|tonnes": "Values refer to ore in tonnes of potassium oxide equivalent.",
     "production|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
@@ -631,8 +632,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         elif unit_reserves == "ore_kt":
             d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
-            # Add a note explaining that the data is for ore.
-            d["Reserves_notes"] = [note + ["Reserves refer to ore."] for note in d["Reserves_notes"]]
+            # A footnote will mention that reserves refer to ore (see FOOTNOTES).
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
@@ -707,8 +707,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
         # Handle special case.
         if unit_production == "Sponge_t":
             unit_production = "t"
-            # Add a note explaining that the data is for ore.
-            d["Production_notes"] = [note + ["Production refers to titanium sponge."] for note in d["Reserves_notes"]]
+            # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
         if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
