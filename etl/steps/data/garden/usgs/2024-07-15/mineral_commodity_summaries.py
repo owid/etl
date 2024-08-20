@@ -528,6 +528,10 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         # Reserves column is called "Reserves_t", however, the numbers clearly show kilotonnes.
         # See that the metadata xml file mentions "Reserves_kt", and the 2023 file is in kilotonnes.
         d = d.rename(columns={"Reserves_t": "Reserves_kt"}, errors="raise")
+    if (year == 2024) & (mineral == "SELENIUM"):
+        # Reserves column is called "Reserves_kt", however, the numbers show tonnes.
+        # See that the metadata xml file mentions "Reserves_t", and the 2023 file is in tonnes.
+        d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
 
     ############################################################################################################
 
