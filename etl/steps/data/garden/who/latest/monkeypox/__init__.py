@@ -54,6 +54,18 @@ def run(dest_dir: str) -> None:
     )
 
     tb_both = pr.merge(tb, tb_suspected, on=["country", "date"], how="outer")
+
+    # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
+    country_mask = tb_both["country"] == "Democratic Republic of Congo"
+    tb_both["annotation"] = ""
+    for col in tb_both.columns:
+        if "deaths" in col:
+            # Update the annotation column for matching rows
+            tb_both.loc[country_mask, "annotation"] = (
+                tb_both.loc[country_mask, "annotation"]
+                + "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
+            )
+
     tb_both = tb_both.format(["country", "date"])
 
     #

@@ -81,3 +81,6 @@ tables:
       iso_code:
         title: ISO code
         unit: ''
+      annotation:
+        title: Annotation
+        unit: ''

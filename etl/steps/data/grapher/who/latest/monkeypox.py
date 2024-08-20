@@ -14,19 +14,8 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("monkeypox")
 
     # Read table from garden dataset.
-    tb = ds_garden["monkeypox"].reset_index()
-    # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
-    country_mask = tb["country"] == "Democratic Republic of Congo"
-    tb["annotation"] = ""
-    for col in tb.columns:
-        if "deaths" in col:
-            # Update the annotation column for matching rows
-            tb.loc[country_mask, "annotation"] = (
-                tb.loc[country_mask, "annotation"]
-                + "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
-            )
+    tb = ds_garden["monkeypox"]
 
-    tb = tb.format(["country", "date"])
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
