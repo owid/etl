@@ -214,6 +214,7 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 # Load github token (only used for creating PRs from the command line).
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
+# IMPORTANT: only use locally, no production use!
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
