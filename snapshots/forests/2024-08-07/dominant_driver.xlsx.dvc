@@ -1,0 +1,45 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# This data was sent by David Gibbs from Global Forest Watch - World Resources Institute over email to Fiona on 2024-08-06.
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Tree Cover Loss by Dominant Driver
+    description: |-
+      Shows a time-series of tree cover loss by dominant driver for the time period 2001-2023, the dominant driver of tree cover loss from 2001-2023 using the following five categories:
+
+      - Commodity-driven deforestation: Large-scale deforestation linked primarily to commercial agricultural expansion.
+
+      - Shifting agriculture: Temporary loss or permanent deforestation due to small- and medium-scale agriculture.
+
+      - Forestry: Temporary loss from plantation and natural forest harvesting, with some deforestation of primary forests.
+
+      - Wildfire: Temporary loss, does not include fire clearing for agriculture.
+
+      - Urbanization: Deforestation for expansion of urban centers.
+
+      The commodity-driven deforestation and urbanization categories represent permanent deforestation, while tree cover usually regrows in the other categories.
+
+    date_published: "2024-05-31"
+
+    # Citation
+    producer: Global Forest Watch
+    citation_full: |-
+      - Hansen, M.C., P.V. Potapov, R. Moore, et al. 2013. "High-Resolution Global Maps of 21st-Century Forest Cover Change." Science 342: 850–53. Data available on-line from: https://glad.earthengine.app/view/global-forest-change.
+      - Curtis, P.G., C.M. Slay, N.L. Harris, A. Tyukavina, and M.C. Hansen. 2018. “Classifying Drivers of Global Forest Loss.” Science. Accessed through Global Forest Watch on 06/08/2024. www.globalforestwatch.org.
+      - Global Administrative Areas Database, version 3.6. Available at http://gadm.org/
+    attribution_short: GFW
+
+    # Files
+    url_main: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
+    date_accessed: 2024-08-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.globalforestwatch.org/documents/ff304784a9f04ac4a45a40f60bae5b26/about
+
+outs:
+  - md5: b68d6fec56344c567d87999eb9620b7b
+    size: 870586
+    path: dominant_driver.xlsx

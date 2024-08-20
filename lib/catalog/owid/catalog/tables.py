@@ -5,6 +5,7 @@
 import json
 import types
 from collections import defaultdict
+from functools import wraps
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
@@ -403,6 +404,9 @@ class Table(pd.DataFrame):
                     value.name = key
                 self._fields[key] = value.metadata
                 value.update_log(operation="rename", variable=key)
+            # assign Table with a single column should work
+            elif isinstance(value, Table) and value.shape[1] == 1:
+                self._fields[key] = value.iloc[:, 0].metadata
             else:
                 self._fields[key] = VariableMeta()
 
@@ -1118,6 +1122,42 @@ class TableGroupBy:
                 )
 
         return tb
+
+    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Union["Table", "Variable"]:
+        mem = {}
+
+        @wraps(func)
+        def f(g):
+            tb = func(g, *args, **kwargs)
+            # remember one table to use its metadata
+            if not mem:
+                mem["table"] = tb
+            return tb
+
+        df = self.groupby.apply(f, *args, include_groups=include_groups)
+        if not mem:
+            return Table(df)
+        elif type(mem["table"]) == pd.DataFrame:
+            return _create_table(df, self.metadata, self._fields)
+        elif type(mem["table"]) == pd.Series:
+            if isinstance(df, Table):
+                return _create_table(df, self.metadata, self._fields)
+            else:
+                return Variable(df)
+        elif isinstance(mem["table"], Table):
+            return _create_table(df, mem["table"].metadata, mem["table"]._fields)
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, variables.Variable):
+            df.metadata = mem["table"].metadata
+            return df
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, Table):
+            # func returns Variable
+            out = _create_table(df, self.metadata, self._fields)
+            if mem["table"].name and mem["table"].name in out.columns:
+                out[mem["table"].name].metadata = mem["table"].metadata
+            return out
+        else:
+            # func returns a scalar, output is a Table
+            return _create_table(df, self.metadata, self._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)

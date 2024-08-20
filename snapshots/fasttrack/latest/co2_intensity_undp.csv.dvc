@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Global Carbon Project, World Bank
+    title: co2_intensity_undp
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQXBTA1HVxY8eDhm1VoU-flevldxnTS-RDai07Eju8hHiR3AokrwkUutx05BV62-PFHwkvsSqvy1ilK/pub?output=csv
+    date_accessed: '2024-08-08'
+  name: CO2 intensity (UNDP Project)
+  description: ''
+  license: {}
+outs:
+  - md5: f02d3e4a716d31266e7dc65ebc3d8167
+    size: 5963
+    path: co2_intensity_undp.csv

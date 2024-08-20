@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Long-Run Trends in the Distribution of Income and Wealth
+    description: |-
+      This chapter reviews the long-run developments in the distribution of personal income and wealth. It also discusses suggested explanations for the observed patterns. We try to answer questions such as: What do we know, and how do we know, about the distribution of income and wealth over time? Are there common trends across countries or over the path of development? How do the facts relate to proposed theories about changes in inequality? We present the main inequality trends, in some cases starting as early as in the late eighteenth century, combining previous research with recent findings in the so-called top income literature and new evidence on wealth concentration. The picture that emerges shows that inequality was historically high almost everywhere at the beginning of the twentieth century. In some countries this situation was preceded by increasing concentration, but in most cases inequality seems to have been relatively constant at a high level in the nineteenth century. Over the twentieth century inequality decreased almost everywhere for the first 80 years, largely due to decreasing wealth concentration and decreasing capital incomes in the top of the distribution. Thereafter trends became more divergent across countries and also different across income and wealth distributions. Econometric evidence over the long run suggests that top shares increase in periods of above-average growth, whereas democracy and high marginal tax rates are associated with lower top shares.
+    date_published: "2015-07-13"
+    title_snapshot: Long-Run Trends in the Distribution of Income and Wealth - Top wealth percentile (P99–100) share of total private wealth in 10 countries
+
+    # Citation
+    producer: Roine and Waldenström
+    citation_full: |-
+      Roine, J., & Waldenström, D. (2015). Long-Run Trends in the Distribution of Income and Wealth. In Atkinson A.B. and Bourguignon F. (2015) Handbook of Income Distribution, 2, 469-592. https://doi.org/10.1016/B978-0-444-59428-0.00008-4
+
+    # Files
+    url_main: https://www.sciencedirect.com/science/article/abs/pii/B9780444594280000084#t0045
+    date_accessed: 2024-08-19
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.sciencedirect.com/science/article/abs/pii/B9780444594280000084#t0045
+
+outs:
+  - md5: cda971d7447ec90cff85421af71b9e7d
+    size: 3536
+    path: roine_waldenstrom_2015.csv

@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: Global Health Estimates
+    description: |-
+      WHO's Global Health Estimates (GHE) provide the latest available data on death and disability globally, by region and country, and by age, sex and cause. The latest updates include global, regional and country trends from 2000 to 2021 inclusive. By providing key insights on mortality and morbidity trends, these estimates are a powerful tool to support informed decision-making on health policy and resource allocation.
+
+      **Methods:**
+      WHO's Global Health Estimates present comprehensive and comparable time-series data from 2000 onwards for health-related indicators, including life expectancy, healthy life expectancy, mortality and morbidity, as well as burden of diseases at global, regional and country levels, disaggregated by age, sex and cause.
+
+      They are produced using data from multiple consolidated sources, including national vital registration data, latest estimates from WHO technical programmes, United Nations partners and inter-agency groups, as well as the Global Burden of Disease and other scientific studies. A broad spectrum of robust and well-established scientific methods were applied for the processing, synthesis and analysis of data.
+
+      Technical report with the full methodology can be found [here](https://cdn.who.int/media/docs/default-source/gho-documents/global-health-estimates/ghe2021_cod_methods.pdf).
+    citation_full: |-
+      Global Health Estimates 2021: Deaths by Cause, Age, Sex, by Country and by Region, 2000-2021. Geneva, World Health Organization; 2024.
+    url_main: https://www.who.int/data/global-health-estimates
+    date_accessed: '2024-07-30'
+    date_published: '2024-05-16'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 72faf57afae32be2f71767544e8daa70
+    size: 591356554
+    path: ghe.feather

@@ -1,0 +1,193 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    zero_day: &zero_day
+      zeroDay: 2020-01-21
+      yearIsDay: true
+    per_capita: &per_capita |-
+      Per-capita values have been estimated by using the population in 2022 as a reference.
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    processing_level: major
+    display:
+      numDecimalPlaces: 2
+      <<: *zero_day
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, vaccinations
+
+tables:
+  vaccinations_global:
+    variables:
+      total_vaccinations:
+        title: COVID-19 doses (cumulative)
+        description_short: Total number of COVID-19 vaccination doses administered.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_vaccinated:
+        title: People vaccinated (cumulative)
+        description_short: Total number of people who received at least one vaccine dose.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_fully_vaccinated:
+        title: People fully vaccinated (cumulative)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      total_boosters:
+        title: Booster doses (cumulative)
+        description_short: |-
+          Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol).
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+
+      total_vaccinations_interpolated:
+        title: COVID-19 doses (cumulative, interpolated)
+        description_short: Total number of COVID-19 vaccination doses administered. Linearly interpolated values.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_vaccinated_interpolated:
+        title: People vaccinated (cumulative, interpolated)
+        description_short: Total number of people who received at least one vaccine dose. Linearly interpolated values.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      people_fully_vaccinated_interpolated:
+        title: People fully vaccinated (cumulative, interpolated)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol. Linearly interpolated values.
+        unit: 'people'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      total_boosters_interpolated:
+        title: Booster doses (cumulative, interpolated)
+        description_short: |-
+          Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol). Linearly interpolated values.
+        unit: 'doses'
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+
+      daily_vaccinations:
+        title: COVID-19 doses (daily)
+        description_short: New COVID-19 vaccination doses administered (only calculated for consecutive days).
+        unit: 'doses'
+      daily_vaccinations_smoothed:
+        title: COVID-19 doses (daily, 7-day average)
+        description_short: |-
+          New COVID-19 vaccination doses administered (7-day smoothed). For countries that don't report vaccination data on a daily basis, we assume that vaccination changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window
+        unit: 'people'
+      daily_vaccinations_smoothed_per_million:
+        title: COVID-19 doses (daily, 7-day average, per million people)
+        description_short: New COVID-19 vaccination doses administered (7-day smoothed) per 1,000,000 people in the total population
+        unit: 'doses per million people'
+        description_processing: *per_capita
+
+      daily_people_vaccinated_smoothed:
+        title: People vaccinated (daily, 7-day average)
+        description_short: Daily number of people receiving their first vaccine dose (7-day smoothed).
+        unit: 'people'
+      daily_people_vaccinated_smoothed_per_hundred:
+        title: People vaccinated (daily, 7-day average, per million people)
+        description_short: Daily number of people receiving their first vaccine dose (7-day smoothed) per 100 people in the total population.
+        unit: 'people per hundred people'
+        description_processing: *per_capita
+
+
+      total_vaccinations_per_hundred:
+        title: COVID-19 doses (cumulative, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
+        unit: 'doses per hundred people'
+        description_processing: *per_capita
+      people_vaccinated_per_hundred:
+        title: People vaccinated (cumulative, per hundred)
+        description_short: Total number of people who received at least one vaccine dose per 100 people in the total population.
+        unit: 'people per hundred people'
+        description_processing: *per_capita
+      people_fully_vaccinated_per_hundred:
+        title: People fully vaccinated (cumulative, per hundred)
+        description_short: Total number of people who received all doses prescribed by the initial vaccination protocol per 100 people in the total population.
+        unit: 'people per hundred people'
+        description_processing: *per_capita
+      total_boosters_per_hundred:
+        title: Booster doses (cumulative, per hundred)
+        description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
+        unit: 'doses per hundred people'
+        description_processing: *per_capita
+
+      people_unvaccinated:
+        title: Unvaccinated people (cumulative)
+        description_short: Total number of people who have not received any vaccine dose.
+        unit: people
+        description_processing: This indicator is derived from the country population in a given day. Daily population estimates are obtained by linearly interpolating the year-estimtes by UN WPP.
+
+      share_of_boosters:
+        title: Share of daily COVID-19 doses that are boosters
+        description_short: |-
+          14-day rolling average. Booster doses are doses administered beyond those prescribed by the original vaccination protocol.
+        unit: boosters
+
+
+
+      rolling_vaccinations_6m:
+        title: COVID-19 doses (last 6 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 6 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_6m_per_hundred:
+        title: COVID-19 doses (last 6 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 6 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita
+      rolling_vaccinations_9m:
+        title: COVID-19 doses (last 9 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 9 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_9m_per_hundred:
+        title: COVID-19 doses (last 9 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 9 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita
+      rolling_vaccinations_12m:
+        title: COVID-19 doses (last 12 months)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 12 months.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+      rolling_vaccinations_12m_per_hundred:
+        title: COVID-19 doses (last 12 months, per hundred)
+        description_short: Total number of COVID-19 vaccination doses administered in the last 12 months, per hundred people.
+        unit: doses
+        display:
+          numDecimalPlaces: 0
+          <<: *zero_day
+        description_processing: *per_capita

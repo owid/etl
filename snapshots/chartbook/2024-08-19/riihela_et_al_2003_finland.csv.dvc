@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: On recent trends in economic poverty in Finland
+    description: |-
+      We have examined recent trends in the economic or financial poverty in Finland using two data sources, the Income Distribution Statistics (IDS) and the Consumption Expenditure Survey (CES). We have drawn on the recent literature on poverty analysis to analyse a range of poverty measures. Scalar measures were complemented by an investigation of stochastic dominance in the analysis of poverty. As regards trends in poverty over time, the long-run perspective available from the CES indicates that from the early 1970s to the beginning of 1990s, the relative poverty rate has declined. The latter part of the 1990s was clearly different. We find that poverty rose over the period 1995-2001 for a very broad class of poverty measures and a wide range of poverty lines. Whilst the total numbers in poverty during the 1990s on these various definitions have risen markedly, the composition of the poor has also changed significantly. There is little doubt that unemployed households are the most vulnerable group of the population. It is obvious that this is not the whole story about poverty. Our study has been based on a series of snapshots of the income and consumption distributions. It makes possible to address questions such as how many people are poor and what sort of individuals are poor at a given point in time. They don’t tell how long are people poor. An important area of future research is to look at the dynamic properties of the income and consumption distributions.
+    date_published: "2003-11-01"
+
+    # Citation
+    producer: Riihelä, Sullström and Tuomala
+    citation_full: |-
+      Riihelä, M; Sullström, R; Tuomala, M. (2003). On Recent Trends in Economic Poverty in Finland. Table A.4.1. Tampere Economic Worldking Papers Net Series. Working Paper 23, November 2003.
+
+    # Files
+    url_main: https://trepo.tuni.fi/handle/10024/65466
+    date_accessed: 2024-08-19
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://trepo.tuni.fi/handle/10024/65466
+
+outs:
+  - md5: 6eb5bc59cc8bc0d945eb4f5c80d6354a
+    size: 327
+    path: riihela_et_al_2003_finland.csv

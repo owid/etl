@@ -88,10 +88,17 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     assert ds.metadata.title, "Dataset must have a title."
 
     for tab in ds:
-        assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
-        assert (
-            tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['year'].dtype}"
+        if {"year", "country"} <= set(tab.all_columns):
+            if "year" in tab.columns:
+                year = tab["year"]
+            else:
+                year = tab.index.get_level_values("year")
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+        elif {"date", "country"} <= set(tab.all_columns):
+            pass
+        else:
+            raise AssertionError("Table must have columns country and year or date.")
+
         for col in tab:
             if col in ("year", "country"):
                 continue
@@ -139,6 +146,30 @@ def _validate_ordinal_variables(tab: Table, col: str) -> None:
         assert (
             not extra_values
         ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+
+
+def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path]) -> catalog.Dataset:
+    """Set channel, namespace, version and short_name from the destination directory."""
+    pattern = (
+        r"\/"
+        + r"\/".join(
+            [
+                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
+                "(?P<namespace>.*?)",
+                r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
+                "(?P<short_name>.*?)",
+            ]
+        )
+        + "$"
+    )
+
+    match = re.search(pattern, str(dest_dir))
+    assert match, f"Could not parse path {str(dest_dir)}"
+
+    for k, v in match.groupdict().items():
+        setattr(ds.metadata, k, v)
+
+    return ds
 
 
 def create_dataset(
@@ -205,6 +236,8 @@ def create_dataset(
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
+    ds = _set_metadata_from_dest_dir(ds, dest_dir)
+
     # add tables to dataset
     used_short_names = set()
     for table in tables:
@@ -212,36 +245,13 @@ def create_dataset(
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
+
         used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats, repack=repack)
-
-    # set metadata from dest_dir
-    pattern = (
-        r"\/"
-        + r"\/".join(
-            [
-                f"(?P<channel>{'|'.join(CHANNEL.__args__)})",
-                "(?P<namespace>.*?)",
-                r"(?P<version>\d{4}\-\d{2}\-\d{2}|\d{4}|latest)",
-                "(?P<short_name>.*?)",
-            ]
-        )
-        + "$"
-    )
-
-    match = re.search(pattern, str(dest_dir))
-    assert match, f"Could not parse path {str(dest_dir)}"
-
-    for k, v in match.groupdict().items():
-        setattr(ds.metadata, k, v)
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
         ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
-
-        # check that we are not using metadata inconsistent with path
-        for k, v in match.groupdict().items():
-            assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
     # another override YAML file with higher priority
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")

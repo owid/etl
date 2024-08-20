@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Income inequality estimates for Canada from Wolfson (1986)
+    description: |-
+      Income inequality in Canada has not changed significantly over the past two decades, though this apparent stability may be surprising in view of the major economic and social changes that occurred over this period. The share of income going to the bottom quintile remains at about four percent while the top quintile continues to receive about 40 percent of income.
+
+      Social trends such as lower fertility rates have coincided with increased female labour force participation to increase family incomes in the middle and upper-middle parts of the income spectrum. At the same time, the trend for baby boom children to establish their own separate households, and increased divorce and separation rates, have tended to create more small family units with low incomes. These social trends, in isolation of other factors, would have increased income inequality.
+
+      However, economic factors have apparently offset these tendencies. Since employment income is concentrated in the middle and upper-middle ranges, the relative fall in this source of income over the past two decades tended to be equalizing. Similarly, the fact that a large part of total investment income accrues to the elderly who have below average income implies that the trend towards high interest rates has been equalizing. Finally, the social “safety nets” put in place in the mid-1960s and early 1970s have grown in relative importance, and this too has had an equalizing impact on the distribution of income.
+
+      Given the overall stability in income inequality, the equalizing tendencies of economic factors such as high interest rates and relatively slow economic growth, with the large automatic responsiveness of governments' social safety net programs, appear to have just about exactly offset the disequalizing social factors of “baby boomers” leaving home, lower fertility, higher divorce and separation rates, and higher female labour force participation.
+    date_published: "1986-12-01"
+    title_snapshot: Income inequality estimates for Canada from Wolfson (1986) - Gini coefficient
+    description_snapshot: |-
+      Gini coefficient for equivalized after-tax household income between 1965 and 1983.
+
+    # Citation
+    producer: Wolfson
+    citation_full: |-
+      Wolfson, M. (1986). Stasis amid change. Income inequality in Canada 1965-1983, Table 3 (d). Review of Income and Wealth, 32(4), 337-369. https://doi.org/10.1111/j.1475-4991.1986.tb00545.x
+
+    # Files
+    url_main: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1475-4991.1986.tb00545.x
+    date_accessed: 2024-08-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1475-4991.1986.tb00545.x
+
+outs:
+  - md5: 18fd8b9fccb4fcb0b2819042fe3f9d35
+    size: 120
+    path: wolfson_1986_canada.csv

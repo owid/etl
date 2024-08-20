@@ -12,6 +12,7 @@ meta:
     producer: United States Geological Survey Data
     citation_full: |-
       Kelly, T.D., and Matos, G.R., comps., 2014, Historical statistics for mineral and material commodities in the United States (2016 version): U.S. Geological Survey Data Series 140.
+    attribution: United States Geological Survey Data - Historical Statistics for Mineral and Material Commodities (2016)
     attribution_short: USGS
 
     # Files

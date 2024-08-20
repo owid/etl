@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  wolfson_1986_canada:
+    variables:
+      gini:
+        title: Gini index
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality.
+        presentation:
+          title_public: Gini coefficient
+          title_variant: Equivalised gross family money income
+        display:
+          name: Gini index
+          numDecimalPlaces: 1
+          tolerance: 5
+

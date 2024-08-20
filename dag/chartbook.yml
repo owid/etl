@@ -44,6 +44,33 @@ steps:
   data://garden/chartbook/2024-08-05/katic_leigh_2015_australia:
     - data://meadow/chartbook/2024-08-05/katic_leigh_2015_australia
 
+  # Household income and wealth, Australia, Australian Bureau of Statistics (live version)
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia:
+    - snapshot://abs/2024-08-06/household_income_and_wealth_australia.zip
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia:
+    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia
+
+  # Household income and wealth, Australia, Australian Bureau of Statistics (2017-18)
+  data://meadow/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
+    - snapshot://abs/2024-08-06/household_income_australia_2017_2018.xlsx
+    - snapshot://abs/2024-08-06/household_wealth_australia_2017_2018.xlsx
+  data://garden/abs/2024-08-06/household_income_and_wealth_australia_2017_2018:
+    - data://meadow/abs/2024-08-06/household_income_and_wealth_australia_2017_2018
+
+  # P90/P50 ratio for Australia, from the Employee Earnings and Hours report (ABS)
+  data://meadow/abs/2024-08-06/employee_earnings_and_hours_australia:
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2006.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2008.csv
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2010.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2012.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2014.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2016.xls
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2018.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2021.xlsx
+    - snapshot://abs/2024-08-06/employee_earnings_and_hours_australia_2023.xlsx
+  data://garden/abs/2024-08-06/employee_earnings_and_hours_australia:
+    - data://meadow/abs/2024-08-06/employee_earnings_and_hours_australia
+
   ################################################################################################
   # BRAZIL
   ################################################################################################
@@ -52,6 +79,86 @@ steps:
     - snapshot://cedlas/2024-07-31/sedlac_poverty_2018.xlsx
   data://garden/cedlas/2024-07-31/sedlac_poverty_2018:
     - data://meadow/cedlas/2024-07-31/sedlac_poverty_2018
+
+  # Langoni (1972) - Income distribution estimates in Brazil (1960-1970)
+  data://meadow/chartbook/2024-08-08/langoni_1972_brazil:
+    - snapshot://chartbook/2024-08-08/langoni_1972_brazil.csv
+  data://garden/chartbook/2024-08-08/langoni_1972_brazil:
+    - data://meadow/chartbook/2024-08-08/langoni_1972_brazil
+
+  # Gini for individual earnings from Neri in OECD (2010)
+  data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - snapshot://oecd/2024-08-08/tackling_inequalities_brazil_2010.csv
+  data://garden/oecd/2024-08-08/tackling_inequalities_brazil_2010:
+    - data://meadow/oecd/2024-08-08/tackling_inequalities_brazil_2010
+
+  ################################################################################################
+  # CANADA
+  ################################################################################################
+  # Gini coefficient for gross family income for non-farm families (Love, 1979)
+  data://meadow/chartbook/2024-08-09/love_1979_canada:
+    - snapshot://chartbook/2024-08-09/love_1979_canada.csv
+  data://garden/chartbook/2024-08-09/love_1979_canada:
+    - data://meadow/chartbook/2024-08-09/love_1979_canada
+
+  # Gini coefficient, equivalized gross family income (Wolfson, 1986)
+  data://meadow/chartbook/2024-08-09/wolfson_1986_canada:
+    - snapshot://chartbook/2024-08-09/wolfson_1986_canada.csv
+  data://garden/chartbook/2024-08-09/wolfson_1986_canada:
+    - data://meadow/chartbook/2024-08-09/wolfson_1986_canada
+
+  # Gini coefficients from Statistics Canada (live)
+  data://meadow/statistics_canada/2024-08-09/gini_coefficients:
+    - snapshot://statistics_canada/2024-08-09/gini_coefficients.csv
+  data://garden/statistics_canada/2024-08-09/gini_coefficients:
+    - data://meadow/statistics_canada/2024-08-09/gini_coefficients
+
+  # Relative poverty data from Statistics Canada (live)
+  data://meadow/statistics_canada/2024-08-09/relative_poverty:
+    - snapshot://statistics_canada/2024-08-09/relative_poverty.csv
+  data://garden/statistics_canada/2024-08-09/relative_poverty:
+    - data://meadow/statistics_canada/2024-08-09/relative_poverty
+
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-14/atkinson_2008_canada:
+    - snapshot://chartbook/2024-08-14/atkinson_2008_canada.xls
+  data://garden/chartbook/2024-08-14/atkinson_2008_canada:
+    - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
+
+   # Wealth share of the top 1% (Davies, Di Matteo, 2020)
+  data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada:
+    - snapshot://chartbook/2024-08-15/davies_di_matteo_2020_canada.csv
+  data://garden/chartbook/2024-08-15/davies_di_matteo_2020_canada:
+    - data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada
+
+  ################################################################################################
+  # FINLAND
+  ################################################################################################
+  # Ginis in Jäntti et al (2010) (Atkinson and Piketty, 2010)
+  data://meadow/chartbook/2024-08-15/jantti_2010_finland:
+    - snapshot://chartbook/2024-08-15/jantti_2010_finland.csv
+  data://garden/chartbook/2024-08-15/jantti_2010_finland:
+    - data://meadow/chartbook/2024-08-15/jantti_2010_finland
+
+  # Gini, relative poverty and wealth share from Statistics Finland (live)
+  data://meadow/statfin/2024-08-16/statistics_finland_inequality:
+    - snapshot://statfin/2024-08-16/gini_coefficient.csv
+    - snapshot://statfin/2024-08-16/relative_poverty.csv
+    - snapshot://statfin/2024-08-16/share_wealth.csv
+  data://garden/statfin/2024-08-16/statistics_finland_inequality:
+    - data://meadow/statfin/2024-08-16/statistics_finland_inequality
+
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-08-16/atkinson_2008_finland:
+    - snapshot://chartbook/2024-08-16/atkinson_2008_finland.xls
+  data://garden/chartbook/2024-08-16/atkinson_2008_finland:
+    - data://meadow/chartbook/2024-08-16/atkinson_2008_finland
+
+  # Relative poverty from Riihelä et al. (2003)
+  data://meadow/chartbook/2024-08-19/riihela_et_al_2003_finland:
+    - snapshot://chartbook/2024-08-19/riihela_et_al_2003_finland.csv
+  data://garden/chartbook/2024-08-19/riihela_et_al_2003_finland:
+    - data://meadow/chartbook/2024-08-19/riihela_et_al_2003_finland
 
   ################################################################################################
   # FRANCE
@@ -107,6 +214,15 @@ steps:
     - data://meadow/chartbook/2024-05-23/wealth_france
 
   ################################################################################################
+  # GERMANY
+  ################################################################################################
+  # Gini coefficients in West Germany (Becker, 1997)
+  data://meadow/chartbook/2024-08-19/becker_1997_germany:
+    - snapshot://chartbook/2024-08-19/becker_1997_germany.csv
+  data://garden/chartbook/2024-08-19/becker_1997_germany:
+    - data://meadow/chartbook/2024-08-19/becker_1997_germany
+
+  ################################################################################################
   # UNITED KINGDOM
   ################################################################################################
 
@@ -115,3 +231,18 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
+
+  ################################################################################################
+  # MULTIPLE-COUNTRY DATASETS
+  ################################################################################################
+  # Decile ratios for gross income from OECD Data Explorer (live, multiple countries)
+  data://meadow/oecd/2024-08-15/decile_ratios:
+    - snapshot://oecd/2024-08-15/decile_ratios.csv
+  data://garden/oecd/2024-08-15/decile_ratios:
+    - data://meadow/oecd/2024-08-15/decile_ratios
+
+  # Long-Run Trends in the Distribution of Income and Wealth (Roine and Waldenström, 2015)
+  data://meadow/chartbook/2024-08-19/roine_waldenstrom_2015:
+    - snapshot://chartbook/2024-08-19/roine_waldenstrom_2015.csv
+  data://garden/chartbook/2024-08-19/roine_waldenstrom_2015:
+    - data://meadow/chartbook/2024-08-19/roine_waldenstrom_2015

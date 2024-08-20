@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, TrackingR
+    description: |-
+      Authors develop a new method for estimating the effective reproduction number of an infectious disease (R) and apply it to track the dynamics of COVID-19. The method is based on the fact that in the SIR model R,  is linearly related to the growth rate of the number of infected individuals. This time-varying growth rate is estimated using the Kalman filter from data on new cases. The method is easy to implement in standard statistical software, and it performs well even when the number of infected individuals is imperfectly measured, or the infection does not follow the SIR model. Our estimates of R for COVID-19 for 124 countries across the world are provided in an interactive online dashboard, and they are used to assess the effectiveness of non-pharmaceutical interventions in a sample of 14 European countries.
+
+
+    date_published: "2023-01-06"
+
+    # Citation
+    producer: Arroyo-Marioli F, Bullano F, Kucinskas S, Rondón-Moreno C
+    citation_full: |-
+      Arroyo-Marioli F, Bullano F, Kucinskas S, Rondón-Moreno C (2021) Tracking R of COVID-19: A new real-time estimation using the Kalman filter. PLoS ONE 16(1): e0244474. https://doi.org/10.1371/journal.pone.0244474
+
+    # Files
+    url_main: https://github.com/crondonm/TrackingR/tree/main
+    url_download: https://github.com/crondonm/TrackingR/raw/main/Estimates-Database/database_7.csv
+    date_accessed: 2024-08-13
+
+    # License
+    license:
+      name: MIT License
+      url: https://github.com/crondonm/TrackingR/blob/main/LICENSE
+
+outs:
+  - md5: 90a0a66f728cb620eef876e8132408dd
+    size: 10467462
+    path: tracking_r.csv

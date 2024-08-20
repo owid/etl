@@ -16,6 +16,9 @@ def main(upload: bool) -> None:
     names = [
         "compact",
         "vaccines",
+        "national_2020",
+        "national_2021",
+        "national_2022",
     ]
     for name in names:
         # Create a new snapshot.

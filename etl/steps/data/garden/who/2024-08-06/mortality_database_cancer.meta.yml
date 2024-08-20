@@ -1,0 +1,63 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+        - Cancer
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  mortality_database_cancer:
+    variables:
+      number:
+        title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
+        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      percentage_of_cause_specific_deaths_out_of_total_deaths:
+        title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
+        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
+        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      age_standardized_death_rate_per_100_000_standard_population:
+        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people
+        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
+        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: |-
+              To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
+      death_rate_per_100_000_population:
+        title: Deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>
+        description_short: Reported deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>.
+        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).

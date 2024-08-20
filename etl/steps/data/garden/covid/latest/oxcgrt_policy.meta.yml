@@ -193,7 +193,7 @@ tables:
 
       h4_emergency_investment_in_healthcare:
         title: Emergency investment in healthcare
-        description_short: "Announced short term spending on healthcare system, eg hospitals, masks, etc. Note: only record amount additional to previously announced spending."
+        description_short: "Announced short term spending on healthcare system, e.g. hospitals, masks, etc. Note: only record amount additional to previously announced spending."
         description_key:
           - |-
             Record monetary value in USD
@@ -285,7 +285,7 @@ tables:
 
       v2c_vaccine_age_eligibility_availability_age_floor__at_risk_summary:
         title: Vaccine age eligibility/availability age floor (at risk summary)
-        description_short: Reports lowest age range of at risk population being vaccinated. Takes C- and H1-indicators into account.
+        description_short: Reports lowest age range of at risk population being vaccinated. Takes 'containment and closure policies'- and H1-indicators into account.
         description_key:
           - |-
             - Blank: no data
@@ -294,7 +294,34 @@ tables:
 
       stringency_index:
         title: Stringency index (average)
-        description_short: Aggregate index that gives an overall impression of government activity. Takes only C-indicators into account.
+        description_short: Aggregate index that gives an overall impression of government activity. Takes only 'containment and closure policies'-indicators into account.
+        description_key:
+          - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
+        display:
+          numDecimalPlaces: 2
+          <<: *year_is_day
+
+      stringency_index_vax:
+        title: Stringency index (vaccinated)
+        description_short: Aggregate index that gives an overall impression of government activity. Takes only 'containment and closure policies'-indicators into account. It constructs the index using 'vaccinated' (V) policies if present, or otherwise using 'everyone' (E) policies.
+        description_key:
+          - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
+        display:
+          numDecimalPlaces: 2
+          <<: *year_is_day
+
+      stringency_index_nonvax:
+        title: Stringency index (non-vaccinated)
+        description_short: Aggregate index that gives an overall impression of government activity. Takes only 'containment and closure policies'-indicators into account. It constructs the index using 'non-vaccinated' (NV) policies if present, or otherwise using 'everyone' (E) policies.
+        description_key:
+          - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
+        display:
+          numDecimalPlaces: 2
+          <<: *year_is_day
+
+      stringency_index_weighted_average:
+        title: Stringency index (weighted average)
+        description_short: Aggregate index that gives an overall impression of government activity. Takes only 'containment and closure policies'-indicators into account. It takes an average of the "_Nonvax" and "_Vax" indices weighted by the proportion of the population that is vaccinated.
         description_key:
           - Estimated as the weighted average for most jurisdictions (but for which we substitute the simple average for jurisdictions where it is not possible to calculate the weighted average.
         display:

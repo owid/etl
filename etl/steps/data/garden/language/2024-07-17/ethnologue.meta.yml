@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+    description_processing: Languages are aggregated to the continent level with each language being counted only once for each region it is spoken in.
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  languages_by_status:
+    variables:
+      total:
+        title: Total number of languages
+        unit: languages
+        description_short: The total number of languages, indigenous and non-indigenous, that have been spoken.
+      living:
+        title: Number of living languages
+        unit: languages
+        description_short: The number of languages, indigenous and non-indigenous, that are still used.
+      extinct:
+        title: Number of extinct languages
+        unit: languages
+        description_short: The number of extinct languages. Extinct languages are those that were formally used but are no longer in use in any country and no one retains a sense of ethnic identity associated with them.
+      living_per_million:
+        title: Number of living languages per million people
+        unit: languages per million people
+        description_short: The number of languages, indigenous and non-indigenous, that are still used per million people.
+        display:
+          numDecimalPlaces: 1

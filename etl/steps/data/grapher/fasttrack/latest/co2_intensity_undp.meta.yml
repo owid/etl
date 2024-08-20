@@ -1,0 +1,14 @@
+dataset:
+  title: CO2 intensity (UNDP Project)
+  description: ''
+  licenses:
+    - {}
+tables:
+  co2_intensity_undp:
+    variables:
+      production_or_consumption_co2:
+        title: production_or_consumption_co2
+        unit: ''
+      co2_intensity_normalised:
+        title: co2_intensity_normalised
+        unit: ''

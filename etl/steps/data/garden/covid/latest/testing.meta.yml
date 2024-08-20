@@ -1,0 +1,213 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  entityAnnotationsMap: &annotations |-
+    Angola: tests performed
+    Antigua and Barbuda: tests performed
+    Argentina: tests performed
+    Armenia: tests performed
+    Australia: tests performed
+    Austria: tests performed
+    Azerbaijan: tests performed
+    Bahamas: tests performed
+    Bahrain: units unclear
+    Bangladesh: tests performed
+    Belarus: tests performed
+    Belgium: tests performed
+    Belize: tests performed
+    Benin: tests performed
+    Bhutan: samples tested
+    Bolivia: tests performed
+    Bosnia and Herzegovina: tests performed
+    Botswana: tests performed
+    Brazil: tests performed
+    Bulgaria: tests performed
+    Burkina Faso: tests performed
+    Burundi: tests performed
+    Cambodia: tests performed
+    Canada: tests performed
+    Cape Verde: tests performed
+    Central African Republic: tests performed
+    Chad: tests performed
+    Chile: tests performed
+    China: tests performed
+    Colombia: tests performed
+    Costa Rica: people tested
+    Cote d'Ivoire: tests performed
+    Croatia: people tested
+    Cuba: tests performed
+    Cyprus: tests performed
+    Czechia: tests performed
+    Democratic Republic of Congo: samples tested
+    Denmark: tests performed
+    Dominican Republic: samples tested
+    Ecuador: people tested
+    El Salvador: tests performed
+    Equatorial Guinea: tests performed
+    Estonia: tests performed
+    Ethiopia: tests performed
+    Faeroe Islands: people tested
+    Fiji: tests performed
+    Finland: tests performed
+    France: people tested
+    Gabon: tests performed
+    Gambia: tests performed
+    Georgia: tests performed
+    Germany: tests performed
+    Ghana: tests performed
+    Greece: samples tested
+    Guatemala: people tested
+    Guyana: tests performed
+    Haiti: tests performed
+    Hong Kong: tests performed
+    Hungary: tests performed
+    Iceland: tests performed
+    India: samples tested
+    Indonesia: people tested
+    Iran: tests performed
+    Iraq: samples tested
+    Ireland: tests performed
+    Israel: tests performed
+    Italy: tests performed
+    Jamaica: samples tested
+    Japan: people tested
+    Jordan: tests performed
+    Kazakhstan: tests performed
+    Kenya: tests performed
+    Kosovo: tests performed
+    Kuwait: tests performed
+    Laos: tests performed
+    Latvia: tests performed
+    Lebanon: tests performed
+    Libya: samples tested
+    Liechtenstein: tests performed
+    Lithuania: tests performed
+    Luxembourg: tests performed
+    Madagascar: tests performed
+    Malawi: tests performed
+    Malaysia: people tested
+    Maldives: samples tested
+    Malta: tests performed
+    Mauritania: tests performed
+    Mexico: people tested
+    Moldova: tests performed
+    Mongolia: samples tested
+    Morocco: people tested
+    Mozambique: tests performed
+    Myanmar: samples tested
+    Namibia: tests performed
+    Nepal: tests performed
+    Netherlands: tests performed
+    New Zealand: tests performed
+    Nigeria: samples tested
+    North Macedonia: tests performed
+    Norway: people tested
+    Oman: units unclear
+    Pakistan: tests performed
+    Palestine: tests performed
+    Panama: tests performed
+    Papua New Guinea: tests performed
+    Paraguay: tests performed
+    Peru: tests performed
+    Philippines: people tested
+    Poland: people tested
+    Portugal: tests performed
+    Qatar: people tested
+    Romania: tests performed
+    Russia: tests performed
+    Rwanda: samples tested
+    Saint Kitts and Nevis: people tested
+    Saint Vincent and the Grenadines: tests performed
+    Saudi Arabia: tests performed
+    Senegal: tests performed
+    Serbia: people tested
+    Singapore: samples tested
+    Slovakia: tests performed
+    Slovenia: tests performed
+    South Africa: people tested
+    South Korea: people tested
+    South Sudan: tests performed
+    Spain: tests performed
+    Sri Lanka: tests performed
+    Suriname: tests performed
+    Sweden: tests performed
+    Switzerland: tests performed
+    Taiwan: people tested
+    Thailand: tests performed
+    East Timor: tests performed
+    Togo: tests performed
+    Trinidad and Tobago: people tested
+    Tunisia: people tested
+    Turkey: tests performed
+    Uganda: tests performed
+    Ukraine: tests performed
+    United Arab Emirates: tests performed
+    United Kingdom: tests performed
+    United States: tests performed
+    Uruguay: people tested
+    Vietnam: samples tested
+    Zambia: tests performed
+    Zimbabwe: tests performed
+  display_common: &display_common
+    zeroDay: "2020-01-21"
+    yearIsDay: true
+    entityAnnotationsMap: *annotations
+
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    description_processing: Comparisons across countries are affected by differences in testing policies and reporting methods.
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+tables:
+  testing:
+    variables:
+      total_tests:
+        title: Cumulative total tests
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *display_common
+      total_tests_per_thousand:
+        title: Cumulative total per 1,000 people
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *display_common
+
+      new_tests:
+        title: Daily COVID-19 tests
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *display_common
+      new_tests_7day_smoothed:
+        title: Daily COVID-19 tests (7-day smoothed)
+        description_short: |-
+          New tests for COVID-19. For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+          <<: *display_common
+
+      new_tests_per_thousand:
+        title: Daily COVID-19 tests per 1,000 people
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *display_common
+      new_tests_per_thousand_7day_smoothed:
+        title: Daily COVID-19 tests per 1,000 people (7-day smoothed)
+        description_short: |-
+          New tests for COVID-19 (7-day smoothed). For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window.
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *display_common
+

@@ -6,7 +6,7 @@ All these things are done in a single script because the processes are intertwin
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -43,387 +43,347 @@ MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES = 178.5
 #  Set to None any commodity-subcommodity that should not be included.
 # NOTE: Sometimes the original names include relevant information.
 #  This information will be included in the footnotes (see FOOTNOTES defined below).
+# NOTE: An easy way to bulk-replace entities is by searching and replacing with regex in VSCode.
+#  For example, to replace "Mine production" with "Mine" in all values, search for ': (\("[^"]+", ")(Mine production)(")' and replace with ': $1Mine$3'.
 COMMODITY_MAPPING = {
-    ("Aluminum", "Smelter production, aluminum"): ("Aluminum", "Smelter production"),
+    ("Aluminum", "Smelter production, aluminum"): ("Aluminum", "Smelter"),
     ("Aluminum", "Smelter yearend capacity"): None,
-    ("Aluminum", "smelter production"): ("Aluminum", "Smelter production"),
-    ("Antimony", "Mine production"): ("Antimony", "Mine production"),
-    ("Antimony", "Mine production, contained antimony"): ("Antimony", "Mine production"),
-    ("Arsenic", "Plant production, arsenic trioxide or calculated equivalent."): ("Arsenic", "Plant production"),
-    ("Arsenic", "arsenic trioxide"): ("Arsenic", "Plant production"),
-    ("Asbestos", "Mine production"): ("Asbestos", "Mine production"),
-    ("Asbestos", "Mine production, asbestos"): ("Asbestos", "Mine production"),
-    ("Barite", "Mine production"): ("Barite", "Mine production"),
-    ("Barite", "Mine production, barite"): ("Barite", "Mine production"),
-    ("Barite", "Mine production, excluding U.S."): ("Barite", "Mine production"),
+    ("Aluminum", "smelter production"): ("Aluminum", "Smelter"),
+    ("Antimony", "Mine production"): ("Antimony", "Mine"),
+    ("Antimony", "Mine production, contained antimony"): ("Antimony", "Mine"),
+    ("Arsenic", "Plant production, arsenic trioxide or calculated equivalent."): ("Arsenic", "Processing"),
+    ("Arsenic", "arsenic trioxide"): ("Arsenic", "Processing"),
+    ("Asbestos", "Mine production"): ("Asbestos", "Mine"),
+    ("Asbestos", "Mine production, asbestos"): ("Asbestos", "Mine"),
+    ("Barite", "Mine production"): ("Barite", "Mine"),
+    ("Barite", "Mine production, barite"): ("Barite", "Mine"),
+    ("Barite", "Mine production, excluding U.S."): ("Barite", "Mine"),
     ("Bauxite and alumina", "Alumina, refinery production - calcined equivalent weights"): (
         "Alumina",
-        "Refinery production",
+        "Refinery",
     ),
-    ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite", "Mine production"),
-    ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite", "Mine production"),
-    ("Bauxite and alumina", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine production"),
+    ("Bauxite and alumina", "Bauxite, mine production"): ("Bauxite", "Mine"),
+    ("Bauxite and alumina", "Mine production, bauxite"): ("Bauxite", "Mine"),
+    ("Bauxite and alumina", "Mine production, bauxite, dry tons"): ("Bauxite", "Mine"),
     ("Bauxite and alumina", "Refinery production, alumina - calcined equivalent weights"): (
         "Alumina",
-        "Refinery production",
+        "Refinery",
     ),
-    ("Beryllium", "Mine production"): ("Beryllium", "Mine production"),
-    ("Beryllium", "Mine production, beryllium"): ("Beryllium", "Mine production"),
-    ("Bismuth", "Mine production"): ("Bismuth", "Mine production"),
-    ("Bismuth", "Refinery production"): ("Bismuth", "Refinery production"),
-    ("Boron", "Mine production, borates"): ("Boron", "Mine production, borates"),
-    ("Boron", "Mine production, boric oxide equivalent"): ("Boron", "Mine production, boric oxide equivalent"),
-    ("Boron", "Mine production, crude borates"): ("Boron", "Mine production, crude borates"),
-    ("Boron", "Mine production, crude ore"): ("Boron", "Mine production, crude ore"),
-    ("Boron", "Mine production, datolite ore"): ("Boron", "Mine production, datolite ore"),
-    ("Boron", "Mine production, ulexite"): ("Boron", "Mine production, ulexite"),
-    ("Boron", "Plant production, compounds"): ("Boron", "Plant production, boron compounds"),
-    ("Boron", "Plant production, refined borates"): ("Boron", "Plant production, refined borates"),
-    ("Boron", "borates"): ("Boron", "Mine production, borates"),
-    ("Boron", "boric oxide eqivalent"): ("Boron", "Mine production, boric oxide equivalent"),
-    ("Boron", "boric oxide equivalent"): ("Boron", "Mine production, boric oxide equivalent"),
-    ("Boron", "boron compounds"): ("Boron", "Plant production, boron compounds"),
-    ("Boron", "boron, crude ore"): ("Boron", "Mine production, crude ore"),
-    ("Boron", "compounds"): ("Boron", "Plant production, boron compounds"),
-    ("Boron", "crude borates"): ("Boron", "Mine production, crude borates"),
-    ("Boron", "crude ore"): ("Boron", "Mine production, crude ore"),
-    ("Boron", "datolite ore"): ("Boron", "Mine production, datolite ore"),
-    ("Boron", "refined borates"): ("Boron", "Plant production, refined borates"),
-    ("Boron", "ulexite"): ("Boron", "Mine production, ulexite"),
-    ("Bromine", "Plant production, bromine content"): ("Bromine", "Plant production"),
-    ("Bromine", "Production, bromine content"): ("Bromine", "Plant production"),
-    ("Bromine", "Production, bromine content, excluding U.S. production"): ("Bromine", "Plant production"),
-    ("Bromine", "Production"): ("Bromine", "Plant production"),
-    ("Cadmium", "Refinery production"): ("Cadmium", "Refinery production"),
-    ("Cement", "Cement production, estimated"): ("Cement", "Production"),
+    ("Beryllium", "Mine production"): ("Beryllium", "Mine"),
+    ("Beryllium", "Mine production, beryllium"): ("Beryllium", "Mine"),
+    # NOTE: Bismuth mine production differs significantly from USGS historical data. It may be because USGS current
+    #  reports as gross weight and USGS historical as metal content. But for now, simply ignore USGS current.
+    ("Bismuth", "Mine production"): None,
+    ("Bismuth", "Refinery production"): ("Bismuth", "Refinery"),
+    # NOTE: None of the following seem to correspond to the Boron mine production from the USGS historical data.
+    ("Boron", "Mine production, borates"): None,
+    ("Boron", "Mine production, boric oxide equivalent"): None,
+    ("Boron", "Mine production, crude borates"): None,
+    ("Boron", "Mine production, crude ore"): None,
+    ("Boron", "Mine production, datolite ore"): None,
+    ("Boron", "Mine production, ulexite"): None,
+    ("Boron", "Plant production, compounds"): None,
+    ("Boron", "Plant production, refined borates"): None,
+    ("Boron", "borates"): None,
+    ("Boron", "boric oxide eqivalent"): None,
+    ("Boron", "boric oxide equivalent"): None,
+    ("Boron", "boron compounds"): None,
+    ("Boron", "boron, crude ore"): None,
+    ("Boron", "compounds"): None,
+    ("Boron", "crude borates"): None,
+    ("Boron", "crude ore"): None,
+    ("Boron", "datolite ore"): None,
+    ("Boron", "refined borates"): None,
+    ("Boron", "ulexite"): None,
+    ("Bromine", "Plant production, bromine content"): ("Bromine", "Processing"),
+    ("Bromine", "Production, bromine content"): ("Bromine", "Processing"),
+    ("Bromine", "Production, bromine content, excluding U.S. production"): ("Bromine", "Processing"),
+    ("Bromine", "Production"): ("Bromine", "Processing"),
+    ("Cadmium", "Refinery production"): ("Cadmium", "Refinery"),
+    ("Cement", "Cement production, estimated"): ("Cement", "Processing"),
     ("Cement", "Clinker capacity, estimated"): None,
-    ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine production, marketable chromite ore"),
-    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): (
-        "Chromium",
-        "Mine production, marketable chromite ore",
-    ),
-    ("Chromium", "Mne production, marketable chromite ore, gross weight"): (
-        "Chromium",
-        "Mine production, marketable chromite ore",
-    ),
-    ("Clays", "Bentonite, mine production"): ("Clays", "Mine production, bentonite"),
-    ("Clays", "Fuller's earth, mine production"): ("Clays", "Mine production, fuller's earth"),
-    ("Clays", "Kaolin, mine production"): ("Clays", "Mine production, kaolin"),
-    ("Clays", "Mine poduction, Bentonite"): ("Clays", "Mine production, bentonite"),
-    ("Clays", "Mine poduction, Fuller's earth"): ("Clays", "Mine production, fuller's earth"),
-    ("Clays", "Mine poduction, Kaolin"): ("Clays", "Mine production, kaolin"),
-    ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine production"),
-    ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine production"),
-    ("Copper", "Mine production, contained copper"): ("Copper", "Mine production"),
+    # NOTE: USGS current data for chromium is odd: It is either significantly larger or significantly smaller than USGS
+    #  historical data, and changes abruptly from one year to another. For now, ignore.
+    ("Chromium", "Mine production, marketable chromite ore"): None,
+    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): None,
+    ("Chromium", "Mne production, marketable chromite ore, gross weight"): None,
+    ("Clays", "Bentonite, mine production"): ("Clays", "Mine, bentonite"),
+    ("Clays", "Fuller's earth, mine production"): ("Clays", "Mine, fuller's earth"),
+    # NOTE: There is good agreement between USGS current and BGS production data for Kaolin for several countries,
+    #  including the US. But for the World (and a few other countries), USGS current is significantly higher.
+    ("Clays", "Kaolin, mine production"): ("Clays", "Mine, kaolin"),
+    ("Clays", "Mine poduction, Bentonite"): ("Clays", "Mine, bentonite"),
+    ("Clays", "Mine poduction, Fuller's earth"): ("Clays", "Mine, fuller's earth"),
+    ("Clays", "Mine poduction, Kaolin"): ("Clays", "Mine, kaolin"),
+    ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine"),
+    ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine"),
+    ("Copper", "Mine production, contained copper"): ("Copper", "Mine"),
     # NOTE: I'm assuming "Mine production, contained copper" is equivalent to "Mine production, recoverable copper content".
     #  The former is used in the 2022 file, and the latter is used in the 2023 and 2024 files.
-    ("Copper", "Mine production, recoverable copper content"): ("Copper", "Mine production"),
-    ("Copper", "Refinery production"): ("Copper", "Refinery production"),
-    ("Copper", "Refinery production, copper"): ("Copper", "Refinery production"),
-    ("Diamond (industrial)", "Mine production"): ("Diamond", "Mine production, industrial"),
-    ("Diamond (industrial)", "Mine production, industrial diamond"): ("Diamond", "Mine production, industrial"),
-    ("Diatomite", "Mine production"): ("Diatomite", "Mine production"),
-    ("Diatomite", "Mine production, diatomite"): ("Diatomite", "Mine production"),
+    ("Copper", "Mine production, recoverable copper content"): ("Copper", "Mine"),
+    ("Copper", "Refinery production"): ("Copper", "Refinery"),
+    ("Copper", "Refinery production, copper"): ("Copper", "Refinery"),
+    ("Diamond (industrial)", "Mine production"): ("Diamond", "Mine, industrial"),
+    ("Diamond (industrial)", "Mine production, industrial diamond"): ("Diamond", "Mine, industrial"),
+    ("Diatomite", "Mine production"): ("Diatomite", "Mine"),
+    ("Diatomite", "Mine production, diatomite"): ("Diatomite", "Mine"),
     # NOTE: In 2022, for Feldspar and nepheline syenite, the subcommodity is "Mine production", whereas in 2023 and 2024, it is "Mine production, feldspar".
-    #  Maybe 2022 also refers to only feldspar?
-    ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar and nepheline syenite", "Mine production"),
-    ("Feldspar and nepheline syenite", "Mine production, feldspar"): ("Feldspar", "Mine production"),
-    ("Fluorspar", "Mine production"): ("Fluorspar", "Mine production"),
-    ("Fluorspar", "Mine production, fluorspar"): ("Fluorspar", "Mine production"),
-    ("Gallium", "Primary production"): ("Gallium", "Primary production"),
-    ("Garnet", "Mine production"): ("Garnet", "Mine production"),
-    ("Gemstones", "Mine production, thousand carats of gem diamond"): ("Gemstones", "Mine production"),
-    ("Gemstones", "Mine production, thousand carats of gem-quality diamond"): ("Gemstones", "Mine production"),
-    ("Germanium", "Primary and secondary refinery production"): (
-        "Germanium",
-        "Primary and secondary refinery production",
-    ),
-    ("Gold", "Gold - contained content, mine production, metric tons"): ("Gold", "Mine production"),
-    ("Gold", "Mine production"): ("Gold", "Mine production"),
-    ("Graphite (natural)", "Mine production"): ("Graphite", "Mine production, natural"),
-    ("Graphite (natural)", "Mine production, graphite"): ("Graphite", "Mine production, natural"),
-    ("Gypsum", "Mine production"): ("Gypsum", "Mine production"),
-    ("Helium", "Mine production"): ("Helium", "Mine production"),
-    ("Helium", "Mine production, helium"): ("Helium", "Mine production"),
-    ("Indium", "Refinery production"): ("Indium", "Refinery production"),
-    ("Indium", "Refinery production, indium"): ("Indium", "Refinery production"),
-    ("Iodine", "Mine production"): ("Iodine", "Mine production"),
-    ("Iodine", "Mine production, elemental iodine"): ("Iodine", "Mine production"),
-    ("Iron and steel", "Pig iron"): ("Iron and steel", "Pig iron"),
-    ("Iron and steel", "Pig iron, million metric tons"): ("Iron and steel", "Pig iron"),
-    ("Iron and steel", "Raw steel"): ("Iron and steel", "Raw steel"),
-    ("Iron and steel", "Raw steel, million metric tons"): ("Iron and steel", "Raw steel"),
-    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): ("Iron ore", "Mine production"),
-    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): (
+    #  It seems 2022 also refers to only feldspar (the numbers are in good agreement).
+    ("Feldspar and nepheline syenite", "Mine production"): ("Feldspar", "Mine"),
+    ("Feldspar and nepheline syenite", "Mine production, feldspar"): ("Feldspar", "Mine"),
+    ("Fluorspar", "Mine production"): ("Fluorspar", "Mine"),
+    ("Fluorspar", "Mine production, fluorspar"): ("Fluorspar", "Mine"),
+    ("Gallium", "Primary production"): ("Gallium", "Processing"),
+    ("Garnet", "Mine production"): ("Garnet", "Mine"),
+    ("Gemstones", "Mine production, thousand carats of gem diamond"): ("Gemstones", "Mine"),
+    ("Gemstones", "Mine production, thousand carats of gem-quality diamond"): ("Gemstones", "Mine"),
+    ("Germanium", "Primary and secondary refinery production"): ("Germanium", "Refinery"),
+    ("Gold", "Gold - contained content, mine production, metric tons"): ("Gold", "Mine"),
+    ("Gold", "Mine production"): ("Gold", "Mine"),
+    ("Graphite (natural)", "Mine production"): ("Graphite", "Mine"),
+    ("Graphite (natural)", "Mine production, graphite"): ("Graphite", "Mine"),
+    ("Gypsum", "Mine production"): ("Gypsum", "Mine"),
+    ("Helium", "Mine production"): ("Helium", "Mine"),
+    ("Helium", "Mine production, helium"): ("Helium", "Mine"),
+    ("Indium", "Refinery production"): ("Indium", "Refinery"),
+    ("Indium", "Refinery production, indium"): ("Indium", "Refinery"),
+    ("Iodine", "Mine production"): ("Iodine", "Mine"),
+    ("Iodine", "Mine production, elemental iodine"): ("Iodine", "Mine"),
+    ("Iron and steel", "Pig iron"): ("Iron", "Smelter, pig iron"),
+    ("Iron and steel", "Pig iron, million metric tons"): ("Iron", "Smelter, pig iron"),
+    ("Iron and steel", "Raw steel"): ("Steel", "Processing, crude"),
+    ("Iron and steel", "Raw steel, million metric tons"): ("Steel", "Processing, crude"),
+    ("Iron ore", "Iron ore - mine production - iron content - thousand metric tons"): (
         "Iron ore",
-        "Mine production, usable ore",
+        "Mine, iron content",
     ),
-    ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Mine production"),
-    ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Mine production, usable ore"),
-    ("Iron oxide pigments", "Iron oxide pigments"): ("Iron oxide pigments", "Mine production"),
-    ("Iron oxide pigments", "Mine production"): ("Iron oxide pigments", "Mine production"),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments"): ("Iron oxide pigments", "Mine production"),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): (
-        "Iron oxide pigments",
-        "Mine production, ocher and red iron oxide",
-    ),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): (
-        "Iron oxide pigments",
-        "Mine production, ocher",
-    ),
-    ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): (
-        "Iron oxide pigments",
-        "Mine production, umber",
-    ),
-    ("Kyanite", "Kyanite and Related Minerals"): ("Kyanite", "Mine production, kyanite and related minerals"),
-    ("Kyanite", "Mine production, andalusite"): ("Kyanite", "Mine production, andalusite"),
-    ("Kyanite", "Mine production, kyanite"): ("Kyanite", "Mine production, kyanite"),
-    ("Kyanite", "Mine production, kyanite and sillimanite"): ("Kyanite", "Mine production, kyanite and sillimanite"),
-    ("Kyanite", "andalusite"): ("Kyanite", "Mine production, andalusite"),
-    ("Kyanite", "kyanite"): ("Kyanite", "Mine production, kyanite"),
-    ("Kyanite", "kyanite and sillimanite"): ("Kyanite", "Mine production, kyanite and sillimanite"),
-    ("Lead", "Mine production"): ("Lead", "Mine production"),
-    ("Lead", "Mine production, lead content"): ("Lead", "Mine production"),
-    ("Lime", "Plant production"): ("Lime", "Plant production"),
-    ("Lime", "Plant production, lime"): ("Lime", "Plant production"),
-    ("Lithium", "Mine production, contained lithium"): ("Lithium", "Mine production"),
-    ("Lithium", "Mine production, lithium content"): ("Lithium", "Mine production"),
-    ("Magnesium compounds", "Mine production"): ("Magnesium compounds", "Mine production"),
+    # Looking at the metadata notes, "usable ore" corresponds to "Crude ore".
+    ("Iron ore", "Iron ore - mine production - usable ore -thousand metric tons"): ("Iron ore", "Mine, crude ore"),
+    ("Iron ore", "Mine production - Iron content"): ("Iron ore", "Mine, iron content"),
+    ("Iron ore", "Mine production - Usable ore"): ("Iron ore", "Mine, crude ore"),
+    ("Iron oxide pigments", "Iron oxide pigments"): None,
+    ("Iron oxide pigments", "Mine production"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): None,
+    ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): None,
+    ("Kyanite", "Kyanite and Related Minerals"): ("Kyanite", "Mine, kyanite and related minerals"),
+    ("Kyanite", "Mine production, andalusite"): ("Andalusite", "Mine"),
+    ("Kyanite", "Mine production, kyanite"): ("Kyanite", "Mine"),
+    ("Kyanite", "Mine production, kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
+    ("Kyanite", "andalusite"): ("Andalusite", "Mine"),
+    ("Kyanite", "kyanite"): ("Kyanite", "Mine"),
+    ("Kyanite", "kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
+    ("Lead", "Mine production"): ("Lead", "Mine"),
+    ("Lead", "Mine production, lead content"): ("Lead", "Mine"),
+    ("Lime", "Plant production"): ("Lime", "Processing"),
+    ("Lime", "Plant production, lime"): ("Lime", "Processing"),
+    ("Lithium", "Mine production, contained lithium"): ("Lithium", "Mine"),
+    ("Lithium", "Mine production, lithium content"): ("Lithium", "Mine"),
+    # NOTE: Even though the names of the sub-commodities are different in the data files, the metadata says the same
+    #  thing, which is tha "Data in thousand metric tons of contained magnesium oxide (MgO) unless otherwise noted".
+    #  Reported as magnesium content through Mineral Commodity Summaries 2016. Based on input from consumers, producers,
+    #  and others involved in the industry, reporting magnesium compound data in terms of contained magnesium oxide was
+    #  determined to be more useful than reporting in terms of magnesium content. Calculations were made using the
+    #  following magnesium oxide (MgO) contents: magnesite, 47.8%; magnesium chloride, 42.3%; magnesium hydroxide,
+    #  69.1%; and magnesium sulfate, 33.5%."
+    #  Numerically, they all are in good agreement.
+    ("Magnesium compounds", "Mine production"): ("Magnesium compounds", "Mine"),
     (
         "Magnesium compounds",
         "Mine production, gross weight of magnesite (magnesium carbonate) in thousand metric tons",
-    ): ("Magnesium compounds", "Mine production, magnesium carbonate"),
+    ): ("Magnesium compounds", "Mine"),
     ("Magnesium compounds", "Mine production, magnesite - contained magnesium oxide (MgO)"): (
         "Magnesium compounds",
-        "Mine production, magnesium oxide",
+        "Mine",
     ),
-    ("Magnesium metal", "Magnesium smelter production"): ("Magnesium metal", "Smelter production"),
-    ("Magnesium metal", "Smelter production"): ("Magnesium metal", "Smelter production"),
-    ("Manganese", "Mine production, manganese content"): ("Manganese", "Mine production"),
-    ("Mercury", "Mine production"): ("Mercury", "Mine production"),
-    ("Mercury", "Mine production, mercury content"): ("Mercury", "Mine production"),
-    ("Mica (natural)", "Mica mine production - scrap and flake"): (
-        "Mica (natural)",
-        "Mine production, scrap and flake",
-    ),
-    ("Mica (natural)", "Mica mine production - sheet"): ("Mica (natural)", "Mica mine production, sheet"),
-    ("Mica (natural)", "Mine production - mica scrap and flake"): (
-        "Mica (natural)",
-        "Mine production, scrap and flake",
-    ),
-    ("Mica (natural)", "Mine production - mica sheet"): ("Mica (natural)", "Mine production, sheet"),
-    ("Molybdenum", "Mine production, contained molybdenum"): ("Molybdenum", "Mine production"),
-    ("Molybdenum", "Molybdenum mine production, contained molybdenum"): ("Molybdenum", "Mine production"),
-    ("Nickel", "Mine production"): ("Nickel", "Mine production"),
-    ("Nickel", "Mine production - nickel, metric tons contained"): ("Nickel", "Mine production"),
-    ("Niobium (columbium)", "Mine production"): ("Niobium", "Mine production"),
-    ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine production"),
-    ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Plant production, fixed ammonia"),
-    ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): (
-        "Nitrogen",
-        "Plant production, fixed ammonia",
-    ),
-    ("Peat", "Mine production"): ("Peat", "Mine production"),
-    ("Peat", "Mine production, peat"): ("Peat", "Mine production"),
-    ("Perlite", "Mine production"): ("Perlite", "Mine production"),
-    ("Perlite", "Mine production, perlite"): ("Perlite", "Mine production"),
-    ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine production"),
-    ("Phosphate rock", "Mine production, phosphate rock ore"): ("Phosphate rock", "Mine production"),
-    ("Platinum-group metals", "Mine production: Palladium"): ("Palladium", "Mine production"),
-    ("Platinum-group metals", "Mine production: Platinum"): ("Platinum", "Mine production"),
-    ("Platinum-group metals", "World mine production: Palladium"): ("Palladium", "Mine production"),
-    ("Platinum-group metals", "World mine production: Platinum"): ("Platinum", "Mine production"),
-    ("Potash", "Mine production"): ("Potash", "Mine production"),
-    ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine production"),
-    ("Pumice and pumicite", "Mine production"): ("Pumice and pumicite", "Mine production"),
-    ("Pumice and pumicite", "Mine production, puice and pumicite"): ("Pumice and pumicite", "Mine production"),
-    ("Pumice and pumicite", "Mine production, pumice and pumicite"): ("Pumice and pumicite", "Mine production"),
+    ("Magnesium metal", "Magnesium smelter production"): ("Magnesium metal", "Smelter"),
+    ("Magnesium metal", "Smelter production"): ("Magnesium metal", "Smelter"),
+    ("Manganese", "Mine production, manganese content"): ("Manganese", "Mine"),
+    ("Mercury", "Mine production"): ("Mercury", "Mine"),
+    ("Mercury", "Mine production, mercury content"): ("Mercury", "Mine"),
+    ("Mica (natural)", "Mica mine production - scrap and flake"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural)", "Mica mine production - sheet"): ("Mica", "Mine, sheet"),
+    ("Mica (natural)", "Mine production - mica scrap and flake"): ("Mica", "Mine, scrap and flake"),
+    ("Mica (natural)", "Mine production - mica sheet"): ("Mica", "Mine, sheet"),
+    ("Molybdenum", "Mine production, contained molybdenum"): ("Molybdenum", "Mine"),
+    ("Molybdenum", "Molybdenum mine production, contained molybdenum"): ("Molybdenum", "Mine"),
+    ("Nickel", "Mine production"): ("Nickel", "Mine"),
+    ("Nickel", "Mine production - nickel, metric tons contained"): ("Nickel", "Mine"),
+    ("Niobium (columbium)", "Mine production"): ("Niobium", "Mine"),
+    ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine"),
+    ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
+    ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): ("Nitrogen", "Fixed ammonia"),
+    ("Peat", "Mine production"): ("Peat", "Mine"),
+    ("Peat", "Mine production, peat"): ("Peat", "Mine"),
+    ("Perlite", "Mine production"): ("Perlite", "Mine"),
+    ("Perlite", "Mine production, perlite"): ("Perlite", "Mine"),
+    ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine"),
+    ("Phosphate rock", "Mine production, phosphate rock ore"): ("Phosphate rock", "Mine"),
+    ("Platinum-group metals", "Mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Platinum-group metals", "Mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
+    ("Platinum-group metals", "World mine production: Palladium"): ("Platinum group metals", "Mine, palladium"),
+    ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
+    ("Potash", "Mine production"): ("Potash", "Mine"),
+    ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine"),
+    ("Pumice and pumicite", "Mine production"): ("Pumice and pumicite", "Mine"),
+    ("Pumice and pumicite", "Mine production, puice and pumicite"): ("Pumice and pumicite", "Mine"),
+    ("Pumice and pumicite", "Mine production, pumice and pumicite"): ("Pumice and pumicite", "Mine"),
     ("Rare earths", "Mine production, metric tons of rare-earth-oxide (REO) equivalent"): (
         "Rare earths",
-        "Mine production",
+        "Mine",
     ),
     ("Rare earths", "Rare earths, mine production, rare-earth-oxide equivalent, metric tons"): (
         "Rare earths",
-        "Mine production",
+        "Mine",
     ),
-    ("Rhenium", "Mine production"): ("Rhenium", "Mine production"),
-    ("Rhenium", "Mine production, contained rhenium"): ("Rhenium", "Mine production"),
-    ("Salt", "Mine production"): ("Salt", "Mine production"),
+    ("Rhenium", "Mine production"): ("Rhenium", "Mine"),
+    ("Rhenium", "Mine production, contained rhenium"): ("Rhenium", "Mine"),
+    ("Salt", "Mine production"): ("Salt", "Mine"),
     ("Sand and gravel (industrial)", "Mine production"): (
-        "Primary aggregates",
-        "Mine production, industrial sand and gravel",
+        "Sand and gravel",
+        "Mine, industrial",
     ),
     ("Sand and gravel (industrial)", "Mine production, industrial sand and gravel"): (
-        "Primary aggregates",
-        "Mine production, industrial sand and gravel",
+        "Sand and gravel",
+        "Mine, industrial",
     ),
-    ("Selenium", "Refinery production"): ("Selenium", "Refinery production"),
-    ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery production"),
+    ("Selenium", "Refinery production"): ("Selenium", "Refinery"),
+    ("Selenium", "Refinery production, contained selenium"): ("Selenium", "Refinery"),
     ("Silicon", "Plant production, silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
-        "Plant production, ferrosilicon and silicon metal",
+        "Processing",
     ),
-    ("Silicon", "Plant production, silicon content of ferrosilicon"): ("Silicon", "Plant production, ferrosilicon"),
-    ("Silicon", "Plant production, silicon content of ferrosilicon production"): (
-        "Silicon",
-        "Plant production, ferrosilicon",
-    ),
-    ("Silicon", "Plant production, silicon metal"): ("Silicon", "Plant production, silicon metal"),
+    ("Silicon", "Plant production, silicon content of ferrosilicon"): None,
+    ("Silicon", "Plant production, silicon content of ferrosilicon production"): None,
+    ("Silicon", "Plant production, silicon metal"): None,
     ("Silicon", "silicon content of combined totals for ferrosilicon and silicon metal production"): (
         "Silicon",
-        "Plant production, ferrosilicon and silicon metal",
+        "Processing",
     ),
-    ("Silicon", "silicon content of ferrosilicon production"): ("Silicon", "Plant production, ferrosilicon"),
-    ("Silver", "Mine production"): ("Silver", "Mine production"),
-    ("Silver", "Silver - mine production, contained silver - metric tons"): ("Silver", "Mine production"),
-    ("Silver", "mine production, silver content"): ("Silver", "Mine production"),
-    ("Soda ash", "Mine production (natural soda ash)"): ("Soda ash", "Mine production, natural"),
-    ("Soda ash", "Soda ash, natural, mine production"): ("Soda ash", "Mine production, natural"),
-    ("Soda ash", "Soda ash, synthetic"): ("Soda ash", "Plant production, synthetic"),
-    ("Soda ash", "Soda ash, total natural and synthetic"): ("Soda ash", "Total production, natural and synthetic"),
-    ("Soda ash", "World total mine production, natural soda ash (rounded)"): ("Soda ash", "Mine production, natural"),
+    ("Silicon", "silicon content of ferrosilicon production"): None,
+    ("Silver", "Mine production"): ("Silver", "Mine"),
+    ("Silver", "Silver - mine production, contained silver - metric tons"): ("Silver", "Mine"),
+    ("Silver", "mine production, silver content"): ("Silver", "Mine"),
+    ("Soda ash", "Mine production (natural soda ash)"): ("Soda ash", "Natural"),
+    ("Soda ash", "Soda ash, natural, mine production"): ("Soda ash", "Natural"),
+    ("Soda ash", "Soda ash, synthetic"): ("Soda ash", "Synthetic"),
+    ("Soda ash", "Soda ash, total natural and synthetic"): ("Soda ash", "Natural and synthetic"),
+    ("Soda ash", "World total mine production, natural soda ash (rounded)"): ("Soda ash", "Natural"),
     ("Soda ash", "World total production, natural and synthetic soda ash (rounded)"): (
         "Soda ash",
-        "Total production, natural and synthetic",
+        "Natural and synthetic",
     ),
-    ("Soda ash", "World total production, synthetic soda ash (rounded)"): ("Soda ash", "Plant production, synthetic"),
-    ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine production"),
-    ("Strontium", "Mine production"): ("Strontium", "Mine production"),
-    ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine production"),
-    ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Production, all forms"),
-    ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Production, all forms"),
-    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): (
-        "Talc and pyrophyllite",
-        "Mine production, crude and beneficiated",
-    ),
-    ("Talc and pyrophyllite", "Mine production, crude talc"): ("Talc", "Mine production, crude"),
-    ("Talc and pyrophyllite", "Mine production, talc"): ("Talc", "Mine production"),
-    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): (
-        "Talc",
-        "Mine production, including steatite",
-    ),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite"): ("Talc and pyrophyllite", "Mine production"),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): (
-        "Talc and pyrophyllite",
-        "Mine production, including crude",
-    ),
-    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): (
-        "Talc and pyrophyllite",
-        "Mine production",
-    ),
-    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): (
-        "Talc and pyrophyllite",
-        "Mine production, unspecified talc and/or pyrophyllite",
-    ),
-    ("Tantalum", "Mine production"): ("Tantalum", "Mine production"),
-    ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine production"),
-    ("Tellurium", "Mine production"): ("Tellurium", "Mine production"),
-    ("Tellurium", "Refinery production, tellurium content"): ("Tellurium", "Refinery production"),
-    ("Tin", "Mine production, metric tons contained tin"): ("Tin", "Mine production"),
-    ("Tin", "Mine production, tin content"): ("Tin", "Mine production"),
-    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): (
-        "Titanium and titanium dioxide",
-        "Sponge Metal Production and Sponge and Pigment Capacity",
-    ),
-    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Yearend Operating Capacity"): (
+    ("Soda ash", "World total production, synthetic soda ash (rounded)"): ("Soda ash", "Synthetic"),
+    ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine"),
+    ("Strontium", "Mine production"): ("Strontium", "Mine"),
+    ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
+    ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
+    ("Sulfur", "Production, all forms, thousand metric tons contained sulfur"): ("Sulfur", "Processing"),
+    ("Talc and pyrophyllite", "Mine production, Crude and benficiated talc and pyrophyllite"): None,
+    # NOTE: Talc production is larger than crude talk production.
+    ("Talc and pyrophyllite", "Mine production, crude talc"): None,
+    ("Talc and pyrophyllite", "Mine production, talc"): None,
+    ("Talc and pyrophyllite", "Mine production, talc (includes steatite)"): None,
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (includes crude)"): None,
+    ("Talc and pyrophyllite", "Mine production, talc and pyrophyllite (rounded)"): ("Talc and pyrophyllite", "Mine"),
+    ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
+    ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
+    ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
+    ("Tellurium", "Mine production"): ("Tellurium", "Mine"),
+    ("Tellurium", "Refinery production, tellurium content"): ("Tellurium", "Refinery"),
+    ("Tin", "Mine production, metric tons contained tin"): ("Tin", "Mine"),
+    ("Tin", "Mine production, tin content"): ("Tin", "Mine"),
+    ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): None,
+    (
         "Titanium and titanium dioxide",
         "Sponge Metal Production and Sponge and Pigment Yearend Operating Capacity",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
-    ),
-    ("Titanium mineral concentrates", "Mine production: Ilmenite and rutile"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite and rutile",
-    ),
+    ): None,
+    ("Titanium mineral concentrates", "Mine production: Ilmenite"): ("Titanium", "Mine, ilmenite"),
+    ("Titanium mineral concentrates", "Mine production: Ilmenite (rounded)"): ("Titanium", "Mine, ilmenite"),
+    ("Titanium mineral concentrates", "Mine production: Ilmenite and rutile"): None,
     ("Titanium mineral concentrates", "Mine production: Ilmenite, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Mine, ilmenite",
     ),
-    ("Titanium mineral concentrates", "Mine production: rutile"): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
-    ),
+    ("Titanium mineral concentrates", "Mine production: rutile"): ("Titanium", "Mine, rutile"),
     ("Titanium mineral concentrates", "Mine production: rutile, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
+        "Titanium",
+        "Mine, rutile",
     ),
     ("Titanium mineral concentrates", "World total mine production: Ilmenite (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Mine, ilmenite",
     ),
     ("Titanium mineral concentrates", "World total mine production: Ilmenite, titanium dioxide (TiO2) content."): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite",
+        "Titanium",
+        "Mine, ilmenite",
     ),
-    ("Titanium mineral concentrates", "World total mine production: ilmentite and rutile (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, ilmenite and rutile",
-    ),
+    ("Titanium mineral concentrates", "World total mine production: ilmentite and rutile (rounded)"): None,
     (
         "Titanium mineral concentrates",
         "World total mine production: ilmentite and rutile (rounded), titanium dioxide (TiO2) content.",
-    ): ("Titanium mineral concentrates", "Mine production, ilmenite and rutile"),
+    ): None,
     ("Titanium mineral concentrates", "World total mine production: rutile (rounded)"): (
-        "Titanium mineral concentrates",
-        "Mine production, rutile",
+        "Titanium",
+        "Mine, rutile",
     ),
     (
         "Titanium mineral concentrates",
         "World total mine production: rutile (rounded), titanium dioxide (TiO2) content.",
-    ): ("Titanium mineral concentrates", "Mine production, rutile"),
-    ("Tungsten", "Mine production, contained tungsten"): ("Tungsten", "Mine production"),
-    ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine production"),
-    ("Vanadium", "Mine production"): ("Vanadium", "Mine production"),
-    ("Vanadium", "Mine production, vanadium content"): ("Vanadium", "Mine production"),
-    ("Vermiculite", "Mine production"): ("Vermiculite", "Mine production"),
-    ("Wollastonite", "Mine production"): ("Wollastonite", "Mine production"),
-    ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine production"),
-    ("Zeolites (natural)", "Mine production"): ("Zeolites (natural)", "Mine production"),
-    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites (natural)", "Mine production"),
+    ): ("Titanium", "Mine, rutile"),
+    ("Tungsten", "Mine production, contained tungsten"): ("Tungsten", "Mine"),
+    ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine"),
+    ("Vanadium", "Mine production"): ("Vanadium", "Mine"),
+    ("Vanadium", "Mine production, vanadium content"): ("Vanadium", "Mine"),
+    ("Vermiculite", "Mine production"): ("Vermiculite", "Mine"),
+    ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
+    ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
+    ("Zeolites (natural)", "Mine production"): ("Zeolites", "Mine"),
+    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites", "Mine"),
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
-        "Mine production, concentrates and direct shipping ores",
+        "Mine",
     ),
     ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"): (
         "Zirconium and hafnium",
-        "Mine production, zirconium ores and zircon concentrates",
+        "Mine",
     ),
     (
         "Zirconium and hafnium",
         "Zirconium ores and zircon concentrates, mine production, thousand metric tons, gross weight",
-    ): ("Zirconium and hafnium", "Mine production, zirconium ores and zircon concentrates"),
+    ): ("Zirconium and hafnium", "Mine"),
 }
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened output table.
 FOOTNOTES = {
-    "production|Iodine|Mine production|tonnes": "Mine production refers to elemental iodine.",
-    "reserves|Iodine|Mine production|tonnes": "Mine production refers to elemental iodine.",
+    "production|Arsenic|Processing|tonnes": "Values are reported as arsenic trioxide or calculated equivalent.",
+    "production|Iodine|Mine|tonnes": "Values refer to elemental iodine.",
+    "reserves|Iodine|Mine|tonnes": "Values refer to elemental iodine.",
+    "production|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "reserves|Graphite|Mine|tonnes": "Values refer to natural graphite.",
+    "production|Silicon|Processing|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
+    "reserves|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
+    "production|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "reserves|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "production|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "reserves|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    "production|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
+    "reserves|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
+    "production|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
+    "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
+    "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
 }
 
 # Dictionary of special units.
 UNITS_MAPPING = {
-    "production|Arsenic|Plant production|tonnes": "tonnes of arsenic trioxide or calculated equivalent",
-    "production|Alumina|Refinery production|tonnes": "tonnes of calcined equivalent weights",
-    "production|Bauxite|Mine production|tonnes": "tonnes of dry content",
-    "reserves|Bauxite|Mine production|tonnes": "tonnes of dry content",
-    "production|Chromium|Mine production, marketable chromite ore|tonnes": "tonnes of gross weight",
-    "reserves|Chromium|Mine production, marketable chromite ore|tonnes": "tonnes of gross weight",
-    "production|Potash|Mine production|tonnes": "tonnes of potassium oxide equivalent",
-    "reserves|Potash|Mine production|tonnes": "tonnes of potassium oxide equivalent",
-    "production|Rare earths|Mine production|tonnes": "tonnes of rare-earth-oxide equivalent",
-    "reserves|Rare earths|Mine production|tonnes": "tonnes of rare-earth-oxide equivalent",
-    "production|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, ilmenite|tonnes": "tonnes of titanium dioxide content",
-    "production|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, rutile|tonnes": "tonnes of titanium dioxide content",
-    "production|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
-    "reserves|Titanium mineral concentrates|Mine production, ilmenite and rutile|tonnes": "tonnes of titanium dioxide content",
+    # "production|Chromium|Mine|tonnes": "tonnes of gross weight",
+    # "production|Bismuth|Mine|tonnes": "tonnes of gross weight",
+    # "production|Bismuth|Refinery|tonnes": "tonnes of metal content",
+    # "reserves|Chromium|Mine|tonnes": "tonnes of gross weight",
 }
 
 
@@ -609,23 +569,7 @@ def clean_spurious_values(series: pd.Series) -> pd.Series:
     return series
 
 
-def _include_note(d: pd.DataFrame, column: str, note: str) -> pd.Series:
-    # Include a note in "column" (which is the column devoted for notes).
-    d = d.copy()
-    if column not in d.columns:
-        d[column] = note
-    else:
-        d[column] = d[column].fillna("")
-        d.loc[d[column].str.endswith("."), column] += " " + note
-        d.loc[
-            (d[column].str.strip().apply(len) > 0) & ~(d[column].str.endswith(".")),
-            column,
-        ] += ". " + note
-        d.loc[d[column] == "", column] = note
-    return d[column]
-
-
-def prepare_reserves_data(d: pd.DataFrame):
+def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
     d = d.copy()
     # Select columns related to reserves data.
     columns_reserves = [
@@ -640,6 +584,11 @@ def prepare_reserves_data(d: pd.DataFrame):
         assert len(_column_reserves) == 1
         column_reserves = _column_reserves[0]
         unit_reserves = "_".join(column_reserves.split("_")[1:])
+
+        # Get general notes for this column, extracted from the xml metadata.
+        notes_reserves = metadata.get(column_reserves)
+        if notes_reserves is not None:
+            d["Reserves_notes"] = [note + [notes_reserves] for note in d["Reserves_notes"]]
 
         # Clean reserves data.
         d[column_reserves] = clean_spurious_values(series=d[column_reserves])
@@ -656,7 +605,7 @@ def prepare_reserves_data(d: pd.DataFrame):
             d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
             # Add a note explaining that the data is for ore.
-            d["Reserves_notes"] = _include_note(d=d, column="Reserves_notes", note="Reserves refer to ore.")
+            d["Reserves_notes"] = [note + ["Reserves refer to ore."] for note in d["Reserves_notes"]]
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
@@ -683,7 +632,7 @@ def prepare_reserves_data(d: pd.DataFrame):
         return df_reserves
 
 
-def prepare_production_data(d: pd.DataFrame):
+def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional[pd.DataFrame]:
     d = d.copy()
 
     # Select columns related to production data.
@@ -703,6 +652,9 @@ def prepare_production_data(d: pd.DataFrame):
 
         # The year can be extracted from the last character of the column name.
         years_production = [int(column[-4:]) for column in columns_production]
+        # Adapt metadata dictionary (which has a note for each production column) to have one note for each year.
+        metadata_production = {year: metadata.get(columns_production[i]) for i, year in enumerate(years_production)}
+
         # Sanity check.
         # NOTE: If data changes in a future update, the following can be relaxed.
         assert all(
@@ -729,9 +681,7 @@ def prepare_production_data(d: pd.DataFrame):
         if unit_production == "Sponge_t":
             unit_production = "t"
             # Add a note explaining that the data is for ore.
-            d["Production_notes"] = _include_note(
-                d=d, column="Production_notes", note="Production refers to titanium sponge."
-            )
+            d["Production_notes"] = [note + ["Production refers to titanium sponge."] for note in d["Reserves_notes"]]
         if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
@@ -739,10 +689,13 @@ def prepare_production_data(d: pd.DataFrame):
         # Create a Year column and a single column for production.
         df_production = pd.DataFrame()
         for year in years_production:
-            columns_to_keep = COMMON_COLUMNS.copy()
-            if ("Production_notes" in d.columns) and (year == years_production[-1]):
-                # Include the column of production notes only once (for example, when adding data for the last year).
-                columns_to_keep += ["Production_notes"]
+            columns_to_keep = COMMON_COLUMNS.copy() + ["Production_notes"]
+
+            # Get general notes for this column, extracted from the xml metadata.
+            notes_production = metadata_production.get(year)
+            if notes_production is not None:
+                d["Production_notes"] = [note + [notes_production] for note in d["Production_notes"]]
+
             _column_production = [column for column in columns_production if str(year) in column][0]
             _df_for_year = (
                 d[columns_to_keep + [_column_production]]
@@ -898,14 +851,25 @@ def gather_and_process_data(data) -> pd.DataFrame:
             # Clean data.
             d = extract_and_clean_data_for_year_and_mineral(data=data, year=year, mineral=mineral)
 
+            # Gather metadata for the current year-mineral.
+            metadata = data[year][mineral]["metadata"]
+
+            # Combine general notes with country-year-specific notes.
+            if "Production_notes" not in d.columns:
+                d["Production_notes"] = None
+            d["Production_notes"] = [[note] if pd.notnull(note) else [] for note in d["Production_notes"]]
+            if "Reserves_notes" not in d.columns:
+                d["Reserves_notes"] = None
+            d["Reserves_notes"] = [[note] if pd.notnull(note) else [] for note in d["Reserves_notes"]]
+
             # Prepare reserves data.
-            _df_reserves = prepare_reserves_data(d=d)
+            _df_reserves = prepare_reserves_data(d=d, metadata=metadata)
 
             # For now, ignore capacity data (which appears in a few commodities).
             # columns_capacity = [column for column in d.columns if column.lower().startswith("cap_")]
 
             # Prepare production data.
-            _df_production = prepare_production_data(d=d)
+            _df_production = prepare_production_data(d=d, metadata=metadata)
 
             # Append the new data to the main dataframe.
             if _df_reserves is not None:
@@ -1038,12 +1002,6 @@ def run(dest_dir: str) -> None:
         snap = paths.load_snapshot(f"mineral_commodity_summaries_{year}.zip")
         data[year] = extract_data_and_metadata_from_compressed_file(zip_file_path=snap.path)
 
-    # Load regions dataset.
-    # ds_regions = paths.load_dataset("regions")
-
-    # Load income groups dataset.
-    # ds_income_groups = paths.load_dataset("income_groups")
-
     #
     # Process data.
     #
@@ -1076,22 +1034,7 @@ def run(dest_dir: str) -> None:
 
     # Before creating aggregates, ensure notes are lists of strings.
     for column in ["notes_reserves", "notes_production"]:
-        tb[column] = [[note] if pd.notnull(note) else [] for note in tb[column]]
-
-    # Add regions to the table.
-    # NOTE: After inspection, it seems that USGS region aggregates often are significantly lower han BGS regions
-    #  aggregates (at least for those indicators where both series overlap). This indicates that USGS' regions may not
-    #  be representative enough. Therefore, it seems safer to not build region aggregates for USGS.
-    #  For more details, see garden minerals step.
-    # tb = geo.add_regions_to_table(
-    #     tb=tb,
-    #     ds_regions=ds_regions,
-    #     ds_income_groups=ds_income_groups,
-    #     min_num_values_per_year=1,
-    #     index_columns=["country", "year", "commodity", "sub_commodity", "unit"],
-    #     countries_that_must_have_data={"North America": ["United States"], "Asia": ["China"]},
-    #     # accepted_overlaps=ACCEPTED_OVERLAPS,
-    # )
+        tb[column] = [note if isinstance(note, list) else [] for note in tb[column]]
 
     # Clean notes columns (e.g. remove repeated notes).
     for column in ["notes_reserves", "notes_production"]:
@@ -1135,6 +1078,9 @@ def run(dest_dir: str) -> None:
         if not tb_flat[column].metadata.presentation:
             tb_flat[column].metadata.presentation = VariablePresentationMeta(grapher_config={})
         tb_flat[column].metadata.presentation.grapher_config["note"] = note
+
+    # Drop empty columns, if any.
+    tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)

@@ -10,6 +10,7 @@ TODO: Should probably re-order this file and split it into multiple files.
     Also, can imagine apps/wizard/ being renamed to just wizard/, and stuff other than wizard should be either (i) deleted or (ii) migrated elsewhere in etl/.
 """
 import argparse
+import ast
 import datetime as dt
 import json
 import os
@@ -21,6 +22,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
+import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
@@ -663,8 +665,9 @@ def enable_bugsnag_for_streamlit():
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
     enable_bugsnag()
+
     # error_util = sys.modules["streamlit.error_util"]
-    error_util = sys.modules["streamlit.runtime.scriptrunner.script_runner"]
+    error_util = sys.modules["streamlit.error_util"]
     original_handler = error_util.handle_uncaught_app_exception
 
     def bugsnag_handler(exception: Exception) -> None:
@@ -719,7 +722,7 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kw
         <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
         <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
         </script>
     </div>
     """
@@ -853,3 +856,36 @@ def st_toast_error(message: str) -> None:
 def st_toast_success(message: str) -> None:
     """Show success message."""
     st.toast(f"✅ :green[{message}]")
+
+
+def default_converter(o):
+    if isinstance(o, np.integer):  # ignore
+        return int(o)
+    else:
+        raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
+
+def as_valid_json(s):
+    """Return `s` as a dictionary if applicable."""
+    try:
+        # First, try to parse the string directly as JSON
+        return json.loads(s)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, use ast.literal_eval to handle mixed quotes
+            python_obj = ast.literal_eval(s)
+
+            # Convert the Python object to a JSON string and then back to a Python object
+            return json.loads(json.dumps(python_obj))
+        except (ValueError, SyntaxError):
+            return s
+
+
+def as_list(s):
+    """Return `s` as a list if applicable."""
+    if isinstance(s, str):
+        try:
+            return ast.literal_eval(s)
+        except (ValueError, SyntaxError):
+            return s
+    return s

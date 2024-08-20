@@ -22,7 +22,7 @@ meta:
 
     # Files
     url_main: https://platform.who.int/mortality
-    date_accessed: 2024-07-26
+    date_accessed: 2024-08-06
 
     # License
     license:
@@ -30,6 +30,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: fc30da3369f3d18fde5ea4163b8e6a53
-    size: 1078620449
-    path: mortality_database.csv
+  - md5: eca8154216acb713e834f62037d19f3d
+    size: 634555133
+    path: mortality_database_cancer.csv

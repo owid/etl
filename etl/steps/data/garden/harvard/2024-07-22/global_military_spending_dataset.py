@@ -17,14 +17,18 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("global_military_spending_dataset")
     ds_population = paths.load_dataset("population")
+    ds_gleditsch = paths.load_dataset("gleditsch")
+    ds_nmc = paths.load_dataset("national_material_capabilities")
 
     # Read table from meadow dataset.
     tb = ds_meadow["global_military_spending_dataset"].reset_index()
     tb_burden = ds_meadow["global_military_spending_dataset_burden"].reset_index()
 
     # Read Gleditsch country codes
-    ds_gleditsch = paths.load_dataset("gleditsch")
     tb_gleditsch = ds_gleditsch["gleditsch_countries"].reset_index()
+
+    # Read National Material Capabilities
+    tb_nmc = ds_nmc["national_material_capabilities"].reset_index()
 
     #
     # Process data.
@@ -40,6 +44,8 @@ def run(dest_dir: str) -> None:
     tb = harmonize_country_names(tb=tb, tb_gw=tb_gleditsch)
 
     tb = calculate_milex_per_capita(tb=tb, ds_population=ds_population)
+
+    tb = calculate_milex_per_military_personnel(tb=tb, tb_nmc=tb_nmc)
 
     tb = tb.format(["country", "year"])
 
@@ -152,5 +158,27 @@ def calculate_milex_per_capita(tb: Table, ds_population: Dataset) -> Table:
 
     # Drop population column
     tb = tb.drop(columns=["population"])
+
+    return tb
+
+
+def calculate_milex_per_military_personnel(tb: Table, tb_nmc: Table) -> Table:
+    """
+    Calculate military spending per military personnel.
+    """
+
+    # Merge tables
+    tb = pr.merge(tb, tb_nmc[["country", "year", "milper"]], on=["country", "year"], how="left")
+
+    # Calculate military spending per military personnel
+    tb["milex_per_military_personnel"] = tb["milex_estimate"] / tb["milper"]
+
+    # Replace infinite values with NaN
+    tb["milex_per_military_personnel"] = tb["milex_per_military_personnel"].replace(
+        [float("inf"), float("-inf")], float("nan")
+    )
+
+    # Drop milper column
+    tb = tb.drop(columns=["milper"])
 
     return tb

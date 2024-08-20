@@ -1,0 +1,56 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  statistics_finland_inequality:
+    variables:
+      gini:
+        title: Gini index
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality.
+        presentation:
+          title_public: Gini coefficient
+          title_variant: Equivalized disposable household cash income
+        display:
+          name: Gini index
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      relative_poverty:
+        title: People living below 60% of median income
+        unit: "%"
+        short_unit: "%"
+        description_short: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 60% of median income.
+        presentation:
+          title_public: Share below 60% median
+          title_variant: Equivalized disposable household cash income
+        display:
+          name: People living below 60% of median income
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_p90p100:
+        title: Wealth share of top 10%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of wealth owned by the richest 10% of the population.
+        presentation:
+          title_public: Share of top 10%
+          title_variant: Individual net wealth
+        display:
+          name: Wealth share of top 10%
+          numDecimalPlaces: 1
+          tolerance: 5
+

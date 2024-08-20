@@ -74,7 +74,7 @@ def expand_dimensions(tb: catalog.Table) -> catalog.Table:
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
-    warn_null_variables: bool = True,
+    warn_null_variables: bool = False,
     trim_long_short_name: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
@@ -534,11 +534,17 @@ def _adapt_table_for_grapher(
     ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
 
     # Remember original dimensions
-    dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
+    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", country_col)]
 
     # Reset index unless we have default index
     if table.index.names != [None]:
         table = table.reset_index()
+
+    # If a table contains `date` instead of `year`, adapt it for grapher
+    if "date" in table.columns:
+        # NOTE: this can be relaxed if we ever need it
+        assert "year" not in table.columns, "Table cannot have both `date` and `year` columns."
+        table = adapt_table_with_dates_to_grapher(table)
 
     assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."

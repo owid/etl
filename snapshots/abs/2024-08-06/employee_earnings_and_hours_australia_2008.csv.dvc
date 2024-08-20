@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Employee Earnings and Hours, Australia
+    description: |-
+      Includes earnings and hours statistics for characteristics such as industry, occupation, sex, age, full-time/part-time, and method of setting pay
+    date_published: "2009-06-17"
+    version_producer: Aug 2008
+
+    # Citation
+    producer: Australian Bureau of Statistics
+    citation_full: |-
+      Australian Bureau of Statistics. (2008, August). Employee Earnings and Hours, Australia. ABS. https://www.abs.gov.au/AUSSTATS/subscriber.nsf/log?openagent&63060_aug%202008.pdf&6306.0&Publication&1E07D323FDE698C2CA2575D700188C43&&Aug%202008&17.06.2009&Latest.
+    attribution_short: ABS
+
+    # Files
+    url_main: https://www.abs.gov.au/AUSSTATS/subscriber.nsf/log?openagent&63060_aug%202008.pdf&6306.0&Publication&1E07D323FDE698C2CA2575D700188C43&&Aug%202008&17.06.2009&Latest
+    date_accessed: 2024-08-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
+
+outs:
+  - md5: efe4e294001f507d4c0c8e75e0e87468
+    size: 128
+    path: employee_earnings_and_hours_australia_2008.csv

@@ -1,0 +1,87 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    icu: &icu |-
+      For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+    zero_day: &zero_day
+      zeroDay: 2020-01-21
+      yearIsDay: true
+
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      numDecimalPlaces: 0
+      <<: *zero_day
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, hospitalisations
+
+tables:
+  hospital:
+    variables:
+
+      daily_occupancy_hosp:
+        title: Daily hospital occupancy
+        description_short: Number of COVID-19 patients in hospital on a given day
+        unit: 'patients'
+      daily_occupancy_hosp_per_1m:
+        title: Daily hospital occupancy per million
+        description_short: Number of COVID-19 patients in hospital on a given day, per million people.
+        unit: 'patients per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+      weekly_admissions_hosp:
+        title: Weekly new hospital admissions
+        description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days).
+        unit: 'admissions'
+      weekly_admissions_hosp_per_1m:
+        title: Weekly new hospital admissions per million
+        description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days), per million people
+        unit: 'admissions per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+
+      daily_occupancy_icu:
+        title: Daily ICU occupancy
+        description_short: Number of COVID-19 patients in ICU on a given day.
+        description_key:
+          - *icu
+        unit: 'patients in ICU'
+      daily_occupancy_icu_per_1m:
+        title: Daily ICU occupancy per million
+        description_short: Number of COVID-19 patients in ICU on a given day, per million people.
+        description_key:
+          - *icu
+        unit: 'patients per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+      weekly_admissions_icu:
+        title: Weekly new ICU admissions
+        description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days).
+        description_key:
+          - *icu
+        unit: 'adpatientsmissions'
+      weekly_admissions_icu_per_1m:
+        title: Weekly new ICU admissions per million
+        description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days), per million people.
+        description_key:
+          - *icu
+        unit: 'patients per million people'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+
