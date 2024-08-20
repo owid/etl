@@ -123,34 +123,33 @@ views:
   #######################
   # Excess mortality (count)
   #######################
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages
     options:
       - Excess mortality (count)
       - Cumulative
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages
     options:
       - Excess mortality (count)
       - Cumulative
       - True
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages_last12m
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages_last12m
+    options:
+      - Excess mortality (count)
+      - Cumulative (last 12 months)
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages_last12m
     options:
       - Excess mortality (count)
       - Cumulative (last 12 months)
       - True
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages_last12m
-    options:
-      - Excess mortality (count)
-      - Cumulative (last 12 months)
 
   #######################
   # Excess mortality (%)
   #######################
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#cum_p_proj_all_ages
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_p_proj_all_ages
     options:
       - Excess mortality (%)
       - Cumulative
-      - True
-  - indicator: grapher/covid/latest/excess_mortality/excess_mortality#p_proj_all_ages
+  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#p_proj_all_ages
     options:
       - Excess mortality (%)
       - Weekly
@@ -158,6 +157,26 @@ views:
   #######################
   # Deaths
   #######################
+  # Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
+    options:
+      - Confirmed deaths
+      - Cumulative
+      - True
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+    options:
+      - Confirmed deaths
+      - Cumulative
+  # Cumulative (last 12 months)
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_last12m
+    options:
+      - Confirmed deaths
+      - Cumulative (last 12 months)
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million_last12m
+    options:
+      - Confirmed deaths
+      - Cumulative (last 12 months)
+      - True
   # 7-day smooth
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_million_7_day_avg_right
     options:
@@ -207,20 +226,21 @@ views:
     options:
       - Confirmed deaths
       - Biweekly change
-  # Cumulative
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_per_million
-    options:
-      - Confirmed deaths
-      - Cumulative
-      - True
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
-    options:
-      - Confirmed deaths
-      - Cumulative
 
   #######################
   # Cases
   #######################
+  # Cumulative
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases
+    options:
+      - Confirmed cases
+      - Cumulative
+      - False
+  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases_per_million
+    options:
+      - Confirmed cases
+      - Cumulative
+      - True
   # 7-day smooth
   - indicator: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right
     options:
@@ -273,17 +293,6 @@ views:
     options:
       - Confirmed cases
       - Biweekly change
-  # Cumulative
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases
-    options:
-      - Confirmed cases
-      - Cumulative
-      - False
-  - indicator: grapher/covid/latest/cases_deaths/cases_deaths#total_cases_per_million
-    options:
-      - Confirmed cases
-      - Cumulative
-      - True
 
   #######################
   # Cases and Deaths

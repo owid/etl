@@ -573,7 +573,7 @@ tables:
       cum_excess_proj_all_ages:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
-        unit: ""
+        unit: "deaths"
         description: The cumulative number of excess deaths; cumulated starting 1 January 2020
         display:
           numDecimalPlaces: 0
@@ -634,7 +634,7 @@ tables:
       cum_excess_per_million_proj_all_ages:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
-        unit: ""
+        unit: "deaths per million people"
         description: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
         display:
           numDecimalPlaces: 0
@@ -688,7 +688,7 @@ tables:
       cum_excess_proj_all_ages_last12m:
         title: cum_excess_proj_all_ages_last12m
         # title: Cumulative excess of deaths (projected, all ages)
-        unit: ""
+        unit: "deaths"
         description: The cumulative number of excess deaths in the last 12 months.
         display:
           numDecimalPlaces: 0
@@ -711,7 +711,7 @@ tables:
       cum_excess_per_million_proj_all_ages_last12m:
         title: cum_excess_per_million_proj_all_ages_last12m
         # title: Cumulative excess deaths per million people (projected, all ages)
-        unit: ""
+        unit: "deaths per million people"
         description: The cumulative number of excess deaths per million people in the population, in the last 12 months.
         display:
           numDecimalPlaces: 0
