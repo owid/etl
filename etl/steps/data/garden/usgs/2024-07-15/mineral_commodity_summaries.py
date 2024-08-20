@@ -285,7 +285,8 @@ COMMODITY_MAPPING = {
         "Natural and synthetic",
     ),
     ("Soda ash", "World total production, synthetic soda ash (rounded)"): ("Soda ash", "Synthetic"),
-    ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine"),
+    # NOTE: The following could be mapped to ("Dimension stone", "Mine"), but it has only US data, not global.
+    ("Stone (dimension)", "Mine production, dimension stone"): None,
     ("Strontium", "Mine production"): ("Strontium", "Mine"),
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),

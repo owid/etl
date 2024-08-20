@@ -58,7 +58,8 @@ COMMODITY_MAPPING = {
     # NOTE: The following could be mapped to ("Crushed stone", "Mine"), but it has only US data, not global.
     ("Crushed stone", "Total"): None,
     ("Diatomite", "Total"): ("Diatomite", "Mine"),
-    ("Dimension stone", "Total"): ("Dimension stone", "Mine"),
+    # NOTE: The following could be mapped to ("Dimension stone", "Mine"), but it has only US data, not global.
+    ("Dimension stone", "Total"): None,
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
     # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
