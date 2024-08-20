@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("flunet")
+    ds_meadow = paths.load_dataset("flunet")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["flunet"]
@@ -64,6 +64,16 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("flunet.end")
+
+
+def remove_nan_dates(df: pd.DataFrame) -> pd.DataFrame:
+    """There are rare mistakes in data with invalid date format."""
+    ix = df.date.isnull()
+    if ix.any():
+        log.warning(f"Removing {ix.sum()} rows with invalid date format")
+    df = df[~ix]
+    df["date"] = df["date"].dt.date.astype(str)
+    return df
 
 
 def remove_rows_that_sum_incorrectly(df: pd.DataFrame) -> pd.DataFrame:
@@ -118,6 +128,17 @@ def split_by_surveillance_type(df: pd.DataFrame) -> pd.DataFrame:
     Summing each column and skipping NAs so there is a column of combined values
     """
     flu_cols = df.columns.drop(["country", "date", "origin_source", "hemisphere"])
+
+    df = df[
+        (df.country == "New Caledonia")
+        & (df.date == "2005-05-16")
+        & (df.hemisphere == "SH")
+        & (df.origin_source == "NOTDEFINED")
+    ]
+
+    print(df.T)
+    __import__("ipdb").set_trace()
+
     df_piv = df.pivot(index=["country", "hemisphere", "date"], columns="origin_source").reset_index()
 
     df_piv.columns = list(map("".join, df_piv.columns))
@@ -145,8 +166,7 @@ def create_date_from_iso_week(date_iso: pd.Series) -> pd.Series:
     """
     Convert iso week to date format
     """
-    date = pd.to_datetime(date_iso, format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    return date
+    return pd.to_datetime(date_iso, format="%Y-%m-%d", utc=True, errors="coerce")
 
 
 def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -158,6 +178,7 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     df["date"] = create_date_from_iso_week(df["iso_weekstartdate"])
+    df = remove_nan_dates(df)
     df = remove_rows_that_sum_incorrectly(df)
     df = combine_columns(df)
     sel_cols = [
@@ -182,6 +203,7 @@ def clean_and_format_data(df: pd.DataFrame) -> pd.DataFrame:
         "spec_received_nb",
     ]
     df = df[sel_cols]
+    df = df.drop_duplicates()
 
     return df
 
