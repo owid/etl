@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: SOEPmonitor Individuals
+    description: |-
+      The SOEPmonitor gathers numerical series since the mid 80´s for chosen indicators, calculated on basis of the SOEP data.
+
+      The most important function of the SOEPmonitor - aside from reporting detailed information on the situations of individuals and households - is to give SOEP users a benchmark for their own studies. With the key figures contained in the SOEPmonitor, we offer an important reference point to evaluate the results of your own research.
+
+      Simultaneously the numerical series of the SOEPmonitor represent social indicators. With every issue of the SOEPmonitor we provide data series for the years 1984 to the current wave - disaggregated for East and West Germany since 1990 - for households and persons. Since SOEPmonitor 2007 the tables are in English language, too.
+    date_published: "2015"
+    title_snapshot: SOEPmonitor Individuals - relative poverty
+    description_snapshot: |-
+      Information available in page 91 of the report. Poverty measures (Foster, Greer, Thorbecke 1984) in Germany - Base: Annual income - Population: All persons in private households.
+
+    # Citation
+    producer: SOEP Group
+    citation_full: |-
+      SOEP Group (2015). SOEP 2013 – SOEPmonitor Individuals 1984-2013 (SOEP v30). Page 91 [FGT=0]. SOEP
+      Survey Papers 284: Series E. Berlin: DIW/SOEP
+
+    # Files
+    url_main: https://www.diw.de/en/diw_02.c.222727.en/soepmonitor.html
+    date_accessed: 2024-08-20
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.diw.de/en/diw_02.c.222727.en/soepmonitor.html
+
+outs:
+  - md5: 54d956399ff94c88ac54ca5c4553bfd9
+    size: 590
+    path: soepmonitor_1984_1983_germany_relative_poverty.csv
