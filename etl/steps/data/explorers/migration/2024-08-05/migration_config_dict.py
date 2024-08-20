@@ -1,11 +1,11 @@
-P_TOTAL = "Total"
+P_TOTAL = "Total number"
 P_CHANGE = "Five-year change"
-P_NEW = "Annual / New"
+P_NEW = "Annual change"
 
 SM_TOTAL = "Total"
 SM_SHARE = "Per capita / Share of population"
 
-A_TOTAL = "Total"
+A_TOTAL = "All ages"
 A_UNDER_18 = "Under 18"
 A_UNDER_15 = "Under 15"
 
@@ -47,15 +47,15 @@ ADDITIONAL_DESCRIPTIONS = {
     },
     "bx_trf_pwkr_dt_gd_zs": {
         "title": "Remittances as share of GDP",
-        "description": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country.",
+        "description": "Share of GDP that is made up of the sum of all personal [remittances](#dod:remittances) sent by migrants to their home countries.",
     },
     "si_rmt_cost_ib_zs": {
         "title": "Average cost for sending remittances to country",
-        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. The cost is based on a single transaction of USD 200. ",
+        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) sent from abroad to this country. The cost is based on a single transaction of USD 200. ",
     },
     "si_rmt_cost_ob_zs": {
         "title": "Average cost for sending remittances from country",
-        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad. Remittances are in-kind or cash transfers made from individuals in a given country to households outside of the host country. The cost is based on a single transaction of USD 200. ",
+        "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad. The cost is based on a single transaction of USD 200. ",
     },
     "emigrants_share_of_total_population": {
         "title": "Share of the population that have left the country",
@@ -414,7 +414,7 @@ CONFIG_DICT = {
     "bx_trf_pwkr_dt_gd_zs": {
         "metric": METRICS["remittance_gdp"],
         "period_radio": P_TOTAL,
-        "sub_metric_radio": SM_SHARE,
+        "sub_metric_radio": SM_TOTAL,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },

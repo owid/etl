@@ -21,12 +21,12 @@ def sort_metrics(x):
 
 
 def sort_age(x):
-    age_order = ["Total", "Under 18"]
+    age_order = ["All ages", "Under 18"]
     return age_order.index(x)
 
 
 def sort_period(x):
-    period_order = ["Total", "Five-year change", "Annual / New"]
+    period_order = ["Total number", "Five-year change", "Annual change"]
     return period_order.index(x)
 
 
@@ -185,7 +185,9 @@ def create_graphers_rows(graphers_dicts, tb, ds):
                 graphers_row_dict["subtitle"] = meta.description_short
                 graphers_row_dict["title"] = meta.title
 
-            if meta.processing_level == "minor":
+            if ds.metadata.short_name == "child_migration":
+                graphers_row_dict["sourceDesc"] = f"{origin.attribution}"
+            elif meta.processing_level == "minor":
                 graphers_row_dict["sourceDesc"] = f"{origin.producer} ({origin.date_published[:4]})"
             elif meta.processing_level == "major":
                 graphers_row_dict[

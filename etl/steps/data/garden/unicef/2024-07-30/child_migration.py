@@ -136,7 +136,7 @@ def run(dest_dir: str) -> None:
             src_key = "UNDESA"
         else:  # skip columns that are not from the original sources
             continue
-        tb[col].metadata.origins[0].attribution = [ORIGINS[src_key]["attribution"]]
+        tb[col].metadata.origins[0].attribution = ORIGINS[src_key]["attribution"]
         tb[col].metadata.origins[0].citation_full = ORIGINS[src_key]["citation_full"]
         tb[col].metadata.origins[0].date_published = ORIGINS[src_key]["data_published"]
         tb[col].metadata.origins[0].attribution_short = ORIGINS[src_key]["attribution_short"]
