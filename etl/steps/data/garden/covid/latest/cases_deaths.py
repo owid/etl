@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from shared import add_population_2022, add_regions, fill_date_gaps
+from shared import add_last12m_to_metric, add_population_2022, add_regions, fill_date_gaps
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -98,6 +98,9 @@ def run(dest_dir: str) -> None:
     tb = add_exemplars(tb)
     ## Drop population
     tb = tb.drop(columns=["population_2022"])
+    # Add last 12 months of data
+    tb = add_last12m_to_metric(tb, "total_deaths")
+    tb = add_last12m_to_metric(tb, "total_deaths_per_100k")
     ## Dtypes
     tb = set_dtypes(tb)
 

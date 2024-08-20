@@ -400,6 +400,29 @@ tables:
             title: Biweekly change of confirmed COVID-19 deaths
             subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed deaths over the last 14 days relative to the number in the previous 14 days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
 
+      # Last 12 months
+      ## Cumulative
+      total_deaths_last12m:
+        title: Total confirmed deaths due to COVID-19 (last 12 months)
+        description_short: |-
+          Total deaths attributed to COVID-19. Counts can include probable deaths, where reported.
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 9999
+          <<: *common_display
+      total_deaths_per_100k_last12m:
+        title: "Total confirmed deaths due to COVID-19 per 100,000 people (last 12 months)"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          name: Confirmed COVID-19 deaths (per 100,000)
+          <<: *common_display
+
       # Case fatality ratio
       #######################
       cfr:
