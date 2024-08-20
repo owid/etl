@@ -805,6 +805,23 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
+  #### DELETE later
+  # UNWTO tourism
+  # Key indicators
+  data://meadow/tourism/2023-05-05/unwto:
+    - snapshot://tourism/2023-05-04/unwto.xlsx
+  data://garden/tourism/2023-05-05/unwto:
+    - data://meadow/tourism/2023-05-05/unwto
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/oecd/2023-06-20/ppp_exchange_rates
+    - data://garden/demography/2022-12-08/population
+  data://grapher/tourism/2023-05-11/unwto:
+    - data://garden/tourism/2023-05-05/unwto
+  # OECD exchange rates
+  data://meadow/oecd/2023-06-20/ppp_exchange_rates:
+    - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+  data://garden/oecd/2023-06-20/ppp_exchange_rates:
+    - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
