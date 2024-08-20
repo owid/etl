@@ -1,4 +1,19 @@
 definitions:
+  color_scale: &color_scale
+    customNumericColorsActive: true
+    binningStrategy: manual
+    customNumericColors:
+      - "#E0F3F8"
+      - "#ffffcc"
+      - "#ffeda0"
+      - "#fed976"
+      - "#feb24c"
+      - "#fd8d3c"
+      - "#fc4e2a"
+      - "#e31a1c"
+      - "#bd0026"
+      - "#800026"
+
   common:
     display: &common_display
       numDecimalPlaces: 0
@@ -38,6 +53,7 @@ tables:
           <<: *common_display
           name: Central estimate
           color: "#B13507"
+
       cumulative_estimated_daily_excess_deaths_ci_95_bot:
         title: Cumulative excess deaths (95% CI, lower bound)
         unit: "deaths"
@@ -61,6 +77,23 @@ tables:
           <<: *common_display
           color: "#B13507"
           name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 300
+                  - 400
+                  - 500
+                  - 600
+                  - 700
+                  - 800
+                  - 900
       cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k:
         title: Cumulative excess deaths per 100,000 people (95% CI, lower bound)
         unit: "deaths per 100,000 people"
@@ -107,6 +140,23 @@ tables:
           color: "#B13507"
           <<: *common_display
           name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 0.5
+                  - 1
+                  - 1.5
+                  - 2
+                  - 2.5
+                  - 3
+                  - 3.5
+                  - 4
+                  - 4.5
       estimated_daily_excess_deaths_ci_95_bot_per_100k:
         title: Daily excess deaths per 100,000 people (95% CI, lower bound)
         unit: "deaths per 100,000 people"
@@ -122,7 +172,7 @@ tables:
           color: "#DDB09E"
           name: Upper bound
 
-      # Cumulative, absolute
+      # Cumulative last 12 months, absolute
       cumulative_estimated_daily_excess_deaths_last12m:
         title: Cumulative excess deaths (central estimate, last 12 months)
         unit: "deaths"
@@ -145,7 +195,7 @@ tables:
           <<: *common_display
           name: Upper bound
 
-      # Cumulative, relative
+      # Cumulative last 12 months, relative
       cumulative_estimated_daily_excess_deaths_per_100k_last12m:
         title: Cumulative excess deaths per 100,000 people (central estimate, last 12 months)
         unit: "deaths per 100,000 people"
@@ -153,6 +203,23 @@ tables:
           <<: *common_display
           color: "#B13507"
           name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 300
+                  - 400
+                  - 500
+                  - 600
+                  - 700
+                  - 800
+                  - 900
       cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k_last12m:
         title: Cumulative excess deaths per 100,000 people (95% CI, lower bound, last 12 months)
         unit: "deaths per 100,000 people"
