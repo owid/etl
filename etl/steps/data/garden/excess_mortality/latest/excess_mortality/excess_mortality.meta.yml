@@ -14,27 +14,21 @@ definitions:
       - "#bd0026"
       - "#800026"
   color_scale_percent: &color_scale_percent
-    customNumericColorsActive: true
-    binningStrategy: manual
-    customNumericValues:
-      - -50
-      - -25
-      - -10
-      - 0
-      - 10
-      - 25
-      - 50
-      - 100
-      - 200
-    customNumericColors:
-      - "#74add1"
-      - "#abd9e9"
-      - "#e0f3f8"
-      - "#ffffbf"
-      - "#fee090"
-      - "#fdae61"
-      - "#f46d43"
-      - "#d73027"
+    map:
+      colorScale:
+        customNumericColorsActive: true
+        binningStrategy: manual
+        colorSchemeInvert: true
+        baseColorScheme: RdYlBu
+        customNumericValues:
+          - -50
+          - -25
+          - -10
+          - 0
+          - 10
+          - 25
+          - 50
+          - 100
   origins:
     hmd: &origin_hmd
       title: "Human Mortality Database"
@@ -196,8 +190,7 @@ tables:
             title: "Excess mortality: Deaths from all causes compared to projection based on previous years"
             subtitle: The percentage difference between the reported number of weekly or monthly deaths in 2020–2022 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
-            colorScale:
-              <<: *color_scale_percent
+            <<: *color_scale_percent
       p_proj_0_14:
         title: p_proj_0_14
         # title: Excess mortality P-scores (projected baseline, 0–14)
@@ -532,8 +525,7 @@ tables:
             title: "Excess mortality: Cumulative deaths from all causes compared to projection based on previous years"
             subtitle: The percentage difference between the cumulative number of deaths since 1 January 2020 and the cumulative projected deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
-            colorScale:
-              <<: *color_scale_percent
+            <<: *color_scale_percent
       cum_excess_per_million_proj_all_ages:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
