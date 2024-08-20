@@ -7,7 +7,14 @@ Currently, the three sources of minerals data are:
 
 For debugging:
 * Add columns to PLOT_TO_COMPARE_DATA_SOURCES (defined below) to plot the data for that column separated by data source.
-* Comment/uncomment columns in COMBINE_BGS_AND_USGS_COLUMNS (defined below); if the difference between the "aggregated World" (a temporary aggregate of all data) becomes larger than USGS's World (by a certain percentage, defined by DEVIATION_MAX_ACCEPTED), an error is raised, and a plot is displayed comparing the two.
+* Comment/uncomment columns in COMBINE_BGS_AND_USGS_COLUMNS (defined below). Two sanity checks will be performed on these columns.
+  * First, we will check if the aggregated global data from only BGS (which was calculated in the garden BGS step) is significantly larger than USGS' World data.
+  * Second, we will create an aggregated global data after combining BGS and USGS data, and then check if this is larger than USGS' original World data.
+  In the two checks above, "significantly larger" means that the aggregated World data is larger than the original USGS's World by more than DEVIATION_MAX_ACCEPTED. If so, an error is raised, and a plot is displayed comparing the two "World" series.
+  We have two ways to tackle these issues:
+  * Accept the discrepancy between BGS and USGS data. We do this if BGS data is significantly larger on years where we have USGS data, since the latter will replace the former when combining both.
+  * Remove data (for all countries except USGS' World) on specific years where BGS data is significantly larger. Ideally, we would not need to do this, and instead we would fetch the rest of USGS' data. However, USGS' data is in a very inconvenient format, and it is a big investment of time to fetch all of it. So, exceptionally, we remove points where BGS data is clearly overestimated, compared to USGS.
+  NOTE: We allow this where one or a few BGS data points are significantly larger than USGS (e.g. Lead). But we do not do this if many points in BGS data are consistently larger than USGS (e.g. Graphite).
 
 """
 import warnings
@@ -36,8 +43,9 @@ paths = PathFinder(__file__)
 SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 
 # We use World data from USGS.
-# We will also aggregate all other data to create an "aggregated world" for sanity check purposes (and then remove it).
+# We will also aggregate all other data to create a "World (aggregated)" for sanity check purposes (and then remove it).
 # If this aggregated world is larger than USGS' World by more a certain percentage, raise an error.
+# We will also raise an error if the "World (BGS)" (aggregated in the BGS garden step) is significantly larger than USGS' World.
 # Define that percentage.
 DEVIATION_MAX_ACCEPTED = 10
 
@@ -140,7 +148,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # 'production|Tellurium|Refinery|tonnes',
     # Reasonable agreement, except for certain years, which leads to >100% shares.
     # "production|Tin|Mine|tonnes",
-    # Significant global disagreement.
+    # BGS aggregated global data is significantly larger than USGS' World.
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # Reasonable global agreement, but noisy data.
     "production|Titanium|Mine, rutile|tonnes",
@@ -161,6 +169,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 # NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
 #  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
 PLOT_TO_COMPARE_DATA_SOURCES = [
+    # 'production|Titanium|Mine, ilmenite|tonnes',
     # 'production|Helium|Mine|tonnes',
 ]
 
@@ -400,41 +409,43 @@ def add_share_of_global_columns(tb: Table) -> Table:
 
 def _raise_error_on_large_deviations(tb: Table, ds_regions: Dataset) -> None:
     # Add up the contribution from all countries and compare it to USGS' original "World".
-    tb = add_global_data(tb=tb, ds_regions=ds_regions)
-    tb["country"] = tb["country"].replace("World", "World aggregated").replace("World (original)", "World")
-    _tb = tb[(tb["country"].isin(["World", "World aggregated"]))].reset_index(drop=True)
-    _tb_pivot = _tb.pivot(
-        index=["year"],
-        columns="country",
-        values=_tb.drop(columns=["country", "year"]).columns,
-        join_column_levels_with="_",
-    )
-    for column in [column for column in _tb.columns if column.startswith("production")]:
-        original_column = f"{column}_World"
-        aggregated_column = f"{column}_World aggregated"
-        # We accept that the aggregated global data often does not add up to 100%, since we lack data for all countries.
-        # (For example, historical USGS data is only given for US and World).
-        # But we should not accept that the aggregated global data is larger than the World by more than a certain
-        # deviation.
-        deviation = 100 * (_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column])
-        if deviation.isnull().all():
-            continue
-        deviation_max = deviation.dropna().max()
-        years_with_deviation = _tb_pivot[deviation > DEVIATION_MAX_ACCEPTED]["year"].tolist()
-        # Raise an error if the maximum deviation of the aggregated world data (above the original world data) is larger
-        # than 15%.
-        # NOTE: Some of these individual peaks have been tackled above, by simply removing all BGS data.
-        # NOTE: An alternative way to detect outliers would be to impose, e.g. maximum deviation > 10% with MAPE > 10%.
-        mape = (
-            (100 * abs(_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column]))
-            .dropna()
-            .mean()
+    tb = _add_global_data_for_comparison(tb=tb, ds_regions=ds_regions)
+    tb["country"] = tb["country"].replace("World", "World (aggregated)").replace("World (original)", "World")
+    for entity_to_compare in ["World (aggregated)", "World (BGS)"]:
+        _tb = tb[(tb["country"].isin(["World", entity_to_compare]))].reset_index(drop=True)
+        _tb_pivot = _tb.pivot(
+            index=["year"],
+            columns="country",
+            values=_tb.drop(columns=["country", "year"]).columns,
+            join_column_levels_with="_",
         )
-        if deviation_max > DEVIATION_MAX_ACCEPTED:
-            log.error(
-                f"Aggregated data exceeds World data by {deviation_max:.0f}% in {years_with_deviation} (MAPE: {mape:.0f}%) for: {column}"
+        for column in [column for column in _tb.columns if column.startswith("production")]:
+            original_column = f"{column}_World"
+            aggregated_column = f"{column}_{entity_to_compare}"
+            # We accept that the aggregated global data often does not add up to 100%, since we lack data for all countries.
+            # (For example, historical USGS data is only given for US and World).
+            # But we should not accept that the aggregated global data is larger than the World by more than a certain
+            # deviation.
+            deviation = 100 * (_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column])
+            if deviation.isnull().all():
+                continue
+            deviation_max = deviation.dropna().max()
+            years_with_deviation = _tb_pivot[deviation > DEVIATION_MAX_ACCEPTED]["year"].tolist()
+            # Raise an error if the maximum deviation of the aggregated world data (above the original world data) is larger
+            # than 15%.
+            # NOTE: Some of these individual peaks have been tackled above, by simply removing all BGS data.
+            # NOTE: An alternative way to detect outliers would be to impose, e.g. maximum deviation > 10% with MAPE > 10%.
+            mape = (
+                (100 * abs(_tb_pivot[aggregated_column] - _tb_pivot[original_column]) / (_tb_pivot[original_column]))
+                .dropna()
+                .mean()
             )
-            px.line(_tb, x="year", y=column, color="country", markers=True, title=column).show()
+            if deviation_max > DEVIATION_MAX_ACCEPTED:
+                # TODO: Create a list of exceptions to not warn about.
+                log.error(
+                    f"{entity_to_compare} exceeds World (USGS) data by {deviation_max:.0f}% in {years_with_deviation} (MAPE: {mape:.0f}%) for: {column}"
+                )
+                px.line(_tb, x="year", y=column, color="country", markers=True, title=column).show()
 
 
 def combine_data(
@@ -461,16 +472,11 @@ def combine_data(
     )
 
     # Create a temporary combined table of BGS and USGS data.
-    # After inspection, it seems that, where USGS and BGS data overlap, BGS is usually more complete.
-    # All region aggregates from BGS have larger values than USGS' region aggregates (even though
-    # data for individual countries agrees reasonably well). However, the latest year is always from USGS.
-    # Initially we tried combining both and producing a combined "World" aggregate.
-    # But this often led to spurious jumps in global data, simply caused by missing data from different countries.
-    # So, the safest option is to combine BGS and USGS only where the "World" aggregate of BGS coincides reasonably well
-    # with the "World" data given by USGS.
-    # Hence, ignore "World" from BGS data (which was created by us).
+    # Keep the "World" that was aggregated with BGS data as "World (BGS)" just for sanity checks.
+    # This will be removed after sanity checks are completed.
+    tb_bgs_flat["country"] = tb_bgs_flat["country"].astype("string").replace("World", "World (BGS)")
     tb_bgs_and_usgs = combine_two_overlapping_dataframes(
-        df1=tb_usgs_combined_flat, df2=tb_bgs_flat[tb_bgs_flat["country"] != "World"], index_columns=["country", "year"]
+        df1=tb_usgs_combined_flat, df2=tb_bgs_flat, index_columns=["country", "year"]
     )
 
     # There are 22 columns that exist both in BGS and USGS, and where USGS includes "Other".
@@ -524,10 +530,13 @@ def combine_data(
     # by USGS.
     _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
 
+    # Remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
+    tb = tb[tb["country"] != "World (BGS)"].reset_index(drop=True)
+
     return tb
 
 
-def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
+def _add_global_data_for_comparison(tb: Table, ds_regions: Dataset) -> Table:
     _tb = tb.copy()
     # We want to create a "World" aggregate, just for sanity checks:
     # * We will ensure there are no overlaps between historical and successor regions.
@@ -555,7 +564,7 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
         "World": {"additional_members": ["Other"]},
     }
     _tb = geo.add_regions_to_table(
-        tb=_tb,
+        tb=_tb[_tb["country"] != "World (BGS)"],
         regions=regions,
         ds_regions=ds_regions,
         min_num_values_per_year=1,
@@ -565,6 +574,9 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     # Now that we have a World aggregate (and we are sure there is no double-counting) remove all other regions.
     regions_to_remove = [region for region in regions if region not in ["World", "World (original)"]]
     _tb = _tb.loc[~_tb["country"].isin(regions_to_remove)].reset_index(drop=True)
+
+    # Include the original "World (BGS)" for comparison.
+    _tb = pr.concat([_tb, tb[tb["country"] == "World (BGS)"]], ignore_index=True)
 
     return _tb
 
