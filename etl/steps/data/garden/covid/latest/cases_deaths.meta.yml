@@ -241,6 +241,7 @@ tables:
         display:
           numDecimalPlaces: 3
           tolerance: 9999
+          name: Confirmed COVID-19 deaths (per 100,000)
           <<: *common_display
 
       ## Daily
@@ -278,6 +279,11 @@ tables:
       new_deaths_7_day_avg_right:
         title: "Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)"
         unit: "deaths"
+        display:
+          name: Confirmed COVID-19 deaths
+          numDecimalPlaces: 3
+          tolerance: 14
+          <<: *common_display
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths
@@ -300,7 +306,7 @@ tables:
         unit: "deaths per 100,000 people"
         description_processing: *daily_population
         display:
-          name: New deaths (per 100,000)
+          name: Confirmed COVID-19 deaths (per 100,000)
           numDecimalPlaces: 3
           tolerance: 14
           <<: *common_display

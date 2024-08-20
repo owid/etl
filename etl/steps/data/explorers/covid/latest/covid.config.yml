@@ -81,7 +81,7 @@ views:
       - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#estimated_daily_excess_deaths_per_100k
       - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#estimated_daily_excess_deaths_ci_95_bot_per_100k
       - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#estimated_daily_excess_deaths_ci_95_top_per_100k
-      - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#new_deaths_per_100k_7_day_avg_right
+      - grapher/covid/latest/cases_deaths/cases_deaths#new_deaths_per_100k_7_day_avg_right
     options:
       - Excess mortality (estimates)
       - 7-day rolling average

@@ -287,7 +287,7 @@ def add_per_capita(tb: Table) -> Table:
     for indicator in indicators_1m:
         tb[f"{indicator}_per_million"] = tb[indicator] / (tb["population_2022"] / 1_000_000)
     for indicator in indicators_100k:
-        tb[f"{indicator}_per_100k"] = tb[indicator] / (tb["population_2022"] / 1_000_000)
+        tb[f"{indicator}_per_100k"] = tb[indicator] / (tb["population_2022"] / 100_000)
     return tb
 
 

@@ -48,7 +48,7 @@ tables:
         unit: "deaths"
         display:
           <<: *common_display
-          name: Upper bound, 95% uncertainty interval
+          name: Upper bound
 
       # Cumulative, relative
       cumulative_estimated_daily_excess_deaths_per_100k:
