@@ -805,7 +805,7 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
-  #### DELETE later
+  #### MOVE TO ARCHIVE later
   # UNWTO tourism
   # Key indicators
   data://meadow/tourism/2023-05-05/unwto:
