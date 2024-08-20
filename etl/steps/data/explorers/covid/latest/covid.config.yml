@@ -6,7 +6,7 @@ config:
     - Brazil
     - Japan
     - Germany
-  downloadDataLink: "https://github.com/owid/covid-19-data/tree/master/public/data"
+  downloadDataLink: "https://docs.owid.io/projects/etl/api/covid/"
   subNavId: "coronavirus"
   subNavCurrentId: "data-explorer"
   wpBlockId: 43869
