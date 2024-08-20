@@ -172,7 +172,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     # Merge the 2021 values with the original dataframe based on the 'country' column
     tb = pr.merge(
         tb,
-        tb_2021[["country", "fp_cpi_totl_zg", "purchasing_power_parities_for_household_final_consumption_expenditure"]],
+        tb_2021[["country", "fp_cpi_totl_zg", "purchasing_power_parities_for_actual_individual_consumption"]],
         on="country",
         suffixes=("", "_2021"),
     )
@@ -184,7 +184,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
     tb["inbound_ppp_cpi_adj_2021"] = (
         100 * (tb["in_tour_exp_the_country"] * tb["exchange_rates__average"]) / tb["fp_cpi_totl_normalized"]
-    ) / tb["purchasing_power_parities_for_household_final_consumption_expenditure_2021"]
+    ) / tb["purchasing_power_parities_for_actual_individual_consumption_2021"]
     tb = tb.drop(
         [
             "fp_cpi_totl_zg",
@@ -194,7 +194,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
             "purchasing_power_parities_for_actual_individual_consumption",
             "purchasing_power_parities_for_household_final_consumption_expenditure",
             "fp_cpi_totl_zg_2021",
-            "purchasing_power_parities_for_household_final_consumption_expenditure_2021",
+            "purchasing_power_parities_for_actual_individual_consumption_2021",
             "fp_cpi_totl_normalized",
         ],
         axis=1,
