@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
     tb_suspected = ds_suspected["africa_cdc"].reset_index()
-
+    origins = tb["total_conf_cases"].metadata.origins
     #
     # Process data.
     #
@@ -65,7 +65,7 @@ def run(dest_dir: str) -> None:
                 tb_both.loc[country_mask, "annotation"]
                 + "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
             )
-
+    tb_both["annotation"].metadata.origins = origins
     tb_both = tb_both.format(["country", "date"])
 
     #
