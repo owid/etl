@@ -152,6 +152,7 @@ def run(dest_dir: str) -> None:
 
 
 def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi):
+    print(tb_exchange_rates)
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
     tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["all_items"] / cpi_2021
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
@@ -167,7 +168,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
             [
                 "country",
                 "year",
-                "purchasing_power_parities_for_actual_individual_consumption",
+                "purchasing_power_parities_for_household_final_consumption_expenditure",
                 "exchange_rates__average",
             ]
         ],
@@ -188,19 +189,16 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     tb["cpi_adj_2021"] = 100 * tb["fp_cpi_totl_zg"] / cpi_all_2021
 
     # Get the PPP value for actual individual consumption for 2021
-    ppp_2021 = tb.loc[tb["year"] == 2021, "purchasing_power_parities_for_actual_individual_consumption"].values[0]
-
+    ppp_2021 = tb.loc[
+        tb["year"] == 2021, "purchasing_power_parities_for_household_final_consumption_expenditure"
+    ].values[0]
+    print(ppp_2021)
     # Convert inbound expenditure to local currency, adjust for local inflation, and convert back to international dollars
     tb["inbound_ppp_cpi_adj_2021"] = (
         (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["cpi_adj_2021"]
     ) / ppp_2021
     tb = tb.drop(
-        [
-            "fp_cpi_totl_zg",
-            "cpi_adj_2021",
-            "purchasing_power_parities_for_actual_individual_consumption",
-            "exchange_rates__average",
-        ],
+        ["fp_cpi_totl_zg", "cpi_adj_2021"],
         axis=1,
     )
 

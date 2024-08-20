@@ -524,3 +524,9 @@ tables:
         presentation:
           grapher_config:
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
+      exchange_rates__average:
+        title: Average exchange rate
+        unit: national currency per US dollar
+      purchasing_power_parities_for_household_final_consumption_expenditure:
+       title: Purchasing power parities for household final consumption expenditure
+       unit: index
