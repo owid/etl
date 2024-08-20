@@ -83,11 +83,14 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # BGS global data is significantly larger than USGS.
     # "production|Bromine|Processing|tonnes",
     # Reasonable global agreement, although not for certain countries: Denmark, Iran.
-    "production|Clays|Mine, bentonite|tonnes",
+    # NOTE: We decided to remove "Clays" altogether.
+    # "production|Clays|Mine, bentonite|tonnes",
     # Big global disagreement.
-    "production|Clays|Mine, fuller's earth|tonnes",
+    # NOTE: We decided to remove "Clays" altogether.
+    # "production|Clays|Mine, fuller's earth|tonnes",
     # Big global disagreement.
-    "production|Clays|Mine, kaolin|tonnes",
+    # NOTE: We decided to remove "Clays" altogether.
+    # "production|Clays|Mine, kaolin|tonnes",
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
     # "production|Cobalt|Mine|tonnes",

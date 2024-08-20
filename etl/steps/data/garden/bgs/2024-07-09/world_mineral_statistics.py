@@ -86,10 +86,14 @@ COMMODITY_MAPPING = {
     ("Bauxite, alumina and aluminium", "Unwrought"): None,
     ("Bauxite, alumina and aluminium", "Unwrought & scrap"): None,
     ("Bauxite, alumina and aluminium", "Unwrought alloys"): None,
-    ("Bentonite and fuller's earth", "Attapulgite"): ("Clays", "Mine, attapulgite"),
-    ("Bentonite and fuller's earth", "Bentonite"): ("Clays", "Mine, bentonite"),
-    ("Bentonite and fuller's earth", "Fuller's earth"): ("Clays", "Mine, fuller's earth"),
-    ("Bentonite and fuller's earth", "Sepiolite"): ("Clays", "Mine, sepiolite"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, attapulgite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Attapulgite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Bentonite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Fuller's earth"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, sepiolite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Sepiolite"): None,
     ("Bentonite and fuller's earth", "Unknown"): None,
     # NOTE: Beryl data may have a data issue: The biggest producer is Namibia, which goes from 15 in 1993 to 15000 in
     #  2021. Discard for now.
@@ -297,7 +301,8 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Sponge"): None,
     ("Iron, steel and ferro-alloys", "Sponge & powder"): None,
     ("Iron, steel and ferro-alloys", "Tin-plate scrap"): None,
-    ("Kaolin", "Unknown"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Kaolin", "Unknown"): None,
     ("Lead", "Ores & concentrates"): None,
     ("Lead", "Refined"): ("Lead", "Refinery"),
     ("Lead", "Scrap"): None,

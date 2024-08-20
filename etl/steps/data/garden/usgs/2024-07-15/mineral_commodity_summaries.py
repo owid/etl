@@ -107,14 +107,18 @@ COMMODITY_MAPPING = {
     ("Chromium", "Mine production, marketable chromite ore"): None,
     ("Chromium", "Mne production, grosss weight, marketable chromite ore"): None,
     ("Chromium", "Mne production, marketable chromite ore, gross weight"): None,
-    ("Clays", "Bentonite, mine production"): ("Clays", "Mine, bentonite"),
-    ("Clays", "Fuller's earth, mine production"): ("Clays", "Mine, fuller's earth"),
-    # NOTE: There is good agreement between USGS current and BGS production data for Kaolin for several countries,
-    #  including the US. But for the World (and a few other countries), USGS current is significantly higher.
-    ("Clays", "Kaolin, mine production"): ("Clays", "Mine, kaolin"),
-    ("Clays", "Mine poduction, Bentonite"): ("Clays", "Mine, bentonite"),
-    ("Clays", "Mine poduction, Fuller's earth"): ("Clays", "Mine, fuller's earth"),
-    ("Clays", "Mine poduction, Kaolin"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Clays", "Bentonite, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Clays", "Fuller's earth, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Clays", "Kaolin, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Bentonite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Fuller's earth"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Kaolin"): None,
     ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine"),
     ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine"),
     ("Copper", "Mine production, contained copper"): ("Copper", "Mine"),

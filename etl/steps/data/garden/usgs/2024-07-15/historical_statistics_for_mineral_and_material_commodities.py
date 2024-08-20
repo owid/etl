@@ -27,11 +27,12 @@ COMMODITY_MAPPING = {
     ("Antimony", "Total"): ("Antimony", "Mine"),
     ("Arsenic", "Total"): ("Arsenic", "Processing"),
     ("Asbestos", "Total"): ("Asbestos", "Mine"),
-    ("Ball clay", "Total"): ("Clays", "Mine, ball clay"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, ball clay"). We decided to remove "Clays".
+    ("Ball clay", "Total"): None,
     ("Barite", "Total"): ("Barite", "Mine"),
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
-    # NOTE: For consistency with USGS current data, rename the following.
-    ("Bentonite", "Total"): ("Clays", "Mine, bentonite"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Bentonite", "Total"): None,
     # NOTE: Extracted from "world_mine_production".
     ("Beryllium", "Total"): ("Beryllium", "Mine"),
     ("Beryllium", "Mine"): ("Beryllium", "Mine"),
@@ -65,9 +66,11 @@ COMMODITY_MAPPING = {
     # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
     #  nepheline syenite.", whereas in USGS current it's unclear.
     ("Feldspar", "Total"): ("Feldspar", "Mine"),
-    ("Fire clay", "Total"): ("Clays", "Mine, fire clay"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, fire clay"). We decided to remove "Clays".
+    ("Fire clay", "Total"): None,
     ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
-    ("Fuller's earth", "Total"): ("Clays", "Mine, fuller's earth"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Fuller's earth", "Total"): None,
     ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
@@ -83,7 +86,8 @@ COMMODITY_MAPPING = {
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
-    ("Kaolin", "Total"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Kaolin", "Total"): None,
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Mine"),
@@ -93,7 +97,8 @@ COMMODITY_MAPPING = {
     ("Metallic abrasives", "Total"): None,
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Mine, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Mine, sheet"),
-    ("Miscellaneous clay", "Total"): ("Clays", "Mine, miscellaneous"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, miscellaneous"). We decided to remove "Clays".
+    ("Miscellaneous clay", "Total"): None,
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Mine"),
@@ -186,9 +191,9 @@ FOOTNOTES_PRODUCTION = {
     "production|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Barite|Mine|tonnes": "Values are reported as gross weight.",
     "production|Asbestos|Mine|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
     "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
