@@ -157,7 +157,9 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
     tb_cpi_inv = pr.merge(tb, tb_us_cpi_2021, on="year", how="inner")
 
-    tb_cpi_inv["outbound_exp_us_cpi_adjust"] = tb_cpi_inv["out_tour_exp_travel"] / (tb_cpi_inv["cpi_adj_2021"])
+    tb_cpi_inv["outbound_exp_us_cpi_adjust"] = (
+        tb_cpi_inv["out_tour_exp_in_other_countries"] / (tb_cpi_inv["cpi_adj_2021"])
+    )
     tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
 
     # Merge expenditure, inflation and exchange rates
@@ -182,7 +184,7 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
 
     # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
     tb["inbound_ppp_cpi_adj_2021"] = (
-        100 * (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["fp_cpi_totl_normalized"]
+        100 * (tb["in_tour_exp_the_country"] * tb["exchange_rates__average"]) / tb["fp_cpi_totl_normalized"]
     ) / tb["purchasing_power_parities_for_household_final_consumption_expenditure_2021"]
     tb = tb.drop(
         [
