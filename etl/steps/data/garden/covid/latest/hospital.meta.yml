@@ -24,6 +24,7 @@ dataset:
 tables:
   hospital:
     variables:
+      # Occupancy in hospital
       daily_occupancy_hosp:
         title: Daily hospital occupancy
         description_short: Number of COVID-19 patients in hospital on a given day
@@ -35,18 +36,33 @@ tables:
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in hospital
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 10, 100, 1000, 10000, 100000, 1000000]
+                baseColorScheme: YlOrRd
       daily_occupancy_hosp_per_1m:
         title: Daily hospital occupancy per million
         description_short: Number of COVID-19 patients in hospital on a given day, per million people.
         unit: "patients per million people"
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
           tolerance: 15
           <<: *zero_day
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in hospital per million people
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+                baseColorScheme: YlOrRd
 
+      # Admissions to hospital
       weekly_admissions_hosp:
         title: Weekly new hospital admissions
         description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days).
@@ -59,20 +75,35 @@ tables:
           grapher_config:
             title: Weekly new hospital admissions for COVID-19
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 10, 100, 1000, 10000, 100000, 1000000]
+                baseColorScheme: YlOrRd
       weekly_admissions_hosp_per_1m:
         title: Weekly new hospital admissions per million
         description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days), per million people
         unit: "patients per million people"
         display:
           name: Hospital admissions (per 1M)
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
           tolerance: 15
           <<: *zero_day
         presentation:
           grapher_config:
             title: Weekly new hospital admissions for COVID-19 per million people
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [100, 200, 300, 400, 500, 600, 700]
+                baseColorScheme: YlOrRd
 
+      # Occupancy of ICU
       daily_occupancy_icu:
         title: Daily ICU occupancy
         description_short: Number of COVID-19 patients in ICU on a given day.
@@ -87,6 +118,13 @@ tables:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU)
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000]
+                baseColorScheme: YlOrRd
       daily_occupancy_icu_per_1m:
         title: Daily ICU occupancy per million
         description_short: Number of COVID-19 patients in ICU on a given day, per million people.
@@ -95,14 +133,22 @@ tables:
         unit: "patients per million people"
         display:
           name: Patients in ICU (per 1M)
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
           tolerance: 15
           <<: *zero_day
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU) per million people
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [20, 40, 60, 80, 100, 120, 140]
+                baseColorScheme: YlOrRd
 
+      # Admissions to ICU
       weekly_admissions_icu:
         title: Weekly new ICU admissions
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days).
@@ -118,6 +164,13 @@ tables:
             title: Weekly new ICU admissions for COVID-19
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
+                baseColorScheme: YlOrRd
       weekly_admissions_icu_per_1m:
         title: Weekly new ICU admissions per million
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days), per million people.
@@ -125,7 +178,7 @@ tables:
           - *icu
         unit: "patients per million people"
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
           tolerance: 15
           <<: *zero_day
         presentation:
@@ -133,3 +186,10 @@ tables:
             title: Weekly new ICU admissions for COVID-19 per million people
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [20, 40, 60, 80, 100, 120, 140]
+                baseColorScheme: YlOrRd
