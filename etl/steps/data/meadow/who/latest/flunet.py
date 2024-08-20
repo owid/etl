@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("flunet.csv")
+    snap = paths.load_snapshot("flunet.csv")
 
     # Load data from snapshot.
     df = pd.read_csv(snap.path)
@@ -34,9 +34,12 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert messy columns to string.
-    for col in ("aother_subtype_details",):
+    for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
         ix = tb[col].notnull()
         tb.loc[ix, col] = tb.loc[ix, col].astype("str")
+
+    # Clean up columns.
+    tb["iso_week"] = tb["iso_week"].replace({"NOTDEFINED": None}).astype(float).astype("Int64")
 
     #
     # Save outputs.
