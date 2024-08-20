@@ -212,7 +212,6 @@ steps:
     - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/output-for-interactive/by_location_full_data.csv
   data://garden/excess_mortality/latest/excess_mortality_economist:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
-    - data://garden/regions/2023-01-01/regions
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
 
