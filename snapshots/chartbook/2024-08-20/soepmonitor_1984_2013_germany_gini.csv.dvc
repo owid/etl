@@ -10,7 +10,7 @@ meta:
       The most important function of the SOEPmonitor - aside from reporting detailed information on the situations of individuals and households - is to give SOEP users a benchmark for their own studies. With the key figures contained in the SOEPmonitor, we offer an important reference point to evaluate the results of your own research.
 
       Simultaneously the numerical series of the SOEPmonitor represent social indicators. With every issue of the SOEPmonitor we provide data series for the years 1984 to the current wave - disaggregated for East and West Germany since 1990 - for households and persons. Since SOEPmonitor 2007 the tables are in English language, too.
-    date_published: "2015"
+    date_published: 2015-11-07
     title_snapshot: SOEPmonitor Individuals - Gini coefficient
     description_snapshot: |-
       Information available in page 83 of the report. Income inequality in Germany - Base: Annual Income - Population: All persons in private households.
