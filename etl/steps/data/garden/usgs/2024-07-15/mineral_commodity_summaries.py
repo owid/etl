@@ -169,12 +169,14 @@ COMMODITY_MAPPING = {
     ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and related minerals"), but it has very sparse data.
     ("Kyanite", "Kyanite and Related Minerals"): None,
-    ("Kyanite", "Mine production, andalusite"): ("Andalusite", "Mine"),
+    # NOTE: The following could be mapped to ("Andalusite", "Mine"), but it has sparse data (without global data).
+    ("Kyanite", "Mine production, andalusite"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
     ("Kyanite", "Mine production, kyanite"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
     ("Kyanite", "Mine production, kyanite and sillimanite"): None,
-    ("Kyanite", "andalusite"): ("Andalusite", "Mine"),
+    # NOTE: The following could be mapped to ("Andalusite", "Mine"), but it has sparse data (without global data).
+    ("Kyanite", "andalusite"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
     ("Kyanite", "kyanite"): None,
     # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.

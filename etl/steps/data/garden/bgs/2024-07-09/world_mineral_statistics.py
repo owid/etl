@@ -485,7 +485,8 @@ COMMODITY_MAPPING = {
     # NOTE: Unclear what "Unknown" means, but it's significantly lower than USGS' "Mine".
     ("Salt", "Unknown"): None,
     ("Selenium, refined", "Unknown"): ("Selenium", "Refinery"),
-    ("Sillimanite minerals", "Andalusite"): ("Andalusite", "Mine"),
+    # NOTE: The following could be mapped to ("Andalusite", "Mine") (and so does USGS, which does not include global data).
+    ("Sillimanite minerals", "Andalusite"): None,
     ("Sillimanite minerals", "Andalusite & kyanite"): None,
     # NOTE: The following could possibly be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does USGS).
     ("Sillimanite minerals", "Kyanite"): None,

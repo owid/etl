@@ -68,7 +68,6 @@ ACCEPTED_DEVIATIONS = [
 COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Alumina|Refinery|tonnes",
     "production|Aluminum|Smelter|tonnes",
-    "production|Andalusite|Mine|tonnes",
     # Reasonable agreement overall, but disagreement during certain periods, leading to >100% shares of global.
     # TODO: This should be investigated.
     # 'production|Antimony|Mine|tonnes',
