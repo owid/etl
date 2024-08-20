@@ -82,5 +82,5 @@ tables:
         title: ISO code
         unit: ''
       annotation:
-        title: Annotation
+        title: annotation
         unit: ''
