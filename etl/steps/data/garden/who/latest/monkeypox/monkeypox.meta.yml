@@ -5,6 +5,7 @@ definitions:
       topic_tags:
         - Mpox (monkeypox)
 
+
 dataset:
   update_period_days: 365
 
@@ -21,6 +22,7 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       new_cases:
         title: New confirmed cases
         unit: cases
@@ -31,6 +33,7 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       new_cases_smoothed:
         title: New confirmed cases (7-day smoothed)
         unit: cases
@@ -41,6 +44,7 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 2
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       new_cases_per_million:
         title: New confirmed cases per million
         unit: cases per million
@@ -61,16 +65,22 @@ tables:
         unit: deaths per million
         display:
           numDecimalPlaces: 3
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       total_deaths_per_million:
         title: Total confirmed deaths per million
         unit: deaths per million
         display:
           numDecimalPlaces: 3
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       new_deaths_smoothed_per_million:
         title: New confirmed deaths per million (7-day smoothed)
         unit: deaths per million
         display:
           numDecimalPlaces: 3
+          entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
       iso_code:
         title: ISO code
+        unit: ''
+      annotation:
+        title: Annotation
         unit: ''
