@@ -152,7 +152,6 @@ def run(dest_dir: str) -> None:
 
 
 def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi):
-    print(tb_exchange_rates)
     cpi_2021 = tb_us_cpi.loc[tb_us_cpi["year"] == 2021, "all_items"].values[0]
     tb_us_cpi["cpi_adj_2021"] = tb_us_cpi["all_items"] / cpi_2021
     tb_us_cpi_2021 = tb_us_cpi[["cpi_adj_2021", "year"]].copy()
@@ -161,47 +160,44 @@ def adjust_inflation_cost_of_living(tb, tb_us_cpi, tb_exchange_rates, tb_all_cpi
     tb_cpi_inv["outbound_exp_us_cpi_adjust"] = tb_cpi_inv["out_tour_exp_travel"] / (tb_cpi_inv["cpi_adj_2021"])
     tb_cpi_inv = tb_cpi_inv.drop("cpi_adj_2021", axis=1)
 
-    # TO DO : Convert back to exchange rates, adjust exchange rates for inflation and then convert back to PPP
-    tb = pr.merge(
-        tb_cpi_inv,
-        tb_exchange_rates[
-            [
-                "country",
-                "year",
-                "purchasing_power_parities_for_household_final_consumption_expenditure",
-                "exchange_rates__average",
-            ]
-        ],
-        on=["country", "year"],
-        how="left",
-    )
+    # Merge expenditure, inflation and exchange rates
+    tb = pr.merge(tb_cpi_inv, tb_all_cpi, on=["country", "year"], how="inner")
+    tb = pr.merge(tb, tb_exchange_rates, on=["country", "year"], how="inner")
+
+    # Filter the dataframe for year 2021
+    tb_2021 = tb[tb["year"] == 2021]
+    print(tb.columns)
+
+    # Merge the 2021 values with the original dataframe based on the 'country' column
     tb = pr.merge(
         tb,
-        tb_all_cpi,
-        on=["country", "year"],
-        how="left",
+        tb_2021[["country", "fp_cpi_totl_zg", "purchasing_power_parities_for_household_final_consumption_expenditure"]],
+        on="country",
+        suffixes=("", "_2021"),
     )
+    print(tb.columns)
 
-    # Get the CPI value for the year 2021
-    cpi_all_2021 = tb.loc[tb["year"] == 2021, "fp_cpi_totl_zg"].values[0]
+    # CPI from 2021 instead of 2010
+    tb["fp_cpi_totl_normalized"] = 100 * tb["fp_cpi_totl_zg"] / tb["fp_cpi_totl_zg_2021"]
 
-    # Adjust CPI values relative to 2021
-    tb["cpi_adj_2021"] = 100 * tb["fp_cpi_totl_zg"] / cpi_all_2021
-
-    # Get the PPP value for actual individual consumption for 2021
-    ppp_2021 = tb.loc[
-        tb["year"] == 2021, "purchasing_power_parities_for_household_final_consumption_expenditure"
-    ].values[0]
-    print(ppp_2021)
-    # Convert inbound expenditure to local currency, adjust for local inflation, and convert back to international dollars
+    # Convert to inbound expenditure to local currency, adjust for local inflation and convert back to international dollars
     tb["inbound_ppp_cpi_adj_2021"] = (
-        (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["cpi_adj_2021"]
-    ) / ppp_2021
+        100 * (tb["in_tour_exp_travel"] * tb["exchange_rates__average"]) / tb["fp_cpi_totl_normalized"]
+    ) / tb["purchasing_power_parities_for_household_final_consumption_expenditure_2021"]
     tb = tb.drop(
-        ["fp_cpi_totl_zg", "cpi_adj_2021"],
+        [
+            "fp_cpi_totl_zg",
+            "exchange_rates__average",
+            "exchange_rates__end_of_period",
+            "purchasing_power_parities_for_gdp",
+            "purchasing_power_parities_for_actual_individual_consumption",
+            "purchasing_power_parities_for_household_final_consumption_expenditure",
+            "fp_cpi_totl_zg_2021",
+            "purchasing_power_parities_for_household_final_consumption_expenditure_2021",
+            "fp_cpi_totl_normalized",
+        ],
         axis=1,
     )
-
     return tb
 
 
