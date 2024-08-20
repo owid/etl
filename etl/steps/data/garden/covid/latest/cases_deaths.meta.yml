@@ -409,6 +409,7 @@ tables:
         unit: "deaths"
         display:
           numDecimalPlaces: 0
+          name: Confirmed COVID-19 deaths
           tolerance: 9999
           <<: *common_display
       total_deaths_per_100k_last12m:
