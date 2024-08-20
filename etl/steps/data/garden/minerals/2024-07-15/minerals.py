@@ -122,8 +122,6 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # 'production|Iron ore|Mine, crude ore|tonnes',
     # BGS global data is consistently larger than USGS since 1992, and also for Mexico, Iran, India.
     # 'production|Iron|Smelter, pig iron|tonnes',
-    # BGS noisy data, and from USGS only US is informed.
-    "production|Kyanite|Mine|tonnes",
     # Reasonable global agreement, although not for certain countries: Turkey, Iran.
     "production|Lead|Mine|tonnes",
     # Reasonable global agreement, although not for certain countries: Turkey, Russia.

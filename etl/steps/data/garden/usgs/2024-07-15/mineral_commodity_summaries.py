@@ -167,13 +167,18 @@ COMMODITY_MAPPING = {
     ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): None,
-    ("Kyanite", "Kyanite and Related Minerals"): ("Kyanite", "Mine, kyanite and related minerals"),
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and related minerals"), but it has very sparse data.
+    ("Kyanite", "Kyanite and Related Minerals"): None,
     ("Kyanite", "Mine production, andalusite"): ("Andalusite", "Mine"),
-    ("Kyanite", "Mine production, kyanite"): ("Kyanite", "Mine"),
-    ("Kyanite", "Mine production, kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
+    # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
+    ("Kyanite", "Mine production, kyanite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
+    ("Kyanite", "Mine production, kyanite and sillimanite"): None,
     ("Kyanite", "andalusite"): ("Andalusite", "Mine"),
-    ("Kyanite", "kyanite"): ("Kyanite", "Mine"),
-    ("Kyanite", "kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
+    # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
+    ("Kyanite", "kyanite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
+    ("Kyanite", "kyanite and sillimanite"): None,
     ("Lead", "Mine production"): ("Lead", "Mine"),
     ("Lead", "Mine production, lead content"): ("Lead", "Mine"),
     ("Lime", "Plant production"): ("Lime", "Processing"),
