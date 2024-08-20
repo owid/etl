@@ -1,18 +1,13 @@
 """Compilation of minerals data from different origins.
 
 Currently, the three sources of minerals data are:
-* From BGS we extract production (and disregard imports/exports, which are very sparse).
+* From BGS we extract production and disregard imports/exports, which are very sparse.
 * From USGS (current) we extract production and reserves.
 * From USGS (historical) we extract production and unit value.
 
-Initially, I thought of creating long tables in the garden steps of USGS current, USGS historical, and BGS data.
-
-However, there is little overlap between the three origins (at the country-year-commodity-subcommodity-unit level).
-If we combined all production data into one column (as it would be common to do in a garden step), the resulting data
-would show as having 3 origins, whereas in reality most data points would come from just one origin.
-
-So it seems more convenient to create wide tables, where each column has its own origin, and then combine the wide
-tables (on those few columns where there is overlap).
+For debugging:
+* Add columns to PLOT_TO_COMPARE_DATA_SOURCES (defined below) to plot the data for that column separated by data source.
+* Comment/uncomment columns in COMBINE_BGS_AND_USGS_COLUMNS (defined below); if the difference between the "aggregated World" (a temporary aggregate of all data) becomes larger than USGS's World (by a certain percentage, defined by DEVIATION_MAX_ACCEPTED), an error is raised, and a plot is displayed comparing the two.
 
 """
 import warnings
@@ -117,7 +112,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Mercury|Mine|tonnes",
     # Reasonable global agreement, except for certain years, and also not for certain countries: Armenia, Iran, Mexico.
     "production|Molybdenum|Mine|tonnes",
-    # Reasonable global agreement, but not for certain years, especially 2013.
+    # Reasonable global agreement, but not for certain years, especially 2013, where Indonesia has a large peak.
     # TODO: This should be investigated.
     # "production|Nickel|Mine|tonnes",
     # Significant global disagreement, leading to world shares of 191%.
@@ -165,7 +160,6 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 # The following list contains all columns where USGS (current and historical) overlaps with BGS.
 # NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
 #  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
-# TODO: Consider keeping "World (BGS)" just for run sanity checks and then remove it. This we we will detect >100% shares.
 PLOT_TO_COMPARE_DATA_SOURCES = [
     # 'production|Helium|Mine|tonnes',
 ]
