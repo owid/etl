@@ -495,7 +495,7 @@ tables:
           - However, it is worth noting that certain countries deviate from UNWTO recommendations and classify their nationals residing abroad as a distinct category, rather than considering them as residents of those countries.
 
       outbound_exp_us_cpi_adjust:
-        title: Outbound expenditure adjusted for US consumer price index
+        title: Outbound expenditure adjusted for inflation
         unit: constant 2021 US$
         description_key:
           - *desc_key_exp
@@ -508,7 +508,7 @@ tables:
             note: This data is expressed in constant 2021 US$. Transactions associated with all types of foreign visitors considered, including students or seasonal workers, which can be significant in certain countries.
 
       inbound_ppp_cpi_adj_2021:
-        title: Inbound expenditure adjusted for purchasing power parity and US consumer price index
+        title: Inbound expenditure adjusted for inflation and cost of living
         unit: international-$ in 2021 prices
         description_short: This data is adjusted for inflation and differences in the cost of living between countries.
         description_processing: The purchasing power parity (PPP) and consumer price index (CPI) are used to adjust the expenditure data for inflation and purchasing power differences. This adjustment allows for a more accurate comparison of expenditure data across different years and countries.
