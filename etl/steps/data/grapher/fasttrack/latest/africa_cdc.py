@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    snap = Snapshot("{{cookiecutter.namespace}}/{{cookiecutter.version}}/{{cookiecutter.short_name}}.csv")
+    snap = Snapshot("fasttrack/latest/africa_cdc.csv")
 
     # load data
     tb = snap.read_csv()

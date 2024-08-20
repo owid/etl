@@ -220,3 +220,5 @@ steps:
     - snapshot://fasttrack/latest/nature_index_undp.csv
   data://grapher/fasttrack/latest/co2_intensity_undp:
     - snapshot://fasttrack/latest/co2_intensity_undp.csv
+  data://grapher/fasttrack/latest/africa_cdc:
+    - snapshot://fasttrack/latest/africa_cdc.csv
