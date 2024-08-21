@@ -367,7 +367,7 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
         notes_bgs, footnotes_bgs = _gather_notes_and_footnotes_from_metadata(tb_flat=tb_bgs_flat, column=column)
 
         # Add notes to metadata.
-        combined_notes = _combine_notes(notes_list=[notes_bgs, notes_usgs, notes_usgs_historical], separator="\n\n")
+        combined_notes = _combine_notes(notes_list=[notes_usgs_historical, notes_usgs, notes_bgs], separator="\n\n")
         if len(combined_notes) > 0:
             tb[column].metadata.description_from_producer = combined_notes
 
