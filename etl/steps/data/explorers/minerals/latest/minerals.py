@@ -57,8 +57,7 @@ def run(dest_dir: str) -> None:
                 sub_commodity = f"{sub_commodity.capitalize()}"
 
             # Metric "Unit value" should not have a map tab.
-            # Also, imports and exports tend to have very sparse data. For now, remove their map tabs.
-            if metric in ["Imports", "Exports", "Unit value"]:
+            if metric in ["Unit value"]:
                 has_map_tab = False
             else:
                 has_map_tab = True
@@ -130,7 +129,7 @@ def run(dest_dir: str) -> None:
     # Sort rows conveniently.
     df_graphers["Metric Dropdown"] = pd.Categorical(
         df_graphers["Metric Dropdown"],
-        categories=["Production", "Reserves", "Unit value", "Imports", "Exports"],
+        categories=["Production", "Reserves", "Unit value"],
         ordered=True,
     )
     df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Metric Dropdown", "Type Dropdown"]).reset_index(
@@ -150,7 +149,7 @@ def run(dest_dir: str) -> None:
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals",
-        "explorerSubtitle": "Explore the amount of minerals that are produced, imported, and exported.",
+        "explorerSubtitle": "Explore the production, reserves and value of minerals.",
         "selection": ["World", "Australia", "Chile", "China", "United States"],
     }
 
