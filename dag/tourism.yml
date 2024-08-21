@@ -1,0 +1,19 @@
+steps:
+
+# UNWTO tourism datasets
+  data://meadow/tourism/2024-08-17/unwto:
+    - snapshot://tourism/2024-08-17/unwto.xlsx
+  data://garden/tourism/2024-08-17/unwto:
+    - data://meadow/tourism/2024-08-17/unwto
+    - data://garden/demography/2024-07-15/population
+    - data://garden/oecd/2024-08-19/ppp_exchange_rates
+    - data://garden/bls/2024-05-16/us_consumer_prices
+    - data://garden/worldbank_wdi/2024-05-20/wdi  # includes inflation data for every country up to 2022
+  data://grapher/tourism/2024-08-17/unwto:
+    - data://garden/tourism/2024-08-17/unwto
+
+# OECD PPP exchange rates used for tourism data
+  data://meadow/oecd/2024-08-19/ppp_exchange_rates:
+    - snapshot://oecd/2024-08-19/ppp_exchange_rates.csv
+  data://garden/oecd/2024-08-19/ppp_exchange_rates:
+    - data://meadow/oecd/2024-08-19/ppp_exchange_rates
