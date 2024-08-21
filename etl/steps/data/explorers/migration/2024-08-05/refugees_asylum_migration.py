@@ -64,6 +64,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # try to get map brackets from old explorer - only if USE_EXISTING_MAP_BRACKETS is True
+    # code left in for eventual update of explorer - might need to change expl_path if explorer is renamed
     if USE_EXISTING_MAP_BRACKETS:
         expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
         if expl_path.exists():
@@ -90,15 +91,15 @@ def run(dest_dir: str) -> None:
     df_graphers = pd.DataFrame(graphers_dicts)
 
     # Add a map tab to all indicators.
-    df_graphers["hasMapTab"] = "true"
+    df_graphers["hasMapTab"] = True
     # show map tab by default
     df_graphers["tab"] = "map"
     # set yAxis to start at 0
     df_graphers["yAxisMin"] = 0
     # hide automatic time/ entity in chart title
-    df_graphers["hideAnnotationFieldsInTitle"] = "true"
+    df_graphers["hideAnnotationFieldsInTitle"] = True
     # set current year als maximum year
-    df_graphers["timelineMaxTime"] = 2024
+    df_graphers["timelineMaxTime"] = paths.version[0:4]
 
     # Sanity check.
     error = "Duplicated rows in explorer."
@@ -107,19 +108,20 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently
-    df_graphers["sort_order_metrics"] = df_graphers["Metric Dropdown"].apply(sort_metrics)
-    df_graphers["sort_order_age"] = df_graphers["Age Radio"].apply(sort_age)
-    df_graphers["sort_order_period"] = df_graphers["Period Radio"].apply(sort_period)
-    df_graphers["sort_order_sub_metric"] = df_graphers["Sub-Metric Radio"].apply(sort_sub_metric)
+    df_graphers["Metric Dropdown"] = pd.Categorical(df_graphers["Metric Dropdown"], categories=SORTER, ordered=True)
+    df_graphers["Period Radio"] = pd.Categorical(
+        df_graphers["Period Radio"], categories=["Total number", "Five-year change", "Annual change"], ordered=True
+    )
+    df_graphers["Sub-Metric Radio"] = pd.Categorical(
+        df_graphers["Sub-Metric Radio"], categories=["Total", "Per capita / Share of population"], ordered=True
+    )
+    df_graphers["Age Radio"] = pd.Categorical(
+        df_graphers["Age Radio"], categories=["All ages", "Under 18"], ordered=True
+    )
 
     df_graphers = df_graphers.sort_values(
-        by=["sort_order_metrics", "sort_order_age", "sort_order_period", "sort_order_sub_metric"],
-        ascending=True,
+        by=["Metric Dropdown", "Age Radio", "Period Radio", "Sub-Metric Radio"], ascending=True
     ).reset_index(drop=True)
-
-    df_graphers = df_graphers.drop(
-        columns=["sort_order_metrics", "sort_order_age", "sort_order_period", "sort_order_sub_metric"]
-    )
 
     # Prepare explorer metadata.
     config = {
@@ -147,7 +149,7 @@ def run(dest_dir: str) -> None:
     df_columns = pd.DataFrame(col_dicts)
 
     df_columns["colorScaleNumericMinValue"] = 0
-    df_columns["colorScaleEqualSizeBins"] = "true"
+    df_columns["colorScaleEqualSizeBins"] = True
 
     # Save outputs.
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
@@ -161,9 +163,6 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             if column not in CONFIG_DICT.keys():
                 continue
             graphers_row_dict = {}
-
-            meta = tb[column].metadata
-            origin = meta.origins[0]
 
             config = CONFIG_DICT[column]
             if column in ["net_migration", "net_migration_rate"]:
@@ -181,18 +180,6 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             if column in ADDITIONAL_DESCRIPTIONS.keys():
                 graphers_row_dict["subtitle"] = ADDITIONAL_DESCRIPTIONS[column]["description"]
                 graphers_row_dict["title"] = ADDITIONAL_DESCRIPTIONS[column]["title"]
-            else:
-                graphers_row_dict["subtitle"] = meta.description_short
-                graphers_row_dict["title"] = meta.title
-
-            if ds.metadata.short_name == "child_migration":
-                graphers_row_dict["sourceDesc"] = f"{origin.attribution}"
-            elif meta.processing_level == "minor":
-                graphers_row_dict["sourceDesc"] = f"{origin.producer} ({origin.date_published[:4]})"
-            elif meta.processing_level == "major":
-                graphers_row_dict[
-                    "sourceDesc"
-                ] = f"Our World in Data based on {origin.producer} ({origin.date_published[:4]})"
 
             graphers_dicts.append(graphers_row_dict)
 
@@ -206,7 +193,6 @@ def create_column_rows(col_dicts, tb, ds):
                 continue
             col_row_dict = {}
             meta = tb[column].metadata
-            origin = meta.origins[0]
 
             # net migration and net migration rate are split again in grapher by sex/ age/ variant - need to add this to the catalog path
             if column in ["net_migration", "net_migration_rate"]:
@@ -222,16 +208,11 @@ def create_column_rows(col_dicts, tb, ds):
             else:
                 col_row_dict["description"] = meta.description_short
 
-            col_row_dict["name"] = meta.title
             col_row_dict["slug"] = column
-            col_row_dict["sourceLink"] = origin.url_main
-            col_row_dict["unit"] = meta.unit
-            col_row_dict["shortUnit"] = meta.short_unit
             if meta.short_unit == "%":
                 col_row_dict["type"] = "Percentage"
             else:
                 col_row_dict["type"] = "Numeric"
-            col_row_dict["retrievedDate"] = origin.date_accessed
             col_row_dict["colorScaleScheme"] = MAP_BRACKETS[column]["colorScaleScheme"]
             col_row_dict["colorScaleNumericBins"] = MAP_BRACKETS[column]["colorScaleNumericBins"]
             col_dicts.append(col_row_dict)
