@@ -139,6 +139,13 @@ def run(dest_dir: str) -> None:
             df_grapher[field] = df_grapher[field].fillna(default)
         else:
             df_grapher[field] = default
+
+    # Set dtypes
+    df_grapher = df_grapher.astype(
+        {
+            "timelineMinTime": "Int64",
+        }
+    )
     #
     # Save outputs.
     #
