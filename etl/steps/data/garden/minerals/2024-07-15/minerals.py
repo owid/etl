@@ -158,7 +158,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Steel|Processing, crude|tonnes",
     # Reasonable agreement, except for certain years, e.g. 2012, where shares reach 160%. Noisy data.
     # "production|Strontium|Mine|tonnes",
-    # Significant global disagreement.
+    # Significant global disagreement. We decided to discard Tellurium.
     # 'production|Tellurium|Refinery|tonnes',
     # Reasonable agreement, except for certain years, which leads to >100% shares.
     # "production|Tin|Mine|tonnes",

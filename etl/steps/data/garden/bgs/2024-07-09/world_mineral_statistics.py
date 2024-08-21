@@ -580,7 +580,8 @@ COMMODITY_MAPPING = {
     ("Tantalum and niobium minerals", "Tantalite -Ta content"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Nb content)"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Ta content)"): None,
-    ("Tellurium, refined", "Unknown"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium, refined", "Unknown"): None,
     ("Tin", "Concentrates"): None,
     ("Tin", "Scrap"): None,
     ("Tin", "Tin-silver ore"): None,

@@ -308,8 +308,10 @@ COMMODITY_MAPPING = {
     ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
-    ("Tellurium", "Mine production"): ("Tellurium", "Mine"),
-    ("Tellurium", "Refinery production, tellurium content"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
+    ("Tellurium", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium", "Refinery production, tellurium content"): None,
     ("Tin", "Mine production, metric tons contained tin"): ("Tin", "Mine"),
     ("Tin", "Mine production, tin content"): ("Tin", "Mine"),
     ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): None,

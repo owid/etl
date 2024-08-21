@@ -122,7 +122,8 @@ COMMODITY_MAPPING = {
     ("Sulfur", "Total"): ("Sulfur", "Processing"),
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Total"): ("Tantalum", "Mine"),
-    ("Tellurium", "Total"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium", "Total"): None,
     ("Tin", "Total"): ("Tin", "Mine"),
     # NOTE: For titanium there is no global data.
     ("Titanium dioxide", "Total"): None,
@@ -593,18 +594,19 @@ def run(dest_dir: str) -> None:
         "production|Sulfur|Processing|tonnes",
     ] = None
 
-    # Tellurium refinery production is very incomplete, as pointed out in the notes.
-    # Specifically, a large range of years exclude US data because of proprietary data.
-    # To be conservative, remove all those years.
-    tb_flat.loc[
-        (tb_flat["country"].isin(["World"])) & (tb_flat["year"] >= 1976) & (tb_flat["year"] <= 2003),
-        "production|Tellurium|Refinery|tonnes",
-    ] = None
-    # Also, in some other years in the past, US production was larger than World production.
-    tb_flat.loc[
-        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1930, 1933])),
-        "production|Tellurium|Refinery|tonnes",
-    ] = None
+    # NOTE: We decided to discard Tellurium.
+    # # Tellurium refinery production is very incomplete, as pointed out in the notes.
+    # # Specifically, a large range of years exclude US data because of proprietary data.
+    # # To be conservative, remove all those years.
+    # tb_flat.loc[
+    #     (tb_flat["country"].isin(["World"])) & (tb_flat["year"] >= 1976) & (tb_flat["year"] <= 2003),
+    #     "production|Tellurium|Refinery|tonnes",
+    # ] = None
+    # # Also, in some other years in the past, US production was larger than World production.
+    # tb_flat.loc[
+    #     (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1930, 1933])),
+    #     "production|Tellurium|Refinery|tonnes",
+    # ] = None
 
     # Vanadium mine production does not include US production in a range of years.
     # Remove those years.
