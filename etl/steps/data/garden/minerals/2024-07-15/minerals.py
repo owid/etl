@@ -49,6 +49,43 @@ SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
 # Define that percentage.
 DEVIATION_MAX_ACCEPTED = 10
 
+# At the end of the step, we remove certain minerals because they are not as critical, and add a significant amount of
+# complexity to the explorer. But we may decide to bring them back in the future.
+COLUMNS_TO_DISCARD = [
+    "production|Alumina|Refinery|tonnes",
+    "unit_value|Alumina|Refinery|constant 1998 US$ per tonne",
+    "share_of_global_production|Alumina|Refinery|tonnes",
+    "production|Bromine|Processing|tonnes",
+    "reserves|Bromine|Processing|tonnes",
+    "share_of_global_production|Bromine|Processing|tonnes",
+    "production|Diatomite|Mine|tonnes",
+    "reserves|Diatomite|Mine|tonnes",
+    "unit_value|Diatomite|Mine|constant 1998 US$ per tonne",
+    "share_of_global_production|Diatomite|Mine|tonnes",
+    "production|Indium|Refinery|tonnes",
+    "unit_value|Indium|Refinery|constant 1998 US$ per tonne",
+    "share_of_global_production|Indium|Refinery|tonnes",
+    "production|Perlite|Mine|tonnes",
+    "reserves|Perlite|Mine|tonnes",
+    "unit_value|Perlite|Mine|constant 1998 US$ per tonne",
+    "share_of_global_production|Perlite|Mine|tonnes",
+    "production|Pumice and pumicite|Mine|tonnes",
+    "unit_value|Pumice and pumicite|Mine|constant 1998 US$ per tonne",
+    "share_of_global_production|Pumice and pumicite|Mine|tonnes",
+    "production|Rhenium|Mine|tonnes",
+    "reserves|Rhenium|Mine|tonnes",
+    "share_of_global_production|Rhenium|Mine|tonnes",
+    "production|Soda ash|Natural and synthetic|tonnes",
+    "production|Soda ash|Natural|tonnes",
+    "production|Soda ash|Synthetic|tonnes",
+    "reserves|Soda ash|Natural|tonnes",
+    "unit_value|Soda ash|Natural and synthetic|constant 1998 US$ per tonne",
+    "share_of_global_production|Soda ash|Natural and synthetic|tonnes",
+    "share_of_global_production|Soda ash|Natural|tonnes",
+    "share_of_global_production|Soda ash|Synthetic|tonnes",
+    "share_of_global_reserves|Soda ash|Natural|tonnes",
+]
+
 # List of known deviations that should not raise an error.
 # The content should be (entity, column, list of years), where entity is either "World (BGS)" or "World (aggregated)".
 # Add to this list specific peaks in BGS data that will be overwritten by more recent USGS data.
@@ -691,6 +728,9 @@ def run(dest_dir: str) -> None:
     tb = improve_metadata(
         tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
     )
+
+    # Discard some columns, since they are not as critical, and add too much complexity to the explorer.
+    tb = tb.drop(columns=COLUMNS_TO_DISCARD, errors="raise")
 
     # Run sanity checks.
     run_sanity_checks(tb=tb)
