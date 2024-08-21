@@ -11,18 +11,21 @@ This guide explains the general workflow to update a dataset that already exists
 
     In a nutshell, these are the steps to follow:
 
-    - Create a _reference git branch_.
+    - Switch to `master` branch and ensure it's up-to-date.
     - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
-    - Commit the new files (without any further changes, and without committing changes to the dag) and push them to the _reference_ branch.
-    - Create a _review_ branch (which is a sub-branch of the _reference_ branch) and a draft pull request (PR), which will also create a staging server where your chart work will take place.
+    - ETL Dashboard will suggest to run the following command to create PR and commit steps
+        ```bash
+        etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
+        ```
+    - Copy the command and run it. It will commit the steps and create a PR with staging server.
     - Adapt the code of the new steps and ensure ETL (e.g. `etlr step-names --grapher`) can execute them successfully.
-    - Commit changes to the code to the _review_ branch.
+    - Commit changes to the code.
     - Use Indicator Upgrader to update the charts (so they use the new variables instead of the old ones).
         - If needed, adapt existing charts or create new ones on the staging server.
     - Archive old steps (i.e. move old steps from the dag to the archive dag).
-    - Commit all your final work to the _review_ branch, and set your PR (merging _review_ to _reference_) to be ready for review.
+    - Commit all your final work and set your PR to be ready for review.
         - Make further changes, if suggested by the reviewer.
-    - Once approved, edit your PR, so that it merges _review_ to `master`, and merge the PR.
+    - Once approved, merge the PR.
     - Archive old grapher dataset(s).
     - Announce your update.
 
@@ -32,22 +35,9 @@ This guide assumes you have already a [working installation of `etl`](../../../g
 
 ## 1. Duplicate the old steps and set up your staging server
 
-Firstly, you will create the _reference_ code, which is the code that the final pull request (PR) will be compared against.
-This is not strictly necessary, but it will be very helpful for the PR reviewer. The need for this step will be clearer later on.
-
 - **Update your `master` and configuration**:
     - Go to ETL `master` branch, and ensure it's up-to-date in your local repository (by running `git pull`).
     - Ensure that, in your `.env` file, you have set `STAGING=1`.
-- **Create a _reference branch_**: That is a temporary branch that will be convenient for the reviewer later on.
-
-    ```bash
-    etl d draft-pr temp-update-temperature-anomaly
-    ```
-
-    This will create a new git branch in your local repository, which will be pushed.
-    It will also create a draft pull request in github, and a staging server.
-    All these things are temporary (which is why we added the `temp-` in the name of the branch).
-    Wait for a notification from `owidbot`. It should take a few minutes, and will inform you that the staging server [http://staging-site-temp-update-temperature-anomaly/admin](http://staging-site-temp-update-temperature-anomaly/admin) has been created.
 
 - **Update steps using the ETL Dashboard**:
     - Start the ETL Wizard, by running:
@@ -68,28 +58,21 @@ This is not strictly necessary, but it will be very helpful for the PR reviewer.
     ![Chart Upgrader](../../../assets/etl-dashboard-update-steps.gif)
     <figcaption>Animation of how to update steps in ETL Dashboard.</figcaption>
     </figure>
+    - Copy the recommended command from the output (i.e. `etl d pr ... --step-update`).
     - You can close the Wizard (kill it with ++ctrl+c++).
 
-- **Commit your changes**: Commit those new files in `snapshots` and `etl` folders to your branch:
+- **Run `etl d pr .. --step-update` to commit changes and create a PR**
+
+    Run the command you copied from the ETL Dashboard:
 
     ```bash
-    git add etl
-    git add snapshots
-    git commit -m "Duplicate previous Met Office steps"
+    etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
     ```
 
-    !!! note
-        For convenience, do not commit the changes in the `dag` (more on this later).
-
-- **Create a _review branch_**: This is the branch that will be reviewed.
-
-    ```bash
-    etl d draft-pr update-temperature-anomaly --base-branch temp-update-temperature-anomaly --title "Update Near-surface temperature anomaly data" --category data
-    ```
-
-    This will create a sub-branch in your local repository, which will be pushed.
+    This will create a new git branch in your local repository, which will be pushed.
     It will also create a draft pull request in github, and a staging server.
-    Wait for a notification from `owidbot`. It should take few minutes, and will inform you that the staging server [http://staging-site-update-temperature-anomaly/admin](http://staging-site-update-temperature-anomaly/admin) has been created.
+    Wait for a notification from `owidbot`. It should take a few minutes, and will inform you that the staging server [http://staging-site-update-temperature-anomaly/admin](http://staging-site-update-temperature-anomaly/admin) has been created.
+
 
 ## 2. Update and run the new steps
 
@@ -132,7 +115,7 @@ So far we have prepared the working environment for the update. Now, you'll be a
     !!! note
         Remember that, even though your ETL code is run locally, the database you are accessing is the one from the staging server (because of the `STAGING=1` parameter in your `.env` file).
 
-- **Commit your changes to the review branch**: You should now include the changes in the dag too.
+- **Commit your changes**: You should now include the changes in the dag too.
 
     ```bash
     git add .
@@ -164,8 +147,6 @@ After updating the data, it is time to update the affected charts! This involves
 
 - **Do further chart changes**: You can make any further changes to charts in your staging server, if needed.
 
-    !!! note
-        You should be making changes to charts in the _review_ server (namely [http://staging-site-update-temperature-anomaly/](http://staging-site-update-temperature-anomaly/)), and **not** in the _reference_ server (namely [http://staging-site-temp-update-temperature-anomaly/](http://staging-site-temp-update-temperature-anomaly/)).
 
 ## 4. Approve chart differences
 
@@ -205,13 +186,15 @@ After your updates, the old steps are no longer relevant. Therefore, we move the
 
 You have now completed the first iteration of your work. Time to get a second opinion on your changes!
 
-!!! note "The PR to review is merging the _review_ branch into the _reference_ branch"
-    Your current draft PR (called "📊 Update Near-surface temperature anomaly data") attempts to merge the sub-branch `update-temperature-anomaly` into `temp-update-temperature-anomaly`.
+!!! note "Helping reviewer see the actual changes"
+    Default Github code diff ("Files changed") will include copied files as new files, and the reviewer will not be able to distinguish what is copied and what is new.
 
-    We do it this way so that the reviewer will see how the code has changed with respect to its previous version.
+    Command `etl pr ... --step-update` has added a link _View diff without step copy_ to your PR description. It shows code changes **excluding the first commit that copied the steps**. We do it this way so that the reviewer will see how the code has changed with respect to its previous version.
 
-    Otherwise, if the PR was comparing your branch with `master`, the reviewer would need to see all the code (that was already reviewed in the past) as if the steps were new.
-
+    If you rebase your branch, the link will not work anymore. In that case, edit your PR description and replace the commit hash in the link with the one that copied the steps (the first one). It'll look like this
+    ```
+    [View diff without step copy](https://github.com/owid/etl/pull/123/files/7f796ad59516f702c09cf6bda000410e90a8e169..HEAD)
+    ```
 
 
 - **Ensure CI/CD checks have passed**: In the GitHub page of the draft PR, check that all checks have a green tick.
