@@ -354,7 +354,9 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine"),
     ("Vanadium", "Mine production"): ("Vanadium", "Mine"),
     ("Vanadium", "Mine production, vanadium content"): ("Vanadium", "Mine"),
-    ("Vermiculite", "Mine production"): ("Vermiculite", "Mine"),
+    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
+    ("Vermiculite", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
     ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
     ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
     ("Zeolites (natural)", "Mine production"): ("Zeolites", "Mine"),

@@ -637,7 +637,8 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Vanadiferous residues"): ("Vanadium", "Vanadiferous residues"),
     ("Vanadium", "Vanadium-titanium pig iron"): None,
     ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
-    ("Vermiculite", "Unknown"): ("Vermiculite", "Mine"),
+    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
+    ("Vermiculite", "Unknown"): None,
     ("Wollastonite", "Unknown"): ("Wollastonite", "Mine"),
     ("Zinc", "Crude & refined"): None,
     ("Zinc", "Ores & concentrates"): None,

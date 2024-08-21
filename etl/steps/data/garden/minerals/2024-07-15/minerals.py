@@ -169,8 +169,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     "production|Tungsten|Mine|tonnes",
     # Reasonable global agreement, except for some years, e.g. 2002, where share becomes 143%. Noisy data.
     # "production|Vanadium|Mine|tonnes",
-    # Reasonable global agreement. Noisy data.
-    "production|Vermiculite|Mine|tonnes",
+    # Reasonable global agreement. Noisy data. We decided to discard Vermiculite.
+    # "production|Vermiculite|Mine|tonnes",
     # Reasonable global agreement, except for certain countries: Mexico.
     "production|Wollastonite|Mine|tonnes",
     # Reasonable global agreement, except for certain countries: Mexico (big peak in 2021), India (big peak in 2021).
