@@ -285,6 +285,7 @@ tables:
         display:
           numDecimalPlaces: 0
           tolerance: 9999
+          color: "#565656"
           <<: *common_display
         presentation:
           grapher_config:
@@ -329,6 +330,7 @@ tables:
         display:
           numDecimalPlaces: 3
           tolerance: 9999
+          color: "#565656"
           name: Confirmed COVID-19 deaths (per 100,000)
           <<: *common_display
 
@@ -566,6 +568,7 @@ tables:
           numDecimalPlaces: 0
           name: Confirmed COVID-19 deaths
           tolerance: 9999
+          color: "#565656"
           <<: *common_display
         presentation:
           grapher_config:
@@ -598,6 +601,7 @@ tables:
         display:
           numDecimalPlaces: 2
           tolerance: 9999
+          color: "#565656"
           <<: *common_display
       total_deaths_per_100k_last12m:
         title: "Total confirmed deaths due to COVID-19 per 100,000 people (last 12 months)"
