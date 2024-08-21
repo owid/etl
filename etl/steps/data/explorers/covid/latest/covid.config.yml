@@ -58,6 +58,8 @@ views:
     selectedFacetStrategy: entity
     facetYDomain: shared
     note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
+    defaultView: "true"
+    tab: "map"
 
   # Cumulative (last 12 months)
   - indicator:
