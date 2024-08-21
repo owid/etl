@@ -55,7 +55,8 @@ DEVIATION_MAX_ACCEPTED = 10
 ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Iodine|Mine|tonnes", [2020, 2022]),
     ("World (BGS)", "production|Zinc|Mine|tonnes", [2021]),
-    ("World (BGS)", "production|Wollastonite|Mine|tonnes", [2022]),
+    # NOTE: We decided to discard Wollastonite.
+    # ("World (BGS)", "production|Wollastonite|Mine|tonnes", [2022]),
     ("World (BGS)", "production|Tungsten|Mine|tonnes", [2020, 2021, 2022]),
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
@@ -171,8 +172,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # "production|Vanadium|Mine|tonnes",
     # Reasonable global agreement. Noisy data. We decided to discard Vermiculite.
     # "production|Vermiculite|Mine|tonnes",
-    # Reasonable global agreement, except for certain countries: Mexico.
-    "production|Wollastonite|Mine|tonnes",
+    # Reasonable global agreement, except for certain countries: Mexico. We decided to discard Wollastonite.
+    # "production|Wollastonite|Mine|tonnes",
     # Reasonable global agreement, except for certain countries: Mexico (big peak in 2021), India (big peak in 2021).
     "production|Zinc|Mine|tonnes",
     # Reasonable global agreement, except for certain countries: China, Sierra Leone.

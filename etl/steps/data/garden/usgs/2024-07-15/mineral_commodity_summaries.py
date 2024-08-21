@@ -356,11 +356,14 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Mine production, vanadium content"): ("Vanadium", "Mine"),
     # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
     ("Vermiculite", "Mine production"): None,
-    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
-    ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
-    ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
-    ("Zeolites (natural)", "Mine production"): ("Zeolites", "Mine"),
-    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites", "Mine"),
+    # NOTE: The following could be mapped to ("Wollastonite", "Mine"). However, we decided to discard Wollastonite.
+    ("Wollastonite", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Wollastonite", "Mine"). However, we decided to discard Wollastonite.
+    ("Wollastonite", "Mine production, wollastonite"): None,
+    # NOTE: The following could be mapped to ("Zeolites", "Mine"). However, we decided to discard zeolites.
+    ("Zeolites (natural)", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Zeolites", "Mine"). However, we decided to discard zeolites.
+    ("Zeolites (natural)", "Mine production, zeolites"): None,
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
         "Mine",
@@ -393,8 +396,10 @@ FOOTNOTES = {
     "reserves|Potash|Mine|tonnes": "Values refer to ore in tonnes of potassium oxide equivalent.",
     "production|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
-    "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
-    "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    # NOTE: We decided to discard zeolites.
+    # "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    # NOTE: We decided to discard zeolites.
+    # "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
     "reserves|Platinum group metals|Mine, platinum|tonnes": "Reserves include all platinum group metals.",
 }
