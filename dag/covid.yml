@@ -1,4 +1,28 @@
 steps:
+  # Explorer
+  data-private://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+
+  # Compact dataset (similar to former megafile)
+  data://garden/covid/latest/compact:
+    - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/vaccinations_global
+    - data://garden/covid/latest/hospital
+    - data://garden/covid/latest/oxcgrt_policy
+    - data://garden/covid/latest/tracking_r
+    - data://garden/covid/latest/testing
+    - data://garden/covid/latest/combined
+    - data://garden/excess_mortality/latest/excess_mortality
+
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
     - snapshot-private://covid/latest/sequence.json
@@ -164,9 +188,6 @@ steps:
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global
 
-  # Explorer
-  data-private://explorers/covid/latest/covid: c
-
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:
     - snapshot://excess_mortality/latest/hmd_stmf.csv
@@ -204,17 +225,6 @@ steps:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
-
-  # Compact dataset (similar to former megafile)
-  data://garden/covid/latest/compact:
-    - data://garden/covid/latest/cases_deaths
-    - data://garden/covid/latest/vaccinations_global
-    - data://garden/covid/latest/hospital
-    - data://garden/covid/latest/oxcgrt_policy
-    - data://garden/covid/latest/tracking_r
-    - data://garden/covid/latest/testing
-    - data://garden/covid/latest/combined
-    - data://garden/excess_mortality/latest/excess_mortality
 
   ######################################
   # ECDC
