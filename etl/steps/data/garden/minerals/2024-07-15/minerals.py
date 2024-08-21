@@ -113,6 +113,7 @@ ACCEPTED_DEVIATIONS = [
 COLUMNS_TO_KEEP_WORLD_BGS = [
     "production|Coal|Mine|tonnes",
     "production|Petroleum|Crude|tonnes",
+    "production|Nickel|Processing|tonnes",
     "production|Uranium|Mine|tonnes",
 ]
 
