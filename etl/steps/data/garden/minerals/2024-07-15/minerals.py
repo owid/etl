@@ -106,6 +106,16 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Mercury|Mine|tonnes", [2022]),
 ]
 
+# BGS does not provide any global data. But we created an aggregated World (which we will later on call "World (BGS)").
+# This is used mainly for checking purposes (to be able to compare BGS data with USGS data).
+# However, for specific minerals, we will keep this global aggregate, since having global data for them is useful.
+# We will check that the data is reasonably complete in those cases.
+COLUMNS_TO_KEEP_WORLD_BGS = [
+    "production|Coal|Mine|tonnes",
+    "production|Petroleum|Crude|tonnes",
+    "production|Uranium|Mine|tonnes",
+]
+
 # Given that BGS and USGS data often have big discrepancies, we will combine columns only after inspection.
 # Specifically, we check that the World aggregate of BGS (constructed in the BGS garden step) coincides reasonably
 # well with the World data given in USGS data.
@@ -602,10 +612,11 @@ def combine_data(
     # by USGS.
     _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
 
-    # It would be useful to have a global total for Coal and Petroleum, which come from BGS and are quite complete.
-    tb_global = tb[tb["country"] == "World (BGS)"][
-        ["country", "year", "production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]
-    ].reset_index(drop=True)
+    # It would be useful to have a global total for certain cases, like Coal and Petroleum, and some critical minerals,
+    # which come from BGS and are quite complete.
+    tb_global = tb[tb["country"] == "World (BGS)"][["country", "year"] + COLUMNS_TO_KEEP_WORLD_BGS].reset_index(
+        drop=True
+    )
     tb_global["country"] = tb_global["country"].replace("World (BGS)", "World")
 
     # For all other indicators, remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
