@@ -15,7 +15,7 @@ This guide explains the general workflow to update a dataset that already exists
     - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
     - ETL Dashboard will suggest to run the following command to create PR and commit steps
         ```bash
-        etl d draft-pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
+        etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
         ```
     - Copy the command and run it. It will commit the steps and create a PR with staging server.
     - Adapt the code of the new steps and ensure ETL (e.g. `etlr step-names --grapher`) can execute them successfully.
@@ -58,15 +58,15 @@ This guide assumes you have already a [working installation of `etl`](../../../g
     ![Chart Upgrader](../../../assets/etl-dashboard-update-steps.gif)
     <figcaption>Animation of how to update steps in ETL Dashboard.</figcaption>
     </figure>
-    - Copy the recommended command from the output (i.e. `etl d draft-pr ... --step-update`).
+    - Copy the recommended command from the output (i.e. `etl d pr ... --step-update`).
     - You can close the Wizard (kill it with ++ctrl+c++).
 
-- **Run `etl d draft-pr .. --step-update` to commit changes and create a PR**
+- **Run `etl d pr .. --step-update` to commit changes and create a PR**
 
     Run the command you copied from the ETL Dashboard:
 
     ```bash
-    etl d draft-pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
+    etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
     ```
 
     This will create a new git branch in your local repository, which will be pushed.
@@ -187,14 +187,14 @@ After your updates, the old steps are no longer relevant. Therefore, we move the
 You have now completed the first iteration of your work. Time to get a second opinion on your changes!
 
 !!! note "Helping reviewer see the actual changes"
-    Github code diff will include copied files as new files, and the reviewer will not be able to distinguish what is copied and what is new.
+    Default Github code diff ("Files changed") will include copied files as new files, and the reviewer will not be able to distinguish what is copied and what is new.
 
-    Command `etl draft-pr ... --step-update` has added a link _View diff without step copy_ to your PR description. It shows code changes excluding the first commit that copied the steps. If it stops working, it's likely because you rebased your branch. In that case, replace commit hash with the one that copied the steps.
+    Command `etl pr ... --step-update` has added a link _View diff without step copy_ to your PR description. It shows code changes **excluding the first commit that copied the steps**. We do it this way so that the reviewer will see how the code has changed with respect to its previous version.
 
-    We do it this way so that the reviewer will see how the code has changed with respect to its previous version.
-
-    Otherwise, if the PR was comparing your branch with `master`, the reviewer would need to see all the code (that was already reviewed in the past) as if the steps were new.
-
+    If you rebase your branch, the link will not work anymore. In that case, edit your PR description and replace the commit hash in the link with the one that copied the steps (the first one). It'll look like this
+    ```
+    [View diff without step copy](https://github.com/owid/etl/pull/123/files/7f796ad59516f702c09cf6bda000410e90a8e169..HEAD)
+    ```
 
 
 - **Ensure CI/CD checks have passed**: In the GitHub page of the draft PR, check that all checks have a green tick.
