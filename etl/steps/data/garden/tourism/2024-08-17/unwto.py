@@ -79,11 +79,10 @@ def run(dest_dir: str) -> None:
     for col in cols_per_1000:
         tb[f"{col}_per_1000"] = tb[col] / (tb["population"] / 1000)
 
-    tb["dom_tour_trips_ovn_vis_tourists_per_person"] = tb[col] / tb["population"]
+    tb["dom_tour_trips_ovn_vis_tourists_per_person"] = tb["dom_tour_trips_ovn_vis_tourists"] / tb["population"]
 
     tb = tb.drop(columns=["population"])
 
-    tb[f"{col}_per_person"]
     #
     # Calculate the inbound tourism by region
     #

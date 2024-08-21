@@ -421,7 +421,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      dom_tour_trips_ovn_vis_tourists_per_perso:
+      dom_tour_trips_ovn_vis_tourists_per_person:
         title: Domestic trips by overnight tourists per person
         unit: trips per capita
         description_short: Trips by individuals who travel within their own country and spend at least one night at their destination.
