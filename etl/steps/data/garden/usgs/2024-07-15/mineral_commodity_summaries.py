@@ -225,8 +225,10 @@ COMMODITY_MAPPING = {
     ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine"),
     ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
     ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): ("Nitrogen", "Fixed ammonia"),
-    ("Peat", "Mine production"): ("Peat", "Mine"),
-    ("Peat", "Mine production, peat"): ("Peat", "Mine"),
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Mine production, peat"): None,
     ("Perlite", "Mine production"): ("Perlite", "Mine"),
     ("Perlite", "Mine production, perlite"): ("Perlite", "Mine"),
     ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine"),

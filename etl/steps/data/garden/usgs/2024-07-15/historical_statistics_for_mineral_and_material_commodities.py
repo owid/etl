@@ -105,7 +105,8 @@ COMMODITY_MAPPING = {
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
-    ("Peat", "Total"): ("Peat", "Mine"),
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Total"): None,
     ("Perlite", "Total"): ("Perlite", "Mine"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
     ("Pig Iron", "Total"): ("Iron", "Smelter, pig iron"),
