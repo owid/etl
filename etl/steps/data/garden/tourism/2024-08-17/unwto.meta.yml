@@ -62,6 +62,7 @@ tables:
       dom_tour_accom_hotels_and_similar_estab_guests:
         title: Domestic tourists staying in hotels and similar establishments
         unit: guests
+        description_short: Number of domestic tourists who stay in hotels and similar establishments.
         description_key: *descr_key_domestic
 
       dom_tour_accom_hotels_and_similar_estab_ovn:
@@ -167,11 +168,13 @@ tables:
       in_tour_exp_passenger_transport:
         title: International expenditure on passenger transport
         unit: US dollars
+        short_unit: $
         description_short: Expenditure on passenger transport includes the cost of transportation services for international tourists, such as air, land, and water transport.
 
       in_tour_exp_travel:
         title: International expenditure on travel in the country
         unit: US dollars
+        short_unit: $
         presentation:
           grapher_config:
             note: *note_exp
@@ -179,6 +182,7 @@ tables:
       in_tour_exp_the_country:
         title: International expenditure in the country
         unit: US dollars
+        short_unit: $
         presentation:
           grapher_config:
             note: *note_exp
@@ -278,7 +282,7 @@ tables:
         description_key: *desc_key_arrivals
 
       out_tour_departures_ovn_vis_tourists:
-        title: International tourist trips
+        title: International tourist departures
         unit: departures
         description_short: Number of trips by people who travel abroad and stay overnight.
         description_key: *desc_key_departures
@@ -417,16 +421,16 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      dom_tour_trips_ovn_vis_tourists_per_1000:
-        title: Domestic trips by overnight tourists per 1,000 people
-        unit: trips per 1,000 people
+      dom_tour_trips_ovn_vis_tourists_per_perso:
+        title: Domestic trips by overnight tourists per person
+        unit: trips per capita
         description_short: Trips by individuals who travel within their own country and spend at least one night at their destination.
         description_key:
           - *descr_key_domestic
-          - Per "1,000 people" in the context of domestic overnight trips refers to the calculation of trips per 1,000 individuals within the population of the country.
+          - Per "person" in the context of domestic overnight trips refers to the calculation of trips per capita within the population of the country.
           - This approach enables standardized comparison and analysis of data or rates, ensuring consistency across different population sizes.
-          - For instance, if there are "10 overnight trips per 1,000 people," it means that among every 1,000 individuals in the population, there are 10 instances of domestic overnight trips.
-          - This indicator provides an insight into the level of domestic tourism in the country of reference.
+          - For instance, if there are "10 trips per person," it means that each individual in the population has taken 10 domestic overnight trips.
+          - This indicator provides an insight into the level of domestic overnight travel in the country of reference.
         display:
           numDecimalPlaces: 1
 
@@ -486,7 +490,7 @@ tables:
           numDecimalPlaces: 1
 
       inbound_tourism_by_region:
-        title: International tourist trips by region of origin
+        title: International tourist arrivals by region of origin
         unit: arrivals
         description_short: Trips by people who arrive from abroad and stay overnight.
         description_key:

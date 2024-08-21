@@ -71,14 +71,19 @@ def run(dest_dir: str) -> None:
         "in_tour_arrivals_ovn_vis_tourists",
         "in_tour_arrivals_same_day_vis_excur",
         "out_tour_departures_ovn_vis_tourists",
-        "dom_tour_trips_ovn_vis_tourists",
         "dom_tour_trips_same_day_vis_excur",
         "employment_food_and_beverage_serving_act",
         "employment_total",
     ]
+
     for col in cols_per_1000:
         tb[f"{col}_per_1000"] = tb[col] / (tb["population"] / 1000)
+
+    tb["dom_tour_trips_ovn_vis_tourists_per_person"] = tb[col] / tb["population"]
+
     tb = tb.drop(columns=["population"])
+
+    tb[f"{col}_per_person"]
     #
     # Calculate the inbound tourism by region
     #
@@ -101,7 +106,7 @@ def run(dest_dir: str) -> None:
         "in_tour_regions_east_asia_and_the_pacific": "East Asia and the Pacific (UNWTO)",
         "in_tour_regions_europe": "Europe (UNWTO)",
         "in_tour_regions_middle_east": "Middle East (UNWTO)",
-        "in_tour_regions_other_not_class": "Other Not Classified (UNWTO)",
+        "in_tour_regions_other_not_class": "Other (UNWTO)",
         "in_tour_regions_south_asia": "South Asia (UNWTO)",
     }
     tb_regions_sum = tb_regions_sum.rename(columns=rename_mapping)
