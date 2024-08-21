@@ -317,9 +317,9 @@ def improve_metadata(tb: Table, tb_usgs_flat: Table, tb_bgs_flat: Table, tb_usgs
                     description_short = f"Based on mined, rather than [refined](#dod:refined-production), production. Measured in {unit}."
             elif sub_commodity.startswith("Refinery"):
                 if not metric.startswith("Share"):
-                    description_short = f"Measured in {unit}. Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                    description_short = f"Measured in {unit} of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards."
                 else:
-                    description_short = "Mineral [refining](#dod:refined-production) takes mined or raw minerals, and separates them into a final product of pure metals and minerals."
+                    description_short = "The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards."
             elif sub_commodity.startswith("Smelter"):
                 description_short = f"Measured in {unit}. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes."
             elif sub_commodity.startswith("Processing"):
