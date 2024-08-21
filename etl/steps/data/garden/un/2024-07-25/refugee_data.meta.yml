@@ -109,19 +109,22 @@ tables:
         description_from_producer: "{definitions.description_host_community}"
       others_of_concern_origin:
         title: Other persons of concern by country of origin
-        description_short: Number of [other persons of concern](#dod:unhcr-concern) to the UNHCR by the country of origin. This measures the total number of persons; not the number per year.
+        description_short: |-
+          [Other persons of concern](#dod:unhcr-concern) to the UNHCR by the country of origin. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_other_concern}"
 
       # populations by asylum country
       refugees_under_unhcrs_mandate_asylum:
         title: Refugees by destination
-        description_short: Number of [refugees](#dod:refugee) under UNHCR's mandate by the country they live in. This measures the total number of refugees; not the number per year.
+        description_short: |-
+          [Refugees](#dod:refugee) under UNHCR's mandate by the country they live in. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
       refugees_per_1000_pop_asylum:
         title: Refugees by destination per 1,000 people
-        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 1,000 people in that country. This measures the total number of refugees; not the number per year.
+        description_short: |-
+          [Refugees](#dod:refugee) by country of asylum, per 1,000 people in that country. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -129,7 +132,8 @@ tables:
           - "{definitions.description_refugee_general}"
       refugees_per_100k_pop_asylum:
         title: Refugees by destination per 100,000 people
-        description_short: Number of [refugees](#dod:refugee) by country of asylum, per 100,000 people in that country. This measures the total number of refugees; not the number per year.
+        description_short: |-
+          [Refugees](#dod:refugee) by country of asylum, per 100,000 people in that country. This measures the total number of refugees; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         display:
           numDecimalPlaces: 1
@@ -147,7 +151,8 @@ tables:
           numDecimalPlaces: 1
       other_people_in_need_of_international_protection_asylum:
         title: Other people in need of international protection by country of residence
-        description_short: Number of [other people in need of international protection](#dod:international-protection) from all regions by the country they live in. This measures the total number of persons; not the number per year.
+        description_short: |-
+          [Other people in need of international protection](#dod:international-protection) from all regions by the country they live in. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_international_protection}"
       stateless_persons_asylum:
         title: Stateless persons by country of residence
@@ -155,7 +160,8 @@ tables:
         description_from_producer: "{definitions.description_stateless}"
       stateless_persons_asylum_per_100k:
         title: Stateless persons per 100,000 people in the country of residence
-        description_short: Number of [stateless persons](#dod:stateless), per 100,000 inhabitants of the country they live in.
+        description_short: |-
+          [Stateless persons](#dod:stateless), per 100,000 inhabitants of the country they live in.
         description_from_producer: "{definitions.description_stateless}"
         display:
           numDecimalPlaces: 1
@@ -165,13 +171,14 @@ tables:
         description_from_producer: "{definitions.description_host_community}"
       others_of_concern_asylum:
         title: Other persons of concern by country of residence
-        description_short: Number of [other persons of concern](#dod:unhcr-concern) to the UNHCR in this country. This measures the total number of persons; not the number per year.
+        description_short: |-
+          [Other persons of concern](#dod:unhcr-concern) to the UNHCR in this country. This measures the total number of persons; not the number per year.
         description_from_producer: "{definitions.description_other_concern}"
 
       # solutions (return, resettlement, naturalization)
       returned_refugees_origin:
         title: Returned refugees by country of origin
-        description_short: Number of returned [refugees](#dod:refugee) by the country of origin and return. Only refugees who returned during the calendar year are included.
+        description_short: Returned [refugees](#dod:refugee) by the country of origin and return. Only refugees who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
@@ -195,17 +202,18 @@ tables:
           numDecimalPlaces: 1
       resettlement_arrivals_origin:
         title: Resettlement arrivals by country of origin
-        description_short: Number of newly [resettled refugees](#dod:resettlement) by the country of origin, which is the country the refugee originally fled from. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
+        description_short: Newly [resettled refugees](#dod:resettlement) by the country of origin, which is the country the refugee originally fled from. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
       naturalisation_origin:
         title: Naturalised refugees by country of origin
-        description_short: Number of [naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of origin per calendar year.
+        description_short: |-
+          [Naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of origin per calendar year.
         description_from_producer: |-
           - {definitions.description_naturalization}
           - {definitions.description_refugee}
       returned_refugees_dest:
         title: Returned refugees by country they returned from
-        description_short: Number of returned [refugees](#dod:refugee) by the country they lived in before their return. Only refugees who returned during the calendar year are included.
+        description_short: Returned [refugees](#dod:refugee) by the country they lived in before their return. Only refugees who returned during the calendar year are included.
         description_from_producer: |-
           - {definitions.description_return}
           - {definitions.description_refugee}
@@ -244,7 +252,8 @@ tables:
           - "{definitions.description_refugee_general}"
       refugees_origin_5y_avg_per_1000_pop:
         title: Refugees by country of origin per 1,000 people (5-year rolling average)
-        description_short: '[Refugees](#dod:refugee) by country of origin, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.'
+        description_short: |-
+          [Refugees](#dod:refugee) by country of origin, per 1,000 people in that country, shown as the 5-year rolling average. This measures the total number of refugees from the country; not the number per year.
         description_from_producer: "{definitions.description_refugee}"
         description_processing: |-
           - {definitions.common.description_processing}
