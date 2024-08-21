@@ -14,6 +14,7 @@ steps:
 
   # Compact dataset (similar to former megafile)
   data://garden/covid/latest/compact:
+    # COVID
     - data://garden/covid/latest/cases_deaths
     - data://garden/covid/latest/vaccinations_global
     - data://garden/covid/latest/hospital
@@ -22,6 +23,9 @@ steps:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/combined
     - data://garden/excess_mortality/latest/excess_mortality
+    # Others
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
 
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:

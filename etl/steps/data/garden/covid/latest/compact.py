@@ -206,6 +206,15 @@ def run(dest_dir: str) -> None:
     # Add tests units
     tb = add_test_units(tb)
 
+    # Extra indicators
+
+    # population, pop density, life exp, median age, 
+    ds_wpp = paths.load_dataset("un_wpp")
+    # ISO, Continent
+    ds_regions = paths.load_dataset("regions")
+
+
+
     #
     # Process data.
     #
