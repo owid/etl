@@ -466,14 +466,16 @@ COMMODITY_MAPPING = {
     ("Rare earth minerals", "Bastnaesite"): None,
     ("Rare earth minerals", "Loparite"): None,
     ("Rare earth minerals", "Monazite"): None,
-    ("Rare earth minerals", "Unknown"): ("Rare earths", "Mine, ores & concentrates"),
+    # NOTE: The following could possibly be mapped to ("Rare earths", "Mine, ores & concentrates"), but it has only sparse data for a few countries.
+    ("Rare earth minerals", "Unknown"): None,
     ("Rare earth minerals", "Xenotime"): None,
     ("Rare earth oxides", "Unknown"): None,
     ("Rare earths", "Cerium compounds"): None,
     ("Rare earths", "Cerium metal"): None,
     ("Rare earths", "Ferro-cerium & other pyrophoric alloys"): None,
     ("Rare earths", "Metals"): ("Rare earths", "Refinery"),
-    ("Rare earths", "Ores & concentrates"): ("Rare earths", "Mine, ores & concentrates"),
+    # NOTE: The following could possibly be mapped to ("Rare earths", "Mine, ores & concentrates"), but it possibly is only for imports/exports data.
+    ("Rare earths", "Ores & concentrates"): None,
     ("Rare earths", "Other rare earth compounds"): None,
     ("Rare earths", "Rare earth compounds"): ("Rare earths", "Compounds"),
     ("Rhenium", "Unknown"): ("Rhenium", "Mine"),
