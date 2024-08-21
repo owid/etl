@@ -84,6 +84,12 @@ COLUMNS_TO_DISCARD = [
     "share_of_global_production|Soda ash|Natural|tonnes",
     "share_of_global_production|Soda ash|Synthetic|tonnes",
     "share_of_global_reserves|Soda ash|Natural|tonnes",
+    "production|Salt|Brine salt|tonnes",
+    "production|Salt|Evaporated salt|tonnes",
+    "production|Salt|Other salt|tonnes",
+    "production|Salt|Rock salt|tonnes",
+    "production|Salt|Salt in brine|tonnes",
+    "production|Salt|Sea salt|tonnes",
 ]
 
 # List of known deviations that should not raise an error.
