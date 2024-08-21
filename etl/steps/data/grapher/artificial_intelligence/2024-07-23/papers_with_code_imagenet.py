@@ -19,11 +19,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.reset_index()
-    tb = tb.rename(columns={"days_since": "year"})
 
     tb["country"] = "Top-1 accuracy"
     tb = tb.drop("name", axis=1)
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.

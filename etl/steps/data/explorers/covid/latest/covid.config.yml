@@ -6,13 +6,14 @@ config:
     - Brazil
     - Japan
     - Germany
-  downloadDataLink: "https://github.com/owid/covid-19-data/tree/master/public/data"
+  downloadDataLink: "https://docs.owid.io/projects/etl/api/covid/"
   subNavId: "coronavirus"
-  subNavCurrentId: "data-explorer-2"
+  subNavCurrentId: "data-explorer"
   wpBlockId: 43869
   hasMapTab: "true"
   yAxisMin: 0
   thumbnail: "https://ourworldindata.org/coronavirus-data-explorer.png"
+  isPublished: "true"
 
 options:
   - type: dropdown

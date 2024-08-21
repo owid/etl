@@ -1,8 +1,7 @@
-import pandas as pd
 from owid.catalog import Table
 
 
-def preprocess_data(tb: Table, date_column: str, index_columns: list, pivot_column: str, value_column: str) -> Table:
+def preprocess_data(tb: Table, index_columns: list, pivot_column: str, value_column: str) -> Table:
     """
     Preprocesses the input data by transforming the date column, creating a pivot table, and renaming group entries.
 
@@ -19,11 +18,6 @@ def preprocess_data(tb: Table, date_column: str, index_columns: list, pivot_colu
     Raises:
 
     """
-    tb["days_since_2021"] = (
-        pd.to_datetime(tb[date_column].astype(str), format="%Y-%m-%d") - pd.to_datetime("2021-01-01")
-    ).dt.days
-    tb = tb.drop(date_column, axis=1)
-
     # Create a pivot table for each demographic group
     pivot_tb = tb.pivot(
         index=index_columns,

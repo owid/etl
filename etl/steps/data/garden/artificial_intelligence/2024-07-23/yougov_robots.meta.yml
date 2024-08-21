@@ -17,8 +17,7 @@ definitions:
     short_unit: '%'
     display:
       numDecimalPlaces: 1
-      zeroDay: '2021-01-01'
-      yearIsDay: true
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
