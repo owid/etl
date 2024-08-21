@@ -58,14 +58,14 @@ tables:
         title: Cumulative excess deaths (95% CI, lower bound)
         unit: "deaths"
         display:
-          color: "#DDB09E"
+          color: "#D7C2BA"
           <<: *common_display
           name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top:
         title: Cumulative excess deaths (95% CI, upper bound)
         unit: "deaths"
         display:
-          color: "#DDB09E"
+          color: "#D7C2BA"
           <<: *common_display
           name: Upper bound
 
@@ -99,14 +99,14 @@ tables:
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k:
         title: Cumulative excess deaths per 100,000 people (95% CI, upper bound)
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Upper bound
 
       # Daily (7d average), absolute
@@ -122,14 +122,14 @@ tables:
         unit: "deaths"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Lower bound, 95% uncertainty interval
       estimated_daily_excess_deaths_ci_95_top:
         title: Daily excess deaths (95% CI, upper bound)
         unit: "deaths"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Upper bound
 
       # Daily (7d average), relative
@@ -162,14 +162,14 @@ tables:
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Lower bound, 95% uncertainty interval
       estimated_daily_excess_deaths_ci_95_top_per_100k:
         title: Daily excess deaths per 100,000 people (95% CI, upper bound)
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Upper bound
 
       # Cumulative last 12 months, absolute
@@ -184,14 +184,14 @@ tables:
         title: Cumulative excess deaths (95% CI, lower bound, last 12 months)
         unit: "deaths"
         display:
-          color: "#DDB09E"
+          color: "#D7C2BA"
           <<: *common_display
           name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top_last12m:
         title: Cumulative excess deaths (95% CI, upper bound, last 12 months)
         unit: "deaths"
         display:
-          color: "#DDB09E"
+          color: "#D7C2BA"
           <<: *common_display
           name: Upper bound
 
@@ -225,12 +225,12 @@ tables:
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k_last12m:
         title: Cumulative excess deaths per 100,000 people (95% CI, upper bound, last 12 months)
         unit: "deaths per 100,000 people"
         display:
           <<: *common_display
-          color: "#DDB09E"
+          color: "#D7C2BA"
           name: Upper bound
