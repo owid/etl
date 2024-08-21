@@ -17,3 +17,13 @@ steps:
     - snapshot://oecd/2024-08-19/ppp_exchange_rates.csv
   data://garden/oecd/2024-08-19/ppp_exchange_rates:
     - data://meadow/oecd/2024-08-19/ppp_exchange_rates
+
+# OECD CO2 emissions from air transport
+  data://meadow/oecd/2024-08-21/co2_air_transport:
+    - snapshot://oecd/2024-08-21/co2_air_transport.csv
+  data://garden/oecd/2024-08-21/co2_air_transport:
+    - data://meadow/oecd/2024-08-21/co2_air_transport
+    - data://garden/tourism/2024-08-17/unwto
+    - data://garden/demography/2024-07-15/population
+  data://grapher/oecd/2024-08-21/co2_air_transport:
+    - data://garden/oecd/2024-08-21/co2_air_transport
