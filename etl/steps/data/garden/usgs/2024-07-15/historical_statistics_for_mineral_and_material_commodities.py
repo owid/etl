@@ -200,7 +200,9 @@ FOOTNOTES_PRODUCTION = {
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
-FOOTNOTES_UNIT_VALUE = {}
+FOOTNOTES_UNIT_VALUE = {
+    "unit_value|Silicon|Processing|constant 1998 US$ per tonne": "Values refer to constant 1998 US$ per tonne of silicon content in ferrosilicon or silicon metal.",
+}
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
