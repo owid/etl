@@ -669,7 +669,7 @@ MAP_BRACKETS = {
     },
     "refugees_under_unhcrs_mandate_origin": {
         "colorScaleScheme": "YlOrRd",
-        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 100000.0, 0],
+        "colorScaleNumericBins": [300.0, 1000.0, 3000.0, 10000.0, 30000.0, 100000.0, 300000.0, 1000000.0, 0],
     },
     "asylum_seekers_origin": {
         "colorScaleScheme": "YlOrRd",

@@ -15,26 +15,6 @@ paths = PathFinder(__file__)
 USE_EXISTING_MAP_BRACKETS = False
 
 
-# used to sort the metrics in explorer
-def sort_metrics(x):
-    return SORTER.index(x)
-
-
-def sort_age(x):
-    age_order = ["All ages", "Under 18"]
-    return age_order.index(x)
-
-
-def sort_period(x):
-    period_order = ["Total number", "Five-year change", "Annual change"]
-    return period_order.index(x)
-
-
-def sort_sub_metric(x):
-    sub_metric_order = ["Total", "Per capita / Share of population"]
-    return sub_metric_order.index(x)
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -96,10 +76,11 @@ def run(dest_dir: str) -> None:
     df_graphers["tab"] = "map"
     # set yAxis to start at 0
     df_graphers["yAxisMin"] = 0
-    # hide automatic time/ entity in chart title
-    df_graphers["hideAnnotationFieldsInTitle"] = True
     # set current year als maximum year
     df_graphers["timelineMaxTime"] = paths.version[0:4]
+
+    df_graphers["relatedQuestionText"] = "Migration Data: Our sources and definitions"
+    df_graphers["relatedQuestionUrl"] = "https://ourworldindata.org/migration-definition"
 
     # Sanity check.
     error = "Duplicated rows in explorer."
@@ -127,6 +108,7 @@ def run(dest_dir: str) -> None:
     config = {
         "explorerTitle": "Migration, Refugees, and Asylum Seekers",
         "explorerSubtitle": "Explore the migration of people across the world.",
+        "thumbnail": "https://assets.ourworldindata.org/uploads/2022/03/Migration-Data-Explorer.png",
         "selection": [
             "Canada",
             "France",
@@ -138,6 +120,12 @@ def run(dest_dir: str) -> None:
             "Syria",
             "Yemen",
         ],
+        "hideAlertBanner": True,
+        "wpBlockId": 49910,
+        "hasMapTab": True,
+        "yAxisMin": 0,
+        "hideAnnotationFieldsInTitle": True,
+        "tab": "map",
     }
 
     # create columns for the explorer
