@@ -2,7 +2,7 @@
 
 This page is a compact summary of our COVID-19 work, with all the relevant links to download our COVID-19 datasets.
 
-!!! tip "I just want [the data](#download-data)"
+!!! tip "I just want [the data](#download-data)!"
 
 ## Our work
 
@@ -10,17 +10,21 @@ At Our World in Data, we have been collecting COVID-19 data from various domains
 
 ### Legacy data work
 
-We started working on COVID-19 data in early 2020 when we developed and implemented several data pipelines to process and publish the data.
-
-All this work has been live and shared with the public via our GitHub repository [https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data), and our [old documentation](https://docs.owid.io/projects/covid/en/latest/).
-
-We have complemented our data work with extensive research articles, which have been shared on our Topic page: [https://ourworldindata.org/coronavirus](https://ourworldindata.org/coronavirus).
+We started working on COVID-19 data in early 2020 when we developed and implemented several data pipelines to process and publish the data. All this work has been live and shared with the public via our GitHub repository [https://github.com/owid/covid-19-data](https://github.com/owid/covid-19-data), and our [old COVID documentation](https://docs.owid.io/projects/covid/en/latest/). We have complemented our data work with extensive research articles, which have been shared on our [topic page](https://ourworldindata.org/coronavirus).
 
 ### Publications
 
--   Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
--   Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
--   Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
+!!! abstract ""
+
+    :material-file-document: Hasell, J., Mathieu, E., Beltekian, D. et al. **A cross-country database of COVID-19 testing**. _Sci Data_ 7, 345 (2020). [https://doi.org/10.1038/s41597-020-00688-8](https://doi.org/10.1038/s41597-020-00688-8)
+
+!!! abstract ""
+
+    :material-file-document: Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. **A global database of COVID-19 vaccinations**. _Nat Hum Behav_ 5, 947–953 (2021). [https://doi.org/10.1038/s41562-021-01122-8](https://doi.org/10.1038/s41562-021-01122-8)
+
+!!! abstract ""
+
+    :material-file-document: Herre, B., Rodés-Guirao, L., Mathieu, E. et al. **Best practices for government agencies to publish data: lessons from COVID-19**. _The Lancet Public Health_, Viewpoint, Volume 9, ISSUE 6, e407-e410 (2024). [https://doi.org/10.1016/S2468-2667(24)00073-2](<https://doi.org/10.1016/S2468-2667(24)00073-2>)
 
 ### Transition to ETL
 
@@ -28,7 +32,13 @@ All our COVID-19 data work was done before we had developed our [ETL system](../
 
 ## Download data
 
-Find below all COVID-19 data that we have collected. These files are direct exports from our ETL. We also provide metadata, which is essential to understand the various indicators and data licenses.
+Our _compact COVID-19 dataset_ is a compilation of our most relevant COVID-19 indicators collected in the last years. It consolidates indicators from various datasets into a single file. It comes with metadata, which explains all the indicators in detail. In the past, this dataset was generated and shared in our [GitHub](https://github.com/owid/covid-19-data/blob/master/public/data) repository.
+
+[:material-download: Download our compact dataset (CSV)](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.csv){ .md-button .md-button--primary }
+[:material-download: Download metadata](https://catalog.ourworldindata.org/garden/covid/latest/compact/compact.meta.json){ .md-button }
+
+In addition to our compact dataset, we also provide individual datasets, with all our COVID-19 indicators. These files are direct exports from our ETL.
+
 
 |                                      | **:material-database: Data**                                                                                                                                | **:material-book: Metadata**                                                                                                                                      |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -46,15 +56,20 @@ Find below all COVID-19 data that we have collected. These files are direct expo
 
 All our COVID-19 data pipelines are specified in [our DAG](https://github.com/owid/etl/blob/master/dag/covid.yml).
 
-!!! note "We rely on data providers for this data"
+### Data providers
 
-    The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
 
-    Learn more on the licensing in the metadata files.
+Learn more on the licensing in the metadata files.
+
+### Understanding our metadata
+Our metadata contains all the relevant information about an indicator. This includes licenses, descriptions, units, etc. We use this metadata to bake our charts on our site.
+
+!!! info "Learn more in our [metadata reference](../architecture/metadata/reference/)."
 
 ## Acces the data with our catalog
 
-!!! warning "Our catalog library is in alpha"
+!!! warning "Our catalog library is in alpha."
 
 ### Install our catalog package
 
