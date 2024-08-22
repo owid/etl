@@ -9,6 +9,12 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define regions to aggregate
+REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+
+# Define fraction of allowed NaNs per year
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+
 
 def run(dest_dir: str) -> None:
     #
@@ -18,6 +24,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("co2_air_transport")
     ds_tourism = paths.load_dataset("unwto")
     ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["co2_air_transport"].reset_index()
@@ -54,6 +61,13 @@ def run(dest_dir: str) -> None:
     tb = tb[tb["year"] != 2024]
     tb = tb.drop(["population"], axis=1)
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
+
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
 
     tb = tb.format(["country", "year"])
 

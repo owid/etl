@@ -25,5 +25,6 @@ steps:
     - data://meadow/oecd/2024-08-21/co2_air_transport
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/oecd/2024-08-21/co2_air_transport:
     - data://garden/oecd/2024-08-21/co2_air_transport
