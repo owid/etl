@@ -2,7 +2,6 @@
 
 import pandas as pd
 from owid.catalog import Dataset, Table
-from owid.catalog.datasets import NULLABLE_DTYPES
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -21,30 +20,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load backport dataset.
-    short_name = "dataset_5676_global_health_observatory__world_health_organization__2022_08"
-    who_gh_dataset: Dataset = paths.load_dependency(short_name)
-    who_gh = who_gh_dataset[short_name].reset_index()
+    who_gh_dataset = paths.load_dataset("gho")
 
     # Load fast track dataset
-    snap: Dataset = paths.load_dependency("cholera.csv")
+    snap = paths.load_snapshot("cholera.csv")
     cholera_ft = pd.read_csv(snap.path)
 
     # Load countries regions
-    regions_dataset: Dataset = paths.load_dependency("regions")
+    regions_dataset = paths.load_dataset("regions")
     regions = regions_dataset["regions"]
 
-    # Process backport dataset
-    cholera_cols = who_gh.columns[who_gh.columns.str.contains("cholera")].to_list()
-    cholera_bp = who_gh[["year", "entity_name"] + cholera_cols]
-    cholera_bp[cholera_cols] = cholera_bp[cholera_cols].apply(pd.to_numeric, errors="coerce")
-    cholera_bp = cholera_bp.dropna(how="all", axis=0, subset=cholera_cols).rename(
-        columns={
-            "entity_name": "country",
-            "indicator__cholera_case_fatality_rate": "cholera_case_fatality_rate",
-            "indicator__number_of_reported_cases_of_cholera": "cholera_reported_cases",
-            "indicator__number_of_reported_deaths_from_cholera": "cholera_deaths",
-        }
-    )
+    # Process GHO dataset
+    cholera_bp = process_gho_cholera(who_gh_dataset).reset_index()
+
     # The regional and global data in the backport is only provided for 2013 so we remove it here and recalculate it
     cholera_bp = geo.harmonize_countries(
         df=cholera_bp, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
@@ -58,9 +46,6 @@ def run(dest_dir: str) -> None:
 
     tb_garden = Table(cholera_combined.set_index(["country", "year"], verify_integrity=True), short_name="cholera")
 
-    # Convert nullable types to float64, otherwise we risk pd.NA and np.nan being mixed up.
-    float64_cols = [col for col, dtype in tb_garden.dtypes.items() if dtype in NULLABLE_DTYPES]
-    tb_garden[float64_cols] = tb_garden[float64_cols].astype(float)
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -70,6 +55,30 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("cholera.end")
+
+
+def process_gho_cholera(who_gh_dataset: Dataset) -> Table:
+    tb_names = [
+        "cholera_case_fatality_rate",
+        "number_of_reported_cases_of_cholera",
+        "number_of_reported_deaths_from_cholera",
+    ]
+    cholera_bp = who_gh_dataset[tb_names[0]]
+    for tb_name in tb_names[1:]:
+        cholera_bp = cholera_bp.join(who_gh_dataset[tb_name], how="outer")
+
+    return (
+        cholera_bp.drop(columns=["comments"])
+        .rename(
+            columns={
+                "cholera_case_fatality_rate": "cholera_case_fatality_rate",
+                "number_of_reported_cases_of_cholera": "cholera_reported_cases",
+                "number_of_reported_deaths_from_cholera": "cholera_deaths",
+            }
+        )
+        .dropna(how="all", axis=0)
+        .astype(float)
+    )
 
 
 def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
@@ -85,7 +94,7 @@ def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     ), f"{df['country'][~df['country'].isin(countries)].drop_duplicates()}, is not a country"
     df_glob = df.groupby(["year"]).agg({"cholera_reported_cases": "sum", "cholera_deaths": "sum"}).reset_index()
     df_glob["country"] = "World"
-    df_glob["cholera_case_fatality_rate"] = (df_glob["cholera_deaths"] / df_glob["cholera_reported_cases"]) * 100
+    df_glob["cholera_case_fatality_rate"] = cholera_case_fatality_rate(df_glob)
     df = pd.concat([df, df_glob])
 
     return df
@@ -122,8 +131,12 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
             )
         df_cont = df_cont[df_cont["country"].isin(continents)]
         df_out = pd.concat([df_out, df_cont])
-    df_out["cholera_case_fatality_rate"] = (df_out["cholera_deaths"] / df_out["cholera_reported_cases"]) * 100
+    df_out["cholera_case_fatality_rate"] = cholera_case_fatality_rate(df_out)
 
     df = pd.concat([df, df_out])
 
     return df
+
+
+def cholera_case_fatality_rate(df: pd.DataFrame) -> pd.Series:
+    return (df["cholera_deaths"] / df["cholera_reported_cases"]) * 100
