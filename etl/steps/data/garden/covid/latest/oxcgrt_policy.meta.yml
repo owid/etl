@@ -28,6 +28,8 @@ tables:
         description_short: Record closings of schools and universities.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing or all schools open with alterations resulting in significant differences compared to non-Covid-19 operations
             - 2: require closing (only some levels or categories, eg just high school, or just public schools)
@@ -38,6 +40,8 @@ tables:
         description_short: Record closings of workplaces.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing (or recommend work from home) or all businesses open with alterations resulting in significant differences compared to non-Covid-19 operation
             - 2: require closing (or work from home) for some sectors or categories of workers
@@ -48,6 +52,8 @@ tables:
         description_short: Record cancelling public events.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend cancelling
             - 2: require cancelling
@@ -57,6 +63,8 @@ tables:
         description_short: Record the cut-off size for limits on gatherings.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no restrictions
             - 1: restrictions on very large gatherings (the limit is above 1000 people)
             - 2: restrictions on gatherings between 101-1000 people
@@ -68,6 +76,8 @@ tables:
         description_short: Record closing of public transport.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing (or significantly reduce volume/route/means of transport available)
             - 2: require closing (or prohibit most citizens from using it)
@@ -77,6 +87,8 @@ tables:
         description_short: Record orders to "shelter-in-place" and otherwise confine to the home.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend not leaving house
             - 2: require not leaving house with exceptions for daily exercise, grocery shopping, and 'essential' trips
@@ -87,6 +99,8 @@ tables:
         description_short: Record restrictions on internal movement between cities/regions.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend not to travel between regions/cities
             - 2: internal movement restrictions in place
@@ -96,6 +110,8 @@ tables:
         description_short: "Record restrictions on international travel. Note: this records policy for foreign travellers, not citizens."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no restrictions
             - 1: screening arrivals
             - 2: quarantine arrivals from some or all regions
@@ -108,6 +124,8 @@ tables:
         description_short: "Record if the government is providing direct cash payments to people who lose their jobs or cannot work. Note: only includes payments to firms if explicitly linked to payroll/salaries"
         description_key:
           - |-
+            Possible categories:
+
             - 0: no income support
             - 1: government is replacing less than 50% of lost salary (or if a flat sum, it is less than 50% median salary)
             - 2: government is replacing 50% or more of lost salary (or if a flat sum, it is greater than 50% median salary)
@@ -117,6 +135,8 @@ tables:
         description_short: "Record if the government is freezing financial obligations for households (eg stopping loan repayments, preventing services like water from stopping, or banning evictions)."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no debt/contract relief
             - 1: narrow relief, specific to one kind of contract
             - 2: broad debt/contract relief
@@ -127,6 +147,8 @@ tables:
         description_key:
           - |-
             Record monetary value in USD of fiscal stimuli, includes any spending or tax cuts NOT included in `International support`, `Emergency investment in healthcare` or `Investment in vaccines`.
+            Possible categories:
+
             - 0: no new spending that day
         unit: "$"
         short_unit: "$"
@@ -140,6 +162,8 @@ tables:
         description_key:
           - |-
             Record monetary value in USD.
+            Possible categories:
+
             - 0: no new spending that day
         unit: "$"
         short_unit: "$"
@@ -153,6 +177,8 @@ tables:
         description_short: Record presence of public info campaigns.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no Covid-19 public information campaign
             - 1: public officials urging caution about Covid-19
             - 2: coordinated public information campaign (eg across traditional and social media)
@@ -162,6 +188,8 @@ tables:
         description_short: "Record government policy on who has access to testing. Note: this records policies about testing for current infection (PCR tests) not testing for immunity (antibody test)."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no testing policy
             - 1: only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)
             - 2: testing of anyone showing Covid-19 symptoms
@@ -172,6 +200,8 @@ tables:
         description_short: Record government policy on contact tracing after a positive diagnosis.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no contact tracing
             - 1: limited contact tracing; not done for all cases
             - 2: comprehensive contact tracing; done for all identified cases
@@ -182,6 +212,8 @@ tables:
         description_key:
           - |-
             Record monetary value in USD
+            Possible categories:
+
             - 0: no new spending that day
         unit: "$"
         short_unit: "$"
@@ -195,6 +227,8 @@ tables:
         description_key:
           - |-
             Record monetary value in USD
+            Possible categories:
+
             - 0: no new spending that day
 
         unit: "$"
@@ -208,6 +242,8 @@ tables:
         description_short: Record policies on the use of facial coverings outside the home.
         description_key:
           - |-
+            Possible categories:
+
             - 0: No policy
             - 1: Recommended
             - 2: Required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible
@@ -219,6 +255,8 @@ tables:
         description_short: Record policies for vaccine delivery for different groups.
         description_key:
           - |-
+            Possible categories:
+
             - 0: No availability
             - 1: Availability for ONE of following: key workers/ clinically vulnerable groups (non elderly) / elderly groups
             - 2: Availability for TWO of following: key workers/ clinically vulnerable groups (non elderly) / elderly groups
@@ -233,6 +271,8 @@ tables:
         description_key:
           - |-
             Blank – no data
+            Possible categories:
+
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
 
@@ -242,6 +282,8 @@ tables:
         description_key:
           - |-
             Blank – no data
+            Possible categories:
+
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
 
@@ -250,6 +292,8 @@ tables:
         description_short: Reports whether any categories of people are receiving vaccines.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - 1: vaccines are available to some categories
             - 2: vaccines are available to anyone over the age of 16 yrs
@@ -260,6 +304,8 @@ tables:
         description_short: Reports lowest age range of general population being vaccinated.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range for 'General' category
         unit: ""
@@ -269,6 +315,8 @@ tables:
         description_short: Reports lowest age range of at risk population being vaccinated. Takes 'containment and closure policies'- and H1-indicators into account.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range from either 'General' or 'At-risk' categories
 
