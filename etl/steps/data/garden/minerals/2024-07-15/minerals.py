@@ -40,7 +40,7 @@ warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 paths = PathFinder(__file__)
 
 # Prefix used for "share" columns.
-SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+SHARE_OF_GLOBAL_PREFIX = "share of global "
 
 # We use World data from USGS.
 # We will also aggregate all other data to create a "World (aggregated)" for sanity check purposes (and then remove it).
@@ -53,37 +53,37 @@ DEVIATION_MAX_ACCEPTED = 10
 # complexity to the explorer. But we may decide to bring them back in the future.
 COLUMNS_TO_DISCARD = [
     "production|Alumina|Refinery|tonnes",
-    "unit_value|Alumina|Refinery|constant 1998 US$ per tonne",
-    "share_of_global_production|Alumina|Refinery|tonnes",
+    "unit value|Alumina|Refinery|constant 1998 US$ per tonne",
+    "share of global production|Alumina|Refinery|tonnes",
     "production|Bromine|Processing|tonnes",
     "reserves|Bromine|Processing|tonnes",
-    "share_of_global_production|Bromine|Processing|tonnes",
+    "share of global production|Bromine|Processing|tonnes",
     "production|Diatomite|Mine|tonnes",
     "reserves|Diatomite|Mine|tonnes",
-    "unit_value|Diatomite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Diatomite|Mine|tonnes",
+    "unit value|Diatomite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Diatomite|Mine|tonnes",
     "production|Indium|Refinery|tonnes",
-    "unit_value|Indium|Refinery|constant 1998 US$ per tonne",
-    "share_of_global_production|Indium|Refinery|tonnes",
+    "unit value|Indium|Refinery|constant 1998 US$ per tonne",
+    "share of global production|Indium|Refinery|tonnes",
     "production|Perlite|Mine|tonnes",
     "reserves|Perlite|Mine|tonnes",
-    "unit_value|Perlite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Perlite|Mine|tonnes",
+    "unit value|Perlite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Perlite|Mine|tonnes",
     "production|Pumice and pumicite|Mine|tonnes",
-    "unit_value|Pumice and pumicite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Pumice and pumicite|Mine|tonnes",
+    "unit value|Pumice and pumicite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Pumice and pumicite|Mine|tonnes",
     "production|Rhenium|Mine|tonnes",
     "reserves|Rhenium|Mine|tonnes",
-    "share_of_global_production|Rhenium|Mine|tonnes",
+    "share of global production|Rhenium|Mine|tonnes",
     "production|Soda ash|Natural and synthetic|tonnes",
     "production|Soda ash|Natural|tonnes",
     "production|Soda ash|Synthetic|tonnes",
     "reserves|Soda ash|Natural|tonnes",
-    "unit_value|Soda ash|Natural and synthetic|constant 1998 US$ per tonne",
-    "share_of_global_production|Soda ash|Natural and synthetic|tonnes",
-    "share_of_global_production|Soda ash|Natural|tonnes",
-    "share_of_global_production|Soda ash|Synthetic|tonnes",
-    "share_of_global_reserves|Soda ash|Natural|tonnes",
+    "unit value|Soda ash|Natural and synthetic|constant 1998 US$ per tonne",
+    "share of global production|Soda ash|Natural and synthetic|tonnes",
+    "share of global production|Soda ash|Natural|tonnes",
+    "share of global production|Soda ash|Synthetic|tonnes",
+    "share of global reserves|Soda ash|Natural|tonnes",
     "production|Salt|Brine salt|tonnes",
     "production|Salt|Evaporated salt|tonnes",
     "production|Salt|Other salt|tonnes",
@@ -746,6 +746,11 @@ def run(dest_dir: str) -> None:
     tb = improve_metadata(
         tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
     )
+    # NOTE: Titles, units and descriptions generated with the above function will be overwritten by the content of the
+    #  accompanying meta.yaml file.
+    #  To regenerate that yaml file, execute the following lines and manually copy the content in the meta.yaml file.
+    # from etl.helpers import print_tables_metadata_template
+    # print_tables_metadata_template([tb], fields=["title", "unit", "short_unit", "description_short", "presentation.title_public"])
 
     # Discard some columns, since they are not as critical, and add too much complexity to the explorer.
     tb = tb.drop(columns=COLUMNS_TO_DISCARD, errors="raise")

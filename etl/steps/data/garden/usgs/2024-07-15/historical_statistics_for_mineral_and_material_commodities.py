@@ -451,7 +451,7 @@ def prepare_wide_table(tb: Table, footnotes: Dict[str, str]) -> Table:
     # So, for now, simply add titles and descriptions from producer.
     for column in tb_flat.drop(columns=["country", "year"]).columns:
         # Create metadata title (before they become snake-case).
-        tb_flat[column].metadata.title = column
+        tb_flat[column].metadata.title = column.replace("_", " ")
         if column in notes:
             tb_flat[column].metadata.description_from_producer = (
                 "Notes found in original USGS historical data:\n" + notes[column]

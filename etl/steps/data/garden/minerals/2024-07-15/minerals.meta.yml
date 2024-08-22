@@ -1,5 +1,6 @@
 definitions:
   common:
+    processing_level: major
     presentation:
       topic_tags:
         - Energy
@@ -8,8 +9,2067 @@ dataset:
   update_period_days: 365
   title: Minerals
 
+
 tables:
   minerals:
     title: Minerals
     variables:
-      {}
+      production_aluminum_smelter_tonnes:
+        title: production|Aluminum|Smelter|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Aluminum production
+      production_antimony_mine_tonnes:
+        title: production|Antimony|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Production of [antimony](#dod:antimony), in tonnes. Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Antimony production
+      production_arsenic_processing_tonnes:
+        title: production|Arsenic|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Arsenic production
+      production_asbestos_mine_tonnes:
+        title: production|Asbestos|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Asbestos production
+      production_barite_mine_tonnes:
+        title: production|Barite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Barite production
+      production_bauxite_mine_tonnes:
+        title: production|Bauxite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Bauxite production
+      production_beryllium_mine_tonnes:
+        title: production|Beryllium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Beryllium production
+      production_bismuth_mine_tonnes:
+        title: production|Bismuth|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Bismuth production
+      production_bismuth_refinery_tonnes:
+        title: production|Bismuth|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined bismuth production
+      production_boron_mine_tonnes:
+        title: production|Boron|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Boron production
+      production_cadmium_refinery_tonnes:
+        title: production|Cadmium|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined cadmium production
+      production_cement_processing_tonnes:
+        title: production|Cement|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Cement production
+      production_chromium_mine_tonnes:
+        title: production|Chromium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Chromium production
+      production_coal_mine_tonnes:
+        title: production|Coal|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Coal production
+      production_cobalt_mine_tonnes:
+        title: production|Cobalt|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Cobalt production
+      production_cobalt_refinery_tonnes:
+        title: production|Cobalt|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined cobalt production
+      production_coltan_mine__columbite_tantalite_tonnes:
+        title: production|Coltan|Mine, columbite-tantalite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Coltan (columbite-tantalite) production
+      production_coltan_mine__columbite_tonnes:
+        title: production|Coltan|Mine, columbite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Coltan (columbite) production
+      production_coltan_mine__tantalite_tonnes:
+        title: production|Coltan|Mine, tantalite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Coltan (tantalite) production
+      production_copper_mine_tonnes:
+        title: production|Copper|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Copper production
+      production_copper_refinery_tonnes:
+        title: production|Copper|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined copper production
+      production_copper_smelter_tonnes:
+        title: production|Copper|Smelter|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Copper production
+      production_diamond_mine_and_synthetic__industrial_tonnes:
+        title: production|Diamond|Mine and synthetic, industrial|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Diamond production
+      production_diamond_mine__industrial_tonnes:
+        title: production|Diamond|Mine, industrial|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Diamond (industrial) production
+      production_feldspar_mine_tonnes:
+        title: production|Feldspar|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Feldspar production
+      production_fluorspar_mine_tonnes:
+        title: production|Fluorspar|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Fluorspar production
+      production_gallium_processing_tonnes:
+        title: production|Gallium|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Gallium production
+      production_gallium_refinery_tonnes:
+        title: production|Gallium|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined gallium production
+      production_garnet_mine_tonnes:
+        title: production|Garnet|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Garnet production
+      production_gemstones_mine_tonnes:
+        title: production|Gemstones|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Gemstones production
+      production_germanium_refinery_tonnes:
+        title: production|Germanium|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined germanium production
+      production_gold_mine_tonnes:
+        title: production|Gold|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Gold production
+      production_graphite_mine_tonnes:
+        title: production|Graphite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Graphite production
+      production_gypsum_mine_tonnes:
+        title: production|Gypsum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Gypsum production
+      production_helium_mine_tonnes:
+        title: production|Helium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Helium production
+      production_iodine_mine_tonnes:
+        title: production|Iodine|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Iodine production
+      production_iron_ore_mine__crude_ore_tonnes:
+        title: production|Iron ore|Mine, crude ore|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Iron ore (crude ore) production
+      production_iron_ore_mine__iron_content_tonnes:
+        title: production|Iron ore|Mine, iron content|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Iron ore (iron content) production
+      production_iron_smelter__pig_iron_tonnes:
+        title: production|Iron|Smelter, pig iron|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Iron production
+      production_lead_mine_tonnes:
+        title: production|Lead|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Lead production
+      production_lead_refinery_tonnes:
+        title: production|Lead|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined lead production
+      production_lime_processing_tonnes:
+        title: production|Lime|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Lime production
+      production_lithium_mine_tonnes:
+        title: production|Lithium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Lithium production
+      production_magnesium_compounds_mine_tonnes:
+        title: production|Magnesium compounds|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Magnesium compounds production
+      production_magnesium_metal_smelter_tonnes:
+        title: production|Magnesium metal|Smelter|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Magnesium metal production
+      production_manganese_mine__ores__and__concentrates_tonnes:
+        title: production|Manganese|Mine, ores & concentrates|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Manganese (ores & concentrates) production
+      production_manganese_mine_tonnes:
+        title: production|Manganese|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Manganese production
+      production_mercury_mine_tonnes:
+        title: production|Mercury|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Mercury production
+      production_mica_mine__scrap_and_flake_tonnes:
+        title: production|Mica|Mine, scrap and flake|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Mica (scrap and flake) production
+      production_mica_mine__sheet_tonnes:
+        title: production|Mica|Mine, sheet|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Mica (sheet) production
+      production_mica_mine_tonnes:
+        title: production|Mica|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Mica production
+      production_molybdenum_mine_tonnes:
+        title: production|Molybdenum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Molybdenum production
+      production_nickel_mine_tonnes:
+        title: production|Nickel|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Nickel production
+      production_nickel_processing_tonnes:
+        title: production|Nickel|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Nickel production
+      production_niobium_mine__pyrochlore_tonnes:
+        title: production|Niobium|Mine, pyrochlore|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Niobium (pyrochlore) production
+      production_niobium_mine_tonnes:
+        title: production|Niobium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Niobium production
+      production_nitrogen_fixed_ammonia_tonnes:
+        title: production|Nitrogen|Fixed ammonia|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: ''
+        presentation:
+          title_public: Nitrogen production
+      production_petroleum_crude_tonnes:
+        title: production|Petroleum|Crude|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: ''
+        presentation:
+          title_public: Petroleum production
+      production_phosphate_rock_guano_tonnes:
+        title: production|Phosphate rock|Guano|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Guano is the accumulated excrement of seabirds, bats, and seals. It is rich in nitrogen, phosphate and potassium, making it valuable as a fertilizer.
+        presentation:
+          title_public: Phosphate rock production
+      production_phosphate_rock_mine__aluminum_phosphate_tonnes:
+        title: production|Phosphate rock|Mine, aluminum phosphate|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Phosphate rock (aluminum phosphate) production
+      production_phosphate_rock_mine_tonnes:
+        title: production|Phosphate rock|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Phosphate rock production
+      production_platinum_group_metals_mine__iridium_tonnes:
+        title: production|Platinum group metals|Mine, iridium|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (iridium) production
+      production_platinum_group_metals_mine__other_tonnes:
+        title: production|Platinum group metals|Mine, other|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (other) production
+      production_platinum_group_metals_mine__palladium_tonnes:
+        title: production|Platinum group metals|Mine, palladium|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (palladium) production
+      production_platinum_group_metals_mine__platinum_tonnes:
+        title: production|Platinum group metals|Mine, platinum|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (platinum) production
+      production_platinum_group_metals_mine__rhodium_tonnes:
+        title: production|Platinum group metals|Mine, rhodium|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (rhodium) production
+      production_platinum_group_metals_mine__ruthenium_tonnes:
+        title: production|Platinum group metals|Mine, ruthenium|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Platinum group metals (ruthenium) production
+      production_potash_mine__chloride_tonnes:
+        title: production|Potash|Mine, chloride|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Potash (chloride) production
+      production_potash_mine__polyhalite_tonnes:
+        title: production|Potash|Mine, polyhalite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Potash (polyhalite) production
+      production_potash_mine__potassic_salts_tonnes:
+        title: production|Potash|Mine, potassic salts|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Potash (potassic salts) production
+      production_potash_mine_tonnes:
+        title: production|Potash|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Potash production
+      production_potash_unspecified_tonnes:
+        title: production|Potash|Unspecified|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: ''
+        presentation:
+          title_public: Potash production
+      production_rare_earths_mine_tonnes:
+        title: production|Rare earths|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Rare earths production
+      production_salt_mine_tonnes:
+        title: production|Salt|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Salt production
+      production_sand_and_gravel_mine__construction_tonnes:
+        title: production|Sand and gravel|Mine, construction|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Sand and gravel (construction) production
+      production_sand_and_gravel_mine__industrial_tonnes:
+        title: production|Sand and gravel|Mine, industrial|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Sand and gravel (industrial) production
+      production_selenium_refinery_tonnes:
+        title: production|Selenium|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined selenium production
+      production_silicon_processing_tonnes:
+        title: production|Silicon|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Silicon production
+      production_silver_mine_tonnes:
+        title: production|Silver|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Silver production
+      production_steel_processing__crude_tonnes:
+        title: production|Steel|Processing, crude|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Steel production
+      production_strontium_mine_tonnes:
+        title: production|Strontium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Strontium production
+      production_sulfur_processing_tonnes:
+        title: production|Sulfur|Processing|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Sulfur production
+      production_talc_and_pyrophyllite_mine__pyrophyllite_tonnes:
+        title: production|Talc and pyrophyllite|Mine, pyrophyllite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Talc and pyrophyllite (pyrophyllite) production
+      production_talc_and_pyrophyllite_mine_tonnes:
+        title: production|Talc and pyrophyllite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Talc and pyrophyllite production
+      production_tantalum_mine_tonnes:
+        title: production|Tantalum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Tantalum production
+      production_tin_mine_tonnes:
+        title: production|Tin|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Tin production
+      production_tin_smelter_tonnes:
+        title: production|Tin|Smelter|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Tin production
+      production_titanium_mine__ilmenite_tonnes:
+        title: production|Titanium|Mine, ilmenite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Titanium (ilmenite) production
+      production_titanium_mine__rutile_tonnes:
+        title: production|Titanium|Mine, rutile|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Titanium (rutile) production
+      production_tungsten_mine_tonnes:
+        title: production|Tungsten|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Tungsten production
+      production_uranium_mine_tonnes:
+        title: production|Uranium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Uranium production
+      production_vanadium_mine_tonnes:
+        title: production|Vanadium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Vanadium production
+      production_zinc_mine_tonnes:
+        title: production|Zinc|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Zinc production
+      production_zinc_refinery_tonnes:
+        title: production|Zinc|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes of [refined](#dod:refined-production) material. The amounts of refined and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined zinc production
+      production_zirconium_and_hafnium_mine_tonnes:
+        title: production|Zirconium and hafnium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        presentation:
+          title_public: Zirconium and hafnium production
+      reserves_antimony_mine_tonnes:
+        title: reserves|Antimony|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Reserves of [antimony](#dod:antimony), in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Antimony reserves
+      reserves_asbestos_mine_tonnes:
+        title: reserves|Asbestos|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Asbestos reserves
+      reserves_barite_mine_tonnes:
+        title: reserves|Barite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Barite reserves
+      reserves_bauxite_mine_tonnes:
+        title: reserves|Bauxite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Bauxite reserves
+      reserves_cobalt_mine_tonnes:
+        title: reserves|Cobalt|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Cobalt reserves
+      reserves_copper_mine_tonnes:
+        title: reserves|Copper|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Copper reserves
+      reserves_diamond_mine__industrial_tonnes:
+        title: reserves|Diamond|Mine, industrial|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Diamond (industrial) reserves
+      reserves_feldspar_mine_tonnes:
+        title: reserves|Feldspar|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Feldspar reserves
+      reserves_fluorspar_mine_tonnes:
+        title: reserves|Fluorspar|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Fluorspar reserves
+      reserves_garnet_mine_tonnes:
+        title: reserves|Garnet|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Garnet reserves
+      reserves_gold_mine_tonnes:
+        title: reserves|Gold|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Gold reserves
+      reserves_graphite_mine_tonnes:
+        title: reserves|Graphite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Graphite reserves
+      reserves_gypsum_mine_tonnes:
+        title: reserves|Gypsum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Gypsum reserves
+      reserves_helium_mine_tonnes:
+        title: reserves|Helium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Helium reserves
+      reserves_iodine_mine_tonnes:
+        title: reserves|Iodine|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iodine reserves
+      reserves_iron_ore_mine__crude_ore_tonnes:
+        title: reserves|Iron ore|Mine, crude ore|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iron ore (crude ore) reserves
+      reserves_iron_ore_mine__iron_content_tonnes:
+        title: reserves|Iron ore|Mine, iron content|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iron ore (iron content) reserves
+      reserves_lead_mine_tonnes:
+        title: reserves|Lead|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Lead reserves
+      reserves_lithium_mine_tonnes:
+        title: reserves|Lithium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Lithium reserves
+      reserves_magnesium_compounds_mine_tonnes:
+        title: reserves|Magnesium compounds|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Magnesium compounds reserves
+      reserves_manganese_mine_tonnes:
+        title: reserves|Manganese|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Manganese reserves
+      reserves_mica_mine__scrap_and_flake_tonnes:
+        title: reserves|Mica|Mine, scrap and flake|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Mica (scrap and flake) reserves
+      reserves_mica_mine__sheet_tonnes:
+        title: reserves|Mica|Mine, sheet|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Mica (sheet) reserves
+      reserves_molybdenum_mine_tonnes:
+        title: reserves|Molybdenum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Molybdenum reserves
+      reserves_nickel_mine_tonnes:
+        title: reserves|Nickel|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Nickel reserves
+      reserves_niobium_mine_tonnes:
+        title: reserves|Niobium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Niobium reserves
+      reserves_phosphate_rock_mine_tonnes:
+        title: reserves|Phosphate rock|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Phosphate rock reserves
+      reserves_platinum_group_metals_mine__platinum_tonnes:
+        title: reserves|Platinum group metals|Mine, platinum|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Platinum group metals (platinum) reserves
+      reserves_potash_mine_tonnes:
+        title: reserves|Potash|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Potash reserves
+      reserves_rare_earths_mine_tonnes:
+        title: reserves|Rare earths|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Rare earths reserves
+      reserves_selenium_refinery_tonnes:
+        title: reserves|Selenium|Refinery|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Refined selenium reserves
+      reserves_silver_mine_tonnes:
+        title: reserves|Silver|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Silver reserves
+      reserves_strontium_mine_tonnes:
+        title: reserves|Strontium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Strontium reserves
+      reserves_talc_and_pyrophyllite_mine_tonnes:
+        title: reserves|Talc and pyrophyllite|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Talc and pyrophyllite reserves
+      reserves_tantalum_mine_tonnes:
+        title: reserves|Tantalum|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Tantalum reserves
+      reserves_tin_mine_tonnes:
+        title: reserves|Tin|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Tin reserves
+      reserves_titanium_mine__ilmenite_tonnes:
+        title: reserves|Titanium|Mine, ilmenite|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Titanium (ilmenite) reserves
+      reserves_titanium_mine__rutile_tonnes:
+        title: reserves|Titanium|Mine, rutile|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Titanium (rutile) reserves
+      reserves_tungsten_mine_tonnes:
+        title: reserves|Tungsten|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Tungsten reserves
+      reserves_vanadium_mine_tonnes:
+        title: reserves|Vanadium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Vanadium reserves
+      reserves_zinc_mine_tonnes:
+        title: reserves|Zinc|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Zinc reserves
+      reserves_zirconium_and_hafnium_mine_tonnes:
+        title: reserves|Zirconium and hafnium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Zirconium and hafnium reserves
+      unit_value_aluminum_smelter_constant_1998_usd_per_tonne:
+        title: unit value|Aluminum|Smelter|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of aluminum, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Aluminum unit value
+      unit_value_antimony_mine_constant_1998_usd_per_tonne:
+        title: unit value|Antimony|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of [antimony](#dod:antimony), in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Antimony unit value
+      unit_value_arsenic_processing_constant_1998_usd_per_tonne:
+        title: unit value|Arsenic|Processing|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of arsenic, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Arsenic unit value
+      unit_value_asbestos_mine_constant_1998_usd_per_tonne:
+        title: unit value|Asbestos|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of asbestos, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Asbestos unit value
+      unit_value_barite_mine_constant_1998_usd_per_tonne:
+        title: unit value|Barite|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of barite, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Barite unit value
+      unit_value_bauxite_mine_constant_1998_usd_per_tonne:
+        title: unit value|Bauxite|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of bauxite, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Bauxite unit value
+      unit_value_beryllium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Beryllium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of beryllium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Beryllium unit value
+      unit_value_bismuth_mine_constant_1998_usd_per_tonne:
+        title: unit value|Bismuth|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of bismuth, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Bismuth unit value
+      unit_value_boron_mine_constant_1998_usd_per_tonne:
+        title: unit value|Boron|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of boron, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Boron unit value
+      unit_value_cadmium_refinery_constant_1998_usd_per_tonne:
+        title: unit value|Cadmium|Refinery|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of cadmium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Refined cadmium unit value
+      unit_value_cement_processing_constant_1998_usd_per_tonne:
+        title: unit value|Cement|Processing|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of cement, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Cement unit value
+      unit_value_chromium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Chromium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of chromium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Chromium unit value
+      unit_value_cobalt_value_constant_1998_usd_per_tonne:
+        title: unit value|Cobalt|Value|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of cobalt, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Cobalt unit value
+      unit_value_copper_mine_constant_1998_usd_per_tonne:
+        title: unit value|Copper|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of copper, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Copper unit value
+      unit_value_diamond_mine_and_synthetic__industrial_constant_1998_usd_per_tonne:
+        title: unit value|Diamond|Mine and synthetic, industrial|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of diamond, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Diamond unit value
+      unit_value_feldspar_mine_constant_1998_usd_per_tonne:
+        title: unit value|Feldspar|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of feldspar, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Feldspar unit value
+      unit_value_fluorspar_mine_constant_1998_usd_per_tonne:
+        title: unit value|Fluorspar|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of fluorspar, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Fluorspar unit value
+      unit_value_gallium_refinery_constant_1998_usd_per_tonne:
+        title: unit value|Gallium|Refinery|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of gallium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Refined gallium unit value
+      unit_value_garnet_mine_constant_1998_usd_per_tonne:
+        title: unit value|Garnet|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of garnet, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Garnet unit value
+      unit_value_germanium_refinery_constant_1998_usd_per_tonne:
+        title: unit value|Germanium|Refinery|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of germanium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Refined germanium unit value
+      unit_value_gold_mine_constant_1998_usd_per_tonne:
+        title: unit value|Gold|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of gold, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Gold unit value
+      unit_value_graphite_mine_constant_1998_usd_per_tonne:
+        title: unit value|Graphite|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of graphite, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Graphite unit value
+      unit_value_gypsum_mine_constant_1998_usd_per_tonne:
+        title: unit value|Gypsum|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of gypsum, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Gypsum unit value
+      unit_value_helium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Helium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of helium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Helium unit value
+      unit_value_iron_ore_mine__crude_ore_constant_1998_usd_per_tonne:
+        title: unit value|Iron ore|Mine, crude ore|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of iron ore, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Iron ore (crude ore) unit value
+      unit_value_iron_smelter__pig_iron_constant_1998_usd_per_tonne:
+        title: unit value|Iron|Smelter, pig iron|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of iron, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Iron unit value
+      unit_value_lead_mine_constant_1998_usd_per_tonne:
+        title: unit value|Lead|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of lead, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Lead unit value
+      unit_value_lime_processing_constant_1998_usd_per_tonne:
+        title: unit value|Lime|Processing|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of lime, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Lime unit value
+      unit_value_magnesium_compounds_mine_constant_1998_usd_per_tonne:
+        title: unit value|Magnesium compounds|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of magnesium compounds, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Magnesium compounds unit value
+      unit_value_magnesium_metal_smelter_constant_1998_usd_per_tonne:
+        title: unit value|Magnesium metal|Smelter|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of magnesium metal, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Magnesium metal unit value
+      unit_value_manganese_mine_constant_1998_usd_per_tonne:
+        title: unit value|Manganese|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of manganese, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Manganese unit value
+      unit_value_mercury_mine_constant_1998_usd_per_tonne:
+        title: unit value|Mercury|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of mercury, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Mercury unit value
+      unit_value_mica_mine__scrap_and_flake_constant_1998_usd_per_tonne:
+        title: unit value|Mica|Mine, scrap and flake|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of mica, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Mica (scrap and flake) unit value
+      unit_value_mica_mine__sheet_constant_1998_usd_per_tonne:
+        title: unit value|Mica|Mine, sheet|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of mica, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Mica (sheet) unit value
+      unit_value_molybdenum_mine_constant_1998_usd_per_tonne:
+        title: unit value|Molybdenum|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of molybdenum, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Molybdenum unit value
+      unit_value_nickel_mine_constant_1998_usd_per_tonne:
+        title: unit value|Nickel|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of nickel, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Nickel unit value
+      unit_value_niobium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Niobium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of niobium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Niobium unit value
+      unit_value_nitrogen_fixed_ammonia_constant_1998_usd_per_tonne:
+        title: unit value|Nitrogen|Fixed ammonia|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of nitrogen, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Nitrogen unit value
+      unit_value_phosphate_rock_mine_constant_1998_usd_per_tonne:
+        title: unit value|Phosphate rock|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of phosphate rock, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Phosphate rock unit value
+      unit_value_salt_mine_constant_1998_usd_per_tonne:
+        title: unit value|Salt|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of salt, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Salt unit value
+      unit_value_sand_and_gravel_mine__construction_constant_1998_usd_per_tonne:
+        title: unit value|Sand and gravel|Mine, construction|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of sand and gravel, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Sand and gravel (construction) unit value
+      unit_value_sand_and_gravel_mine__industrial_constant_1998_usd_per_tonne:
+        title: unit value|Sand and gravel|Mine, industrial|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of sand and gravel, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Sand and gravel (industrial) unit value
+      unit_value_selenium_refinery_constant_1998_usd_per_tonne:
+        title: unit value|Selenium|Refinery|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of selenium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Refined selenium unit value
+      unit_value_silicon_processing_constant_1998_usd_per_tonne:
+        title: unit value|Silicon|Processing|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of silicon, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Silicon unit value
+      unit_value_silver_mine_constant_1998_usd_per_tonne:
+        title: unit value|Silver|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of silver, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Silver unit value
+      unit_value_steel_processing__crude_constant_1998_usd_per_tonne:
+        title: unit value|Steel|Processing, crude|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of steel, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Steel unit value
+      unit_value_strontium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Strontium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of strontium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Strontium unit value
+      unit_value_sulfur_processing_constant_1998_usd_per_tonne:
+        title: unit value|Sulfur|Processing|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of sulfur, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Sulfur unit value
+      unit_value_talc_and_pyrophyllite_mine_constant_1998_usd_per_tonne:
+        title: unit value|Talc and pyrophyllite|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of talc and pyrophyllite, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Talc and pyrophyllite unit value
+      unit_value_tantalum_mine_constant_1998_usd_per_tonne:
+        title: unit value|Tantalum|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of tantalum, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Tantalum unit value
+      unit_value_tin_mine_constant_1998_usd_per_tonne:
+        title: unit value|Tin|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of tin, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Tin unit value
+      unit_value_tungsten_mine_constant_1998_usd_per_tonne:
+        title: unit value|Tungsten|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of tungsten, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Tungsten unit value
+      unit_value_vanadium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Vanadium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of vanadium, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Vanadium unit value
+      unit_value_zinc_mine_constant_1998_usd_per_tonne:
+        title: unit value|Zinc|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of zinc, in constant 1998 US$ per tonne.
+        presentation:
+          title_public: Zinc unit value
+      share_of_global_production_aluminum_smelter_tonnes:
+        title: share of global production|Aluminum|Smelter|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Aluminum production as a share of the global total
+      share_of_global_production_antimony_mine_tonnes:
+        title: share of global production|Antimony|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Production of [antimony](#dod:antimony) as a share of global antimony production. Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Antimony production as a share of the global total
+      share_of_global_production_arsenic_processing_tonnes:
+        title: share of global production|Arsenic|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Arsenic production as a share of the global total
+      share_of_global_production_asbestos_mine_tonnes:
+        title: share of global production|Asbestos|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Asbestos production as a share of the global total
+      share_of_global_production_barite_mine_tonnes:
+        title: share of global production|Barite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Barite production as a share of the global total
+      share_of_global_production_bauxite_mine_tonnes:
+        title: share of global production|Bauxite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Bauxite production as a share of the global total
+      share_of_global_production_beryllium_mine_tonnes:
+        title: share of global production|Beryllium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Beryllium production as a share of the global total
+      share_of_global_production_bismuth_mine_tonnes:
+        title: share of global production|Bismuth|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Bismuth production as a share of the global total
+      share_of_global_production_bismuth_refinery_tonnes:
+        title: share of global production|Bismuth|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined bismuth production as a share of the global total
+      share_of_global_production_boron_mine_tonnes:
+        title: share of global production|Boron|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Boron production as a share of the global total
+      share_of_global_production_cadmium_refinery_tonnes:
+        title: share of global production|Cadmium|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined cadmium production as a share of the global total
+      share_of_global_production_cement_processing_tonnes:
+        title: share of global production|Cement|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Cement production as a share of the global total
+      share_of_global_production_chromium_mine_tonnes:
+        title: share of global production|Chromium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Chromium production as a share of the global total
+      share_of_global_production_coal_mine_tonnes:
+        title: share of global production|Coal|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Coal production as a share of the global total
+      share_of_global_production_cobalt_mine_tonnes:
+        title: share of global production|Cobalt|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Cobalt production as a share of the global total
+      share_of_global_production_cobalt_refinery_tonnes:
+        title: share of global production|Cobalt|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined cobalt production as a share of the global total
+      share_of_global_production_copper_mine_tonnes:
+        title: share of global production|Copper|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Copper production as a share of the global total
+      share_of_global_production_copper_refinery_tonnes:
+        title: share of global production|Copper|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined copper production as a share of the global total
+      share_of_global_production_diamond_mine_and_synthetic__industrial_tonnes:
+        title: share of global production|Diamond|Mine and synthetic, industrial|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Diamond production as a share of the global total
+      share_of_global_production_diamond_mine__industrial_tonnes:
+        title: share of global production|Diamond|Mine, industrial|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Diamond (industrial) production as a share of the global total
+      share_of_global_production_feldspar_mine_tonnes:
+        title: share of global production|Feldspar|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Feldspar production as a share of the global total
+      share_of_global_production_fluorspar_mine_tonnes:
+        title: share of global production|Fluorspar|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Fluorspar production as a share of the global total
+      share_of_global_production_gallium_processing_tonnes:
+        title: share of global production|Gallium|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Gallium production as a share of the global total
+      share_of_global_production_gallium_refinery_tonnes:
+        title: share of global production|Gallium|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined gallium production as a share of the global total
+      share_of_global_production_garnet_mine_tonnes:
+        title: share of global production|Garnet|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Garnet production as a share of the global total
+      share_of_global_production_gemstones_mine_tonnes:
+        title: share of global production|Gemstones|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Gemstones production as a share of the global total
+      share_of_global_production_germanium_refinery_tonnes:
+        title: share of global production|Germanium|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined germanium production as a share of the global total
+      share_of_global_production_gold_mine_tonnes:
+        title: share of global production|Gold|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Gold production as a share of the global total
+      share_of_global_production_graphite_mine_tonnes:
+        title: share of global production|Graphite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Graphite production as a share of the global total
+      share_of_global_production_gypsum_mine_tonnes:
+        title: share of global production|Gypsum|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Gypsum production as a share of the global total
+      share_of_global_production_helium_mine_tonnes:
+        title: share of global production|Helium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Helium production as a share of the global total
+      share_of_global_production_iodine_mine_tonnes:
+        title: share of global production|Iodine|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Iodine production as a share of the global total
+      share_of_global_production_iron_ore_mine__crude_ore_tonnes:
+        title: share of global production|Iron ore|Mine, crude ore|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Iron ore (crude ore) production as a share of the global total
+      share_of_global_production_iron_ore_mine__iron_content_tonnes:
+        title: share of global production|Iron ore|Mine, iron content|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Iron ore (iron content) production as a share of the global total
+      share_of_global_production_iron_smelter__pig_iron_tonnes:
+        title: share of global production|Iron|Smelter, pig iron|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Iron production as a share of the global total
+      share_of_global_production_lead_mine_tonnes:
+        title: share of global production|Lead|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Lead production as a share of the global total
+      share_of_global_production_lime_processing_tonnes:
+        title: share of global production|Lime|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Lime production as a share of the global total
+      share_of_global_production_lithium_mine_tonnes:
+        title: share of global production|Lithium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Lithium production as a share of the global total
+      share_of_global_production_magnesium_compounds_mine_tonnes:
+        title: share of global production|Magnesium compounds|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Magnesium compounds production as a share of the global total
+      share_of_global_production_magnesium_metal_smelter_tonnes:
+        title: share of global production|Magnesium metal|Smelter|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
+        presentation:
+          title_public: Magnesium metal production as a share of the global total
+      share_of_global_production_manganese_mine_tonnes:
+        title: share of global production|Manganese|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Manganese production as a share of the global total
+      share_of_global_production_mercury_mine_tonnes:
+        title: share of global production|Mercury|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Mercury production as a share of the global total
+      share_of_global_production_mica_mine__scrap_and_flake_tonnes:
+        title: share of global production|Mica|Mine, scrap and flake|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Mica (scrap and flake) production as a share of the global total
+      share_of_global_production_mica_mine__sheet_tonnes:
+        title: share of global production|Mica|Mine, sheet|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Mica (sheet) production as a share of the global total
+      share_of_global_production_molybdenum_mine_tonnes:
+        title: share of global production|Molybdenum|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Molybdenum production as a share of the global total
+      share_of_global_production_nickel_mine_tonnes:
+        title: share of global production|Nickel|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Nickel production as a share of the global total
+      share_of_global_production_nickel_processing_tonnes:
+        title: share of global production|Nickel|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Nickel production as a share of the global total
+      share_of_global_production_niobium_mine_tonnes:
+        title: share of global production|Niobium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Niobium production as a share of the global total
+      share_of_global_production_nitrogen_fixed_ammonia_tonnes:
+        title: share of global production|Nitrogen|Fixed ammonia|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: ''
+        presentation:
+          title_public: Nitrogen production as a share of the global total
+      share_of_global_production_petroleum_crude_tonnes:
+        title: share of global production|Petroleum|Crude|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: ''
+        presentation:
+          title_public: Petroleum production as a share of the global total
+      share_of_global_production_phosphate_rock_mine_tonnes:
+        title: share of global production|Phosphate rock|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Phosphate rock production as a share of the global total
+      share_of_global_production_platinum_group_metals_mine__palladium_tonnes:
+        title: share of global production|Platinum group metals|Mine, palladium|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Platinum group metals (palladium) production as a share of the global total
+      share_of_global_production_platinum_group_metals_mine__platinum_tonnes:
+        title: share of global production|Platinum group metals|Mine, platinum|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Platinum group metals (platinum) production as a share of the global total
+      share_of_global_production_potash_mine_tonnes:
+        title: share of global production|Potash|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Potash production as a share of the global total
+      share_of_global_production_rare_earths_mine_tonnes:
+        title: share of global production|Rare earths|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Rare earths production as a share of the global total
+      share_of_global_production_salt_mine_tonnes:
+        title: share of global production|Salt|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Salt production as a share of the global total
+      share_of_global_production_sand_and_gravel_mine__construction_tonnes:
+        title: share of global production|Sand and gravel|Mine, construction|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Sand and gravel (construction) production as a share of the global total
+      share_of_global_production_sand_and_gravel_mine__industrial_tonnes:
+        title: share of global production|Sand and gravel|Mine, industrial|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Sand and gravel (industrial) production as a share of the global total
+      share_of_global_production_selenium_refinery_tonnes:
+        title: share of global production|Selenium|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: The amounts of [refined](#dod:refined-production) and raw materials differ because refining removes impurities and adjusts the composition to meet specific standards.
+        presentation:
+          title_public: Refined selenium production as a share of the global total
+      share_of_global_production_silicon_processing_tonnes:
+        title: share of global production|Silicon|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Silicon production as a share of the global total
+      share_of_global_production_silver_mine_tonnes:
+        title: share of global production|Silver|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Silver production as a share of the global total
+      share_of_global_production_steel_processing__crude_tonnes:
+        title: share of global production|Steel|Processing, crude|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Steel production as a share of the global total
+      share_of_global_production_strontium_mine_tonnes:
+        title: share of global production|Strontium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Strontium production as a share of the global total
+      share_of_global_production_sulfur_processing_tonnes:
+        title: share of global production|Sulfur|Processing|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral processing involves the extraction, purification, or production of materials from ores, brines, or other raw sources, often as a byproduct or through specialized industrial processes.
+        presentation:
+          title_public: Sulfur production as a share of the global total
+      share_of_global_production_talc_and_pyrophyllite_mine_tonnes:
+        title: share of global production|Talc and pyrophyllite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Talc and pyrophyllite production as a share of the global total
+      share_of_global_production_tantalum_mine_tonnes:
+        title: share of global production|Tantalum|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Tantalum production as a share of the global total
+      share_of_global_production_tin_mine_tonnes:
+        title: share of global production|Tin|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Tin production as a share of the global total
+      share_of_global_production_titanium_mine__ilmenite_tonnes:
+        title: share of global production|Titanium|Mine, ilmenite|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Titanium (ilmenite) production as a share of the global total
+      share_of_global_production_titanium_mine__rutile_tonnes:
+        title: share of global production|Titanium|Mine, rutile|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Titanium (rutile) production as a share of the global total
+      share_of_global_production_tungsten_mine_tonnes:
+        title: share of global production|Tungsten|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Tungsten production as a share of the global total
+      share_of_global_production_uranium_mine_tonnes:
+        title: share of global production|Uranium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Uranium production as a share of the global total
+      share_of_global_production_vanadium_mine_tonnes:
+        title: share of global production|Vanadium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Vanadium production as a share of the global total
+      share_of_global_production_zinc_mine_tonnes:
+        title: share of global production|Zinc|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Zinc production as a share of the global total
+      share_of_global_production_zirconium_and_hafnium_mine_tonnes:
+        title: share of global production|Zirconium and hafnium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Zirconium and hafnium production as a share of the global total
+      share_of_global_reserves_bauxite_mine_tonnes:
+        title: share of global reserves|Bauxite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Bauxite reserves as a share of the global total
+      share_of_global_reserves_cobalt_mine_tonnes:
+        title: share of global reserves|Cobalt|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Cobalt reserves as a share of the global total
+      share_of_global_reserves_copper_mine_tonnes:
+        title: share of global reserves|Copper|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Copper reserves as a share of the global total
+      share_of_global_reserves_diamond_mine__industrial_tonnes:
+        title: share of global reserves|Diamond|Mine, industrial|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Diamond (industrial) reserves as a share of the global total
+      share_of_global_reserves_fluorspar_mine_tonnes:
+        title: share of global reserves|Fluorspar|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Fluorspar reserves as a share of the global total
+      share_of_global_reserves_gold_mine_tonnes:
+        title: share of global reserves|Gold|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Gold reserves as a share of the global total
+      share_of_global_reserves_graphite_mine_tonnes:
+        title: share of global reserves|Graphite|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Graphite reserves as a share of the global total
+      share_of_global_reserves_iodine_mine_tonnes:
+        title: share of global reserves|Iodine|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iodine reserves as a share of the global total
+      share_of_global_reserves_iron_ore_mine__crude_ore_tonnes:
+        title: share of global reserves|Iron ore|Mine, crude ore|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iron ore (crude ore) reserves as a share of the global total
+      share_of_global_reserves_iron_ore_mine__iron_content_tonnes:
+        title: share of global reserves|Iron ore|Mine, iron content|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Iron ore (iron content) reserves as a share of the global total
+      share_of_global_reserves_lead_mine_tonnes:
+        title: share of global reserves|Lead|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Lead reserves as a share of the global total
+      share_of_global_reserves_lithium_mine_tonnes:
+        title: share of global reserves|Lithium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Lithium reserves as a share of the global total
+      share_of_global_reserves_magnesium_compounds_mine_tonnes:
+        title: share of global reserves|Magnesium compounds|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Magnesium compounds reserves as a share of the global total
+      share_of_global_reserves_manganese_mine_tonnes:
+        title: share of global reserves|Manganese|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Manganese reserves as a share of the global total
+      share_of_global_reserves_molybdenum_mine_tonnes:
+        title: share of global reserves|Molybdenum|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Molybdenum reserves as a share of the global total
+      share_of_global_reserves_nickel_mine_tonnes:
+        title: share of global reserves|Nickel|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Nickel reserves as a share of the global total
+      share_of_global_reserves_niobium_mine_tonnes:
+        title: share of global reserves|Niobium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Niobium reserves as a share of the global total
+      share_of_global_reserves_phosphate_rock_mine_tonnes:
+        title: share of global reserves|Phosphate rock|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Phosphate rock reserves as a share of the global total
+      share_of_global_reserves_platinum_group_metals_mine__platinum_tonnes:
+        title: share of global reserves|Platinum group metals|Mine, platinum|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Platinum group metals (platinum) reserves as a share of the global total
+      share_of_global_reserves_rare_earths_mine_tonnes:
+        title: share of global reserves|Rare earths|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Rare earths reserves as a share of the global total
+      share_of_global_reserves_selenium_refinery_tonnes:
+        title: share of global reserves|Selenium|Refinery|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Refined selenium reserves as a share of the global total
+      share_of_global_reserves_silver_mine_tonnes:
+        title: share of global reserves|Silver|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Silver reserves as a share of the global total
+      share_of_global_reserves_tin_mine_tonnes:
+        title: share of global reserves|Tin|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Tin reserves as a share of the global total
+      share_of_global_reserves_titanium_mine__ilmenite_tonnes:
+        title: share of global reserves|Titanium|Mine, ilmenite|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Titanium (ilmenite) reserves as a share of the global total
+      share_of_global_reserves_titanium_mine__rutile_tonnes:
+        title: share of global reserves|Titanium|Mine, rutile|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Titanium (rutile) reserves as a share of the global total
+      share_of_global_reserves_tungsten_mine_tonnes:
+        title: share of global reserves|Tungsten|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Tungsten reserves as a share of the global total
+      share_of_global_reserves_vanadium_mine_tonnes:
+        title: share of global reserves|Vanadium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Vanadium reserves as a share of the global total
+      share_of_global_reserves_zinc_mine_tonnes:
+        title: share of global reserves|Zinc|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Zinc reserves as a share of the global total
+      share_of_global_reserves_zirconium_and_hafnium_mine_tonnes:
+        title: share of global reserves|Zirconium and hafnium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Zirconium and hafnium reserves as a share of the global total
+

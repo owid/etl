@@ -725,29 +725,37 @@ def print_tables_metadata_template(tables: List[Table], fields: Optional[List[st
         for column in tb.columns:
             dict_values = {}
             for field in fields:
-                value = getattr(tb[column].metadata, field) or ""
+                if field.startswith("presentation"):
+                    field = field.replace("presentation.", "")
+                    value = getattr(tb[column].metadata.presentation, field) or ""
+                    if "presentation" not in dict_values:
+                        dict_values["presentation"] = {}
+                    dict_values["presentation"][field] = value
+                else:
+                    value = getattr(tb[column].metadata, field) or ""
 
-                # Add some simple rules to simplify some common cases.
+                    # Add some simple rules to simplify some common cases.
 
-                # If title is empty, or if title is underscore (probably because it is taken from the column name),
-                # create a custom title.
-                if (field == "title") and ((value == "") or ("_" in value)):
-                    value = column.capitalize().replace("_", " ")
+                    # If title is empty, or if title is underscore (probably because it is taken from the column name),
+                    # create a custom title.
+                    if (field == "title") and ((value == "") or ("_" in value)):
+                        value = column.capitalize().replace("_", " ")
 
-                # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
-                if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
-                    value = "%"
+                    # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
+                    if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
+                        value = "%"
 
-                if field == "processing_level":
-                    # Assume a minor processing level (it will be manually overwritten, if needed).
-                    value = "minor"
+                    if field == "processing_level":
+                        # Assume a minor processing level (it will be manually overwritten, if needed).
+                        value = "minor"
 
-                dict_values[field] = value
+                    dict_values[field] = value
             dict_variables[column] = dict_values
         dict_tables[tb.metadata.short_name] = {"variables": dict_variables}
     dict_output = {"tables": dict_tables}
 
-    print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
+    # print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
+    print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False, width=float("inf")))
 
 
 @contextmanager
