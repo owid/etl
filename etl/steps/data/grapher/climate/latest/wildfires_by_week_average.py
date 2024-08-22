@@ -56,12 +56,11 @@ def run(dest_dir: str) -> None:
             if country_rows.empty or country_rows[group_columns_sorted].isnull().all(axis=1).all():
                 continue
             # Find max and min columns
-            max_col = country_rows[group_columns_sorted].idxmax(axis=1).iloc[0]
-            min_col = country_rows[group_columns_sorted].idxmin(axis=1).iloc[0]
-
+            max_col = country_rows[group_columns_sorted].idxmax(axis=1)
+            min_col = country_rows[group_columns_sorted].idxmin(axis=1)
             # Set upper and lower bounds
-            tb.loc[country_rows.index, f"upper_bound_{group}"] = country_rows[max_col].iloc[0]
-            tb.loc[country_rows.index, f"lower_bound_{group}"] = country_rows[min_col].iloc[0]
+            tb.loc[country_rows.index, f"upper_bound_{group}"] = country_rows[max_col]
+            tb.loc[country_rows.index, f"lower_bound_{group}"] = country_rows[min_col]
 
         # Drop original columns as they are used in a different dataset and not needed here
         tb = tb.drop(columns=[f"{group}_until_2024"] + group_columns)
@@ -71,7 +70,6 @@ def run(dest_dir: str) -> None:
         if origin_column in tb.columns:  # Check if the origin column exists
             for col in [f"avg_{group}_until_2024", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
-
     tb = tb.format(["country", "year"])
 
     #
