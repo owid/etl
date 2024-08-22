@@ -15,7 +15,7 @@ This guide explains the general workflow to update a dataset that already exists
     - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
     - ETL Dashboard will suggest to run the following command to create PR and commit steps
         ```bash
-        etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
+        etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
         ```
     - Copy the command and run it. It will commit the steps and create a PR with staging server.
     - Adapt the code of the new steps and ensure ETL (e.g. `etlr step-names --grapher`) can execute them successfully.
@@ -58,15 +58,15 @@ This guide assumes you have already a [working installation of `etl`](../../../g
     ![Chart Upgrader](../../../assets/etl-dashboard-update-steps.gif)
     <figcaption>Animation of how to update steps in ETL Dashboard.</figcaption>
     </figure>
-    - Copy the recommended command from the output (i.e. `etl d pr ... --step-update`).
+    - Copy the recommended command from the output (i.e. `etl pr ... --step-update`).
     - You can close the Wizard (kill it with ++ctrl+c++).
 
-- **Run `etl d pr .. --step-update` to commit changes and create a PR**
+- **Run `etl pr .. --step-update` to commit changes and create a PR**
 
     Run the command you copied from the ETL Dashboard:
 
     ```bash
-    etl d pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
+    etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update
     ```
 
     This will create a new git branch in your local repository, which will be pushed.
