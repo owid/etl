@@ -51,17 +51,21 @@ def run(dest_dir: str) -> None:
 
         # Process data for each country
         for country in tb["country"].unique():
-            country_rows_max = tb_grouped[(tb_grouped["country"] == country) & (tb_grouped["year"] == 52)]
             country_rows = tb_grouped[tb_grouped["country"] == country]
+            country_row_52 = country_rows[country_rows["year"] == 52]
 
-            if country_rows_max.empty or country_rows_max[group_columns_sorted].isnull().all(axis=1).all():
+            if country_row_52.empty or country_row_52[group_columns_sorted].isnull().all(axis=1).all():
                 continue
-            # Find max and min columns
-            max_col = country_rows_max[group_columns_sorted].idxmax(axis=1)
-            min_col = country_rows_max[group_columns_sorted].idxmin(axis=1)
-            # Set upper and lower bounds
-            tb.loc[country_rows.index, f"upper_bound_{group}"] = country_rows[max_col]
-            tb.loc[country_rows.index, f"lower_bound_{group}"] = country_rows[min_col]
+
+            # Find the column with the maximum value at year 52
+            max_col = country_row_52[group_columns_sorted].idxmax(axis=1).iloc[0]
+
+            # Find the column with the minimum value at year 52
+            min_col = country_row_52[group_columns_sorted].idxmin(axis=1).iloc[0]
+
+            # Set upper and lower bounds for all rows of this country using the columns identified at year 52
+            tb.loc[tb["country"] == country, f"upper_bound_{group}"] = country_rows[max_col]
+            tb.loc[tb["country"] == country, f"lower_bound_{group}"] = country_rows[min_col]
 
         # Drop original columns as they are used in a different dataset and not needed here
         tb = tb.drop(columns=[f"{group}_until_2024"] + group_columns)
