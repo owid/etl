@@ -37,9 +37,14 @@ def run(dest_dir: str) -> None:
         tb[f"{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
         tb[f"avg_{group}_until_2024"] = tb[f"{group}_until_2024"] / len(group_columns_sorted)
 
-        # Find minimum and maximum values for the group
-        tb[f"upper_bound_{group}"] = tb[group_columns_sorted].max(axis=1)
-        tb[f"lower_bound_{group}"] = tb[group_columns_sorted].min(axis=1)
+        # Identify the rows where the year is 52
+        year_52_rows = tb[tb["year"] == 52]
+
+        # Use the maximum value at year 52 as the upper bound for each country
+        tb[f"upper_bound_{group}"] = year_52_rows[group_columns_sorted].max(axis=0)
+
+        # Find the minimum value for the group as before
+        tb[f"lower_bound_{group}"] = year_52_rows[group_columns_sorted].min(axis=1)
 
         # Drop original columns as they are used in a different dataset and not needed here
         tb = tb.drop(columns=[f"{group}_until_2024"] + group_columns)
