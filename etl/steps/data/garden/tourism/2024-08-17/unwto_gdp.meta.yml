@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Tourism
+    display:
+      numDecimalPlaces: 1
 
 
 # Learn more about the available fields:
