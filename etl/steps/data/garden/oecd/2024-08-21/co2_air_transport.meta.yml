@@ -50,14 +50,14 @@ tables:
         short_unit: kg
 
       per_capita_ter_int_a:
-        title: Per capita CO₂ emissions from international aviation.
+        title: Per capita CO₂ emissions from international aviation
         description_short: *desc_short_int
         description_processing: *desc_process_per_capita
         unit: kilograms
         short_unit: kg
 
       int_inb_out_per_capita:
-        title: Per capita CO₂ emissions from international flights, international tourism-adjusted.
+        title: Per capita CO₂ emissions from international flights, international tourism-adjusted
         description_short: International aviation emissions are allocated to the country of departure, then [adjusted for tourism](#dod:tourism-adjusted).
         description_processing:  *description_processing_tour_adj
         unit: kilograms
