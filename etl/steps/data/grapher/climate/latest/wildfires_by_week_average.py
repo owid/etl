@@ -1,8 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import owid.catalog.processing as pr
-import pandas as pd
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
