@@ -1,4 +1,85 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Missing states/countries are:
+
+Sweden:
+'Aland Islands',
+
+US:
+'American Samoa',
+'Marshall Islands',
+'United States Minor Outlying Islands',
+'Northern Mariana Islands',
+
+UK:
+'British Indian Ocean Territory',
+'British Virgin Islands',
+'Cayman Islands',
+'Christmas Island',
+'Cocos Islands',
+'Cook Islands',
+'Falkland Islands',
+'Gibraltar',
+'Guernsey',
+'Isle of Man',
+'Jersey',
+'Norfolk Island',
+'Pitcairn',
+'Saint Helena',
+'South Georgia and the South Sandwich Islands',
+'Anguilla',
+'Antigua and Barbuda',
+
+Netherlands:
+'Curacao',
+'Bonaire Sint Eustatius and Saba',
+'Sint Maarten (Dutch part)',
+
+France:
+‘French Guiana',
+'French Polynesia',
+'Guadeloupe',
+'Guinea-Bissau',
+'Maldives',
+'Martinique',
+'Mayotte',
+'New Caledonia',
+'Reunion',
+'Saint Barthelemy',
+'Saint Martin (French part)',
+'Saint Pierre and Miquelon',
+'Wallis and Futuna',
+
+New Zealand:
+'Niue',
+'Tokelau',
+
+soverign states / others:
+'Armenia',
+'Antigua and Barbuda',
+'Comoros',
+'Equatorial Guinea',
+'Grenada',
+'Micronesia (country)',
+'Montenegro',
+'Montserrat',
+'Nauru',
+'North Macedonia',
+'North Korea',
+'Saint Kitts and Nevis',
+'Saint Lucia',
+'Saint Vincent and the Grenadines',
+'Samoa',
+'Sao Tome and Principe',
+'Serbia excluding Kosovo',
+'Turks and Caicos Islands',
+'Tuvalu',
+'Vatican',
+'Palau',
+'Northern Cyprus',
+'Western Sahara'
+
+"""
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -103,7 +184,17 @@ def add_region_names(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Tabl
 
     # Complete table with entries of countries missing
     countries_all = set(countries_to_continent)
-
+    countries_ignore = {
+        "British Indian Ocean Territory",
+        "United States Minor Outlying Islands",
+        "British Indian Ocean Territory",
+        "South Georgia and the South Sandwich Islands",
+        "Aland Islands",
+        "Guernsey",
+        "Isle of Man",
+        "Jersey",
+    }
+    countries_all = {c for c in countries_all if c not in countries_ignore}
     tb = expand_time_column(
         df=tb,
         entity_col="country",
