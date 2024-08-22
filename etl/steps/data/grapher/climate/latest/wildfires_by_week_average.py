@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
         tb[f"avg_{group}_until_2024"] = tb[f"{group}_until_2024"] / len(group_columns_sorted)
 
         # Calculate the standard deviation
-        tb["std_dev"] = tb[group_columns_sorted].std(axis=1)
+        tb["std_dev"] = tb[group_columns_sorted].max(axis=1)
 
         # Calculate the number of observations
         n = len(group_columns_sorted)
@@ -52,8 +52,8 @@ def run(dest_dir: str) -> None:
         tb[f"std_err_{group}_until_2024"] = tb["std_dev"] / np.sqrt(n)
 
         # Calculate the upper and lower bounds of the standard deviation
-        tb[f"upper_bound_{group}"] = tb[f"avg_{group}_until_2024"] + tb[f"std_err_{group}_until_2024"]
-        tb[f"lower_bound_{group}"] = tb[f"avg_{group}_until_2024"] - tb[f"std_err_{group}_until_2024"]
+        tb[f"upper_bound_{group}"] = tb[group_columns_sorted].max(axis=1)
+        tb[f"lower_bound_{group}"] = tb[group_columns_sorted].min(axis=1)
 
         # Drop original columns as they are used in a different dataset
         tb = tb.drop(columns=[f"std_err_{group}_until_2024", f"{group}_until_2024", "std_dev"] + group_columns)
