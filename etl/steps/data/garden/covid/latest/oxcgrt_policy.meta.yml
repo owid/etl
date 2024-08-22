@@ -32,7 +32,6 @@ tables:
             - 1: recommend closing or all schools open with alterations resulting in significant differences compared to non-Covid-19 operations
             - 2: require closing (only some levels or categories, eg just high school, or just public schools)
             - 3: require closing all levels
-            - Blank: no data
 
       c2m_workplace_closing:
         title: Workplace closing
@@ -43,7 +42,6 @@ tables:
             - 1: recommend closing (or recommend work from home) or all businesses open with alterations resulting in significant differences compared to non-Covid-19 operation
             - 2: require closing (or work from home) for some sectors or categories of workers
             - 3: require closing (or work from home) for all-but-essential workplaces (eg grocery stores, doctors)
-            - Blank: no data
 
       c3m_cancel_public_events:
         title: Cancel public events
@@ -53,7 +51,6 @@ tables:
             - 0: no measures
             - 1: recommend cancelling
             - 2: require cancelling
-            - Blank: no data
 
       c4m_restrictions_on_gatherings:
         title: Restrictions on gatherings
@@ -65,7 +62,6 @@ tables:
             - 2: restrictions on gatherings between 101-1000 people
             - 3: restrictions on gatherings between 11-100 people
             - 4: restrictions on gatherings of 10 people or less
-            - Blank: no data
 
       c5m_close_public_transport:
         title: Close public transport
@@ -75,7 +71,6 @@ tables:
             - 0: no measures
             - 1: recommend closing (or significantly reduce volume/route/means of transport available)
             - 2: require closing (or prohibit most citizens from using it)
-            - Blank: no data
 
       c6m_stay_at_home_requirements:
         title: Stay at home requirements
@@ -86,7 +81,6 @@ tables:
             - 1: recommend not leaving house
             - 2: require not leaving house with exceptions for daily exercise, grocery shopping, and 'essential' trips
             - 3: require not leaving house with minimal exceptions (eg allowed to leave once a week, or only one person can leave at a time, etc)
-            - Blank: no data
 
       c7m_restrictions_on_internal_movement:
         title: Restrictions on internal movement
@@ -96,7 +90,6 @@ tables:
             - 0: no measures
             - 1: recommend not to travel between regions/cities
             - 2: internal movement restrictions in place
-            - Blank: no data
 
       c8ev_international_travel_controls:
         title: International travel controls
@@ -108,7 +101,6 @@ tables:
             - 2: quarantine arrivals from some or all regions
             - 3: ban arrivals from some regions
             - 4: ban on all regions or total border closure
-            - Blank: no data
 
       # E - economic policies
       e1_income_support:
@@ -119,7 +111,6 @@ tables:
             - 0: no income support
             - 1: government is replacing less than 50% of lost salary (or if a flat sum, it is less than 50% median salary)
             - 2: government is replacing 50% or more of lost salary (or if a flat sum, it is greater than 50% median salary)
-            - Blank: no data
 
       e2_debt_contract_relief:
         title: Debt/contract relief
@@ -137,7 +128,6 @@ tables:
           - |-
             Record monetary value in USD of fiscal stimuli, includes any spending or tax cuts NOT included in `International support`, `Emergency investment in healthcare` or `Investment in vaccines`.
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -151,7 +141,6 @@ tables:
           - |-
             Record monetary value in USD.
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -167,7 +156,6 @@ tables:
             - 0: no Covid-19 public information campaign
             - 1: public officials urging caution about Covid-19
             - 2: coordinated public information campaign (eg across traditional and social media)
-            - Blank: no data
 
       h2_testing_policy:
         title: Testing policy
@@ -178,7 +166,6 @@ tables:
             - 1: only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)
             - 2: testing of anyone showing Covid-19 symptoms
             - 3: open public testing (eg "drive through" testing available to asymptomatic people)
-            - Blank: no data
 
       h3_contact_tracing:
         title: Contact tracing
@@ -196,7 +183,6 @@ tables:
           - |-
             Record monetary value in USD
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -210,7 +196,6 @@ tables:
           - |-
             Record monetary value in USD
             - 0: no new spending that day
-            - Blank: no data
 
         unit: "$"
         short_unit: "$"
@@ -265,7 +250,6 @@ tables:
         description_short: Reports whether any categories of people are receiving vaccines.
         description_key:
           - |-
-            - Blank: no data
             - 0: no categories are receiving vaccines
             - 1: vaccines are available to some categories
             - 2: vaccines are available to anyone over the age of 16 yrs
@@ -276,7 +260,6 @@ tables:
         description_short: Reports lowest age range of general population being vaccinated.
         description_key:
           - |-
-            - Blank: no data
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range for 'General' category
         unit: ""
@@ -286,7 +269,6 @@ tables:
         description_short: Reports lowest age range of at risk population being vaccinated. Takes 'containment and closure policies'- and H1-indicators into account.
         description_key:
           - |-
-            - Blank: no data
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range from either 'General' or 'At-risk' categories
 
