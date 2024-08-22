@@ -3,59 +3,6 @@ definitions:
   year_is_day: &year_is_day
     yearIsDay: true
     zeroDay: "2020-01-01"
-  restriction_text: |-
-    <% if restriction_degree == -1 %>
-    Number of countries with no data on restrictions on
-    <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
-     'Public gatherings'.
-    <% elif restriction_name == 'h6m_facial_coverings' %>
-     'Face covering'.
-    <% elif restriction_name == 'c8ev_international_travel_controls' %>
-     'International travels'.
-    <%- endif -%>
-    <%- else -%>
-    Number of countries with restrictions on
-    <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
-     'Public gatherings', with level: (<< restriction_degree >>/4)
-    <% if restriction_degree == 0 %>
-     'No restrictions'.
-    <% elif restriction_degree == 1 %>
-     'restrictions on very large gatherings (the limit is above 1000 people)'.
-    <% elif restriction_degree == 2 %>
-     'restrictions on gatherings between 101-1000 people'.
-    <% elif restriction_degree == 3 %>
-     'restrictions on gatherings between 11-100 people'.
-    <% elif restriction_degree == 4 %>
-     'restrictions on gatherings of 10 people or less'.
-    <%- endif -%>
-    <% elif restriction_name == 'h6m_facial_coverings' %>
-     'Face coverings', with level: (<< restriction_degree >>/4)
-    <% if restriction_degree == 0 %>
-     'No policy'.
-    <% elif restriction_degree == 1 %>
-     'recommended'.
-    <% elif restriction_degree == 2 %>
-     'required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible'.
-    <% elif restriction_degree == 3 %>
-     'required in all shared/public spaces outside the home with other people present or all situations when social distancing not possible'.
-    <% elif restriction_degree == 4 %>
-     'required outside the home at all times regardless of location or presence of other people'.
-    <%- endif -%>
-    <% elif restriction_name == 'c8ev_international_travel_controls' %>
-     'International travel controls', with level: (<< restriction_degree >>/4)
-    <% if restriction_degree == 0 %>
-     'no restrictions'.
-    <% elif restriction_degree == 1 %>
-     'screening arrivals'.
-    <% elif restriction_degree == 2 %>
-     'quarantine arrivals from some or all regions'.
-    <% elif restriction_degree == 3 %>
-     'ban arrivals from some regions'.
-    <% elif restriction_degree == 4 %>
-     'ban on all regions or total border closure'.
-    <%- endif -%>
-    <%- endif -%>
-    <%- endif -%>
   restriction_text_short: |-
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
     Public gatherings:
@@ -489,5 +436,36 @@ tables:
         title: |-
           Number of countries - Restriction: {definitions.restriction_text_short}
         description_short: |-
-          {definitions.restriction_text}
+          <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+          This indicator codes the most stringent COVID-19 policy relating to public gatherings, with the following ordered levels: 'no restrictions', '≥1000 people', '101-1000 people', '11-100 people', and '≤10 people'.
+          <% elif restriction_name == 'h6m_facial_coverings' %>
+          This indicator codes the most stringent COVID-19 policy relating to facial coverings, with the following ordered levels: 'no policy', 'recommended', 'required sometimes', 'required outside around other people', and 'required outside home'.
+          <% elif restriction_name == 'c8ev_international_travel_controls' %>
+          This indicator codes the most stringent COVID-19 policy relating to international travel arrivals, with the following ordered levels: 'no restrictions', 'screening for arrivals', 'quarantine on some arrivals', 'partial ban', and 'complete ban'.
+          <%- endif -%>
+        description_key:
+          - |-
+            <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+            This indicator codes the most stringent COVID-19 policy relating to public gatherings, with the following ordered levels: 'no restrictions', '≥1000 people', '101-1000 people', '11-100 people', and '≤10 people'.
+            <% elif restriction_name == 'h6m_facial_coverings' %>
+            This indicator codes the most stringent COVID-19 policy relating to facial coverings, with the following ordered levels: 'no policy', 'recommended', 'required sometimes', 'required outside around other people', and 'required outside home'.
+            <% elif restriction_name == 'c8ev_international_travel_controls' %>
+            This indicator codes the most stringent COVID-19 policy relating to international travel arrivals, with the following ordered levels: 'no restrictions', 'screening for arrivals', 'quarantine on some arrivals', 'partial ban', and 'complete ban'.
+            <%- endif -%>
+          - |-
+            <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+            The authors explain that: when private gatherings of only 10 or less are permitted, this restriction would prevent public events from taking place, so they are recorded as required to cancel, unless there is a specific policy in place permitting public gatherings to go ahead. When all public gatherings are cancelled, but people can still go to church, we record this as a 2 (all gatherings cancelled), but make a note about the exception for religious gatherings. There is no explicit cut off point for a 'mass gathering'. If really large events, such as political protests, can go ahead, but with strict social distancing and hygiene measures in place, this could be reported as 'recommended'.
+
+            Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <% elif restriction_name == 'h6m_facial_coverings' %>
+            The authors explain the difference between the 'required outside around other people' and the 'required outside home' levels is that at the 'required outside home' level, a mask is required at all times when leaving the house with no exception. Even if people are in a street and more than the recommended social distance from other people, a mask is still required. Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <% elif restriction_name == 'c8ev_international_travel_controls' %>
+            The authors explain that if visitors can get a PCR test to avoid quarantine, this is recorded as 'screening for arrivals'. If quarantine is mandatory, and visitors cannot do a test to avoid this, this is recorded as 'quarantine on some arrivals'. Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <%- endif -%>
         unit: "countries"
+        description_processing: |-
+          There is no data for:
+
+          Aland Islands, American Samoa, Anguilla, Antigua and Barbuda, Armenia, Bonaire Sint Eustatius and Saba, British Indian Ocean Territory, British Virgin Islands, Cayman Islands, Christmas Island, Cocos Islands, Comoros, Cook Islands, Curacao, Equatorial Guinea, Falkland Islands, French Guiana, French Polynesia, Gibraltar, Grenada, Guadeloupe, Guernsey, Guinea-Bissau, Isle of Man, Jersey, Maldives, Marshall Islands, Martinique, Mayotte, Micronesia (country), Montenegro, Montserrat, Nauru, New Caledonia, Norfolk Island, Northern Cyprus, Northern Mariana Islands, North Macedonia, North Korea, Niue, Palau, Pitcairn, Reunion, Saint Barthelemy, Saint Helena, Saint Kitts and Nevis, Saint Lucia, Saint Martin (French part), Saint Pierre and Miquelon, Saint Vincent and the Grenadines, Samoa, Sao Tome and Principe, Serbia excluding Kosovo, Sint Maarten (Dutch part), South Georgia and the South Sandwich Islands, Tokelau, Turks and Caicos Islands, Tuvalu, United States Minor Outlying Islands, Vatican, Wallis and Futuna, Western Sahara
+
+          Note that some of these are dependant states and might have adopted the same policy as their parent state.
