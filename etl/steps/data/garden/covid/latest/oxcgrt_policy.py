@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
     #
     tables = [
         tb.format(["country", "date"], short_name="oxcgrt_policy"),
-        tb_counts.format(["country", "date", "restriction_name", "restriction_level"], short_name="country_counts"),
+        tb_counts.format(["country", "date", "restriction_name", "restriction_degree"], short_name="country_counts"),
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
@@ -121,7 +121,7 @@ def add_region_names(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Tabl
 
 def get_num_countries_per_region(tb: Table) -> Table:
     ## input: country, date, continent, income_group, restriction_A, restriction_B
-    ## output: region, date, restriction_name, restriction_level (region is continent and/or income_group)
+    ## output: region, date, restriction_name, restriction_degree (region is continent and/or income_group)
     cols = [
         "c4m_restrictions_on_gatherings",  # 0, 1, 2, 3, 4
         "h6m_facial_coverings",  # 0, 1, 2, 3, 4
@@ -136,13 +136,13 @@ def get_num_countries_per_region(tb: Table) -> Table:
         id_vars=["date", "continent", "income_group"],
         value_vars=cols,
         var_name="restriction_name",
-        value_name="restriction_level",
+        value_name="restriction_degree",
     )
     # Dtypes
-    tb = tb.astype({"restriction_level": "category"})
+    tb = tb.astype({"restriction_degree": "category"})
 
     # World
-    tb_world = tb.groupby(["date", "restriction_name", "restriction_level"], as_index=False).size()
+    tb_world = tb.groupby(["date", "restriction_name", "restriction_degree"], as_index=False).size()
     tb_world["country"] = "World"
 
     # Regions
@@ -153,7 +153,7 @@ def get_num_countries_per_region(tb: Table) -> Table:
         ]
     )
     ## Actual counting
-    tb = tb.groupby(["country", "date", "restriction_name", "restriction_level"], as_index=False).size()
+    tb = tb.groupby(["country", "date", "restriction_name", "restriction_degree"], as_index=False).size()
 
     # Concat regions + world
     tb = pr.concat([tb, tb_world], ignore_index=True)
@@ -166,5 +166,5 @@ def get_num_countries_per_region(tb: Table) -> Table:
     )
 
     # Dtypes
-    tb = tb.astype({"restriction_level": int})
+    tb = tb.astype({"restriction_degree": int})
     return tb

@@ -4,7 +4,7 @@ definitions:
     yearIsDay: true
     zeroDay: "2020-01-01"
   restriction_text: |-
-    <% if restriction_level == -1 %>
+    <% if restriction_degree == -1 %>
     Number of countries with no data on restrictions on
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
      'Public gatherings'.
@@ -16,42 +16,42 @@ definitions:
     <%- else -%>
     Number of countries with restrictions on
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
-     'Public gatherings', with level: (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     'Public gatherings', with level: (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      'No restrictions'.
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      'restrictions on very large gatherings (the limit is above 1000 people)'.
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      'restrictions on gatherings between 101-1000 people'.
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      'restrictions on gatherings between 11-100 people'.
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      'restrictions on gatherings of 10 people or less'.
     <%- endif -%>
     <% elif restriction_name == 'h6m_facial_coverings' %>
-     'Face coverings', with level: (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     'Face coverings', with level: (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      'No policy'.
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      'recommended'.
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      'required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible'.
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      'required in all shared/public spaces outside the home with other people present or all situations when social distancing not possible'.
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      'required outside the home at all times regardless of location or presence of other people'.
     <%- endif -%>
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
-     'International travel controls', with level: (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     'International travel controls', with level: (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      'no restrictions'.
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      'screening arrivals'.
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      'quarantine arrivals from some or all regions'.
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      'ban arrivals from some regions'.
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      'ban on all regions or total border closure'.
     <%- endif -%>
     <%- endif -%>
@@ -59,55 +59,55 @@ definitions:
   restriction_text_short: |-
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
     Public gatherings:
-    <% if restriction_level == -1 %>
+    <% if restriction_degree == -1 %>
      No data
     <% else %>
-     (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      No restrictions
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      ≥1000 people
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      101-1000 people
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      11-100 people
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      ≤10 people
     <%- endif -%>
     <%- endif -%>
     <% elif restriction_name == 'h6m_facial_coverings' %>
      Face coverings:
-    <% if restriction_level == -1 %>
+    <% if restriction_degree == -1 %>
      No data
     <% else %>
-     (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      No policy
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      Recommended
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      Required sometimes
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      Required when around other people or social distancing is not possible
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      Required outside the home at all times
     <%- endif -%>
     <%- endif -%>
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
      International travels:
-    <% if restriction_level == -1 %>
+    <% if restriction_degree == -1 %>
      No data
     <% else %>
-     (<< restriction_level >>/4)
-    <% if restriction_level == 0 %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
      No restrictions
-    <% elif restriction_level == 1 %>
+    <% elif restriction_degree == 1 %>
      Screening arrivals
-    <% elif restriction_level == 2 %>
+    <% elif restriction_degree == 2 %>
      Quarantine arrivals from some or all regions
-    <% elif restriction_level == 3 %>
+    <% elif restriction_degree == 3 %>
      Ban arrivals from some regions
-    <% elif restriction_level == 4 %>
+    <% elif restriction_degree == 4 %>
      Ban on all regions or total border closure
     <%- endif -%>
     <%- endif -%>
