@@ -16,7 +16,7 @@ definitions:
   description_processing_tour_adj: &description_processing_tour_adj |-
     - CO₂ emission footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes - much of the departures will result from travellers rather than local residents.
 
-    - We have therefore also calculated 'adjusted' aviation footprints by multiplying per capita international CO₂ emissions by an adjustment factor.
+    - We have therefore also calculated 'adjusted' aviation footprints by multiplying international CO₂ emissions by an adjustment factor.
 
     - This adjustment factor is taken as the ratio between outbound and inbound tourist trips.
 
