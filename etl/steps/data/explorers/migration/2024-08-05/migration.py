@@ -120,11 +120,11 @@ def run(dest_dir: str) -> None:
             "Syria",
             "Yemen",
         ],
-        "hideAlertBanner": True,
+        "hideAlertBanner": "true",
         "wpBlockId": 49910,
-        "hasMapTab": True,
+        "hasMapTab": "true",
         "yAxisMin": 0,
-        "hideAnnotationFieldsInTitle": True,
+        "hideAnnotationFieldsInTitle": "true",
         "tab": "map",
     }
 
