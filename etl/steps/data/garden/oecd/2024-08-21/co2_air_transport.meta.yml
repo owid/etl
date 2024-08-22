@@ -58,14 +58,14 @@ tables:
 
       int_inb_out_per_capita:
         title: Per capita CO₂ emissions from international flights, international tourism-adjusted.
-        description_short: *desc_short_int
+        description_short: International aviation emissions are allocated to the country of departure, then [adjusted for tourism](#dod:tourism-adjusted).
         description_processing:  *description_processing_tour_adj
         unit: kilograms
         short_unit: kg
 
       int_inb_out_tot:
         title: CO₂ emissions from international flights, international tourism-adjusted
-        description_short: *desc_short_int
+        description_short: International aviation emissions are allocated to the country of departure, then [adjusted for tourism](#dod:tourism-adjusted).
         description_processing: *description_processing_tour_adj
         unit: kilograms
         short_unit: kg
