@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import numpy as np
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -18,24 +20,54 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Extract columns related to area and events
-    area_cum_columns = [col for col in tb.columns if "area_ha_cumulative" in col]
+    column_groups = [
+        "area_ha_cumulative",
+        "share_area_ha_cumulative",
+        "co2_cumulative",
+        "pm2_5_cumulative",
+        "area_ha",
+        "events",
+        "share_area_ha",
+        "co2",
+        "pm2_5",
+    ]
+    # Loop through each group and apply the same calculations
+    for group in column_groups:
+        # Select columns that contain the group name and a year between 2003 and 2023 (inclusive)
+        group_columns = [col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= "2023"]
 
-    # Sort these columns by year (assuming the year is embedded in the column name after the first underscore)
-    area_columns_sorted = sorted(area_cum_columns, key=lambda x: int(x.split("_")[1]))
+        group_columns_sorted = sorted(group_columns, key=lambda x: int(x.split("_")[1]))
 
-    # Calculate the cumulative area burned (2012-2022)
-    tb["cumulative_area_burned_2012_2022"] = tb[area_columns_sorted].sum(axis=1)
+        tb[f"cumulative_{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
 
-    # Average cumulative area burned (2012-2022)
-    tb["avg_cumulative_area_burned_2012_2022"] = tb["cumulative_area_burned_2012_2022"] / len(area_columns_sorted)
+        tb[f"avg_cumulative_{group}_until_2024"] = tb[f"cumulative_{group}_until_2024"] / len(group_columns_sorted)
 
-    # 4. Calculate the standard deviation of area burned (2012-2022)
-    tb["std_dev_cum_area_burned_2012_2022"] = tb[area_columns_sorted].std(axis=1)
+        # Calculate the standard deviation
+        tb["std_dev"] = tb[group_columns_sorted].std(axis=1)
 
-    # 5. Calculate the upper and lower bounds of the standard deviation
-    tb["upper_bound_cum_area"] = tb["avg_cumulative_area_burned_2012_2022"] + tb["std_dev_cum_area_burned_2012_2022"]
-    tb["lower_bound_cum_area"] = tb["avg_cumulative_area_burned_2012_2022"] - tb["std_dev_cum_area_burned_2012_2022"]
-    tb = tb.drop(columns=["std_dev_cum_area_burned_2012_2022", "cumulative_area_burned_2012_2022"])
+        # Calculate the number of observations
+        n = len(group_columns_sorted)
+
+        # Calculate the standard error
+        tb[f"std_err_cum_{group}_until_2024"] = tb["std_dev"] / np.sqrt(n)
+
+        # Calculate the upper and lower bounds of the standard deviation
+        tb[f"upper_bound_cum_{group}"] = (
+            tb[f"avg_cumulative_{group}_until_2024"] + tb[f"std_err_cum_{group}_until_2024"]
+        )
+        tb[f"lower_bound_cum_{group}"] = (
+            tb[f"avg_cumulative_{group}_until_2024"] - tb[f"std_err_cum_{group}_until_2024"]
+        )
+
+        # Drop original columns as they are used in a different dataset
+        tb = tb.drop(
+            columns=[f"std_err_cum_{group}_until_2024", f"cumulative_{group}_until_2024", "std_dev"] + group_columns
+        )
+        # Dynamically set origins based on the group
+        origin_column = f"_2024_{group}"  # Dynamically set based on group name
+        if origin_column in tb.columns:  # Check if the origin column exists
+            for col in [f"avg_cumulative_{group}_until_2024", f"upper_bound_cum_{group}", f"lower_bound_cum_{group}"]:
+                tb[col].origins = tb[origin_column].origins
 
     # Set 'country' and 'year' as the index of the DataFrame
     tb = tb.set_index(["country", "year"])

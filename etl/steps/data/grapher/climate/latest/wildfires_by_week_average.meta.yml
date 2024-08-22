@@ -1,7 +1,61 @@
+# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    unit: hectares
-    short_unit: ha
+    presentation:
+      topic_tags:
+        - Climate Change
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+  unit_wildfires: &unit_wildfires |-
+    hectares
+  short_unit_wildfires: &short_unit_wildfires |-
+    ha
+  unit_emissions: &unit_emissions |-
+    tonnes
+  short_unit_emissions: &short_unit_emissions |-
+    t
+  unit_share: &unit_share |-
+    %
+  short_unit_share: &short_unit_share |-
+    %
+  unit_events: &unit_events |-
+    events
+  desc_wildfires: &desc_wildfires
+    - Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.
+    - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  description_short_wildires_cumulative: &description_short_wildires_cumulative
+    The cumulative area burnt by wildfires in hectares. {definitions.desc_update}
+  description_short_wildfires: &description_short_wildfires |-
+    Area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
+  description_short_share_wildfires: &description_short_share_wildfires |-
+    The total area consumed by [wildfires](#dod:wildfires) is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
+  description_short_share_wildfires_cumulative: &description_short_share_wildfires_cumulative |-
+    Cumultive share of the total land area burnt by [wildfires](#dod:wildfires).
+  description_short_events: &description_short_events |-
+    Number of [wildfires](#dod:wildfires). {definitions.desc_update}
+  description_short_co2: &description_short_co2 |-
+    Carbon dioxide released by [wildfires](#dod:wildfires) in tonnes.
+  description_short_pm2_5: &description_short_pm2_5 |-
+    PM2.5 emissions from [wildfires](#dod:wildfires) in tonnes.
+  description_short_co2_cumulative: &description_short_co2_cumulative |-
+    Cumulative carbon dioxide released by [wildfires](#dod:wildfires) in tonnes.
+  description_short_pm2_5_cumulative: &description_short_pm2_5_cumulative |-
+    Cumulative PM2.5 emissions from [wildfires](#dod:wildfires) in tonnes.
+  description_key_co2: &description_key_co2
+      - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
+  description_ke_pm2_5: &description_ke_pm2_5
+      - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
+      - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
+  description_processing_share: &description_processing_share  |-
+    The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 7
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
@@ -9,11 +63,254 @@ tables:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-        upper_bound_cum_area:
-          title: Upper bound of the average cumulative area burned by wildfires
+        _2024_area_ha:
+          title: Monthly area burnt by wildfires in 2024
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildfires
+          description_key: *desc_wildfires
 
-        lower_bound_cum_area:
-         title: Lower bound of the average cumulative area burned by wildfires
+        _2024_co2:
+          title: Monthly carbon dioxide emissions from wildfires in 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2
+          description_key: *description_key_co2
 
-        avg_cumulative_area_burned_2012_2022:
-          title: Average cumulative area burned by wildfires 2012-2022
+        _2024_pm2_5:
+          title: Monthly PM2.5 emissions from wildfires in 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5
+          description_key: *description_ke_pm2_5
+
+        _2024_share_area_ha:
+          title: Monthly share of the total land area burnt by wildfires in 2024
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires
+          description_processing: *description_processing_share
+
+        _2024_area_ha_cumulative:
+          title: Monthly cumulative area burnt by wildfires in 2024
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key: *desc_wildfires
+
+        _2024_co2_cumulative:
+          title: Monthly cumulative carbon dioxide emissions from wildfires in 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2_cumulative
+          description_key: *description_key_co2
+
+        _2024_pm2_5_cumulative:
+          title: Monthly cumulative PM2.5 emissions from wildfires in 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5_cumulative
+          description_key: *description_ke_pm2_5
+
+        _2024_share_area_ha_cumulative:
+          title: Monthly cumulative share of the total land area burnt by wildfires in 2024
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires_cumulative
+          description_processing: *description_processing_share
+
+        _2024_events:
+          title: Monthly number of fires in 2024
+          unit: *unit_events
+          short_unit: ''
+          description_short: *description_short_events
+          description_key: *desc_wildfires
+
+        avg_cumulative_area_ha_cumulative_until_2024:
+          title: Average cumulative area burnt by wildfires until 2024
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key: *desc_wildfires
+
+        upper_bound_cum_area_ha_cumulative:
+          title: Upper bound cumulative area burnt by wildfires
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key:  *desc_wildfires
+
+
+        lower_bound_cum_area_ha_cumulative:
+          title: Lower bound cumulative area burnt by wildfires
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key:  *desc_wildfires
+
+        avg_cumulative_share_area_ha_cumulative_until_2024:
+          title: Average cumulative share of the total land area burnt by wildfires until 2024
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires_cumulative
+          description_processing: *description_processing_share
+
+        upper_bound_cum_share_area_ha_cumulative:
+          title: Upper bound cumulative share of the total land area burnt by wildfires
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires_cumulative
+          description_processing: *description_processing_share
+
+        lower_bound_cum_share_area_ha_cumulative:
+          title: Lower bound cumulative share of the total land area burnt by wildfires
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires_cumulative
+          description_processing: *description_processing_share
+
+        avg_cumulative_co2_cumulative_until_2024:
+          title: Average cumulative carbon dioxide emissions from wildfires until 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2_cumulative
+          description_key: *description_key_co2
+
+        upper_bound_cum_co2_cumulative:
+          title: Upper bound cumulative carbon dioxide emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2_cumulative
+          description_key: *description_key_co2
+
+        lower_bound_cum_co2_cumulative:
+          title: Lower bound cumulative carbon dioxide emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2_cumulative
+          description_key: *description_key_co2
+
+        avg_cumulative_pm2_5_cumulative_until_2024:
+          title: Average cumulative PM2.5 emissions from wildfires until 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5_cumulative
+          description_key: *description_ke_pm2_5
+
+        upper_bound_cum_pm2_5_cumulative:
+          title: Upper bound cumulative PM2.5 emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5_cumulative
+          description_key: *description_ke_pm2_5
+
+        lower_bound_cum_pm2_5_cumulative:
+          title: Lower bound cumulative PM2.5 emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5_cumulative
+          description_key: *description_ke_pm2_5
+
+        avg_cumulative_area_ha_until_2024:
+          title: Average cumulative area burnt by wildfires until 2024
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key: *desc_wildfires
+
+        upper_bound_cum_area_ha:
+          title: Upper bound cumulative area burnt by wildfires
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key: *desc_wildfires
+
+        lower_bound_cum_area_ha:
+          title: Lower bound cumulative area burnt by wildfires
+          unit: *unit_wildfires
+          short_unit: *short_unit_wildfires
+          description_short: *description_short_wildires_cumulative
+          description_key: *desc_wildfires
+
+        avg_cumulative_events_until_2024:
+          title: Average cumulative number of fires until 2024
+          unit: *unit_events
+          short_unit: ''
+          description_short: *description_short_events
+          description_key: *desc_wildfires
+
+        upper_bound_cum_events:
+          title: Upper bound cumulative number of fires
+          unit: *unit_events
+          short_unit: ''
+          description_short: *description_short_events
+          description_key: *desc_wildfires
+
+        lower_bound_cum_events:
+          title: Lower bound cumulative number of fires
+          unit: *unit_events
+          short_unit: ''
+          description_short: *description_short_events
+          description_key: *desc_wildfires
+
+        avg_cumulative_share_area_ha_until_2024:
+          title: Average cumulative share of the total land area burnt by wildfires until 2024
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires
+          description_processing: *description_processing_share
+
+        upper_bound_cum_share_area_ha:
+          title: Upper bound cumulative share of the total land area burnt by wildfires
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires
+          description_processing: *description_processing_share
+
+        lower_bound_cum_share_area_ha:
+          title: Lower bound cumulative share of the total land area burnt by wildfires
+          unit: *unit_share
+          short_unit: *short_unit_share
+          description_short: *description_short_share_wildfires
+          description_processing: *description_processing_share
+
+        avg_cumulative_co2_until_2024:
+          title: Average cumulative carbon dioxide emissions from wildfires until 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2
+          description_key: *description_key_co2
+
+        upper_bound_cum_co2:
+          title: Upper bound cumulative carbon dioxide emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2
+          description_key: *description_key_co2
+
+        lower_bound_cum_co2:
+          title: Lower bound cumulative carbon dioxide emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_co2
+          description_key: *description_key_co2
+
+        avg_cumulative_pm2_5_until_2024:
+          title: Average cumulative PM2.5 emissions from wildfires until 2024
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5
+          description_key: *description_ke_pm2_5
+
+        upper_bound_cum_pm2_5:
+          title: Upper bound cumulative PM2.5 emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5
+          description_key: *description_ke_pm2_5
+        lower_bound_cum_pm2_5:
+          title: Lower bound cumulative PM2.5 emissions from wildfires
+          unit: *unit_emissions
+          short_unit: *short_unit_emissions
+          description_short: *description_short_pm2_5
+          description_key: *description_ke_pm2_5
