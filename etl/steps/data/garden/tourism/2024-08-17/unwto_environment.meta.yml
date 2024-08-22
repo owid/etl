@@ -26,7 +26,7 @@ tables:
       total_tables:
        title: Total number of tables
        unit: tables
-       description_short: These tables track key economic and environmental aspects of tourism, including expenditure, production, employment, and resource flows.
+       description_short: Monitoring is expressed as the number of implemented tables across the Tourism Satellite Account and the System of Environmental and Economic Account. These tables track key economic and environmental aspects of tourism, including expenditure, production, employment, and resource flows.
        description_key:
          - The relevant tables for monitoring tourism sustainability include TSA tables on various aspects of tourism expenditure, production, and employment, as well as SEEA tables on environmental flows such as water, energy, GHG emissions, and solid waste.
          - These tables collectively track the economic and environmental impacts of tourism.
