@@ -444,8 +444,8 @@ class PathFinder:
         return self._dag
 
     @property
-    def channel(self) -> str:
-        return self.f.parent.parent.parent.name
+    def channel(self) -> CHANNEL:
+        return self.f.parent.parent.parent.name  # type: ignore
 
     @property
     def namespace(self) -> str:
@@ -605,7 +605,7 @@ class PathFinder:
     def get_dependency_step_name(
         self,
         short_name: str,
-        channel: Optional[str] = None,
+        channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
@@ -646,7 +646,7 @@ class PathFinder:
     def load_dependency(
         self,
         short_name: str,
-        channel: Optional[str] = None,
+        channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
@@ -673,7 +673,7 @@ class PathFinder:
             )
             dataset = catalog.Dataset(dataset_path)
 
-        return dataset
+        return dataset  # type: ignore[reportReturnType]
 
     def load_snapshot(self, short_name: Optional[str] = None, **kwargs) -> Snapshot:
         """Load snapshot dependency. short_name defaults to the current step's short_name."""
@@ -690,7 +690,7 @@ class PathFinder:
     def load_dataset(
         self,
         short_name: Optional[str] = None,
-        channel: Optional[str] = None,
+        channel: Optional[CHANNEL] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
     ) -> catalog.Dataset:

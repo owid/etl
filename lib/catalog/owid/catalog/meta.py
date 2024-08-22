@@ -35,7 +35,7 @@ class MetaBase:
         """Hash that uniquely identifies an object (without needing frozen dataclass)."""
         return _hash_any(self)
 
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: Self) -> bool:  # type: ignore
         if not isinstance(other, self.__class__):
             return False
         return self.__hash__() == other.__hash__()

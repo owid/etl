@@ -86,7 +86,7 @@ def cli(step: str, cpu: bool, mem: bool, functions: tuple[str]) -> None:
 
     # Profile the run function
     if mem:
-        memory_usage((mem_profile(lp_wrapper), [dest_dir]))
+        memory_usage((mem_profile(lp_wrapper), [dest_dir]))  # type: ignore[reportArgumentType]
     else:
         lp_wrapper(dest_dir)
 

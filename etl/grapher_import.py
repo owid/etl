@@ -221,11 +221,11 @@ def upsert_table(
     )
     table = table.reorder_levels(["year", "entity_id"])
     assert (
-        table.index.dtypes.iloc[0] in gh.INT_TYPES
-    ), f"year must be of an integer type but was: {table.index.dtypes.iloc[0]}"
+        table.index.dtypes.iloc[0] in gh.INT_TYPES  # type: ignore[reportAttributeAccessIssue]
+    ), f"year must be of an integer type but was: {table.index.dtypes.iloc[0]}"  # type: ignore[reportAttributeAccessIssue]
     assert (
-        table.index.dtypes.iloc[1] in gh.INT_TYPES
-    ), f"entity_id must be of an integer type but was: {table.index.dtypes.iloc[1]}"
+        table.index.dtypes.iloc[1] in gh.INT_TYPES  # type: ignore[reportAttributeAccessIssue]
+    ), f"entity_id must be of an integer type but was: {table.index.dtypes.iloc[1]}"  # type: ignore[reportAttributeAccessIssue]
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 

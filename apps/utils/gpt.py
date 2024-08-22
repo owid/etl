@@ -72,7 +72,7 @@ class GPTResponse(ChatCompletion):
 
     message_content_dix: Optional[Dict[str, Any]] = field(default_factory=dict)
 
-    def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:
+    def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Initialize OpenAI API wrapper."""
         if chat_completion_instance:
             super().__init__(**chat_completion_instance.dict())
@@ -102,7 +102,7 @@ class GPTResponse(ChatCompletion):
                 self.message_content_dix = yaml.safe_load(self.message_content)
             else:
                 raise ValueError("`message_content` is empty!")
-        return self.message_content_dix
+        return self.message_content_dix  # type: ignore[reportReturnType]
 
     @property
     def cost(self) -> float | None:
@@ -167,7 +167,7 @@ class GPTQuery:
 class OpenAIWrapper(OpenAI):
     """Wrapper for OpenAI API."""
 
-    def __init__(self: Self, **kwargs) -> None:
+    def __init__(self: Self, **kwargs) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Initialize OpenAI API wrapper."""
         super().__init__(**kwargs)
 

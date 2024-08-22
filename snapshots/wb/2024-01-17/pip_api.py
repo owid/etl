@@ -41,7 +41,7 @@ import pandas as pd
 import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
-from owid.catalog import connect_r2_cached
+from owid.catalog import connect_r2_cached  # type: ignore[reportAttributeAccessIssue]
 from structlog import get_logger
 from tenacity import retry
 from tenacity.stop import stop_after_attempt

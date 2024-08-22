@@ -81,6 +81,12 @@ def mock(_type: type) -> Any:
     elif getattr(_type, "__origin__", None) == Literal:
         return random.choice(_type.__args__)  # type: ignore
 
+    elif getattr(_type, "__origin__", None) == Union:
+        return mock(random.choice(_type.__args__))
+
+    elif _type is type(None):
+        return None
+
     raise ValueError(f"don't know how to mock type: {_type}")
 
 
