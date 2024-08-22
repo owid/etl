@@ -1,0 +1,19 @@
+definitions:
+  common:
+    unit: hectares
+    short_unit: ha
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  weekly_wildfires:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+        upper_bound_cum_area:
+          title: Upper bound of the average cumulative area burned by wildfires
+
+        lower_bound_cum_area:
+         title: Lower bound of the average cumulative area burned by wildfires
+
+        avg_cumulative_area_burned_2012_2022:
+          title: Average cumulative area burned by wildfires 2012-2022
