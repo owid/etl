@@ -61,6 +61,9 @@ def run(dest_dir: str) -> None:
     # Count countries per region
     tb_counts = get_num_countries_per_region(tb_counts)
 
+    # Copy metadata
+    tb_counts["num_countries"] = tb_counts["num_countries"].copy_metadata(tb["c8ev_international_travel_controls"])
+
     #
     # Save outputs.
     #
