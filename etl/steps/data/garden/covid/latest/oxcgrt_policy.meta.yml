@@ -7,51 +7,52 @@ definitions:
     <% if restriction_level == -1 %>
     Number of countries with no data on restrictions on
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
-    'Public gatherings'.
+     'Public gatherings'.
     <% elif restriction_name == 'h6m_facial_coverings' %>
-    'Facial covering'.
+     'Facial covering'.
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
-    'International travels'.
+     'International travels'.
+    <%- endif -%>
     <%- else -%>
     Number of countries with restrictions on
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
-    'Public gatherings', with level: (<< restriction_level >>/4)
+     'Public gatherings', with level: (<< restriction_level >>/4)
     <% if restriction_level == 0 %>
-    'No restrictions'.
+     'No restrictions'.
     <% elif restriction_level == 1 %>
-    'restrictions on very large gatherings (the limit is above 1000 people)'.
+     'restrictions on very large gatherings (the limit is above 1000 people)'.
     <% elif restriction_level == 2 %>
-    'restrictions on gatherings between 101-1000 people'.
+     'restrictions on gatherings between 101-1000 people'.
     <% elif restriction_level == 3 %>
-    'restrictions on gatherings between 11-100 people'.
+     'restrictions on gatherings between 11-100 people'.
     <% elif restriction_level == 4 %>
-    'restrictions on gatherings of 10 people or less'.
+     'restrictions on gatherings of 10 people or less'.
     <%- endif -%>
     <% elif restriction_name == 'h6m_facial_coverings' %>
-    'Face coverings', with level: (<< restriction_level >>/4)
+     'Face coverings', with level: (<< restriction_level >>/4)
     <% if restriction_level == 0 %>
-    'No policy'.
+     'No policy'.
     <% elif restriction_level == 1 %>
-    'recommended'.
+     'recommended'.
     <% elif restriction_level == 2 %>
-    'required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible'.
+     'required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible'.
     <% elif restriction_level == 3 %>
-    'required in all shared/public spaces outside the home with other people present or all situations when social distancing not possible'.
+     'required in all shared/public spaces outside the home with other people present or all situations when social distancing not possible'.
     <% elif restriction_level == 4 %>
-    'required outside the home at all times regardless of location or presence of other people'.
+     'required outside the home at all times regardless of location or presence of other people'.
     <%- endif -%>
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
-    'International travel controls', with level: (<< restriction_level >>/4)
+     'International travel controls', with level: (<< restriction_level >>/4)
     <% if restriction_level == 0 %>
-    'no restrictions'.
+     'no restrictions'.
     <% elif restriction_level == 1 %>
-    'screening arrivals'.
+     'screening arrivals'.
     <% elif restriction_level == 2 %>
-    'quarantine arrivals from some or all regions'.
+     'quarantine arrivals from some or all regions'.
     <% elif restriction_level == 3 %>
-    'ban arrivals from some regions'.
+     'ban arrivals from some regions'.
     <% elif restriction_level == 4 %>
-    'ban on all regions or total border closure'.
+     'ban on all regions or total border closure'.
     <%- endif -%>
     <%- endif -%>
     <%- endif -%>
@@ -73,8 +74,9 @@ definitions:
     <% elif restriction_level == 4 %>
      Restrictions on gatherings (≤10 people)
     <%- endif -%>
+    <%- endif -%>
     <% elif restriction_name == 'h6m_facial_coverings' %>
-    International travel controls:
+     International travel controls:
     <% if restriction_level == -1 %>
      No data
     <% else %>
@@ -90,8 +92,9 @@ definitions:
     <% elif restriction_level == 4 %>
      Required outside the home at all times
     <%- endif -%>
+    <%- endif -%>
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
-    Face coverings:
+     Face coverings:
     <% if restriction_level == -1 %>
      No data
     <% else %>
