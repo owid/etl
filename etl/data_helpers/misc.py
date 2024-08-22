@@ -76,7 +76,7 @@ def interpolate_table(
 
     if time_mode != "none":
         # Expand time
-        df = expand_time_column(df, entity_col, time_col, time_mode)
+        df = expand_time_column(df, entity_col, time_col, mode=time_mode)
 
     # Set index
     df = cast(TableOrDataFrame, df.set_index([entity_col, time_col]).sort_index())
