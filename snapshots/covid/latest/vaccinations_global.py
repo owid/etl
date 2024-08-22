@@ -5,7 +5,7 @@ Run the lines from https://github.com/owid/covid-19-data/blob/d8fae5631e21302705
 """
 from datetime import date
 from pathlib import Path
-from typing import cast
+from typing import Optional, cast
 
 import click
 import pandas as pd
@@ -21,16 +21,17 @@ URL_WHO = "https://srhdpeuwpubsa.blob.core.windows.net/whdh/COVID/vaccination-da
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
-def main(path_to_file: str, upload: bool) -> None:
+def main(upload: bool, path_to_file: Optional[str] = None) -> None:
     # MANUAL
-    ## This is a snapshot from github.com/owid/covid-19-data
-    snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/vaccinations_global.csv")
-    snap.create_snapshot(filename=path_to_file, upload=upload)
+    ## This is a snapshot from github.com/owid/covid-19-data as of 15th August 2024
+    ## No need to re-run it again
+    if path_to_file:
+        snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/vaccinations_global.csv")
+        snap.create_snapshot(filename=path_to_file, upload=upload)
 
     # AUTOMATED
     ## This is extracted from WHO, and updates current snapshot
-
-    ### Creat snapshot
+    ### Create snapshot
     snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/vaccinations_global_who.csv")
     ### Load new data from WHO
     df = pd.read_csv(URL_WHO)
