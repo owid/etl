@@ -231,14 +231,6 @@ def migrate(
         # backport to refresh snapshots in S3
         if pb.needs_update():
             pb.upload(upload=True, dry_run=False, engine=engine)
-        # run ETL on backport
-        else:
-            from etl.command import main
-
-            main(
-                [pb.short_name],
-                backport=True,
-            )
 
     spreadsheet = client.open(spreadsheet_title)
 

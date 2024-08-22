@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load backport dataset.
+    # Load GHO dataset.
     who_gh_dataset = paths.load_dataset("gho")
 
     # Load fast track dataset
@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     )
     # Add global aggregate
     cholera_bp = add_global_total(cholera_bp, regions)
-    # Combine backport and fast track datasets
+    # Combine datasets
     cholera_combined = pd.concat([cholera_bp, cholera_ft])
 
     cholera_combined = add_regions(cholera_combined, regions)
