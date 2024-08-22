@@ -1,9 +1,12 @@
 definitions:
+  zero_day: &zero_day
+    yearIsDay: true
+    zeroDay: "2020-01-01"
   common:
     display:
       numDecimalPlaces: 1
-      yearIsDay: true
-      zeroDay: "2020-01-01"
+      tolerance: 15
+      <<: *zero_day
     processing_level: major
 
 dataset:
@@ -13,42 +16,90 @@ dataset:
     This dataset is built by combinining indicators of multiple COVID-19 indicators. It estimates various indicators based on relationships between others.
 
 tables:
-  testing:
+  combined:
     variables:
-
+      # Tests per case, 7d average
       short_term_tests_per_case:
         title: Daily COVID-19 tests per new confirmed case
-        unit: 'tests per confirmed case'
+        unit: "tests per confirmed case"
         description_short: |-
           The number of tests each day divided by the number of confirmed cases each day. The series is smoothed by averaging daily figures over a rolling 7-day window.
-        description_processing:
-          Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally on a daily basis over any periods in which no data was reported.
-
+        description_processing: Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally on a daily basis over any periods in which no data was reported.
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: Tests conducted per confirmed case of COVID-19
+            subtitle: 7-day rolling average. The number of tests divided by the number of confirmed cases. Comparisons across countries are affected by differences in testing policies and reporting methods.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 2, 5, 10, 20, 50, 100, 200]
+                baseColorScheme: Reds
+      # Tests per case, cumulative
       cumulative_tests_per_case:
         title: Total COVID-19 tests per confirmed case
         description_short: |-
           The total number of tests to date divided by the total number of confirmed cases. Tests may refer to the number of tests performed or the number of people tested - depending on which is reported by the particular country.
-        unit: 'tests per confirmed case'
+        unit: "tests per confirmed case"
 
+      # Positivity rate, 7d average
       short_term_positivity_rate:
         title: COVID-19 positivity rate
         description_short: |-
           The daily number of confirmed cases divided by the daily number of tests, expressed as a percentage. Tests may refer to the number of tests performed or the number of people tested - depending on which is reported by the particular country.
-        unit: '%'
-        short_unit: '%'
-
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          name: Positive test rate
+          tolerance: 10
+          <<: *zero_day
+        presentation:
+          grapher_config:
+            title: The share of daily COVID-19 tests that are positive
+            subtitle: 7-day rolling average. The number of confirmed cases divided by the number of tests, expressed as a percentage. Comparisons across countries are affected by differences in testing policies and reporting methods.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 2, 5, 10, 20, 50]
+                baseColorScheme: Reds
+      # Positivity rate, 7d avg
       cumulative_positivity_rate:
         title: COVID-19 positivity rate (cumulative)
         description_short: |-
           The total number of confirmed cases to date divided by the total number of tests to date, expressed as a percentage. Tests may refer to the number of tests performed or the number of people tested - depending on which is reported by the particular country.
-        description_processing:
-          Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally on a daily basis over any periods in which no data was reported.
-        unit: '%'
-        short_unit: '%'
+        description_processing: Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally on a daily basis over any periods in which no data was reported.
+        unit: "%"
+        short_unit: "%"
 
+      # Specific threshold indicator
       has_population_5m_and_100_cases_and_testing_data:
         title: "Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data"
         description_short: |-
           Boolean value indicating if a country has had more than 100 cased in the last 21 days, has testing data and has more than 5 million population.
-        unit: ''
+        unit: ""
 
+      # Share of cases sequenced
+      share_cases_sequenced:
+        title: Share of cases that are sequenced
+        description_short: Share of confirmed cases for which the genome of the virus has been sequenced to determine which mutations it has.
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            title: Share of confirmed COVID-19 cases sequenced
+            subtitle: Share of confirmed cases for which the genome of the virus has been sequenced to determine which mutations it has.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                baseColorScheme: Blues

@@ -16,6 +16,7 @@ import sh
 from git import Repo
 from structlog import get_logger
 
+from etl.config import TLS_VERIFY
 from etl.paths import BASE_DIR
 
 CACHE_DIR = Path("~/.owid/git")
@@ -115,7 +116,7 @@ class GithubRepo:
         # S: 0000
 
         uri = self.github_url + "/info/refs?service=git-upload-pack"
-        resp = requests.get(uri)
+        resp = requests.get(uri, verify=TLS_VERIFY)
         resp.raise_for_status()
         lines = resp.content.decode("latin-1").splitlines()
 

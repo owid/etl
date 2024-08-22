@@ -1,13 +1,14 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common_display: &common_display
-      zeroDay: "2020-01-21"
-      yearIsDay: true
+    zeroDay: "2020-01-21"
+    yearIsDay: true
   daily_population: &daily_population |-
     This indicator is estimated by normalizing by population. We have used daily population estimates, which leads to changes in the denominator between datapoints from different days. For instance, the denominator for January 1st will be different to the one on January 2nd.
   common:
     display:
-      numDecimalPlaces: 3
+      numDecimalPlaces: 2
+      tolerance: 14
       <<: *common_display
     presentation:
       topic_tags:
@@ -23,200 +24,645 @@ dataset:
 tables:
   cases_deaths:
     variables:
-      # Absolute values
-      new_cases:
-        title: Daily new confirmed cases of COVID-19
-        description_short: |-
-          New confirmed cases of COVID-19. Counts can include probable cases, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
-        unit: 'cases'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
+      # Cases
+      #######################
 
+      ## Cumulative
       total_cases:
         title: Total confirmed cases of COVID-19
         description_short: Total confirmed cases of COVID-19. Counts can include probable cases, where reported.
-        unit: 'cases'
+        unit: "cases"
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *common_display
-
-      new_deaths:
-        title: Daily new confirmed deaths due to COVID-19
-        description_short: |-
-          New deaths attributed to COVID-19. Counts can include probable deaths, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
-        unit: 'deaths'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
-
-      total_deaths:
-        title: Total confirmed deaths due to COVID-19
-        description_short: |-
-          Total deaths attributed to COVID-19. Counts can include probable deaths, where reported.
-        unit: 'deaths'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
-
-      # Per million
-      new_cases_per_million:
-        title: "Daily new confirmed cases of COVID-19 per million people"
-        description_short: |-
-          New confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
-        description_processing: *daily_population
-        unit: 'cases per million people'
-
-      new_deaths_per_million:
-        title: "Daily new confirmed deaths due to COVID-19 per million people"
-        description_short: |-
-          New deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
-        description_processing: *daily_population
-        unit: 'deaths per million people'
-
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 cases
+            subtitle: Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000]
+                baseColorScheme: RdPu
       total_cases_per_million:
         title: "Total confirmed cases of COVID-19 per million people"
         description_short: |-
           Total confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
         description_processing: *daily_population
-        unit: 'cases per million people'
+        unit: "cases per million people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 cases per million people
+            subtitle: Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                baseColorScheme: OrRd
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          <<: *common_display
 
-      total_deaths_per_million:
-        title: "Total confirmed deaths due to COVID-19 per million people"
+      ## Daily
+      new_cases:
+        title: Daily new confirmed cases of COVID-19
         description_short: |-
-          Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+          New confirmed cases of COVID-19. Counts can include probable cases, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
+        unit: "cases"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 14
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 cases
+            subtitle: Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                baseColorScheme: RdPu
+      new_cases_per_million:
+        title: "Daily new confirmed cases of COVID-19 per million people"
+        description_short: |-
+          New confirmed cases of COVID-19 per 1,000,000 people. Counts can include probable cases, where reported.
         description_processing: *daily_population
-        unit: 'deaths per million people'
+        unit: "cases per million people"
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 cases per million people
+            subtitle: Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+                baseColorScheme: OrRd
 
-      # Days since
+      ## Daily (smoothed)
+      new_cases_7_day_avg_right:
+        title: "Daily new confirmed cases due to COVID-19 (rolling 7-day average, right-aligned)"
+        unit: "cases"
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 cases
+            subtitle: 7-day rolling average. Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                baseColorScheme: RdPu
+      new_cases_per_million_7_day_avg_right:
+        title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
+        unit: "cases per million people"
+        description_processing: *daily_population
+        display:
+          name: New cases (per 1M)
+          numDecimalPlaces: 3
+          tolerance: 14
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 cases per million people
+            subtitle: 7-day rolling average. Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+                baseColorScheme: OrRd
+
+      ## Days since
       days_since_100_total_cases:
         title: "Days since the total confirmed cases of COVID-19 reached 100"
-        unit: 'days'
+        unit: "days"
         display:
           numDecimalPlaces: 0
           <<: *common_display
-
       days_since_100_total_cases_and_5m_pop:
         title: "Days since the total confirmed cases of COVID-19 reached 100 (with population ≥ 5M)"
-        unit: 'days'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
-
-      days_since_5_total_deaths:
-        title: "Days since the total confirmed deaths of COVID-19 reached 5"
-        unit: 'days'
+        unit: "days"
         display:
           numDecimalPlaces: 0
           <<: *common_display
       days_since_1_total_cases_per_million:
         title: "Days since the total confirmed cases of COVID-19 per million people reached 1"
         description_processing: *daily_population
-        unit: 'days'
+        unit: "days"
+        display:
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      ## Weekly
+      weekly_cases:
+        title: Weekly cases
+        unit: "cases"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Weekly confirmed COVID-19 cases
+            subtitle: Weekly confirmed cases refer to the cumulative number of confirmed cases over the previous week.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000]
+                baseColorScheme: RdPu
+      weekly_cases_per_million:
+        title: "Weekly cases per million people"
+        unit: "cases per million people"
+        description_processing: *daily_population
+        presentation:
+          grapher_config:
+            title: Weekly confirmed COVID-19 cases per million people
+            subtitle: Weekly confirmed cases refer to the cumulative number of confirmed cases over the previous week.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 50, 100, 500, 1000, 5000, 10000, 50000]
+                baseColorScheme: OrRd
+        display:
+          numDecimalPlaces: 3
+          tolerance: 30
+          <<: *common_display
+      weekly_pct_growth_cases:
+        title: Weekly case growth (%)
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            title: Week by week change of confirmed COVID-19 cases
+            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed cases over the last seven days relative to the number in the previous seven days.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 500]
+                colorSchemeInvert: true
+                baseColorScheme: RdBu
+        display:
+          numDecimalPlaces: 2
+          tolerance: 30
+          <<: *common_display
+
+      ## Biweekly
+      biweekly_cases:
+        title: Biweekly cases
+        unit: "cases"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly confirmed COVID-19 cases
+            subtitle: Biweekly confirmed cases refer to the cumulative number of confirmed cases over the previous two weeks.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+                baseColorScheme: RdPu
+      biweekly_cases_per_million:
+        title: "Biweekly cases per million people"
+        unit: "cases per million people"
+        description_processing: *daily_population
+        display:
+          numDecimalPlaces: 0
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly confirmed COVID-19 cases per million people
+            subtitle: Biweekly confirmed cases refer to the cumulative number of confirmed cases over the previous two weeks.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+                baseColorScheme: OrRd
+      biweekly_pct_growth_cases:
+        title: Biweekly case growth (%)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly change of confirmed COVID-19 cases
+            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed cases over the last 14 days relative to the number in the previous 14 days.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [-200, -100, -40, 0, 40, 100, 200, 400, 1000]
+                colorSchemeInvert: true
+                baseColorScheme: RdBu
+
+      # Deaths
+      ################
+
+      ## Cumulative
+      total_deaths:
+        title: Total confirmed deaths due to COVID-19
+        description_short: |-
+          Total deaths attributed to COVID-19. Counts can include probable deaths, where reported.
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 9999
+          color: "#565656"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000]
+                baseColorScheme: RdPu
+      total_deaths_per_million:
+        title: "Total confirmed deaths due to COVID-19 per million people"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per million people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths per million people
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1000, 2000, 3000, 4000, 5000, 6000]
+                baseColorScheme: OrRd
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          color: "#565656"
+          <<: *common_display
+      total_deaths_per_100k:
+        title: "Total confirmed deaths due to COVID-19 per 100,000 people"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths per 100,000 people
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+        display:
+          numDecimalPlaces: 3
+          tolerance: 9999
+          color: "#565656"
+          name: Confirmed COVID-19 deaths (per 100,000)
+          <<: *common_display
+
+      ## Daily
+      new_deaths:
+        title: Daily new confirmed deaths due to COVID-19
+        description_short: |-
+          New deaths attributed to COVID-19. Counts can include probable deaths, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 14
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 deaths
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, -1]
+                baseColorScheme: RdPu
+      new_deaths_per_million:
+        title: "Daily new confirmed deaths due to COVID-19 per million people"
+        description_short: |-
+          New deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per million people"
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 deaths per million people
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                baseColorScheme: OrRd
+      new_deaths_per_100k:
+        title: "Daily new confirmed deaths due to COVID-19 per 100,000 people"
+        description_short: |-
+          New deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
+
+      ## Daily (smoothed)
+      new_deaths_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)"
+        unit: "deaths"
+        display:
+          name: Confirmed COVID-19 deaths
+          numDecimalPlaces: 2
+          tolerance: 14
+          color: "#565656"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 deaths
+            subtitle: 7-day rolling average. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
+                baseColorScheme: RdPu
+      new_deaths_per_million_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
+        unit: "deaths per million people"
+        description_processing: *daily_population
+        display:
+          name: New deaths (per 1M)
+          numDecimalPlaces: 2
+          tolerance: 14
+          color: "#565656"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Daily new confirmed COVID-19 deaths per million people
+            subtitle: 7-day rolling average. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                baseColorScheme: OrRd
+      new_deaths_per_100k_7_day_avg_right:
+        title: "Daily new confirmed deaths due to COVID-19 per 100,000 people (rolling 7-day average, right-aligned)"
+        unit: "deaths per 100,000 people"
+        description_processing: *daily_population
+        display:
+          name: Confirmed COVID-19 deaths (per 100,000)
+          numDecimalPlaces: 3
+          tolerance: 14
+          color: "#565656"
+          <<: *common_display
+
+      ## Days since
+      days_since_5_total_deaths:
+        title: "Days since the total confirmed deaths of COVID-19 reached 5"
+        unit: "days"
         display:
           numDecimalPlaces: 0
           <<: *common_display
       days_since_0_1_total_deaths_per_million:
         title: "Days since the total confirmed deaths of COVID-19 per million people reached 0.1"
         description_processing: *daily_population
-        unit: 'days'
+        unit: "days"
         display:
           numDecimalPlaces: 0
           <<: *common_display
 
-      # Rolling averages
-      new_cases_7_day_avg_right:
-        title: "Daily new confirmed cases due to COVID-19 (rolling 7-day average, right-aligned)"
-        unit: 'cases'
-      new_deaths_7_day_avg_right:
-        title: "Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)"
-        unit: 'deaths'
-
-      # Rolling averages - per million
-      new_cases_per_million_7_day_avg_right:
-        title: "Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)"
-        unit: 'cases per million people'
-        description_processing: *daily_population
-      new_deaths_per_million_7_day_avg_right:
-        title: "Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)"
-        unit: 'deaths per million people'
-        description_processing: *daily_population
-
-      # Case fatality ratio
-      cfr:
-        title: "Case fatality rate of COVID-19 (%)"
-        unit: '%'
-        short_unit: '%'
-      cfr_100_cases:
-        title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
-        unit: '%'
-        short_unit: '%'
-
-      # Weekly aggregates
-      weekly_cases:
-        title: Weekly cases
-        unit: 'cases'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
+      ## Weekly
       weekly_deaths:
         title: Weekly deaths
-        unit: 'deaths'
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
+          tolerance: 30
           <<: *common_display
-      weekly_pct_growth_cases:
-        title: Weekly case growth (%)
-        unit: '%'
-        short_unit: '%'
-      weekly_pct_growth_deaths:
-        title: Weekly death growth (%)
-        unit: '%'
-        short_unit: '%'
-
-      # Biweekly aggregates
-      biweekly_cases:
-        title: Biweekly cases
-        unit: 'cases'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
-      biweekly_deaths:
-        title: Biweekly deaths
-        unit: 'deaths'
-        display:
-          numDecimalPlaces: 0
-          <<: *common_display
-      biweekly_pct_growth_cases:
-        title: Biweekly case growth (%)
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          <<: *common_display
-      biweekly_pct_growth_deaths:
-        title: Biweekly death growth (%)
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 1
-          <<: *common_display
-
-      # Weekly aggregates per capita
-      weekly_cases_per_million:
-        title: "Weekly cases per million people"
-        unit: 'cases per million people'
-        description_processing: *daily_population
+        presentation:
+          grapher_config:
+            title: Weekly confirmed COVID-19 deaths
+            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [50, 100, 500, 1000, 5000, 10000, 50000]
+                baseColorScheme: RdPu
       weekly_deaths_per_million:
         title: "Weekly deaths per million people"
-        unit: 'deaths per million people'
+        unit: "deaths per million people"
         description_processing: *daily_population
-      # Biweekly aggregates per capita
-      biweekly_cases_per_million:
-        title: "Biweekly cases per million people"
-        unit: 'cases per million people'
-        description_processing: *daily_population
+        presentation:
+          grapher_config:
+            title: Weekly confirmed COVID-19 deaths per million people
+            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1, 5, 10, 50, 100, 500]
+                baseColorScheme: OrRd
+        display:
+          numDecimalPlaces: 2
+          tolerance: 30
+          <<: *common_display
+      weekly_pct_growth_deaths:
+        title: Weekly death growth (%)
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          grapher_config:
+            title: Week by week change of confirmed COVID-19 deaths
+            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [-50, -25, -10, 0, 10, 25, 50, 100, 300]
+                colorSchemeInvert: true
+                baseColorScheme: RdBu
+
+        display:
+          numDecimalPlaces: 2
+          tolerance: 30
+          <<: *common_display
+
+      ## Biweekly
+      biweekly_deaths:
+        title: Biweekly deaths
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly confirmed COVID-19 deaths
+            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous two weeks. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [50, 100, 500, 1000, 5000, 10000, 50000]
+                baseColorScheme: RdPu
       biweekly_deaths_per_million:
         title: "Biweekly deaths per million people"
-        unit: 'deaths per million people'
+        unit: "deaths per million people"
         description_processing: *daily_population
+        display:
+          numDecimalPlaces: 2
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly confirmed COVID-19 deaths per million people
+            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [1, 5, 10, 50, 100, 500]
+                baseColorScheme: OrRd
+      biweekly_pct_growth_deaths:
+        title: Biweekly death growth (%)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 30
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Biweekly change of confirmed COVID-19 deaths
+            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed deaths over the last 14 days relative to the number in the previous 14 days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [-50, -25, -10, 0, 10, 25, 50, 100, 300]
+                colorSchemeInvert: true
+                baseColorScheme: RdBu
+
+      # Last 12 months
+      ## Cumulative
+      total_deaths_last12m:
+        title: Total confirmed deaths due to COVID-19 (last 12 months)
+        description_short: |-
+          Total deaths attributed to COVID-19. Counts can include probable deaths, where reported.
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+          name: Confirmed COVID-19 deaths
+          tolerance: 9999
+          color: "#565656"
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths in the last 12 months
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+                baseColorScheme: RdPu
+      total_deaths_per_million_last12m:
+        title: "Total confirmed deaths due to COVID-19 per million people (last 12 months)"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 1,000,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per million people"
+        presentation:
+          grapher_config:
+            title: Cumulative confirmed COVID-19 deaths per million people in the last 12 months
+            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000]
+                baseColorScheme: OrRd
+        display:
+          numDecimalPlaces: 2
+          tolerance: 9999
+          color: "#565656"
+          <<: *common_display
+      total_deaths_per_100k_last12m:
+        title: "Total confirmed deaths due to COVID-19 per 100,000 people (last 12 months)"
+        description_short: |-
+          Total deaths attributed to COVID-19 per 100,000 people. Counts can include probable deaths, where reported.
+        description_processing: *daily_population
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 9999
+          color: "#565656"
+          name: Confirmed COVID-19 deaths (per 100,000)
+          <<: *common_display
+
+      # Case fatality ratio
+      #######################
+      cfr:
+        title: "Case fatality rate of COVID-19 (%)"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 2
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Case fatality rate of COVID-19
+            subtitle: The case fatality rate (CFR) is the ratio between confirmed deaths and confirmed cases. The CFR can be a poor measure of the mortality risk of the disease.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+                baseColorScheme: YlGnBu
+      cfr_100_cases:
+        title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
+        unit: "%"
+        short_unit: "%"
+      cfr_short_term:
+        title: Case fatality rate of COVID-19 (short-term, %)
+        description_processing: |-
+          We compute number of deaths divided by number of cases 10 days before.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          tolerance: 2
+          <<: *common_display
+        presentation:
+          grapher_config:
+            title: Moving-average case fatality rate of COVID-19
+            subtitle: The case fatality rate (CFR) is the ratio between confirmed deaths and confirmed cases. Our rolling-average CFR is calculated as the ratio between the 7-day average number of deaths and the 7-day average number of cases 10 days earlier.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+                baseColorScheme: Reds

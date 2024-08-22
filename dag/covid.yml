@@ -1,4 +1,42 @@
 steps:
+  # Explorer
+  data-private://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+
+  # Compact dataset (similar to former megafile)
+  data://garden/covid/latest/compact:
+    # COVID
+    - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/vaccinations_global
+    - data://garden/covid/latest/hospital
+    - data://garden/covid/latest/oxcgrt_policy
+    - data://garden/covid/latest/tracking_r
+    - data://garden/covid/latest/testing
+    - data://garden/covid/latest/combined
+    - data://garden/excess_mortality/latest/excess_mortality
+    # Regions
+    - data://garden/regions/2023-01-01/regions
+    # Demography
+    - data://garden/demography/2024-07-15/population
+    - data://garden/demography/2023-10-09/life_expectancy
+    - data://garden/un/2024-07-12/un_wpp
+    # Econ
+    - data://garden/wb/2024-03-27/world_bank_pip
+    - data://garden/un/2024-04-09/undp_hdr
+    # Health
+    - data://garden/wash/2024-01-06/who
+    - data://garden/who/2024-07-30/ghe
+    # WDI
+    - data://garden/worldbank_wdi/2024-05-20/wdi
 
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
@@ -19,7 +57,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
-
 
   # JHU - cases and deaths
   data://meadow/covid/latest/john_hopkins_university:
@@ -118,6 +155,7 @@ steps:
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/sequence
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/combined:
     - data://garden/covid/latest/combined
@@ -200,7 +238,6 @@ steps:
     - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/output-for-interactive/by_location_full_data.csv
   data://garden/excess_mortality/latest/excess_mortality_economist:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
-    - data://garden/regions/2023-01-01/regions
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
 

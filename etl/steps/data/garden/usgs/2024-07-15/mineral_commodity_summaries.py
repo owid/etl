@@ -107,14 +107,18 @@ COMMODITY_MAPPING = {
     ("Chromium", "Mine production, marketable chromite ore"): None,
     ("Chromium", "Mne production, grosss weight, marketable chromite ore"): None,
     ("Chromium", "Mne production, marketable chromite ore, gross weight"): None,
-    ("Clays", "Bentonite, mine production"): ("Clays", "Mine, bentonite"),
-    ("Clays", "Fuller's earth, mine production"): ("Clays", "Mine, fuller's earth"),
-    # NOTE: There is good agreement between USGS current and BGS production data for Kaolin for several countries,
-    #  including the US. But for the World (and a few other countries), USGS current is significantly higher.
-    ("Clays", "Kaolin, mine production"): ("Clays", "Mine, kaolin"),
-    ("Clays", "Mine poduction, Bentonite"): ("Clays", "Mine, bentonite"),
-    ("Clays", "Mine poduction, Fuller's earth"): ("Clays", "Mine, fuller's earth"),
-    ("Clays", "Mine poduction, Kaolin"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Clays", "Bentonite, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Clays", "Fuller's earth, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Clays", "Kaolin, mine production"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Bentonite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Fuller's earth"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Clays", "Mine poduction, Kaolin"): None,
     ("Cobalt", "Mine production, contained cobalt"): ("Cobalt", "Mine"),
     ("Cobalt", "Mine production, metric tons of contained cobalt"): ("Cobalt", "Mine"),
     ("Copper", "Mine production, contained copper"): ("Copper", "Mine"),
@@ -167,13 +171,20 @@ COMMODITY_MAPPING = {
     ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher and red iron oxide)"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments (ocher)"): None,
     ("Iron oxide pigments", "Mine production, iron oxide pigments (umber)"): None,
-    ("Kyanite", "Kyanite and Related Minerals"): ("Kyanite", "Mine, kyanite and related minerals"),
-    ("Kyanite", "Mine production, andalusite"): ("Andalusite", "Mine"),
-    ("Kyanite", "Mine production, kyanite"): ("Kyanite", "Mine"),
-    ("Kyanite", "Mine production, kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
-    ("Kyanite", "andalusite"): ("Andalusite", "Mine"),
-    ("Kyanite", "kyanite"): ("Kyanite", "Mine"),
-    ("Kyanite", "kyanite and sillimanite"): ("Kyanite", "Mine, kyanite and sillimanite"),
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and related minerals"), but it has very sparse data.
+    ("Kyanite", "Kyanite and Related Minerals"): None,
+    # NOTE: The following could be mapped to ("Andalusite", "Mine"), but it has sparse data (without global data).
+    ("Kyanite", "Mine production, andalusite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
+    ("Kyanite", "Mine production, kyanite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
+    ("Kyanite", "Mine production, kyanite and sillimanite"): None,
+    # NOTE: The following could be mapped to ("Andalusite", "Mine"), but it has sparse data (without global data).
+    ("Kyanite", "andalusite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does BGS).
+    ("Kyanite", "kyanite"): None,
+    # NOTE: The following could be mapped to ("Kyanite", "Mine, kyanite and sillimanite"), but it has very sparse data.
+    ("Kyanite", "kyanite and sillimanite"): None,
     ("Lead", "Mine production"): ("Lead", "Mine"),
     ("Lead", "Mine production, lead content"): ("Lead", "Mine"),
     ("Lime", "Plant production"): ("Lime", "Processing"),
@@ -214,8 +225,10 @@ COMMODITY_MAPPING = {
     ("Niobium (columbium)", "Mine production, niobium content"): ("Niobium", "Mine"),
     ("Nitrogen (fixed)-ammonia", "Plant production"): ("Nitrogen", "Fixed ammonia"),
     ("Nitrogen (fixed)-ammonia", "Plant production, ammonia - contained nitrogen"): ("Nitrogen", "Fixed ammonia"),
-    ("Peat", "Mine production"): ("Peat", "Mine"),
-    ("Peat", "Mine production, peat"): ("Peat", "Mine"),
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Mine production, peat"): None,
     ("Perlite", "Mine production"): ("Perlite", "Mine"),
     ("Perlite", "Mine production, perlite"): ("Perlite", "Mine"),
     ("Phosphate rock", "Mine production"): ("Phosphate rock", "Mine"),
@@ -226,9 +239,12 @@ COMMODITY_MAPPING = {
     ("Platinum-group metals", "World mine production: Platinum"): ("Platinum group metals", "Mine, platinum"),
     ("Potash", "Mine production"): ("Potash", "Mine"),
     ("Potash", "Mine production, potassium oxide (K2O) equivalent"): ("Potash", "Mine"),
-    ("Pumice and pumicite", "Mine production"): ("Pumice and pumicite", "Mine"),
-    ("Pumice and pumicite", "Mine production, puice and pumicite"): ("Pumice and pumicite", "Mine"),
-    ("Pumice and pumicite", "Mine production, pumice and pumicite"): ("Pumice and pumicite", "Mine"),
+    # NOTE: The following could be mapped to ("Pumice and pumicite", "Mine").
+    # However, the resulting World aggregate is significantly larger than from USGS historical.
+    # This is possibly caused by a sudden increase in production in Turkey in 2022 and 2023, found in the 2024 file.
+    ("Pumice and pumicite", "Mine production"): None,
+    ("Pumice and pumicite", "Mine production, puice and pumicite"): None,
+    ("Pumice and pumicite", "Mine production, pumice and pumicite"): None,
     ("Rare earths", "Mine production, metric tons of rare-earth-oxide (REO) equivalent"): (
         "Rare earths",
         "Mine",
@@ -275,7 +291,8 @@ COMMODITY_MAPPING = {
         "Natural and synthetic",
     ),
     ("Soda ash", "World total production, synthetic soda ash (rounded)"): ("Soda ash", "Synthetic"),
-    ("Stone (dimension)", "Mine production, dimension stone"): ("Dimension stone", "Mine"),
+    # NOTE: The following could be mapped to ("Dimension stone", "Mine"), but it has only US data, not global.
+    ("Stone (dimension)", "Mine production, dimension stone"): None,
     ("Strontium", "Mine production"): ("Strontium", "Mine"),
     ("Strontium", "Mine production, contained strontium"): ("Strontium", "Mine"),
     ("Sulfur", "Production, all forms, contained sulfur"): ("Sulfur", "Processing"),
@@ -291,8 +308,10 @@ COMMODITY_MAPPING = {
     ("Talc and pyrophyllite", "Mine production, unspecified talc and/or pyrophyllite"): None,
     ("Tantalum", "Mine production"): ("Tantalum", "Mine"),
     ("Tantalum", "Mine production, tantalum content"): ("Tantalum", "Mine"),
-    ("Tellurium", "Mine production"): ("Tellurium", "Mine"),
-    ("Tellurium", "Refinery production, tellurium content"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Mine"). However, we decided to discard Tellurium.
+    ("Tellurium", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium", "Refinery production, tellurium content"): None,
     ("Tin", "Mine production, metric tons contained tin"): ("Tin", "Mine"),
     ("Tin", "Mine production, tin content"): ("Tin", "Mine"),
     ("Titanium and titanium dioxide", "Sponge Metal Production and Sponge and Pigment Capacity"): None,
@@ -337,11 +356,16 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Mine production, tungsten content"): ("Tungsten", "Mine"),
     ("Vanadium", "Mine production"): ("Vanadium", "Mine"),
     ("Vanadium", "Mine production, vanadium content"): ("Vanadium", "Mine"),
-    ("Vermiculite", "Mine production"): ("Vermiculite", "Mine"),
-    ("Wollastonite", "Mine production"): ("Wollastonite", "Mine"),
-    ("Wollastonite", "Mine production, wollastonite"): ("Wollastonite", "Mine"),
-    ("Zeolites (natural)", "Mine production"): ("Zeolites", "Mine"),
-    ("Zeolites (natural)", "Mine production, zeolites"): ("Zeolites", "Mine"),
+    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
+    ("Vermiculite", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Wollastonite", "Mine"). However, we decided to discard Wollastonite.
+    ("Wollastonite", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Wollastonite", "Mine"). However, we decided to discard Wollastonite.
+    ("Wollastonite", "Mine production, wollastonite"): None,
+    # NOTE: The following could be mapped to ("Zeolites", "Mine"). However, we decided to discard zeolites.
+    ("Zeolites (natural)", "Mine production"): None,
+    # NOTE: The following could be mapped to ("Zeolites", "Mine"). However, we decided to discard zeolites.
+    ("Zeolites (natural)", "Mine production, zeolites"): None,
     ("Zinc", "Mine production, zinc content of concentrates and direct shipping ores"): (
         "Zinc",
         "Mine",
@@ -366,16 +390,20 @@ FOOTNOTES = {
     "production|Silicon|Processing|tonnes": "Values refer to silicon content of ferrosilicon and silicon metal.",
     "reserves|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
+    # "production|Titanium|Sponge|tonnes": "Values refer to titanium sponge.",
     "reserves|Titanium|Mine, ilmenite|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "reserves|Titanium|Mine, rutile|tonnes": "Values are reported as tonnes of titanium dioxide content.",
     "production|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
-    "reserves|Potash|Mine|tonnes": "Values are reported in tonnes of potassium oxide equivalent.",
+    "reserves|Potash|Mine|tonnes": "Values refer to ore in tonnes of potassium oxide equivalent.",
     "production|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
     "reserves|Rare earths|Mine|tonnes": "Values are reported in tonnes of rare-earth-oxide equivalent.",
-    "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
-    "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    # NOTE: We decided to discard zeolites.
+    # "production|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
+    # NOTE: We decided to discard zeolites.
+    # "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
+    "reserves|Platinum group metals|Mine, platinum|tonnes": "Reserves include all platinum group metals.",
 }
 
 # Dictionary of special units.
@@ -517,6 +545,22 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         # whatever reason not in any of the "notes" columns).
         # For simplicity, simply remove this row.
         d = d[d["Reserves_kt"].str.lower() != "included with ilmenite"].reset_index(drop=True)
+    if (year == 2023) & (mineral == "VANADIUM"):
+        # Reserves column is called "Reserves_t", however, the numbers clearly show kilotonnes.
+        # See that the world reserves in this file are 26000 tonnes, wheres in the file for 2024 they are 19 million tonnes.
+        d = d.rename(columns={"Reserves_t": "Reserves_kt"}, errors="raise")
+    if (year == 2024) & (mineral == "TALC AND PYROPHYLLITE"):
+        # Reserves column is called "Reserves_t", however, the numbers clearly show kilotonnes.
+        # See that the metadata xml file mentions "Reserves_kt", and the 2023 file is in kilotonnes.
+        d = d.rename(columns={"Reserves_t": "Reserves_kt"}, errors="raise")
+    if (year == 2024) & (mineral == "SELENIUM"):
+        # Reserves column is called "Reserves_kt", however, the numbers show tonnes.
+        # See that the metadata xml file mentions "Reserves_t", and the 2023 file is in tonnes.
+        d = d.rename(columns={"Reserves_kt": "Reserves_t"}, errors="raise")
+    if (year == 2023) & (mineral == "RHENIUM"):
+        # Reserves column is called "Reserves_kt", however, the numbers show kilograms.
+        # See that the metadata xml file mentions "Reserves_kg", and the 2024 file is in kg.
+        d = d.rename(columns={"Reserves_kt": "Reserves_kg"}, errors="raise")
 
     ############################################################################################################
 
@@ -604,8 +648,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Optional
         elif unit_reserves == "ore_kt":
             d["Reserves_ore_kt"] *= 1e3
             d = d.rename(columns={"Reserves_ore_kt": "Reserves_t"}, errors="raise")
-            # Add a note explaining that the data is for ore.
-            d["Reserves_notes"] = [note + ["Reserves refer to ore."] for note in d["Reserves_notes"]]
+            # A footnote will mention that reserves refer to ore (see FOOTNOTES).
         elif unit_reserves in ["Mt", "mt"]:
             d[f"Reserves_{unit_reserves}"] *= 1e6
             d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
@@ -680,8 +723,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: Dict[str, str]) -> Option
         # Handle special case.
         if unit_production == "Sponge_t":
             unit_production = "t"
-            # Add a note explaining that the data is for ore.
-            d["Production_notes"] = [note + ["Production refers to titanium sponge."] for note in d["Reserves_notes"]]
+            # A footnote will be added to mention that it refers to sponge (see FOOTNOTES).
         if d["Mineral"].unique().item() == "Soda ash":  # type: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
@@ -1081,6 +1123,18 @@ def run(dest_dir: str) -> None:
 
     # Drop empty columns, if any.
     tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
+
+    ####################################################################################################################
+    # Corrections to USGS current data.
+    # Zinc mine reserves in Australia in 2022 is unreasonably high, much larger than the world.
+    tb_flat.loc[(tb_flat["country"] == "Australia") & (tb_flat["year"] == 2022), "reserves|Zinc|Mine|tonnes"] = None
+
+    # Asbestos mine production in Kazakhstan 2020, data says "27400", but in BGS, it is "227400", which is much more
+    # reasonable, looking at prior and posterior data. So it looks like an error in the data. Remove that point.
+    tb_flat.loc[
+        (tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"
+    ] = None
+    ####################################################################################################################
 
     # Format tables conveniently.
     tb = tb.format(["country", "year", "commodity", "sub_commodity"], short_name=paths.short_name)

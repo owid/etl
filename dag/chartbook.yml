@@ -125,12 +125,6 @@ steps:
   data://garden/chartbook/2024-08-14/atkinson_2008_canada:
     - data://meadow/chartbook/2024-08-14/atkinson_2008_canada
 
-  # Decile ratios for gross income from OECD Data Explorer (live, multiple countries)
-  data://meadow/oecd/2024-08-15/decile_ratios:
-    - snapshot://oecd/2024-08-15/decile_ratios.csv
-  data://garden/oecd/2024-08-15/decile_ratios:
-    - data://meadow/oecd/2024-08-15/decile_ratios
-
    # Wealth share of the top 1% (Davies, Di Matteo, 2020)
   data://meadow/chartbook/2024-08-15/davies_di_matteo_2020_canada:
     - snapshot://chartbook/2024-08-15/davies_di_matteo_2020_canada.csv
@@ -220,6 +214,22 @@ steps:
     - data://meadow/chartbook/2024-05-23/wealth_france
 
   ################################################################################################
+  # GERMANY
+  ################################################################################################
+  # Gini coefficients in West Germany (Becker, 1997)
+  data://meadow/chartbook/2024-08-19/becker_1997_germany:
+    - snapshot://chartbook/2024-08-19/becker_1997_germany.csv
+  data://garden/chartbook/2024-08-19/becker_1997_germany:
+    - data://meadow/chartbook/2024-08-19/becker_1997_germany
+
+  #  SOEPmonitor data (1984-2013)
+  data://meadow/chartbook/2024-08-20/soepmonitor_1984_2013_germany:
+    - snapshot://chartbook/2024-08-20/soepmonitor_1984_2013_germany_gini.csv
+    - snapshot://chartbook/2024-08-20/soepmonitor_1984_2013_germany_relative_poverty.csv
+  data://garden/chartbook/2024-08-20/soepmonitor_1984_2013_germany:
+    - data://meadow/chartbook/2024-08-20/soepmonitor_1984_2013_germany
+
+  ################################################################################################
   # UNITED KINGDOM
   ################################################################################################
 
@@ -228,3 +238,18 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
+
+  ################################################################################################
+  # MULTIPLE-COUNTRY DATASETS
+  ################################################################################################
+  # Decile ratios for gross income from OECD Data Explorer (live, multiple countries)
+  data://meadow/oecd/2024-08-15/decile_ratios:
+    - snapshot://oecd/2024-08-15/decile_ratios.csv
+  data://garden/oecd/2024-08-15/decile_ratios:
+    - data://meadow/oecd/2024-08-15/decile_ratios
+
+  # Long-Run Trends in the Distribution of Income and Wealth (Roine and Waldenström, 2015)
+  data://meadow/chartbook/2024-08-19/roine_waldenstrom_2015:
+    - snapshot://chartbook/2024-08-19/roine_waldenstrom_2015.csv
+  data://garden/chartbook/2024-08-19/roine_waldenstrom_2015:
+    - data://meadow/chartbook/2024-08-19/roine_waldenstrom_2015

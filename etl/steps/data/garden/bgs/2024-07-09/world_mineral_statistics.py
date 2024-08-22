@@ -4,6 +4,7 @@ import ast
 import json
 from typing import Dict, List
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from tqdm.auto import tqdm
@@ -85,19 +86,25 @@ COMMODITY_MAPPING = {
     ("Bauxite, alumina and aluminium", "Unwrought"): None,
     ("Bauxite, alumina and aluminium", "Unwrought & scrap"): None,
     ("Bauxite, alumina and aluminium", "Unwrought alloys"): None,
-    ("Bentonite and fuller's earth", "Attapulgite"): ("Clays", "Mine, attapulgite"),
-    ("Bentonite and fuller's earth", "Bentonite"): ("Clays", "Mine, bentonite"),
-    ("Bentonite and fuller's earth", "Fuller's earth"): ("Clays", "Mine, fuller's earth"),
-    ("Bentonite and fuller's earth", "Sepiolite"): ("Clays", "Mine, sepiolite"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, attapulgite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Attapulgite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Bentonite"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Fuller's earth"): None,
+    # NOTE: The following could be mapped to ("Clays", "Mine, sepiolite"). We decided to remove "Clays".
+    ("Bentonite and fuller's earth", "Sepiolite"): None,
     ("Bentonite and fuller's earth", "Unknown"): None,
-    ("Beryl", "Unknown"): ("Beryl", "Mine"),
+    # NOTE: Beryl data may have a data issue: The biggest producer is Namibia, which goes from 15 in 1993 to 15000 in
+    #  2021. Discard for now.
+    ("Beryl", "Unknown"): None,
     ("Bismuth", "Compounds"): ("Bismuth", "Compounds"),
     ("Bismuth", "Metal"): ("Bismuth", "Metal"),
     ("Bismuth", "Ores & concentrates"): ("Bismuth", "Ores & concentrates"),
     ("Bismuth, mine", "Unknown"): ("Bismuth", "Mine"),
     ("Borates", "Unknown"): None,
     ("Bromine", "Compounds"): ("Bromine", "Compounds"),
-    ("Bromine", "Unknown"): ("Bromine", "Unspecified"),
+    ("Bromine", "Unknown"): ("Bromine", "Processing"),
     ("Cadmium", "Metal"): ("Cadmium", "Refinery"),
     ("Cadmium", "Other"): None,
     ("Cadmium", "Oxide"): None,
@@ -111,6 +118,7 @@ COMMODITY_MAPPING = {
     ("Chromium", "Metal"): ("Chromium", "Refinery"),
     ("Chromium", "Ores & concentrates"): None,
     ("Chromium ores and concentrates", "Unknown"): None,
+    # NOTE: All subcommodities of coal production will be summed up into one.
     ("Coal", "Anthracite"): ("Coal", "Mine, anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Mine, anthracite & Bituminous"),
     # NOTE: Old data.
@@ -128,7 +136,9 @@ COMMODITY_MAPPING = {
     ("Coal", "Briquettes"): None,
     ("Coal", "Brown coal"): ("Coal", "Mine, brown coal"),
     ("Coal", "Brown coal & lignite"): ("Coal", "Mine, brown coal & lignite"),
-    ("Coal", "Coal"): ("Coal", "Mine, coal"),
+    # NOTE: The following sounds like it could be a total, but it's not. It is complementary to all other coal subtypes.
+    # Therefore, we will combine all coal subtypes into one (and check that there is no double-counting).
+    ("Coal", "Coal"): ("Coal", "Mine, other"),
     ("Coal", "Coking coal"): ("Coal", "Mine, coking coal"),
     ("Coal", "Hard coal"): ("Coal", "Mine, hard coal"),
     ("Coal", "Lignite"): ("Coal", "Mine, lignite"),
@@ -291,7 +301,8 @@ COMMODITY_MAPPING = {
     ("Iron, steel and ferro-alloys", "Sponge"): None,
     ("Iron, steel and ferro-alloys", "Sponge & powder"): None,
     ("Iron, steel and ferro-alloys", "Tin-plate scrap"): None,
-    ("Kaolin", "Unknown"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Kaolin", "Unknown"): None,
     ("Lead", "Ores & concentrates"): None,
     ("Lead", "Refined"): ("Lead", "Refinery"),
     ("Lead", "Scrap"): None,
@@ -368,8 +379,10 @@ COMMODITY_MAPPING = {
     #  units are explicitly mentioned, and sometimes the notes mention oil equivalent.
     ("Natural gas", "Unknown"): None,
     ("Nepheline syenite", "Nepheline concentrates"): None,
-    ("Nepheline syenite", "Nepheline-syenite"): ("Nepheline syenite", "Mine"),
-    ("Nepheline syenite", "Unknown"): ("Nepheline syenite", "Mine"),
+    # NOTE: The following could be mapped to ("Nepheline syenite", "Mine"), but it has very sparse and noisy data for just a few countries.
+    ("Nepheline syenite", "Nepheline-syenite"): None,
+    # NOTE: The following could be mapped to ("Nepheline syenite", "Mine"), but it has very sparse and noisy data for just a few countries.
+    ("Nepheline syenite", "Unknown"): None,
     ("Nickel", "Mattes, sinters etc"): None,
     ("Nickel", "Ores & concentrates"): None,
     ("Nickel", "Ores, concentrates & scrap"): None,
@@ -453,14 +466,16 @@ COMMODITY_MAPPING = {
     ("Rare earth minerals", "Bastnaesite"): None,
     ("Rare earth minerals", "Loparite"): None,
     ("Rare earth minerals", "Monazite"): None,
-    ("Rare earth minerals", "Unknown"): ("Rare earths", "Mine, ores & concentrates"),
+    # NOTE: The following could possibly be mapped to ("Rare earths", "Mine, ores & concentrates"), but it has only sparse data for a few countries.
+    ("Rare earth minerals", "Unknown"): None,
     ("Rare earth minerals", "Xenotime"): None,
     ("Rare earth oxides", "Unknown"): None,
     ("Rare earths", "Cerium compounds"): None,
     ("Rare earths", "Cerium metal"): None,
     ("Rare earths", "Ferro-cerium & other pyrophoric alloys"): None,
     ("Rare earths", "Metals"): ("Rare earths", "Refinery"),
-    ("Rare earths", "Ores & concentrates"): ("Rare earths", "Mine, ores & concentrates"),
+    # NOTE: The following could possibly be mapped to ("Rare earths", "Mine, ores & concentrates"), but it possibly is only for imports/exports data.
+    ("Rare earths", "Ores & concentrates"): None,
     ("Rare earths", "Other rare earth compounds"): None,
     ("Rare earths", "Rare earth compounds"): ("Rare earths", "Compounds"),
     ("Rhenium", "Unknown"): ("Rhenium", "Mine"),
@@ -481,14 +496,17 @@ COMMODITY_MAPPING = {
     # NOTE: Unclear what "Unknown" means, but it's significantly lower than USGS' "Mine".
     ("Salt", "Unknown"): None,
     ("Selenium, refined", "Unknown"): ("Selenium", "Refinery"),
-    ("Sillimanite minerals", "Andalusite"): ("Andalusite", "Mine"),
+    # NOTE: The following could be mapped to ("Andalusite", "Mine") (and so does USGS, which does not include global data).
+    ("Sillimanite minerals", "Andalusite"): None,
     ("Sillimanite minerals", "Andalusite & kyanite"): None,
-    ("Sillimanite minerals", "Kyanite"): ("Kyanite", "Mine"),
+    # NOTE: The following could possibly be mapped to ("Kyanite", "Mine"), but it has very sparse data (and so does USGS).
+    ("Sillimanite minerals", "Kyanite"): None,
     ("Sillimanite minerals", "Kyanite & related minerals"): None,
     ("Sillimanite minerals", "Mullite"): None,
     ("Sillimanite minerals", "Mullite, chamotte, dinas earth"): None,
     ("Sillimanite minerals", "Other"): None,
-    ("Sillimanite minerals", "Sillimanite"): ("Sillimanite", "Mine"),
+    # NOTE: The following could be mapped to ("Sillimanite", "Mine"), but it has very sparse data, and it's not included in USGS data.
+    ("Sillimanite minerals", "Sillimanite"): None,
     ("Sillimanite minerals", "Sillimanite minerals"): None,
     ("Sillimanite minerals", "Sillimanite minerals & dinas earth"): None,
     ("Sillimanite minerals", "Sillimanite minerals, calcined"): None,
@@ -564,7 +582,8 @@ COMMODITY_MAPPING = {
     ("Tantalum and niobium minerals", "Tantalite -Ta content"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Nb content)"): None,
     ("Tantalum and niobium minerals", "Tantalum & Niobium (Ta content)"): None,
-    ("Tellurium, refined", "Unknown"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium, refined", "Unknown"): None,
     ("Tin", "Concentrates"): None,
     ("Tin", "Scrap"): None,
     ("Tin", "Tin-silver ore"): None,
@@ -621,8 +640,10 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Vanadiferous residues"): ("Vanadium", "Vanadiferous residues"),
     ("Vanadium", "Vanadium-titanium pig iron"): None,
     ("Vanadium, mine", "Unknown"): ("Vanadium", "Mine"),
-    ("Vermiculite", "Unknown"): ("Vermiculite", "Mine"),
-    ("Wollastonite", "Unknown"): ("Wollastonite", "Mine"),
+    # NOTE: The following could be mapped to ("Vermiculite", "Mine"). However, we decided to discard Vemiculite.
+    ("Vermiculite", "Unknown"): None,
+    # NOTE: The following could be mapped to ("Wollastonite", "Mine"). However, we decided to discard Wollastonite.
+    ("Wollastonite", "Unknown"): None,
     ("Zinc", "Crude & refined"): None,
     ("Zinc", "Ores & concentrates"): None,
     ("Zinc", "Oxides"): None,
@@ -701,7 +722,9 @@ FOOTNOTES = {
 # There are many historical regions with overlapping data with their successor countries.
 # Accept only overlaps on the year when the historical country stopped existing.
 # NOTE: We decided to not include region aggregates, but this is still relevant because, to create world data, we first
-# create data for continents, then build an aggregate for the world, and then remove continents.
+#  create data for continents, then build an aggregate for the world, and then remove continents.
+#  World data aggregated in this step will be used in the garden minerals step to compare it with the World data given
+#  by USGS. But the World data created in this step will then be removed and not shown in the minerals explorer.
 # NOTE: Some of the overlaps occur only for certain commodities.
 ACCEPTED_OVERLAPS = [
     # {1991: {"USSR", "Armenia"}},
@@ -988,6 +1011,101 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     return tb
 
 
+def aggregate_coal(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # Check that categories like "Mine, brown coal & lignite" are not the combination of "Mine, brown coal" and "Mine, lignite".
+    # Indeed, such pairs never overlap. So, we can safely add up all coal contributions into one total category.
+
+    # import plotly.express as px
+    # coal_agg = tb[(tb["category"]=="Production")&(tb["commodity"]=="Coal")].groupby(["country", "year"], observed=True, as_index=False).agg({"value": "sum"})
+    # for country in sorted(set(coal_agg["country"])):
+    #     _coal_disagg = tb[(tb["country"]==country)&(tb["category"]=="Production")&(tb["commodity"]=="Coal")]
+    #     _coal_agg = coal_agg[coal_agg["country"]==country].assign(**{"sub_commodity": "SUM"})
+    #     compare = pd.concat([_coal_disagg, _coal_agg], ignore_index=True)
+    #     px.line(compare, x="year", y="value", color="sub_commodity", markers=True, title=country).show()
+
+    # Select coal production data.
+    tb_coal = tb[(tb["category"] == "Production") & (tb["commodity"] == "Coal")]
+
+    # Create a series with the sum of all coal data per country-year.
+    tb_coal_sum = tb_coal.groupby(["country", "year"], observed=True, as_index=False).agg({"value": "sum"})
+
+    # Visually compare the resulting series with the one from the Statistical Review of World Energy.
+    # from etl.paths import DATA_DIR
+    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read_table("statistical_review_of_world_energy")
+    # tb_sr = tb_sr[["country", "year", 'coal_production_mt']].rename(columns={"coal_production_mt": "value"})
+    # tb_sr["value"] *= 1e6
+    # compare = pr.concat([tb_sr.assign(**{"source": "EI"}), tb_coal_sum.assign(**{"source": "BGS"})], ignore_index=True)
+    # for country in sorted(set(compare["country"])):
+    #     _compare = compare[compare["country"] == country]
+    #     if len(_compare["source"].unique()) == 2:
+    #         px.line(compare[compare["country"] == country], x="year", y="value", color="source", markers=True, title=country).show()
+
+    # Concatenate the old data (removing the disaggregated coal data) with the aggregated coal data.
+    tb_coal_sum = tb_coal_sum.assign(
+        **{"category": "Production", "commodity": "Coal", "sub_commodity": "Mine", "unit": "tonnes"}
+    )
+    tb = pr.concat([tb.drop(tb_coal.index), tb_coal_sum], ignore_index=True)
+
+    ####################################################################################################################
+    # Remove some spurious values after visual inspection (comparing with the Statistical Review).
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Germany")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Czechia")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Slovakia")
+        & (tb["year"] == 1992)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Mexico")
+        & (tb["year"] == 2019)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Pakistan")
+        & (tb["year"] == 1997)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "United Kingdom")
+        & (tb["year"] == 1986)
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    # For Russia, 2018, 2019, 2020 and 2021 are much higher than the rest, and then 2022 drops in BGS data.
+    # This does not happen in the Statistical Review, so it looks spurious.
+    tb.loc[
+        (tb["category"] == "Production")
+        & (tb["country"] == "Russia")
+        & (tb["year"].isin([2018, 2019, 2020, 2021, 2022]))
+        & (tb["commodity"] == "Coal"),
+        "value",
+    ] = None
+    ####################################################################################################################
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -1018,6 +1136,31 @@ def run(dest_dir: str) -> None:
 
     # Harmonize units.
     tb = harmonize_units(tb=tb)
+
+    ####################################################################################################################
+    # Fix some known issues in the data.
+    # Molybdenum, mine for the US between 1970 and 1976 is significantly larger than in USGS.
+    # And BGS notes on 1977 say "Break in series". So I will remove those points prior to 1977.
+    # A similar thing happens for Turkey and the USSR.
+    # Even after removing these, BGS data is larger than USGS' World. So, simply remove all points prior to 1977.
+    tb.loc[
+        (tb["commodity"] == "Molybdenum")
+        # & (tb["country"].isin(["United States", "Turkey", "USSR"]))
+        & (tb["year"] < 1977)
+        & (tb["category"] == "Production"),
+        "value",
+    ] = None
+
+    # A similar issue happens with tugsten.
+    tb.loc[
+        (tb["commodity"] == "Tungsten") & (tb["year"] < 1977) & (tb["category"] == "Production"),
+        "value",
+    ] = None
+
+    ####################################################################################################################
+
+    # Combine all subcommodities of coal production, and fix some issues.
+    tb = aggregate_coal(tb=tb)
 
     # Pivot table to have a column for each category.
     tb = (

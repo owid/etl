@@ -36,6 +36,7 @@ from sqlalchemy.engine import Engine
 
 from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
+from etl.config import TLS_VERIFY
 from etl.db import get_engine
 from etl.snapshot import Snapshot
 
@@ -225,17 +226,11 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
-    elif step_type == "backport":
-        step = BackportStep(path, dependencies)
-
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
     elif step_type == "walden-private":
         step = WaldenStepPrivate(path)
-
-    elif step_type == "backport-private":
-        step = BackportStepPrivate(path, dependencies)
 
     elif step_type == "snapshot-private":
         step = SnapshotStepPrivate(path)
@@ -633,7 +628,7 @@ class DataStep(Step):
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
         url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
-        resp = requests.get(url)
+        resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
 
@@ -997,7 +992,7 @@ class GithubStep(Step):
 
 
 def get_etag(url: str) -> str:
-    resp = requests.head(url)
+    resp = requests.head(url, verify=TLS_VERIFY)
     resp.raise_for_status()
     return cast(str, resp.headers["ETag"])
 
@@ -1028,34 +1023,6 @@ class ETagStep(Step):
         return get_etag(f"https://{self.path}")
 
 
-class BackportStep(DataStep):
-    dependencies = []
-
-    def __str__(self) -> str:
-        return f"backport://{self.path}"
-
-    def run(self) -> None:
-        from etl import backport_helpers
-
-        # make sure the enclosing folder is there
-        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
-
-        dataset = backport_helpers.create_dataset(self._dest_dir.as_posix(), self._dest_dir.name)
-
-        # modify the dataset to remember what inputs were used to build it
-        dataset.metadata.source_checksum = self.checksum_input()
-        dataset.save()
-
-        self.after_run()
-
-    def can_execute(self, archive_ok: bool = True) -> bool:
-        return True
-
-    @property
-    def _dest_dir(self) -> Path:
-        return paths.DATA_DIR / self.path.lstrip("/")
-
-
 class PrivateMixin:
     def after_run(self) -> None:
         """Make dataset private"""
@@ -1077,13 +1044,6 @@ class WaldenStepPrivate(WaldenStep):
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
-
-
-class BackportStepPrivate(PrivateMixin, BackportStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"backport-private://{self.path}"
 
 
 def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:

@@ -10,10 +10,10 @@ meta:
     date_published: "2022-01-31"
 
     # Citation
-    producer: United States Geological Survey Data
+    producer: United States Geological Survey
     citation_full: |-
       National Minerals Information Center, 2022, Mineral commodity summaries 2022 data release: U.S. Geological Survey data release, https://doi.org/10.5066/P9KKMCP4.
-    attribution: United States Geological Survey Data - Mineral Commodity Summaries (2022)
+    attribution: USGS - Mineral Commodity Summaries (2022)
     attribution_short: USGS
 
     # Files

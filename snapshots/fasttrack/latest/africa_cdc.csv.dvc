@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Africa Centres for Disease Control and Prevention
+    title: Africa CDC Epidemic Intelligence Weekly Reports
+    citation_full: Africa CDC, Epidemic Intelligence Weekly Reports (2024)
+    attribution: Africa CDC
+    attribution_short: Africa CDC
+    url_main: https://africacdc.org/thematic-area/surveillance-and-disease-intelligence/africa-cdc-weekly-event-based-surveillance/
+    url_download: https://docs.google.com/spreadsheets/d/1KlqUXISKxEpvHxxG8rSzqT3YK5w0mEpJH0ttyAOGLwo/pub?output=csv
+    date_accessed: '2024-08-20'
+    date_published: '2024-08-16'
+    license:
+      name: © All rights reserved Africa CDC
+  name: Africa CDC Epidemic Intelligence Weekly Reports
+  description: |-
+    Epidemic Intelligence Weekly Reports, are a source of real-time updates on priority events of concern on the continent. The narrative brought to you focuses on three main areas: the epidemiological situation, event assessment (risk assessment and geoscope) and public health interventions by the affected Member State, partners, and Africa CDC.
+  license:
+    name: © All rights reserved Africa CDC
+outs:
+  - md5: 36e233362700df501428f2d28bbf3f8c
+    size: 1730
+    path: africa_cdc.csv

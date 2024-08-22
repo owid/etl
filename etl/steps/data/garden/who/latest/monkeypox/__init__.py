@@ -28,10 +28,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("monkeypox")
-
+    ds_suspected = paths.load_dataset("africa_cdc")
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
-
+    tb_suspected = ds_suspected["africa_cdc"].reset_index()
+    origins = tb["total_conf_cases"].metadata.origins
     #
     # Process data.
     #
@@ -52,14 +53,23 @@ def run(dest_dir: str) -> None:
         .pipe(filter_dates)
     )
 
-    tb = tb.format(["country", "date"])
+    tb_both = pr.merge(tb, tb_suspected, on=["country", "date"], how="outer")
+
+    # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
+    country_mask = tb_both["country"] == "Democratic Republic of Congo"
+    tb_both["annotation"] = ""
+    tb_both.loc[country_mask, "annotation"] = (
+        tb_both.loc[country_mask, "annotation"] + "Includes only confirmed deaths as reported by WHO"
+    )
+    tb_both["annotation"].metadata.origins = origins
+    tb_both = tb_both.format(["country", "date"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb_both], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.

@@ -27,11 +27,12 @@ COMMODITY_MAPPING = {
     ("Antimony", "Total"): ("Antimony", "Mine"),
     ("Arsenic", "Total"): ("Arsenic", "Processing"),
     ("Asbestos", "Total"): ("Asbestos", "Mine"),
-    ("Ball clay", "Total"): ("Clays", "Mine, ball clay"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, ball clay"). We decided to remove "Clays".
+    ("Ball clay", "Total"): None,
     ("Barite", "Total"): ("Barite", "Mine"),
     ("Bauxite", "Total"): ("Bauxite", "Mine"),
-    # NOTE: For consistency with USGS current data, rename the following.
-    ("Bentonite", "Total"): ("Clays", "Mine, bentonite"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
+    ("Bentonite", "Total"): None,
     # NOTE: Extracted from "world_mine_production".
     ("Beryllium", "Total"): ("Beryllium", "Mine"),
     ("Beryllium", "Mine"): ("Beryllium", "Mine"),
@@ -44,7 +45,8 @@ COMMODITY_MAPPING = {
     ("Boron carbide", "Total"): None,
     ("Cadmium", "Total"): ("Cadmium", "Refinery"),
     ("Cement", "Total"): ("Cement", "Processing"),
-    ("Cesium", "Total"): ("Cesium", "Mine"),
+    # NOTE: The following could be mapped to ("Cesium", "Mine"), but it has only global data until 1977.
+    ("Cesium", "Total"): None,
     ("Chromium", "Total"): ("Chromium", "Mine"),
     # NOTE: Cobalt total is only used for unit value.
     ("Cobalt", "Total"): ("Cobalt", "Value"),
@@ -54,17 +56,21 @@ COMMODITY_MAPPING = {
     ("Cobalt", "Refinery"): ("Cobalt", "Refinery"),
     ("Construction sand and gravel", "Total"): ("Sand and gravel", "Mine, construction"),
     ("Copper", "Total"): ("Copper", "Mine"),
-    ("Crushed stone", "Total"): ("Crushed stone", "Mine"),
+    # NOTE: The following could be mapped to ("Crushed stone", "Mine"), but it has only US data, not global.
+    ("Crushed stone", "Total"): None,
     ("Diatomite", "Total"): ("Diatomite", "Mine"),
-    ("Dimension stone", "Total"): ("Dimension stone", "Mine"),
+    # NOTE: The following could be mapped to ("Dimension stone", "Mine"), but it has only US data, not global.
+    ("Dimension stone", "Total"): None,
     # NOTE: The following could be mapped to ("Iron", "Sponge"). But for now, we decided to exclude it.
     ("Direct Reduced Iron", "Total"): None,
     # NOTE: In USGS historical, the notes explicitly say "World production data do not include production data for
     #  nepheline syenite.", whereas in USGS current it's unclear.
     ("Feldspar", "Total"): ("Feldspar", "Mine"),
-    ("Fire clay", "Total"): ("Clays", "Mine, fire clay"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, fire clay"). We decided to remove "Clays".
+    ("Fire clay", "Total"): None,
     ("Fluorspar", "Total"): ("Fluorspar", "Mine"),
-    ("Fuller's earth", "Total"): ("Clays", "Mine, fuller's earth"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
+    ("Fuller's earth", "Total"): None,
     ("Gallium", "Total"): ("Gallium", "Refinery"),
     ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
@@ -80,7 +86,8 @@ COMMODITY_MAPPING = {
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
-    ("Kaolin", "Total"): ("Clays", "Mine, kaolin"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
+    ("Kaolin", "Total"): None,
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Mine"),
@@ -90,14 +97,16 @@ COMMODITY_MAPPING = {
     ("Metallic abrasives", "Total"): None,
     ("Mica (natural), scrap and flake", "Total"): ("Mica", "Mine, scrap and flake"),
     ("Mica (natural), sheet", "Total"): ("Mica", "Mine, sheet"),
-    ("Miscellaneous clay", "Total"): ("Clays", "Mine, miscellaneous"),
+    # NOTE: The following could be mapped to ("Clays", "Mine, miscellaneous"). We decided to remove "Clays".
+    ("Miscellaneous clay", "Total"): None,
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
     ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Mine"),
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
-    ("Peat", "Total"): ("Peat", "Mine"),
+    # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
+    ("Peat", "Total"): None,
     ("Perlite", "Total"): ("Perlite", "Mine"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
     ("Pig Iron", "Total"): ("Iron", "Smelter, pig iron"),
@@ -113,7 +122,8 @@ COMMODITY_MAPPING = {
     ("Sulfur", "Total"): ("Sulfur", "Processing"),
     ("Talc and pyrophyllite", "Total"): ("Talc and pyrophyllite", "Mine"),
     ("Tantalum", "Total"): ("Tantalum", "Mine"),
-    ("Tellurium", "Total"): ("Tellurium", "Refinery"),
+    # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
+    ("Tellurium", "Total"): None,
     ("Tin", "Total"): ("Tin", "Mine"),
     # NOTE: For titanium there is no global data.
     ("Titanium dioxide", "Total"): None,
@@ -183,14 +193,16 @@ FOOTNOTES_PRODUCTION = {
     "production|Bauxite|Mine|tonnes": "Values are reported as dried bauxite equivalents.",
     "production|Barite|Mine|tonnes": "Values are reported as gross weight.",
     "production|Asbestos|Mine|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
-    "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
+    # "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
     "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }
-FOOTNOTES_UNIT_VALUE = {}
+FOOTNOTES_UNIT_VALUE = {
+    "unit_value|Silicon|Processing|constant 1998 US$ per tonne": "Values refer to constant 1998 US$ per tonne of silicon content in ferrosilicon or silicon metal.",
+}
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
@@ -543,15 +555,88 @@ def run(dest_dir: str) -> None:
     # Fix some other specific cases.
     # Bismuth in gross weight only has data for the US, and it's all zeros.
     tb_flat.loc[(tb_flat["country"] == "United States"), "production|Bismuth|Mine|tonnes"] = pd.NA
+
+    # Boron mine production data is in gross weight.
+    # However, between 1964 and 1975, it is reported as boron oxide content.
+    # Apart from creating spurious jumps in the data, this causes the US to have a larger production than the world.
+    tb_flat.loc[
+        (tb_flat["country"] == "World")
+        & (tb_flat["year"].isin([1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975])),
+        "production|Boron|Mine|tonnes",
+    ] = None
+    # Also, data from 2006 onwards excludes the US (as US data is "withheld").
+    tb_flat.loc[(tb_flat["country"] == "World") & (tb_flat["year"] >= 2006), "production|Boron|Mine|tonnes"] = None
+
+    # Diatomite mine production data between 1913 and 1918 for US is slightly larger than for the World.
+    # There are notes mentioning that US production around that time was incomplete, so I'll remove all those points.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"]))
+        & (tb_flat["year"].isin([1913, 1914, 1915, 1916, 1917, 1918])),
+        "production|Diatomite|Mine|tonnes",
+    ] = None
+
+    # Helium mine production for the US is larger than the World on specific years.
+    # I understand that these issues are within the uncertainty, and that most production the time came from the US.
+    # So I'll simply remove those points where US > World.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"])) & (tb_flat["year"].isin([1990, 1994])),
+        "production|Helium|Mine|tonnes",
+    ] = None
+
+    # A similar thing happens to Mica mine production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"]))
+        & (tb_flat["year"].isin([1938, 1940, 1941, 1945, 1947, 1949])),
+        "production|Mica|Mine, scrap and flake|tonnes",
+    ] = None
+
+    # A similar thing happens to Sulfur processing production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World", "United States"])) & (tb_flat["year"].isin([1920])),
+        "production|Sulfur|Processing|tonnes",
+    ] = None
+
+    # NOTE: We decided to discard Tellurium.
+    # # Tellurium refinery production is very incomplete, as pointed out in the notes.
+    # # Specifically, a large range of years exclude US data because of proprietary data.
+    # # To be conservative, remove all those years.
+    # tb_flat.loc[
+    #     (tb_flat["country"].isin(["World"])) & (tb_flat["year"] >= 1976) & (tb_flat["year"] <= 2003),
+    #     "production|Tellurium|Refinery|tonnes",
+    # ] = None
+    # # Also, in some other years in the past, US production was larger than World production.
+    # tb_flat.loc[
+    #     (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1930, 1933])),
+    #     "production|Tellurium|Refinery|tonnes",
+    # ] = None
+
+    # Vanadium mine production does not include US production in a range of years.
+    # Remove those years.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1927, 1928, 1929, 1930, 1931, 1997, 1998, 1999])),
+        "production|Vanadium|Mine|tonnes",
+    ] = None
+    # Also, in some other years in the past, US production was larger than World production.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1913, 1914, 1921, 1922])),
+        "production|Vanadium|Mine|tonnes",
+    ] = None
+
+    # There is a big dip in global Magnesium metal in 1974, because of missing US data.
+    # A similar thing happens in 1999.
+    tb_flat.loc[
+        (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1974, 1999])),
+        "production|Magnesium metal|Smelter|tonnes",
+    ] = None
     ####################################################################################################################
 
     # Format tables conveniently.
-    tb_combined = tb_combined.format(
-        ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
-    )
-    tb_combined = tb_combined.astype(
-        {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
-    )
+    # tb_combined = tb_combined.format(
+    #     ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_production"
+    # )
+    # tb_combined = tb_combined.astype(
+    #     {column: "string" for column in tb_combined.columns if column.startswith("notes_")}
+    # )
     tb_unit_value = tb_unit_value.format(
         ["country", "year", "commodity", "sub_commodity", "unit"], short_name="historical_unit_value"
     )
@@ -564,7 +649,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined, tb_unit_value, tb_flat], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_unit_value, tb_flat], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

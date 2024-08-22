@@ -782,7 +782,7 @@ def adapt_table_with_dates_to_grapher(
         tb = tb.drop(columns=["year"], errors="raise")
 
     # Ensure date column is in datetime format.
-    tb[date_column] = pd.to_datetime(tb[date_column])
+    tb[date_column] = pd.to_datetime(tb[date_column].astype(object))
 
     # If no columns are specified, list all columns in the table (except the country and date columns).
     if columns is None:

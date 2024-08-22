@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -40,7 +41,8 @@ class Explorer:
         # Columns table of the explorer.
         self.df_columns = pd.DataFrame([], columns=["variableId"])
 
-        if self.path.exists():
+        # added os.environ.get("EXPLORER") as hotfix
+        if self.path.exists() and os.environ.get("EXPLORER"):
             log.info(f"Loading explorer file {self.path}.")
             # Read explorer from existing file.
             self._load_content()

@@ -19,8 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Rename the 'question' to 'country' and days_since_2021 to year for visualising in the grapher
-    tb = tb.rename_index_names({"days_since_2021": "year", "group": "country"})
+    # Rename the 'question' to 'country' for visualising in the grapher
+    tb = tb.rename_index_names({"group": "country"})
 
     #
     # Save outputs.

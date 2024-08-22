@@ -1,133 +1,236 @@
+definitions:
+  color_scale: &color_scale
+    customNumericColorsActive: true
+    binningStrategy: manual
+    customNumericColors:
+      - "#E0F3F8"
+      - "#ffffcc"
+      - "#ffeda0"
+      - "#fed976"
+      - "#feb24c"
+      - "#fd8d3c"
+      - "#fc4e2a"
+      - "#e31a1c"
+      - "#bd0026"
+      - "#800026"
+
+  common:
+    display: &common_display
+      numDecimalPlaces: 0
+      zeroDay: "2020-01-01"
+      yearIsDay: true
+      includeInTable: true
+    description_key:
+      - Data from The Economist estimating the number of excess deaths, from all causes, during the COVID-19 pandemic for 223 countries & regions. The Economist publishes new estimates each day. We update our charts with the latest available data each week.
+      - Excess deaths measure the difference between how many people died during the pandemic, from any cause, and how many deaths would have been expected had there been no pandemic.
+      - Many countries have not reported any all-cause mortality data during the pandemic, which means their entire data series is estimated. Other countries report data regularly, but it is not always up-to-date due to delays in reporting; for these, only recent weeks are estimated. These delays, as well as incomplete reporting coverage, mean the reported number of deaths might not count all deaths that occurred.
+    origins:
+      - producer: The Economist
+        title: Excess Deaths Model
+        description: >-
+          The Living Planet Database contains tens of thousands of vertebrate population time-series from around the world. It is the largest collection of its kind, and is publicly available, making it an invaluable tool for both research and conservation.
+
+          This dataset contains time-series of population abundance data for vertebrate species spanning years between 1970 and 2021. This is the public version of the database as confidential records that cannot be shared have been removed. The open-source code used to calculate the Living Planet Index using this data set can be found here: [https://github.com/Zoological-Society-of-London/rlpi](https://github.com/Zoological-Society-of-London/rlpi).
+
+          [Text from [Living Planet Index website](https://www.livingplanetindex.org/data_portal)]
+        citation_full: |-
+          The Economist and Solstad, S. (corresponding author), 2021. The pandemic's true death toll. [online] The Economist. Available at: https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates [Accessed {TODAY}]. First published in the article "Counting the dead", The Economist, issue 20, 2021.
+        url_main: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model
+        date_accessed: "2024-08-20"
+        date_published: "2024"
+
 dataset:
-  title: Excess Mortality (The Economist, 2023)
-  description: ''
-  sources:
-  - name: The Economist (2023)
-    description: |-
-      Data from The Economist estimating the number of excess deaths, from all causes, during the COVID-19 pandemic for 223 countries & regions. The Economist publishes new estimates each day. We update our charts with the latest available data each week.
+  title: COVID-19, Excess Mortality
 
-      Excess deaths measure the difference between how many people died during the pandemic, from any cause, and how many deaths would have been expected had there been no pandemic.
-
-      Many countries have not reported any all-cause mortality data during the pandemic, which means their entire data series is estimated. Other countries report data regularly, but it is not always up-to-date due to delays in reporting; for these, only recent weeks are estimated. These delays, as well as incomplete reporting coverage, mean the reported number of deaths might not count all deaths that occurred.
-
-      The Economist's GitHub page, which contains their data and code, is here: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model
-
-      To read The Economist's article presenting the model estimates, see: https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates
-
-      To read about the model methodology, see: https://www.economist.com/graphic-detail/2021/05/13/how-we-estimated-the-true-death-toll-of-the-pandemic
-
-      For the Our World in Data page on excess mortality during COVID-19, with expanded explanations and data from other sources, see: https://ourworldindata.org/excess-mortality-covid
-    url: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model
-    date_accessed: '2023-05-09'
-    published_by: The Economist
 tables:
   excess_mortality_economist:
     variables:
+      # Cumulative, absolute
       cumulative_estimated_daily_excess_deaths:
-        title: cumulative_estimated_daily_excess_deaths
-        unit: ''
+        title: Cumulative excess deaths (central estimate)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          <<: *common_display
+          name: Central estimate
+          color: "#B13507"
+
       cumulative_estimated_daily_excess_deaths_ci_95_bot:
-        title: cumulative_estimated_daily_excess_deaths_ci_95_bot
-        unit: ''
+        title: Cumulative excess deaths (95% CI, lower bound)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
-      cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k:
-        title: cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k
-        unit: ''
-        display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          color: "#D7C2BA"
+          <<: *common_display
+          name: Lower bound, 95% uncertainty interval
       cumulative_estimated_daily_excess_deaths_ci_95_top:
-        title: cumulative_estimated_daily_excess_deaths_ci_95_top
-        unit: ''
+        title: Cumulative excess deaths (95% CI, upper bound)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
-      cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k:
-        title: cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k
-        unit: ''
-        display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          color: "#D7C2BA"
+          <<: *common_display
+          name: Upper bound
+
+      # Cumulative, relative
       cumulative_estimated_daily_excess_deaths_per_100k:
-        title: cumulative_estimated_daily_excess_deaths_per_100k
-        unit: ''
+        title: Cumulative excess deaths per 100,000 people (central estimate)
+        unit: "deaths per 100,000 people"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          <<: *common_display
+          color: "#B13507"
+          name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 300
+                  - 400
+                  - 500
+                  - 600
+                  - 700
+                  - 800
+                  - 900
+      cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k:
+        title: Cumulative excess deaths per 100,000 people (95% CI, lower bound)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Lower bound, 95% uncertainty interval
+      cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k:
+        title: Cumulative excess deaths per 100,000 people (95% CI, upper bound)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Upper bound
+
+      # Daily (7d average), absolute
       estimated_daily_excess_deaths:
-        title: estimated_daily_excess_deaths
-        unit: ''
+        title: Daily excess deaths (central estimate)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          <<: *common_display
+          color: "#B13507"
+          name: Central estimate
       estimated_daily_excess_deaths_ci_95_bot:
-        title: estimated_daily_excess_deaths_ci_95_bot
-        unit: ''
+        title: Daily excess deaths (95% CI, lower bound)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
-      estimated_daily_excess_deaths_ci_95_bot_per_100k:
-        title: estimated_daily_excess_deaths_ci_95_bot_per_100k
-        unit: ''
-        display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Lower bound, 95% uncertainty interval
       estimated_daily_excess_deaths_ci_95_top:
-        title: estimated_daily_excess_deaths_ci_95_top
-        unit: ''
+        title: Daily excess deaths (95% CI, upper bound)
+        unit: "deaths"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
-      estimated_daily_excess_deaths_ci_95_top_per_100k:
-        title: estimated_daily_excess_deaths_ci_95_top_per_100k
-        unit: ''
-        display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Upper bound
+
+      # Daily (7d average), relative
       estimated_daily_excess_deaths_per_100k:
-        title: estimated_daily_excess_deaths_per_100k
-        unit: ''
+        title: Daily excess deaths per 100,000 people (central estimate)
+        unit: "deaths per 100,000 people"
         display:
-          includeInTable: true
-          numDecimalPlaces: 0
-          yearIsDay: true
-          zeroDay: '2020-01-01'
-        short_unit: ''
+          color: "#B13507"
+          <<: *common_display
+          name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 0.5
+                  - 1
+                  - 1.5
+                  - 2
+                  - 2.5
+                  - 3
+                  - 3.5
+                  - 4
+                  - 4.5
+      estimated_daily_excess_deaths_ci_95_bot_per_100k:
+        title: Daily excess deaths per 100,000 people (95% CI, lower bound)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Lower bound, 95% uncertainty interval
+      estimated_daily_excess_deaths_ci_95_top_per_100k:
+        title: Daily excess deaths per 100,000 people (95% CI, upper bound)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Upper bound
+
+      # Cumulative last 12 months, absolute
+      cumulative_estimated_daily_excess_deaths_last12m:
+        title: Cumulative excess deaths (central estimate, last 12 months)
+        unit: "deaths"
+        display:
+          <<: *common_display
+          name: Central estimate
+          color: "#B13507"
+      cumulative_estimated_daily_excess_deaths_ci_95_bot_last12m:
+        title: Cumulative excess deaths (95% CI, lower bound, last 12 months)
+        unit: "deaths"
+        display:
+          color: "#D7C2BA"
+          <<: *common_display
+          name: Lower bound, 95% uncertainty interval
+      cumulative_estimated_daily_excess_deaths_ci_95_top_last12m:
+        title: Cumulative excess deaths (95% CI, upper bound, last 12 months)
+        unit: "deaths"
+        display:
+          color: "#D7C2BA"
+          <<: *common_display
+          name: Upper bound
+
+      # Cumulative last 12 months, relative
+      cumulative_estimated_daily_excess_deaths_per_100k_last12m:
+        title: Cumulative excess deaths per 100,000 people (central estimate, last 12 months)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#B13507"
+          name: Central estimate
+        presentation:
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                <<: *color_scale
+                customNumericValues:
+                  - 0
+                  - 100
+                  - 200
+                  - 300
+                  - 400
+                  - 500
+                  - 600
+                  - 700
+                  - 800
+                  - 900
+      cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k_last12m:
+        title: Cumulative excess deaths per 100,000 people (95% CI, lower bound, last 12 months)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Lower bound, 95% uncertainty interval
+      cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k_last12m:
+        title: Cumulative excess deaths per 100,000 people (95% CI, upper bound, last 12 months)
+        unit: "deaths per 100,000 people"
+        display:
+          <<: *common_display
+          color: "#D7C2BA"
+          name: Upper bound

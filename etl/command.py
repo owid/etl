@@ -84,12 +84,6 @@ log = structlog.get_logger()
     help="Run the debugger on uncaught exceptions.",
 )
 @click.option(
-    "--backport",
-    "-b",
-    is_flag=True,
-    help="Add steps for backporting OWID datasets.",
-)
-@click.option(
     "--downstream",
     "-d",
     is_flag=True,
@@ -151,7 +145,6 @@ def main_cli(
     private: bool = False,
     grapher: bool = False,
     explorer: bool = False,
-    backport: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
     only: bool = False,
@@ -203,7 +196,6 @@ def main_cli(
         private=private,
         grapher=grapher,
         explorer=explorer,
-        backport=backport,
         downstream=downstream,
         only=only,
         exclude=exclude,
@@ -236,7 +228,6 @@ def main(
     private: bool = False,
     grapher: bool = False,
     explorer: bool = False,
-    backport: bool = False,
     downstream: bool = False,
     only: bool = False,
     exclude: Optional[str] = None,
@@ -256,7 +247,7 @@ def main(
         # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
         grapher = True
 
-    dag = construct_dag(dag_path, backport=backport, private=private, grapher=grapher)
+    dag = construct_dag(dag_path, private=private, grapher=grapher)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -285,22 +276,11 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, backport: bool, private: bool, grapher: bool) -> DAG:
+def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
-
-    # If backport is set, add all backport steps. Otherwise add only those used in DAG
-    if backport:
-        filter_steps = None
-    else:
-        # Get all backported datasets that are used in the DAG
-        filter_steps = {dep for deps in dag.values() for dep in deps if dep.startswith("backport://")}
-
-    backporting_dag = _backporting_steps(private, filter_steps=filter_steps)
-
-    dag.update(backporting_dag)
 
     # If --grapher is set, add steps for upserting to DB
     if grapher:

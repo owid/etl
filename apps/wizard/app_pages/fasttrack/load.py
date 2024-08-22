@@ -265,10 +265,17 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
         raise ValidationError("Missing column 'country' in data")
 
     # check types
-    if data_df.year.dtype not in INT_TYPES:
-        raise ValidationError("Column 'year' should be integer")
+    if data_df.year.dtype not in INT_TYPES and not _is_valid_date(data_df.year):
+        raise ValidationError("Column 'year' should be integer or date")
 
     return data_df.set_index(["country", "year"])
+
+
+def _is_valid_date(series: pd.Series) -> bool:
+    # Try converting the series to datetime
+    converted = pd.to_datetime(series, errors="coerce")
+    # Check if there are any NaT (invalid dates)
+    return converted.notna().all()
 
 
 def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:

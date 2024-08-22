@@ -84,7 +84,6 @@ SUBGROUPS = {
         "commands": {
             "fasttrack": "apps.backport.fasttrack_backport.cli",
             "migrate": "apps.backport.migrate.migrate.cli",
-            "bulk": "apps.backport.bulk_backport.bulk_backport",
             "run": "apps.backport.backport.backport_cli",
         },
     },
@@ -169,6 +168,7 @@ GROUPS = (
                 "update": "apps.step_update.cli.cli",
                 "archive": "apps.step_update.cli.archive_cli",
                 "explorer-update": "apps.explorer_update.cli.cli",
+                "pr": "apps.utils.draft_pull_request.cli",
             },
         },
         {

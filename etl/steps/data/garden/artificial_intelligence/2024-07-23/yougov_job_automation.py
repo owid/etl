@@ -25,12 +25,11 @@ def run(dest_dir: str) -> None:
     #
     tb = sh.preprocess_data(
         tb,
-        date_column="date",
-        index_columns=["group", "days_since_2021"],
+        index_columns=["group", "date"],
         pivot_column="how_worried__if_it_all__are_you_that_your_type_of_work_could_be_automated_within_your_lifetime",
         value_column="value",
     )
-    tb = tb.format(["group", "days_since_2021"])
+    tb = tb.format(["group", "date"])
     #
     # Save outputs.
     #

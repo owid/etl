@@ -154,6 +154,7 @@ exclude = [
     ".cachedir/",
     ".cache/",
     "etl/steps",
+    "snapshots/",
 ]
 
 [tool.pytest.ini_options]
