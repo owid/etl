@@ -10,7 +10,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Define regions to aggregate
-REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania"]
 
 # Define fraction of allowed NaNs per year
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
@@ -62,12 +62,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(["population"], axis=1)
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
 
-    tb = geo.add_regions_to_table(
-        tb=tb,
-        ds_regions=ds_regions,
-        regions=REGIONS,
-        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
-    )
+    tb = geo.add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=REGIONS, frac_allowed_nans_per_year=0.9)
 
     tb = tb.format(["country", "year"])
 
