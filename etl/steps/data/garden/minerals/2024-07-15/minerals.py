@@ -233,10 +233,9 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonable global agreement, except for certain countries: China, Sierra Leone.
     "production|Zirconium and hafnium|Mine|tonnes",
 ]
-# The following list contains all columns where USGS (current and historical) overlaps with BGS.
-# NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
-#  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
+# Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
+    # "production|Chromium|Mine|tonnes",
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # 'production|Helium|Mine|tonnes',
 ]

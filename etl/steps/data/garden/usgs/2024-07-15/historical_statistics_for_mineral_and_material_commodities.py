@@ -47,7 +47,21 @@ COMMODITY_MAPPING = {
     ("Cement", "Total"): ("Cement", "Processing"),
     # NOTE: The following could be mapped to ("Cesium", "Mine"), but it has only global data until 1977.
     ("Cesium", "Total"): None,
-    ("Chromium", "Total"): ("Chromium", "Mine"),
+    # NOTE: It's not clear what the following means.
+    #  According to the Word document in the excel file,
+    # "World production is an estimate of world chromite ore mine production measured in contained chromium.
+    #  World production reported in gross weight was converted to contained chromium by assuming that its chromic oxide
+    #  content was the same as that of chromite ore imported into the United States.
+    #  Before content of chromite ore was reported, a time-averaged value was used."
+    # So this seems to be chromite (ore of chromium) in tonnes of contained chromium.
+    # However, according to the excel file from https://www.usgs.gov/centers/national-minerals-information-center/chromium-statistics-and-information
+    # World production of Ferrochromium, in tonnes of gross weight, has similar values to the previous.
+    # In any case, USGS current only provides production data for chromite, as:
+    # "Units are thousand metric tons, gross weight, of marketable chromite ore."
+    # Maybe both USGS historical and current report chromite, but the main difference is that USGS historical is in
+    # "contained chromium", whereas USGS current is in "contained chromium".
+    # But for now, we will keep only USGS current data.
+    ("Chromium", "Total"): None,
     # NOTE: Cobalt total is only used for unit value.
     ("Cobalt", "Total"): ("Cobalt", "Value"),
     # NOTE: Extracted from "world_mine_production".
@@ -196,7 +210,7 @@ FOOTNOTES_PRODUCTION = {
     # "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
-    "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
+    # "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
 }

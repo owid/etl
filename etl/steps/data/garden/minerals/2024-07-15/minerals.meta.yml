@@ -329,13 +329,13 @@ tables:
         description_short: Measured in tonnes. [Smelting](#dod:smelting) takes raw minerals and produces metals through high-temperature processes.
         presentation:
           title_public: Magnesium metal production
-      production_manganese_mine__ores__and__concentrates_tonnes:
-        title: production|Manganese|Mine, ores & concentrates|tonnes
-        unit: tonnes
-        short_unit: t
-        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
-        presentation:
-          title_public: Manganese (ores & concentrates) production
+      # production_manganese_mine__ores__and__concentrates_tonnes:
+      #   title: production|Manganese|Mine, ores & concentrates|tonnes
+      #   unit: tonnes
+      #   short_unit: t
+      #   description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+      #   presentation:
+      #     title_public: Manganese (ores & concentrates) production
       production_manganese_mine_tonnes:
         title: production|Manganese|Mine|tonnes
         unit: tonnes
@@ -1050,13 +1050,13 @@ tables:
         description_short: Value of 1 tonne of cement, in constant 1998 US$ per tonne.
         presentation:
           title_public: Cement unit value
-      unit_value_chromium_mine_constant_1998_usd_per_tonne:
-        title: unit value|Chromium|Mine|constant 1998 US$ per tonne
-        unit: constant 1998 US$ per tonne
-        short_unit: $/t
-        description_short: Value of 1 tonne of chromium, in constant 1998 US$ per tonne.
-        presentation:
-          title_public: Chromium unit value
+      # unit_value_chromium_mine_constant_1998_usd_per_tonne:
+      #   title: unit value|Chromium|Mine|constant 1998 US$ per tonne
+      #   unit: constant 1998 US$ per tonne
+      #   short_unit: $/t
+      #   description_short: Value of 1 tonne of chromium, in constant 1998 US$ per tonne.
+      #   presentation:
+      #     title_public: Chromium unit value
       unit_value_cobalt_value_constant_1998_usd_per_tonne:
         title: unit value|Cobalt|Value|constant 1998 US$ per tonne
         unit: constant 1998 US$ per tonne

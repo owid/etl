@@ -115,7 +115,8 @@ COMMODITY_MAPPING = {
     ("Cement", "Portland cement"): None,
     ("Cement  clinker", "Cement, clinker"): None,
     ("Cement, finished", "Cement, finished"): None,
-    ("Chromium", "Metal"): ("Chromium", "Refinery"),
+    # NOTE: The following has only imports/exports data.
+    ("Chromium", "Metal"): None,
     ("Chromium", "Ores & concentrates"): None,
     ("Chromium ores and concentrates", "Unknown"): None,
     # NOTE: All subcommodities of coal production will be summed up into one.
@@ -342,11 +343,13 @@ COMMODITY_MAPPING = {
     ("Magnesite and magnesia", "Unknown"): None,
     ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Metal"): ("Manganese", "Refinery"),
-    ("Manganese", "Ores & Concentrates"): ("Manganese", "Mine, ores & concentrates"),
+    # NOTE: The following could be mapped to ("Manganese", "Mine, ores & concentrates"), but we decided to discard it.
+    ("Manganese", "Ores & Concentrates"): None,
     ("Manganese ore", "Chemical"): None,
     ("Manganese ore", "Manganese ore (ferruginous)"): None,
     ("Manganese ore", "Metallurgical"): None,
-    ("Manganese ore", "Unknown"): ("Manganese", "Mine, ores & concentrates"),
+    # NOTE: The following could be mapped to ("Manganese", "Mine, ores & concentrates"), but we decided to discard it.
+    ("Manganese ore", "Unknown"): None,
     ("Mercury", "Unknown"): ("Mercury", "Mine"),
     # NOTE: All mica data below is very sparse. Several have data until 1980, or 2002.
     #  The sub-commodity with the largest numbers is "Unknown", so it's not clear what it means.
