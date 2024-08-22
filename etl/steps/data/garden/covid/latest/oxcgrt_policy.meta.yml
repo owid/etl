@@ -9,7 +9,7 @@ definitions:
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
      'Public gatherings'.
     <% elif restriction_name == 'h6m_facial_coverings' %>
-     'Facial covering'.
+     'Face covering'.
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
      'International travels'.
     <%- endif -%>
