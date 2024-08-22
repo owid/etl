@@ -17,8 +17,18 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Extract columns related to cumulative area burned and emissions
-    column_groups = ["area_ha_cumulative", "share_area_ha_cumulative", "co2_cumulative", "pm2_5_cumulative"]
+    # Identify columns that include 'share_area_ha_cumulative'
+    columns_to_rename = {
+        col: col.replace("share_area_ha_cumulative", "share_cumulative_area")
+        for col in tb.columns
+        if "share_area_ha_cumulative" in col
+    }
+
+    # Rename the columns
+    tb = tb.rename(columns=columns_to_rename)
+
+    # Extract columns related to cumulative area burned and emissions.
+    column_groups = ["area_ha_cumulative", "share_cumulative_area", "co2_cumulative", "pm2_5_cumulative"]
     # Filter the Table columns to include only those that match any of the indicators in the list
     columns = [col for col in tb.columns if any(group in col for group in column_groups)] + ["country", "year"]
 
@@ -30,6 +40,8 @@ def run(dest_dir: str) -> None:
         # Select columns that contain the group name and a year between 2003 (minimum value in emisssions; 2012 in area burned) and 2023 (inclusive)
         group_columns = [col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= "2023"]
 
+        tb_grouped = tb[group_columns + ["country", "year"]]
+
         # Sort the group columns by year
         group_columns_sorted = sorted(group_columns, key=lambda x: int(x.split("_")[1]))
 
@@ -37,14 +49,19 @@ def run(dest_dir: str) -> None:
         tb[f"{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
         tb[f"avg_{group}_until_2024"] = tb[f"{group}_until_2024"] / len(group_columns_sorted)
 
-        # Identify the rows where the year is 52
-        year_52_rows = tb[tb["year"] == 52]
+        # Process data for each country
+        for country in tb["country"].unique():
+            country_rows = tb_grouped[(tb_grouped["country"] == country) & (tb_grouped["year"] == 52)]
 
-        # Use the maximum value at year 52 as the upper bound for each country
-        tb[f"upper_bound_{group}"] = year_52_rows[group_columns_sorted].max(axis=0)
+            if country_rows.empty or country_rows[group_columns_sorted].isnull().all(axis=1).all():
+                continue
+            # Find max and min columns
+            max_col = country_rows[group_columns_sorted].idxmax(axis=1).iloc[0]
+            min_col = country_rows[group_columns_sorted].idxmin(axis=1).iloc[0]
 
-        # Find the minimum value for the group as before
-        tb[f"lower_bound_{group}"] = year_52_rows[group_columns_sorted].min(axis=1)
+            # Set upper and lower bounds
+            tb.loc[country_rows.index, f"upper_bound_{group}"] = country_rows[max_col].iloc[0]
+            tb.loc[country_rows.index, f"lower_bound_{group}"] = country_rows[min_col].iloc[0]
 
         # Drop original columns as they are used in a different dataset and not needed here
         tb = tb.drop(columns=[f"{group}_until_2024"] + group_columns)
