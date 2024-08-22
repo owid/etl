@@ -111,6 +111,8 @@ tables:
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *upper_bound_description_processing_wildfires
+          display:
+            isProjection: true
 
         lower_bound_area_ha_cumulative:
           title: Minimum cumulative area burnt by wildfires between 2012 and 2023
@@ -119,6 +121,8 @@ tables:
           description_short: *description_short_wildires_cumulative
           description_key: *desc_wildfires
           description_processing: *lower_bound_description_processing_wildfires
+          display:
+            isProjection: true
 
         avg_share_cumulative_area_until_2024:
           title: Average cumulative share of the total land area burnt by wildfires between 2012 and 2023
@@ -137,6 +141,8 @@ tables:
           description_processing: |-
               - {definitions.description_processing_share}
               - {definitions.upper_bound_description_processing_wildfires}
+          display:
+            isProjection: true
 
         lower_bound_share_cumulative_area:
           title: Minimum cumulative share of the total land area burnt by wildfires between 2012 and 2023
@@ -146,6 +152,8 @@ tables:
           description_processing: |-
               - {definitions.description_processing_share}
               - {definitions.lower_bound_description_processing_wildfires}
+          display:
+            isProjection: true
 
         avg_co2_cumulative_until_2024:
           title: Average monthly cumulative carbon dioxide emissions from wildfires between 2003 and 2023
@@ -162,6 +170,8 @@ tables:
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *upper_bound_description_processing_emisssions
+          display:
+            isProjection: true
 
         lower_bound_co2_cumulative:
           title: Minimum monthly cumulative carbon dioxide emissions from wildfires between 2003 and 2023
@@ -170,6 +180,8 @@ tables:
           description_short: *description_short_co2_cumulative
           description_key: *description_key_co2
           description_processing: *lower_bound_description_processing_emisssions
+          display:
+            isProjection: true
 
         avg_pm2_5_cumulative_until_2024:
           title: Average monthly cumulative PM2.5 emissions from wildfires between 2003 and 2023
@@ -186,6 +198,8 @@ tables:
           description_short: *description_short_pm2_5_cumulative
           description_key: *description_ke_pm2_5
           description_processing: *upper_bound_description_processing_emisssions
+          display:
+            isProjection: true
 
         lower_bound_pm2_5_cumulative:
           title: Minimum monthly cumulative PM2.5 emissions from wildfires between 2003 and 2023
@@ -194,3 +208,5 @@ tables:
           description_short: *description_short_pm2_5_cumulative
           description_key: *description_ke_pm2_5
           description_processing: *lower_bound_description_processing_emisssions
+          display:
+            isProjection: true
