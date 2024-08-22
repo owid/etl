@@ -29,7 +29,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb[tb["flight_type"] == "Passenger flights"]
     tb = tb.drop("flight_type", axis=1)
-    print(tb)
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
     tb_annual = process_annual_data(tb)
@@ -40,7 +39,6 @@ def run(dest_dir: str) -> None:
     # Generate per capital co2 emissions data and add it do the dataframe and convert to kg
     for col in emissions_columns:
         tb_annual[f"per_capita_{col}"] = (tb_annual[col] * 1000) / tb_annual["population"]
-    print(tb_annual.columns)
 
     tb_annual = add_inbound_outbound_tour(tb_annual, tb_tourism)
 
