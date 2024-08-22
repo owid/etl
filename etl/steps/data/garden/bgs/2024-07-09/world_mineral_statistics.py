@@ -117,8 +117,9 @@ COMMODITY_MAPPING = {
     ("Cement, finished", "Cement, finished"): None,
     # NOTE: The following has only imports/exports data.
     ("Chromium", "Metal"): None,
+    # NOTE: The following has only imports/exports data.
     ("Chromium", "Ores & concentrates"): None,
-    ("Chromium ores and concentrates", "Unknown"): None,
+    ("Chromium ores and concentrates", "Unknown"): ("Chromium", "Mine"),
     # NOTE: All subcommodities of coal production will be summed up into one.
     ("Coal", "Anthracite"): ("Coal", "Mine, anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Mine, anthracite & Bituminous"),

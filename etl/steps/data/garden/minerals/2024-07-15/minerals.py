@@ -146,6 +146,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Big global disagreement.
     # NOTE: We decided to remove "Clays" altogether.
     # "production|Clays|Mine, kaolin|tonnes",
+    # Reasonable global agreement, except for Turkey and Finland, where USGS is significantly larger.
+    "production|Chromium|Mine|tonnes",
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
     # "production|Cobalt|Mine|tonnes",
