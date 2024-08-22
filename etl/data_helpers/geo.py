@@ -885,6 +885,7 @@ def list_members_of_region(
     additional_members: Optional[List[str]] = None,
     excluded_members: Optional[List[str]] = None,
     include_historical_regions_in_income_groups: bool = False,
+    exclude_historical_countries: bool = False,
 ) -> List[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
@@ -907,6 +908,8 @@ def list_members_of_region(
         Individual members to exclude from the list.
     include_historical_regions_in_income_groups : bool
         True to include historical regions in income groups.
+    exclude_historical_countries : bool
+        True to include historical countries.
 
     Returns
     -------
@@ -995,6 +998,12 @@ def list_members_of_region(
 
     # Convert set of countries into a sorted list.
     countries = sorted(countries_set)
+
+    # Filter historical countries
+    if exclude_historical_countries:
+        tb_hist = ds_regions["regions"]
+        countries_historical = set(tb_hist.loc[tb_hist["is_historical"], "name"])
+        countries = [c for c in countries if c not in countries_historical]
 
     return countries
 
@@ -1389,3 +1398,77 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: O
         ), f"Missing countries don't match the expected! {countries_missing}"
 
     return tb
+
+
+def countries_to_continent_mapping(ds_regions: Dataset):
+    """Get dictionary mapping country names to continents.
+
+    E.g.
+        {
+            "United States": "North America",
+            "Congo": "Africa",
+            ...
+        }
+
+    Parameters
+    ----------
+    ds_regions : Dataset
+        Regions dataset.
+    """
+    regions = [
+        "Africa",
+        "Asia",
+        "Europe",
+        "North America",
+        "Oceania",
+        "South America",
+    ]
+    countries_to_continent = {}
+    for region in regions:
+        members = list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            # By default, include historical regions in income groups.
+            exclude_historical_countries=True,
+        )
+        countries_to_continent |= {m: region for m in members}
+
+    return countries_to_continent
+
+
+def countries_to_income_mapping(ds_regions: Dataset, ds_income: Dataset):
+    """Get dictionary mapping country names to income groups.
+
+    E.g.
+        {
+            "United States": "High-income countries",
+            ...
+        }
+
+    Parameters
+    ----------
+    ds_regions : Dataset
+        Regions dataset. Not used in the function, but needed due to strict requirement by `list_members_of_region`.
+    ds_income_groups : Optional[Dataset], default: None
+        World Bank income groups dataset.
+        * If given, aggregates for income groups may be added to the data.
+        * If None, no aggregates for income groups will be added.
+    """
+    regions = [
+        "Low-income countries",
+        "Lower-middle-income countries",
+        "Upper-middle-income countries",
+        "High-income countries",
+    ]
+    countries_to_continent = {}
+    for region in regions:
+        members = list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income,
+            # By default, include historical regions in income groups.
+            exclude_historical_countries=True,
+        )
+        countries_to_continent |= {m: region for m in members}
+
+    return countries_to_continent
