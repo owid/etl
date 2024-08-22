@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Extract columns related to cumulative area and emissions
+    # Extract columns related to cumulative area burned and emissions
     column_groups = ["area_ha_cumulative", "share_area_ha_cumulative", "co2_cumulative", "pm2_5_cumulative"]
     # Filter the Table columns to include only those that match any of the indicators in the list
     columns = [col for col in tb.columns if any(group in col for group in column_groups)] + ["country", "year"]
@@ -27,23 +27,21 @@ def run(dest_dir: str) -> None:
 
     # Loop through each group of indicators and apply the same calculations
     for group in column_groups:
-        # Select columns that contain the group name and a year between 2003 and 2023 (inclusive)
+        # Select columns that contain the group name and a year between 2003 (minimum value in emisssions; 2012 in area burned) and 2023 (inclusive)
         group_columns = [col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= "2023"]
 
         # Sort the group columns by year
         group_columns_sorted = sorted(group_columns, key=lambda x: int(x.split("_")[1]))
 
-        # Calculate the cumulative sum of the group until 2024
+        # Calculate the average until 2024
         tb[f"{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
-
-        # Calculate the average cumulative sum of the group until 2024
         tb[f"avg_{group}_until_2024"] = tb[f"{group}_until_2024"] / len(group_columns_sorted)
 
-        # Calculate the upper and lower bounds of the standard deviation
+        # Find minimum and maximum values for the group
         tb[f"upper_bound_{group}"] = tb[group_columns_sorted].max(axis=1)
         tb[f"lower_bound_{group}"] = tb[group_columns_sorted].min(axis=1)
 
-        # Drop original columns as they are used in a different dataset
+        # Drop original columns as they are used in a different dataset and not needed here
         tb = tb.drop(columns=[f"{group}_until_2024"] + group_columns)
 
         # Dynamically set origins based on the group
@@ -52,7 +50,6 @@ def run(dest_dir: str) -> None:
             for col in [f"avg_{group}_until_2024", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
 
-    # Format the DataFrame with specific columns
     tb = tb.format(["country", "year"])
 
     #
