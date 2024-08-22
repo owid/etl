@@ -239,6 +239,15 @@ steps:
   data://grapher/homicide/2023-01-03/homicide_long_run_omm:
     - data://garden/homicide/2023-01-03/homicide_long_run_omm
 
+  # CO2 emissions from air transport (OECD)
+  data://meadow/oecd/2023-05-18/co2_air_transport:
+    - snapshot://oecd/2023-05-18/co2_air_transport.csv
+  data://garden/oecd/2023-05-19/co2_air_transport:
+    - data://garden/tourism/2023-05-05/unwto
+    - data://meadow/oecd/2023-05-18/co2_air_transport
+    - data://garden/demography/2022-12-08/population
+  data://grapher/oecd/2023-05-19/co2_air_transport:
+    - data://garden/oecd/2023-05-19/co2_air_transport
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
