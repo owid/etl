@@ -95,15 +95,27 @@ def expand_time_column(
     df: TableOrDataFrame,
     entity_col: str,
     time_col: str,
+    entities_complete: Optional[List[str] | Set[str]] = None,
     mode: Literal["full_range", "full_range_entity", "reduced"] = "full_range",
 ) -> TableOrDataFrame:
     """Add rows to complete the timeseries.
 
-    You can complete the timeseries in various ways, by changing the value of `mode`
 
-        - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the data.
-        - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
-        - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
+    Parameters
+    ----------
+    df: Table or DataFrame
+        Should contain three columns: country, year, and the column to be interpolated.
+    entity_col: str
+        Name of the column with entity names (typically for countries).
+    time_col: str
+        Name of the column with years.
+    entities_index_values: List[str]
+        Adds rows for all entities in `entities_index_values`, even if they don't exist in the input table. Does no apply when mode='full_range'.
+    mode: str
+        You can complete the timeseries in various ways, by changing the value of this argument:
+            - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the data.
+            - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
+            - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
     """
 
     def _get_complete_date_range(ds):
@@ -120,16 +132,19 @@ def expand_time_column(
 
         def _reindex_dates(group):
             complete_date_range = _get_complete_date_range(group["date"])
-            group = group.set_index("date").reindex(complete_date_range).reset_index().rename(columns={"index": "date"})
-            group["country"] = group["country"].ffill().bfill()  # Fill NaNs in 'country'
+            group = (
+                group.set_index(time_col).reindex(complete_date_range).reset_index().rename(columns={"index": time_col})
+            )
+            group[entity_col] = group[entity_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
         # Apply the reindexing to each group
-        df = df.groupby("country").apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+        df = df.groupby(entity_col).apply(_reindex_dates).reset_index(drop=True).set_index([entity_col, time_col])  # type: ignore
     else:
         # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
         # Optionally fill missing years linearly.
-        countries_in_data = df[entity_col].unique()
+        if entities_complete is None:
+            entities_complete = df[entity_col].unique()  # type: ignore
         # Get list of year-country tuples
         if mode == "full_range":
             date_values = _get_complete_date_range(df[time_col])
@@ -138,7 +153,7 @@ def expand_time_column(
         # Reindex
         df = (
             df.set_index([entity_col, time_col])
-            .reindex(pd.MultiIndex.from_product([countries_in_data, date_values], names=[entity_col, time_col]))  # type: ignore
+            .reindex(pd.MultiIndex.from_product([entities_complete, date_values], names=[entity_col, time_col]))  # type: ignore
             .sort_index()
         )
 
