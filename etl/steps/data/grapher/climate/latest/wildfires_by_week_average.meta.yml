@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Climate Change
+      grapher_config:
+         note: The numbers 1 to 52 on the horizontal axis represent the weeks from the start of the year, from 1 for the first week of January to 52 for the last week of December.
     processing_level: minor
     display:
       numDecimalPlaces: 0
@@ -24,7 +26,7 @@ definitions:
     - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
   desc_update: The 2024 data is incomplete and was last updated {TODAY}.
   description_short_wildires_cumulative: &description_short_wildires_cumulative  |-
-    The cumulative area burnt by wildfires in hectares. {definitions.desc_update}
+    The cumulative area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
   description_short_share_wildfires_cumulative: &description_short_share_wildfires_cumulative |-
     Cumultive share of the total land area burnt by [wildfires](#dod:wildfires). The total area consumed by wildfires is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
   description_short_co2_cumulative: &description_short_co2_cumulative |-
