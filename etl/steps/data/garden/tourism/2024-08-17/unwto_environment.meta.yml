@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  unwto_environment:
+    variables:
+      seea_tables:
+        title: Number of tables in the System of Environmental and Economic Account
+        unit: tables
+        description_short: Number of tables in the SEEA that track key environmental aspects of tourism, including water, energy, GHG emissions, and solid waste.
+
+      tsa_tables:
+        title: Number of tables in the Tourism Satellite Account
+        unit: tables
+        description_short: Number of tables in the TSA that track key economic aspects of tourism, including expenditure, production, and employment.
+
+      total_tables:
+       title: Total number of tables
+       unit: tables
+       description_short: These tables track key economic and environmental aspects of tourism, including expenditure, production, employment, and resource flows.
+       description_key:
+         - The relevant tables for monitoring tourism sustainability include TSA tables on various aspects of tourism expenditure, production, and employment, as well as SEEA tables on environmental flows such as water, energy, GHG emissions, and solid waste.
+         - These tables collectively track the economic and environmental impacts of tourism.

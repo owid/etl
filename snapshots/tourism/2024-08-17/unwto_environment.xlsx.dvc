@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Implementation of standards accounting tools to monitor the economic and environmental aspects of tourism sustainability
+    description: |-
+      Indicator 12.b.1 shows the preparedness of countries to “develop and implement tools to monitor sustainable development impacts for sustainable tourism” called for in target 12.b under Goal 12 on Sustainable Consumption and Production.
+
+      More specifically, it tracks the implementation of the most relevant Tourism Satellite Account (TSA) and System of Environmental Economic Accounting (SEEA) tables.
+    date_published: "2024-04-29"
+
+    # Citation
+    producer: UNWTO
+    citation_full: |-
+      World Tourism Organization (2024),Implementation of standards accounting tools to monitor the economic and environmental aspects of tourism sustainability, UNWTO, Madrid:
+      https://www.unwto.org/tourism-statistics/economic-contribution-SDG [17-08-2024].
+
+    # Files
+    url_main: https://www.unwto.org/tourism-statistics/economic-contribution-SDG
+    url_download: http://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2024-04/Indicator-12_b_1-2022-UN_Toiurism_april2024_update.xlsx
+    date_accessed: 2024-08-17
+
+    # License
+    license:
+      name: © UNWTO, 92844/14/23
+outs:
+  - md5: a94df0e7146e9c5b3253433289ee4d6a
+    size: 503732
+    path: unwto_environment.xlsx

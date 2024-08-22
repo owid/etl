@@ -28,3 +28,15 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/oecd/2024-08-21/co2_air_transport:
     - data://garden/oecd/2024-08-21/co2_air_transport
+  data://meadow/tourism/2024-08-17/unwto_environment:
+    - snapshot://tourism/2024-08-17/unwto_environment.xlsx
+  data://garden/tourism/2024-08-17/unwto_environment:
+    - data://meadow/tourism/2024-08-17/unwto_environment
+  data://grapher/tourism/2024-08-17/unwto_environment:
+    - data://garden/tourism/2024-08-17/unwto_environment
+  data://meadow/tourism/2024-08-17/unwto_gdp:
+    - snapshot://tourism/2024-08-17/unwto_gdp.xlsx
+  data://garden/tourism/2024-08-17/unwto_gdp:
+    - data://meadow/tourism/2024-08-17/unwto_gdp
+  data://grapher/tourism/2024-08-17/unwto_gdp:
+    - data://garden/tourism/2024-08-17/unwto_gdp
