@@ -17,7 +17,7 @@ definitions:
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
      'Public gatherings', with level: (<< restriction_level >>/4)
     <% if restriction_level == 0 %>
-     'Nno restrictions'.
+     'No restrictions'.
     <% elif restriction_level == 1 %>
      'restrictions on very large gatherings (the limit is above 1000 people)'.
     <% elif restriction_level == 2 %>
@@ -31,7 +31,7 @@ definitions:
     <% elif restriction_name == 'h6m_facial_coverings' %>
      'Face coverings', with level: (<< restriction_level >>/4)
     <% if restriction_level == 0 %>
-     'Nno policy'.
+     'No policy'.
     <% elif restriction_level == 1 %>
      'recommended'.
     <% elif restriction_level == 2 %>
@@ -491,5 +491,6 @@ tables:
       num_countries:
         title: |-
           Number of countries - Restriction: {definitions.restriction_text_short}
-        description_short: Number of countries with restrictions in '{definitions.restriction_text}'
+        description_short: |-
+          {definitions.restriction_text}
         unit: "countries"
