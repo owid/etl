@@ -164,4 +164,7 @@ def get_num_countries_per_region(tb: Table) -> Table:
             "size": "num_countries",
         }
     )
+
+    # Dtypes
+    tb = tb.astype({"restriction_level": int})
     return tb
