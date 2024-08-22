@@ -39,6 +39,7 @@ HEADINGS_TO_USE = [
 NAN_VALUES = [
     "No data",
     "Not applicable",
+    "not applicable",
     "",
     "-",
     "—",
@@ -47,6 +48,8 @@ NAN_VALUES = [
     "None",
     "none",
     "Data not available",
+    "Not available",
+    "Figure not available",
     "...",
     "…",
 ]
@@ -122,9 +125,8 @@ def run(dest_dir: str) -> None:
         # Check for duplicate index
         tb = check_duplicate_index(tb)
 
-        # If numeric value is all nan (does not exist), use display_value
-        if "numeric" not in tb.columns:
-            tb["numeric"] = tb["display_value"]
+        # Clean up display value
+        tb = clean_numeric_column(tb)
 
         # Remove display_value column
         tb = tb.drop(columns=["display_value"])
@@ -173,6 +175,27 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def clean_numeric_column(tb: Table) -> Table:
+    # Detect nans in display_value
+    ix = tb["display_value"].isin(NAN_VALUES)
+    if ix.any():
+        tb["display_value"] = tb["display_value"].astype(str)
+        tb.loc[ix, "display_value"] = np.nan
+
+    # If numeric value is all nan (does not exist), use display_value
+    if "numeric" not in tb.columns:
+        tb["numeric"] = tb["display_value"]
+
+    # Sometimes numeric is missing, but display_value is present (e.g. in table cholera_0000000001)
+    if tb["numeric"].isnull().any():
+        if pd.api.types.is_numeric_dtype(tb["numeric"]):
+            tb["numeric"] = tb["numeric"].astype(float).fillna(pd.to_numeric(tb["display_value"], errors="coerce"))
+        else:
+            tb["numeric"] = tb["numeric"].fillna(tb["display_value"])
+
+    return tb
 
 
 def check_overlapping_names(tb: Table) -> None:
