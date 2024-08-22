@@ -138,15 +138,23 @@ def get_num_countries_per_region(tb: Table) -> Table:
         var_name="restriction_name",
         value_name="restriction_level",
     )
+
+    # World
+    tb_world = tb.groupby(["date", "restriction_name", "restriction_level"], observed=True, as_index=False).size()
+    tb_world["country"] = "World"
+
+    # Regions
     tb = pr.concat(
         [
             tb.drop(columns="continent").rename(columns={"income_group": "country"}),
             tb.drop(columns="income_group").rename(columns={"continent": "country"}),
         ]
     )
-
-    # Actual counting
+    ## Actual counting
     tb = tb.groupby(["country", "date", "restriction_name", "restriction_level"], observed=True, as_index=False).size()
+
+    # Concat regions + world
+    tb = pr.concat([tb, tb_world], ignore_index=True)
 
     # Rename column
     tb = tb.rename(
