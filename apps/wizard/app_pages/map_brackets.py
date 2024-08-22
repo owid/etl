@@ -991,7 +991,7 @@ elif use_type == USE_TYPE_EXPLORERS:
         # Select a variable id from a dropdown menu.
         variable_id: str = str(
             st.selectbox(  # type: ignore
-                label="Indicator id",
+                label=f"Indicator id ({len(variable_ids)} variables available)",
                 options=variable_ids,
                 index=0,
             )
