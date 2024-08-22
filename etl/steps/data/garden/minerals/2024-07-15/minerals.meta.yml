@@ -102,7 +102,7 @@ tables:
         title: production|Chromium|Mine|tonnes
         unit: tonnes
         short_unit: t
-        description_short: Based on mined, rather than [refined](#dod:refined-production), production. Measured in tonnes.
+        description_short: Production of chromium, in tonnes. Based on mined, rather than [refined](#dod:refined-production), production.
         presentation:
           title_public: Chromium production
       production_coal_mine_tonnes:
@@ -707,6 +707,13 @@ tables:
         description_short: Reserves of [bauxite](#dod:bauxite), in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
         presentation:
           title_public: Bauxite reserves
+      reserves_chromium_mine_tonnes:
+        title: reserves|Chromium|Mine|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Reserves of chromium, in tonnes. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Chromium reserves
       reserves_cobalt_mine_tonnes:
         title: reserves|Cobalt|Mine|tonnes
         unit: tonnes
@@ -1439,7 +1446,7 @@ tables:
         title: share of global production|Chromium|Mine|tonnes
         unit: '%'
         short_unit: '%'
-        description_short: Based on mined, rather than [refined](#dod:refined-production), production.
+        description_short: Production of chromium as a share of global chromium production. Based on mined, rather than [refined](#dod:refined-production), production.
         presentation:
           title_public: Chromium production as a share of the global total
       share_of_global_production_coal_mine_tonnes:
@@ -1876,6 +1883,13 @@ tables:
         description_short: Reserves of [bauxite](#dod:bauxite) as a share of global bauxite reserves. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
         presentation:
           title_public: Bauxite reserves as a share of the global total
+      share_of_global_reserves_chromium_mine_tonnes:
+        title: share of global reserves|Chromium|Mine|tonnes
+        unit: '%'
+        short_unit: '%'
+        description_short: Reserves of chromium as a share of global chromium reserves. Mineral [reserves](#dod:mineral-reserve) are resources that have been evaluated and can be mined economically with current technologies.
+        presentation:
+          title_public: Chromium reserves as a share of the global total
       share_of_global_reserves_cobalt_mine_tonnes:
         title: share of global reserves|Cobalt|Mine|tonnes
         unit: '%'
