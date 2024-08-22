@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 
 # Prefix used for "share" columns.
 # NOTE: This must coincide with the same variable as defined in the garden minerals step.
-SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+SHARE_OF_GLOBAL_PREFIX = "share of global "
 
 
 def run(dest_dir: str) -> None:
