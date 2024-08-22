@@ -976,7 +976,7 @@ class VersionTracker:
         missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
 
         # Remove those special steps that are expected to not appear in the dag as executable steps (e.g. snapshots).
-        channels_to_ignore = ("snapshot", "backport", "etag", "github", "walden")
+        channels_to_ignore = ("snapshot", "etag", "github", "walden")
         missing_steps = set([step for step in missing_steps if not step.startswith(channels_to_ignore)])
 
         if len(missing_steps) > 0:
@@ -1105,21 +1105,6 @@ class VersionTracker:
         # Depending on whether connect_to_db is True or False, the criterion will be different.
         # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
         self.check_that_all_active_steps_are_necessary()
-
-    def get_backported_db_dataset_ids(self) -> List[int]:
-        """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
-
-        Returns
-        -------
-        backported_dataset_ids : List[int]
-            Grapher DB dataset ids that are used in ETL backported datasets.
-        """
-        backported_dataset_names = [step for step in self.all_active_dependencies if step.startswith("backport://")]
-        backported_dataset_ids = sorted(
-            set([int(step.split("dataset_")[1].split("_")[0]) for step in backported_dataset_names])
-        )
-
-        return backported_dataset_ids
 
 
 @click.command(name="version-tracker", cls=RichCommand)

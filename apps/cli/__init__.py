@@ -85,7 +85,6 @@ SUBGROUPS = {
         "commands": {
             "fasttrack": "apps.backport.fasttrack_backport.cli",
             "migrate": "apps.backport.migrate.migrate.cli",
-            "bulk": "apps.backport.bulk_backport.bulk_backport",
             "run": "apps.backport.backport.backport_cli",
         },
     },

@@ -558,7 +558,7 @@ class PathFinder:
         if channel_type.startswith(("walden", "snapshot")):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type.startswith(("data", "backport")):
+        elif channel_type.startswith(("data",)):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
