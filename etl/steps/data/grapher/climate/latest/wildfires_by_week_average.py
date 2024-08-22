@@ -52,15 +52,17 @@ def run(dest_dir: str) -> None:
         # Process data for each country
         for country in tb["country"].unique():
             country_rows = tb_grouped[tb_grouped["country"] == country]
+
+            # Select rows with year 52 (actually the last week of the year)
             country_row_52 = country_rows[country_rows["year"] == 52]
 
             if country_row_52.empty or country_row_52[group_columns_sorted].isnull().all(axis=1).all():
                 continue
 
-            # Find the column with the maximum value at year 52 (actually the last month of the year)
+            # Find the column with the maximum value at year 52 (actually the last week of the year)
             max_col = country_row_52[group_columns_sorted].idxmax(axis=1).iloc[0]
 
-            # Find the column with the minimum value at year 52 (actually the last month of the year)
+            # Find the column with the minimum value at year 52 (actually the last week of the year)
             min_col = country_row_52[group_columns_sorted].idxmin(axis=1).iloc[0]
 
             # Set upper and lower bounds for all rows of this country using the columns identified at year 52
