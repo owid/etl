@@ -66,17 +66,17 @@ definitions:
     <% if restriction_level == 0 %>
      No restrictions
     <% elif restriction_level == 1 %>
-     Restrictions on gatherings (≥1000 people)
+     ≥1000 people
     <% elif restriction_level == 2 %>
-     Restrictions on gatherings (101-1000 people)
+     101-1000 people
     <% elif restriction_level == 3 %>
-     Restrictions on gatherings (11-100 people)
+     11-100 people
     <% elif restriction_level == 4 %>
-     Restrictions on gatherings (≤10 people)
+     ≤10 people
     <%- endif -%>
     <%- endif -%>
     <% elif restriction_name == 'h6m_facial_coverings' %>
-     International travel controls:
+     Face coverings:
     <% if restriction_level == -1 %>
      No data
     <% else %>
@@ -94,7 +94,7 @@ definitions:
     <%- endif -%>
     <%- endif -%>
     <% elif restriction_name == 'c8ev_international_travel_controls' %>
-     Face coverings:
+     International travels:
     <% if restriction_level == -1 %>
      No data
     <% else %>
