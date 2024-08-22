@@ -77,5 +77,5 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_grapher.metadata)
-    ds_grapher.metadata.title = "Seasonal wildfire trends by week - Average and Standard Deviation"
+    ds_grapher.metadata.title = "Seasonal wildfire trends by week - average with upper and lower bounds"
     ds_grapher.save()
