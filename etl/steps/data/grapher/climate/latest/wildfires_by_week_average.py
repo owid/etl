@@ -38,9 +38,9 @@ def run(dest_dir: str) -> None:
 
         group_columns_sorted = sorted(group_columns, key=lambda x: int(x.split("_")[1]))
 
-        tb[f"cumulative_{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
+        tb[f"{group}_until_2024"] = tb[group_columns_sorted].sum(axis=1)
 
-        tb[f"avg_cumulative_{group}_until_2024"] = tb[f"cumulative_{group}_until_2024"] / len(group_columns_sorted)
+        tb[f"avg_{group}_until_2024"] = tb[f"{group}_until_2024"] / len(group_columns_sorted)
 
         # Calculate the standard deviation
         tb["std_dev"] = tb[group_columns_sorted].std(axis=1)
@@ -49,24 +49,18 @@ def run(dest_dir: str) -> None:
         n = len(group_columns_sorted)
 
         # Calculate the standard error
-        tb[f"std_err_cum_{group}_until_2024"] = tb["std_dev"] / np.sqrt(n)
+        tb[f"std_err_{group}_until_2024"] = tb["std_dev"] / np.sqrt(n)
 
         # Calculate the upper and lower bounds of the standard deviation
-        tb[f"upper_bound_cum_{group}"] = (
-            tb[f"avg_cumulative_{group}_until_2024"] + tb[f"std_err_cum_{group}_until_2024"]
-        )
-        tb[f"lower_bound_cum_{group}"] = (
-            tb[f"avg_cumulative_{group}_until_2024"] - tb[f"std_err_cum_{group}_until_2024"]
-        )
+        tb[f"upper_bound_{group}"] = tb[f"avg_{group}_until_2024"] + tb[f"std_err_{group}_until_2024"]
+        tb[f"lower_bound_{group}"] = tb[f"avg_{group}_until_2024"] - tb[f"std_err_{group}_until_2024"]
 
         # Drop original columns as they are used in a different dataset
-        tb = tb.drop(
-            columns=[f"std_err_cum_{group}_until_2024", f"cumulative_{group}_until_2024", "std_dev"] + group_columns
-        )
+        tb = tb.drop(columns=[f"std_err_{group}_until_2024", f"{group}_until_2024", "std_dev"] + group_columns)
         # Dynamically set origins based on the group
         origin_column = f"_2024_{group}"  # Dynamically set based on group name
         if origin_column in tb.columns:  # Check if the origin column exists
-            for col in [f"avg_cumulative_{group}_until_2024", f"upper_bound_cum_{group}", f"lower_bound_cum_{group}"]:
+            for col in [f"avg_{group}_until_2024", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
 
     # Set 'country' and 'year' as the index of the DataFrame
