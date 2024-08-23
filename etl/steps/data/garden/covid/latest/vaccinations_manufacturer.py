@@ -45,6 +45,9 @@ def run(dest_dir: str) -> None:
         }
     )
 
+    # Forward-fill + Zero-fill
+    tb = fill_time_gaps(tb)
+
     # Aggregate
     tb = add_regional_aggregates(tb, ds_regions, index_columns=["country", "date", "vaccine"])
 
@@ -71,12 +74,26 @@ def run(dest_dir: str) -> None:
 
 
 def add_regional_aggregates(tb: Table, ds_regions: Dataset, index_columns: Optional[List[str]] = None) -> Table:
-    tb_agg = _prepare_table_for_aggregates(tb)
     tb_agg = add_regions(
-        tb_agg, ds_regions, keep_only_regions=True, regions={"European Union (27)": {}}, index_columns=index_columns
+        tb, ds_regions, keep_only_regions=True, regions={"European Union (27)": {}}, index_columns=index_columns
     )
     tb = concat([tb, tb_agg], ignore_index=True)
     return tb
+
+
+def fill_time_gaps(tb: Table) -> Table:
+    """Prepare table for region-aggregate values.
+
+    Often, values for certain countries are missing. This can lead to very large under-estimates regional values. To mitigate this, we combine zero-filling with interpolation and other techniques.
+    """
+    tb_agg = expand_time_column(tb, ["country", "vaccine"], "date", "full_range")
+    # cumulative metrics: Interpolate, forward filling (for latest) + zero-filling (for remaining NaNs, likely at start)
+    cols_ffill = [
+        "total_vaccinations",
+    ]
+    tb_agg = _interp_ffill_fillna(tb_agg, cols_ffill, ["country", "vaccine"], "date")
+
+    return cast(Table, tb_agg)
 
 
 def _interp_ffill_fillna(
@@ -96,18 +113,3 @@ def _interp_ffill_fillna(
     tb.loc[:, columns] = tb.groupby(entity_col)[columns].ffill().fillna(0)  # type: ignore
 
     return tb
-
-
-def _prepare_table_for_aggregates(tb: Table) -> Table:
-    """Prepare table for region-aggregate values.
-
-    Often, values for certain countries are missing. This can lead to very large under-estimates regional values. To mitigate this, we combine zero-filling with interpolation and other techniques.
-    """
-    tb_agg = expand_time_column(tb, ["country", "vaccine"], "date", "full_range")
-    # cumulative metrics: Interpolate, forward filling (for latest) + zero-filling (for remaining NaNs, likely at start)
-    cols_ffill = [
-        "total_vaccinations",
-    ]
-    tb_agg = _interp_ffill_fillna(tb_agg, cols_ffill, ["country", "vaccine"], "date")
-
-    return cast(Table, tb_agg)
