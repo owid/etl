@@ -42,6 +42,7 @@ tables:
       bryophytes:
         title: First records of established alien bryophyte species
         description_short: The year in which an [established alien bryophyte species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
+        description_key: Data includes birds, mammals, reptiles, amphibians, vascular plants, bryophytes, algae, fishes, insects, mollusks, crustaceans, arachnids, arthropods (myriapods, diplopods, etc.), other invertebrates, fungi, bacteria and protozoans.
       algae:
         title: First records of established alien algae species
         description_short: The year in which an [established alien algae species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
