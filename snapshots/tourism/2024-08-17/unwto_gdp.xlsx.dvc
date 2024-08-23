@@ -22,6 +22,7 @@ meta:
     # License
     license:
       name: © UNWTO, 92844/14/23
+      url: https://www.unwto.org/copyright
 outs:
   - md5: 59d7f0de99ca71355adf49c9c0792df7
     size: 94361

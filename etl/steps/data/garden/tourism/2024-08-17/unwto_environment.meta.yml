@@ -29,7 +29,10 @@ tables:
       total_tables:
        title: Total number of tables
        unit: tables
-       description_short: Monitoring is expressed as the number of implemented tables across the Tourism Satellite Account and the System of Environmental and Economic Account. These tables track key economic and environmental aspects of tourism, including expenditure, production, employment, and resource flows.
+       description_short: Monitoring is expressed as the number of data tables implemented within the Tourism Satellite Account (TSA) and the System of Environmental and Economic Accounts (SEEA). These tables organize and track key economic and environmental aspects of tourism, such as expenditure, production, employment, and resource flows.
        description_key:
-         - The relevant tables for monitoring tourism sustainability include TSA tables on various aspects of tourism expenditure, production, and employment, as well as SEEA tables on environmental flows such as water, energy, GHG emissions, and solid waste.
-         - These tables collectively track the economic and environmental impacts of tourism.
+        - The Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) are standardized methods used by countries to measure the economic and environmental impacts of tourism.
+        - TSA tables track economic aspects of tourism, such as tourist spending, the production of tourism-related goods and services, and employment in the tourism sector.
+        - SEEA tables monitor environmental impacts, including the consumption of resources like water and energy, as well as the emission of greenhouse gases and generation of waste by the tourism industry.
+        - National governments or statistical agencies collect and organize data into these tables to understand tourism's influence on the economy and environment.
+        - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked, with more tables providing a more detailed and nuanced understanding.
