@@ -648,12 +648,12 @@ def _add_global_data_for_comparison(tb: Table, ds_regions: Dataset) -> Table:
 
     # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
     accepted_overlaps = [
-        {1991: {"USSR", "Russia"}},
+        # {1991: {"USSR", "Russia"}},
         {1992: {"Czechia", "Czechoslovakia"}},
         {1992: {"Slovakia", "Czechoslovakia"}},
-        {1990: {"Germany", "East Germany"}},
-        {1990: {"Germany", "West Germany"}},
-        {1990: {"Yemen", "Yemen People's Republic"}},
+        # {1990: {"Germany", "East Germany"}},
+        # {1990: {"Germany", "West Germany"}},
+        # {1990: {"Yemen", "Yemen People's Republic"}},
     ]
     # Regions to create.
     # NOTE: We only need "World", but we need other regions to construct it.
