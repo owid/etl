@@ -111,7 +111,6 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = make_table_growth_rate(
         tb_population=tb,
     )
-    tb_growth_rate = add_smoothed_growth_rate(tb_growth_rate)
 
     # Add population density
     tb_density = make_table_density(
@@ -674,6 +673,9 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     # Sorting the DataFrame by country and year to ensure the calculations are accurate
     tb = tb_population.sort_values(by=["country", "year"]).copy()
 
+    # PRE-1900: Only keep years that are multiples of 50
+    tb = tb.loc[(tb["year"] >= 1900) | (tb["year"] % 50 == 0)]
+
     # Creating the 'previous_population' and 'previous_year' columns
     tb["previous_population"] = tb.groupby("country")["population"].shift(1)
     tb["previous_year"] = tb.groupby("country")["year"].shift(1)
@@ -681,13 +683,13 @@ def make_table_growth_rate(tb_population: Table) -> Table:
     tb["next_year"] = tb.groupby("country")["year"].shift(-1)
 
     # Only since 1700
-    tb = tb.loc[tb["year"] > 1700]
+    tb = tb.loc[tb["year"] >= 1700]
 
     # Drop rows without previous year
     tb = tb.dropna(subset=["previous_year"])
 
     # Only estimate popultion growth rate if distance to latest datapoint is lower than 10 years
-    tb = tb.loc[tb["year"] - tb["previous_year"] <= 10]
+    # tb = tb.loc[tb["year"] - tb["previous_year"] <= 10]
 
     # Estimate population growth rate
     tb["growth_rate"] = 100 * (
@@ -709,33 +711,6 @@ def make_table_growth_rate(tb_population: Table) -> Table:
 
     # Keep relevant columns
     tb = tb.loc[:, ["country", "year", "growth_rate"]]
-    return tb
-
-
-def add_smoothed_growth_rate(tb: Table) -> Table:
-    """Smooth growth rate (pre-1900) with 50-year rolling average."""
-    # Separate the data for years before 1900
-    tb_before_1900 = tb.loc[tb["year"] < 1900]
-
-    # Reindex to ensure all years from 1700 to 1900 are included for each country
-    countries = tb_before_1900["country"].unique()
-    years = range(1700, 1900)
-    tb_before_1900 = (
-        tb_before_1900.set_index(COLUMNS_INDEX)
-        .reindex(pd.MultiIndex.from_product([countries, years], names=COLUMNS_INDEX))
-        .sort_index()
-        .reset_index()
-    )
-
-    # Apply the 50-year rolling average within each country group
-    tb_before_1900["growth_rate"] = tb_before_1900.groupby("country", as_index=False)["growth_rate"].transform(
-        lambda x: x.rolling(window=50, min_periods=1, center=True).mean()
-    )
-
-    # Merge back to growth rate table
-    tb = tb.merge(tb_before_1900, on=COLUMNS_INDEX, suffixes=("", "_smoothed"), how="left")
-    tb["growth_rate_smoothed"] = tb["growth_rate_smoothed"].fillna(tb["growth_rate"])
-
     return tb
 
 
