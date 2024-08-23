@@ -21,28 +21,31 @@ def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
 
     Meant to be ran as a subprocess by the main `etl` command. There's a quite big overhead (~3s) from importing all packages again in the new subprocess.
     """
-    if not uri.startswith("data://") and not uri.startswith("data-private://"):
-        raise ValueError("Only data:// or data-private:// URIs are supported")
+    step_type, path = uri.split("://", 1)
 
-    path = uri.split("//", 1)[1]
+    allowed_step_types = ["data", "data-private", "export"]
+    if step_type not in allowed_step_types:
+        raise ValueError(f"Step type must be one of {allowed_step_types}, not {step_type}")
+
+    step_type = step_type.replace("-private", "")
 
     if ipdb:
         with launch_ipdb_on_exception():
-            _import_and_run(path, dest_dir)
+            _import_and_run(step_type, path, dest_dir)
     else:
-        _import_and_run(path, dest_dir)
+        _import_and_run(step_type, path, dest_dir)
 
 
-def _import_and_run(path: str, dest_dir: str) -> None:
+def _import_and_run(step_type: str, path: str, dest_dir: str) -> None:
     # ensure that the module search path includes the script
-    step_path = STEP_DIR / "data" / path
+    step_path = STEP_DIR / step_type / path
     # path can be either in a module with __init__.py or a single .py file
     module_dir = step_path if step_path.is_dir() else step_path.parent
     sys.path.append(module_dir.as_posix())
 
     # import the module
     module_path = path.replace("/", ".")
-    import_path = f"{BASE_PACKAGE}.steps.data.{module_path}"
+    import_path = f"{BASE_PACKAGE}.steps.{step_type}.{module_path}"
     module = import_module(import_path)
 
     # check it matches the expected interface
