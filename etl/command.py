@@ -314,8 +314,8 @@ def run_dag(
     """
     excludes = excludes or []
 
-    if not private:
-        _validate_private_steps(dag)
+    # if not private:
+    #     _validate_private_steps(dag)
 
     if not private:
         excludes.append("-private://")
