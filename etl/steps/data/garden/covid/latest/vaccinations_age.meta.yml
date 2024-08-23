@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    processing_level: major
+    unit: "people vaccinated per hundred"
+    display:
+      numDecimalPlaces: 2
+      tolerance: 9999
+      name: << age_group >>
+    description_processing: Per-capita values have been estimated using UN WPP (2022 review) data for year 2021.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, vaccinations (by manufacturer)
+
+tables:
+  vaccinations_age:
+    variables:
+      people_vaccinated_per_hundred:
+        title: People vaccinated, per hundred (cumulative) - Manufacturer << age_group >>
+        description_short: Total number of << age_group >> COVID-19 vaccination doses administered.
+
+      people_fully_vaccinated_per_hundred:
+        title: People fully vaccinated, per hundred (cumulative) - Age group << age_group >>
+        description_short: Total number of << age_group >> COVID-19 vaccination doses administered.
+
+      people_with_booster_per_hundred:
+        title: People with boosters, per hundred (cumulative) - Manufacturer << age_group >>
+        description_short: Total number of << age_group >> COVID-19 vaccination doses administered.

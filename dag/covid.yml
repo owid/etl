@@ -211,6 +211,13 @@ steps:
   data://grapher/covid/latest/vaccinations_manufacturer:
     - data://garden/covid/latest/vaccinations_manufacturer
 
+  data://meadow/covid/latest/vaccinations_age:
+    - snapshot://covid/latest/vaccinations_age.csv
+  data://garden/covid/latest/vaccinations_age:
+    - data://meadow/covid/latest/vaccinations_age
+  data://grapher/covid/latest/vaccinations_age:
+    - data://garden/covid/latest/vaccinations_age
+
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:
     - snapshot://excess_mortality/latest/hmd_stmf.csv
@@ -255,13 +262,3 @@ steps:
     - data://garden/covid/latest/ecdc
   data://garden/covid/latest/ecdc:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/archived/ecdc/COVID-2019%20-%20ECDC%20(2020).csv
-  # Vaccinations by age
-  data-private://grapher/covid/latest/vaccinations_by_age_group:
-    - data-private://garden/covid/latest/vaccinations_by_age_group
-  data-private://garden/covid/latest/vaccinations_by_age_group:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20age%20group.csv
-  # Vaccinations by manufacturer
-  data-private://grapher/covid/latest/vaccinations_by_manufacturer:
-    - data-private://garden/covid/latest/vaccinations_by_manufacturer
-  data-private://garden/covid/latest/vaccinations_by_manufacturer:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
