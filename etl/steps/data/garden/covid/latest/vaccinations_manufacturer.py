@@ -82,18 +82,18 @@ def add_regional_aggregates(tb: Table, ds_regions: Dataset, index_columns: Optio
 
 
 def fill_time_gaps(tb: Table) -> Table:
-    """Prepare table for region-aggregate values.
+    """Interpolate missing time gaps.
 
     Often, values for certain countries are missing. This can lead to very large under-estimates regional values. To mitigate this, we combine zero-filling with interpolation and other techniques.
     """
-    tb_agg = expand_time_column(tb, ["country", "vaccine"], "date", "full_range")
+    tb = expand_time_column(tb, ["country", "vaccine"], "date", "full_range")
     # cumulative metrics: Interpolate, forward filling (for latest) + zero-filling (for remaining NaNs, likely at start)
     cols_ffill = [
         "total_vaccinations",
     ]
-    tb_agg = _interp_ffill_fillna(tb_agg, cols_ffill, ["country", "vaccine"], "date")
-
-    return cast(Table, tb_agg)
+    tb = _interp_ffill_fillna(tb, cols_ffill, ["country", "vaccine"], "date")
+    tb[cols_ffill] = tb[cols_ffill].astype(int)
+    return cast(Table, tb)
 
 
 def _interp_ffill_fillna(
