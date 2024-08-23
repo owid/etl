@@ -39,10 +39,10 @@ tables:
       all:
         title: First records of all established alien species
         description_short: The year in which an [established alien species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
-        description_key: |
-        - For global values a species may be counted multiple times, if the species was found in different regions (one first record per species and region). A region mostly refers to countries and some distinguished islands such as Hawaii, Azores or Sicily.
-        - For continental values, only the very first record of a species on a continent is considered. That is, a species has at maximum one first record per continent.
-        - Data includes birds, mammals, reptiles, amphibians, vascular plants, bryophytes, algae, fishes, insects, mollusks, crustaceans, arachnids, arthropods (myriapods, diplopods, etc.), other invertebrates, fungi, bacteria and protozoans.
+        description_key:
+          - For global values a species may be counted multiple times, if the species was found in different regions (one first record per species and region). A region mostly refers to countries and some distinguished islands such as Hawaii, Azores or Sicily.
+          - For continental values, only the very first record of a species on a continent is considered. That is, a species has at maximum one first record per continent.
+          - Data includes birds, mammals, reptiles, amphibians, vascular plants, bryophytes, algae, fishes, insects, mollusks, crustaceans, arachnids, arthropods (myriapods, diplopods, etc.), other invertebrates, fungi, bacteria and protozoans.
       bryophytes:
         title: First records of established alien bryophyte species
         description_short: The year in which an [established alien bryophyte species](#dod:established-alien-species) was first recorded outside of its [native range](#dod:species-native-range).
