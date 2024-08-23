@@ -249,8 +249,8 @@ steps:
   data://grapher/oecd/2023-05-19/co2_air_transport:
     - data://garden/oecd/2023-05-19/co2_air_transport
 
-  # UNWTO tourism
-  # Key indicators
+  # Tourism datasets
+  # UNWTO key indicators
   data://meadow/tourism/2023-05-05/unwto:
     - snapshot://tourism/2023-05-04/unwto.xlsx
   data://garden/tourism/2023-05-05/unwto:
@@ -260,11 +260,29 @@ steps:
     - data://garden/demography/2022-12-08/population
   data://grapher/tourism/2023-05-11/unwto:
     - data://garden/tourism/2023-05-05/unwto
+
   # OECD exchange rates
   data://meadow/oecd/2023-06-20/ppp_exchange_rates:
     - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
     - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+
+  # UNWTO Environment Tables Implementations
+  data://meadow/tourism/2023-05-09/unwto_environment:
+    - snapshot://tourism/2023-05-09/unwto_environment.xlsx
+  data://garden/tourism/2023-05-10/unwto_environment:
+    - data://meadow/tourism/2023-05-09/unwto_environment
+  data://grapher/tourism/2023-05-23/unwto_environment:
+    - data://garden/tourism/2023-05-10/unwto_environment
+
+  # UNWTO GDP
+  data://meadow/tourism/2023-05-09/unwto_gdp:
+    - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
+  data://garden/tourism/2023-05-10/unwto_gdp:
+    - data://meadow/tourism/2023-05-09/unwto_gdp
+  data://grapher/tourism/2023-05-23/unwto_gdp:
+    - data://garden/tourism/2023-05-10/unwto_gdp
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
