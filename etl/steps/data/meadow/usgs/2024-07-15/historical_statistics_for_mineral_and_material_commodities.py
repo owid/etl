@@ -5,6 +5,7 @@ import tempfile
 import warnings
 from pathlib import Path
 from typing import Dict, Tuple
+from xml.etree import ElementTree
 from zipfile import ZipFile
 
 import owid.catalog.processing as pr
@@ -30,7 +31,7 @@ World Production
 Data are defined as world primary aluminum production. Data are reported in the MR and MYB.
 """,
     "chromium": """
-    World Production
+World Production
 World production is an estimate of world chromite ore mine production measured in contained chromium. World production reported in gross weight was converted to contained chromium by assuming that its chromic oxide content was the same as that of chromite ore imported into the United States. Before content of chromite ore was reported, a time-averaged value was used.
 """,
     "vanadium": """
@@ -117,11 +118,38 @@ def extract_embedded_files_from_excel(excel_path: Path, output_dir: Path) -> Non
 
 def extract_text_from_word_document(file_path: Path) -> str:
     # NOTE: This will only work for ".docx" files, not ".doc".
+    #  If metadata is in a ".doc", the relevant sections should be manually copied in MANUALLY_EXTRACTED_TEXT.
+
     # Load Word document.
     doc = Document(file_path.as_posix())
 
-    # Extract text from each paragraph
-    text = "\n".join([para.text for para in doc.paragraphs])
+    # Initialize a list to store the extracted text.
+    extracted_text = []
+
+    # Iterate through each paragraph in the document.
+    for para in doc.paragraphs:
+        # Get the XML of the paragraph and parse the XML.
+        xml_tree = ElementTree.fromstring(para._element.xml)
+
+        # Temporary list to hold the text of the current paragraph.
+        para_text = []
+
+        # Extract text, including text inside smart tags.
+        for elem in xml_tree.iter():
+            # 't' stands for text in the Word XML schema.
+            if elem.tag.endswith("}t"):
+                if elem.text:
+                    # Append text without leading/trailing spaces.
+                    para_text.append(elem.text)
+
+        # Join the text in the current paragraph with no extra spaces.
+        if para_text:
+            # Combine text parts, ensuring no extra spaces around punctuation.
+            combined_text = "".join(para_text).replace("  ", " ")
+            extracted_text.append(combined_text.strip())
+
+    # Join the paragraphs with newlines and add an additional newline between sections.
+    text = "\n\n".join(extracted_text)
 
     return text
 
@@ -196,12 +224,12 @@ def combine_data_for_all_commodities(
     # Initialize a dataframe that will combine the data for all commodities.
     combined = pd.DataFrame()
     combined_metadata = pd.DataFrame()
+
     for commodity, data in supply_demand_data.items():
         if commodity == "abrasives__natural__discontinued__see_garnet__industrial":
             # This file has a different format, with two tables in the same sheet.
             # For now, simply skip it.
             continue
-
         if commodity == "nickel":
             # For commodities with multiple sheets, the sheets correspond to different commodities.
             # For example, "bauxite_and_alumina" has a sheet for "Bauxite" and another for "Alumina".
@@ -222,10 +250,18 @@ def combine_data_for_all_commodities(
             # Gather metadata for the current commodity (from the text in the word document inside the excel file).
             metadata = supply_demand_metadata[commodity]
             df_metadata = pd.DataFrame({"commodity": [sheet_name]})
-            for column in df.columns:
-                paragraph = extract_paragraph(text=metadata, header=column)
+
+            for column in df.drop(columns=["Year", "commodity", "unit", "source"]).columns:
+                if column.lower().startswith("unit value"):
+                    header = column.replace(" $/t", " ($/t)").replace(" 98$/t", " (98$/t)")
+                else:
+                    header = column
+
+                paragraph = extract_paragraph(text=metadata, header=header)
+
                 if len(paragraph) > 0:
                     df_metadata[column] = paragraph
+
             combined_metadata = pd.concat([combined_metadata, df_metadata], ignore_index=True)
 
     # Sanity check.
@@ -241,23 +277,33 @@ def combine_data_for_all_commodities(
 
 
 def extract_paragraph(text: str, header: str) -> str:
+    lines = text.splitlines()
+    paragraph_text = []
     start_paragraph = False
-    paragraph_text = ""
-    for line in text.split("\n"):
-        if line.strip().lower().replace("(", "").replace(")", "").startswith(
-            header.lower().replace("(", "").replace(")", "")
-        ) and (len(line.strip()) < 1.2 * len(header)):
+    empty_line_after_header = False
+
+    # Normalize the header to be searched (remove punctuation, etc.).
+    normalized_header = re.sub(r"[\W_]+", "", header.lower())
+
+    for line in lines:
+        normalized_line = re.sub(r"[\W_]+", "", line.strip().lower())
+
+        if normalized_line == normalized_header:
             start_paragraph = True
-            # Skip title, but start storing text from the next line.
+            empty_line_after_header = True
             continue
 
         if start_paragraph:
-            paragraph_text += line + "\n"
+            if empty_line_after_header and not line.strip():
+                empty_line_after_header = False
+                continue
 
-        if len(line.strip()) == 0:
-            # The paragraph has ended.
-            start_paragraph = False
-    return paragraph_text.strip()
+            if not line.strip() or (line.strip().isupper() and len(line.strip()) > 3):
+                break
+
+            paragraph_text.append(line.strip())
+
+    return " ".join(paragraph_text).strip()
 
 
 def run(dest_dir: str) -> None:

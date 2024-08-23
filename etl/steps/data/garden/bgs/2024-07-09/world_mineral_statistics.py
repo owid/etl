@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import ast
-import json
 from typing import Dict, List
 
 import owid.catalog.processing as pr
@@ -10,6 +9,7 @@ from owid.catalog import Dataset, Table, VariablePresentationMeta
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
+from etl.files import ruamel_load
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -115,9 +115,11 @@ COMMODITY_MAPPING = {
     ("Cement", "Portland cement"): None,
     ("Cement  clinker", "Cement, clinker"): None,
     ("Cement, finished", "Cement, finished"): None,
-    ("Chromium", "Metal"): ("Chromium", "Refinery"),
+    # NOTE: The following has only imports/exports data.
+    ("Chromium", "Metal"): None,
+    # NOTE: The following has only imports/exports data.
     ("Chromium", "Ores & concentrates"): None,
-    ("Chromium ores and concentrates", "Unknown"): None,
+    ("Chromium ores and concentrates", "Unknown"): ("Chromium", "Mine"),
     # NOTE: All subcommodities of coal production will be summed up into one.
     ("Coal", "Anthracite"): ("Coal", "Mine, anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Mine, anthracite & Bituminous"),
@@ -342,11 +344,13 @@ COMMODITY_MAPPING = {
     ("Magnesite and magnesia", "Unknown"): None,
     ("Magnesium metal, primary", "Unknown"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Metal"): ("Manganese", "Refinery"),
-    ("Manganese", "Ores & Concentrates"): ("Manganese", "Mine, ores & concentrates"),
+    # NOTE: The following could be mapped to ("Manganese", "Mine, ores & concentrates"), but we decided to discard it.
+    ("Manganese", "Ores & Concentrates"): None,
     ("Manganese ore", "Chemical"): None,
     ("Manganese ore", "Manganese ore (ferruginous)"): None,
     ("Manganese ore", "Metallurgical"): None,
-    ("Manganese ore", "Unknown"): ("Manganese", "Mine, ores & concentrates"),
+    # NOTE: The following could be mapped to ("Manganese", "Mine, ores & concentrates"), but we decided to discard it.
+    ("Manganese ore", "Unknown"): None,
     ("Mercury", "Unknown"): ("Mercury", "Mine"),
     # NOTE: All mica data below is very sparse. Several have data until 1980, or 2002.
     #  The sub-commodity with the largest numbers is "Unknown", so it's not clear what it means.
@@ -708,8 +712,8 @@ FOOTNOTES = {
     "production|Potash|Unspecified|tonnes": "Values are reported as tonnes of potassium oxide content.",
     "production|Potash|Mine, polyhalite|tonnes": "Values are reported as tonnes of potassium oxide content.",
     "production|Potash|Mine, potassic salts|tonnes": "Values are reported as tonnes of potassium oxide content.",
-    "imports|Potash|Mine, chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
-    "exports|Potash|Mine, chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    # "imports|Potash|Mine, chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
+    # "exports|Potash|Mine, chloride|tonnes": "Values are reported as tonnes of potassium oxide content.",
     "production|Platinum group metals|Mine, iridium|tonnes": "Values are reported as tonnes of metal content.",
     "production|Platinum group metals|Mine, other|tonnes": "Values are reported as tonnes of metal content.",
     "production|Platinum group metals|Mine, palladium|tonnes": "Values are reported as tonnes of metal content.",
@@ -729,13 +733,13 @@ FOOTNOTES = {
 ACCEPTED_OVERLAPS = [
     # {1991: {"USSR", "Armenia"}},
     # {1991: {"USSR", "Belarus"}},
-    {1991: {"USSR", "Russia"}},
+    # {1991: {"USSR", "Russia"}},
     {1992: {"Czechia", "Czechoslovakia"}},
     {1992: {"Slovakia", "Czechoslovakia"}},
-    {1990: {"Germany", "East Germany"}},
-    {1990: {"Germany", "West Germany"}},
+    # {1990: {"Germany", "East Germany"}},
+    # {1990: {"Germany", "West Germany"}},
     # {2010: {"Netherlands Antilles", "Bonaire Sint Eustatius and Saba"}},
-    {1990: {"Yemen", "Yemen People's Republic"}},
+    # {1990: {"Yemen", "Yemen People's Republic"}},
 ]
 
 
@@ -926,7 +930,9 @@ def clean_notes(notes):
     return notes_clean
 
 
-def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(
+    tb: Table, notes_columns: List[str], notes_original: Dict[str, List[str]], notes_edited: Dict[str, List[str]]
+) -> Dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],
@@ -940,7 +946,7 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
 
     # Gather all notes for each column.
     notes_dict = {}
-    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns):
+    for column in tqdm(tb_flat_notes.drop(columns=["country", "year"]).columns, disable=True):
         _notes = tb_flat_notes[column].dropna().tolist()
         if len(_notes) > 0:
             # Gather all notes for this column.
@@ -949,10 +955,24 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
             notes = pd.unique(pd.Series(notes)).tolist()
             # Join notes.
             if len(notes) > 0:
-                notes_str = "- " + "\n- ".join(notes)
-                notes_dict[column] = notes_str
+                notes_dict[column] = notes
 
-    return notes_dict
+    # Check that the notes coincide with the original notes stored in an adjacent file.
+    error = "Original BGS notes and footnotes have changed."
+    assert notes_dict == notes_original, error
+    # To update the original notes:
+    # from etl.files import ruamel_dump
+    # (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_original))
+
+    # Load the edited notes, that will overwrite the original notes.
+    notes_dict.update(notes_edited)
+
+    # Join all notes into one string, separated by line breaks.
+    notes_str_dict = {}
+    for column, notes in notes_dict.items():
+        notes_str_dict[column] = "- " + "\n- ".join(notes)
+
+    return notes_str_dict
 
 
 def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
@@ -986,27 +1006,27 @@ def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
     regions_to_remove = [region for region in regions if region != "World"]
     tb = tb.loc[~tb["country"].isin(regions_to_remove)].reset_index(drop=True)
 
-    # We noticed that imports/exports data have:
-    # * Only data for European countries (and Turkey) from 2003 onwards. Check this:
-    regions = ds_regions["regions"]
-    europe = regions.loc[json.loads(regions[regions["name"] == "Europe"]["members"].item())]["name"].unique().tolist()
-    error = "Expected only European countries (including Turkey) imports/exports data after 2002."
-    assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
-        set(europe) | set(["United Kingdom", "Turkey", "World"])
-    ), error
-    assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
-        set(europe) | set(["United Kingdom", "Turkey", "World"])
-    ), error
-    # * Only UK data from 2019 onwards. Check this:
-    error = "Expected only UK imports/exports data after 2018."
-    assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
-        ["United Kingdom", "World"]
-    ), error
-    assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
-        ["United Kingdom", "World"]
-    ), error
-    # Therefore, it only makes sense to have global imports/exports data until 2002.
-    tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), ["imports", "exports"]] = None
+    # # We noticed that imports/exports data have:
+    # # * Only data for European countries (and Turkey) from 2003 onwards. Check this:
+    # regions = ds_regions["regions"]
+    # europe = regions.loc[json.loads(regions[regions["name"] == "Europe"]["members"].item())]["name"].unique().tolist()
+    # error = "Expected only European countries (including Turkey) imports/exports data after 2002."
+    # assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
+    #     set(europe) | set(["United Kingdom", "Turkey", "World"])
+    # ), error
+    # assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2002)]["country"]) <= (
+    #     set(europe) | set(["United Kingdom", "Turkey", "World"])
+    # ), error
+    # # * Only UK data from 2019 onwards. Check this:
+    # error = "Expected only UK imports/exports data after 2018."
+    # assert set(tb[(tb["imports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
+    #     ["United Kingdom", "World"]
+    # ), error
+    # assert set(tb[(tb["exports"].notnull()) & (tb["year"] > 2018)]["country"]) == set(
+    #     ["United Kingdom", "World"]
+    # ), error
+    # # Therefore, it only makes sense to have global imports/exports data until 2002.
+    # tb.loc[(tb["year"] > 2002) & (tb["country"] == "World"), ["imports", "exports"]] = None
 
     return tb
 
@@ -1117,6 +1137,13 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
 
+    # Load adjacent file containing the original BGS notes and footnotes for each data column.
+    # NOTE: This file is loaded as a sanity check, in case in a later update notes change.
+    notes_original = ruamel_load(paths.directory / "notes_original.yml")
+
+    # Load the addjacent file containing the edited notes.
+    notes_edited = ruamel_load(paths.directory / "notes_edited.yml")
+
     #
     # Process data.
     #
@@ -1124,6 +1151,10 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    # We decided to discard imports and exports data, since (as mentioned in other comments) it includes data for
+    # non-european countries only until 2002, and it causes many issues.
+    tb = tb[tb["category"] == "Production"].reset_index(drop=True)
 
     # Remove data for regions that did not exist at the time.
     tb = remove_data_from_non_existing_regions(tb=tb)
@@ -1171,23 +1202,16 @@ def run(dest_dir: str) -> None:
             join_column_levels_with="_",
         )
         .underscore()
-        .rename(
-            columns={"value_production": "production", "value_imports": "imports", "value_exports": "exports"},
-            errors="raise",
-        )
+        .rename(columns={"value_production": "production"}, errors="raise")
     )
 
     # Set an appropriate format for value columns.
-    tb = tb.astype({column: "Float64" for column in ["production", "imports", "exports"]})
+    tb = tb.astype({column: "Float64" for column in ["production"]})
 
     # Parse notes as lists of strings.
     for column in [
         "note_production",
-        "note_imports",
-        "note_exports",
         "general_notes_production",
-        "general_notes_imports",
-        "general_notes_exports",
     ]:
         tb[column] = tb[column].fillna("[]").apply(ast.literal_eval)
 
@@ -1195,7 +1219,7 @@ def run(dest_dir: str) -> None:
     tb = add_global_data(tb=tb, ds_regions=ds_regions)
 
     # Clean notes columns, and combine notes at the individual row level with general table notes.
-    for category in ["exports", "imports", "production"]:
+    for category in ["production"]:
         tb[f"notes_{category}"] = [
             clean_notes(note) for note in tb[f"note_{category}"] + tb[f"general_notes_{category}"]
         ]
@@ -1203,13 +1227,15 @@ def run(dest_dir: str) -> None:
         tb = tb.drop(columns=[f"note_{category}", f"general_notes_{category}"])
 
     # Gather all notes in a dictionary.
-    notes = gather_notes(tb, notes_columns=["notes_exports", "notes_imports", "notes_production"])
+    notes = gather_notes(
+        tb, notes_columns=["notes_production"], notes_original=notes_original, notes_edited=notes_edited
+    )
 
     # Create a wide table.
     tb_flat = tb.pivot(
         index=["country", "year"],
         columns=["commodity", "sub_commodity", "unit"],
-        values=["exports", "imports", "production"],
+        values=["production"],
         join_column_levels_with="|",
     )
 
@@ -1223,7 +1249,7 @@ def run(dest_dir: str) -> None:
             tb_flat[column].metadata.description_from_producer = "Notes found in original BGS data:\n" + notes[column]
 
     # To avoid ETL failing when storing the table, convert lists of notes to strings (and add metadata).
-    for column in ["notes_imports", "notes_exports", "notes_production"]:
+    for column in ["notes_production"]:
         tb[column] = tb[column].copy_metadata(tb["production"]).astype(str)
 
     # Add footnotes.
@@ -1236,12 +1262,7 @@ def run(dest_dir: str) -> None:
     tb_flat = tb_flat.dropna(axis=1, how="all").reset_index(drop=True)
 
     # Format table conveniently.
-    # NOTE: All commodities have the same unit for imports, exports and production except one:
-    #  Potash Chloride uses "tonnes" for imports and exports, and "tonnes of K20 content" (which is also misspelled).
-    #  Due to this, the index cannot simply be "country", "year", "commodity", "sub_commodity"; we need also "unit".
-    # counts = tb.groupby(["commodity", "sub_commodity", "country", "year"], observed=True, as_index=False).nunique()
-    # counts[counts["unit"] > 1][["commodity", "sub_commodity"]].drop_duplicates()
-    tb = tb.format(["country", "year", "commodity", "sub_commodity", "unit"])
+    tb = tb.format(["country", "year", "commodity", "sub_commodity"])
     tb_flat = tb_flat.format(["country", "year"], short_name=paths.short_name + "_flat")
     tb_flat = tb_flat.astype({column: "Float64" for column in tb_flat.columns})
 
