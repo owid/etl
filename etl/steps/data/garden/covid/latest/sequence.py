@@ -221,7 +221,7 @@ def clean_date(tb: Table) -> Table:
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))
     # Group values with duplicate dates caused by min(x, last_update)
-    tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False).sum()
+    tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False, observed=True).sum()
     # Set dtype to `date`
     tb["date"] = pd.to_datetime(tb["date"])
 
