@@ -10,7 +10,6 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, License, Origin, Table
 from utils import (
     COUNTRIES_FORMER_EQUIVALENTS,
