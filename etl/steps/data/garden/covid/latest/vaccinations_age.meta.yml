@@ -22,7 +22,7 @@ tables:
   vaccinations_age:
     variables:
       people_vaccinated_per_hundred:
-        title: People vaccinated, per hundred (cumulative) - Manufacturer << age_group >>
+        title: People vaccinated, per hundred (cumulative) - Age group << age_group >>
         description_short: Total number of << age_group >> COVID-19 vaccination doses administered.
 
       people_fully_vaccinated_per_hundred:
@@ -30,5 +30,5 @@ tables:
         description_short: Total number of << age_group >> COVID-19 vaccination doses administered.
 
       people_with_booster_per_hundred:
-        title: People with boosters, per hundred (cumulative) - Manufacturer << age_group >>
+        title: People with boosters, per hundred (cumulative) - Age group << age_group >>
         description_short: Total number of << age_group >> COVID-19 vaccination doses administered.
