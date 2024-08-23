@@ -220,8 +220,8 @@ def clean_date(tb: Table) -> Table:
     # Get date of publication of latest available file
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))
-    # Drop week column
-    tb = tb.drop(columns=["week"])
+    # Group values with duplicate dates caused by min(x, last_update)
+    tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False).sum()
     # Set dtype to `date`
     tb["date"] = pd.to_datetime(tb["date"])
 
