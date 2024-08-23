@@ -1,6 +1,6 @@
 steps:
   # Explorer
-  data-private://explorers/covid/latest/covid:
+  export://explorers/covid/latest/covid:
     - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/hospital

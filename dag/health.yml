@@ -719,3 +719,5 @@ steps:
     - data://garden/who/latest/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+  export://github/who/latest/monkeypox:
+    - data://garden/who/latest/monkeypox

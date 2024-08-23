@@ -4,9 +4,9 @@ from pathlib import Path
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
-from etl.config import EXPLORERS_DIR
 from etl.explorer_helpers import Explorer
 from etl.helpers import PathFinder, create_explorer
+from etl.paths import EXPLORERS_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

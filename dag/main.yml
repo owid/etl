@@ -616,7 +616,7 @@ steps:
     - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
   # Refugee, Asylum and Migration Explorer:
-  data://explorers/migration/2024-08-05/migration:
+  export://explorers/migration/2024-08-05/migration:
     - data://grapher/unicef/2024-07-30/child_migration
     - data://grapher/un/2024-07-25/refugee_data
     - data://grapher/un/2024-07-16/migrant_stock
