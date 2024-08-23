@@ -6,6 +6,7 @@ from typing import Dict, List
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, VariablePresentationMeta
+from owid.datautils.io.json import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
@@ -929,7 +930,9 @@ def clean_notes(notes):
     return notes_clean
 
 
-def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
+def gather_notes(
+    tb: Table, notes_columns: List[str], notes_original: Dict[str, List[str]], notes_edited: Dict[str, List[str]]
+) -> Dict[str, str]:
     # Create another table with the same structure, but containing notes.
     tb_flat_notes = tb.pivot(
         index=["country", "year"],
@@ -952,10 +955,21 @@ def gather_notes(tb: Table, notes_columns: List[str]) -> Dict[str, str]:
             notes = pd.unique(pd.Series(notes)).tolist()
             # Join notes.
             if len(notes) > 0:
-                notes_str = "- " + "\n- ".join(notes)
-                notes_dict[column] = notes_str
+                notes_dict[column] = notes
 
-    return notes_dict
+    # Check that the notes coincide with the original notes stored in an adjacent file.
+    error = "Original BGS notes and footnotes have changed."
+    assert notes_dict == notes_original, error
+
+    # Load the edited notes, that will overwrite the original notes.
+    notes_dict.update(notes_edited)
+
+    # Join all notes into one string, separated by line breaks.
+    notes_str_dict = {}
+    for column, notes in notes_dict.items():
+        notes_str_dict[column] = "- " + "\n- ".join(notes)
+
+    return notes_str_dict
 
 
 def add_global_data(tb: Table, ds_regions: Dataset) -> Table:
@@ -1120,6 +1134,13 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
 
+    # Load adjacent file containing the original BGS notes and footnotes for each data column.
+    # NOTE: This file is loaded as a sanity check, in case in a later update notes change.
+    notes_original = load_json(paths.directory / "notes_original.json")
+
+    # Load the addjacent file containing the edited notes.
+    notes_edited = load_json(paths.directory / "notes_edited.json")
+
     #
     # Process data.
     #
@@ -1203,7 +1224,9 @@ def run(dest_dir: str) -> None:
         tb = tb.drop(columns=[f"note_{category}", f"general_notes_{category}"])
 
     # Gather all notes in a dictionary.
-    notes = gather_notes(tb, notes_columns=["notes_production"])
+    notes = gather_notes(
+        tb, notes_columns=["notes_production"], notes_original=notes_original, notes_edited=notes_edited
+    )
 
     # Create a wide table.
     tb_flat = tb.pivot(
