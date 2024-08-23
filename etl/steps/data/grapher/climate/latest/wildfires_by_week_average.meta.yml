@@ -44,16 +44,22 @@ definitions:
   average_description_processing_wildfires: &average_description_processing_wildfires |-
     Average weekly wildfires between 2012 and 2023 inclusive.
   upper_bound_description_processing_wildfires: &upper_bound_description_processing_wildfires |-
-    The year with the highest value at the end of the year, between 2012 and 2023 inclusive.
+    The year with the highest cumulative area burned at the end of the year, between 2012 and 2023 inclusive.
   lower_bound_description_processing_wildfires: &lower_bound_description_processing_wildfires |-
-    The year with the lowest value at the end of the year, between 2012 and 2023 inclusive.
+    The year with the lowest cumulative area burned at the end of the year, between 2012 and 2023 inclusive.
   average_description_processing_emisssions: &average_description_processing_emisssions |-
     Average weekly emissions between 2003 and 2023 inclusive.
   upper_bound_description_processing_emisssions: &upper_bound_description_processing_emisssions |-
-    The year with the highest value at the end of the year, between 2003 and 2023 inclusive.
+    The year with the highest cumulative emissions at the end of the year, between 2003 and 2023 inclusive.
   lower_bound_description_processing_emisssions: &lower_bound_description_processing_emisssions |-
-    The year with the lowest value at the end of the year, between 2003 and 2023 inclusive.
+    The year with the lowest cumulative emissions at the end of the year, between 2003 and 2023 inclusive.
 
+  average_description_processing_share_wildfires: &average_description_processing_share_wildfires |-
+    Average weekly share of the total land area burnt by wildfires between 2012 and 2023 inclusive.
+  upper_bound_description_processing_share_wildfires: &upper_bound_description_processing_share_wildfires |-
+    The year with the highest cumulative share of the total land area burnt at the end of the year, between 2012 and 2023 inclusive.
+  lower_bound_description_processing_share_wildfires: &lower_bound_description_processing_share_wildfires |-
+    The year with the lowest cumulative share of the total land area burnt at the end of the year, between 2012 and 2023 inclusive.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -131,7 +137,7 @@ tables:
           description_short: *description_short_share_wildfires_cumulative
           description_processing: |-
               - {definitions.description_processing_share}
-              - {definitions.average_description_processing_wildfires}
+              - {definitions.average_description_processing_share_wildfires}
 
         upper_bound_share_cumulative_area:
           title: Maximum cumulative share of the total land area burnt by wildfires between 2012 and 2023
@@ -140,7 +146,7 @@ tables:
           description_short: *description_short_share_wildfires_cumulative
           description_processing: |-
               - {definitions.description_processing_share}
-              - {definitions.upper_bound_description_processing_wildfires}
+              - {definitions.upper_bound_description_processing_share_wildfires}
           display:
             isProjection: true
 
@@ -151,7 +157,7 @@ tables:
           description_short: *description_short_share_wildfires_cumulative
           description_processing: |-
               - {definitions.description_processing_share}
-              - {definitions.lower_bound_description_processing_wildfires}
+              - {definitions.lower_bound_description_processing_share_wildfires}
           display:
             isProjection: true
 
