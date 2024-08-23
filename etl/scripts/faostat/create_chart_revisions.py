@@ -97,14 +97,18 @@ def get_grapher_data_for_old_and_new_variables(
         try:
             # Get old and new dataset ids.
             dataset_id_old = db.get_dataset_id(
-                db_conn=db_conn, dataset_name=dataset_old.metadata.title, version=dataset_old.metadata.version
+                db_conn=db_conn,
+                dataset_name=dataset_old.metadata.title,  # type: ignore
+                version=dataset_old.metadata.version,  # type: ignore[reportArgumentType]
             )
         except AssertionError:
             log.error(f"Dataset {dataset_old.metadata.title} not found in grapher DB.")
             return None, None
         try:
             dataset_id_new = db.get_dataset_id(
-                db_conn=db_conn, dataset_name=dataset_new.metadata.title, version=dataset_new.metadata.version
+                db_conn=db_conn,
+                dataset_name=dataset_new.metadata.title,  # type: ignore
+                version=dataset_new.metadata.version,  # type: ignore[reportArgumentType]
             )
         except AssertionError:
             log.error(f"Dataset {dataset_new.metadata.title} not found in grapher DB.")

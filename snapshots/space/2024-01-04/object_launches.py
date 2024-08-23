@@ -54,7 +54,7 @@ def main(upload: bool) -> None:
     assert len(data) == n
 
     # Add file to DVC and upload to S3.
-    snap.create_snapshot(data=data, upload=upload)
+    snap.create_snapshot(data=data, upload=upload)  # type: ignore[reportArgumentType]
 
 
 if __name__ == "__main__":

@@ -73,7 +73,7 @@ class ProcessingLog(List[LogEntry]):
     def as_dict(self) -> List[Dict[str, Any]]:
         return [r.to_dict() for r in self]
 
-    def clear(self) -> "ProcessingLog":
+    def clear(self) -> "ProcessingLog":  # type: ignore
         if enabled():
             super().clear()
         return self

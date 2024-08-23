@@ -22,7 +22,7 @@ def main(upload: bool) -> None:
     url = snap.metadata.origin.url_download  # type: ignore
     df = import_US_cpi_API(url)
     # Save the resulting dataframe to a single csv file
-    df_to_file(df, file_path=snap.path)
+    df_to_file(df, file_path=snap.path)  # type: ignore[reportArgumentType]
     # Add the snapshot to DVC
     snap.dvc_add(upload=upload)
 

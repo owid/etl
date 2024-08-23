@@ -54,8 +54,8 @@ class GSheetsApi:
         """
         ssheet = self.sheets.get(spreadsheet_id)
         if worksheet_id:
-            return ssheet.get(worksheet_id)
-        return ssheet
+            return ssheet.get(worksheet_id)  # type: ignore[reportReturnType]
+        return ssheet  # type: ignore[reportReturnType]
 
     def download_worksheet(
         self,
@@ -84,7 +84,7 @@ class GSheetsApi:
         """
         sheet = self.get(spreadsheet_id, worksheet_id)
         if output_path:
-            sheet.to_csv(output_path, encoding=encoding, **kwargs)
+            sheet.to_csv(output_path, encoding=encoding, **kwargs)  # type: ignore[reportCallIssue]
         else:
             make_filename = "%(title)s.csv"
             sheet.to_csv(make_filename=make_filename, encoding=encoding, **kwargs)
@@ -129,5 +129,5 @@ class GSheetsApi:
             Dataframe with the data from the worksheet.
         """
         ws = self.get(spreadsheet_id, worksheet_id)
-        df: pd.DataFrame = ws.to_frame()
+        df: pd.DataFrame = ws.to_frame()  # type: ignore[reportAttributeAccessIssue]
         return df

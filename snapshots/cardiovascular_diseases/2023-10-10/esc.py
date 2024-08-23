@@ -68,7 +68,7 @@ def main(upload: bool) -> None:
                 dfs.append(df)
     all_dfs = pd.concat(dfs, ignore_index=True)
 
-    df_to_file(all_dfs, file_path=snap.path)
+    df_to_file(all_dfs, file_path=snap.path)  # type: ignore[reportArgumentType]
 
     # Download data from source, add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

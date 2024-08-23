@@ -7,14 +7,11 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.db import get_variables_data
-from etl.paths import BASE_DIR
+from etl.paths import EXPLORERS_DIR
 from etl.version_tracker import VersionTracker
 
 # Initialize logger.
 log = get_logger()
-
-# Default path to the explorers folder.
-EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 
 # URL of the data catalog.
 CATALOG_URL = "https://catalog.ourworldindata.org/"

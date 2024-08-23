@@ -112,7 +112,7 @@ def download_cause_data(causes) -> pd.DataFrame:
     all_df = pd.concat(all_data)
     all_df = all_df.reset_index()
 
-    return repack_frame(all_df)
+    return repack_frame(all_df)  # type: ignore[reportArgumentType]
 
 
 if __name__ == "__main__":

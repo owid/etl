@@ -362,7 +362,7 @@ class StepUpdater:
 
             # Tell user how to automatically create PR
             short_name = steps[-1].split("/")[-1].split(".")[0]
-            cmd = f'etl d draft-pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
+            cmd = f'etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
             log.info(f"Create PR automatically with:\n  {cmd}")
 
     def _archive_step(self, step: str) -> None:

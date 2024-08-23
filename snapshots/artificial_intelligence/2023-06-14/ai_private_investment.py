@@ -23,7 +23,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/ai_private_investment.csv")
     all_dfs = get_data()
-    df_to_file(all_dfs, file_path=snap.path)
+    df_to_file(all_dfs, file_path=snap.path)  # type: ignore[reportArgumentType]
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
 

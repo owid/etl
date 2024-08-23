@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
+# import botocore.client.S3 as BaseClient
 import structlog
 from botocore.client import BaseClient
 from botocore.exceptions import ClientError

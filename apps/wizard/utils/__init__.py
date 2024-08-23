@@ -161,7 +161,7 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
 class classproperty(property):
     """Decorator."""
 
-    def __get__(self, owner_self: Self, owner_cls: Self):
+    def __get__(self, owner_self: Self, owner_cls: Self):  # type: ignore[reportIncompatibleMethodOverride]
         return self.fget(owner_cls)  # type: ignore
 
 

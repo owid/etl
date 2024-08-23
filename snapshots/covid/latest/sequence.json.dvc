@@ -43,6 +43,6 @@ meta:
       name: GISAID EpiFlu Database Access Agreement
       url: https://gisaid.org/terms-of-use/
 outs:
-  - md5: f62b6005a21cba8e3699b7da717c2fcc
-    size: 24077591
+  - md5: fd525e547487937a1869784358da9692
+    size: 24755348
     path: sequence.json
