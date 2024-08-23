@@ -9,7 +9,7 @@ definitions:
       - Both BGS and USGS datasets include numerous notes and footnotes. We have retained most of these, making only minor edits or deletions where necessary to maintain clarity.
     presentation:
       topic_tags:
-        - Energy
+        - Metals & Minerals
   unit_value_description_key: &unit-value-description-key
     - "Unit value represents the price of a physical unit of apparent consumption (such as a metric ton) in dollars. Apparent consumption itself is determined by the formula: Apparent Consumption = Production + Imports - Exports ± (Stock Change)."
     - For commodities that exist in a single physical form, like copper, a straightforward price series can estimate the unit value.
