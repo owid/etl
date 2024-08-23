@@ -1,5 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-
 from datetime import timedelta
 
 import owid.catalog.processing as pr
@@ -220,8 +219,9 @@ def clean_date(tb: Table) -> Table:
     # Get date of publication of latest available file
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))
-    # Group values with duplicate dates caused by min(x, last_update)
-    tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False, observed=True).sum()
+    # Group values with duplicate dates caused by min(x, last_update), HOTFIX: https://github.com/owid/etl/pull/3180/files
+    # tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False, observed=True).sum()
+    tb = tb.drop(columns=["week"])
     # Set dtype to `date`
     tb["date"] = pd.to_datetime(tb["date"])
 
