@@ -56,7 +56,7 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
 
 def interpolate_table(
     df: TableOrDataFrame,
-    entity_col: str,
+    entity_col: str | List[str],
     time_col: str,
     time_mode: Literal["full_range", "full_range_entity", "reduced", "none"] = "full_range",
     method: str = "linear",
@@ -73,13 +73,20 @@ def interpolate_table(
     mode: str
         How to compelte time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
     """
+    SINGLE_ENTITY = isinstance(entity_col, str)
+    MULTIPLE_ENTITY = isinstance(entity_col, list)
+    assert SINGLE_ENTITY | MULTIPLE_ENTITY, "`entity_col` must be either a string or a list of strings!"
+    if SINGLE_ENTITY:
+        index = [entity_col, time_col]
+    else:
+        index = entity_col + [time_col]
 
     if time_mode != "none":
         # Expand time
         df = expand_time_column(df, entity_col, time_col, time_mode)
 
     # Set index
-    df = cast(TableOrDataFrame, df.set_index([entity_col, time_col]).sort_index())
+    df = cast(TableOrDataFrame, df.set_index(index).sort_index())
 
     # Interpolate
     df = (
@@ -93,7 +100,7 @@ def interpolate_table(
 
 def expand_time_column(
     df: TableOrDataFrame,
-    entity_col: str,
+    entity_col: str | List[str],
     time_col: str,
     mode: Literal["full_range", "full_range_entity", "reduced"] = "full_range",
 ) -> TableOrDataFrame:
@@ -105,6 +112,9 @@ def expand_time_column(
         - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
         - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
     """
+    SINGLE_ENTITY = isinstance(entity_col, str)
+    MULTIPLE_ENTITY = isinstance(entity_col, list)
+    assert SINGLE_ENTITY | MULTIPLE_ENTITY, "`entity_col` must be either a string or a list of strings!"
 
     def _get_complete_date_range(ds):
         date_min = ds.min()
@@ -116,29 +126,43 @@ def expand_time_column(
 
     assert mode in {"full_range_entity", "full_range", "reduced"}, f"Wrong value for `mode` {mode}!"
 
+    if SINGLE_ENTITY:
+        index = [entity_col, time_col]
+    else:
+        index = entity_col + [time_col]
+
     if mode == "full_range_entity":
 
         def _reindex_dates(group):
-            complete_date_range = _get_complete_date_range(group["date"])
-            group = group.set_index("date").reindex(complete_date_range).reset_index().rename(columns={"index": "date"})
-            group["country"] = group["country"].ffill().bfill()  # Fill NaNs in 'country'
+            complete_date_range = _get_complete_date_range(group[time_col])
+            group = (
+                group.set_index(time_col).reindex(complete_date_range).reset_index().rename(columns={"index": time_col})
+            )
+            group[entity_col] = group[entity_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
-        # Apply the reindexing to each group
-        df = df.groupby("country").apply(_reindex_dates).reset_index(drop=True).set_index(["country", "date"])  # type: ignore
+        df = df.groupby(entity_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
     else:
-        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
-        # Optionally fill missing years linearly.
-        countries_in_data = df[entity_col].unique()
-        # Get list of year-country tuples
+        # Get list of times
         if mode == "full_range":
             date_values = _get_complete_date_range(df[time_col])
         elif mode == "reduced":
             date_values = df[time_col].unique()
+
+        if SINGLE_ENTITY:
+            # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+            # Optionally fill missing years linearly.
+            countries_in_data = df[entity_col].unique()
+            iterables = [countries_in_data, date_values]
+            names = [entity_col, time_col]
+        else:
+            iterables = [df[col].unique() for col in entity_col] + [date_values]
+            names = [col for col in entity_col] + [time_col]
+
         # Reindex
         df = (
-            df.set_index([entity_col, time_col])
-            .reindex(pd.MultiIndex.from_product([countries_in_data, date_values], names=[entity_col, time_col]))  # type: ignore
+            df.set_index(index)
+            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # type: ignore
             .sort_index()
         )
 

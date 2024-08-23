@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Optional, Set, cast
+from typing import Any, Dict, Hashable, Optional, Set, cast
 
 import numpy as np
 import pandas as pd
@@ -188,39 +188,47 @@ def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
     return tb
 
 
-def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_regions: bool = False) -> Table:
-    regions = {
-        # Standard continents
-        "Africa": {},
-        "Asia": {},
-        "Europe": {},
-        "North America": {},
-        "Oceania": {},
-        "South America": {},
-        # Income groups
-        "Low-income countries": {},
-        "Lower-middle-income countries": {},
-        "Upper-middle-income countries": {},
-        "High-income countries": {},
-        # Special regions
-        "European Union (27)": {},
-        "World excl. China": {
-            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-            "excluded_members": ["China"],
-        },
-        "World excl. China and South Korea": {
-            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-            "excluded_members": ["China", "South Korea"],
-        },
-        "World excl. China, South Korea, Japan and Singapore": {
-            "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
-            "excluded_members": ["China", "South Korea", "Japan", "Singapore"],
-        },
-        "Asia excl. China": {
-            "additional_regions": ["Asia"],
-            "excluded_members": ["China"],
-        },
-    }
+def add_regions(
+    tb: Table,
+    ds_regions: Dataset,
+    ds_income: Optional[Dataset] = None,
+    keep_only_regions: bool = False,
+    regions: Optional[Dict[Hashable, Any]] = None,
+    **kwargs,
+) -> Table:
+    if regions is None:
+        regions = {
+            # Standard continents
+            "Africa": {},
+            "Asia": {},
+            "Europe": {},
+            "North America": {},
+            "Oceania": {},
+            "South America": {},
+            # Income groups
+            "Low-income countries": {},
+            "Lower-middle-income countries": {},
+            "Upper-middle-income countries": {},
+            "High-income countries": {},
+            # Special regions
+            "European Union (27)": {},
+            "World excl. China": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China"],
+            },
+            "World excl. China and South Korea": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China", "South Korea"],
+            },
+            "World excl. China, South Korea, Japan and Singapore": {
+                "additional_regions": ["Asia", "Africa", "Europe", "North America", "Oceania", "South America"],
+                "excluded_members": ["China", "South Korea", "Japan", "Singapore"],
+            },
+            "Asia excl. China": {
+                "additional_regions": ["Asia"],
+                "excluded_members": ["China"],
+            },
+        }
     # Regions
     tb = geo.add_regions_to_table(
         tb,
@@ -228,6 +236,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_re
         ds_income,
         year_col="date",
         regions=regions,
+        **kwargs,
     )
     # World
     tb = geo.add_regions_to_table(
@@ -236,6 +245,7 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income: Dataset, keep_only_re
         ds_income,
         year_col="date",
         regions={"World": {}},
+        **kwargs,
     )
     # Filter only regions if specified
     if keep_only_regions:
