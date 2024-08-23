@@ -152,7 +152,7 @@ steps:
     - data://garden/covid/latest/testing
 
   # Combined dataset (megafile-related indicators)
-  data-private://garden/covid/latest/combined:
+  data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
     - data-private://garden/covid/latest/sequence

@@ -282,6 +282,10 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
 
+    # Make sure we don't have both public and private steps in the same DAG
+    if private:
+        _check_public_private_steps(dag)
+
     # If --grapher is set, add steps for upserting to DB
     if grapher:
         dag.update(_grapher_steps(dag, private))
@@ -310,7 +314,8 @@ def run_dag(
     """
     excludes = excludes or []
 
-    _validate_private_steps(dag)
+    if not private:
+        _validate_private_steps(dag)
 
     if not private:
         excludes.append("-private://")
@@ -592,7 +597,9 @@ def _validate_private_steps(dag: DAG) -> None:
             continue
         for dependency in step_dependencies:
             if _is_private_step(dependency):
-                raise ValueError(f"Public step {step_name} has a dependency on private {dependency}")
+                raise ValueError(
+                    f"Public step {step_name} has a dependency on private {dependency}. Use --private flag."
+                )
 
 
 def _is_private_step(step_name: str) -> bool:
@@ -661,6 +668,21 @@ def _set_dependencies_to_nondirty(step: Step) -> None:
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
             step.data_step.is_dirty = lambda: False
+
+
+def _check_public_private_steps(dag: DAG) -> None:
+    """Make sure we don't mix public and private steps for the same dataset."""
+    all_steps = set(dag.keys()) | set(itertools.chain.from_iterable(dag.values()))
+    private_steps = {s for s in all_steps if _is_private_step(s)}
+    public_steps = all_steps - private_steps
+
+    # strip prefix
+    private_steps = {s.split("://")[1] for s in private_steps}
+    public_steps = {s.split("://")[1] for s in public_steps}
+
+    common = private_steps & public_steps
+    if common:
+        raise ValueError(f"Public and private steps share datasets: {common}")
 
 
 if __name__ == "__main__":
