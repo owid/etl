@@ -19,14 +19,13 @@ from graphlib import TopologicalSorter
 from multiprocessing import Manager
 from os import environ
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set
+from typing import Any, Callable, Dict, Iterator, List, Optional
 
 import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
-from etl.snapshot import snapshot_catalog
 from etl.steps import (
     DAG,
     DataStep,
@@ -283,8 +282,7 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
     dag = load_dag(dag_path)
 
     # Make sure we don't have both public and private steps in the same DAG
-    if private:
-        _check_public_private_steps(dag)
+    _check_public_private_steps(dag)
 
     # If --grapher is set, add steps for upserting to DB
     if grapher:
@@ -314,9 +312,6 @@ def run_dag(
     """
     excludes = excludes or []
 
-    # if not private:
-    #     _validate_private_steps(dag)
-
     if not private:
         excludes.append("-private://")
 
@@ -325,6 +320,9 @@ def run_dag(
     excludes.append("grapher://grapher/regions/latest/regions")
 
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
+
+    if not private:
+        _validate_private_steps(steps)
 
     if not steps:
         # If no steps are found, the most likely case is that the step passed as argument was misspelled.
@@ -589,57 +587,16 @@ def timed_run(f: Callable[[], Any]) -> float:
     return time.time() - start_time
 
 
-def _validate_private_steps(dag: DAG) -> None:
+def _validate_private_steps(steps: list[Step]) -> None:
     """Make sure there are no public steps that have private steps as dependency."""
-    for step_name, step_dependencies in dag.items():
-        # does not apply for private and grapher steps
-        if _is_private_step(step_name) or step_name.startswith("grapher://"):
-            continue
-        for dependency in step_dependencies:
-            if _is_private_step(dependency):
-                raise ValueError(
-                    f"Public step {step_name} has a dependency on private {dependency}. Use --private flag."
-                )
+    for step in steps:
+        for dep in step.dependencies:
+            if not dep.is_public:
+                raise ValueError(f"Public step {step} depends on private step {dep}. Use --private flag.")
 
 
 def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
-
-
-def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -> DAG:
-    """Return a DAG of steps for backporting datasets."""
-    dag: DAG = {}
-
-    # get all backports, this takes a long time
-    if filter_steps is None:
-        match = "backport/.*"
-    elif len(filter_steps) == 0:
-        return {}
-    else:
-        match = "|".join([step.split("/")[-1] for step in filter_steps])
-
-    # load all backported snapshots
-    for snap in snapshot_catalog(match):
-        # skip private backported steps
-        if not private and not snap.metadata.is_public:
-            continue
-
-        # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_config"):
-            # skip archived backported datasets
-            if "(archived)" in snap.metadata.name:  # type: ignore
-                continue
-
-            short_name = snap.metadata.short_name.removesuffix("_config")
-
-            private_suffix = "" if snap.metadata.is_public else "-private"
-
-            dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
-                f"snapshot{private_suffix}://backport/latest/{short_name}_values.feather",
-                f"snapshot{private_suffix}://backport/latest/{short_name}_config.json",
-            }
-
-    return dag
 
 
 def _grapher_steps(dag: DAG, private: bool) -> DAG:
@@ -682,7 +639,7 @@ def _check_public_private_steps(dag: DAG) -> None:
 
     common = private_steps & public_steps
     if common:
-        raise ValueError(f"Public and private steps share datasets: {common}")
+        raise ValueError(f"Dataset has both public and private version: {common}")
 
 
 if __name__ == "__main__":
