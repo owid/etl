@@ -101,8 +101,6 @@ tables:
 
           - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision). Growth rate estimated over 1-year periods.
 
-          Growth pre-1900 is calculated every 50 years.
-
   # Historical data
   historical:
     common:
