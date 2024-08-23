@@ -98,7 +98,7 @@ def get_all_data_from_api(path: str) -> pd.DataFrame:
 
     # Define requests session
     session = requests.Session()
-    retry = Retry(connect=3, backoff_factor=0.5)
+    retry = Retry(connect=3, backoff_factor=0.5)  # type: ignore[reportArgumentType]
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("http://", adapter)
     session.mount("https://", adapter)

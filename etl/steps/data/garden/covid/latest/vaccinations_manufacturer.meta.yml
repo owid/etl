@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    processing_level: major
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, vaccinations (by manufacturer)
+
+tables:
+  vaccinations_manufacturer:
+    variables:
+      total_vaccinations:
+        title: COVID-19 doses (cumulative) - Manufacturer << vaccine >>
+        description_short: Total number of << vaccine >> COVID-19 vaccination doses administered.
+        unit: "doses"
+        display:
+          numDecimalPlaces: 0
+          tolerance: 9999
+          name: << vaccine >>

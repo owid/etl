@@ -392,11 +392,11 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = (
-            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)
+        entity_id[ix] = (  # type: ignore[reportCallIssue]
+            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # type: ignore[reportCallIssue]
         )
 
-    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
+    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
 
     return cast(pd.Series, entity_id.astype(int))
 

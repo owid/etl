@@ -225,7 +225,7 @@ def are_equal(
             absolute_tolerance=absolute_tolerance,
             relative_tolerance=relative_tolerance,
         )
-        all_values_equal = compared.all().all()
+        all_values_equal = compared.all().all()  # type: ignore
         if not all_values_equal:
             summary += "\n* Values differ by more than the given absolute and relative" " tolerances."
 
@@ -392,7 +392,7 @@ def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "
     """
     merged = dfs[0].copy()
     for df in dfs[1:]:
-        merged = pd.merge(merged, df, how=how, on=on)
+        merged = pd.merge(merged, df, how=how, on=on)  # type: ignore
 
     return merged
 
@@ -470,7 +470,7 @@ def map_series(
         missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
         if missing.any():
             # Replace those nans by their original values.
-            series_mapped.loc[missing] = series[missing]
+            series_mapped.loc[missing] = series[missing]  # type: ignore[reportCallIssue]
 
     if warn_on_missing_mappings:
         unmapped = set(series) - set(mapping)

@@ -10,6 +10,7 @@ import pandas as pd
 import rich
 from dotenv import dotenv_values
 from owid import catalog
+from owid.catalog import CHANNEL
 from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
@@ -116,7 +117,7 @@ def diff_print(
 @click.pass_context
 def etl_catalog(
     ctx: click.core.Context,
-    channel: str,
+    channel: CHANNEL,
     namespace: str,
     dataset: str,
     table: str,
@@ -140,7 +141,11 @@ def etl_catalog(
     """
     try:
         remote_df = catalog.find_latest(
-            table=table, namespace=namespace, dataset=dataset, channels=[channel], version=version
+            table=table,
+            namespace=namespace,
+            dataset=dataset,
+            channels=[channel],
+            version=version,  # type: ignore[reportArgumentType]
         )
     except Exception as e:
         if debug:
@@ -157,7 +162,7 @@ def etl_catalog(
                 namespace=namespace,
                 dataset=dataset,
                 channel=cast(catalog.CHANNEL, channel),
-                version=version,
+                version=version,  # type: ignore[reportArgumentType]
             )
         except ValueError as e:
             # try again after reindexing
@@ -168,7 +173,7 @@ def etl_catalog(
                     namespace=namespace,
                     dataset=dataset,
                     channel=cast(catalog.CHANNEL, channel),
-                    version=version,
+                    version=version,  # type: ignore[reportArgumentType]
                 )
             else:
                 raise e

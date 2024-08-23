@@ -134,9 +134,12 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
         index_issues = sorted(set(df_repeated.index) - set(df_repeated_with_same_values.index))
         if not df_repeated.equals(df_repeated_with_same_values):
             df_issues = df.loc[index_issues]
-            log.warning(
-                f'Duplicated entries with different values on Category {set(df_issues["Category"])}, {len(df_issues["Country"].unique())} countries, Commodity {set(df_issues["Commodity"])}, and Sub-commodities: {set(df_issues["Sub-commodity"])}.'
-            )
+            # NOTE: Ignore issues about imports/exports, which we decided to not use in the end.
+            df_issues = df_issues[df_issues["Category"] == "Production"]
+            if len(df_issues) > 0:
+                log.warning(
+                    f'Duplicated entries with different values on Category {set(df_issues["Category"])}, {len(df_issues["Country"].unique())} countries, Commodity {set(df_issues["Commodity"])}, and Sub-commodities: {set(df_issues["Sub-commodity"])}.'
+                )
         # Drop duplicates.
         df = df.drop_duplicates(
             subset=["Category", "Country", "Commodity", "Sub-commodity", "Year", "note"], keep="last"
@@ -218,8 +221,15 @@ def process_raw_data(data: Dict[str, Any]):
                     [footnotes.get(note, None) for note in str(notes).replace("(", "").replace(")", "")]
                     for notes in df["Note"].fillna("")
                 ]
-                if None in sum(notes_mapped, []):
-                    log.warning(f"Missing footnotes for: {data_type} - {commodity} - {year_start}")
+                if (None in sum(notes_mapped, [])) and (data_type == "Production"):
+                    if (data_type == "Production") and (
+                        commodity not in ["tantalum and niobium minerals", "ferro-alloys"]
+                    ):
+                        # NOTE: We choose here only "Production" because there are many issues for imports/exports.
+                        #  We decided to not use imports/exports data.
+                        # Also, some footnotes are missing for tantalum and niobium minerals and ferro-alloys, since their symbols have multiple letters, e.g. "ac", "ae" instead of just one (as in all other cases).
+                        # Simply ignore these cases.
+                        log.warning(f"Missing footnotes for: {data_type} - {commodity} - {year_start}")
                 df["Note"] = [[note for note in notes if note] for notes in notes_mapped]
 
                 # Add general notes as a new column.

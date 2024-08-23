@@ -225,7 +225,7 @@ tb = {_snippet_dataset(ds_b, table_name)}
                         changed.append("changed [u]metadata[/u]")
                     if new_index.any():
                         changed.append("new [u]data[/u]")
-                    if (~eq_data[~new_index]).any():
+                    if (~eq_data[~new_index]).any():  # type: ignore[reportCallIssue]
                         changed.append("changed [u]data[/u]")
 
                     if changed:

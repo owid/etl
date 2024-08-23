@@ -33,7 +33,7 @@ def main(upload: bool) -> None:
 
     # Load data for each variable.
     # Get data for all variables one by one.
-    data = []
+    data: list[pd.DataFrame] = []
     # Note: This takes a few minutes and could possibly be parallelized.
     for variable in tqdm(variables.items):
         # Load data for current variable and add it to the list of all dataframes.

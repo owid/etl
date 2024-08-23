@@ -13,7 +13,7 @@ from owid.datautils.io.df import from_file, to_file
 
 
 class TestLoadDf:
-    df_original = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["a", "b", "c"])
+    df_original = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=["a", "b", "c"])  # type: ignore
 
     def test_from_file_basic(self, tmpdir):
         output_methods = {

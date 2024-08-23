@@ -56,7 +56,7 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
 
 def interpolate_table(
     df: TableOrDataFrame,
-    entity_col: str,
+    entity_col: str | List[str],
     time_col: str,
     time_mode: Literal["full_range", "full_range_entity", "reduced", "none"] = "full_range",
     method: str = "linear",
@@ -73,13 +73,20 @@ def interpolate_table(
     mode: str
         How to compelte time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
     """
+    SINGLE_ENTITY = isinstance(entity_col, str)
+    MULTIPLE_ENTITY = isinstance(entity_col, list)
+    assert SINGLE_ENTITY | MULTIPLE_ENTITY, "`entity_col` must be either a string or a list of strings!"
+    if SINGLE_ENTITY:
+        index = [entity_col, time_col]
+    else:
+        index = entity_col + [time_col]
 
     if time_mode != "none":
         # Expand time
         df = expand_time_column(df, entity_col, time_col, mode=time_mode)
 
     # Set index
-    df = cast(TableOrDataFrame, df.set_index([entity_col, time_col]).sort_index())
+    df = cast(TableOrDataFrame, df.set_index(index).sort_index())
 
     # Interpolate
     df = (
@@ -93,7 +100,7 @@ def interpolate_table(
 
 def expand_time_column(
     df: TableOrDataFrame,
-    entity_col: str,
+    entity_col: str | List[str],
     time_col: str,
     entities_complete: Optional[List[str] | Set[str]] = None,
     mode: Literal["full_range", "full_range_entity", "reduced"] = "full_range",
@@ -117,6 +124,9 @@ def expand_time_column(
             - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
             - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
     """
+    SINGLE_ENTITY = isinstance(entity_col, str)
+    MULTIPLE_ENTITY = isinstance(entity_col, list)
+    assert SINGLE_ENTITY | MULTIPLE_ENTITY, "`entity_col` must be either a string or a list of strings!"
 
     def _get_complete_date_range(ds):
         date_min = ds.min()
@@ -128,32 +138,44 @@ def expand_time_column(
 
     assert mode in {"full_range_entity", "full_range", "reduced"}, f"Wrong value for `mode` {mode}!"
 
+    if SINGLE_ENTITY:
+        index = [entity_col, time_col]
+    else:
+        index = entity_col + [time_col]
+
     if mode == "full_range_entity":
 
         def _reindex_dates(group):
-            complete_date_range = _get_complete_date_range(group["date"])
+            complete_date_range = _get_complete_date_range(group[time_col])
             group = (
                 group.set_index(time_col).reindex(complete_date_range).reset_index().rename(columns={"index": time_col})
             )
             group[entity_col] = group[entity_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
-        # Apply the reindexing to each group
-        df = df.groupby(entity_col).apply(_reindex_dates).reset_index(drop=True).set_index([entity_col, time_col])  # type: ignore
+        df = df.groupby(entity_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
     else:
-        # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
-        # Optionally fill missing years linearly.
-        if entities_complete is None:
-            entities_complete = df[entity_col].unique()  # type: ignore
-        # Get list of year-country tuples
+        # Get list of times
         if mode == "full_range":
             date_values = _get_complete_date_range(df[time_col])
         elif mode == "reduced":
             date_values = df[time_col].unique()
+
+        if SINGLE_ENTITY:
+            # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+            # Optionally fill missing years linearly.
+            countries_in_data = df[entity_col].unique()
+            iterables = [countries_in_data, date_values]
+            names = [entity_col, time_col]
+        else:
+            iterables = [df[col].unique() for col in entity_col] + [date_values]
+            names = [col for col in entity_col] + [time_col]
+
         # Reindex
         df = (
-            df.set_index([entity_col, time_col])
-            .reindex(pd.MultiIndex.from_product([entities_complete, date_values], names=[entity_col, time_col]))  # type: ignore
+
+            df.set_index(index)
+            .reindex(pd.MultiIndex.from_product(iterables, names=names))  # type: ignore
             .sort_index()
         )
 
@@ -180,7 +202,7 @@ def add_origins_to_mortality_database(tb_who: Table) -> Table:
                 producer="World Health Organisation",
                 url_main="https://platform.who.int/mortality/themes/theme-details/MDB/all-causes",
                 date_accessed="2023-08-01",
-                date_published="2023-08-01",
+                date_published="2023-08-01",  # type: ignore
                 citation_full="Mortality Database, World Health Organization. Licence: CC BY-NC-SA 3.0 IGO.",
                 description="The WHO mortality database is a collection death registration data including cause-of-death information from member states. Where they are collected, death registration data are the best source of information on key health indicators, such as life expectancy, and death registration data with cause-of-death information are the best source of information on mortality by cause, such as maternal mortality and suicide mortality. WHO requests from all countries annual data by age, sex, and complete ICD code (e.g., 4-digit code if the 10th revision of ICD was used). Countries have reported deaths by cause of death, year, sex, and age for inclusion in the WHO Mortality Database since 1950. Data are included only for countries reporting data properly coded according to the International Classification of Diseases (ICD). Today the database is maintained by the WHO Division of Data, Analytics and Delivery for Impact (DDI) and contains data from over 120 countries and areas. Data reported by member states and selected areas are displayed in this portal’s interactive visualizations if the data are reported to the WHO mortality database in the requested format and at least 65% of deaths were recorded in each country and year.",
                 license=License(name="CC BY 4.0"),
@@ -212,7 +234,7 @@ def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
                 producer="Institute of Health Metrics and Evaluation",
                 url_main="https://vizhub.healthdata.org/gbd-results/",
                 date_accessed="2021-12-01",
-                date_published="2020-10-17",
+                date_published="2020-10-17",  # type: ignore
                 citation_full="Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.",
                 description="The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated. GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.",
                 license=License(

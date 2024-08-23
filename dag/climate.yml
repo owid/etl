@@ -97,6 +97,8 @@ steps:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_week:
     - data://garden/climate/latest/weekly_wildfires
+  data://grapher/climate/latest/wildfires_by_week_average:
+    - data://grapher/climate/latest/wildfires_by_week
   #
   # EPA - Climate change indicators (possibly not updateable).
   #

@@ -44,7 +44,7 @@ def main():
             )
             continue
         try:
-            dataset_id = db.get_dataset_id(dataset_name=dataset_name, version=VERSION)
+            dataset_id = db.get_dataset_id(dataset_name=dataset_name, version=VERSION)  # type: ignore[reportArgumentType]
         except AssertionError:
             log.error(
                 f"Grapher dataset for {domain} could not be found in the database. "

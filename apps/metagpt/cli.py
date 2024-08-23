@@ -87,7 +87,7 @@ def main(path_to_file: str, output_dir: str, overwrite: bool, model: str) -> Non
 class MetadataGPTUpdater:
     """Update metadata file using Chat GPT."""
 
-    def __init__(self: Self, path_to_file: str, model: str) -> None:
+    def __init__(self: Self, path_to_file: str, model: str) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Initialize the metadata updater."""
         # Name of the model
         self.model: str = model

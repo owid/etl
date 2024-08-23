@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Preventive cancer screenings - programme data
+    description: |-
+      This dataset contains statistical data related to cancer screening across the European Union (EU) for three major types of cancer: breast cancer, cervical cancer, and colorectal cancer.
+
+      The dataset includes information on screening statistics for specific types of cancers, classified according to the International Statistical Classification of Diseases and Related Health Problems (ICD-10 2010). For breast cancer, the relevant classification is ICD-10 Code C50, covering malignant neoplasms of the breast. Cervical cancer is classified under ICD-10 Code C53, which pertains to malignant neoplasms of the cervix uteri. Colorectal cancer is classified under ICD-10 Codes C18-C21, which encompass malignant neoplasms of the colon, rectosigmoid junction, rectum, anus, and anal canal.
+
+    date_published: "2024-07-11"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      European Commission,  Eurostat, Preventive cancer screenings - programme data,  https://doi.org/10.2908/HLTH_PS_PREV [2024-08-23]
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/hlth_ps_prev__custom_12660114/default/table?lang=en
+    date_accessed: 2024-08-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://commission.europa.eu/legal-notice_en#copyright-notice
+
+outs:
+  - md5: ca4ff1a4582b71fa2817b85695ae4949
+    size: 111100
+    path: eurostat_cancer.csv
