@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Get age group
-    age_min = tb.age_group_min.astype(int).astype(str)
+    age_min = tb.age_group_min.astype(int).astype("string")
     age_max = tb.age_group_max.astype("Int64").apply(lambda x: str(int(x)) if not pd.isna(x) else "+")
     tb["age_group"] = (age_min + "-" + age_max).replace(to_replace=r"-\+", value="+", regex=True)
     tb = tb.drop(columns=["age_group_min", "age_group_max"])
