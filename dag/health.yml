@@ -721,9 +721,3 @@ steps:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
-  data://meadow/health/2024-08-23/eurostat_cancer:
-    - snapshot://health/2024-08-23/eurostat_cancer.csv
-  data://garden/health/2024-08-23/eurostat_cancer:
-    - data://meadow/health/2024-08-23/eurostat_cancer
-  data://grapher/health/2024-08-23/eurostat_cancer:
-    - data://garden/health/2024-08-23/eurostat_cancer
