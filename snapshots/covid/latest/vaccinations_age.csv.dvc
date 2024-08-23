@@ -1,0 +1,73 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, vaccinations (broken down by age)
+    description: |-
+      Country-by-country data on global COVID-19 vaccinations by age. We only rely on figures that are verifiable based on public official sources.
+
+      The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
+    date_published: "2024-08-23"
+    # Citation
+    producer: Official data collated by Our World in Data
+    citation_full: |-
+      Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. A global database of COVID-19 vaccinations. Nat Hum Behav (2021). https://doi.org/10.1038/s41562-021-01122-8
+
+      The data has been obtained from different sources depending on the country:
+
+      - Argentina: Ministry of Health via https://covidstats.com.ar/ws/vacunadosargentina?portipovacuna=1 (https://covidstats.com.ar/)
+      - Austria: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Belgium: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Bulgaria: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Canada: Public Health Agency of Canada (https://health-infobase.canada.ca/covid-19/vaccine-administration/)
+      - Chile: Ministry of Health, via Ministry of Science GitHub repository (https://github.com/MinCiencia/Datos-COVID19)
+      - Croatia: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Cyprus: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Czechia: Ministry of Health (https://onemocneni-aktualne.mzcr.cz/api/v2/covid-19/ockovani.csv)
+      - Denmark: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Ecuador: Ministerio de Salud Pública del Ecuador (via https://github.com/andrab/ecuacovid) (https://github.com/andrab/ecuacovid)
+      - Estonia: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Finland: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - France: Public Health France (https://www.data.gouv.fr/fr/datasets/donnees-relatives-aux-personnes-vaccinees-contre-la-covid-19-1/)
+      - Germany: Robert Koch Institut (https://impfdashboard.de/)
+      - Hong Kong: Food and Health Bureau (https://data.gov.hk/en-data/dataset/hk-dh-chpsebcddr-novel-infectious-agent)
+      - Hungary: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Iceland: Ministry of Health (https://e.infogram.com/c3bc3569-c86d-48a7-9d4c-377928f102bf)
+      - Ireland: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Italy: Extraordinary commissioner for the Covid-19 emergency (https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/somministrazioni-vaccini-latest.csv)
+      - Japan: Prime Minister's Office (https://www.kantei.go.jp/jp/headline/kansensho/vaccine.html)
+      - Latvia: National Health Service (https://data.gov.lv/dati/eng/dataset/covid19-vakcinacijas)
+      - Liechtenstein: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Lithuania: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Luxembourg: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Malta: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Nepal: Ministry of Health and Population (https://covid19.mohp.gov.np/situation-report)
+      - Netherlands: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Norway: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Peru: Ministerio de Salud via https://github.com/jmcastagnetto/covid-19-peru-vacunas (https://www.datosabiertos.gob.pe/dataset/vacunacion)
+      - Poland: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Portugal: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Romania: Government of Romania via datelazi.ro (https://d35p9e4fm9h3wo.cloudfront.net/latestData.json)
+      - Slovakia: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Slovenia: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - South Africa: National Department of Health (https://sacoronavirus.co.za/latest-vaccine-statistics/)
+      - South Korea: Korea Centers for Disease Control and Prevention (https://ncv.kdca.go.kr/)
+      - Spain: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Sweden: European Centre for Disease Prevention and Control (ECDC) (https://www.ecdc.europa.eu/en/publications-data/data-covid-19-vaccination-eu-eea)
+      - Switzerland: Federal Office of Public Health (https://opendata.swiss/en/dataset/covid-19-schweiz)
+      - Ukraine: National Security and Defense Council of Ukraine (https://health-security.rnbo.gov.ua)
+      - United States: Centers for Disease Control and Prevention (https://covid.cdc.gov/covid-data-tracker/COVIDData/getAjaxData?id=vaccination_data)
+      - Uruguay: Ministry of Health via vacuna.uy (https://raw.githubusercontent.com/3dgiordano/covid-19-uy-vacc-data/main/data/Uruguay.csv)
+    # Files
+    url_main: https://github.com/owid/covid-19-data/
+    date_accessed: 2024-08-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data
+outs:
+  - md5: e3f32722abef506ec97addba08229261
+    size: 3186194
+    path: vaccinations_age.csv
