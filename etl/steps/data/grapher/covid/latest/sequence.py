@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from shared import to_grapher_date
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("sequence")
 
     # Read table from garden dataset.
-    tables = [to_grapher_date(tb) for tb in list(ds_garden)]
+    tables = list(ds_garden)
 
     #
     # Process data.

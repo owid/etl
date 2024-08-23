@@ -156,7 +156,7 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
-    print(ds_garden["variants"]["num_sequences"].metadata.description_processing)
+    # print(ds_garden["variants"]["num_sequences"].metadata.description_processing)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
