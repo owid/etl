@@ -22,3 +22,4 @@ tables:
         display:
           numDecimalPlaces: 0
           tolerance: 9999
+          name: << vaccine >>
