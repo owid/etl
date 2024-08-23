@@ -203,6 +203,14 @@ steps:
   data://grapher/covid/latest/vaccinations_global:
     - data://garden/covid/latest/vaccinations_global
 
+  data://meadow/covid/latest/vaccinations_manufacturer:
+    - snapshot://covid/latest/vaccinations_manufacturer.csv
+  data://garden/covid/latest/vaccinations_manufacturer:
+    - data://meadow/covid/latest/vaccinations_manufacturer
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/covid/latest/vaccinations_manufacturer:
+    - data://garden/covid/latest/vaccinations_manufacturer
+
   # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
   data://meadow/excess_mortality/latest/hmd_stmf:
     - snapshot://excess_mortality/latest/hmd_stmf.csv
