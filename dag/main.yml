@@ -278,23 +278,6 @@ steps:
   data://grapher/itopf/2023-05-18/oil_spills:
     - data://garden/itopf/2023-05-18/oil_spills
 
-  # Environment Tables Implementations
-  data://meadow/tourism/2023-05-09/unwto_environment:
-    - snapshot://tourism/2023-05-09/unwto_environment.xlsx
-  data://garden/tourism/2023-05-10/unwto_environment:
-    - data://meadow/tourism/2023-05-09/unwto_environment
-  data://grapher/tourism/2023-05-23/unwto_environment:
-    - data://garden/tourism/2023-05-10/unwto_environment
-
-  # GDP
-  data://meadow/tourism/2023-05-09/unwto_gdp:
-    - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
-  data://garden/tourism/2023-05-10/unwto_gdp:
-    - data://meadow/tourism/2023-05-09/unwto_gdp
-  data://grapher/tourism/2023-05-23/unwto_gdp:
-    - data://garden/tourism/2023-05-10/unwto_gdp
-
-
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2024-05-02/world_economic_outlook:
     - snapshot://imf/2024-05-02/world_economic_outlook.xls
