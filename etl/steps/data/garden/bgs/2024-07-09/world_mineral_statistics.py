@@ -6,10 +6,10 @@ from typing import Dict, List
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, VariablePresentationMeta
-from owid.datautils.io.json import load_json
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
+from etl.files import ruamel_load
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -960,6 +960,9 @@ def gather_notes(
     # Check that the notes coincide with the original notes stored in an adjacent file.
     error = "Original BGS notes and footnotes have changed."
     assert notes_dict == notes_original, error
+    # To update the original notes:
+    # from etl.files import ruamel_dump
+    # (paths.directory / "notes_original.yml").write_text(ruamel_dump(notes_original))
 
     # Load the edited notes, that will overwrite the original notes.
     notes_dict.update(notes_edited)
@@ -1136,10 +1139,10 @@ def run(dest_dir: str) -> None:
 
     # Load adjacent file containing the original BGS notes and footnotes for each data column.
     # NOTE: This file is loaded as a sanity check, in case in a later update notes change.
-    notes_original = load_json(paths.directory / "notes_original.json")
+    notes_original = ruamel_load(paths.directory / "notes_original.yml")
 
     # Load the addjacent file containing the edited notes.
-    notes_edited = load_json(paths.directory / "notes_edited.json")
+    notes_edited = ruamel_load(paths.directory / "notes_edited.yml")
 
     #
     # Process data.
