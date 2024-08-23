@@ -18,6 +18,9 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"covid/{SNAPSHOT_VERSION}/sequence.json")
 
+    # Update metadata
+    modify_metadata(snap)
+
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)
 
@@ -37,7 +40,7 @@ def modify_metadata(snap: Snapshot) -> Snapshot:
     # Get access date
     snap.metadata.origin.date_accessed = date.today()  # type: ignore
     # Set publication date
-    snap.metadata.origin.publication_date = _get_latest_update()  # type: ignore
+    snap.metadata.origin.date_published = _get_latest_update()  # type: ignore
     # Save
     snap.metadata.save()
     return snap
