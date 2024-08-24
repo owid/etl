@@ -23,12 +23,12 @@ meta:
     url_main: https://www.gisaid.org/
     url_download: https://raw.githubusercontent.com/hodcroftlab/covariants/master/web/public/data/perCountryData.json
     date_accessed: 2024-08-24
-    date_published: 2024-08-22
+    date_published: 2024-08-24
     license:
       name: GISAID EpiFlu Database Access Agreement
       url: https://gisaid.org/terms-of-use/
   is_public: false
 outs:
-  - md5: fd525e547487937a1869784358da9692
-    size: 24755348
+  - md5: 1ecb44a0946404df5b52bd83c3c54811
+    size: 24798821
     path: sequence.json
