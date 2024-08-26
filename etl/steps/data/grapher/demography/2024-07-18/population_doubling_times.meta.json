@@ -1,0 +1,368 @@
+{
+  "short_name": "population_doubling_times",
+  "title": "Population",
+  "dataset": {
+    "channel": "garden",
+    "namespace": "demography",
+    "short_name": "population_doubling_times",
+    "title": "Population doubling times",
+    "description": "Number of years it takes for a country or region to double its population.",
+    "licenses": [
+      {
+        "name": "Creative Commons BY 4.0",
+        "url": "https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing"
+      }
+    ],
+    "is_public": true,
+    "version": "2024-07-18",
+    "update_period_days": 730,
+    "non_redistributable": false,
+    "source_checksum": "1d06fb5430c6bf7a8f3e79ab0019234b"
+  },
+  "primary_key": [],
+  "fields": {
+    "year": {
+      "title": "Population",
+      "description": "Population by country and year.",
+      "origins": [
+        {
+          "producer": "PBL Netherlands Environmental Assessment Agency",
+          "title": "History Database of the Global Environment",
+          "description": "This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.",
+          "citation_full": "Utrecht University/PBL Netherlands Environmental Assessment Agency - History Database of the Global Environment (HYDE v 3.3, 2023).\nKlein Goldewijk, C.G.M., Beusen, A., Doelman, J., Stehfest, E., 2017, Anthropogenic land use estimates for the Holocene \u2013 HYDE 3.2, Earth Syst. Sci. Data, 9, 927\u2013953",
+          "attribution": "HYDE (2023)",
+          "attribution_short": "HYDE",
+          "version_producer": 3.3,
+          "url_main": "https://doi.org/10.24416/UU01-AEZZIT",
+          "url_download": "https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/original/hyde33_c7_base_mrt2023/txt/all_indicators.zip",
+          "date_accessed": "2024-01-02",
+          "date_published": "2023-11-30",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://doi.org/10.24416/UU01-AEZZIT"
+          }
+        },
+        {
+          "producer": "Gapminder",
+          "title": "Population",
+          "citation_full": "Gapminder Population v7 (2022).\n\nGapminder's population data is divided into two chunks: One long historical trend for the global population that goes back to 10,000 BC. And the second chunk is country estimates that only reaches back to 1800. For the first chunk, several sources were used. You can learn more at https://docs.google.com/spreadsheets/d/1hkLbEilJbl630IG68q-aQJlUjuTFm9b_12nQMVd1sZM/edit#gid=0. For the second chunk, Gapminder uses UN population data between 1950 to 2100 from the UN Population Division World Population Prospects 2019, and the forecast to the year 2100 uses their medium-fertility variant. For years before 1950, this version uses the data documented in greater detail by Mattias Lindgren in version 3. The main source was Angus Maddison's data, which CLIO Infra Project maintained and improved. Note that when combining version 3 with the new UN data, the trends for a few countries didn't match up in the overlapping year 1950. Minor adjustments were made to the years before and after to smooth out discrepancies between the two sources and avoid spurious jumps in Gapminder's visualisations. Visit https://www.gapminder.org/data/documentation/gd003/ to learn more about the methodology used and the data from back to 10,000 BC.",
+          "attribution": "Gapminder - Population v7 (2022)",
+          "attribution_short": "Gapminder",
+          "version_producer": "v7",
+          "url_main": "http://gapm.io/dpop",
+          "url_download": "https://gapm.io/dl_popv7",
+          "date_accessed": "2023-03-31",
+          "date_published": "2022-10-19",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Estimates 1950-2023",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Medium_1950-2023.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Low-fertility scenario 1950-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Low_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Medium scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Medium_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, High-fertility scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_High_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Constant-fertility scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Constant%20fertility_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Demographic indicators",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/EXCEL_FILES/1_General/WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_FULL.xlsx",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "Gapminder",
+          "title": "Systema Globalis",
+          "citation_full": "Gapminder - Systema Globalis (2023).",
+          "attribution": "Gapminder - Systema Globalis (2022)",
+          "attribution_short": "Gapminder",
+          "url_main": "https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+          "date_accessed": "2023-03-31",
+          "date_published": "2023-02-21",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://github.com/open-numbers/ddf--gapminder--systema_globalis"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "name": "Creative Commons BY 4.0",
+          "url": "https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing"
+        }
+      ],
+      "short_unit": "",
+      "processing_level": "minor"
+    },
+    "population_target": {
+      "title": "Population (rounded)",
+      "description_short": "Population of a country or region for a given year. It is measured in 10^8 precision. That means that, e.g. 521,000,000 gets rounded to 500,000,000.",
+      "unit": "people",
+      "presentation": {
+        "topic_tags": [
+          "Population Growth"
+        ]
+      }
+    },
+    "num_years_to_double": {
+      "title": "Years since population was half",
+      "description": "Population by country and year.",
+      "description_short": "Number of years it took for a country or region to reach the current population since it had half of it.",
+      "origins": [
+        {
+          "producer": "PBL Netherlands Environmental Assessment Agency",
+          "title": "History Database of the Global Environment",
+          "description": "This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.",
+          "citation_full": "Utrecht University/PBL Netherlands Environmental Assessment Agency - History Database of the Global Environment (HYDE v 3.3, 2023).\nKlein Goldewijk, C.G.M., Beusen, A., Doelman, J., Stehfest, E., 2017, Anthropogenic land use estimates for the Holocene \u2013 HYDE 3.2, Earth Syst. Sci. Data, 9, 927\u2013953",
+          "attribution": "HYDE (2023)",
+          "attribution_short": "HYDE",
+          "version_producer": 3.3,
+          "url_main": "https://doi.org/10.24416/UU01-AEZZIT",
+          "url_download": "https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/original/hyde33_c7_base_mrt2023/txt/all_indicators.zip",
+          "date_accessed": "2024-01-02",
+          "date_published": "2023-11-30",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://doi.org/10.24416/UU01-AEZZIT"
+          }
+        },
+        {
+          "producer": "Gapminder",
+          "title": "Population",
+          "citation_full": "Gapminder Population v7 (2022).\n\nGapminder's population data is divided into two chunks: One long historical trend for the global population that goes back to 10,000 BC. And the second chunk is country estimates that only reaches back to 1800. For the first chunk, several sources were used. You can learn more at https://docs.google.com/spreadsheets/d/1hkLbEilJbl630IG68q-aQJlUjuTFm9b_12nQMVd1sZM/edit#gid=0. For the second chunk, Gapminder uses UN population data between 1950 to 2100 from the UN Population Division World Population Prospects 2019, and the forecast to the year 2100 uses their medium-fertility variant. For years before 1950, this version uses the data documented in greater detail by Mattias Lindgren in version 3. The main source was Angus Maddison's data, which CLIO Infra Project maintained and improved. Note that when combining version 3 with the new UN data, the trends for a few countries didn't match up in the overlapping year 1950. Minor adjustments were made to the years before and after to smooth out discrepancies between the two sources and avoid spurious jumps in Gapminder's visualisations. Visit https://www.gapminder.org/data/documentation/gd003/ to learn more about the methodology used and the data from back to 10,000 BC.",
+          "attribution": "Gapminder - Population v7 (2022)",
+          "attribution_short": "Gapminder",
+          "version_producer": "v7",
+          "url_main": "http://gapm.io/dpop",
+          "url_download": "https://gapm.io/dl_popv7",
+          "date_accessed": "2023-03-31",
+          "date_published": "2022-10-19",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Estimates 1950-2023",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Medium_1950-2023.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Low-fertility scenario 1950-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Low_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Medium scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Medium_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, High-fertility scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_High_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Population, Constant-fertility scenario 2024-2100",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationBySingleAgeSex_Constant%20fertility_2024-2100.csv.gz",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "United Nations",
+          "title": "World Population Prospects",
+          "description": "World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population that have been published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality and international migration for 237 countries or areas. More details at https://population.un.org/wpp/Publications/.",
+          "title_snapshot": "World Population Prospects, Demographic indicators",
+          "citation_full": "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.",
+          "attribution": "UN, World Population Prospects (2024)",
+          "attribution_short": "UN WPP",
+          "url_main": "https://population.un.org/wpp/Download/",
+          "url_download": "https://population.un.org/wpp/Download/Files/1_Indicator%20(Standard)/EXCEL_FILES/1_General/WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_FULL.xlsx",
+          "date_accessed": "2024-07-11",
+          "date_published": "2024-07-11",
+          "license": {
+            "name": "CC BY 3.0 IGO",
+            "url": "https://population.un.org/wpp/Download/Standard/MostUsed/"
+          }
+        },
+        {
+          "producer": "Gapminder",
+          "title": "Systema Globalis",
+          "citation_full": "Gapminder - Systema Globalis (2023).",
+          "attribution": "Gapminder - Systema Globalis (2022)",
+          "attribution_short": "Gapminder",
+          "url_main": "https://github.com/open-numbers/ddf--gapminder--systema_globalis",
+          "date_accessed": "2023-03-31",
+          "date_published": "2023-02-21",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://github.com/open-numbers/ddf--gapminder--systema_globalis"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "name": "Creative Commons BY 4.0",
+          "url": "https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing"
+        }
+      ],
+      "unit": "years",
+      "short_unit": "",
+      "processing_level": "minor",
+      "presentation": {
+        "topic_tags": [
+          "Population Growth"
+        ]
+      }
+    }
+  }
+}

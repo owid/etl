@@ -1,0 +1,208 @@
+{
+  "short_name": "avg_10y",
+  "dataset": {
+    "channel": "garden",
+    "namespace": "news",
+    "short_name": "guardian_mentions",
+    "title": "Attention to each country in The Guardian's articles",
+    "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.",
+    "is_public": true,
+    "version": "2024-05-08",
+    "update_period_days": 365,
+    "non_redistributable": false,
+    "source_checksum": "bcd0e660ee490d8b8ebc0c2616f682e6"
+  },
+  "primary_key": [
+    "country",
+    "year"
+  ],
+  "fields": {
+    "country": {
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (tags)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country if it is tagged with a country-related label. To this end, we have used a set of tags for each country. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        },
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (raw mentions)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ]
+    },
+    "year": {},
+    "num_pages_tags": {
+      "title": "{ tables.guardian_mentions.variables.num_pages_tags.description_processing } (10-year average)",
+      "description_short": "{ tables.guardian_mentions.variables.num_pages_tags.description_short }. It reflects a 10-year average (2014 - 2023).",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (tags)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country if it is tagged with a country-related label. To this end, we have used a set of tags for each country. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. The strategy for this indicator is based on first getting all the tags for a country, and then getting the number of articles that have those tags.\n\n\n1. Obtain all tags that concern a country:\n    - Obtain all the tag pages that have a title starting with a country name: a query like \"https://content.guardianapis.com/tags?web-title=spain\", for Spain. As a result we obtain a mapping that tells us for each country the list of tags (e.g. \"Spain: [world/spain, travel/spain, etc.]\") in use.\n    - We work with a list of ~240 countries.\n    - Getting the right country names has been an iterative process, trying to align our standard country names with the Guardian's.\n\n2. For each country, obtain the number of pages using each set of tags. Steps:\n    - For each country and year we get all content metadata: a query like \"https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31\" for year 2020. The count of pages is in the property `response.total`.\n\nFor mor details, please refer to the snapshot script."
+    },
+    "num_pages_mentions": {
+      "title": "{ tables.guardian_mentions.variables.num_pages_mentions.description_processing } (10-year average)",
+      "description_short": "{ tables.guardian_mentions.variables.num_pages_mentions.description_short }. It reflects a 10-year average (2014 - 2023).",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (raw mentions)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. The strategy for this indicator is based on first defining a set of country name variations for each country, and then look for content on The Guardian with an explicit mention to these names.\n\n\n1. Get all country name variations:\n    - Obtain all the country name variations using our standard name list.\n    - Our list may not cover all cases, and may contain some names that are not valid on The Guardian API (e.g. names with symbols like ';' are not supported). Therefore, we clean this list.\n\n2. For each country, obtain the number of pages using each set of name variations. Steps:\n    - For each country and year we get all content metadata: a query like \"https://content.guardianapis.com/search?q=...&from-date=2020-01-01&to-date=2020-12-31\" for year 2020. The count of pages is in the property `response.total`.\n\nFor mor details, please refer to the snapshot script."
+    },
+    "relative_pages_tags": {
+      "title": "{ tables.guardian_mentions.variables.relative_pages_tags.description_processing } (10-year average)",
+      "description_short": "{ tables.guardian_mentions.variables.relative_pages_tags.description_short }. It reflects a 10-year average (2014 - 2023).",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (tags)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country if it is tagged with a country-related label. To this end, we have used a set of tags for each country. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages per 100,000 pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. The strategy for this indicator is based on first getting all the tags for a country, and then getting the number of articles that have those tags.\n\n\n1. Obtain all tags that concern a country:\n    - Obtain all the tag pages that have a title starting with a country name: a query like \"https://content.guardianapis.com/tags?web-title=spain\", for Spain. As a result we obtain a mapping that tells us for each country the list of tags (e.g. \"Spain: [world/spain, travel/spain, etc.]\") in use.\n    - We work with a list of ~240 countries.\n    - Getting the right country names has been an iterative process, trying to align our standard country names with the Guardian's.\n\n2. For each country, obtain the number of pages using each set of tags. Steps:\n    - For each country and year we get all content metadata: a query like \"https://content.guardianapis.com/search?tags=...&from-date=2020-01-01&to-date=2020-12-31\" for year 2020. The count of pages is in the property `response.total`.\n\nFor mor details, please refer to the snapshot script."
+    },
+    "relative_pages_tags_excluded": {
+      "title": "{ tables.guardian_mentions.variables.relative_pages_tags_excluded.description_processing } (10-year average)",
+      "description_short": "{ tables.guardian_mentions.variables.relative_pages_tags_excluded.description_short }. It reflects a 10-year average (2014 - 2023).",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (tags)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country if it is tagged with a country-related label. To this end, we have used a set of tags for each country. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages per 100,000 pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }"
+    },
+    "relative_pages_mentions": {
+      "title": "{ tables.guardian_mentions.variables.relative_pages_mentions.description_processing } (10-year average)",
+      "description_short": "Share of pages in The Guardian that that mention a particular country.",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (raw mentions)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages per 100,000 pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "Getting the number of articles/entries talking about a certain country has no straightforward answer, since there can be different strategies. The strategy for this indicator is based on first defining a set of country name variations for each country, and then look for content on The Guardian with an explicit mention to these names.\n\n\n1. Get all country name variations:\n    - Obtain all the country name variations using our standard name list.\n    - Our list may not cover all cases, and may contain some names that are not valid on The Guardian API (e.g. names with symbols like ';' are not supported). Therefore, we clean this list.\n\n2. For each country, obtain the number of pages using each set of name variations. Steps:\n    - For each country and year we get all content metadata: a query like \"https://content.guardianapis.com/search?q=...&from-date=2020-01-01&to-date=2020-12-31\" for year 2020. The count of pages is in the property `response.total`.\n\nFor mor details, please refer to the snapshot script."
+    },
+    "relative_pages_mentions_excluded": {
+      "title": "{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing } (10-year average)",
+      "description_short": "{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_short }. It reflects a 10-year average (2014 - 2023).",
+      "origins": [
+        {
+          "producer": "The Guardian",
+          "title": "Attention to each country in The Guardian's articles (raw mentions)",
+          "description": "Aggregate estimates on the number of entries that talk about each country and year.\n\nThe data was obtained by querying The Guardian's Open Platform.\n\nAn entry or page in The Guardian is considered to be about a certain country if that particular country is mentioned in the text. To this end, we have used a set of country name variations to ensure that we capture all the entries. Nonetheless, this is not a perfect method and some entries might be missed.",
+          "citation_full": "The Guardian, Open Platform",
+          "url_main": "https://open-platform.theguardian.com/access/",
+          "date_accessed": "2024-05-07",
+          "date_published": "2024",
+          "license": {
+            "name": "The Guardian terms of service",
+            "url": "https://www.theguardian.com/help/terms-of-service"
+          }
+        }
+      ],
+      "unit": "pages per 100,000 pages",
+      "presentation": {
+        "topic_tags": [
+          "Uncategorized"
+        ]
+      },
+      "description_processing": "{ tables.guardian_mentions.variables.relative_pages_mentions_excluded.description_processing }"
+    }
+  }
+}

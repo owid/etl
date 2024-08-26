@@ -1,0 +1,77 @@
+{
+  "short_name": "testing",
+  "title": "COVID-19, testing",
+  "description": "This data is collected by the Our World in Data team from official reports.\n\nYou can find further details in our post on COVID-19 testing, including:\n\n- Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)\n- Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)\n- detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).\n\nOn 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.\n\nThe data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.",
+  "dataset": {
+    "channel": "meadow",
+    "namespace": "covid",
+    "short_name": "testing",
+    "title": "COVID-19, testing",
+    "description": "This data is collected by the Our World in Data team from official reports.\n\nYou can find further details in our post on COVID-19 testing, including:\n\n- Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)\n- Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)\n- detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).\n\nOn 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.\n\nThe data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.",
+    "is_public": true,
+    "version": "latest",
+    "non_redistributable": false,
+    "source_checksum": "80f2e893d323fb2b68ecdd3d48790283"
+  },
+  "primary_key": [],
+  "fields": {
+    "country": {},
+    "source_label": {
+      "title": "Source label",
+      "origins": [
+        {
+          "producer": "Official data collated by Our World in Data",
+          "title": "COVID-19, testing",
+          "description": "This data is collected by the Our World in Data team from official reports.\n\nYou can find further details in our post on COVID-19 testing, including:\n\n- Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)\n- Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)\n- detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).\n\nOn 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.\n\nThe data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.",
+          "citation_full": "Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8",
+          "url_main": "https://github.com/owid/covid-19-data/tree/master",
+          "url_download": "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv",
+          "date_accessed": "2024-08-09",
+          "date_published": "2022-06-23",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data"
+          }
+        }
+      ]
+    },
+    "source_url": {
+      "title": "Source URL",
+      "origins": [
+        {
+          "producer": "Official data collated by Our World in Data",
+          "title": "COVID-19, testing",
+          "description": "This data is collected by the Our World in Data team from official reports.\n\nYou can find further details in our post on COVID-19 testing, including:\n\n- Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)\n- Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)\n- detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).\n\nOn 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.\n\nThe data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.",
+          "citation_full": "Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8",
+          "url_main": "https://github.com/owid/covid-19-data/tree/master",
+          "url_download": "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv",
+          "date_accessed": "2024-08-09",
+          "date_published": "2022-06-23",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data"
+          }
+        }
+      ]
+    },
+    "date": {
+      "title": "Date",
+      "origins": [
+        {
+          "producer": "Official data collated by Our World in Data",
+          "title": "COVID-19, testing",
+          "description": "This data is collected by the Our World in Data team from official reports.\n\nYou can find further details in our post on COVID-19 testing, including:\n\n- Our checklist of questions to understand testing data (https://ourworldindata.org/coronavirus-testing#our-checklist-for-covid-19-testing-data)\n- Information on geographical and temporal coverage (https://ourworldindata.org/coronavirus-testing#which-countries-do-we-have-testing-data-for)\n- detailed country-by-country source information (https://ourworldindata.org/coronavirus-testing#source-information-country-by-country).\n\nOn 23 June 2022, we stopped adding new datapoints to our COVID-19 testing dataset. You can read more at https://github.com/owid/covid-19-data/discussions/2667.\n\nThe data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.",
+          "citation_full": "Hasell, J., Mathieu, E., Beltekian, D. et al. A cross-country database of COVID-19 testing. Sci Data 7, 345 (2020). https://doi.org/10.1038/s41597-020-00688-8",
+          "url_main": "https://github.com/owid/covid-19-data/tree/master",
+          "url_download": "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv",
+          "date_accessed": "2024-08-09",
+          "date_published": "2022-06-23",
+          "license": {
+            "name": "CC BY 4.0",
+            "url": "https://ourworldindata.org/faqs#can-i-use-or-reproduce-your-data"
+          }
+        }
+      ]
+    }
+  }
+}

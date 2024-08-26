@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Upplands Conflict Data Program
+    title: Battle-Related Deaths
+    description: |-
+      This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2021 that appear in the UCDP/PRIO Armed Conflict Dataset.
+
+      You can find more notes at https://web.archive.org/web/20230624051617/https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-231.pdf
+    title_snapshot: Battle-Related Deaths (Conflict version)
+    citation_full: |-
+      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022, and the return of conflict between states. Journal of Peace Research 60(4).
+    attribution_short: UCDP
+    version_producer: version 23.1
+    url_main: https://ucdp.uu.se/downloads/index.html
+    url_download: https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-231-csv.zip
+    date_accessed: '2024-08-26'
+    date_published: '2023'
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/

@@ -50,5 +50,6 @@
   "yaml.format.printWidth": 999,
   "ruff.path": [
     ".venv/bin/ruff"
-  ]
+  ],
+  "r.lsp.promptToInstall": false
 }
