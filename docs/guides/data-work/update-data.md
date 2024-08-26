@@ -11,7 +11,7 @@ This guide explains the general workflow to update a dataset that already exists
 
     In a nutshell, these are the steps to follow:
 
-    - Switch to `master` branch and ensure it's up-to-date.
+    - Switch to `master` branch, ensure it's up-to-date and **not dirty**.
     - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
     - ETL Dashboard will suggest to run the following command to create PR and commit steps
         ```bash
