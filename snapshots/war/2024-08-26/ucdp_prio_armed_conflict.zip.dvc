@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Uppsala Conflict Data Program and Peace Research Institute Oslo
+    title: Armed Conflict
+    description: |-
+      A conflict-year dataset with information on armed conflict where at least one party is the government of a state in the time period 1946-2022.
+
+      You can find more notes at https://web.archive.org/web/20230624120457/https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231.pdf
+    citation_full: |-
+      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4)
+
+      Gleditsch, Nils Petter, Peter Wallensteen, Mikael Eriksson, Margareta Sollenberg, and Håvard Strand (2002) Armed Conflict 1946-2001: A New Dataset. Journal of Peace Research 39(5).
+    attribution_short: UCDP/PRIO
+    version_producer: version 23.1
+    url_main: https://ucdp.uu.se/downloads/index.html#armedconflict
+    url_download: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-231-csv.zip
+    date_accessed: '2024-08-26'
+    date_published: '2023'
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/

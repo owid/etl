@@ -233,3 +233,18 @@ steps:
 
   ######################################################################################################################
 
+  # UCDP
+  data://meadow/war/2024-08-26/ucdp:
+    - snapshot://war/2024-08-26/ucdp_non_state.zip
+    - snapshot://war/2024-08-26/ucdp_geo.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_one_sided.zip
+  data://garden/war/2024-08-26/ucdp:
+    - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://meadow/war/2024-08-26/ucdp
+  data://grapher/war/2024-08-26/ucdp:
+    - data://garden/war/2024-08-26/ucdp
