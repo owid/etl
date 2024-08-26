@@ -31,9 +31,8 @@ def update_metadata_from_yaml(
     """
     # load YAML file as dictionary, add parameters from dataset metadata
     # TODO: tb.metadata.dataset reference shouldn't exist
-    annot = dynamic_yaml_to_dict(
-        dynamic_yaml_load(path, DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta()))
-    )
+    yml = dynamic_yaml_load(path, DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta()))
+    annot = dynamic_yaml_to_dict(yml)
 
     tb.metadata.short_name = table_name
 

@@ -10,7 +10,6 @@ import pandas as pd
 import pymysql
 import sqlalchemy
 import structlog
-from jinja2 import Environment
 from owid import catalog
 from owid.catalog import warnings
 from owid.catalog.utils import underscore
@@ -23,7 +22,7 @@ from etl.files import checksum_str
 
 log = structlog.get_logger()
 
-jinja_env = Environment(
+jinja_env = jinja2.Environment(
     block_start_string="<%",
     block_end_string="%>",
     variable_start_string="<<",
@@ -32,7 +31,16 @@ jinja_env = Environment(
     comment_end_string="#>",
     trim_blocks=True,
     lstrip_blocks=True,
+    undefined=jinja2.StrictUndefined,
 )
+
+
+# Helper function to raise an error with << raise("uh oh...") >>
+def raise_helper(msg):
+    raise Exception(msg)
+
+
+jinja_env.globals["raise"] = raise_helper
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple({f"{n}{b}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64")})
@@ -212,6 +220,9 @@ def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
+    except jinja2.exceptions.UndefinedError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message) from e
 
 
 def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
