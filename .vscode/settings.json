@@ -9,7 +9,8 @@
     "schemas/dataset-schema.json": [
       "**/*.meta.yml",
       "**/*.meta.override.yml"
-    ]
+    ],
+    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
   },
   "[python]": {
     "editor.formatOnSave": true,

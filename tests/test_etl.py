@@ -10,7 +10,7 @@ from typing import List, Union
 from unittest.mock import patch
 
 from etl import paths
-from etl.command import _detect_strictness_level
+from etl.command import _detect_strictness_level, _grapher_steps
 from etl.steps import DataStep, Step, WaldenStep, compile_steps, load_dag
 
 
@@ -61,5 +61,9 @@ def test_detect_strictness():
 
 def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[Step]:
     dag = load_dag(filename)
+
+    # add grapher steps
+    dag.update(_grapher_steps(dag, private=True))
+
     steps = compile_steps(dag, [])
     return steps

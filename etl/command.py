@@ -280,16 +280,17 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     if not export:
         dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
 
-    grapher_steps = _grapher_steps(dag, private)
     # If --grapher is set, add all steps for upserting to DB
     if grapher:
-        dag.update(grapher_steps)
-    # Otherwise just add those in dependencies
+        steps = _grapher_steps(dag, private)
+        dag.update(steps)
+    # Otherwise just add those in dependencies, even if they're private
     else:
+        steps = _grapher_steps(dag, True)
         for deps in list(dag.values()):
             for dep in deps:
                 if dep.startswith("grapher://"):
-                    dag[dep] = grapher_steps[dep]
+                    dag[dep] = steps[dep]
 
     return dag
 
