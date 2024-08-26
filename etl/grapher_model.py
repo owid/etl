@@ -178,7 +178,7 @@ class Tag(Base):
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()
+        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
