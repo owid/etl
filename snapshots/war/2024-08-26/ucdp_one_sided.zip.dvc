@@ -5,17 +5,21 @@ meta:
     description: |-
       An actor-year dataset with information of intentional attacks on civilians by governments and formally organized armed groups.
 
-      You can find more notes at https://web.archive.org/web/20230624043806/https://ucdp.uu.se/downloads/nsos/ucdp-onesided-231.pdf
+      You can find more notes at https://ucdp.uu.se/downloads/nsos/ucdp-onesided-241.pdf
     citation_full: |-
-      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4).
+      Davies, Shawn, Garoun Engström, Therese Pettersson & Magnus Öberg (2024). Organized violence 1989-2023, and the prevalence of organized crime groups. Journal of Peace Research 61(4).
 
       Eck, Kristine & Lisa Hultman (2007) Violence Against Civilians in War. Journal of Peace Research 44(2).
     attribution_short: UCDP
-    version_producer: version 23.1
-    url_main: https://ucdp.uu.se/downloads/index.html
-    url_download: https://ucdp.uu.se/downloads/nsos/ucdp-onesided-231-csv.zip
-    date_accessed: '2024-08-26'
-    date_published: '2023'
+    version_producer: version 24.1
+    url_main: https://ucdp.uu.se/downloads/index.html#onesided
+    url_download: https://ucdp.uu.se/downloads/nsos/ucdp-onesided-241-csv.zip
+    date_accessed: "2024-08-26"
+    date_published: "2024"
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 81f02b42d90d051286a05c3bd243c4bf
+    size: 388151
+    path: ucdp_one_sided.zip

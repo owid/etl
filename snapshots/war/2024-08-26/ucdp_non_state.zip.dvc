@@ -5,17 +5,21 @@ meta:
     description: |-
       A conflict-year dataset containing information on communal and organized armed conflict where none of the parties is the government of a state.
 
-      You can find more notes at https://web.archive.org/web/20230624051732/https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-231.pdf
+      You can find more notes at https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-241.pdf
     citation_full: |-
-      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4).
+      Davies, Shawn, Garoun Engström, Therese Pettersson & Magnus Öberg (2024). Organized violence 1989-2023, and the prevalence of organized crime groups. Journal of Peace Research 61(4).
 
       Sundberg, Ralph, Kristine Eck and Joakim Kreutz (2012) Introducing the UCDP Non-State Conflict Dataset. Journal of Peace Research 49(2).
     attribution_short: UCDP
-    version_producer: version 23.1
-    url_main: https://ucdp.uu.se/downloads/index.html
-    url_download: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-231-csv.zip
-    date_accessed: '2024-08-26'
-    date_published: '2023'
+    version_producer: version 24.1
+    url_main: https://ucdp.uu.se/downloads/index.html#nonstate
+    url_download: https://ucdp.uu.se/downloads/nsos/ucdp-nonstate-241-csv.zip
+    date_accessed: "2024-08-26"
+    date_published: "2024"
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: d4eeff28aa25f8bf09469b0c48cdaef3
+    size: 75252
+    path: ucdp_non_state.zip

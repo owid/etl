@@ -3,18 +3,22 @@ meta:
     producer: Uppsala Conflict Data Program
     title: Battle-Related Deaths
     description: |-
-      This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2021 that appear in the UCDP/PRIO Armed Conflict Dataset.
+      This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2023 that appear in the UCDP/PRIO Armed Conflict Dataset.
 
-      You can find more notes at https://web.archive.org/web/20230624051617/https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-231.pdf
+      You can find more notes at https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-241.pdf
     title_snapshot: Battle-Related Deaths (Dyadic version)
     citation_full: |-
-      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022, and the return of conflict between states. Journal of Peace Research 60(4).
+      Davies, Shawn, Garoun Engström, Therese Pettersson & Magnus Öberg (2024). Organized violence 1989-2023, and the prevalence of organized crime groups. Journal of Peace Research 61(4).
     attribution_short: UCDP
-    version_producer: version 23.1
-    url_main: https://ucdp.uu.se/downloads/index.html
-    url_download: https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-231-csv.zip
-    date_accessed: '2024-08-26'
-    date_published: '2023'
+    version_producer: version 24.1
+    url_main: https://ucdp.uu.se/downloads/index.html#battlerelated
+    url_download: https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-241-csv.zip
+    date_accessed: "2024-08-26"
+    date_published: "2024"
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 76125fa0928b881631f0f74036902048
+    size: 43132
+    path: ucdp_battle_related_dyadic.zip
