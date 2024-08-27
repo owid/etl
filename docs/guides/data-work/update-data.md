@@ -13,7 +13,7 @@ This guide explains the general workflow to update a dataset that already exists
 
     - Switch to `master` branch, ensure it's up-to-date and **not dirty**.
     - Use the ETL Dashboard to create new versions of the steps (by duplicating the old ones).
-    - Run the command suggested by the ETL Dashboard to create a PR with a staging server
+    - Create a PR with a staging server with
         ```bash
         etl pr update-{short_name} --title ":bar_chart: Update {short_name}"
         ```
@@ -63,7 +63,7 @@ This guide assumes you have already a [working installation of `etl`](../../../g
 
 - **Run `etl pr ..` to create a PR**
 
-    Run the command you copied from the ETL Dashboard:
+    Create a PR with the following command (replace `{short_name}` with the short name of the dataset, e.g. `temperature-anomaly`):
 
     ```bash
     etl pr update-{short_name} --title ":bar_chart: Update {short_name}"
@@ -73,7 +73,7 @@ This guide assumes you have already a [working installation of `etl`](../../../g
     It will also create a draft pull request in github, and a staging server.
 
     Then, commit generated files and push them to the new branch. This commit will contain only copied steps, subsequent changes
-    will be added as separate commits.
+    will be added as separate commits. It's likely that CI/CD checks will fail at this point, since the snapshot hasn't been run yet.
 
     Wait for a notification from `owidbot`. It should take a few minutes, and will inform you that the staging server [http://staging-site-update-temperature-anomaly/admin](http://staging-site-update-temperature-anomaly/admin) has been created.
 
