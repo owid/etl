@@ -70,7 +70,7 @@ def fix_percent(tb: Table) -> Table:
     it indicates all values are 100x too small and we need to multiply values by 100
     """
     if "Percent" in tb["metric"].unique():
-        if max(tb["value"][tb["metric"] == "Percent"]) <= 1:
+        if max(tb["value"][tb["metric"] == "Percent"]) <= 1.1:
             subset_percent = tb["metric"] == "Percent"
             tb.loc[subset_percent, "value"] *= 100
             # tb["value"][(tb["metric"] == "Percent")] = tb["value"][(tb["metric"] == "Percent")] * 100
