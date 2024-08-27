@@ -90,7 +90,7 @@ def run(dest_dir: str) -> None:
 
     # Prepare explorer metadata.
     config = {
-        "explorerTitle": "Minerals supply and demand prospects",
+        "explorerTitle": "Minerals Supply and Demand Prospects",
         "explorerSubtitle": "",
         # "selection": ["World", "Australia", "Chile", "China", "United States"],
     }
