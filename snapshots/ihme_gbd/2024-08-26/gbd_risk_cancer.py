@@ -10,7 +10,7 @@ Important - You need and account to access the data.
 * In Metric select 'Number', 'Percent' and 'Rate'
 * In Cause select all of the cancers and Total cancers, Total cancers excluding non-melanoma skin cancer:
 * In Risk  select 'Select all risks and all level 2 causes'
-* In Location select 'Global', 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions'
+* In Location select 'Select all countries and territories', each of the regions in the following groups: 'WHO region', 'World Bank Income Level' and 'World Bank Regions' (selecting 'Global' leads to download failure so can calculate it later)
 * In Age select:
 #    - Age-standardized
 #    - All ages
