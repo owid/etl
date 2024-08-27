@@ -93,6 +93,12 @@ log = structlog.get_logger()
     help="Only run the selected step (no upstream or downstream dependencies). Overrides `--downstream` option.",
 )
 @click.option(
+    "--exact-match",
+    "-x",
+    is_flag=True,
+    help="Steps should exactly match the arguments (if so, pass the steps with their full name, e.g. 'data://garden/.../step_name').",
+)
+@click.option(
     "--exclude",
     "-e",
     help="Comma-separated patterns to exclude",
@@ -145,6 +151,7 @@ def main_cli(
     ipdb: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
@@ -195,6 +202,7 @@ def main_cli(
         export=export,
         downstream=downstream,
         only=only,
+        exact_match=exact_match,
         exclude=exclude,
         dag_path=dag_path,
         workers=workers,
@@ -227,6 +235,7 @@ def main(
     export: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
@@ -251,6 +260,7 @@ def main(
         private=private,
         downstream=downstream,
         only=only,
+        exact_match=exact_match,
         excludes=excludes,
         workers=workers,
         strict=strict,
@@ -303,6 +313,7 @@ def run_dag(
     private: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
     strict: Optional[bool] = None,
@@ -323,7 +334,7 @@ def run_dag(
     # but are not supposed to be in DB
     excludes.append("grapher://grapher/regions/latest/regions")
 
-    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
+    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
 
     if not private:
         _validate_private_steps(steps)
