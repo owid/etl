@@ -55,6 +55,7 @@ def compile_steps(
     excludes: Optional[List[str]] = None,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
@@ -64,7 +65,7 @@ def compile_steps(
     excludes = excludes or []
 
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only)
+    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
 
     # parse the steps into Python objects
     return [parse_step(name, dag) for name in steps]
