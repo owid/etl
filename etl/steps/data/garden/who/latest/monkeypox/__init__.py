@@ -36,10 +36,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb_orig = tb.copy()
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        make_missing_countries_nan=True,
     )
+
+    missing_countries = set(tb_orig[tb.country.isnull()].country)
+    if missing_countries:
+        raise ValueError(f"Missing countries in monkeypox.meta.yml: {missing_countries}")
 
     tb = (
         tb.pipe(clean_columns)
