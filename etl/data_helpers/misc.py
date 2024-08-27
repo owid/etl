@@ -170,6 +170,67 @@ def expand_time_column(
     return df
 
 
+def explode_rows_by_time_range(
+    tb: Table,
+    col_time_start: str,
+    col_time_end: str,
+    col_time: str,
+    cols_scale: Optional[List[str]] = None,
+) -> Table:
+    """Expand a table to have a row per time unit given a range.
+
+    Example
+    -------
+
+        Input:
+
+        | value | time_start | time_end |
+        |---------|------------|----------|
+        | 1       | 1990       | 1993     |
+
+        Output:
+
+        |  time | value |
+        |-------|---------|
+        |  1990 |    1    |
+        |  1991 |    1    |
+        |  1992 |    1    |
+        |  1993 |    1    |
+
+    Parameters
+    ----------
+    tb : Table
+        Original table, where each row is describes a period. It should have two columns determining the time period.
+    col_time_start: str
+        Name of the column that contains the lower-bound time range. Only year is supported for now.
+    col_time_end: str
+        Name of the column that contains the upper-bound time range. Only year is supported for now.
+    col_time: str
+        Name of the new column for time. E.g. 'year'.
+    cols_scale: List[str]
+        If given, column specified by this will be scalled based on the length of the time period. E.g. if the value was '10' over the whole period of 20 years, the new rows per year will have the value '0.5'.
+
+    Returns
+    -------
+    Table
+        Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
+    """
+    # For that we scale the number of deaths proportional to the duration of the conflict.
+    if cols_scale:
+        for col in cols_scale:
+            tb[col] = (tb[col] / (tb[col_time_end] - tb[col_time_start] + 1)).copy_metadata(tb[col])
+
+    # Add missing times for each triplet
+    TIME_MIN = tb[col_time_start].min()
+    TIME_MAX = tb[col_time_end].max()
+    tb_all_times = Table(pd.RangeIndex(TIME_MIN, TIME_MAX + 1), columns=[col_time])
+    tb = tb.merge(tb_all_times, how="cross")
+    # Filter only entries that actually existed
+    tb = tb[(tb[col_time] >= tb[col_time_start]) & (tb[col_time] < tb[col_time_end])]
+
+    return tb
+
+
 ########################################################################################################################
 # TODO: Remote this temporary function once WDI has origins.
 def add_origins_to_mortality_database(tb_who: Table) -> Table:

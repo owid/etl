@@ -67,7 +67,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 
 
 def run(dest_dir: str) -> None:
-    paths.log.info("war_ucdp.start")
+    paths.log.info("start")
 
     #
     # Load inputs.
@@ -95,20 +95,44 @@ def run(dest_dir: str) -> None:
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
-    tb_geo = ds_meadow["ucdp_geo"].reset_index()
-    tb_conflict = ds_meadow["ucdp_battle_related_conflict"].reset_index()
+    tb_ged = (
+        ds_meadow["ucdp_ged"]
+        .reset_index()
+        .astype(
+            {
+                "deaths_a": float,
+                "deaths_b": float,
+                "deaths_civilians": float,
+                "deaths_unknown": float,
+                "best": float,
+                "high": float,
+                "low": float,
+            }
+        )
+    )
+    tb_conflict = (
+        ds_meadow["ucdp_battle_related_conflict"]
+        .reset_index()
+        .astype(
+            {
+                "bd_best": float,
+                "bd_low": float,
+                "bd_high": float,
+            }
+        )
+    )
     tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
-    tb_geo = tb_geo[tb_geo["active_year"] == 1]
+    tb_ged = tb_ged[tb_ged["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
-    tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
+    tb_ged["region"] = tb_ged["region"].cat.rename_categories({"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
     paths.log.info("add field `conflict_type`")
-    tb = add_conflict_type(tb_geo, tb_conflict)
+    tb = add_conflict_type(tb_ged, tb_conflict)
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
@@ -203,83 +227,79 @@ def run(dest_dir: str) -> None:
 
 def _sanity_checks(ds: Dataset) -> None:
     """Check that the tables in the dataset are as expected."""
-    tb_geo = ds["ucdp_geo"].reset_index()
+
+    def _check_consistency_of_ged(
+        tb_ged: Table,
+        tb_type: Table,
+        death_col: str,
+        type_of_violence: int,
+        conflict_ids_errors: Optional[List[int]] = None,
+    ):
+        ERR_THRESHOLD = 0.015
+
+        # Check IDs
+        ged_ids = tb_ged.loc[tb_ged["type_of_violence"] == type_of_violence, ["conflict_new_id"]].drop_duplicates()
+        conflict_ids = tb_type[["conflict_id"]].drop_duplicates()
+        res = ged_ids.merge(conflict_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
+        assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
+
+        # Check number of deaths
+        deaths_ged = (
+            tb_ged.loc[(tb_ged["type_of_violence"] == type_of_violence) & (tb_ged["active_year"] == 1)]
+            .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
+            .sum()
+            .sort_values(["conflict_new_id", "year"])
+        )
+        deaths = tb_type[["conflict_id", "year", death_col]].sort_values(["conflict_id", "year"])
+        res = deaths_ged.merge(
+            deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+        )
+
+        # Get error
+        res["err"] = res["best"].astype(float) - res[death_col].astype(float)
+        res["err_rel"] = res["err"] / res["best"]
+        res = res[res["err_rel"] > ERR_THRESHOLD]
+        # Remove accepted errors
+        if conflict_ids_errors is not None:
+            res = res.loc[~res["conflict_new_id"].isin(conflict_ids_errors)]
+        assert (
+            len(res) == 0
+        ), f"Dicrepancy between number of deaths in conflict ({tb_ged.m.short_name} vs. {tb_type.m.short_name}). \n {res})"
+
+    # Read tables
+    tb_ged = ds["ucdp_ged"].reset_index()
     tb_conflict = ds["ucdp_battle_related_conflict"].reset_index()
     tb_nonstate = ds["ucdp_non_state"].reset_index()
     tb_onesided = ds["ucdp_one_sided"].reset_index()
 
     # Battle-related conflict #
-    # Check IDs
-    geo_ids = tb_geo.loc[tb_geo["type_of_violence"] == 1, ["conflict_new_id"]].drop_duplicates()
-    conflict_ids = tb_conflict[["conflict_id"]].drop_duplicates()
-    res = geo_ids.merge(conflict_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    # Check number of deaths
-    geo_deaths = (
-        tb_geo.loc[(tb_geo["type_of_violence"] == 1) & (tb_geo["active_year"] == 1)]
-        .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
-        .sum()
-        .sort_values(["conflict_new_id", "year"])
+    _check_consistency_of_ged(
+        tb_ged,
+        tb_conflict,
+        "bd_best",
+        1,
     )
-    conflict_deaths = tb_conflict[["conflict_id", "year", "bd_best"]].sort_values(["conflict_id", "year"])
-    res = geo_deaths.merge(
-        conflict_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
-    )
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert (
-        len(res[res["best"] - res["bd_best"] != 0]) <= 1
-    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
     # Non-state #
-    # Check IDs
-    geo_ids = tb_geo.loc[tb_geo["type_of_violence"] == 2, ["conflict_new_id"]].drop_duplicates()
-    nonstate_ids = tb_nonstate[["conflict_id"]].drop_duplicates()
-    res = geo_ids.merge(nonstate_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    # Check number of deaths
-    geo_deaths = (
-        tb_geo.loc[(tb_geo["type_of_violence"] == 2) & (tb_geo["active_year"] == 1)]
-        .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
-        .sum()
-        .sort_values(["conflict_new_id", "year"])
+    _check_consistency_of_ged(
+        tb_ged,
+        tb_nonstate,
+        "best_fatality_estimate",
+        2,
+        [16009],
     )
-    nonstate_deaths = tb_nonstate[["conflict_id", "year", "best_fatality_estimate"]].sort_values(
-        ["conflict_id", "year"]
-    )
-    res = geo_deaths.merge(
-        nonstate_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
-    )
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert (
-        len(res[res["best"] - res["best_fatality_estimate"] != 0]) == 0
-    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
     # One-sided #
-    # Check IDs
-    geo_ids = tb_geo.loc[tb_geo["type_of_violence"] == 3, ["conflict_new_id"]].drop_duplicates()
-    onesided_ids = tb_onesided[["conflict_id"]].drop_duplicates()
-    res = geo_ids.merge(onesided_ids, left_on="conflict_new_id", right_on="conflict_id", how="outer")
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    # Check number of deaths
-    geo_deaths = (
-        tb_geo.loc[(tb_geo["type_of_violence"] == 3) & (tb_geo["active_year"] == 1)]
-        .groupby(["conflict_new_id", "year"], as_index=False)[["best"]]
-        .sum()
-        .sort_values(["conflict_new_id", "year"])
+    _check_consistency_of_ged(
+        tb_ged,
+        tb_onesided,
+        "best_fatality_estimate",
+        3,
+        [16009],
     )
-    onesided_deaths = tb_onesided[["conflict_id", "year", "best_fatality_estimate"]].sort_values(
-        ["conflict_id", "year"]
-    )
-    res = geo_deaths.merge(
-        onesided_deaths, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
-    )
-    assert res.isna().sum().sum() == 0, "Check NaNs in conflict_new_id or conflict_id"
-    assert (
-        len(res[res["best"] - res["best_fatality_estimate"] != 0]) <= 3
-    ), "Dicrepancy between number of deaths in conflict (Geo vs. Non-state datasets)"
 
 
-def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
+def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     """Add `conflict_type` to georeferenced dataset table.
 
     Values for conflict_type are:
@@ -290,13 +310,13 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
        - intrastate
        - internationalized intrastate
 
-    The thing is that the original table `tb_geo` only contains a very high level categorisation. In particular,
+    The thing is that the original table `tb_ged` only contains a very high level categorisation. In particular,
     it labels all state-based conflicts as 'state-based'. Instead, we want to use a more fine grained definition:
     extrasystemic, intrastate, interstate.
 
     Parameters
     ----------
-        tb_geo: Table
+        tb_ged: Table
             This is the main table with the relevant data
         tb_conflict: Table
             This is a secondary table, that we use to obtain the conflict types of the conflicts.
@@ -304,34 +324,34 @@ def add_conflict_type(tb_geo: Table, tb_conflict: Table) -> Table:
     tb_conflict = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
 
-    # Add `type_of_conflict` to `tb_geo`.
+    # Add `type_of_conflict` to `tb_ged`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
-    tb_geo = tb_geo.merge(
+    tb_ged = tb_ged.merge(
         tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
     )
     # Fill unknown types of violence
-    mask = tb_geo["type_of_violence"] == 1  # these are state-based conflicts
-    tb_geo.loc[mask, "type_of_conflict"] = tb_geo.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
+    mask = tb_ged["type_of_violence"] == 1  # these are state-based conflicts
+    tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
 
     # Assert that `type_of_conflict` was only added for state-based events
     assert (
-        tb_geo[tb_geo["type_of_violence"] != 1]["type_of_conflict"].isna().all()
+        tb_ged[tb_ged["type_of_violence"] != 1]["type_of_conflict"].isna().all()
     ), "There are some actual values for non-state based conflicts! These should only be NaN, since `tb_conflict` should only contain data for state-based conflicts."
     # Check that `type_of_conflict` is not NaN for state-based events
     assert (
-        not tb_geo[tb_geo["type_of_violence"] == 1]["type_of_conflict"].isna().any()
+        not tb_ged[tb_ged["type_of_violence"] == 1]["type_of_conflict"].isna().any()
     ), "Could not find the type of conflict for some state-based conflicts!"
 
     # Create `conflict_type` column as a combination of `type_of_violence` and `type_of_conflict`.
-    tb_geo["conflict_type"] = (
-        tb_geo["type_of_conflict"]
+    tb_ged["conflict_type"] = (
+        tb_ged["type_of_conflict"]
         .replace(TYPE_OF_CONFLICT_MAPPING)
-        .fillna(tb_geo["type_of_violence"].replace(TYPE_OF_VIOLENCE_MAPPING))
+        .fillna(tb_ged["type_of_violence"].replace(TYPE_OF_VIOLENCE_MAPPING))
     )
 
     # Sanity check
-    assert tb_geo["conflict_type"].isna().sum() == 0, "Check NaNs in conflict_type (i.e. conflicts without a type)!"
-    return tb_geo
+    assert tb_ged["conflict_type"].isna().sum() == 0, "Check NaNs in conflict_type (i.e. conflicts without a type)!"
+    return tb_ged
 
 
 def _sanity_check_conflict_types(tb: Table) -> Table:
