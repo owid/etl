@@ -117,7 +117,7 @@ def filter_to_subgraph(
 
     if only:
         # Only include explicitly selected nodes
-        return {step: graph.get(step, set()) & included for step in includes}
+        return {step: graph.get(step, set()) & included for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
