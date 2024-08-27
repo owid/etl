@@ -62,3 +62,8 @@ steps:
   #
   export://explorers/minerals/latest/minerals:
     - data://grapher/minerals/2024-07-15/minerals
+  #
+  # Minerals - Minerals supply and demand prospects.
+  #
+  export://explorers/minerals/latest/minerals_supply_and_demand_prospects:
+    - data://grapher/iea/2024-07-04/critical_minerals
