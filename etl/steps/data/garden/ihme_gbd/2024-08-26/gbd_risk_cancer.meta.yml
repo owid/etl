@@ -1,5 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+
   common:
     presentation:
       topic_tags:
@@ -7,6 +8,15 @@ definitions:
         - Causes of Death
       grapher_config:
         note: <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+  sex: |-
+    <% if sex == "Both" %>
+    individuals
+    <% elif sex == "Male" %>
+    males
+    <% elif sex == "Female" %>
+    females
+    <%- endif -%>
+  value:
     processing_level: minor
     unit: |-
       <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
@@ -16,50 +26,44 @@ definitions:
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} aged << age >>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>
+      Age-standardized deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}
       <% elif metric == "Number" and age == 'All ages'%>
-      Total number of deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex}>>
+      Total number of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from << cause.lower() >> attributed to << rei.lower() >> among individuals aged << age >> per 100,000 {definitions.sex}
+      Deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} aged << age >> per 100,000 people
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause.lower() >> attributed to << rei.lower() >> per 100,000 {definitions.sex}
+      Age-standardized deaths among {definitions.sex} from << cause.lower() >> attributed to << rei.lower() >> per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
-      Deaths from << cause.lower() >> attributed to << rei.lower() >> per 100,000 {definitions.sex}
+      Deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} per 100,000 people
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
       Share of total deaths of {definitions.sex} aged << age >> from << cause.lower() >> attributed to << rei.lower() >>
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized deaths that are from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>
+      Share of total age-standardized deaths among {definitions.sex} that are from << cause.lower() >> attributed to << rei.lower() >>
       <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total deaths that are from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>
+      Share of total deaths among {definitions.sex} that are from << cause.lower() >> attributed to << rei.lower() >>
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>.
+      The estimated number of age-standardized deaths from << cause.lower() >> attributed to << rei.lower() >>.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>.
+      The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}.
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} aged << age >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from << cause.lower() >> attributed to << rei.lower() >>, per 100,000 {definitions.sex}.
+      The estimated number of age-standardized deaths among {definitions.sex} from << cause.lower() >> attributed to << rei.lower() >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() >>, per 100,000 {definitions.sex}.
+      The estimated number of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}, per 100,000 people.
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated share of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex} aged << age >>.
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      The estimated share of age-standardized deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex}>>.
+      The estimated share of age-standardized deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}.
       <% elif metric == "Percent" and age == 'All ages'%>
-      The estimated share of deaths from << cause.lower() >> attributed to << rei.lower() among {definitions.sex} >>.
+      The estimated share of deaths from << cause.lower() >> attributed to << rei.lower() >> among {definitions.sex}.
       <%- endif -%>
-  sex: |-
-    <% if sex == "Both" %>
-    individuals
-    <% elif sex == "Male" %>
-    males
-    <% elif sex == "Female" %>
-    females
-    <%- endif -%>
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 dataset:
   update_period_days: 1460
   non_redistributable: true
@@ -67,6 +71,16 @@ tables:
   gbd_risk_cancer:
     variables:
       value:
+        title: |-
+          {definitions.value.title}
+        unit: |-
+          {definitions.value.unit}
+        description_short: |-
+          {definitions.value.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
         display:
-          numDecimalPlaces:
-            <% if metric == 'Number' %>0<% else %>1<% endif %>
+          numDecimalPlaces: |-
+            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
