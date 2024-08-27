@@ -16,12 +16,21 @@ def add_regional_aggregates(
     run_percent: bool = False,
 ) -> Table:
     """
-    Adding the regional aggregated data for the OWID continent regions
+    Add regional aggregated data for the OWID continent regions.
 
-    For Number and Percent we can sum the values, as the Percent denominator is the same across countries (total number of deaths/cases etc)
-    Not all datasets will include Percent as this isn't always that meaningful e.g. in prevalence or incidence data.
+    For 'Number', values are summed.
+    For 'Percent', values are averaged.
+    For 'Rate', it is calculated by dividing the sum of 'Number' values by the sum of the population.
 
-    For Rate we need to calculate it for each region by dividing the sum of the 'Number' values by the sum of the population.
+    Parameters:
+    - tb: Table containing the data.
+    - ds_regions: Dataset containing region information.
+    - index_cols: List of columns to use as index.
+    - regions: List of regions to aggregate.
+    - age_group_mapping: Mapping of age groups to age ranges.
+
+    Returns:
+    - Table with regional aggregates added.
     """
     # Split the table into Number, Percent and Rate
     tb_percent = tb[tb["metric"].isin(["Percent"])].copy()
