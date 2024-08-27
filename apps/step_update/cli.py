@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
 import structlog
+from git import Repo
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
@@ -342,6 +343,7 @@ class StepUpdater:
                 excludes=[],
                 downstream=False,
                 only=True,
+                exact_match=True,
             )
 
             message = "The following steps will be updated:"
@@ -350,6 +352,8 @@ class StepUpdater:
             log.info(message)
             if self.interactive:
                 input("Press enter to continue.")
+
+            repo_is_dirty = Repo(BASE_DIR).is_dirty()
 
             # Update each step.
             for step in steps:
@@ -361,9 +365,14 @@ class StepUpdater:
                     break
 
             # Tell user how to automatically create PR
-            short_name = steps[-1].split("/")[-1].split(".")[0]
-            cmd = f'etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
-            log.info(f"Create PR automatically with:\n  {cmd}")
+            if repo_is_dirty:
+                log.info(
+                    "You cannot use the automatic PR creation because the repository is dirty. Stash or commit your changes or create the PR manually."
+                )
+            else:
+                short_name = steps[-1].split("/")[-1].split(".")[0]
+                cmd = f'etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
+                log.info(f"Create PR automatically with:\n  {cmd}")
 
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.
