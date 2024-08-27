@@ -34,7 +34,7 @@ steps:
   # UCDP
   data://meadow/war/2024-08-26/ucdp:
     - snapshot://war/2024-08-26/ucdp_non_state.zip
-    - snapshot://war/2024-08-26/ucdp_geo.zip
+    - snapshot://war/2024-08-26/ucdp_ged.zip
     - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
     - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
     - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
