@@ -1,18 +1,13 @@
 """Load a snapshot and create a meadow dataset."""
 
-from structlog import get_logger
-
 from etl.helpers import PathFinder, create_dataset
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("war_ucdp: start")
+    paths.log.info("start")
 
     #
     # Load inputs.
@@ -22,6 +17,7 @@ def run(dest_dir: str) -> None:
     short_names = {
         "one_sided": {
             "index": ["conflict_id", "dyad_id", "year"],
+            "filename": "OneSided_v24_1.csv",
         },
         "non_state": {
             "index": ["conflict_id", "dyad_id", "year"],
@@ -32,8 +28,9 @@ def run(dest_dir: str) -> None:
         "battle_related_dyadic": {
             "index": ["conflict_id", "dyad_id", "year"],
         },
-        "geo": {
+        "ged": {
             "index": ["id"],
+            "dtype": {"gwnoa": "string"},
         },
         "prio_armed_conflict": {
             "index": ["conflict_id", "year"],
@@ -41,16 +38,24 @@ def run(dest_dir: str) -> None:
     }
     for short_name, props in short_names.items():
         snap = paths.load_snapshot(short_name=f"ucdp_{short_name}.zip")
-        log.info(f"war_ucdp: creating table from {snap.path}")
+        paths.log.info(f"creating table from {snap.path}")
 
         # Load data from snapshot.
-        if short_name == "geo":
-            tb = snap.read_csv(dtype={"gwnoa": "str"})
+        # Set params
+        kwargs = {}
+        kwarg_names = ["dtype"]
+        for name in kwarg_names:
+            if name in props:
+                kwargs[name] = props[name]
+
+        # Read within zip?
+        if "filename" in props:
+            tb = snap.read_in_archive(props["filename"], **kwargs)
         else:
-            tb = snap.read_csv()
+            tb = snap.read_csv(**kwargs)
 
         # Set index
-        tb = tb.set_index(props["index"], verify_integrity=True)
+        tb = tb.format(props["index"])
 
         # Add table to list of tables.
         tables.append(tb)
@@ -64,4 +69,4 @@ def run(dest_dir: str) -> None:
     # Save changes in the new garden dataset.
     ds_meadow.save()
 
-    log.info("war_ucdp: end")
+    paths.log.info("end")
