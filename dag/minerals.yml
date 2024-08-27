@@ -10,6 +10,11 @@ steps:
   data://garden/iea/2024-07-04/critical_minerals:
     - data://meadow/iea/2024-07-04/critical_minerals
   #
+  # IEA - Critical minerals.
+  #
+  data://grapher/iea/2024-07-04/critical_minerals:
+    - data://garden/iea/2024-07-04/critical_minerals
+  #
   # BGS - World Mineral Statistics.
   #
   data://meadow/bgs/2024-07-09/world_mineral_statistics:
