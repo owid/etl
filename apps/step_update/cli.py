@@ -343,6 +343,7 @@ class StepUpdater:
                 excludes=[],
                 downstream=False,
                 only=True,
+                exact_match=True,
             )
 
             message = "The following steps will be updated:"
