@@ -55,9 +55,9 @@ def run(dest_dir: str) -> None:
 
     # Add to table list
     tables = [
-        tb.set_index(["id", "start", "end"], verify_integrity=True).sort_index(),
-        tb_countries.set_index(["id", "year"], verify_integrity=True).sort_index(),
-        tb_regions.set_index(["region", "year"], verify_integrity=True).sort_index(),
+        tb.format(["id", "start", "end"]),
+        tb_countries.format(["id", "year"]),
+        tb_regions.format(["region", "year"]),
     ]
 
     #
