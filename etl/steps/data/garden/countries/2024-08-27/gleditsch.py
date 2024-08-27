@@ -4,9 +4,6 @@ from datetime import datetime as dt
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import (
-    fill_timeseries,
-)
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import explode_rows_by_time_range
@@ -103,11 +100,8 @@ def create_table_country_years(tb: Table) -> Table:
     # define mask for last year
     mask = tb_countries["year"] == EXPECTED_LAST_YEAR
 
-    tb_last = fill_timeseries(
-        tb_countries[mask].drop(columns="year"),
-        EXPECTED_LAST_YEAR + 1,
-        LAST_YEAR,
-    )
+    tb_all_years = Table(pd.RangeIndex(EXPECTED_LAST_YEAR + 1, LAST_YEAR + 1), columns=["year"])
+    tb_last = tb_countries[mask].drop(columns="year").merge(tb_all_years, how="cross")
 
     tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="gleditsch_countries")
     return tb
