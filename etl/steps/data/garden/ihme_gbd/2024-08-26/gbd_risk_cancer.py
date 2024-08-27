@@ -11,7 +11,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 AGE_GROUPS_RANGES = {"All ages": [0, None]}
 
 
