@@ -147,7 +147,6 @@ def expand_time_column(
 
     # Save initial dataframe column order
     columns_order = list(df.columns)
-    print(columns_order)
 
     # Temporary function to get the upper and lower bounds of the time period
     def _get_complete_date_range(ds):
@@ -243,9 +242,13 @@ def expand_time_column(
             df_range = df_range.loc[df_range[time_col] < df_range["min"]]
         else:
             df_range = df_range.loc[(df_range[time_col] < df_range["min"]) | (df_range[time_col] > df_range["max"])]
+        df_range = df_range.drop(columns=["min", "max"])
 
         # Extend the dataframe
-        df = pr.concat([df, df_range.drop(columns=["min", "max"])])
+        if isinstance(df, Table):
+            df = pr.concat([df, Table(df_range)])
+        elif isinstance(df, pd.DataFrame):
+            df = pd.concat([df, df_range])
 
     df = df.sort_values(index)
 
