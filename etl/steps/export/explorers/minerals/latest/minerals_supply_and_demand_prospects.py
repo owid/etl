@@ -100,29 +100,28 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
-    # df_graphers["Metric Dropdown"] = pd.Categorical(
-    #     df_graphers["Metric Dropdown"],
-    #     categories=["Production", "Reserves", "Unit value"],
-    #     ordered=True,
-    # )
-    # df_graphers = df_graphers.sort_values(["Mineral Dropdown", "Metric Dropdown", "Type Dropdown"]).reset_index(
-    #     drop=True
-    # )
+    df_graphers = df_graphers.sort_values(
+        ["Indicator Radio", "Mineral Dropdown", "Type Dropdown", "Case Dropdown", "Scenario Dropdown", "Metric Radio"]
+    ).reset_index(drop=True)
 
     # Choose which indicator to show by default when opening the explorer.
-    # df_graphers["defaultView"] = False
-    # df_graphers.loc[
-    #     (df_graphers["Mineral Dropdown"] == "Copper")
-    #     & (df_graphers["Type Dropdown"] == "Mine")
-    #     & (df_graphers["Metric Dropdown"] == "Production")
-    #     & (~df_graphers["Share of global Checkbox"]),
-    #     "defaultView",
-    # ] = True
+    df_graphers["defaultView"] = False
+    default_mask = (
+        (df_graphers["Indicator Radio"] == "Demand by technology")
+        & (df_graphers["Mineral Dropdown"] == "Copper")
+        & (df_graphers["Type Dropdown"] == "Refinery")
+        & (df_graphers["Case Dropdown"] == "Base case")
+        & (df_graphers["Scenario Dropdown"] == "Net zero by 2050")
+        & (df_graphers["Metric Radio"] == "Total")
+    )
+    assert len(df_graphers[default_mask]) == 1, "Multiple rows selected for default view."
+    df_graphers.loc[default_mask, "defaultView"] = True
 
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals Supply and Demand Prospects",
         "explorerSubtitle": "",
+        "entityType": "country or technology",
         # Ensure all entities (countries or technologies) are selected by default, so that stacked area charts are always showing totals.
         "selection": sorted(set(tb["country"])),
     }
