@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     df_graphers["Mineral Dropdown"] = mineral_dropdown
     df_graphers["Type Dropdown"] = type_dropdown
     df_graphers["Case Dropdown"] = case_dropdown
-    df_graphers["Scenario Dropdown"] = scenario_dropdown
+    df_graphers["Demand Scenario Dropdown"] = scenario_dropdown
     df_graphers["Metric Radio"] = metric_radio
     df_graphers["hasMapTab"] = map_tab
 
@@ -90,7 +90,7 @@ def run(dest_dir: str) -> None:
             subset=[
                 "Indicator Radio",
                 "Case Dropdown",
-                "Scenario Dropdown",
+                "Demand Scenario Dropdown",
                 "Mineral Dropdown",
                 "Type Dropdown",
                 "Metric Radio",
@@ -100,8 +100,20 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
+    df_graphers["Demand Scenario Dropdown"] = pd.Categorical(
+        df_graphers["Demand Scenario Dropdown"],
+        categories=["Stated policies", "Announced pledges", "Net zero by 2050"],
+        ordered=True,
+    )
     df_graphers = df_graphers.sort_values(
-        ["Indicator Radio", "Mineral Dropdown", "Type Dropdown", "Case Dropdown", "Scenario Dropdown", "Metric Radio"]
+        [
+            "Indicator Radio",
+            "Mineral Dropdown",
+            "Type Dropdown",
+            "Case Dropdown",
+            "Demand Scenario Dropdown",
+            "Metric Radio",
+        ]
     ).reset_index(drop=True)
 
     # Choose which indicator to show by default when opening the explorer.
@@ -111,7 +123,7 @@ def run(dest_dir: str) -> None:
         & (df_graphers["Mineral Dropdown"] == "Copper")
         & (df_graphers["Type Dropdown"] == "Refinery")
         & (df_graphers["Case Dropdown"] == "Base case")
-        & (df_graphers["Scenario Dropdown"] == "Net zero by 2050")
+        & (df_graphers["Demand Scenario Dropdown"] == "Stated policies")
         & (df_graphers["Metric Radio"] == "Total")
     )
     assert len(df_graphers[default_mask]) == 1, "Multiple rows selected for default view."
