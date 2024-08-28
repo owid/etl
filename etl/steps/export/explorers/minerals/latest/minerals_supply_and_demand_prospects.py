@@ -11,10 +11,6 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Prefix used for "share" columns.
-# NOTE: This must coincide with the same variable as defined in the garden minerals step.
-SHARE_OF_GLOBAL_PREFIX = "share of global "
-
 
 def run(dest_dir: str) -> None:
     #
@@ -28,10 +24,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Remove "World" from supply data (since all countries should always add up to World).
-    # TODO: Add sanity check for this.
-    tb_supply = tb_supply[tb_supply["country"] != "World"].reset_index(drop=True)
-
     # Combine the two tables into one (where "country" column actually means technology for demand table, and country for supply table).
     tb = tb_demand.merge(tb_supply, on=["country", "year"], how="outer")
 

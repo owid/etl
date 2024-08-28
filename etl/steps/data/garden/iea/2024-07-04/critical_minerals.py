@@ -50,20 +50,25 @@ technologies = {
     "wind": "Wind",
 }
 
-# Name of rare earth elements aggregate.
+# Name of rare earth elements aggregate (as given in the spreadsheet).
 RARE_ELEMENTS_LABEL = "Magnet rare earth elements"
+RARE_ELEMENTS_LABEL_NEW = "Rare earths"
 
 # List of rare element magnets.
 RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
 
-# Name of all graphite uses, listed in sheet 1 (of total demand including uses outside of clean tech).
+# Name of all graphite uses, as listed in sheet 1 (of total demand including uses outside of clean tech).
 GRAPHITE_ALL_LABEL = "Graphite (all grades: natural and synthetic)"
+# New name.
+GRAPHITE_ALL_LABEL_NEW = "Graphite (natural and synthetic)"
 
-# Name of battery-grade graphite.
+# Name of battery-grade graphite, as it appears in the spreadsheet.
 GRAPHITE_BATTERY_GRADE_LABEL = "Battery-grade graphite"
+# New name.
+GRAPHITE_BATTERY_GRADE_LABEL_NEW = "Graphite (battery-grade)"
 
 # Name of a new mineral category, which encompasses the difference in demand between sheet 1 and the combined 4.x sheets.
-OTHER_GRAPHITE_LABEL = "Graphite, other than battery-grade"
+GRAPHITE_OTHER_LABEL = "Graphite (other than battery-grade)"
 
 # Name of other uses in clean tech.
 OTHER_LOW_LABEL = "Other low emissions power generation"
@@ -129,6 +134,12 @@ def combine_individual_demand_tables(ds_meadow: Dataset) -> Table:
         short_name="demand_for_key_minerals",
     )
 
+    # Fix typo "iridum".
+    mapping = {
+        "PGMs (other than iridum)": "PGMs (other than iridium)",
+    }
+    tb_demand["mineral"] = map_series(tb_demand["mineral"], mapping=mapping)
+
     return tb_demand
 
 
@@ -147,7 +158,7 @@ def prepare_clean_technologies_by_mineral_table(ds_meadow: Dataset) -> Table:
     # Also, fix typo "iridum".
     mapping = {
         "Total rare earth elements": RARE_ELEMENTS_LABEL,
-        "PGMs (other than iridum)": "PGMs other than iridium",
+        "PGMs (other than iridum)": "PGMs (other than iridium)",
     }
     tb_clean["mineral"] = map_series(tb_clean["mineral"], mapping=mapping)
 
@@ -229,7 +240,7 @@ def add_demand_from_other_graphite(tb_demand: Table, tb_total: Table) -> Table:
     # NOTE: Only include it if the difference is larger than 1%.
     tb_graphite_other = (
         combined[combined["difference"] >= combined["demand"] * 0.01]
-        .assign(**{"mineral": OTHER_GRAPHITE_LABEL})
+        .assign(**{"mineral": GRAPHITE_OTHER_LABEL})
         .drop(columns=["demand", "demand_summary"])
         .rename(columns={"difference": "demand"})
         .reset_index(drop=True)
@@ -361,6 +372,14 @@ def run(dest_dir: str) -> None:
         ],
         ignore_index=True,
     )
+
+    # For consistency, rename some minerals.
+    tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
+    tb_demand["mineral"] = tb_demand["mineral"].replace(
+        {GRAPHITE_BATTERY_GRADE_LABEL: GRAPHITE_BATTERY_GRADE_LABEL_NEW}
+    )
+    tb_demand["mineral"] = tb_demand["mineral"].replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
+    tb_supply["mineral"] = tb_supply["mineral"].astype("string").replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])

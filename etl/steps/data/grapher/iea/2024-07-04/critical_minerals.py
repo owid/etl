@@ -46,11 +46,14 @@ def run(dest_dir: str) -> None:
     # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
     # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
     # TODO: Add those footnotes.
-    tb_supply = tb_supply.astype({"process": "string"}).copy()
+    tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
     tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
     tb_supply.loc[
         (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
     ] = "Refining"
+    tb_supply.loc[
+        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
+    ] = "Mining"
 
     # Create a table for global demand.
     # For each case-scenario-mineral-year, we need the global demand of all technologies.
@@ -94,8 +97,8 @@ def run(dest_dir: str) -> None:
         tb_supply = tb_supply.merge(tb_demand_global, on=["case", "year", "mineral", "process"], how="left")
 
         # Add "share" columns.
-        tb_supply["supply_as_share_of_global_demand"] = 100 * tb_supply["supply"] / tb_supply["global_demand"]
-        tb_supply["supply_as_share_of_global_supply"] = 100 * tb_supply["supply"] / tb_supply["global_supply"]
+        tb_supply["supply_as_a_share_of_global_demand"] = 100 * tb_supply["supply"] / tb_supply["global_demand"]
+        tb_supply["supply_as_a_share_of_global_supply"] = 100 * tb_supply["supply"] / tb_supply["global_supply"]
 
         return tb_supply
 
@@ -115,8 +118,8 @@ def run(dest_dir: str) -> None:
         tb_demand = tb_demand.merge(tb_supply_global, on=["case", "year", "mineral", "process"], how="left")
 
         # Add "share" columns.
-        tb_demand["demand_as_share_of_global_demand"] = 100 * tb_demand["demand"] / tb_demand["global_demand"]
-        tb_demand["demand_as_share_of_global_supply"] = 100 * tb_demand["demand"] / tb_demand["global_supply"]
+        tb_demand["demand_as_a_share_of_global_demand"] = 100 * tb_demand["demand"] / tb_demand["global_demand"]
+        tb_demand["demand_as_a_share_of_global_supply"] = 100 * tb_demand["demand"] / tb_demand["global_supply"]
 
         return tb_demand
 
@@ -130,12 +133,17 @@ def run(dest_dir: str) -> None:
         tb_supply=tb_supply, tb_demand_global=tb_demand_global, tb_supply_global=tb_supply_global
     )
 
+    # Rename a few things, for consistency with the minerals explorer.
+    for table in [tb_demand_by_technology, tb_supply_by_country]:
+        table.loc[(table["mineral"] == "Magnet rare earth elements"), "mineral"] = "Rare earths"
+        table["process"] = table["process"].replace({"Mining": "Mine", "Refining": "Refinery"})
+
     def create_demand_by_technology_flat(tb_demand_by_technology: Table) -> Table:
         # Create a wide-format table.
         tb_demand_by_technology_flat = tb_demand_by_technology.pivot(
             index=["technology", "year"],
             columns=["mineral", "process", "case", "scenario"],
-            values=["demand", "demand_as_share_of_global_demand", "demand_as_share_of_global_supply"],
+            values=["demand", "demand_as_a_share_of_global_demand", "demand_as_a_share_of_global_supply"],
             join_column_levels_with="|",
         )
         # Adapt table to grapher.
@@ -154,7 +162,7 @@ def run(dest_dir: str) -> None:
         tb_supply_by_country_flat = tb_supply_by_country.pivot(
             index=["country", "year"],
             columns=["mineral", "process", "case", "scenario"],
-            values=["supply", "supply_as_share_of_global_demand", "supply_as_share_of_global_supply"],
+            values=["supply", "supply_as_a_share_of_global_demand", "supply_as_a_share_of_global_supply"],
             join_column_levels_with="|",
         )
 
@@ -165,6 +173,12 @@ def run(dest_dir: str) -> None:
 
     # Create a wide-format table of supply by country.
     tb_supply_by_country_flat = create_supply_by_country_flat(tb_supply_by_country=tb_supply_by_country)
+
+    # Remove "World" from supply data (since all countries should always add up to World).
+    # TODO: Add sanity check for this.
+    tb_supply_by_country_flat = tb_supply_by_country_flat[tb_supply_by_country_flat["country"] != "World"].reset_index(
+        drop=True
+    )
 
     # Improve metadata.
     # TODO: Do this properly.
