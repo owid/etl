@@ -747,6 +747,8 @@ def test_expand_time_complex():
         10.0,
         10.0,
         10.0,
+        10.0,
+        0.0,
         0.0,
         0.0,
         0.0,
@@ -775,6 +777,7 @@ def test_expand_time_complex():
         20.0,
         20.0,
         20.0,
+        20.0,
         11.0,
         11.0,
         11.0,
@@ -784,6 +787,7 @@ def test_expand_time_complex():
         11.0,
         12.5,
         14.0,
+        22.0,
         22.0,
         22.0,
         22.0,
@@ -805,6 +809,8 @@ def test_expand_time_complex():
         100.0,
         100.0,
         100.0,
+        100.0,
+        0.0,
         0.0,
         0.0,
         0.0,
@@ -833,6 +839,7 @@ def test_expand_time_complex():
         200.0,
         200.0,
         200.0,
+        200.0,
         111.0,
         111.0,
         111.0,
@@ -847,6 +854,7 @@ def test_expand_time_complex():
         200.0,
         200.0,
         200.0,
+        200.0,
     ]
-    assert dfx["value1"].equals(pd.Series(value1_expected)), "Unexpected timeseries!"
+    assert dfx["value1"].equals(pd.Series(value1_expected, name="value1")), "Unexpected timeseries!"
     assert dfx["value2"].equals(pd.Series(value2_expected)), "Unexpected timeseries!"
