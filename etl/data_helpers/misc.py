@@ -15,6 +15,7 @@ import math
 from datetime import datetime
 from typing import Any, List, Literal, Optional, Set, TypeVar, Union, cast
 
+import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
 from owid.catalog import License, Origin, Table
@@ -61,6 +62,7 @@ def interpolate_table(
     time_mode: Literal["full_range", "full_range_entity", "reduced", "none"] = "full_range",
     method: str = "linear",
     limit_direction: str = "both",
+    limit_area: Optional[str] = None,
 ) -> TableOrDataFrame:
     """Interpolate missing values in a column linearly.
 
@@ -91,7 +93,7 @@ def interpolate_table(
     # Interpolate
     df = (
         df.groupby(entity_col)
-        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction))  # type: ignore
+        .transform(lambda x: x.interpolate(method=method, limit_direction=limit_direction, limit_area=limit_area))  # type: ignore
         .reset_index()
     )
 
@@ -100,22 +102,54 @@ def interpolate_table(
 
 def expand_time_column(
     df: TableOrDataFrame,
-    entity_col: str | List[str],
+    dimension_col: str | List[str],
     time_col: str,
-    mode: Literal["full_range", "full_range_entity", "reduced"] = "full_range",
+    method: Literal["full_range", "full_range_entity", "observed"] = "full_range",
+    until_time: Optional[int] = None,
+    since_time: Optional[int] = None,
+    fillna_method: Optional[str] = None,
 ) -> TableOrDataFrame:
     """Add rows to complete the timeseries.
 
-    You can complete the timeseries in various ways, by changing the value of `mode`
-
-        - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the data.
-        - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity.
-        - 'reduced': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
+    Parameters
+    ----------
+    df: Table or pd.DataFrame
+        Table or dataframe for which you want to add new time rows. It should have an entity column (or columns) and time column.
+    dimension_col: str or List[str]
+        Name of the dimension columns. Dimension columns typically include the entity (e.g. country name) and other optional dimensions (e.g. sex, age group, etc.)
+    time_col: str
+        Name of the time column. Tables should either have a column with the year, or with dates.
+    method: "full_range", "full_range_entity" or "observed"
+        You can complete the timeseries in various ways, by changing the value of `method`:
+            - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity. That is, the ranges covered for each entity is different.
+            - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the (complete) data. That is, the time range covered by each entity is the same.
+            - 'observed': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
+    until_time: int
+        Only year is supported. After expanding the time-series using `method`, extend it until the given time.
+    since_time: int
+        Only year is supported. After expanding the time-series using `method`, extend it since the given time.
+    fillna_method: List[str] or str
+        If the table is expanded, new rows with NaN values will appear. You can fill these NaNs with a strategy:
+            - None: If none is given, NaNs are left as-is.
+            - 'interpolate': Linearly interpolate values.
+            - 'ffill': Forward-filling.
+            - 'bfill': Backward-filling.
+            - 'zero': Replace NaNs with zeroes.
+        You can provide a list of strategies, e.g. ['bfill', 'ffill']. This will first apply backward-filling and then forward-filling.
     """
-    SINGLE_ENTITY = isinstance(entity_col, str)
-    MULTIPLE_ENTITY = isinstance(entity_col, list)
-    assert SINGLE_ENTITY | MULTIPLE_ENTITY, "`entity_col` must be either a string or a list of strings!"
+    # Determine if we have a single or multiple dimensiosn (will affect how groupbys are done)
+    SINGLE_DIMENSION = isinstance(dimension_col, str)
+    MULTIPLE_DIMENSION = isinstance(dimension_col, list)
+    assert SINGLE_DIMENSION | MULTIPLE_DIMENSION, "`dimension_col` must be either a string or a list of strings!"
 
+    # Sanity check: value for `method` is as expected
+    assert method in {"full_range_entity", "full_range", "observed"}, f"Wrong value for `method` {method}!"
+
+    # Save initial dataframe column order
+    columns_order = list(df.columns)
+    print(columns_order)
+
+    # Temporary function to get the upper and lower bounds of the time period
     def _get_complete_date_range(ds):
         date_min = ds.min()
         date_max = ds.max()
@@ -124,40 +158,46 @@ def expand_time_column(
         else:
             return range(date_min, date_max + 1)
 
-    assert mode in {"full_range_entity", "full_range", "reduced"}, f"Wrong value for `mode` {mode}!"
+    def _get_iter_and_names(df: pd.DataFrame, single_dimension: bool, dimension_col: List[str] | str, date_values: str):
+        if single_dimension:
+            # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
+            # Optionally fill missing years linearly.
+            entities_in_data = df[dimension_col].unique()
+            iterables = [entities_in_data, date_values]
+            names = [dimension_col, time_col]
+        else:
+            iterables = [df[col].unique() for col in dimension_col] + [date_values]
+            names = [col for col in dimension_col] + [time_col]
 
-    if SINGLE_ENTITY:
-        index = [entity_col, time_col]
+        return iterables, names
+
+    # Define index column (or columns). Useful for groupby and alike operations
+    if SINGLE_DIMENSION:
+        index = [dimension_col, time_col]
     else:
-        index = entity_col + [time_col]
+        index = dimension_col + [time_col]
 
-    if mode == "full_range_entity":
+    # Cover complete time range for each country
+    if method == "full_range_entity":
 
         def _reindex_dates(group):
             complete_date_range = _get_complete_date_range(group[time_col])
             group = (
                 group.set_index(time_col).reindex(complete_date_range).reset_index().rename(columns={"index": time_col})
             )
-            group[entity_col] = group[entity_col].ffill().bfill()  # Fill NaNs in 'country'
+            group[dimension_col] = group[dimension_col].ffill().bfill()  # Fill NaNs in 'country'
             return group
 
-        df = df.groupby(entity_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
+        df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
+    # Either full range or all observations.
     else:
         # Get list of times
-        if mode == "full_range":
+        if method == "full_range":
             date_values = _get_complete_date_range(df[time_col])
-        elif mode == "reduced":
+        elif method == "observed":
             date_values = df[time_col].unique()
 
-        if SINGLE_ENTITY:
-            # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
-            # Optionally fill missing years linearly.
-            countries_in_data = df[entity_col].unique()
-            iterables = [countries_in_data, date_values]
-            names = [entity_col, time_col]
-        else:
-            iterables = [df[col].unique() for col in entity_col] + [date_values]
-            names = [col for col in entity_col] + [time_col]
+        iterables, names = _get_iter_and_names(df, SINGLE_DIMENSION, dimension_col, date_values)
 
         # Reindex
         df = (
@@ -167,6 +207,75 @@ def expand_time_column(
         )
 
     df = cast(TableOrDataFrame, df.reset_index())
+
+    #####################################################################
+    # Further extend (back, forth, back and forth)
+    #####################################################################
+    EXTEND_END = (since_time is None) and (until_time is not None)
+    EXTEND_START = (since_time is not None) and (until_time is None)
+    EXTEND_BOTH = (since_time is not None) and (until_time is not None)
+    if EXTEND_END or EXTEND_START or EXTEND_BOTH:
+        # Get time bounds
+        df_bounds = df.reset_index().groupby(dimension_col)[time_col].agg(["min", "max"]).reset_index()
+
+        # Get dates to add (preliminary)
+        if EXTEND_END:
+            date_values = range(df[time_col].min(), until_time)
+        elif EXTEND_START:
+            date_values = range(since_time, df[time_col].max())
+        else:
+            date_values = range(since_time, until_time)
+
+        # Build ranges to add (preliminary)
+        iterables, names = _get_iter_and_names(
+            df.reset_index(),
+            SINGLE_DIMENSION,
+            dimension_col,
+            date_values,
+        )
+        df_range = pd.MultiIndex.from_product(iterables, names=names).to_frame(index=False)
+        df_range = df_range.merge(df_bounds, on=dimension_col)
+
+        # Filter and get the actual range to extend
+        if EXTEND_END:
+            df_range = df_range.loc[df_range[time_col] > df_range["max"]]
+        elif EXTEND_START:
+            df_range = df_range.loc[df_range[time_col] < df_range["min"]]
+        else:
+            df_range = df_range.loc[(df_range[time_col] < df_range["min"]) | (df_range[time_col] > df_range["max"])]
+
+        # Extend the dataframe
+        df = pr.concat([df, df_range.drop(columns=["min", "max"])])
+
+    df = df.sort_values(index)
+
+    #####################################################################
+    # Fill method
+    #####################################################################
+    def _fillna(df, method):
+        values_column = [col for col in df.columns if col not in index]
+        if method == "interpolate":
+            df = interpolate_table(df, dimension_col, time_col, "none", limit_area="inside")
+        elif method == "bfill":
+            df[values_column] = df.groupby(dimension_col)[values_column].bfill()
+        elif method == "ffill":
+            df[values_column] = df.groupby(dimension_col)[values_column].ffill()
+        elif method == "zero":
+            df[values_column] = df.groupby(dimension_col)[values_column].fillna(0)
+        return df
+
+    if isinstance(fillna_method, list):
+        for m in fillna_method:
+            df = _fillna(df, m)
+    else:
+        df = _fillna(df, fillna_method)
+
+    #####################################################################
+    # Final touches
+    #####################################################################
+    # Output dataframe in same order as input
+    df = df[columns_order]
+
     return df
 
 
