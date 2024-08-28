@@ -30,11 +30,15 @@ Therefore, the strategy should be:
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize log.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -434,6 +438,42 @@ def create_supply_by_country_flat(tb_supply: Table) -> Table:
     return tb_supply_flat
 
 
+def improve_metadata(tb_demand_flat, tb_supply_flat):
+    tb_demand_flat = tb_demand_flat.copy()
+    tb_supply_flat = tb_supply_flat.copy()
+
+    # Improve metadata.
+    for table in [tb_demand_flat, tb_supply_flat]:
+        for column in table.drop(columns=["country", "technology", "year"], errors="ignore").columns:
+            metric, mineral, process, case, scenario = column.split("|")
+
+            # Create a variable title that is convenient to create the explorer later on.
+            table[column].m.title = column
+
+            # Create a public title.
+            title_public = f"Projected {metric.split('_')[0]} of "
+            if process == "Mine":
+                title_public += mineral.lower()
+            elif process == "Refinery":
+                title_public += f"refined {mineral.lower()}"
+            else:
+                log.warning(f"Unexpected process for column {column}")
+            if "_share_of_" in metric:
+                title_public += " " + " ".join(metric.split("_")[1:])
+                table[column].m.unit = "%"
+                table[column].m.short_unit = "%"
+            else:
+                table[column].m.unit = "tonnes"
+                table[column].m.short_unit = "t"
+
+            # Add public title to the metadata.
+            if not table[column].metadata.presentation:
+                table[column].metadata.presentation = VariablePresentationMeta()
+            table[column].metadata.presentation.title_public = title_public
+
+    return tb_demand_flat, tb_supply_flat
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -538,16 +578,7 @@ def run(dest_dir: str) -> None:
     tb_supply_flat = create_supply_by_country_flat(tb_supply=tb_supply)
 
     # Improve metadata.
-    # TODO: Do this properly.
-    for table in [tb_demand_flat, tb_supply_flat]:
-        for column in table.columns:
-            table[column].m.title = column
-            if "_share_of_" in column:
-                table[column].m.unit = "%"
-                table[column].m.short_unit = "%"
-            else:
-                table[column].m.unit = "tonnes"
-                table[column].m.short_unit = "t"
+    tb_demand_flat, tb_supply_flat = improve_metadata(tb_demand_flat=tb_demand_flat, tb_supply_flat=tb_supply_flat)
 
     # Improve its format.
     # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
