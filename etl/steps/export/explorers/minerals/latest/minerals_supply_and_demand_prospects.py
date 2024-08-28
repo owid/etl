@@ -23,11 +23,18 @@ def run(dest_dir: str) -> None:
     # Load minerals grapher dataset and read its main table.
     ds = paths.load_dataset("critical_minerals")
     tb_demand = ds.read_table("demand_by_technology")
-    # tb_supply = ds.read_table("supply_by_country")
+    tb_supply = ds.read_table("supply_by_country")
 
     #
     # Process data.
     #
+    # Remove "World" from supply data (since all countries should always add up to World).
+    # TODO: Add sanity check for this.
+    tb_supply = tb_supply[tb_supply["country"] != "World"].reset_index(drop=True)
+
+    # Combine the two tables into one (where "country" column actually means technology for demand table, and country for supply table).
+    tb = tb_demand.merge(tb_supply, on=["country", "year"], how="outer")
+
     # Prepare graphers table of explorer.
     variable_ids = []
     metric_dropdown = []
@@ -36,12 +43,16 @@ def run(dest_dir: str) -> None:
     case_dropdown = []
     scenario_dropdown = []
     map_tab = []
-    for column in tb_demand.drop(columns=["country", "year"]).columns:
-        metric, mineral, process, case, scenario = tb_demand[column].metadata.title.split("|")
+    for column in tb.drop(columns=["country", "year"]).columns:
+        metric, mineral, process, case, scenario = tb[column].metadata.title.split("|")
         metric = metric.replace("_", " ").capitalize()
 
         # Append extracted values.
-        variable_ids.append([f"{ds.metadata.uri}/{tb_demand.metadata.short_name}#{column}"])
+        if column in tb_demand.columns:
+            table_name = tb_demand.metadata.short_name
+        else:
+            table_name = tb_supply.metadata.short_name
+        variable_ids.append([f"{ds.metadata.uri}/{table_name}#{column}"])
         metric_dropdown.append(metric)
         type_dropdown.append(process)
         mineral_dropdown.append(mineral)
@@ -53,9 +64,9 @@ def run(dest_dir: str) -> None:
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Mineral Dropdown"] = mineral_dropdown
     df_graphers["Type Dropdown"] = type_dropdown
+    df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["Case Dropdown"] = case_dropdown
     df_graphers["Scenario Dropdown"] = scenario_dropdown
-    df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["hasMapTab"] = map_tab
 
     # Impose that all line charts start at zero.
@@ -97,7 +108,8 @@ def run(dest_dir: str) -> None:
     config = {
         "explorerTitle": "Minerals Supply and Demand Prospects",
         "explorerSubtitle": "",
-        # "selection": ["World", "Australia", "Chile", "China", "United States"],
+        # Ensure all entities (countries or technologies) are selected by default, so that stacked area charts are always showing totals.
+        "selection": sorted(set(tb["country"])),
     }
 
     #
