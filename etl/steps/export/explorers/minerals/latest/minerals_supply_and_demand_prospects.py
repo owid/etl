@@ -29,7 +29,8 @@ def run(dest_dir: str) -> None:
 
     # Prepare graphers table of explorer.
     variable_ids = []
-    metric_dropdown = []
+    indicator_radio = []
+    metric_radio = []
     mineral_dropdown = []
     type_dropdown = []
     case_dropdown = []
@@ -37,28 +38,43 @@ def run(dest_dir: str) -> None:
     map_tab = []
     for column in tb.drop(columns=["country", "year"]).columns:
         metric, mineral, process, case, scenario = tb[column].metadata.title.split("|")
-        metric = metric.replace("_", " ").capitalize()
 
         # Append extracted values.
         if column in tb_demand.columns:
+            indicator = "Demand by technology"
             table_name = tb_demand.metadata.short_name
+            has_map_tab = False
         else:
+            indicator = "Supply by country"
             table_name = tb_supply.metadata.short_name
+            has_map_tab = True
+
+        if metric in ["demand", "supply"]:
+            metric = "Total"
+        elif metric.endswith("_share_of_global_demand"):
+            metric = "Share of demand"
+        elif metric.endswith("_share_of_global_supply"):
+            metric = "Share of supply"
+        else:
+            log.warning(f"Unexpected metric {metric}")
         variable_ids.append([f"{ds.metadata.uri}/{table_name}#{column}"])
-        metric_dropdown.append(metric)
+
+        indicator_radio.append(indicator)
+        metric_radio.append(metric)
         type_dropdown.append(process)
         mineral_dropdown.append(mineral)
         case_dropdown.append(case)
         scenario_dropdown.append(scenario)
-        map_tab.append(False)
+        map_tab.append(has_map_tab)
 
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
+    df_graphers["Indicator Radio"] = indicator_radio
     df_graphers["Mineral Dropdown"] = mineral_dropdown
     df_graphers["Type Dropdown"] = type_dropdown
-    df_graphers["Metric Dropdown"] = metric_dropdown
     df_graphers["Case Dropdown"] = case_dropdown
     df_graphers["Scenario Dropdown"] = scenario_dropdown
+    df_graphers["Metric Radio"] = metric_radio
     df_graphers["hasMapTab"] = map_tab
 
     # Impose that all line charts start at zero.
@@ -71,7 +87,14 @@ def run(dest_dir: str) -> None:
     error = "Duplicated rows in explorer."
     assert df_graphers[
         df_graphers.duplicated(
-            subset=["Case Dropdown", "Scenario Dropdown", "Mineral Dropdown", "Type Dropdown", "Metric Dropdown"],
+            subset=[
+                "Indicator Radio",
+                "Case Dropdown",
+                "Scenario Dropdown",
+                "Mineral Dropdown",
+                "Type Dropdown",
+                "Metric Radio",
+            ],
             keep=False,
         )
     ].empty, error
