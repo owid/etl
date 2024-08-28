@@ -21,40 +21,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Remove unnecessary country column.
-    tb_demand = tb_demand.drop(columns=["country"], errors="raise")
-    # Drop rows with no demand data.
-    tb_demand = tb_demand.dropna(subset="demand").reset_index(drop=True)
-    # We want the current year to appear in all scenarios (and therefore drop "Current" scenario).
-    tb_demand_current = tb_demand[tb_demand["scenario"] == "Current"].reset_index(drop=True)
-    tb_demand = tb_demand[tb_demand["scenario"] != "Current"].reset_index(drop=True)
-    for scenario in sorted(set(tb_demand[tb_demand["scenario"] != "Current"]["scenario"])):
-        tb_demand = pr.concat([tb_demand, tb_demand_current.assign(**{"scenario": scenario})], ignore_index=True)
-    # After doing this, some combinations for which there was no data for a given scenario will have only data for 2023.
-    # Drop these cases, where there is only one row (one year) for a given case-mineral-scenario-technology combination.
-    tb_demand = tb_demand[
-        tb_demand.groupby(["case", "mineral", "scenario", "technology"], observed=True, as_index=False)[
-            "year"
-        ].transform("nunique")
-        > 1
-    ].reset_index(drop=True)
-    # We assume that the demand is only on refined minerals.
-    tb_demand["process"] = "Refining"
-
-    # Supply data for each mineral is divided in "mining" and "refining".
-    # But there are two special cases:
-    # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
-    # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
-    # TODO: Add those footnotes.
-    tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
-    tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
-    ] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
-    ] = "Mining"
-
     # Create a table for global demand.
     # For each case-scenario-mineral-year, we need the global demand of all technologies.
     # NOTE: Global mineral demand, including uses outside clean tech, is only given for "Base case" for a few minerals (for which "Other uses" is explicitly given).
@@ -73,17 +39,7 @@ def run(dest_dir: str) -> None:
         .rename(columns={"supply": "global_supply"})
     )
 
-    # TODO: Move some of the following processing to the garden step.
-    # TODO: We will create two tables:
-    #  * Demand by technology. Explorer will have mineral, case, scenario, and metric.
-    #  * Supply by country.
-    #
-    #  We will then create a "Mineral supply and demand prospects" explorer, with the following elements:
-    #  * A radio button for "Demand by tech" (demand table) and "Supply by country" (supply table).
-    #  * A "Mineral" dropdown.
-    #  * A "Case" dropdown (which will be only "Base case" for the supply table).
-    #  * A "Scenario" dropdown (which will be only "All scenarios" (or empty?) for the supply table).
-    #  * A "Metric" dropdown, with options "Total", "Share of global demand", and "Share of global supply".
+    # TODO: Move some of the following processing to the garden step. Note that tb_supply may have here a degeneracy related to "scenario".
 
     # Prepare supply by country table.
     def create_supply_by_country_table(tb_supply: Table, tb_demand_global: Table, tb_supply_global: Table) -> Table:
@@ -132,11 +88,6 @@ def run(dest_dir: str) -> None:
     tb_supply_by_country = create_supply_by_country_table(
         tb_supply=tb_supply, tb_demand_global=tb_demand_global, tb_supply_global=tb_supply_global
     )
-
-    # Rename a few things, for consistency with the minerals explorer.
-    for table in [tb_demand_by_technology, tb_supply_by_country]:
-        table.loc[(table["mineral"] == "Magnet rare earth elements"), "mineral"] = "Rare earths"
-        table["process"] = table["process"].replace({"Mining": "Mine", "Refining": "Refinery"})
 
     def create_demand_by_technology_flat(tb_demand_by_technology: Table) -> Table:
         # Create a wide-format table.

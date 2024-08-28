@@ -359,8 +359,24 @@ def run(dest_dir: str) -> None:
     tb_demand["demand"] *= 1000
     tb_supply["supply"] *= 1000
 
-    # Add a country column to demand.
-    tb_demand["country"] = "World"
+    # Drop rows with no demand data.
+    tb_demand = tb_demand.dropna(subset="demand").reset_index(drop=True)
+    # We want the current year to appear in all scenarios (and therefore drop "Current" scenario).
+    tb_demand_current = tb_demand[tb_demand["scenario"] == "Current"].reset_index(drop=True)
+    tb_demand = tb_demand[tb_demand["scenario"] != "Current"].reset_index(drop=True)
+    for scenario in sorted(set(tb_demand[tb_demand["scenario"] != "Current"]["scenario"])):
+        tb_demand = pr.concat([tb_demand, tb_demand_current.assign(**{"scenario": scenario})], ignore_index=True)
+    # After doing this, some combinations for which there was no data for a given scenario will have only data for 2023.
+    # Drop these cases, where there is only one row (one year) for a given case-mineral-scenario-technology combination.
+    tb_demand = tb_demand[
+        tb_demand.groupby(["case", "mineral", "scenario", "technology"], observed=True, as_index=False)[
+            "year"
+        ].transform("nunique")
+        > 1
+    ].reset_index(drop=True)
+
+    # We assume that the demand is only on refined minerals.
+    tb_demand["process"] = "Refining"
 
     # Add a global aggregate for supply.
     tb_supply = pr.concat(
@@ -381,9 +397,27 @@ def run(dest_dir: str) -> None:
     tb_demand["mineral"] = tb_demand["mineral"].replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
     tb_supply["mineral"] = tb_supply["mineral"].astype("string").replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
 
+    # Supply data for each mineral is divided in "mining" and "refining".
+    # But there are two special cases:
+    # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
+    # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
+    # TODO: Add those footnotes.
+    tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
+    tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
+    tb_supply.loc[
+        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
+    ] = "Refining"
+    tb_supply.loc[
+        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
+    ] = "Mining"
+
+    # Rename a few things, for consistency with the minerals explorer.
+    for table in [tb_demand, tb_supply]:
+        table["process"] = table["process"].replace({"Mining": "Mine", "Refining": "Refinery"})
+
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process"])
-    tb_demand = tb_demand.format(["case", "country", "year", "mineral", "scenario", "technology"])
+    tb_demand = tb_demand.format(["case", "year", "mineral", "process", "scenario", "technology"])
 
     #
     # Save outputs.
