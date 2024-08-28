@@ -38,11 +38,14 @@ def run(dest_dir: str) -> None:
         ].transform("nunique")
         > 1
     ].reset_index(drop=True)
+    # We assume that the demand is only on refined minerals.
+    tb_demand["process"] = "Refining"
 
     # Supply data for each mineral is divided in "mining" and "refining".
     # But there are two special cases:
     # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
     # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
+    # TODO: Add those footnotes.
     tb_supply = tb_supply.astype({"process": "string"}).copy()
     tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
     tb_supply.loc[
@@ -55,7 +58,7 @@ def run(dest_dir: str) -> None:
     minerals_with_total_demand = tb_demand[tb_demand["technology"] == "Other uses"]["mineral"].unique().tolist()
     tb_demand_global = (
         tb_demand[(tb_demand["case"] == "Base case") & (tb_demand["mineral"].isin(minerals_with_total_demand))]
-        .groupby(["case", "scenario", "mineral", "year"], observed=True, as_index=False)
+        .groupby(["case", "scenario", "mineral", "process", "year"], observed=True, as_index=False)
         .agg({"demand": "sum"})
         .rename(columns={"demand": "global_demand"})
     )
@@ -82,15 +85,12 @@ def run(dest_dir: str) -> None:
     # Prepare supply by country table.
     def create_supply_by_country_table(tb_supply: Table, tb_demand_global: Table, tb_supply_global: Table) -> Table:
         tb_supply = tb_supply.copy()
-        tb_demand_global = tb_demand_global.copy()
-        tb_supply_global = tb_supply_global.copy()
 
         # Add global supply.
         tb_supply = tb_supply.merge(tb_supply_global, on=["case", "year", "mineral", "process"], how="left")
         assert set(tb_supply[tb_supply["supply"] == tb_supply["global_supply"]]["country"]) == set(["World"])
 
         # We assume that all demand is of refined minerals.
-        tb_demand_global = tb_demand_global.assign(**{"process": "Refining"})
         tb_supply = tb_supply.merge(tb_demand_global, on=["case", "year", "mineral", "process"], how="left")
 
         # Add "share" columns.
@@ -101,26 +101,18 @@ def run(dest_dir: str) -> None:
 
     def create_demand_by_technology_table(tb_demand: Table, tb_demand_global: Table, tb_supply_global: Table) -> Table:
         tb_demand = tb_demand.copy()
-        tb_demand_global = tb_demand_global.copy()
-        tb_supply_global = tb_supply_global.copy()
 
         # From the original supply table, we need the global supply of each mineral-year (given only for the "Base case").
         # TODO: For consistency with the current minerals explorer, we should rename them "Mine" and "Refinery".
-        # When combining with demand data, we can simply take "refining" values, as they are the ones actually demanded to produce the technology.
-        # TODO: Add those footnotes.
-        tb_supply_global = tb_supply_global[tb_supply_global["process"] == "Refining"][
-            ["case", "year", "mineral", "global_supply"]
-        ].reset_index(drop=True)
 
         # Add total demand to the demand table.
-        # NOTE:
-        tb_demand = tb_demand.merge(tb_demand_global, on=["case", "scenario", "mineral", "year"], how="left")
+        tb_demand = tb_demand.merge(tb_demand_global, on=["case", "scenario", "mineral", "process", "year"], how="left")
         # TODO: For "Graphite (all grades: natural and synthetic)", "Other uses" has all the demand. There may be a bug.
         #  t[t["demand"]==t["global_demand"]]
         # TODO: After fixing that, consider renaming to "Graphite" and add a subtitle or footnote.
 
         # Add total supply to the demand table.
-        tb_demand = tb_demand.merge(tb_supply_global, on=["case", "year", "mineral"], how="left")
+        tb_demand = tb_demand.merge(tb_supply_global, on=["case", "year", "mineral", "process"], how="left")
 
         # Add "share" columns.
         tb_demand["demand_as_share_of_global_demand"] = 100 * tb_demand["demand"] / tb_demand["global_demand"]
@@ -142,7 +134,7 @@ def run(dest_dir: str) -> None:
         # Create a wide-format table.
         tb_demand_by_technology_flat = tb_demand_by_technology.pivot(
             index=["technology", "year"],
-            columns=["mineral", "case", "scenario"],
+            columns=["mineral", "process", "case", "scenario"],
             values=["demand", "demand_as_share_of_global_demand", "demand_as_share_of_global_supply"],
             join_column_levels_with="|",
         )
@@ -152,16 +144,13 @@ def run(dest_dir: str) -> None:
         # Remove empty columns.
         tb_demand_by_technology_flat = tb_demand_by_technology_flat.dropna(axis=1, how="all")
 
-        # Improve its format.
-        tb_demand_by_technology_flat = tb_demand_by_technology_flat.format(short_name="demand_by_technology")
-
         return tb_demand_by_technology_flat
 
     # Create a wide-format table of demand by technology.
     tb_demand_by_technology_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand_by_technology)
 
     def create_supply_by_country_flat(tb_supply_by_country: Table) -> Table:
-        # TODO: Continue here.
+        # Create a wide-format table.
         tb_supply_by_country_flat = tb_supply_by_country.pivot(
             index=["country", "year"],
             columns=["mineral", "process", "case", "scenario"],
@@ -171,9 +160,6 @@ def run(dest_dir: str) -> None:
 
         # Remove empty columns.
         tb_supply_by_country_flat = tb_supply_by_country_flat.dropna(axis=1, how="all")
-
-        # Improve its format.
-        tb_supply_by_country_flat = tb_supply_by_country_flat.format(short_name="supply_by_country")
 
         return tb_supply_by_country_flat
 
@@ -191,6 +177,11 @@ def run(dest_dir: str) -> None:
             else:
                 table[column].m.unit = "tonnes"
                 table[column].m.short_unit = "t"
+
+    # Improve its format.
+    # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
+    tb_demand_by_technology_flat = tb_demand_by_technology_flat.format(short_name="demand_by_technology")
+    tb_supply_by_country_flat = tb_supply_by_country_flat.format(short_name="supply_by_country")
 
     #
     # Save outputs.

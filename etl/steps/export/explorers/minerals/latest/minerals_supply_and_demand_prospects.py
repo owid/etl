@@ -22,7 +22,8 @@ def run(dest_dir: str) -> None:
     #
     # Load minerals grapher dataset and read its main table.
     ds = paths.load_dataset("critical_minerals")
-    tb = ds.read_table("demand_by_technology")
+    tb_demand = ds.read_table("demand_by_technology")
+    # tb_supply = ds.read_table("supply_by_country")
 
     #
     # Process data.
@@ -31,16 +32,18 @@ def run(dest_dir: str) -> None:
     variable_ids = []
     metric_dropdown = []
     mineral_dropdown = []
+    type_dropdown = []
     case_dropdown = []
     scenario_dropdown = []
     map_tab = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        metric, mineral, case, scenario = tb[column].metadata.title.split("|")
+    for column in tb_demand.drop(columns=["country", "year"]).columns:
+        metric, mineral, process, case, scenario = tb_demand[column].metadata.title.split("|")
         metric = metric.replace("_", " ").capitalize()
 
         # Append extracted values.
-        variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
+        variable_ids.append([f"{ds.metadata.uri}/{tb_demand.metadata.short_name}#{column}"])
         metric_dropdown.append(metric)
+        type_dropdown.append(process)
         mineral_dropdown.append(mineral)
         case_dropdown.append(case)
         scenario_dropdown.append(scenario)
@@ -49,6 +52,7 @@ def run(dest_dir: str) -> None:
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
     df_graphers["Mineral Dropdown"] = mineral_dropdown
+    df_graphers["Type Dropdown"] = type_dropdown
     df_graphers["Case Dropdown"] = case_dropdown
     df_graphers["Scenario Dropdown"] = scenario_dropdown
     df_graphers["Metric Dropdown"] = metric_dropdown
@@ -64,7 +68,8 @@ def run(dest_dir: str) -> None:
     error = "Duplicated rows in explorer."
     assert df_graphers[
         df_graphers.duplicated(
-            subset=["Case Dropdown", "Scenario Dropdown", "Mineral Dropdown", "Metric Dropdown"], keep=False
+            subset=["Case Dropdown", "Scenario Dropdown", "Mineral Dropdown", "Type Dropdown", "Metric Dropdown"],
+            keep=False,
         )
     ].empty, error
 
