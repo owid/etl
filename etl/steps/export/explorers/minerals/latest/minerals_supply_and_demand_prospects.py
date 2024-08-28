@@ -123,7 +123,7 @@ def run(dest_dir: str) -> None:
         & (df_graphers["Mineral Dropdown"] == "Copper")
         & (df_graphers["Type Dropdown"] == "Refinery")
         & (df_graphers["Case Dropdown"] == "Base case")
-        & (df_graphers["Demand Scenario Dropdown"] == "Stated policies")
+        & (df_graphers["Demand Scenario Dropdown"] == "Net zero by 2050")
         & (df_graphers["Metric Radio"] == "Total")
     )
     assert len(df_graphers[default_mask]) == 1, "Multiple rows selected for default view."

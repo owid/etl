@@ -56,7 +56,7 @@ technologies = {
 
 # Name of rare earth elements aggregate (as given in the spreadsheet).
 RARE_ELEMENTS_LABEL = "Magnet rare earth elements"
-RARE_ELEMENTS_LABEL_NEW = "Rare earths"
+RARE_ELEMENTS_LABEL_NEW = "Magnet rare earth elements"
 
 # List of rare element magnets.
 RARE_ELEMENTS_LIST = ["Praseodymium", "Neodymium", "Terbium", "Dysprosium"]
