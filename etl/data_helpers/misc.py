@@ -13,7 +13,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 
 import math
 from datetime import datetime
-from typing import Any, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -57,9 +57,9 @@ def check_values_in_column(df: pd.DataFrame, column_name: str, values_expected: 
 
 def interpolate_table(
     df: TableOrDataFrame,
-    entity_col: str | List[str],
+    entity_col: str | List[str] | Iterable[str],
     time_col: str,
-    time_mode: Literal["full_range", "full_range_entity", "reduced", "none"] = "full_range",
+    time_mode: Literal["full_range", "full_range_entity", "observed", "none"] = "full_range",
     method: str = "linear",
     limit_direction: str = "both",
     limit_area: Optional[str] = None,
@@ -81,7 +81,7 @@ def interpolate_table(
     if SINGLE_ENTITY:
         index = [entity_col, time_col]
     else:
-        index = entity_col + [time_col]
+        index = list(entity_col) + [time_col]
 
     if time_mode != "none":
         # Expand time
@@ -102,12 +102,12 @@ def interpolate_table(
 
 def expand_time_column(
     df: TableOrDataFrame,
-    dimension_col: str | List[str],
+    dimension_col: str | Iterable[str],
     time_col: str,
     method: Literal["full_range", "full_range_entity", "observed"] = "full_range",
-    until_time: Optional[int] = None,
-    since_time: Optional[int] = None,
-    fillna_method: Optional[str] = None,
+    until_time: Optional[int | datetime] = None,
+    since_time: Optional[int | datetime] = None,
+    fillna_method: Optional[List[str] | str] = None,
 ) -> TableOrDataFrame:
     """Add rows to complete the timeseries.
 
@@ -157,7 +157,9 @@ def expand_time_column(
         else:
             return range(date_min, date_max + 1)
 
-    def _get_iter_and_names(df: pd.DataFrame, single_dimension: bool, dimension_col: List[str] | str, date_values: str):
+    def _get_iter_and_names(
+        df: pd.DataFrame, single_dimension: bool, dimension_col: Iterable[str] | str, date_values: Iterable[Any]
+    ):
         if single_dimension:
             # For some countries we have population data only on certain years, e.g. 1900, 1910, etc.
             # Optionally fill missing years linearly.
@@ -174,7 +176,7 @@ def expand_time_column(
     if SINGLE_DIMENSION:
         index = [dimension_col, time_col]
     else:
-        index = dimension_col + [time_col]
+        index = list(dimension_col) + [time_col]
 
     # Cover complete time range for each country
     if method == "full_range_entity":
@@ -196,7 +198,12 @@ def expand_time_column(
         elif method == "observed":
             date_values = df[time_col].unique()
 
-        iterables, names = _get_iter_and_names(df, SINGLE_DIMENSION, dimension_col, date_values)
+        iterables, names = _get_iter_and_names(
+            df,
+            SINGLE_DIMENSION,
+            dimension_col,
+            date_values,
+        )
 
         # Reindex
         df = (
@@ -218,12 +225,16 @@ def expand_time_column(
         df_bounds = df.reset_index().groupby(dimension_col)[time_col].agg(["min", "max"]).reset_index()
 
         # Get dates to add (preliminary)
+        start = since_time
+        end = until_time
         if EXTEND_END:
-            date_values = range(df[time_col].min(), until_time)
+            start = df[time_col].min()
         elif EXTEND_START:
-            date_values = range(since_time, df[time_col].max())
+            end = df[time_col].max()
+        if isinstance(start, datetime):
+            date_values = pd.date_range(start=start, end=end)
         else:
-            date_values = range(since_time, until_time)
+            date_values = range(start, end + 1)  # type: ignore
 
         # Build ranges to add (preliminary)
         iterables, names = _get_iter_and_names(
@@ -246,9 +257,9 @@ def expand_time_column(
 
         # Extend the dataframe
         if isinstance(df, Table):
-            df = pr.concat([df, Table(df_range)])
+            df = pr.concat([df, Table(df_range)])  #  type: ignore
         elif isinstance(df, pd.DataFrame):
-            df = pd.concat([df, df_range])
+            df = pd.concat([df, df_range])  # type: ignore
 
     df = df.sort_values(index)
 
@@ -257,7 +268,7 @@ def expand_time_column(
     #####################################################################
     values_column = [col for col in df.columns if col not in index]
 
-    def _fillna(df, method):
+    def _fillna(df: Any, method: Any):
         if method == "interpolate":
             df = interpolate_table(
                 df,
@@ -285,7 +296,7 @@ def expand_time_column(
     # Final touches
     #####################################################################
     # Output dataframe in same order as input
-    df = df[columns_order]
+    df = df.loc[:, columns_order]
 
     return df
 
@@ -346,7 +357,7 @@ def explode_rows_by_time_range(
     tb_all_times = Table(pd.RangeIndex(TIME_MIN, TIME_MAX + 1), columns=[col_time])
     tb = tb.merge(tb_all_times, how="cross")
     # Filter only entries that actually existed
-    tb = tb[(tb[col_time] >= tb[col_time_start]) & (tb[col_time] < tb[col_time_end])]
+    tb = tb.loc[(tb[col_time] >= tb[col_time_start]) & (tb[col_time] < tb[col_time_end])]
 
     return tb
 
