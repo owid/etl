@@ -252,10 +252,17 @@ def expand_time_column(
     #####################################################################
     # Fill method
     #####################################################################
+    values_column = [col for col in df.columns if col not in index]
+
     def _fillna(df, method):
-        values_column = [col for col in df.columns if col not in index]
         if method == "interpolate":
-            df = interpolate_table(df, dimension_col, time_col, "none", limit_area="inside")
+            df = interpolate_table(
+                df,
+                dimension_col,
+                time_col,
+                "none",  # NOTE: DO NOT CHANGE THIS, CAN LEAD TO CIRCULAR LOOP
+                limit_area="inside",
+            )
         elif method == "bfill":
             df[values_column] = df.groupby(dimension_col)[values_column].bfill()
         elif method == "ffill":
@@ -264,11 +271,12 @@ def expand_time_column(
             df[values_column] = df.groupby(dimension_col)[values_column].fillna(0)
         return df
 
-    if isinstance(fillna_method, list):
-        for m in fillna_method:
-            df = _fillna(df, m)
-    else:
-        df = _fillna(df, fillna_method)
+    if values_column:
+        if isinstance(fillna_method, list):
+            for m in fillna_method:
+                df = _fillna(df, m)
+        else:
+            df = _fillna(df, fillna_method)
 
     #####################################################################
     # Final touches
