@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     # fixing the metadata which has got lost somewhere
 
     for col in tb_entities.columns:
-        print(col)
         tb_entities[col] = tb_entities[col].copy_metadata(tb["value"])
     # Save outputs.
     #
