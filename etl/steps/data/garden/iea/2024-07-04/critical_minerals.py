@@ -82,6 +82,10 @@ TOTAL_CLEAN_LABEL = "Total clean technologies"
 # Name of total demand (in sheet 1).
 TOTAL_DEMAND_LABEL = "Total demand"
 
+# New label for "scenario" to use for supply data (that does not depend on scenario).
+# NOTE: The new "supply_as_a_share_of_global_demand" column will depend on scenario, since global demand does.
+ALL_SCENARIOS_LABEL = "All scenarios"
+
 
 def prepare_supply_table(ds_meadow: Dataset) -> Table:
     # Read supply table.
@@ -351,11 +355,27 @@ def add_share_columns(tb_demand: Table, tb_supply: Table) -> Table:
     tb_supply["supply_as_a_share_of_global_demand"] = 100 * tb_supply["supply"] / tb_supply["global_demand"]
     tb_supply["supply_as_a_share_of_global_supply"] = 100 * tb_supply["supply"] / tb_supply["global_supply"]
 
+    # Drop unnecessary columns.
+    tb_supply = tb_supply.drop(columns=["global_demand", "global_supply"], errors="raise")
+
     # After merging with global demand, "scenario" is added to the supply table.
     # Supply does not change depending on the scenario, but demand does, and therefore supply as a share of global demand changes.
-    # Therefore, fill all cases where "scenario" is now nan (for "Mine" process) with some reasonable label.
-    # TODO: Later, when flattening the table, assert that all scenarios for total supply yield the same values, and assign the same label to scenario.
-    ALL_SCENARIOS_LABEL = "All scenarios"
+    # As a sanity check, ensure that each row for supply and supply_as_a_share_of_global_supply is repeated 3 times.
+    # After flattening the table, remove all unnecessary columns.
+    # NOTE: This will happen only for "Refinery" (that was merged with global demand), not for "Mine".
+    # NOTE: Ideally, we should not show the scenario dropdown for total supply. But if we replace their scenarios with something else, e.g. "All scenarios", then one can't easily switch between total and share metrics.
+    ####################################################################################################################
+    # TODO: Again, there are issues with Graphite. Once fixed remove the condition (tb_supply["mineral"] != "Graphite").
+    ####################################################################################################################
+    grouped = (
+        tb_supply[(tb_supply["mineral"] != "Graphite") & (tb_supply["process"] == "Refinery")]
+        .groupby(
+            [column for column in tb_supply.columns if column not in ["scenario", "supply_as_a_share_of_global_demand"]]
+        )
+        .size()
+    )
+    assert (grouped == 3).all()
+    # Fill all cases where "scenario" is now nan (for "Mine" process) with a reasonable label.
     tb_supply["scenario"] = tb_supply["scenario"].astype("string").fillna(ALL_SCENARIOS_LABEL)
 
     # From the original supply table, we need the global supply of each mineral-year (given only for the "Base case").
@@ -376,7 +396,6 @@ def add_share_columns(tb_demand: Table, tb_supply: Table) -> Table:
 
     # Drop unnecessary columns.
     tb_demand = tb_demand.drop(columns=["global_demand", "global_supply"], errors="raise")
-    tb_supply = tb_supply.drop(columns=["global_demand", "global_supply"], errors="raise")
 
     return tb_demand, tb_supply
 
@@ -396,9 +415,9 @@ def create_demand_by_technology_flat(tb_demand_by_technology: Table) -> Table:
     return tb_demand_by_technology_flat
 
 
-def create_supply_by_country_flat(tb_supply_by_country: Table) -> Table:
+def create_supply_by_country_flat(tb_supply: Table) -> Table:
     # Create a wide-format table.
-    tb_supply_by_country_flat = tb_supply_by_country.pivot(
+    tb_supply_flat = tb_supply.pivot(
         index=["country", "year"],
         columns=["mineral", "process", "case", "scenario"],
         values=["supply", "supply_as_a_share_of_global_demand", "supply_as_a_share_of_global_supply"],
@@ -406,15 +425,13 @@ def create_supply_by_country_flat(tb_supply_by_country: Table) -> Table:
     )
 
     # Remove empty columns.
-    tb_supply_by_country_flat = tb_supply_by_country_flat.dropna(axis=1, how="all")
+    tb_supply_flat = tb_supply_flat.dropna(axis=1, how="all")
 
     # Remove "World" from supply data (since all countries should always add up to World).
     # TODO: Add sanity check for this.
-    tb_supply_by_country_flat = tb_supply_by_country_flat[tb_supply_by_country_flat["country"] != "World"].reset_index(
-        drop=True
-    )
+    tb_supply_flat = tb_supply_flat[tb_supply_flat["country"] != "World"].reset_index(drop=True)
 
-    return tb_supply_by_country_flat
+    return tb_supply_flat
 
 
 def run(dest_dir: str) -> None:
@@ -515,14 +532,14 @@ def run(dest_dir: str) -> None:
     tb_demand, tb_supply = add_share_columns(tb_demand=tb_demand, tb_supply=tb_supply)
 
     # Create a wide-format table of demand by technology.
-    tb_demand_by_technology_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand)
+    tb_demand_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand)
 
     # Create a wide-format table of supply by country.
-    tb_supply_by_country_flat = create_supply_by_country_flat(tb_supply_by_country=tb_supply)
+    tb_supply_flat = create_supply_by_country_flat(tb_supply=tb_supply)
 
     # Improve metadata.
     # TODO: Do this properly.
-    for table in [tb_demand_by_technology_flat, tb_supply_by_country_flat]:
+    for table in [tb_demand_flat, tb_supply_flat]:
         for column in table.columns:
             table[column].m.title = column
             if "_share_of_" in column:
@@ -534,10 +551,8 @@ def run(dest_dir: str) -> None:
 
     # Improve its format.
     # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
-    tb_demand_by_technology_flat = tb_demand_by_technology_flat.format(
-        keys=["technology", "year"], short_name="demand_by_technology"
-    )
-    tb_supply_by_country_flat = tb_supply_by_country_flat.format(short_name="supply_by_country")
+    tb_demand_flat = tb_demand_flat.format(keys=["technology", "year"], short_name="demand_by_technology")
+    tb_supply_flat = tb_supply_flat.format(short_name="supply_by_country")
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process", "scenario"])
@@ -549,7 +564,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_demand, tb_supply, tb_demand_by_technology_flat, tb_supply_by_country_flat],
+        tables=[tb_demand, tb_supply, tb_demand_flat, tb_supply_flat],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
