@@ -104,7 +104,7 @@ def expand_time_column(
     df: TableOrDataFrame,
     dimension_col: str | Iterable[str],
     time_col: str,
-    method: Literal["full_range", "full_range_entity", "observed"] = "full_range",
+    method: Literal["full_range", "full_range_entity", "observed", "none"] = "full_range",
     until_time: Optional[int | datetime] = None,
     since_time: Optional[int | datetime] = None,
     fillna_method: Optional[List[str] | str] = None,
@@ -124,6 +124,7 @@ def expand_time_column(
             - 'full_range_entity': Add rows for all possible times within the minimum and maximum times in the data for a given entity. That is, the ranges covered for each entity is different.
             - 'full_range': Add rows for all possible entity-time pairs within the minimum and maximum times in the (complete) data. That is, the time range covered by each entity is the same.
             - 'observed': Add rows for all times that appear in the data. Note that some times might be present for an entity, but not for another.
+            - 'none': No row is added. Might be useful when you are only interested in using `until_time` and `since_time`.
     until_time: int
         Only year is supported. After expanding the time-series using `method`, extend it until the given time.
     since_time: int
@@ -136,6 +137,16 @@ def expand_time_column(
             - 'bfill': Backward-filling.
             - 'zero': Replace NaNs with zeroes.
         You can provide a list of strategies, e.g. ['bfill', 'ffill']. This will first apply backward-filling and then forward-filling.
+
+    Notes
+    -----
+
+    - This method has been extensively tested in datasets using `year`. If you are using dates, please use with caution and please report any issue.
+    - Behaviour of interpolation and filling methods for non-numeric values is unknown. Please pay attention to the output if that's your case.
+
+    Future work:
+    ------------
+    - Add arguments `since_time_condition_value` and `until_time_condition_value`: only extend those entity-dimensions that start (or end) in a particular year or date. E.g. Extend table until 2023, but only for those countries that made it up to 2015 (this avoid extending historical countries that ended up way before). This could be actually `since_time_condition_values`, i.e. list of conditions!
     """
     # Determine if we have a single or multiple dimensiosn (will affect how groupbys are done)
     SINGLE_DIMENSION = isinstance(dimension_col, str)
@@ -143,10 +154,13 @@ def expand_time_column(
     assert SINGLE_DIMENSION | MULTIPLE_DIMENSION, "`dimension_col` must be either a string or a list of strings!"
 
     # Sanity check: value for `method` is as expected
-    assert method in {"full_range_entity", "full_range", "observed"}, f"Wrong value for `method` {method}!"
+    assert method in {"full_range_entity", "full_range", "observed", "none"}, f"Wrong value for `method` {method}!"
 
-    # Save initial dataframe column order
+    # Save initial states
+    ## dataframe column order
     columns_order = list(df.columns)
+    ## dtypes
+    dtypes = df.dtypes
 
     # Temporary function to get the upper and lower bounds of the time period
     def _get_complete_date_range(ds):
@@ -190,12 +204,13 @@ def expand_time_column(
             return group
 
         df = df.groupby(dimension_col).apply(_reindex_dates).reset_index(drop=True).set_index(index)  # type: ignore
+        df = cast(TableOrDataFrame, df.reset_index())
     # Either full range or all observations.
-    else:
+    elif method in {"full_range", "observed"}:
         # Get list of times
         if method == "full_range":
             date_values = _get_complete_date_range(df[time_col])
-        elif method == "observed":
+        else:
             date_values = df[time_col].unique()
 
         iterables, names = _get_iter_and_names(
@@ -212,7 +227,7 @@ def expand_time_column(
             .sort_index()
         )
 
-    df = cast(TableOrDataFrame, df.reset_index())
+        df = cast(TableOrDataFrame, df.reset_index())
 
     #####################################################################
     # Further extend (back, forth, back and forth)
@@ -297,7 +312,10 @@ def expand_time_column(
     #####################################################################
     # Output dataframe in same order as input
     df = df.loc[:, columns_order]
-
+    try:
+        df = df.astype(dtypes)
+    except pd.errors.IntCastingNaNError:
+        pass
     return df
 
 

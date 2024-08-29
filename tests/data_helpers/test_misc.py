@@ -255,6 +255,31 @@ def test_expand_time_column_observed():
     ), "Original values should have been preserved"
 
 
+def test_expand_time_column_none():
+    data = {
+        "country": ["spain", "spain", "spain", "spain", "spain", "spain", "italy", "italy", "italy"],
+        "dimension": ["female", "female", "female", "male", "male", "male", "female", "female", "female"],
+        "year": [2001, 2003, 2005, 2001, 2003, 2005, 2000, 2001, 2002],
+        "value1": [10, 15, 20, 11, 14, 22, 5, 7, 10],
+        "value2": [100, 150, 200, 111, 135, 200, 50, 70, 100],
+    }
+    df = pd.DataFrame(data)
+    dimension_col = ["country", "dimension"]
+    time_col = "year"
+
+    # 1/ Check complete period within dimension
+    dfx = expand_time_column(
+        df,
+        dimension_col=dimension_col,
+        time_col=time_col,
+        method="none",
+    )
+
+    df = df.sort_values(dimension_col).reset_index(drop=True)
+    dfx = dfx.sort_values(dimension_col).reset_index(drop=True)
+    assert df.equals(dfx), "Input and output dataframes were assumed to be equal"
+
+
 def test_expand_time_column_fillna_basic():
     data = {
         "country": ["spain", "spain", "spain", "spain", "spain", "spain", "italy", "italy", "italy"],
