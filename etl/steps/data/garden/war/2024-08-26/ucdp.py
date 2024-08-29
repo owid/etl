@@ -30,12 +30,12 @@ from shapely import wkt
 from shared import (
     add_indicators_extra,
     aggregate_conflict_types,
-    fill_gaps_with_zeroes,
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -64,6 +64,8 @@ REGIONS_MAPPING = {
     5: "Americas",
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
+# Last year of data
+LAST_YEAR = 2023
 
 
 def run(dest_dir: str) -> None:
@@ -154,9 +156,20 @@ def run(dest_dir: str) -> None:
 
     # Fill NaNs
     paths.log.info("replace missing data with zeros (where applicable)")
-    tb_prio = replace_missing_data_with_zeros(tb_prio)
-    tb = replace_missing_data_with_zeros(tb)
-
+    tb_prio = expand_time_column(
+        tb_prio,
+        ["region", "conflict_type"],
+        "year",
+        method="full_range",
+        fillna_method="zero",
+    )
+    tb = expand_time_column(
+        tb,
+        ["region", "conflict_type"],
+        "year",
+        method="full_range",
+        fillna_method="zero",
+    )
     # Combine main dataset with PRIO/UCDP
     paths.log.info("add data from ucdp/prio table")
     tb = combine_tables(tb, tb_prio)
@@ -193,22 +206,11 @@ def run(dest_dir: str) -> None:
     # Adapt region names
     tb = adapt_region_names(tb)
 
-    # Set index, sort rows
-    tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
-    tb_participants = tb_participants.set_index(
-        ["year", "country", "conflict_type"], verify_integrity=True
-    ).sort_index()
-    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
-
-    # Add short_name to table
-    paths.log.info("add shortname to table")
-    tb.metadata.short_name = paths.short_name
-
     # Tables
     tables = [
-        tb,
-        tb_participants,
-        tb_locations,
+        tb.format(["year", "region", "conflict_type"], short_name=paths.short_name),
+        tb_participants.format(["year", "country", "conflict_type"]),
+        tb_locations.format(["year", "country", "conflict_type"]),
     ]
 
     #
@@ -397,36 +399,6 @@ def _sanity_check_prio_conflict_types(tb: Table) -> Table:
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
 
-def replace_missing_data_with_zeros(tb: Table, columns: Optional[List[str]] = None) -> Table:
-    """Replace missing data with zeros.
-
-    In some instances (e.g. extrasystemic conflicts after ~1964) there is missing data. Instead, we'd like this to be zero-valued.
-    """
-    # Add missing (year, region, conflict_typ) entries (filled with NaNs)
-    years = np.arange(tb["year"].min(), tb["year"].max() + 1)
-    regions = set(tb["region"])
-    conflict_types = set(tb["conflict_type"])
-    new_idx = pd.MultiIndex.from_product([years, regions, conflict_types], names=["year", "region", "conflict_type"])
-    tb = tb.set_index(["year", "region", "conflict_type"]).reindex(new_idx).reset_index()
-
-    # ADD HERE IF YOU WANT TO REPLACE MISSING DATA WITH ZEROS
-    ## Change NaNs for 0 for specific rows
-    ## For columns "number_ongoing_conflicts", "number_new_conflicts", and "number_deaths_ongoing_conflict*"
-    if columns is None:
-        columns = [
-            "number_ongoing_conflicts",
-            "number_new_conflicts",
-            "number_deaths_ongoing_conflicts",
-            "number_deaths_ongoing_conflicts_low",
-            "number_deaths_ongoing_conflicts_high",
-        ]
-    for col in columns:
-        if col in tb.columns:
-            tb.loc[:, col] = tb.loc[:, col].fillna(0)
-
-    return tb
-
-
 def estimate_metrics(tb: Table) -> Table:
     """Add number of ongoing and new conflicts, and number of deaths.
 
@@ -541,7 +513,7 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     """
     # Ensure year period for each table is as expected
     assert tb["year"].min() == 1989, "Unexpected start year!"
-    assert tb["year"].max() == 2022, "Unexpected start year!"
+    assert tb["year"].max() == LAST_YEAR, "Unexpected start year!"
     assert tb_prio["year"].min() == 1946, "Unexpected start year!"
     assert tb_prio["year"].max() == 1989, "Unexpected start year!"
 
@@ -559,15 +531,15 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     ## Data from PRIO/UCDP for `number_ongoing_conflicts` goes from 1946 to 1988 (inc)
     assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].min() == 1946
     assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].max() == 1988
-    ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2022 (inc)
+    ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2023 (inc)
     assert tb[tb["number_ongoing_conflicts_main"].notna()].year.min() == 1989
-    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == 2022
+    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == LAST_YEAR
     ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1946 to 1989 (inc)
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].min() == 1946
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].max() == 1989
     ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
     assert tb[tb["number_new_conflicts_main"].notna()]["year"].min() == 1990
-    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == 2022
+    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == LAST_YEAR
 
     # Actually combine timeseries from UCDP/PRIO and GEO.
     # We prioritise values from PRIO for 1989, therefore the order `PRIO.fillna(MAIN)`
@@ -832,7 +804,7 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
     ###################
     # NUMBER COUNTRIES
 
-    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "gw")
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type")
 
     # Combine tables
     tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
@@ -845,14 +817,7 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
     ############
     tb_country_prio = estimate_metrics_participants_prio(tb_prio, tb_codes)
 
-    tb_country = pr.concat([tb_country, tb_country_prio], ignore_index=True)
-
-    ###############
-    # Final steps #
-    ###############
-
-    # Set short name
-    tb_country.metadata.short_name = f"{paths.short_name}_country"
+    tb_country = pr.concat([tb_country, tb_country_prio], ignore_index=True, short_name=f"{paths.short_name}_country")
 
     return tb_country
 
@@ -938,7 +903,7 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     ###################
     # NUMBER COUNTRIES
 
-    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "gw")
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type")
 
     # Combine tables
     tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
@@ -983,10 +948,6 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating country flag 'is_location_of_conflict'...")
 
-    # tb_locations = tb_locations.merge(
-    #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
-    # )
-
     # Estimate if a conflict occured in a country, and the number of deaths in it
     tb_locations_country = (
         tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
@@ -1027,7 +988,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     assert (
         "Greenland" not in set(tb_locations_country.country)
     ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
-    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [2022]}))
+    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [LAST_YEAR]}))
     tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
 
     # NaNs of numeric indicators to zero
@@ -1041,10 +1002,12 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     tb_locations_country["conflict_type"] = tb_locations_country["conflict_type"].fillna("one-sided violence")
 
     # Fill with zeroes
-    tb_locations_country = fill_gaps_with_zeroes(
-        tb=tb_locations_country,
-        columns=["country", "year", "conflict_type"],
-        cols_use_range=["year"],
+    tb_locations_country = expand_time_column(
+        tb_locations_country,
+        ["country", "conflict_type"],
+        "year",
+        method="full_range",
+        fillna_method="zero",
     )
 
     # Add origins from Natural Earth
@@ -1162,11 +1125,13 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     # Add origins
     tb_locations_regions["number_locations"].m.origins = tb_locations_country["is_location_of_conflict"].origins
 
-    # Fill with zeroes
-    tb_locations_regions = fill_gaps_with_zeroes(
-        tb=tb_locations_regions,
-        columns=["country", "year", "conflict_type"],
-        cols_use_range=["year"],
+    # Extend to full time-series + fill NaNs with zeros.
+    tb_locations_regions = expand_time_column(
+        df=tb_locations_regions,
+        dimension_col=["country", "conflict_type"],
+        time_col="year",
+        method="full_range",
+        fillna_method="zero",
     )
 
     ###################
@@ -1197,12 +1162,15 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     # Use the overlay function to extract data from the world map that each point sits on top of.
     gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
     # Events not assigned to any country
-    # There are 1618 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
-    assert gdf.shape[0] - gdf_match.shape[0] == 1618, "Unexpected number of events without exact coordinate match!"
+    # There are 2100 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    assert gdf.shape[0] - gdf_match.shape[0] == 2100, "Unexpected number of events without exact coordinate match!"
+    # DEBUG: Examine which are these unlabeled conflicts
+    # mask = ~tb["relid"].isin(gdf_match["relid"])
+    # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]
 
     # Get missing entries
     ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
-    gdf_missing = gdf[gdf["relid"].isin(ids_missing)]
+    gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
 
     # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
     wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
@@ -1251,7 +1219,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
         tb.loc[error[0], "flag"] = error[1]
         tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
 
-    assert tb["country_name_location"].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
-    tb = tb.dropna(subset=["country_name_location"])
+    assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
+    tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
     return tb
