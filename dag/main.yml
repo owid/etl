@@ -398,6 +398,15 @@ steps:
   data://grapher/countries/2024-08-27/gleditsch:
     - data://garden/countries/2024-08-27/gleditsch
 
+  # Outdated gleditsch
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
+  data://garden/countries/2024-01-08/gleditsch_no_population:
+    - data://meadow/countries/2023-09-25/gleditsch
+
   data://meadow/countries/2023-09-29/cow_ssm:
     - snapshot://countries/2023-09-22/cow_ssm_majors.csv
     - snapshot://countries/2023-09-22/cow_ssm_states.csv
@@ -407,9 +416,6 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-09-29/cow_ssm:
     - data://garden/countries/2023-09-29/cow_ssm
-
-  data://garden/countries/2024-01-08/gleditsch_no_population:
-    - data://meadow/countries/2023-09-25/gleditsch
 
   # Fertility rate, Gapminder
   data://meadow/gapminder/2023-09-22/total_fertility_rate:
@@ -786,13 +792,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
-
-# Countries
-data://garden/countries/2023-09-25/gleditsch:
-  - data://meadow/countries/2023-09-25/gleditsch
-  - data://garden/demography/2023-03-31/population
-data://grapher/countries/2023-10-01/gleditsch:
-  - data://garden/countries/2023-09-25/gleditsch
 
 include:
   - dag/open_numbers.yml
