@@ -16,10 +16,13 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load minerals grapher dataset and read its main table.
-    ds = paths.load_dataset("critical_minerals")
-    tb_demand = ds.read_table("demand_by_technology")
-    tb_supply = ds.read_table("supply_by_country")
+    # Load minerals grapher dataset on demand by technology.
+    ds_demand = paths.load_dataset("critical_minerals_demand_by_technology")
+    tb_demand = ds_demand.read_table("demand_by_technology")
+
+    # Load minerals grapher dataset on supply by country.
+    ds_supply = paths.load_dataset("critical_minerals_supply_by_country")
+    tb_supply = ds_supply.read_table("supply_by_country")
 
     #
     # Process data.
@@ -44,10 +47,12 @@ def run(dest_dir: str) -> None:
             indicator = "Demand by technology"
             table_name = tb_demand.metadata.short_name
             has_map_tab = False
+            variable_id = f"{ds_demand.metadata.uri}/{table_name}#{column}"
         else:
             indicator = "Supply by country"
             table_name = tb_supply.metadata.short_name
             has_map_tab = True
+            variable_id = f"{ds_supply.metadata.uri}/{table_name}#{column}"
 
         if metric in ["demand", "supply"]:
             metric = "Total"
@@ -57,8 +62,8 @@ def run(dest_dir: str) -> None:
             metric = "Share of supply"
         else:
             log.warning(f"Unexpected metric {metric}")
-        variable_ids.append([f"{ds.metadata.uri}/{table_name}#{column}"])
 
+        variable_ids.append([variable_id])
         indicator_radio.append(indicator)
         metric_radio.append(metric)
         type_dropdown.append(process)

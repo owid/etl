@@ -12,7 +12,12 @@ steps:
   #
   # IEA - Critical minerals.
   #
-  data://grapher/iea/2024-07-04/critical_minerals:
+  data://grapher/iea/2024-07-04/critical_minerals_demand_by_technology:
+    - data://garden/iea/2024-07-04/critical_minerals
+  #
+  # IEA - Critical minerals.
+  #
+  data://grapher/iea/2024-07-04/critical_minerals_supply_by_country:
     - data://garden/iea/2024-07-04/critical_minerals
   #
   # BGS - World Mineral Statistics.
@@ -66,4 +71,5 @@ steps:
   # Minerals - Minerals supply and demand prospects.
   #
   export://explorers/minerals/latest/minerals_supply_and_demand_prospects:
-    - data://grapher/iea/2024-07-04/critical_minerals
+    - data://grapher/iea/2024-07-04/critical_minerals_demand_by_technology
+    - data://grapher/iea/2024-07-04/critical_minerals_supply_by_country
