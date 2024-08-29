@@ -539,6 +539,58 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
         for column in table.drop(columns=["country", "technology", "year"], errors="ignore").columns:
             metric, mineral, process, case, scenario = column.split("|")
 
+            # Define some auxiliary items:
+            # * Mineral-process.
+            if process == "Mine":
+                mineral_process = mineral.lower()
+            elif process == "Refinery":
+                mineral_process = f"refined {mineral.lower()}"
+            else:
+                log.warning(f"Unexpected process for column {column}")
+            # * Official IEA's scenario name:
+            if scenario == "Stated policies":
+                scenario_name = "Stated Policies Scenario"
+                scenario_dod = "iea-stated-policies-scenario"
+            elif scenario == "Announced pledges":
+                scenario_name = "Announced Pledges Scenario"
+                scenario_dod = "iea-announced-pledges-scenario"
+            elif scenario == "Net zero by 2050":
+                scenario_name = "Net Zero Emissions by 2050 Scenario"
+                scenario_dod = "iea-net-zero-by-2050-scenario"
+            elif scenario == "All scenarios":
+                # NOTE: The following should not be used in any string.
+                scenario_name = ""
+                scenario_dod = ""
+            else:
+                log.warning(f"Unexpected scenario for column {column}")
+            # * Case description:
+            if case == "Base case":
+                case_description = (
+                    "Supply projections are based on operating and announced mining and refining projects."
+                )
+            elif case == "High material prices":
+                case_description = "Projections assume high material prices."
+            elif case == "Comeback of high Cd-Te technology":
+                case_description = "Projections assume a comeback of high Cd-Te technology."
+            elif case == "Constrained rare earth elements supply":
+                case_description = "Projections assume a constrained rare earth elements supply."
+            elif case == "Faster uptake of solid state batteries":
+                case_description = "Projections assume a faster uptake of solid state batteries."
+            elif case == "Limited battery size reduction":
+                case_description = "Projections assume a limited battery size reduction."
+            elif case == "Lower battery sizes":
+                case_description = "Projections assume lower battery sizes."
+            elif case == "Wider adoption of Ga-As technology":
+                case_description = "Projections assume a wider adoption of Ga-As technology."
+            elif case == "Wider adoption of perovskite solar cells":
+                case_description = "Projections assume a wider adoption of perovskite solar cells."
+            elif case == "Wider direct current (DC) technology development":
+                case_description = "Projections assume a wider direct current (DC) technology development."
+            elif case == "Wider use of silicon-rich anodes":
+                case_description = "Projections assume a wider use of silicon-rich anodes."
+            else:
+                log.warning(f"Unexpected case for column {column}")
+
             # Initialize a list of footnotes.
             footnotes = []
 
@@ -546,13 +598,7 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
             table[column].m.title = column
 
             # Create a public title.
-            title_public = f"Projected {metric.split('_')[0]} of "
-            if process == "Mine":
-                title_public += mineral.lower()
-            elif process == "Refinery":
-                title_public += f"refined {mineral.lower()}"
-            else:
-                log.warning(f"Unexpected process for column {column}")
+            title_public = f"Projected {metric.split('_')[0]} of {mineral_process}"
             if "_share_of_" in metric:
                 title_public += " " + " ".join(metric.split("_")[1:])
                 table[column].m.unit = "%"
@@ -561,11 +607,48 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
                 table[column].m.unit = "tonnes"
                 table[column].m.short_unit = "t"
 
+            # Create a short description.
+            short_descriptions = []
+            # * Supply combinations.
+            if metric == "supply":
+                # NOTE: There is no need to repeat the title.
+                # short_descriptions.append(f"Projected supply of {mineral_process}.")
+                pass
+            elif metric == "supply_as_a_share_of_global_supply":
+                short_descriptions.append(
+                    f"Projected supply of {mineral_process} as a share of the projected global supply of {mineral_process}."
+                )
+            elif metric == "supply_as_a_share_of_global_demand":
+                short_descriptions.append(
+                    f"Projected supply of {mineral_process}, as a share of the projected global demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}). A share below 100% means that our current supply would not be enough to meet the projected demand."
+                )
+            # * Demand combinations.
+            elif metric == "demand":
+                short_descriptions.append(f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}).")
+            elif metric == "demand_as_a_share_of_global_supply":
+                short_descriptions.append(
+                    f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}), as a share of the projected global supply of {mineral_process}. A share above 100% means that our current supply would not be enough to meet the projected demand."
+                )
+            elif metric == "demand_as_a_share_of_global_demand":
+                short_descriptions.append(
+                    f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}), as a share of the projected global demand of {mineral_process}."
+                )
+            else:
+                log.warning(f"Unexpected metric for column {column}")
+            # Append the case description at the end.
+            short_descriptions.append(case_description)
+
             # Create a footnote in special cases.
             if (mineral == "Lithium") & (metric.startswith("demand")):
                 footnotes.append("Lithium demand is in lithium content.")
                 if process == "Refinery":
                     footnotes.append("Refined lithium refers to lithium chemicals.")
+
+            if mineral == "Magnet rare earth elements":
+                # TODO: Currently, this will never happen, as we renamed "Rare earths" to "Magnet rare earth elements". Consider renaming again to "Rare earths", for consistency with the minerals explorer.
+                footnotes.append(
+                    "Rare earth elements refer only to four magnet rare earths, namely neodymium, praseodymium, dysprosium and terbium."
+                )
 
             if (mineral == "Graphite") & (process == "Refinery"):
                 # TODO: Currently, this applies to supply only. We need to harmonize graphite data.
@@ -575,6 +658,9 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
             if not table[column].metadata.presentation:
                 table[column].metadata.presentation = VariablePresentationMeta()
             table[column].metadata.presentation.title_public = title_public
+
+            # Add short descriptions.
+            table[column].metadata.description_short = " ".join(short_descriptions)
 
             # Add footnotes.
             if len(footnotes) > 0:
