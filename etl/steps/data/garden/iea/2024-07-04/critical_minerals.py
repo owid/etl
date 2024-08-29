@@ -29,6 +29,8 @@ Therefore, the strategy should be:
 
 """
 
+from typing import Tuple
+
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
@@ -100,6 +102,17 @@ def prepare_supply_table(ds_meadow: Dataset) -> Table:
 
     # Harmonize country names.
     tb_supply = geo.harmonize_countries(df=tb_supply, countries_file=paths.country_mapping_path)
+
+    # Add a global aggregate for supply.
+    tb_supply = pr.concat(
+        [
+            tb_supply,
+            tb_supply.groupby(["year", "mineral", "process", "case"], observed=True, as_index=False)
+            .agg({"supply": "sum"})
+            .assign(**{"country": "World"}),
+        ],
+        ignore_index=True,
+    )
 
     return tb_supply
 
@@ -329,7 +342,7 @@ def run_sanity_checks_on_outputs(tb_demand: Table, tb_total: Table) -> None:
     assert compared[compared["_deviation"] > 1].empty, error
 
 
-def add_share_columns(tb_demand: Table, tb_supply: Table) -> Table:
+def add_share_columns(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
     # Create a table for global demand.
     # For each case-scenario-mineral-year, we need the global demand of all technologies.
     # NOTE: Global mineral demand, including uses outside clean tech, is only given for "Base case" for a few minerals (for which "Other uses" is explicitly given).
@@ -383,7 +396,6 @@ def add_share_columns(tb_demand: Table, tb_supply: Table) -> Table:
     tb_supply["scenario"] = tb_supply["scenario"].astype("string").fillna(ALL_SCENARIOS_LABEL)
 
     # From the original supply table, we need the global supply of each mineral-year (given only for the "Base case").
-    # TODO: For consistency with the current minerals explorer, we should rename them "Mine" and "Refinery".
 
     # Add total demand to the demand table.
     tb_demand = tb_demand.merge(tb_demand_global, on=["case", "scenario", "mineral", "process", "year"], how="left")
@@ -492,6 +504,73 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
     return tb_demand_flat, tb_supply_flat
 
 
+def clean_demand_table(tb_demand: Table) -> Table:
+    # Drop rows with no demand data.
+    tb_demand = tb_demand.dropna(subset="demand").reset_index(drop=True)
+    # We want the current year to appear in all scenarios (and therefore drop "Current" scenario).
+    tb_demand_current = tb_demand[tb_demand["scenario"] == "Current"].reset_index(drop=True)
+    tb_demand = tb_demand[tb_demand["scenario"] != "Current"].reset_index(drop=True)
+    for scenario in sorted(set(tb_demand[tb_demand["scenario"] != "Current"]["scenario"])):
+        tb_demand = pr.concat([tb_demand, tb_demand_current.assign(**{"scenario": scenario})], ignore_index=True)
+    # After doing this, some combinations for which there was no data for a given scenario will have only data for 2023.
+    # Drop these cases, where there is only one row (one year) for a given case-mineral-scenario-technology combination.
+    tb_demand = tb_demand[
+        tb_demand.groupby(["case", "mineral", "scenario", "technology"], observed=True, as_index=False)[
+            "year"
+        ].transform("nunique")
+        > 1
+    ].reset_index(drop=True)
+
+    # We assume that the demand is only on refined minerals.
+    tb_demand["process"] = "Refining"
+
+    return tb_demand
+
+
+def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
+    # For consistency, rename some minerals.
+    tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
+    tb_demand["mineral"] = tb_demand["mineral"].replace(
+        {GRAPHITE_BATTERY_GRADE_LABEL: GRAPHITE_BATTERY_GRADE_LABEL_NEW}
+    )
+    tb_demand["mineral"] = tb_demand["mineral"].replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
+
+    tb_supply["mineral"] = tb_supply["mineral"].astype("string").replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
+
+    # Supply data for each mineral is divided in "mining" and "refining".
+    # But there are two special cases:
+    # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
+    # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
+    # TODO: Add those footnotes.
+    tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
+    tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
+    tb_supply.loc[
+        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
+    ] = "Refining"
+    tb_supply.loc[
+        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
+    ] = "Mining"
+
+    # Rename a few things, for consistency with the minerals explorer.
+    for table in [tb_demand, tb_supply]:
+        table["process"] = table["process"].replace({"Mining": "Mine", "Refining": "Refinery"})
+
+    return tb_demand, tb_supply
+
+
+def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tuple[Table, Table, Table]:
+    tb_demand = tb_demand.copy()
+    tb_supply = tb_supply.copy()
+    tb_total = tb_total.copy()
+
+    # Convert units from kilotonnes to tonnes.
+    tb_demand["demand"] *= 1000
+    tb_total["demand"] *= 1000
+    tb_supply["supply"] *= 1000
+
+    return tb_demand, tb_supply, tb_total
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -523,68 +602,14 @@ def run(dest_dir: str) -> None:
     # Add other uses of minerals (outside of clean tech) from sheet 1 to the total demand.
     tb_demand = add_demand_from_other_uses(tb_demand=tb_demand, tb_total=tb_total)
 
-    # Sanity checks.
-    run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
+    # Further processing of the demand table.
+    tb_demand = clean_demand_table(tb_demand=tb_demand)
 
-    # Convert units from kilotonnes to tonnes.
-    tb_demand["demand"] *= 1000
-    tb_supply["supply"] *= 1000
+    # Harmonize units.
+    tb_demand, tb_supply, tb_total = harmonize_units(tb_demand=tb_demand, tb_supply=tb_supply, tb_total=tb_total)
 
-    # Drop rows with no demand data.
-    tb_demand = tb_demand.dropna(subset="demand").reset_index(drop=True)
-    # We want the current year to appear in all scenarios (and therefore drop "Current" scenario).
-    tb_demand_current = tb_demand[tb_demand["scenario"] == "Current"].reset_index(drop=True)
-    tb_demand = tb_demand[tb_demand["scenario"] != "Current"].reset_index(drop=True)
-    for scenario in sorted(set(tb_demand[tb_demand["scenario"] != "Current"]["scenario"])):
-        tb_demand = pr.concat([tb_demand, tb_demand_current.assign(**{"scenario": scenario})], ignore_index=True)
-    # After doing this, some combinations for which there was no data for a given scenario will have only data for 2023.
-    # Drop these cases, where there is only one row (one year) for a given case-mineral-scenario-technology combination.
-    tb_demand = tb_demand[
-        tb_demand.groupby(["case", "mineral", "scenario", "technology"], observed=True, as_index=False)[
-            "year"
-        ].transform("nunique")
-        > 1
-    ].reset_index(drop=True)
-
-    # We assume that the demand is only on refined minerals.
-    tb_demand["process"] = "Refining"
-
-    # Add a global aggregate for supply.
-    tb_supply = pr.concat(
-        [
-            tb_supply,
-            tb_supply.groupby(["year", "mineral", "process", "case"], observed=True, as_index=False)
-            .agg({"supply": "sum"})
-            .assign(**{"country": "World"}),
-        ],
-        ignore_index=True,
-    )
-
-    # For consistency, rename some minerals.
-    tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
-    tb_demand["mineral"] = tb_demand["mineral"].replace(
-        {GRAPHITE_BATTERY_GRADE_LABEL: GRAPHITE_BATTERY_GRADE_LABEL_NEW}
-    )
-    tb_demand["mineral"] = tb_demand["mineral"].replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
-    tb_supply["mineral"] = tb_supply["mineral"].astype("string").replace({RARE_ELEMENTS_LABEL: RARE_ELEMENTS_LABEL_NEW})
-
-    # Supply data for each mineral is divided in "mining" and "refining".
-    # But there are two special cases:
-    # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
-    # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
-    # TODO: Add those footnotes.
-    tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
-    tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
-    ] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
-    ] = "Mining"
-
-    # Rename a few things, for consistency with the minerals explorer.
-    for table in [tb_demand, tb_supply]:
-        table["process"] = table["process"].replace({"Mining": "Mine", "Refining": "Refinery"})
+    # For consistency (within the dataset and also with the minerals explorer) rename certain minerals.
+    tb_demand, tb_supply = harmonize_minerals_and_processes(tb_demand=tb_demand, tb_supply=tb_supply)
 
     # Add "share" columns.
     tb_demand, tb_supply = add_share_columns(tb_demand=tb_demand, tb_supply=tb_supply)
@@ -592,13 +617,16 @@ def run(dest_dir: str) -> None:
     # Create a wide-format table of demand by technology.
     tb_demand_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand)
 
+    # Sanity checks.
+    run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
+
     # Create a wide-format table of supply by country.
     tb_supply_flat = create_supply_by_country_flat(tb_supply=tb_supply)
 
-    # Improve metadata.
+    # Improve metadata of flat tables.
     tb_demand_flat, tb_supply_flat = improve_metadata(tb_demand_flat=tb_demand_flat, tb_supply_flat=tb_supply_flat)
 
-    # Improve its format.
+    # Improve tables format.
     # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
     tb_demand_flat = tb_demand_flat.format(keys=["technology", "year"], short_name="demand_by_technology")
     tb_supply_flat = tb_supply_flat.format(short_name="supply_by_country")
