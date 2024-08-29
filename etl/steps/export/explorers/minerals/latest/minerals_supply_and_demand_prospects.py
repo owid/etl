@@ -74,12 +74,12 @@ def run(dest_dir: str) -> None:
 
     df_graphers = pd.DataFrame()
     df_graphers["yVariableIds"] = variable_ids
-    df_graphers["Indicator Radio"] = indicator_radio
     df_graphers["Mineral Dropdown"] = mineral_dropdown
     df_graphers["Type Dropdown"] = type_dropdown
-    df_graphers["Case Dropdown"] = case_dropdown
-    df_graphers["Demand Scenario Dropdown"] = scenario_dropdown
+    df_graphers["Indicator Radio"] = indicator_radio
     df_graphers["Metric Radio"] = metric_radio
+    df_graphers["Demand Scenario Dropdown"] = scenario_dropdown
+    df_graphers["Case Dropdown"] = case_dropdown
     df_graphers["hasMapTab"] = map_tab
 
     # Impose that all line charts start at zero.
@@ -105,18 +105,26 @@ def run(dest_dir: str) -> None:
     ].empty, error
 
     # Sort rows conveniently.
+    # To ensure categories appear in the right order, they corresponding column can be defined as categorical.
+    # NOTE: But ensure they are defined in the same way as they appear in the data, otherwise they will not appear in the explorer.
+    scenarios_sorted = ["All scenarios", "Stated policies", "Announced pledges", "Net zero by 2050"]
+    error = "The defined categories do not coincide with scenarios. They will not appear in the explorer."
+    assert set(df_graphers["Demand Scenario Dropdown"]) == set(scenarios_sorted), error
     df_graphers["Demand Scenario Dropdown"] = pd.Categorical(
         df_graphers["Demand Scenario Dropdown"],
-        categories=["Stated policies", "Announced pledges", "Net zero by 2050"],
+        categories=scenarios_sorted,
         ordered=True,
     )
+    # NOTE: Ideally, the "Type Dropdown" would be sorted as first "Mine" and then "Refinery" (for consistency with the
+    # minerals explorer). However, the first mineral in this explorer is "Arsenic", which only has "Refinery" type, and
+    # therefore, "Refinery" will always be the first choice in that dropdown.
     df_graphers = df_graphers.sort_values(
         [
             "Indicator Radio",
             "Mineral Dropdown",
             "Type Dropdown",
-            "Case Dropdown",
             "Demand Scenario Dropdown",
+            "Case Dropdown",
             "Metric Radio",
         ]
     ).reset_index(drop=True)

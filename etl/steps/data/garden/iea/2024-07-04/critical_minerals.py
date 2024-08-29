@@ -87,7 +87,7 @@ TOTAL_CLEAN_LABEL = "Total clean technologies"
 TOTAL_DEMAND_LABEL = "Total demand"
 
 # New label for "scenario" to use for supply data (that does not depend on scenario).
-# NOTE: The new "supply_as_a_share_of_global_demand" column will depend on scenario, since global demand does.
+# NOTE: The new "supply_as_a_share_of_global_demand" column will still depend on scenario, since global demand does.
 ALL_SCENARIOS_LABEL = "All scenarios"
 
 
@@ -434,6 +434,24 @@ def create_supply_by_country_flat(tb_supply: Table) -> Table:
     # Remove "World" from supply data (since all countries should always add up to World).
     # TODO: Add sanity check for this.
     tb_supply_flat = tb_supply_flat[tb_supply_flat["country"] != "World"].reset_index(drop=True)
+
+    # The "scenario" is only relevant for demand. So, for supply (and supply as a share of global supply) the scenario
+    # should always be generic (e.g. "All scenarios"). The only time when we need "scenario" is for
+    # "supply_as_a_share_of_global_demand", since global demand does depend on scenario.
+    # Therefore, for supply and supply as a share of global supply, ensure there is only one scenario.
+    for column in tb_supply_flat.columns:
+        scenario = column.split("|")[-1]
+        if (scenario != ALL_SCENARIOS_LABEL) and column.startswith(("supply|", "supply_as_a_share_of_global_supply|")):
+            column_new = column.replace(scenario, ALL_SCENARIOS_LABEL)
+            if column_new in tb_supply_flat.columns:
+                tb_supply_flat = tb_supply_flat.drop(columns=[column], errors="raise")
+            else:
+                tb_supply_flat = tb_supply_flat.rename(columns={column: column_new}, errors="raise")
+
+    # Check that the previous operation was successful.
+    for column in tb_supply_flat.drop(columns=["country", "year"]).columns:
+        if not column.startswith("supply_as_a_share_of_global_demand"):
+            assert column.split("|")[-1] == ALL_SCENARIOS_LABEL
 
     return tb_supply_flat
 
