@@ -300,11 +300,16 @@ def expand_time_column(
             df[values_column] = df.groupby(dimension_col)[values_column].fillna(0)
         return df
 
+    DID_INTERPOLATE = False
     if values_column:
         if isinstance(fillna_method, list):
+            if "interpolate" in fillna_method:
+                DID_INTERPOLATE = True
             for m in fillna_method:
                 df = _fillna(df, m)
         else:
+            if "interpolate" == fillna_method:
+                DID_INTERPOLATE = True
             df = _fillna(df, fillna_method)
 
     #####################################################################
@@ -312,7 +317,8 @@ def expand_time_column(
     #####################################################################
     # Output dataframe in same order as input
     df = df.loc[:, columns_order]
-    if ("interpolate" != fillna_method) & ("interpolate" not in fillna_method):  # type: ignore
+
+    if not DID_INTERPOLATE:  # type: ignore
         try:
             df = df.astype(dtypes)
         except pd.errors.IntCastingNaNError:
