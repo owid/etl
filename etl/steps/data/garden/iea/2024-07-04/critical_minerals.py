@@ -620,14 +620,16 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
                 )
             elif metric == "supply_as_a_share_of_global_demand":
                 short_descriptions.append(
-                    f"Projected supply of {mineral_process}, as a share of the projected global demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}). A share below 100% means that our current supply would not be enough to meet the projected demand."
+                    f"Projected supply of {mineral_process}, as a share of the projected global demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}). A share below 100% means that the projected supply is not enough to meet the projected demand."
                 )
             # * Demand combinations.
             elif metric == "demand":
-                short_descriptions.append(f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}).")
+                short_descriptions.append(
+                    f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod})."
+                )
             elif metric == "demand_as_a_share_of_global_supply":
                 short_descriptions.append(
-                    f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}), as a share of the projected global supply of {mineral_process}. A share above 100% means that our current supply would not be enough to meet the projected demand."
+                    f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}), as a share of the projected global supply of {mineral_process}. A share above 100% means that the projected supply is not enough to meet the projected demand."
                 )
             elif metric == "demand_as_a_share_of_global_demand":
                 short_descriptions.append(
@@ -653,6 +655,15 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
             if (mineral == "Graphite") & (process == "Refinery"):
                 # TODO: Currently, this applies to supply only. We need to harmonize graphite data.
                 footnotes.append("Refined graphite refers to battery-grade graphite.")
+
+            if mineral not in ["Copper", "Cobalt", "Lithium", "Nickel", "Magnet rare earth elements", "Graphite"]:
+                footnotes.append(
+                    f"Values are limited to {mineral_process} used in clean technologies, excluding other possible applications."
+                )
+
+            # TODO: For Cobalt refinery, supply total is called "Total clean technologies" (unlike all other minerals,
+            #  where it is "Total", including Cobalt mine). It's unclear if it's a typo.
+            #  If not, we could exclude "Other uses" from the demand to calculate the share, and add a footnote.
 
             # Add public title to the metadata.
             if not table[column].metadata.presentation:
