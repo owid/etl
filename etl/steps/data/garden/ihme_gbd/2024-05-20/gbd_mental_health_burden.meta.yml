@@ -98,7 +98,7 @@ tables:
         unit: |-
           {definitions.dalys.unit}
         short_unit: |-
-          {defintions.dalys.short_unit}
+          {definitions.dalys.short_unit}
         description_short: |-
           {definitions.dalys.description_short}
         presentation:
