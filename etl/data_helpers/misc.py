@@ -312,10 +312,11 @@ def expand_time_column(
     #####################################################################
     # Output dataframe in same order as input
     df = df.loc[:, columns_order]
-    try:
-        df = df.astype(dtypes)
-    except pd.errors.IntCastingNaNError:
-        pass
+    if ("interpolate" != fillna_method) & ("interpolate" not in fillna_method):  # type: ignore
+        try:
+            df = df.astype(dtypes)
+        except pd.errors.IntCastingNaNError:
+            pass
     return df
 
 
