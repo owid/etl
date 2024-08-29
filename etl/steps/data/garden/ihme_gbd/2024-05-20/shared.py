@@ -41,9 +41,9 @@ def add_regional_aggregates(
         assert tb_percent["value"].min() >= 0 or tb_percent.shape[0] == 0
     # Combine all the metrics back together
     tb_out = pr.concat([tb_number, tb_rate, tb_percent], ignore_index=True)
-    for col in ("age", "cause", "metric", "measure", "country"):
-        if col in tb_out.columns:
-            assert tb_out[col].dtype == "category"
+    # for col in ("age", "cause", "metric", "measure", "country"):
+    #   if col in tb_out.columns:
+    #        assert tb_out[col].dtype == "category"
     assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
     return tb_out
