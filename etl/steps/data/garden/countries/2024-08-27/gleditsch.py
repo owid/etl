@@ -6,7 +6,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.data_helpers.misc import explode_rows_by_time_range
+from etl.data_helpers.misc import expand_time_column, explode_rows_by_time_range
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -104,6 +104,7 @@ def create_table_country_years(tb: Table) -> Table:
     tb_last = tb_countries[mask].drop(columns="year").merge(tb_all_years, how="cross")
 
     tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="gleditsch_countries")
+
     return tb
 
 
@@ -122,10 +123,13 @@ def create_table_countries_in_region(tb: Table, ds_pop: Dataset) -> Table:
     tb_regions = pr.concat([tb_regions, tb_world], ignore_index=True, short_name="gleditsch_regions")
 
     # Finish by adding missing last years
-    tb_regions = add_latest_years_with_constant_num_countries(
-        tb_regions,
-        column_year="year",
-        expected_last_year=EXPECTED_LAST_YEAR,
+    tb_regions = expand_time_column(
+        df=tb_regions,
+        dimension_col=["region"],
+        time_col="year",
+        method="none",
+        until_time=LAST_YEAR,
+        fillna_method="ffill",
     )
     return tb_regions
 
@@ -194,30 +198,6 @@ def init_table_countries_in_region(
     tb_regions = tb_regions[[column_id, column_year, column_country]]
 
     return tb_regions
-
-
-def add_latest_years_with_constant_num_countries(
-    tb: Table,
-    column_year: str,
-    expected_last_year: int,
-) -> Table:
-    """Extend data until LAST_YEAR with constant number of countries.
-
-    Data stops at expected_last_year, extend it until LAST_YEAR with constant number of countries.
-    """
-    # Check latest year is as expected, drop year column
-    tb_last = tb.sort_values(column_year).drop_duplicates(subset=["region"], keep="last")
-    assert (tb_last.year.unique() == expected_last_year).all(), f"Last year is not {expected_last_year}!"
-    tb_last = tb_last.drop(columns=[column_year])
-
-    # Cross merge with missing years
-    tb_all_years = Table(pd.RangeIndex(expected_last_year + 1, stop=LAST_YEAR + 1), columns=[column_year])
-    tb_last = tb_last[["region", "number_countries"]].merge(tb_all_years, how="cross")
-
-    # Add to main table
-    tb = pr.concat([tb, tb_last], ignore_index=True).sort_values(["region", column_year])
-
-    return tb
 
 
 def add_population_to_table(
