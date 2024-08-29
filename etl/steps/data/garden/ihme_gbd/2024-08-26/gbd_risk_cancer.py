@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
@@ -92,7 +92,9 @@ def add_regional_aggregates(
             sex_group_male="Male",
         )
 
-    def add_region_aggregates(tb: Table, metric: str, aggregation: str = "sum") -> Table:
+    def add_region_aggregates(
+        tb: Table, metric: str, aggregation: str = "sum", weighted_vars={"value": False}
+    ) -> Table:
         return geo.add_regions_to_table(
             tb[tb["metric"] == metric].copy(),
             index_columns=index_cols,
@@ -100,6 +102,7 @@ def add_regional_aggregates(
             ds_regions=ds_regions,
             aggregations={"value": aggregation},
             min_num_values_per_year=1,
+            weighted_vars=weighted_vars,
         )
 
     def calculate_rate(tb: Table) -> Table:
@@ -120,7 +123,7 @@ def add_regional_aggregates(
 
     # Add region aggregates for Number and Percent
     tb_number = add_region_aggregates(tb_number_percent, "Number", aggregation="sum")
-    tb_percent = add_region_aggregates(tb_number_percent, "Percent", aggregation="mean")
+    tb_percent = add_region_aggregates(tb_number_percent, "Percent", aggregation="mean", weighted_vars={"value": True})
 
     # Concatenate Number and Percent tables
     tb_number_percent = pr.concat([tb_number, tb_percent], ignore_index=True)  # type: ignore
