@@ -148,6 +148,9 @@ def expand_time_column(
     ------------
     - Add arguments `since_time_condition_value` and `until_time_condition_value`: only extend those entity-dimensions that start (or end) in a particular year or date. E.g. Extend table until 2023, but only for those countries that made it up to 2015 (this avoid extending historical countries that ended up way before). This could be actually `since_time_condition_values`, i.e. list of conditions!
     """
+    # Sanity check
+    assert isinstance(time_col, str), "`time_col` must be a string!"
+
     # Determine if we have a single or multiple dimensiosn (will affect how groupbys are done)
     SINGLE_DIMENSION = isinstance(dimension_col, str)
     MULTIPLE_DIMENSION = isinstance(dimension_col, list)
@@ -169,7 +172,7 @@ def expand_time_column(
         if isinstance(date_max, datetime):
             return pd.date_range(start=date_min, end=date_max)
         else:
-            return range(date_min, date_max + 1)
+            return range(int(date_min), int(date_max) + 1)
 
     def _get_iter_and_names(
         df: pd.DataFrame, single_dimension: bool, dimension_col: Iterable[str] | str, date_values: Iterable[Any]
