@@ -13,7 +13,19 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("critical_minerals")
-    tb_supply_by_country_flat = ds_garden.read_table("supply_by_country", reset_index=False)
+    tb_supply_by_country_flat = ds_garden.read_table("supply_by_country")
+
+    #
+    # Process data.
+    #
+    # Remove "World" from supply data, since charts will be stacked area
+    # (and, by construction, all countries should always add up to World).
+    tb_supply_by_country_flat = tb_supply_by_country_flat[tb_supply_by_country_flat["country"] != "World"].reset_index(
+        drop=True
+    )
+
+    # Improve format.
+    tb_supply_by_country_flat = tb_supply_by_country_flat.format()
 
     #
     # Save outputs.

@@ -443,10 +443,6 @@ def create_supply_by_country_flat(tb_supply: Table) -> Table:
     # Remove empty columns.
     tb_supply_flat = tb_supply_flat.dropna(axis=1, how="all")
 
-    # Remove "World" from supply data (since all countries should always add up to World).
-    # TODO: Add sanity check for this.
-    tb_supply_flat = tb_supply_flat[tb_supply_flat["country"] != "World"].reset_index(drop=True)
-
     # The "scenario" is only relevant for demand. So, for supply (and supply as a share of global supply) the scenario
     # should always be generic (e.g. "All scenarios"). The only time when we need "scenario" is for
     # "supply_as_a_share_of_global_demand", since global demand does depend on scenario.
@@ -617,11 +613,11 @@ def run(dest_dir: str) -> None:
     # Create a wide-format table of demand by technology.
     tb_demand_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand)
 
-    # Sanity checks.
-    run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
-
     # Create a wide-format table of supply by country.
     tb_supply_flat = create_supply_by_country_flat(tb_supply=tb_supply)
+
+    # Sanity checks.
+    run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
 
     # Improve metadata of flat tables.
     tb_demand_flat, tb_supply_flat = improve_metadata(tb_demand_flat=tb_demand_flat, tb_supply_flat=tb_supply_flat)
