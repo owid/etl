@@ -464,42 +464,6 @@ def create_supply_by_country_flat(tb_supply: Table) -> Table:
     return tb_supply_flat
 
 
-def improve_metadata(tb_demand_flat, tb_supply_flat):
-    tb_demand_flat = tb_demand_flat.copy()
-    tb_supply_flat = tb_supply_flat.copy()
-
-    # Improve metadata.
-    for table in [tb_demand_flat, tb_supply_flat]:
-        for column in table.drop(columns=["country", "technology", "year"], errors="ignore").columns:
-            metric, mineral, process, case, scenario = column.split("|")
-
-            # Create a variable title that is convenient to create the explorer later on.
-            table[column].m.title = column
-
-            # Create a public title.
-            title_public = f"Projected {metric.split('_')[0]} of "
-            if process == "Mine":
-                title_public += mineral.lower()
-            elif process == "Refinery":
-                title_public += f"refined {mineral.lower()}"
-            else:
-                log.warning(f"Unexpected process for column {column}")
-            if "_share_of_" in metric:
-                title_public += " " + " ".join(metric.split("_")[1:])
-                table[column].m.unit = "%"
-                table[column].m.short_unit = "%"
-            else:
-                table[column].m.unit = "tonnes"
-                table[column].m.short_unit = "t"
-
-            # Add public title to the metadata.
-            if not table[column].metadata.presentation:
-                table[column].metadata.presentation = VariablePresentationMeta()
-            table[column].metadata.presentation.title_public = title_public
-
-    return tb_demand_flat, tb_supply_flat
-
-
 def clean_demand_table(tb_demand: Table) -> Table:
     # Drop rows with no demand data.
     tb_demand = tb_demand.dropna(subset="demand").reset_index(drop=True)
@@ -523,6 +487,19 @@ def clean_demand_table(tb_demand: Table) -> Table:
     return tb_demand
 
 
+def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tuple[Table, Table, Table]:
+    tb_demand = tb_demand.copy()
+    tb_supply = tb_supply.copy()
+    tb_total = tb_total.copy()
+
+    # Convert units from kilotonnes to tonnes.
+    tb_demand["demand"] *= 1000
+    tb_total["demand"] *= 1000
+    tb_supply["supply"] *= 1000
+
+    return tb_demand, tb_supply, tb_total
+
+
 def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]:
     # For consistency, rename some minerals.
     tb_demand["mineral"] = tb_demand["mineral"].replace({GRAPHITE_ALL_LABEL: GRAPHITE_ALL_LABEL_NEW})
@@ -537,7 +514,6 @@ def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tupl
     # But there are two special cases:
     # * For lithium, supply data is divided in "mining" and "chemicals". For consistency, we can rename them "mining" and "refining" and add a footnote.
     # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
-    # TODO: Add those footnotes.
     tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
     tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
     tb_supply.loc[
@@ -554,17 +530,60 @@ def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tupl
     return tb_demand, tb_supply
 
 
-def harmonize_units(tb_demand: Table, tb_supply: Table, tb_total: Table) -> Tuple[Table, Table, Table]:
-    tb_demand = tb_demand.copy()
-    tb_supply = tb_supply.copy()
-    tb_total = tb_total.copy()
+def improve_metadata(tb_demand_flat, tb_supply_flat):
+    tb_demand_flat = tb_demand_flat.copy()
+    tb_supply_flat = tb_supply_flat.copy()
 
-    # Convert units from kilotonnes to tonnes.
-    tb_demand["demand"] *= 1000
-    tb_total["demand"] *= 1000
-    tb_supply["supply"] *= 1000
+    # Improve metadata.
+    for table in [tb_demand_flat, tb_supply_flat]:
+        for column in table.drop(columns=["country", "technology", "year"], errors="ignore").columns:
+            metric, mineral, process, case, scenario = column.split("|")
 
-    return tb_demand, tb_supply, tb_total
+            # Initialize a list of footnotes.
+            footnotes = []
+
+            # Create a variable title that is convenient to create the explorer later on.
+            table[column].m.title = column
+
+            # Create a public title.
+            title_public = f"Projected {metric.split('_')[0]} of "
+            if process == "Mine":
+                title_public += mineral.lower()
+            elif process == "Refinery":
+                title_public += f"refined {mineral.lower()}"
+            else:
+                log.warning(f"Unexpected process for column {column}")
+            if "_share_of_" in metric:
+                title_public += " " + " ".join(metric.split("_")[1:])
+                table[column].m.unit = "%"
+                table[column].m.short_unit = "%"
+            else:
+                table[column].m.unit = "tonnes"
+                table[column].m.short_unit = "t"
+
+            # Create a footnote in special cases.
+            if (mineral == "Lithium") & (metric.startswith("demand")):
+                footnotes.append("Lithium demand is in lithium content.")
+                if process == "Refinery":
+                    footnotes.append("Refined lithium refers to lithium chemicals.")
+
+            if (mineral == "Graphite") & (process == "Refinery"):
+                # TODO: Currently, this applies to supply only. We need to harmonize graphite data.
+                footnotes.append("Refined graphite refers to battery-grade graphite.")
+
+            # Add public title to the metadata.
+            if not table[column].metadata.presentation:
+                table[column].metadata.presentation = VariablePresentationMeta()
+            table[column].metadata.presentation.title_public = title_public
+
+            # Add footnotes.
+            if len(footnotes) > 0:
+                combined_footnotes = " ".join(footnotes)
+                if table[column].metadata.presentation.grapher_config is None:
+                    table[column].metadata.presentation.grapher_config = {}
+                table[column].metadata.presentation.grapher_config["note"] = combined_footnotes
+
+    return tb_demand_flat, tb_supply_flat
 
 
 def run(dest_dir: str) -> None:
