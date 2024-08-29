@@ -38,6 +38,7 @@ def add_regional_aggregates(
         # Check there aren't any values above 100
         tb_percent = pr.concat([tb_percent, tb_percent_regions], ignore_index=True)
         assert tb_percent["value"].max() <= 100 or tb_percent.shape[0] == 0
+        assert tb_percent["value"].min() >= 0 or tb_percent.shape[0] == 0
     # Combine all the metrics back together
     tb_out = pr.concat([tb_number, tb_rate, tb_percent], ignore_index=True)
     for col in ("age", "cause", "metric", "measure", "country"):
