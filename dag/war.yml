@@ -32,20 +32,20 @@ steps:
     - snapshot://war/2023-01-09/sutton_1971.csv
 
   # UCDP
-  data://meadow/war/2023-09-21/ucdp:
-    - snapshot://war/2023-09-21/ucdp_one_sided.zip
-    - snapshot://war/2023-09-21/ucdp_non_state.zip
-    - snapshot://war/2023-09-21/ucdp_battle_related_conflict.zip
-    - snapshot://war/2023-09-21/ucdp_battle_related_dyadic.zip
-    - snapshot://war/2023-09-21/ucdp_geo.zip
-    - snapshot://war/2023-09-21/ucdp_prio_armed_conflict.zip
-  data://garden/war/2023-09-21/ucdp:
-    - data://meadow/war/2023-09-21/ucdp
-    - data://garden/countries/2023-09-25/gleditsch
+  data://meadow/war/2024-08-26/ucdp:
+    - snapshot://war/2024-08-26/ucdp_non_state.zip
+    - snapshot://war/2024-08-26/ucdp_ged.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_one_sided.zip
+  data://garden/war/2024-08-26/ucdp:
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/demography/2024-07-15/population
     - data://garden/geography/2023-11-28/nat_earth_110
-    - data://garden/demography/2023-03-31/population
-  data://grapher/war/2023-09-21/ucdp:
-    - data://garden/war/2023-09-21/ucdp
+    - data://meadow/war/2024-08-26/ucdp
+  data://grapher/war/2024-08-26/ucdp:
+    - data://garden/war/2024-08-26/ucdp
 
   # PRIO v3.1
   data://meadow/war/2023-09-21/prio_v31:
@@ -117,12 +117,12 @@ steps:
     - data://garden/war/2023-09-27/peace_diehl
 
   # UCDP/PRIO
-  data://garden/war/2023-09-21/ucdp_prio:
-    - data://garden/war/2023-09-21/ucdp
+  data://garden/war/2024-08-26/ucdp_prio:
+    - data://garden/war/2024-08-26/ucdp
     - data://garden/war/2023-09-21/prio_v31
     - data://garden/countries/2023-09-25/gleditsch
-  data://grapher/war/2023-10-24/ucdp_prio:
-    - data://garden/war/2023-09-21/ucdp_prio
+  data://grapher/war/2024-08-26/ucdp_prio:
+    - data://garden/war/2024-08-26/ucdp_prio
 
   # Chupilkin and Koczan (Supplementary dataset to CoW)
   data://meadow/war/2023-11-29/chupilkin_koczan:
@@ -232,4 +232,3 @@ steps:
   # Older versions to be archived once they are not used by any other steps.
 
   ######################################################################################################################
-

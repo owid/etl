@@ -91,7 +91,6 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-
   #
   # UN
   data://grapher/un/2022-07-11/un_wpp:
@@ -248,7 +247,6 @@ steps:
   data://grapher/happiness/2024-06-09/happiness:
     - data://garden/happiness/2024-06-09/happiness
 
-
   # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
     - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
@@ -390,14 +388,25 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/isd:
     - data://garden/countries/2023-09-25/isd
+
   data://meadow/countries/2023-09-25/gleditsch:
     - snapshot://countries/2023-09-22/gleditsch_states.dat
     - snapshot://countries/2023-09-22/gleditsch_microstates.dat
+  data://garden/countries/2024-08-27/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2024-07-15/population
+  data://grapher/countries/2024-08-27/gleditsch:
+    - data://garden/countries/2024-08-27/gleditsch
+
+  # Outdated gleditsch
   data://garden/countries/2023-09-25/gleditsch:
     - data://meadow/countries/2023-09-25/gleditsch
     - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-10-01/gleditsch:
     - data://garden/countries/2023-09-25/gleditsch
+  data://garden/countries/2024-01-08/gleditsch_no_population:
+    - data://meadow/countries/2023-09-25/gleditsch
+
   data://meadow/countries/2023-09-29/cow_ssm:
     - snapshot://countries/2023-09-22/cow_ssm_majors.csv
     - snapshot://countries/2023-09-22/cow_ssm_states.csv
@@ -407,9 +416,6 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/countries/2023-09-29/cow_ssm:
     - data://garden/countries/2023-09-29/cow_ssm
-
-  data://garden/countries/2024-01-08/gleditsch_no_population:
-    - data://meadow/countries/2023-09-25/gleditsch
 
   # Fertility rate, Gapminder
   data://meadow/gapminder/2023-09-22/total_fertility_rate:
@@ -607,9 +613,6 @@ steps:
     - data://grapher/worldbank_wdi/2024-05-20/wdi
     - data://grapher/idmc/2024-08-02/internal_displacement
 
-
-
-
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -663,7 +666,6 @@ steps:
     - data://meadow/news/2024-05-23/gdelt_v2
   data://grapher/news/2024-05-23/gdelt_v2:
     - data://garden/news/2024-05-23/gdelt_v2
-
 
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.
@@ -728,7 +730,7 @@ steps:
   data://grapher/pew/2024-06-03/same_sex_marriage:
     - data://garden/pew/2024-06-03/same_sex_marriage
 
-# UN Regions
+  # UN Regions
   data://meadow/un/2024-06-24/sdg_regions:
     - snapshot://un/2024-06-24/sdg_regions.csv
   data://garden/un/2024-06-24/sdg_regions:
@@ -736,7 +738,7 @@ steps:
   data://grapher/un/2024-06-24/sdg_regions:
     - data://garden/un/2024-06-24/sdg_regions
 
-# WHO Mort DB Homicides
+  # WHO Mort DB Homicides
   data://meadow/homicide/2024-07-30/who_mort_db:
     - snapshot://homicide/2024-07-30/who_mort_db.csv
   data://garden/homicide/2024-07-30/who_mort_db:
@@ -753,7 +755,7 @@ steps:
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
-# WB income groups 2023-04-30
+  # WB income groups 2023-04-30
   data://meadow/wb/2023-04-30/income_groups:
     - snapshot://wb/2023-04-30/income_groups.xlsx
   data://garden/wb/2023-04-30/income_groups:
@@ -761,7 +763,7 @@ steps:
   data://grapher/wb/2023-04-30/income_groups:
     - data://garden/wb/2023-04-30/income_groups
 
-# WB income groups 2024-03-11
+  # WB income groups 2024-03-11
   data://meadow/wb/2024-03-11/income_groups:
     - snapshot://wb/2024-03-11/income_groups.xlsx
   data://garden/wb/2024-03-11/income_groups:
@@ -769,7 +771,7 @@ steps:
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
 
-# WB income groups 2024-07-29
+  # WB income groups 2024-07-29
   data://meadow/wb/2024-07-29/income_groups:
     - snapshot://wb/2024-07-29/income_groups.xlsx
 
@@ -781,7 +783,7 @@ steps:
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
 
-# Ethnologue
+  # Ethnologue
   data-private://meadow/language/2024-07-17/ethnologue:
     - snapshot-private://language/2024-07-17/ethnologue.zip
   data-private://garden/language/2024-07-17/ethnologue:
