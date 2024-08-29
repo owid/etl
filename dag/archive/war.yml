@@ -1,5 +1,4 @@
 steps:
-
   # UCDP
   data://meadow/war/2023-06-22/ucdp:
     - snapshot://war/2023-06-22/ucdp_one_sided.zip
@@ -91,3 +90,27 @@ steps:
     - data://meadow/war/2024-01-08/strategic_nuclear_forces
   data://grapher/war/2024-01-08/strategic_nuclear_forces:
     - data://garden/war/2024-01-08/strategic_nuclear_forces
+
+  # UCDP
+  data://meadow/war/2023-09-21/ucdp:
+    - snapshot://war/2023-09-21/ucdp_one_sided.zip
+    - snapshot://war/2023-09-21/ucdp_non_state.zip
+    - snapshot://war/2023-09-21/ucdp_battle_related_conflict.zip
+    - snapshot://war/2023-09-21/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2023-09-21/ucdp_geo.zip
+    - snapshot://war/2023-09-21/ucdp_prio_armed_conflict.zip
+  data://garden/war/2023-09-21/ucdp:
+    - data://meadow/war/2023-09-21/ucdp
+    - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://garden/demography/2023-03-31/population
+  data://grapher/war/2023-09-21/ucdp:
+    - data://garden/war/2023-09-21/ucdp
+
+  # UCDP/PRIO
+  data://garden/war/2023-09-21/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp
+    - data://garden/war/2023-09-21/prio_v31
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/war/2023-10-24/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp_prio
