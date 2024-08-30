@@ -193,12 +193,7 @@ def add_infectious_diseases(tb: Table) -> Table:
     tb_infectious["cause"] = "Infectious diseases"
     tb_infectious["value"] = tb_infectious["value"] - tb_infectious["value_maternal_neonatal_nutritional"]
     tb_infectious = tb_infectious.drop(columns="value_maternal_neonatal_nutritional")
-
-    # Check for any negative values in the 'value' column
-    negative_values = tb_infectious[tb_infectious["value"] < 0]
-
-    # Assert that there are no negative values
-    assert negative_values.empty, f"Negative values found in 'value' column: {negative_values}"
+    assert all(tb_infectious["value"] >= 0), "Negative values found in 'value' column"
 
     tb = pr.concat([tb, tb_infectious], ignore_index=True)
     return tb
