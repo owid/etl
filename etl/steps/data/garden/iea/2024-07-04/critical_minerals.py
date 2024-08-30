@@ -692,6 +692,22 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
     return tb_demand_flat, tb_supply_flat
 
 
+def improve_metadata_for_technology_tables(table: Table, technology: str) -> Table:
+    table = table.copy()
+    title_public = f"Mineral demand for {technology}"
+    short_description = "Projections assume one of IEA's World Energy Outlook scenarios, namely [Stated Policies](#dod:iea-stated-policies-scenario), [Announced Pledges](#dod:iea-announced-pledges-scenario), or [Net Zero Emissions by 2050](#dod:iea-net-zero-emissions-by-2050-scenario). Click on 'Change scenario' to switch between them."
+    for column in table.drop(columns=["scenario", "year"], errors="raise").columns:
+        mineral = column.split("|")[1]
+        table[column].metadata.title = column
+        table[column].metadata.description_short = short_description
+        table[column].metadata.unit = "tonnes"
+        table[column].metadata.short_unit = "t"
+        table[column].metadata.display = {"name": mineral}
+        table[column].metadata.presentation = VariablePresentationMeta(title_public=title_public)
+
+    return table
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -747,10 +763,33 @@ def run(dest_dir: str) -> None:
     # Improve metadata of flat tables.
     tb_demand_flat, tb_supply_flat = improve_metadata(tb_demand_flat=tb_demand_flat, tb_supply_flat=tb_supply_flat)
 
+    # Create other flat tables for different clean technologies (assuming base case).
+    tb_demand_ev_flat = tb_demand[
+        (tb_demand["case"] == "Base case") & (tb_demand["technology"] == "Electric vehicles")
+    ].pivot(index=["scenario", "year"], columns=["mineral"], values=["demand"], join_column_levels_with="|")
+    # tb_demand_pv_flat = tb_demand[(tb_demand["case"] == "Base case") & (tb_demand["technology"]=="Solar PV")].pivot(index=["scenario", "year"], columns=["mineral"], values=["demand"], join_column_levels_with="|")
+    # tb_demand_wind_flat = tb_demand[(tb_demand["case"] == "Base case") & (tb_demand["technology"]=="Wind")].pivot(index=["scenario", "year"], columns=["mineral"], values=["demand"], join_column_levels_with="|")
+    # tb_demand_batteries_flat = tb_demand[(tb_demand["case"] == "Base case") & (tb_demand["technology"]=="Grid battery storage")].pivot(index=["scenario", "year"], columns=["mineral"], values=["demand"], join_column_levels_with="|")
+    # tb_demand_hydrogen_flat = tb_demand[(tb_demand["case"] == "Base case") & (tb_demand["technology"]=="Hydrogen technologies")].pivot(index=["scenario", "year"], columns=["mineral"], values=["demand"], join_column_levels_with="|")
+
+    # Improve metadata of these tables.
+    tb_demand_ev_flat = improve_metadata_for_technology_tables(table=tb_demand_ev_flat, technology="electric vehicles")
+    # tb_demand_pv_flat = improve_metadata_for_technology_tables(table=tb_demand_pv_flat, technology="solar PV power generation")
+    # tb_demand_wind_flat = improve_metadata_for_technology_tables(table=tb_demand_wind_flat, technology="wind power generation")
+    # tb_demand_batteries_flat = improve_metadata_for_technology_tables(table=tb_demand_batteries_flat, technology="batteries")
+    # tb_demand_hydrogen_flat = improve_metadata_for_technology_tables(table=tb_demand_hydrogen_flat, technology="hydrogen technologies")
+
     # Improve tables format.
     # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
     tb_demand_flat = tb_demand_flat.format(keys=["technology", "year"], short_name="demand_by_technology")
     tb_supply_flat = tb_supply_flat.format(short_name="supply_by_country")
+    tb_demand_ev_flat = tb_demand_ev_flat.format(
+        keys=["scenario", "year"], short_name="demand_for_electric_vehicles_by_scenario"
+    )
+    # tb_demand_pv_flat = tb_demand_pv_flat.format(keys=["scenario", "year"], short_name="demand_for_solar_pv_by_scenario")
+    # tb_demand_wind_flat = tb_demand_wind_flat.format(keys=["scenario", "year"], short_name="demand_for_wind_by_scenario")
+    # tb_demand_batteries_flat = tb_demand_wind_flat.format(keys=["scenario", "year"], short_name="demand_for_batteries_by_scenario")
+    # tb_demand_hydrogen_flat = tb_demand_wind_flat.format(keys=["scenario", "year"], short_name="demand_for_hydrogen_by_scenario")
 
     # Format output tables conveniently.
     tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process", "scenario"])
@@ -762,7 +801,17 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_demand, tb_supply, tb_demand_flat, tb_supply_flat],
+        tables=[
+            tb_demand,
+            tb_supply,
+            tb_demand_flat,
+            tb_supply_flat,
+            tb_demand_ev_flat,
+            # tb_demand_pv_flat,
+            # tb_demand_wind_flat,
+            # tb_demand_batteries_flat,
+            # tb_demand_hydrogen_flat,
+        ],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )

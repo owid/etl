@@ -20,6 +20,11 @@ steps:
   data://grapher/iea/2024-07-04/critical_minerals_supply_by_country:
     - data://garden/iea/2024-07-04/critical_minerals
   #
+  # IEA - Critical minerals.
+  #
+  data://grapher/iea/2024-07-04/critical_minerals_demand_for_electric_vehicles_by_scenario:
+    - data://garden/iea/2024-07-04/critical_minerals
+  #
   # BGS - World Mineral Statistics.
   #
   data://meadow/bgs/2024-07-09/world_mineral_statistics:
