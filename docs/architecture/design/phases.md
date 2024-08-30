@@ -109,6 +109,11 @@ They present a [long format](https://towardsdatascience.com/long-and-wide-format
 - `value`: Value of the variable.
 
 
+!!! info "Using date instead of year"
+
+    It's possible to use `date` column instead of `year` if you work with daily data. Grapher step will automatically convert it to `yearIsDay` under the hood. Explicitly defining `yearIsDay` in metadata and converting `date` to `year` has been deprecated.
+
+
 However, datasets in the ETL are often in a very different shape instead. For example, they may have data broken down by gender, disease type, fish stock, or some other dimension. Therefore, we need a step that adapts the ETL dataset format into a Grapher friendly format: **The grapher step**.
 
 !!! abstract "Grapher steps"
