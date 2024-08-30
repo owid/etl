@@ -43,28 +43,8 @@ tables:
     variables:
       # Filled programmatically.
       {}
-  demand_for_electric_vehicles_by_scenario:
-    title: Critical minerals demand for electric vehicles by scenario
+  demand_by_scenario:
+    title: Critical minerals demand for clean technologies by scenario
     variables:
       # Filled programmatically.
       {}
-  # demand_for_solar_pv_by_scenario:
-  #   title: Critical minerals demand for solar PV power generation by scenario
-  #   variables:
-  #     # Filled programmatically.
-  #     {}
-  # demand_for_wind_by_scenario:
-  #   title: Critical minerals demand for wind power generation by scenario
-  #   variables:
-  #     # Filled programmatically.
-  #     {}
-  # demand_for_batteries_by_scenario:
-  #   title: Critical minerals demand for batteries by scenario
-  #   variables:
-  #     # Filled programmatically.
-  #     {}
-  # demand_for_hydrogen_by_scenario:
-  #   title: Critical minerals demand for hydrogen technologies by scenario
-  #   variables:
-  #     # Filled programmatically.
-  #     {}

@@ -22,7 +22,7 @@ steps:
   #
   # IEA - Critical minerals.
   #
-  data://grapher/iea/2024-07-04/critical_minerals_demand_for_electric_vehicles_by_scenario:
+  data://grapher/iea/2024-07-04/critical_minerals_demand_by_scenario:
     - data://garden/iea/2024-07-04/critical_minerals
   #
   # BGS - World Mineral Statistics.
