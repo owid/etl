@@ -283,6 +283,13 @@ steps:
   data://grapher/tourism/2023-05-23/unwto_gdp:
     - data://garden/tourism/2023-05-10/unwto_gdp
 
+  # Global GDP in the long run (MD + MPD)
+  data://grapher/growth/2024-04-29/gdp_historical:
+    - data://garden/growth/2024-04-29/gdp_historical
+  data://garden/growth/2024-04-29/gdp_historical:
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/ggdc/2022-12-23/maddison_database
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
