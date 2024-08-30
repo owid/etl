@@ -578,13 +578,6 @@ steps:
   data://grapher/ggdc/2024-04-26/maddison_project_database:
     - data://garden/ggdc/2024-04-26/maddison_project_database
 
-  # Global GDP in the long run (MD + MPD)
-  data://grapher/growth/2024-04-29/gdp_historical:
-    - data://garden/growth/2024-04-29/gdp_historical
-  data://garden/growth/2024-04-29/gdp_historical:
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-    - data://garden/ggdc/2022-12-23/maddison_database
-
   # Global GDP in the long run (with WDI)
   data://garden/growth/2024-05-16/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
