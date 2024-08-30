@@ -671,7 +671,8 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
             # Add a display name to the metadata.
             if not table[column].metadata.display:
                 table[column].metadata.display = {}
-            table[column].metadata.display["name"] = mineral_process[0].upper() + mineral_process[1:]
+            # table[column].metadata.display["name"] = mineral_process[0].upper() + mineral_process[1:]
+            table[column].metadata.display["name"] = mineral
 
             # Add public title to the metadata.
             if not table[column].metadata.presentation:
