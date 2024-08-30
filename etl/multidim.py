@@ -82,7 +82,7 @@ def expand_views(config: dict, combinations: dict[str, str], table: str, engine:
     :params engine: SQLAlchemy engine
     """
 
-    # Get all allowed valuse from choices
+    # Get all allowed values from choices
     choices = {}
     for choice_dict in config["dimensions"]:
         allowed_values = []
