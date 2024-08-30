@@ -342,6 +342,7 @@ class StepUpdater:
                 excludes=[],
                 downstream=False,
                 only=True,
+                exact_match=True,
             )
 
             message = "The following steps will be updated:"
@@ -362,8 +363,8 @@ class StepUpdater:
 
             # Tell user how to automatically create PR
             short_name = steps[-1].split("/")[-1].split(".")[0]
-            cmd = f'etl pr update-{short_name} --title ":bar_chart: Update {short_name}" --step-update'
-            log.info(f"Create PR automatically with:\n  {cmd}")
+            cmd = f'etl pr update-{short_name} --title ":bar_chart: Update {short_name}"'
+            log.info(f"Create the PR automatically with:\n  {cmd}")
 
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.

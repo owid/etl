@@ -55,6 +55,7 @@ def compile_steps(
     excludes: Optional[List[str]] = None,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
@@ -64,7 +65,7 @@ def compile_steps(
     excludes = excludes or []
 
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only)
+    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
 
     # parse the steps into Python objects
     return [parse_step(name, dag) for name in steps]
@@ -76,13 +77,18 @@ def to_dependency_order(
     excludes: List[str],
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
 ) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = filter_to_subgraph(dag, includes, downstream=downstream, only=only) if includes else dag
+    subgraph = (
+        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match)
+        if includes
+        else dag
+    )
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
@@ -91,7 +97,9 @@ def to_dependency_order(
     return filtered
 
 
-def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False) -> Graph:
+def filter_to_subgraph(
+    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False, exact_match: bool = False
+) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -102,7 +110,10 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
+    if exact_match:
+        included = set(includes) & all_steps
+    else:
+        included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
 
     if only:
         # Only include explicitly selected nodes

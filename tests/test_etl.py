@@ -10,7 +10,7 @@ from typing import List, Union
 from unittest.mock import patch
 
 from etl import paths
-from etl.command import _detect_strictness_level
+from etl.command import _detect_strictness_level, _grapher_steps
 from etl.steps import DataStep, Step, WaldenStep, compile_steps, load_dag
 
 
@@ -61,5 +61,38 @@ def test_detect_strictness():
 
 def get_all_steps(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> List[Step]:
     dag = load_dag(filename)
+
+    # add grapher steps
+    dag.update(_grapher_steps(dag, private=True))
+
     steps = compile_steps(dag, [])
     return steps
+
+
+def test_get_exact_matches():
+    dag = load_dag("tests/data/dag.yml")
+
+    # Try all possible combinations of "exact_match" and "only" arguments, when passing the full step uri as arguments.
+    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=True, only=True)] == [
+        "test/step_1"
+    ]
+    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=True, only=False)] == [
+        "test/step_0",
+        "test/step_1",
+    ]
+    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=False, only=True)] == [
+        "test/step_1"
+    ]
+    assert [s.path for s in compile_steps(dag, includes=["data://test/step_1"], exact_match=False, only=False)] == [
+        "test/step_0",
+        "test/step_1",
+    ]
+
+    # Try all possible combinations of "exact_match" and "only" arguments, when passing a substring of the step uri.
+    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=True, only=True)] == []
+    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=True, only=False)] == []
+    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=False, only=True)] == ["test/step_1"]
+    assert [s.path for s in compile_steps(dag, includes=["step_1"], exact_match=False, only=False)] == [
+        "test/step_0",
+        "test/step_1",
+    ]
