@@ -44,7 +44,7 @@ tables:
       # Filled programmatically.
       {}
   demand_by_scenario:
-    title: Critical minerals demand for clean technologies by scenario
+    title: Critical minerals demand by scenario
     variables:
       # Filled programmatically.
       {}
