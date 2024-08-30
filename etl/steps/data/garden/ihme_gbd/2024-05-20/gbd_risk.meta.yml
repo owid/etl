@@ -115,6 +115,8 @@ tables:
           <% if measure == 'Deaths'%>{definitions.value_deaths.title}<% else %>{definitions.value_dalys.title}<%- endif -%>
         unit: |-
           <% if measure == 'Deaths'%>{definitions.value_deaths.unit}<% else %>{definitions.value_dalys.unit}<%- endif -%>
+        short_unit: |-
+          <% if measure == 'Deaths'%>{definitions.value_deaths.short_unit}<% else %>{definitions.value_dalys.short_unit}<%- endif -%>
         description_short: |-
           <% if measure == 'Deaths'%>{definitions.value_deaths.description_short}<% else %>{definitions.value_dalys.description_short}<%- endif -%>
         presentation:
