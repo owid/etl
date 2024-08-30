@@ -416,9 +416,9 @@ def add_share_columns(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]
     return tb_demand, tb_supply
 
 
-def create_demand_by_technology_flat(tb_demand_by_technology: Table) -> Table:
+def create_demand_by_technology_flat(tb_demand: Table) -> Table:
     # Create a wide-format table.
-    tb_demand_by_technology_flat = tb_demand_by_technology.pivot(
+    tb_demand_by_technology_flat = tb_demand.pivot(
         index=["technology", "year"],
         columns=["mineral", "process", "case", "scenario"],
         values=["demand", "demand_as_a_share_of_global_demand", "demand_as_a_share_of_global_supply"],
@@ -462,6 +462,18 @@ def create_supply_by_country_flat(tb_supply: Table) -> Table:
             assert column.split("|")[-1] == ALL_SCENARIOS_LABEL
 
     return tb_supply_flat
+
+
+def create_demand_by_scenario_flat(tb_demand: Table) -> Table:
+    # Create other flat tables for different clean technologies (assuming base case).
+    tb_demand_by_scenario_flat = tb_demand[(tb_demand["case"] == "Base case")].pivot(
+        index=["scenario", "year"], columns=["mineral", "technology"], values=["demand"], join_column_levels_with="|"
+    )
+
+    # Remove empty columns, if any.
+    tb_demand_by_scenario_flat = tb_demand_by_scenario_flat.dropna(axis=1, how="all")
+
+    return tb_demand_by_scenario_flat
 
 
 def clean_demand_table(tb_demand: Table) -> Table:
@@ -530,7 +542,7 @@ def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tupl
     return tb_demand, tb_supply
 
 
-def improve_metadata(tb_demand_flat, tb_supply_flat):
+def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_supply_flat):
     tb_demand_flat = tb_demand_flat.copy()
     tb_supply_flat = tb_supply_flat.copy()
 
@@ -692,7 +704,7 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
     return tb_demand_flat, tb_supply_flat
 
 
-def improve_metadata_for_technology_tables(tb_demand_by_scenario_flat: Table) -> Table:
+def improve_metadata_of_tables_by_scenario(tb_demand_by_scenario_flat: Table) -> Table:
     tb_demand_by_scenario_flat = tb_demand_by_scenario_flat.copy()
     short_description = "Projections assume one of IEA's World Energy Outlook scenarios, namely [Stated Policies](#dod:iea-stated-policies-scenario), [Announced Pledges](#dod:iea-announced-pledges-scenario), or [Net Zero Emissions by 2050](#dod:iea-net-zero-emissions-by-2050-scenario). Click on 'Change scenario' to switch between them."
     for column in tb_demand_by_scenario_flat.drop(columns=["scenario", "year"], errors="raise").columns:
@@ -764,39 +776,37 @@ def run(dest_dir: str) -> None:
     # Add "share" columns.
     tb_demand, tb_supply = add_share_columns(tb_demand=tb_demand, tb_supply=tb_supply)
 
-    # Create a wide-format table of demand by technology.
-    tb_demand_flat = create_demand_by_technology_flat(tb_demand_by_technology=tb_demand)
-
-    # Create a wide-format table of supply by country.
-    tb_supply_flat = create_supply_by_country_flat(tb_supply=tb_supply)
-
     # Sanity checks.
     run_sanity_checks_on_outputs(tb_demand=tb_demand, tb_total=tb_total)
 
+    # Create a wide-format table of demand by technology.
+    tb_demand_by_technology_flat = create_demand_by_technology_flat(tb_demand=tb_demand)
+
+    # Create a wide-format table of supply by country.
+    tb_supply_by_country_flat = create_supply_by_country_flat(tb_supply=tb_supply)
+
+    # Create a wide-format table of demand by scenario.
+    tb_demand_by_scenario_flat = create_demand_by_scenario_flat(tb_demand=tb_demand)
+
     # Improve metadata of flat tables.
-    tb_demand_flat, tb_supply_flat = improve_metadata(tb_demand_flat=tb_demand_flat, tb_supply_flat=tb_supply_flat)
-
-    # Create other flat tables for different clean technologies (assuming base case).
-    tb_demand_by_scenario_flat = tb_demand[(tb_demand["case"] == "Base case")].pivot(
-        index=["scenario", "year"], columns=["mineral", "technology"], values=["demand"], join_column_levels_with="|"
+    tb_demand_by_technology_flat, tb_supply_by_country_flat = improve_metadata_of_tables_by_technology_and_by_country(
+        tb_demand_flat=tb_demand_by_technology_flat, tb_supply_flat=tb_supply_by_country_flat
     )
-
-    # Improve metadata of these tables.
-    tb_demand_by_scenario_flat = improve_metadata_for_technology_tables(
+    tb_demand_by_scenario_flat = improve_metadata_of_tables_by_scenario(
         tb_demand_by_scenario_flat=tb_demand_by_scenario_flat
     )
 
     # Improve tables format.
     # NOTE: This should be done after improving metadata, otherwise titles will get snake-cased.
-    tb_demand_flat = tb_demand_flat.format(keys=["technology", "year"], short_name="demand_by_technology")
-    tb_supply_flat = tb_supply_flat.format(short_name="supply_by_country")
+    tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process", "scenario"])
+    tb_demand = tb_demand.format(["case", "year", "mineral", "process", "scenario", "technology"])
+    tb_demand_by_technology_flat = tb_demand_by_technology_flat.format(
+        keys=["technology", "year"], short_name="demand_by_technology"
+    )
+    tb_supply_by_country_flat = tb_supply_by_country_flat.format(short_name="supply_by_country")
     tb_demand_by_scenario_flat = tb_demand_by_scenario_flat.format(
         keys=["scenario", "year"], short_name="demand_by_scenario"
     )
-
-    # Format output tables conveniently.
-    tb_supply = tb_supply.format(["case", "country", "year", "mineral", "process", "scenario"])
-    tb_demand = tb_demand.format(["case", "year", "mineral", "process", "scenario", "technology"])
 
     #
     # Save outputs.
@@ -807,8 +817,8 @@ def run(dest_dir: str) -> None:
         tables=[
             tb_demand,
             tb_supply,
-            tb_demand_flat,
-            tb_supply_flat,
+            tb_demand_by_technology_flat,
+            tb_supply_by_country_flat,
             tb_demand_by_scenario_flat,
         ],
         check_variables_metadata=True,
