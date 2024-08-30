@@ -196,10 +196,9 @@ def add_region_names(tb: Table, ds_regions: Dataset, ds_income: Dataset) -> Tabl
     }
     countries_all = {c for c in countries_all if c not in countries_ignore}
     tb = expand_time_column(
-        df=tb,
+        df=tb.loc[~tb["country"].isin(countries_ignore)],
         dimension_col="country",
         time_col="date",
-        entities_complete=countries_all,
         method="full_range",
     )
 
