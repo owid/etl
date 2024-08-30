@@ -547,6 +547,9 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
                 mineral_process = f"refined {mineral.lower()}"
             else:
                 log.warning(f"Unexpected process for column {column}")
+            # Fix special cases.
+            mineral_process = mineral_process.replace("pgms", "PGMs")
+
             # * Official IEA's scenario name:
             if scenario == "Stated policies":
                 scenario_name = "Stated Policies Scenario"
@@ -664,6 +667,11 @@ def improve_metadata(tb_demand_flat, tb_supply_flat):
             # TODO: For Cobalt refinery, supply total is called "Total clean technologies" (unlike all other minerals,
             #  where it is "Total", including Cobalt mine). It's unclear if it's a typo.
             #  If not, we could exclude "Other uses" from the demand to calculate the share, and add a footnote.
+
+            # Add a display name to the metadata.
+            if not table[column].metadata.display:
+                table[column].metadata.display = {}
+            table[column].metadata.display["name"] = mineral_process[0].upper() + mineral_process[1:]
 
             # Add public title to the metadata.
             if not table[column].metadata.presentation:
