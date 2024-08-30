@@ -101,7 +101,7 @@ def add_regional_aggregates(
             regions=regions,
             ds_regions=ds_regions,
             aggregations={"value": aggregation},
-            min_num_values_per_year=1
+            min_num_values_per_year=1,
         )
 
     def calculate_rate(tb: Table) -> Table:
@@ -123,9 +123,7 @@ def add_regional_aggregates(
     # Add region aggregates for Number
     tb_number = add_region_aggregates(tb_number_percent, "Number", aggregation="sum")
     # Add region aggregates for Percent with weighted mean
-    tb_percent = add_region_aggregates(
-        tb_number_percent, "Percent", aggregation="mean")
-    )
+    tb_percent = add_region_aggregates(tb_number_percent, "Percent", aggregation="mean")
 
     # Concatenate Number and Percent tables
     tb_number_percent = pr.concat([tb_number, tb_percent], ignore_index=True)  # type: ignore
