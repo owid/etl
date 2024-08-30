@@ -278,7 +278,6 @@ def add_region_aggregates(
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
-    weighted_vars: Optional[Dict[str, bool]] = None,
 ) -> TableOrDataFrame:
     """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
@@ -388,8 +387,7 @@ def add_region_aggregates(
 
     # Initialise dataframe of added regions, and add variables one by one to it.
     # df_region = Table({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
-    if weighted_vars is None:
-        weighted_vars = {}
+
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
 
@@ -416,14 +414,6 @@ def add_region_aggregates(
         df_region.loc[mask_countries_present, variables] = np.nan
     # Replace the column that was used to check if most contributing countries were present by the region's name.
     df_region[country_col] = region
-
-    if population is not None:
-        for var in variables:
-            is_weighted = weighted_vars.get(var, False)
-            if is_weighted:
-                weighted_sum = (df_countries[var] * df_countries[population[var]]).groupby(df_countries[year_col]).sum()
-                total_population = df_countries[population[var]].groupby(df_countries[year_col]).sum()
-                df_region[var] = (weighted_sum / total_population).values
 
     if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
@@ -1125,7 +1115,6 @@ def add_regions_to_table(
     ignore_overlaps_of_zeros: bool = False,
     subregion_type: str = "successors",
     countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
-    weighted_vars: Optional[Dict[str, bool]] = None,
 ) -> Table:
     """Add one or more region aggregates to a table (or dataframe).
 
@@ -1341,7 +1330,6 @@ def add_regions_to_table(
             country_col=country_col,
             year_col=year_col,
             keep_original_region_with_suffix=keep_original_region_with_suffix,
-            weighted_vars=weighted_vars,
         )
 
     # If the original object was a Table, copy metadata

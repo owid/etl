@@ -93,7 +93,7 @@ def add_regional_aggregates(
         )
 
     def add_region_aggregates(
-        tb: Table, metric: str, aggregation: str = "sum", weighted_vars={"value": False}
+        tb: Table, metric: str, aggregation: str = "sum", weighted_vars={"value": False}, population_col="population"
     ) -> Table:
         return geo.add_regions_to_table(
             tb[tb["metric"] == metric].copy(),
@@ -101,8 +101,7 @@ def add_regional_aggregates(
             regions=regions,
             ds_regions=ds_regions,
             aggregations={"value": aggregation},
-            min_num_values_per_year=1,
-            weighted_vars=weighted_vars,
+            min_num_values_per_year=1
         )
 
     def calculate_rate(tb: Table) -> Table:
@@ -121,9 +120,12 @@ def add_regional_aggregates(
     # Ensure no missing values in 'Number' table
     assert tb_number_percent["value"].notna().all(), "Values are missing in the Number table, check configuration"
 
-    # Add region aggregates for Number and Percent
+    # Add region aggregates for Number
     tb_number = add_region_aggregates(tb_number_percent, "Number", aggregation="sum")
-    tb_percent = add_region_aggregates(tb_number_percent, "Percent", aggregation="mean", weighted_vars={"value": True})
+    # Add region aggregates for Percent with weighted mean
+    tb_percent = add_region_aggregates(
+        tb_number_percent, "Percent", aggregation="mean")
+    )
 
     # Concatenate Number and Percent tables
     tb_number_percent = pr.concat([tb_number, tb_percent], ignore_index=True)  # type: ignore
