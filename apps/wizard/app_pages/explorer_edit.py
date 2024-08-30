@@ -1,6 +1,7 @@
 """Helper tool to create map brackets for all indicators in an indicator-based explorer.
 
 """
+import pandas as pd
 import streamlit as st
 
 # PAGE CONFIG
@@ -17,5 +18,5 @@ with st.container(border=True):
 
     uploaded_files = st.file_uploader(
         label="Upload Explorer config file",
-        type="tsv",
+        type=["csv", "tsv"],
     )
