@@ -159,7 +159,6 @@ definitions:
     description_processing: Comparisons across countries are affected by differences in testing policies and reporting methods.
     processing_level: major
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -168,46 +167,130 @@ dataset:
 tables:
   testing:
     variables:
+      # Tests, absolute
       total_tests:
         title: Cumulative total tests
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
+          tolerance: 9999
           <<: *display_common
+        presentation:
+          grapher_config:
+            title: Cumulative COVID-19 tests
+            subtitle: Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [100000, 1000000, 10000000, 100000000, 1000000000]
+                baseColorScheme: Blues
+      # Tests, per-capita
       total_tests_per_thousand:
         title: Cumulative total per 1,000 people
-        unit: ''
+        unit: ""
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 1
+          tolerance: 9999
           <<: *display_common
+        presentation:
+          grapher_config:
+            title: Cumulative COVID-19 tests per 1,000 people
+            subtitle: Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [10, 30, 100, 300, 1000, 3000, 10000]
+                baseColorScheme: Blues
 
+      # Tests, daily, absolute
       new_tests:
         title: Daily COVID-19 tests
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
+          tolerance: 10
           <<: *display_common
+        presentation:
+          grapher_config:
+            title: Daily new COVID-19 tests
+            subtitle: Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [25000, 50000, 100000, 250000, 500000, 1000000]
+                baseColorScheme: Blues
+      # Tests, daily, per-capita
+      new_tests_per_thousand:
+        title: Daily COVID-19 tests per 1,000 people
+        unit: ""
+        display:
+          numDecimalPlaces: 1
+          tolerance: 10
+          <<: *display_common
+        presentation:
+          grapher_config:
+            title: Daily new COVID-19 tests per 1,000 people
+            subtitle: Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                baseColorScheme: Blues
+
+      # Tests, 7d average, absolute
       new_tests_7day_smoothed:
         title: Daily COVID-19 tests (7-day smoothed)
         description_short: |-
           New tests for COVID-19. For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures.
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
+          tolerance: 10
           <<: *display_common
-
-      new_tests_per_thousand:
-        title: Daily COVID-19 tests per 1,000 people
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-          <<: *display_common
+        presentation:
+          grapher_config:
+            title: Daily new COVID-19 tests
+            subtitle: 7-day rolling average. Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [25000, 50000, 100000, 250000, 500000, 1000000]
+                baseColorScheme: Blues
+      # Tests, 7d average, per-capita
       new_tests_per_thousand_7day_smoothed:
         title: Daily COVID-19 tests per 1,000 people (7-day smoothed)
         description_short: |-
           New tests for COVID-19 (7-day smoothed). For countries that don't report testing data on a daily basis, we assume that testing changed equally on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures, which is then averaged over a rolling 7-day window.
-        unit: ''
+        unit: ""
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 1
+          tolerance: 10
+          name: New tests (per 1,000)
           <<: *display_common
-
+        presentation:
+          grapher_config:
+            title: Daily new COVID-19 tests per 1,000 people
+            subtitle: 7-day rolling average. Comparisons across countries are affected by differences in testing policies and reporting methods.
+            note: Our data on COVID-19 tests and positive rate is no longer updated since 23 June 2022.
+            hasMapTab: true
+            map:
+              colorScale:
+                customNumericColorsActive: true
+                binningStrategy: manual
+                customNumericValues: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
+                baseColorScheme: Blues

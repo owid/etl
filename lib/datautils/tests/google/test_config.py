@@ -78,8 +78,8 @@ def test_google_config_init_error():
         google_config_init(client_secrets_file)
 
 
-@mock.patch.object(pydrive2.auth.GoogleAuth, "__init__", return_value=None)
-@mock.patch.object(pydrive2.auth.GoogleAuth, "CommandLineAuth", return_value=None)
+@mock.patch.object(pydrive2.auth.GoogleAuth, "__init__", return_value=None)  # type: ignore[reportAttributeAccessIssue]
+@mock.patch.object(pydrive2.auth.GoogleAuth, "CommandLineAuth", return_value=None)  # type: ignore[reportAttributeAccessIssue]
 def test_google_config_init_1(mocker_google_1, mocker_google_2):
     # with tempfile.TemporaryDirectory() as config_dir:
     config_dir = next(tempfile._get_candidate_names())  # type: ignore

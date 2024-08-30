@@ -2,7 +2,7 @@
 #
 #  update-covid-sequence.sh
 #
-#  Update COVID-19 cases and deaths dataset data://grapher/covid/latest/sequence
+#  Update COVID-19 sequence dataset data://grapher/covid/latest/sequence
 #
 
 set -e

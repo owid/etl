@@ -1,4 +1,11 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+
+The file comes from the original paper, available online here https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1475-4991.1986.tb00545.x.
+I use a csv file from the data extracted in the past by the Chartbook team. See https://docs.google.com/spreadsheets/d/1zxuxAXriOrp0x_dxklVbULKGqG3fEOGBkouUNWx7AY8/edit?gid=1521965312#gid=1521965312
+After creating the file, run
+    python snapshots/chartbook/2024-08-09/wolfson_1986_canada.py --path-to-file <path-to-file>
+"""
 
 from pathlib import Path
 

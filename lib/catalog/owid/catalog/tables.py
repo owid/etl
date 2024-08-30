@@ -5,6 +5,7 @@
 import json
 import types
 from collections import defaultdict
+from functools import wraps
 from os.path import dirname, join, splitext
 from pathlib import Path
 from typing import (
@@ -12,6 +13,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterable,
     Iterator,
     List,
     Literal,
@@ -189,13 +191,24 @@ class Table(pd.DataFrame):
 
         return table
 
-    # Mypy complaints about this not matching the defintiion of NDFrame.to_csv but I don't understand why
-    def to_csv(self, path: Any, **kwargs: Any) -> None:  # type: ignore
+    @overload
+    def to_csv(self, path: None = None, **kwargs: Any) -> str:
+        ...
+
+    @overload
+    def to_csv(self, path: Any, **kwargs: Any) -> None:
+        ...
+
+    def to_csv(self, path: Optional[Any] = None, **kwargs: Any) -> Union[None, str]:
         """
         Save this table as a csv file plus accompanying JSON metadata file.
         If the table is stored at "mytable.csv", the metadata will be at
         "mytable.meta.json".
         """
+        # return string
+        if path is None:
+            return super().to_csv(**kwargs)
+
         if not str(path).endswith(".csv"):
             raise ValueError(f'filename must end in ".csv": {path}')
 
@@ -403,6 +416,9 @@ class Table(pd.DataFrame):
                     value.name = key
                 self._fields[key] = value.metadata
                 value.update_log(operation="rename", variable=key)
+            # assign Table with a single column should work
+            elif isinstance(value, Table) and value.shape[1] == 1:
+                self._fields[key] = value.iloc[:, 0].metadata
             else:
                 self._fields[key] = VariableMeta()
 
@@ -567,21 +583,21 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, *, inplace: Literal[True], **kwargs) -> None:
+    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None:
         ...
 
     @overload
-    def reset_index(self, *, inplace: Literal[False], **kwargs) -> "Table":
+    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> "Table":
         ...
 
     @overload
-    def reset_index(self, **kwargs) -> "Table":
+    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> "Table":
         ...
 
-    def reset_index(self, *args, **kwargs) -> Optional["Table"]:  # type: ignore
+    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Optional["Table"]:  # type: ignore
         """Fix type signature of reset_index."""
-        t = super().reset_index(*args, **kwargs)
-        if kwargs.get("inplace"):
+        t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
+        if inplace:
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
@@ -623,7 +639,7 @@ class Table(pd.DataFrame):
         return t  # type: ignore
 
     def _repr_html_(self):
-        html = super()._repr_html_()
+        html = super()._repr_html_()  # type: ignore
         if self.DEBUG:
             self.check_metadata()
         return f"""
@@ -886,7 +902,7 @@ class Table(pd.DataFrame):
 
     def sum(self, *args, **kwargs) -> variables.Variable:
         variable_name = variables.UNNAMED_VARIABLE
-        variable = variables.Variable(super().sum(*args, **kwargs), name=variable_name)
+        variable = variables.Variable(super().sum(*args, **kwargs), name=variable_name)  # type: ignore
         variable.metadata = variables.combine_variables_metadata(
             variables=[self[column] for column in self.columns], operation="+", name=variable_name
         )
@@ -895,7 +911,7 @@ class Table(pd.DataFrame):
 
     def prod(self, *args, **kwargs) -> variables.Variable:
         variable_name = variables.UNNAMED_VARIABLE
-        variable = variables.Variable(super().prod(*args, **kwargs), name=variable_name)
+        variable = variables.Variable(super().prod(*args, **kwargs), name=variable_name)  # type: ignore
         variable.metadata = variables.combine_variables_metadata(
             variables=[self[column] for column in self.columns], operation="*", name=variable_name
         )
@@ -905,8 +921,11 @@ class Table(pd.DataFrame):
     def assign(self, *args, **kwargs) -> "Table":
         return super().assign(*args, **kwargs)  # type: ignore
 
+    def reorder_levels(self, *args, **kwargs) -> "Table":
+        return super().reorder_levels(*args, **kwargs)  # type: ignore
+
     @staticmethod
-    def _update_log(tb: "Table", other: Union[Scalar, Series, variables.Variable, "Table"], operation: str) -> None:
+    def _update_log(tb: "Table", other: Union[Scalar, Series, variables.Variable, "Table"], operation: str) -> None:  # type: ignore
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
@@ -917,60 +936,60 @@ class Table(pd.DataFrame):
                 parents = [tb[column], other]
             tb[column].update_log(parents=parents, operation=operation)
 
-    def __add__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __add__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "+")
         return tb
 
-    def __iadd__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __iadd__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __sub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "-")
         return tb
 
-    def __isub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __isub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __mul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "*")
         return tb
 
-    def __imul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __imul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __truediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "/")
         return tb
 
-    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "//")
         return tb
 
-    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __mod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "%")
         return tb
 
-    def __imod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __imod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __pow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
         self._update_log(tb, other, "**")
         return tb
 
-    def __ipow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+    def __ipow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":  # type: ignore
         return self.__pow__(other)
 
     def sort_index(self, *args, **kwargs) -> "Table":
@@ -982,7 +1001,7 @@ class Table(pd.DataFrame):
 
     def rolling(self, *args, **kwargs) -> "TableRolling":
         """Rolling operation that preserves metadata."""
-        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)
+        return TableRolling(super().rolling(*args, **kwargs), self.metadata, self._fields)  # type: ignore
 
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
@@ -1118,6 +1137,42 @@ class TableGroupBy:
                 )
 
         return tb
+
+    def apply(self, func: Callable[..., Any], *args, include_groups=True, **kwargs) -> Union["Table", "Variable"]:
+        mem = {}
+
+        @wraps(func)
+        def f(g):
+            tb = func(g, *args, **kwargs)
+            # remember one table to use its metadata
+            if not mem:
+                mem["table"] = tb
+            return tb
+
+        df = self.groupby.apply(f, *args, include_groups=include_groups)
+        if not mem:
+            return Table(df)
+        elif type(mem["table"]) == pd.DataFrame:
+            return _create_table(df, self.metadata, self._fields)
+        elif type(mem["table"]) == pd.Series:
+            if isinstance(df, Table):
+                return _create_table(df, self.metadata, self._fields)
+            else:
+                return Variable(df)
+        elif isinstance(mem["table"], Table):
+            return _create_table(df, mem["table"].metadata, mem["table"]._fields)
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, variables.Variable):
+            df.metadata = mem["table"].metadata
+            return df
+        elif isinstance(mem["table"], variables.Variable) and isinstance(df, Table):
+            # func returns Variable
+            out = _create_table(df, self.metadata, self._fields)
+            if mem["table"].name and mem["table"].name in out.columns:
+                out[mem["table"].name].metadata = mem["table"].metadata
+            return out
+        else:
+            # func returns a scalar, output is a Table
+            return _create_table(df, self.metadata, self._fields)
 
     def rolling(self, *args, **kwargs) -> "TableRollingGroupBy":
         rolling_groupby = self.groupby.rolling(*args, **kwargs)
@@ -1354,7 +1409,7 @@ def concat(
         table = Table(
             # use our concatenate that gracefully handles categoricals
             dataframes.concatenate(
-                objs=objs,
+                objs=objs,  # type: ignore
                 axis=axis,  # type: ignore
                 join=join,
                 ignore_index=ignore_index,
@@ -1814,7 +1869,7 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
     return tab
 
 
-def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
+def get_unique_sources_from_tables(tables: Iterable[Table]) -> List[Source]:
     # Make a list of all sources of all variables in all tables.
     sources = []
     for table in tables:
@@ -1824,7 +1879,7 @@ def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     return sources
 
 
-def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
+def get_unique_licenses_from_tables(tables: Iterable[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
     licenses = []
     for table in tables:
@@ -1834,7 +1889,7 @@ def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     return licenses
 
 
-def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:
+def _get_metadata_value_from_tables_if_all_identical(tables: Iterable[Table], field: str) -> Optional[Any]:
     # Get unique values from list, ignoring Nones.
     unique_values = set(
         [getattr(table.metadata, field) for table in tables if getattr(table.metadata, field) is not None]
@@ -1847,15 +1902,15 @@ def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field:
     return combined_value
 
 
-def combine_tables_title(tables: List[Table]) -> Optional[str]:
+def combine_tables_title(tables: Iterable[Table]) -> Optional[str]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="title")
 
 
-def combine_tables_description(tables: List[Table]) -> Optional[str]:
+def combine_tables_description(tables: Iterable[Table]) -> Optional[str]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="description")
 
 
-def combine_tables_datasetmeta(tables: List[Table]) -> Optional[DatasetMeta]:
+def combine_tables_datasetmeta(tables: Iterable[Table]) -> Optional[DatasetMeta]:
     return _get_metadata_value_from_tables_if_all_identical(tables=tables, field="dataset")
 
 
@@ -1871,7 +1926,7 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
     return metadata
 
 
-def combine_tables_update_period_days(tables: List[Table]) -> Optional[int]:
+def combine_tables_update_period_days(tables: Iterable[Table]) -> Optional[int]:
     # NOTE: This is a metadata field that is extracted from the dataset, not the table itself.
 
     # Gather all update_period_days from all tables (technically, from their dataset metadata).
@@ -1890,7 +1945,7 @@ def combine_tables_update_period_days(tables: List[Table]) -> Optional[int]:
     return update_period_days_combined
 
 
-def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
+def check_all_variables_have_metadata(tables: Iterable[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
         fields = ["origins"]
 

@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from datetime import datetime as dt
+from typing import cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -329,8 +330,8 @@ def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
     tb_regions["number_country_pairs"] = (
         tb_regions["number_countries"] * (tb_regions["number_countries"] - 1) / 2
     ).astype(int)
-    tb_no_rel = tb_regions.groupby("year", as_index=False).apply(_get_intercontinental_pairs)
-    tb_no_rel = Table(tb_no_rel).rename(columns={None: "number_country_pairs"})
+    tb_no_rel = cast(Table, tb_regions.groupby("year", as_index=False).apply(_get_intercontinental_pairs))
+    tb_no_rel = tb_no_rel.rename(columns={None: "number_country_pairs"})
     tb_no_rel["region"] = "Inter-continental"
     tb_regions = pr.concat([tb_regions, tb_no_rel]).rename(columns={"region": "country"})
 
@@ -349,11 +350,11 @@ def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
     tb[column_new] = tb["number_country_pairs"] - tb[columns_indicators].sum(axis=1)
 
     ## Remove unused columns
-    tb = tb[columns_index + columns_indicators + [column_new]]
+    tb = tb.loc[:, columns_index + columns_indicators + [column_new]]
     return tb
 
 
-def _get_intercontinental_pairs(tb_group: Table):
+def _get_intercontinental_pairs(tb_group: Table) -> int:
     # expected_regions = {
     #     "Africa",
     #     "Americas",

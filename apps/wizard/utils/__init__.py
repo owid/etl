@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
+import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
@@ -160,7 +161,7 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
 class classproperty(property):
     """Decorator."""
 
-    def __get__(self, owner_self: Self, owner_cls: Self):
+    def __get__(self, owner_self: Self, owner_cls: Self):  # type: ignore[reportIncompatibleMethodOverride]
         return self.fget(owner_cls)  # type: ignore
 
 
@@ -721,7 +722,7 @@ def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kw
         <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
         <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
         </script>
     </div>
     """
@@ -855,6 +856,13 @@ def st_toast_error(message: str) -> None:
 def st_toast_success(message: str) -> None:
     """Show success message."""
     st.toast(f"✅ :green[{message}]")
+
+
+def default_converter(o):
+    if isinstance(o, np.integer):  # ignore
+        return int(o)
+    else:
+        raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
 
 
 def as_valid_json(s):

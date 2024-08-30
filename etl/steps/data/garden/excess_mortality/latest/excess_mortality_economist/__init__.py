@@ -1,34 +1,34 @@
-from typing import cast
+from owid.catalog import Table
 
-from owid.catalog import Dataset, Table
-from structlog import get_logger
-
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
+from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
+    # Load table
     ds_meadow = paths.load_dataset()
+    tb = ds_meadow["excess_mortality_economist"].reset_index()
 
-    tb = ds_meadow["excess_mortality_economist"]
-
-    # Set index
-    tb = tb.reset_index()
     # Set type
-    tb = tb.astype({"country": str})
+    tb = tb.astype({"country": "string", "date": "datetime64[ns]"})
 
-    regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
+    # Harmonize country names
+    tb = geo.harmonize_countries(
+        tb,
+        paths.country_mapping_path,
+    )
 
-    tb = _harmonize_countries(tb, regions)
-
-    tb = cast(Table, tb.drop(columns=["known_excess_deaths"]))
+    # Add last 12 months
+    tb = add_last12m_values(tb)
+    # Drop unused column
+    tb = tb.drop(columns=["known_excess_deaths"])
 
     # Set index
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
@@ -40,13 +40,14 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def _harmonize_countries(tb: Table, regions: Table) -> Table:
-    # Map codes to country names, keep originals if no match.
-    tb["country"] = tb["country"].map(regions["name"].astype(str)).fillna(tb["country"])
-
-    # Map KSV to Kosovo
-    tb.loc[tb["country"] == "KSV", "country"] = "Kosovo"
-
-    assert set(tb["country"]) - set(regions["name"]) == set(), "Unknown countries"
-
+def add_last12m_values(tb: Table) -> Table:
+    """Add last 12 month data."""
+    columns = [
+        "cumulative_estimated_daily_excess_deaths",
+        "cumulative_estimated_daily_excess_deaths_ci_95_bot",
+        "cumulative_estimated_daily_excess_deaths_ci_95_top",
+    ]
+    for col in columns:
+        tb = add_last12m_to_metric(tb, col)
+        tb = add_last12m_to_metric(tb, f"{col}_per_100k")
     return tb

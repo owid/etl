@@ -208,7 +208,7 @@ def parse_metadata_from_csv(
         date_published=str(dt.date.today()),  # type: ignore
     )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # type: ignore
 
 
 ###################################
@@ -250,6 +250,9 @@ def import_google_sheets(url: str) -> Dict[str, Any]:
 
 
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
+    # drop empty rows
+    data_df = data_df.dropna(how="all")
+
     # lowercase columns names
     for col in data_df.columns:
         if col.lower() in ("entity", "year", "country"):
@@ -265,10 +268,17 @@ def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
         raise ValidationError("Missing column 'country' in data")
 
     # check types
-    if data_df.year.dtype not in INT_TYPES:
-        raise ValidationError("Column 'year' should be integer")
+    if data_df.year.dtype not in INT_TYPES and not _is_valid_date(data_df.year):
+        raise ValidationError("Column 'year' should be integer or date")
 
     return data_df.set_index(["country", "year"])
+
+
+def _is_valid_date(series: pd.Series) -> bool:
+    # Try converting the series to datetime
+    converted = pd.to_datetime(series, errors="coerce")
+    # Check if there are any NaT (invalid dates)
+    return converted.notna().all()
 
 
 def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
@@ -294,7 +304,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     # short_name is not used anymore
     source.pop("short_name", None)
 
-    return Source(**source)
+    return Source(**source)  # type: ignore[reportCallIssue]
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:

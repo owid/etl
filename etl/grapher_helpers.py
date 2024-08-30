@@ -392,11 +392,11 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = (
-            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)
+        entity_id[ix] = (  # type: ignore[reportCallIssue]
+            country[ix].map(_get_and_create_entities_in_db(set(country[ix].unique()), engine=engine)).astype(float)  # type: ignore[reportCallIssue]
         )
 
-    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
+    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"  # type: ignore[reportCallIssue]
 
     return cast(pd.Series, entity_id.astype(int))
 
@@ -534,11 +534,17 @@ def _adapt_table_for_grapher(
     ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
 
     # Remember original dimensions
-    dim_names = [n for n in table.index.names if n and n not in ("year", "entity_id", country_col)]
+    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", country_col)]
 
     # Reset index unless we have default index
     if table.index.names != [None]:
         table = table.reset_index()
+
+    # If a table contains `date` instead of `year`, adapt it for grapher
+    if "date" in table.columns:
+        # NOTE: this can be relaxed if we ever need it
+        assert "year" not in table.columns, "Table cannot have both `date` and `year` columns."
+        table = adapt_table_with_dates_to_grapher(table)
 
     assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."
@@ -776,7 +782,7 @@ def adapt_table_with_dates_to_grapher(
         tb = tb.drop(columns=["year"], errors="raise")
 
     # Ensure date column is in datetime format.
-    tb[date_column] = pd.to_datetime(tb[date_column])
+    tb[date_column] = pd.to_datetime(tb[date_column].astype(object))
 
     # If no columns are specified, list all columns in the table (except the country and date columns).
     if columns is None:

@@ -192,6 +192,9 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
+# if True, commit to monkeypox repository from export step
+MONKEYPOX_COMMIT = env.get("MONKEYPOX_COMMIT") in ("True", "true", "1")
+
 ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING else "http://localhost:3030")
 
 # Tailscale address of Admin, this cannot be just `http://owid-admin-prod`
@@ -213,6 +216,10 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 
 # Load github token (only used for creating PRs from the command line).
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
+
+# IMPORTANT: only use locally, no production use!
+# Skip SSL verify
+TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 
 def enable_bugsnag() -> None:
@@ -490,6 +497,3 @@ OWID_ENV = OWIDEnv(
         DB_HOST=DB_HOST,
     )
 )
-
-# Default path to the explorers folder.
-EXPLORERS_DIR = env.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers")

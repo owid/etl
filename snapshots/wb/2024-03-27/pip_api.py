@@ -258,7 +258,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 
     # try to get it from cache
     try:
-        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)
+        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)  # type: ignore[reportAttributeAccessIssue]
         s = obj["Body"].read().decode("utf-8")
         # we might have cached invalid responses, in that case fetch it again
         if "Server Error" not in s:
@@ -275,7 +275,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
     log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
 
     # save the result to R2 cache
-    r2.put_object(
+    r2.put_object(  # type: ignore[reportAttributeAccessIssue]
         Body=response.content,
         Bucket=r2_bucket,
         Key=r2_key,

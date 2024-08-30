@@ -77,7 +77,7 @@ def st_show_home():
             # text=f"Press {i + 1}",
             # text=["This is a test card", "This is a subtext"],
             styles=styles,
-            on_click=lambda: None,
+            on_click=lambda: None,  # type: ignore[reportArgumentType]
         )
         if go_to_page:
             st.switch_page(entrypoint)

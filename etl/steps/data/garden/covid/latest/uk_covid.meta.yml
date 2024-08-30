@@ -1,0 +1,177 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  zero_day: &zero_day
+    zeroDay: "2020-01-01"
+    yearIsDay: true
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      numDecimalPlaces: 0
+      <<: *zero_day
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: COVID-19, UK data
+  update_period_days: 0
+
+
+tables:
+  uk_covid:
+    variables:
+      # Cases
+      daily_cases:
+        title: Cases (daily)
+        description_short: Number of daily cases of COVID-19.
+        unit: 'cases'
+      daily_cases_rolling_average:
+        title: Cases (daily, 7-day average)
+        description_short: Number of daily cases of COVID-19. Smoothed with by averaging with a 7-day rolling-window.
+        description_key:
+          - Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+      daily_cases_rate_rolling_average:
+        title: Case rate (daily, 7-day average)
+        description_short: Daily number of cases of COVID-19, per 100,000 people.
+        description_key:
+          - Reported by the date a positive specimen is taken, not the date that a case is reported. This lag in processing means the latest data shown is several days behind the current date. Due to limited testing, the number of confirmed cases is lower than the true number of infections.
+        unit: 'cases per 100,000 people'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+      weekly_cases_rolling:
+        title: Cases (7-day rolling)
+        unit: 'cases'
+        description_short: Number of cases of COVID-19 in the preceeding 7 days.
+      weekly_cases_rolling_normalized:
+        title: Cases (7-day rolling, normalized)
+        description_short: Number of cases of COVID-19 in the preceeding 7 days. Normalized by the maximum number of weekly cases.
+        unit: 'cases'
+        display:
+          numDecimalPlaces: 2
+          <<: *zero_day
+      weekly_cases_rate:
+        title: Case rate (7-day rolling)
+        description_short: Number of cases of COVID-19 in the preceeding 7 days, per 100,000 people.
+        unit: 'cases per 100,000 people'
+        display:
+          numDecimalPlaces: 1
+          <<: *zero_day
+
+      cumulative_cases:
+        title: Cases (cumulative)
+        description_short: Total number of cases of COVID-19.
+        unit: 'cases'
+      cumulative_cases_rate:
+        title: Case rate (cumulative)
+        description_short: Total number of cases of COVID-19, per 100,000 people.
+        unit: 'cases per 100,000 people'
+        display:
+          numDecimalPlaces: 1
+          <<: *zero_day
+
+      # Deaths
+      daily_deaths:
+        title: Deaths (daily)
+        description_short: Number of daily confirmed deaths of COVID-19.
+        unit: 'deaths'
+      daily_deaths_rolling_average:
+        title: Deaths (daily, 7-day average)
+        description_short: Number of daily confirmed deaths of COVID-19. Smoothed by averaging with a 7-day rolling-window.
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+      daily_deaths_rate_rolling_average:
+        title: Death rate (daily, 7-day average)
+        description_short: Number of deaily confirmed deaths of COVID-19, per 100,000 people. Smoothed by averaging with a 7-day rolling-window.
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day
+
+      weekly_deaths_rolling:
+        title: Deaths (weekly, 7-day average)
+        description_short: Number of deaths due to COVID-19 in the preceeding 7 days. Smoothed by averaging with a 7-day rolling-window.
+        unit: 'deaths'
+      weekly_deaths_rolling_normalized:
+        title: Deaths (weekly, 7-day average, normalized)
+        description_short: Number of deaths due to COVID-19 in the preceeding 7 days. Smoothed by averaging with a 7-day rolling-window. Normalized by the maximum number of weekly deaths.
+        unit: ''
+        display:
+          numDecimalPlaces: 2
+          <<: *zero_day
+      weekly_deaths_rate:
+        title: Death rate (7-day rolling)
+        description_short: Number of deaths due to COVID-19 in the preceeding 7 days, per 100,000 people.
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+          <<: *zero_day
+
+
+      cumulative_deaths:
+        title: Deaths (cumulative)
+        description_short: Total number of confirmed deaths due to COVID-19.
+        unit: 'deaths'
+      cumulative_deaths_rate:
+        title: Death rate (cumulative)
+        description_short: Total number of confirmed deaths due to COVID-19, per 100,000 people.
+        unit: 'death'
+        display:
+          numDecimalPlaces: 1
+          <<: *zero_day
+
+
+      # Others
+      test_positivity_rate:
+        title: Share of COVID-19 tests that are positive
+        description_short: |-
+          PErcentage of people who had a PCR test in the previous 7 days and had at least one positive test result.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          <<: *zero_day
+
+      # Hospitalisations
+      weekly_hospital_admissions:
+        title: Hospital admissions (weekly)
+        description_short: Number of weekly hospital admissions.
+        unit: 'admissions'
+
+      people_in_hospital:
+        title: People in hospital
+        unit: 'people'
+      people_in_hospital_normalized:
+        title: People in hospital (normalized)
+        unit: 'people'
+        display:
+          numDecimalPlaces: 2
+          <<: *zero_day
+
+      people_ventilated:
+        title: Patients ventilated
+        description_short: Patients in ventilation.
+        unit: 'patients'
+      people_ventilated_normalized:
+        title: Patients ventilated (normalized)
+        description_short: Patients in ventilation. Normalized by the maximum value of people in ventilation registered.
+        unit: 'patients'
+        display:
+          numDecimalPlaces: 2
+          <<: *zero_day
+
+      new_hospital_admissions:
+        title: New hospital admissions
+        unit: 'admissions'
+        display:
+          numDecimalPlaces: 3
+          <<: *zero_day

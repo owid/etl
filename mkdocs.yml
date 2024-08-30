@@ -163,6 +163,11 @@ plugins:
 extra_css:
   - css/extra.css
 
+# JS
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - javascripts/tablesort.js
+
 # Custom home page
 home:
   # Custom Homepage Elements
@@ -216,6 +221,7 @@ nav:
       - Metadata in data pages: "guides/metadata-play.md"
       - Edit the documentation: "dev/docs.md"
       - OpenAI setup: "guides/openai.md"
+      - Sharing with external people: "guides/sharing-external.md"
 
   - Design principles:
       - Design principles & workflow: architecture/index.md
@@ -246,3 +252,4 @@ nav:
       - API: "api/index.md"
       - Notebook: "api/python.ipynb"
       - Maintenance: "api/maintenance.md"
+      - COVID-19: "api/covid.md"

@@ -444,7 +444,7 @@ class VersionTracker:
     def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Optional[Path]:
         """Get the path to the script of a given step."""
         # Get step attributes.
-        _, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
+        _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
         state = "active" if step in self.all_active_steps else "archive"
 
         # Create a dictionary that contains the path to a script for a given step.
@@ -452,7 +452,9 @@ class VersionTracker:
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
         path_to_script = {"active": None, "archive": None}
-        if channel == "snapshot":
+        if step_type == "export":
+            path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
+        elif channel == "snapshot":
             path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
             path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
@@ -501,7 +503,7 @@ class VersionTracker:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
             [extract_step_attributes(step).values() for step in self.all_steps],
-            columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
+            columns=["step", "step_type", "kind", "channel", "namespace", "version", "name", "identifier"],
         )
 
         # Add list of all existing versions for each step.
@@ -976,7 +978,7 @@ class VersionTracker:
         missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
 
         # Remove those special steps that are expected to not appear in the dag as executable steps (e.g. snapshots).
-        channels_to_ignore = ("snapshot", "backport", "etag", "github", "walden")
+        channels_to_ignore = ("snapshot", "etag", "github", "walden")
         missing_steps = set([step for step in missing_steps if not step.startswith(channels_to_ignore)])
 
         if len(missing_steps) > 0:
@@ -1105,21 +1107,6 @@ class VersionTracker:
         # Depending on whether connect_to_db is True or False, the criterion will be different.
         # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
         self.check_that_all_active_steps_are_necessary()
-
-    def get_backported_db_dataset_ids(self) -> List[int]:
-        """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
-
-        Returns
-        -------
-        backported_dataset_ids : List[int]
-            Grapher DB dataset ids that are used in ETL backported datasets.
-        """
-        backported_dataset_names = [step for step in self.all_active_dependencies if step.startswith("backport://")]
-        backported_dataset_ids = sorted(
-            set([int(step.split("dataset_")[1].split("_")[0]) for step in backported_dataset_names])
-        )
-
-        return backported_dataset_ids
 
 
 @click.command(name="version-tracker", cls=RichCommand)

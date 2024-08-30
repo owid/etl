@@ -129,7 +129,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
 
         # Extract text from data file.
         url = snap.metadata.origin.url_download  # type: ignore
-        response = requests.get(url)
+        response = requests.get(url)  # type: ignore[reportArgumentType]
         for line in response.text.split("\n"):
             # At the top of the file, there is a line like "Last updated 11 December 2023 by J.E. Dore".
             if "Last updated" in line:
@@ -148,7 +148,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
 
         # Extract text from data file.
         url = snap.metadata.origin.url_download  # type: ignore
-        response = requests.get(url)
+        response = requests.get(url)  # type: ignore[reportArgumentType]
         for line in response.text.split("\n"):
             # At the top of the file, there is a line like "Last updated 11 December 2023 by J.E. Dore".
             if "File Creation" in line:

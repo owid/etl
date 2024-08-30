@@ -248,12 +248,15 @@
             "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
           ]
         ],
-        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)",
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)|(^{TODAY})",
         "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
         "category": "dataset"
       },
       "version_producer": {
-        "type": ["string", "number"],
+        "type": [
+          "string",
+          "number"
+        ],
         "title": "Version of the data product as given by the producer",
         "description": "Producer's version of the data product.",
         "requirement_level": "recommended (if existing)",
@@ -338,9 +341,15 @@
             {
               "type": "list",
               "value": [
-                ["One author: `Williams`."],
-                ["Two authors: `Williams and Jones`."],
-                ["Three or more authors: `Williams et al.`."]
+                [
+                  "One author: `Williams`."
+                ],
+                [
+                  "Two authors: `Williams and Jones`."
+                ],
+                [
+                  "Three or more authors: `Williams et al.`."
+                ]
               ]
             }
           ],
@@ -549,7 +558,7 @@
             "Must be the date when the current version of the producer's data was accessed (not any other previous version)."
           ]
         ],
-        "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^{TODAY})",
         "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
         "category": "files"
       },
@@ -589,7 +598,10 @@
                   "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
                   {
                     "type": "list",
-                    "value": ["**Note:** This means that the title of the snapshot may contain the title of the data product."]}
+                    "value": [
+                      "**Note:** This means that the title of the snapshot may contain the title of the data product."
+                    ]
+                  }
                 ]
               ]
             }
@@ -760,7 +772,10 @@
       "roundingMode": {
         "description": "Specifies the rounding mode to use.",
         "type": "string",
-        "enum": ["significantFigures", "decimalPlaces"]
+        "enum": [
+          "significantFigures",
+          "decimalPlaces"
+        ]
       },
       "numSignificantFigures": {
         "description": "Number of significant rounding figures in charts.",

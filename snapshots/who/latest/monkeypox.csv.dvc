@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    producer: World Health Organization
+    title: Mpox confirmed cases and deaths
+    description: |-
+      Data on mpox is collated by the World Health Organization since 2022, and is updated as new information is reported.
+
+      We fetch the latest version of the WHO data every hour, keep records up to the previous day, apply some transformations (7-day averages, per-capita adjustments, etc.), and produce a transformed version of the data, available on GitHub. This transformed data powers our Mpox Data Explorer on Our World in Data.
+
+    # Citation
+    citation_full: |-
+      Mpox confirmed cases and deaths. World Health Organization; 2024.
+    attribution_short: WHO
+
+    # Files
+    url_main: https://frontdoor-l4uikgap6gz3m.azurefd.net/MPX/V_MPX_VALIDATED_DAILY
+    date_accessed: 2024-08-07
+    date_published: "2024-08-07"
+
+    # License
+    license:
+      name: CC BY 4.0
+
+outs:
+  - md5: 5a0c6feb2e1dfdaa64a2b643515ba435
+    size: 561610
+    path: monkeypox.csv

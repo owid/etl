@@ -1,11 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
-
 from datetime import timedelta
 
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
-from shared import add_population_daily
+from shared import add_population_2022
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -156,7 +155,7 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
-    print(ds_garden["variants"]["num_sequences"].metadata.description_processing)
+    # print(ds_garden["variants"]["num_sequences"].metadata.description_processing)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -220,7 +219,8 @@ def clean_date(tb: Table) -> Table:
     # Get date of publication of latest available file
     last_update = tb.date.m.origins[0].date_published
     tb["date"] = tb["date"].apply(lambda x: min(x, last_update))
-    # Drop week column
+    # Group values with duplicate dates caused by min(x, last_update), HOTFIX: https://github.com/owid/etl/pull/3180/files
+    # tb = tb.drop(columns=["week"]).groupby(["country", "date", "variant"], as_index=False, observed=True).sum()
     tb = tb.drop(columns=["week"])
     # Set dtype to `date`
     tb["date"] = pd.to_datetime(tb["date"])
@@ -397,9 +397,9 @@ def add_variant_totals(tb: Table) -> Table:
 
 def add_per_capita(tb: Table, ds_population: Dataset) -> Table:
     """Get per-capita values."""
-    tb = add_population_daily(tb, ds_population)
-    tb["num_sequences_per_1M"] = 1000000 * tb["num_sequences"] / tb["population"]
-    tb = tb.drop(columns=["population"])
+    tb = add_population_2022(tb, ds_population)
+    tb["num_sequences_per_1M"] = 1000000 * tb["num_sequences"] / tb["population_2022"]
+    tb = tb.drop(columns=["population_2022"])
     return tb
 
 

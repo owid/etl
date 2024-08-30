@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
 
     tb["mmr"] = tb["maternal_deaths"] / tb["births"] * 100_000
     tb["hiv_related_indirect_mmr"] = tb["hiv_related_indirect_maternal_deaths"] / tb["births"] * 100_000
-    tb["hiv_related_indirect_percentage"] = tb["hiv_related_indirect_maternal_deaths"] / tb["maternal_deaths"]
+    tb["hiv_related_indirect_percentage"] = tb["hiv_related_indirect_maternal_deaths"] / tb["maternal_deaths"] * 100
 
     tb = tb.format(["country", "year"])
 

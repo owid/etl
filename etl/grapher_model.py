@@ -2,6 +2,11 @@
 ```
 sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
 ```
+or
+```
+sqlacodegen --generator dataclasses --options use_inflect mysql://owid:owid@staging-site-branch:3306/owid
+```
+
 If you want to add a new table to ORM, add --tables mytable to the command above.
 
 Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
@@ -178,7 +183,7 @@ class Tag(Base):
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()
+        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -1488,6 +1493,28 @@ class ChartDiffConflicts(Base):
         assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
 
         return conflicts
+
+
+class MultiDimDataPage(Base):
+    __tablename__ = "multi_dim_data_pages"
+
+    slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+
+    def upsert(self, session: Session) -> "MultiDimDataPage":
+        cls = self.__class__
+        existing = session.scalars(select(cls).where(cls.slug == self.slug)).one_or_none()
+        if existing:
+            existing.config = self.config
+            return existing
+        else:
+            session.add(self)
+            return self
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

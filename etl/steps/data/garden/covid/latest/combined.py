@@ -2,7 +2,7 @@
 
 import numpy as np
 from owid.catalog import Dataset, Table
-from shared import add_population_daily
+from shared import add_population_2022
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -17,10 +17,12 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_tests = paths.load_dataset("testing")
     ds_who = paths.load_dataset("cases_deaths")
+    ds_seq = paths.load_dataset("sequence")
 
     # Read table from meadow dataset.
     tb_tests = ds_tests["testing"].reset_index()
     tb_who = ds_who["cases_deaths"].reset_index()
+    tb_seq = ds_seq["sequencing"].reset_index()
 
     # Population dataset
     ds_population = paths.load_dataset("population")
@@ -43,14 +45,25 @@ def run(dest_dir: str) -> None:
             "new_cases_7_day_avg_right": float,
         }
     )
+    tb_seq = tb_seq.astype(
+        {
+            "num_sequences": float,
+            "num_sequences_cumulative": float,
+        }
+    )
     # Merge
-    tb = tb_tests.merge(tb_cases, on=["country", "date"])
+    tb = tb_tests.merge(tb_cases, on=["country", "date"], how="outer")
+    tb = tb.merge(tb_seq, on=["country", "date"], how="outer")
 
     # Estimate indicators
     tb = add_test_case_ratios(tb)
 
     ## Criteria: 'Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data'
     tb = add_criteria(tb, ds_population)
+
+    # % cases sequenced
+    tb["share_cases_sequenced"] = tb["num_sequences"].mul(100).div(tb["biweekly_cases"])
+    tb["share_cases_sequenced"] = tb["share_cases_sequenced"].replace([np.inf, -np.inf], np.nan)
 
     # Keep relevant columns
     tb = tb[
@@ -62,11 +75,12 @@ def run(dest_dir: str) -> None:
             "short_term_positivity_rate",
             "cumulative_positivity_rate",
             "has_population_5m_and_100_cases_and_testing_data",
+            "share_cases_sequenced",
         ]
     ]
 
     # Format
-    tb = tb.format(["country", "date"])
+    tb = tb.format(["country", "date"], short_name="combined")
 
     #
     # Save outputs.
@@ -90,11 +104,15 @@ def add_test_case_ratios(tb: Table) -> Table:
 
     NOTE: all is smoothed by a 7-day rolling window average.
     """
+    ## Tests per cases
     tb["cumulative_tests_per_case"] = tb["total_tests"] / tb["total_cases"]
     tb["short_term_tests_per_case"] = tb["new_tests_7day_smoothed"] / tb["new_cases_7_day_avg_right"]
     ## Cases per tests
     tb["short_term_positivity_rate"] = 100 * tb["new_cases_7_day_avg_right"] / tb["new_tests_7day_smoothed"]
     tb["cumulative_positivity_rate"] = 100 * tb["total_cases"] / tb["total_tests"]
+
+    ## Replace too-high values with NaNs
+    tb.loc[tb["short_term_positivity_rate"] > 95, "short_term_positivity_rate"] = np.nan
 
     # Replace infinite values
     cols = [
@@ -123,17 +141,17 @@ def add_test_case_ratios(tb: Table) -> Table:
 
 
 def add_criteria(tb: Table, ds_population: Dataset) -> Table:
-    tb = add_population_daily(tb, ds_population)
+    tb = add_population_2022(tb, ds_population)
     mask = (
         (tb["days_since_100_total_cases"].notnull())
         & (tb["days_since_100_total_cases"] >= 21)
-        & (tb["population"] >= 5_000_000)
+        & (tb["population_2022"] >= 5_000_000)
     )
     tb["has_population_5m_and_100_cases_and_testing_data"] = 0
     tb.loc[mask, "has_population_5m_and_100_cases_and_testing_data"] = 1
     tb["has_population_5m_and_100_cases_and_testing_data"] = tb[
         "has_population_5m_and_100_cases_and_testing_data"
     ].copy_metadata(tb["days_since_100_total_cases"])
-    tb = tb.drop(columns="population")
+    tb = tb.drop(columns="population_2022")
 
     return tb

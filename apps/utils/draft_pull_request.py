@@ -211,6 +211,7 @@ def cli(
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
+        return
 
 
 def generate_pr_title(title: str | None, category: str | None, scope: str | None) -> None | str:

@@ -83,19 +83,6 @@ def list_archivable_db_datasets(
     # Select all grapher datasets whose version is not the latest.
     df = df[df["version"] < df["latest_version"]].reset_index(drop=True)
 
-    # Get list of backported datasets ids from the dag.
-    backported_dataset_ids = tracker.get_backported_db_dataset_ids()
-    not_archivable_datasets = sorted(set(df["dataset_id"]) & set(backported_dataset_ids))
-
-    if len(not_archivable_datasets) > 0:
-        log.warning(
-            "The following grapher DB datasets cannot be archived because they are backported: "
-            f"{not_archivable_datasets}"
-        )
-
-    # Remove backported datasets from the list of archivable datasets.
-    df = df[~df["dataset_id"].isin(not_archivable_datasets)].reset_index(drop=True)
-
     # Sort conveniently.
     datasets_to_archive = df.sort_values("dataset_id").reset_index(drop=True)
 
@@ -109,9 +96,6 @@ def check_db_dataset_is_archivable(dataset_id: int, tracker: VersionTracker, db_
     db_datasets_active_ids = sorted(set(list_active_db_datasets(db_conn=db_conn)["dataset_id"]))
     error = f"DB dataset with id {dataset_id} cannot be archived because it has variables used in charts."
     assert dataset_id not in db_datasets_active_ids, error
-
-    error = f"DB dataset with id {dataset_id} cannot be archived because it is backported by an active ETL step."
-    assert dataset_id not in tracker.get_backported_db_dataset_ids(), error
 
 
 def archive_db_datasets(
@@ -200,16 +184,10 @@ def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -
         log.warning(f"The following grapher steps are used as dependencies of other steps:\n{_list}")
     grapher_steps_used_as_dependencies = grapher_steps_used_as_dependencies[["namespace", "version", "short_name"]]
 
-    # Get ETL paths of grapher steps that have a DB dataset that is a backported dependency of an active ETL step.
-    backported_db_dataset_ids = tracker.get_backported_db_dataset_ids()
-    backported_steps = get_etl_paths_for_db_dataset_ids(dataset_ids=backported_db_dataset_ids, db_conn=db_conn).dropna(
-        subset="version"
-    )
-
     # Combine active DB steps, grapher steps used as dependencies of active steps, and backported steps.
     # to gather all not archivable steps.
     not_archivable_steps = (
-        pd.concat([db_datasets_active, backported_steps, grapher_steps_used_as_dependencies], ignore_index=True)
+        pd.concat([db_datasets_active, grapher_steps_used_as_dependencies], ignore_index=True)
         .drop_duplicates(subset=["namespace", "version", "short_name"])
         .reset_index(drop=True)
     )

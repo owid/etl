@@ -5,13 +5,17 @@ meta:
     # Data product / Snapshot
     title: Historical Statistics for Mineral and Material Commodities
     description: |-
-      Information on approximately 90 mineral commodities, including production, imports, exports, and stocks; reported and apparent consumption; and unit value (the real and nominal price in U.S. dollars of a metric ton of apparent consumption). For many of the commodities, data are reported as far back as 1900.
-    date_published: "2016-01-01"
+      Information on mineral commodities, including production and unit value (the real and nominal price in U.S. dollars of a metric ton of apparent consumption). For many of the commodities, data are reported as far back as 1900.
+      The data was compiled primarily from publications of the United States Geological Survey (USGS) and the U.S. Bureau of Mines (USBM). The principal references are the annual Minerals Yearbook (MYB) publication and its predecessor, Mineral Resources of the United States (MR). Other USGS and USBM publications used as references included: Statistical Compendium (SC), Metal Prices in the United States Through 1991 (MP91), Metal Prices in the United States Through 1998 (MP98), Metal Prices in the United States Through 2010, MCS and its predecessor Commodity Data Summaries (CDS), Minerals Facts and Problems (MFP), and various USBM Information Circulars. In some cases, USGS mineral commodity specialists added previously unpublished or recently revised data to the historical statistics series.
+    # NOTE: The publication date is the latest year that appears in the table, in "Supply-Demand statistics" -> "Update year", in the following page:
+    # https://www.usgs.gov/centers/national-minerals-information-center/historical-statistics-mineral-and-material-commodities
+    date_published: "2023"
 
     # Citation
-    producer: United States Geological Survey Data
+    producer: United States Geological Survey
     citation_full: |-
       Kelly, T.D., and Matos, G.R., comps., 2014, Historical statistics for mineral and material commodities in the United States (2016 version): U.S. Geological Survey Data Series 140.
+    attribution: USGS - Historical Statistics for Mineral and Material Commodities (2023)
     attribution_short: USGS
 
     # Files

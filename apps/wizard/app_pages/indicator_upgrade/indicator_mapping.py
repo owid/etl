@@ -2,6 +2,7 @@
 
 from typing import Dict, List, cast
 
+import numpy as np
 import pandas as pd
 import streamlit as st
 from structlog import get_logger
@@ -15,7 +16,7 @@ from apps.wizard.app_pages.indicator_upgrade.utils import (
 )
 from apps.wizard.utils import Pagination, set_states
 from etl.config import OWID_ENV
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 
 # Logger
 log = get_logger()
@@ -81,10 +82,10 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
                     for iu in indicator_upgrades_shown
                     if not iu.skip and iu.id_new_selected is not None
                 }
-                test = [
-                    {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
-                ]
-                st.write(test)
+                # test = [
+                #     {"old": iu.id_old, "new": iu.id_new_selected, "skip": iu.skip} for iu in indicator_upgrades_shown
+                # ]
+                # st.write(test)
     return indicator_mapping
 
 
@@ -500,7 +501,32 @@ def get_indicator_data_cached(indicator_ids: List[int]):
             workers=10,
             value_as_str=False,
         )
+
+        df = convert_year_to_date(df, indicator_ids)
+
     return df
+
+
+def convert_year_to_date(df: pd.DataFrame, indicator_ids: List[int]) -> pd.DataFrame:
+    """Convert year to date if zeroDay is True. Keep the column named 'year'."""
+    q = """
+    select
+        id as variableId,
+        display->>'$.yearIsDay' as yearIsDay,
+        display->>'$.zeroDay' as zeroDay
+    from variables where id in %(indicator_ids)s;
+    """
+    mf = read_sql(q, get_engine(), params={"indicator_ids": tuple(indicator_ids)})
+    df = df.merge(mf, on="variableId")
+
+    ix = df.yearIsDay == "true"
+    if ix.any():
+        df.year = df.year.astype(object)
+        df.loc[ix, "year"] = pd.to_datetime(df.loc[ix, "zeroDay"]).dt.date + np.array(
+            [pd.Timedelta(days=y) for y in df.loc[ix, "year"]]
+        )
+
+    return df.drop(columns=["yearIsDay", "zeroDay"])
 
 
 def reset_indicator_form() -> None:

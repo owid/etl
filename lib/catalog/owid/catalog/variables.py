@@ -167,67 +167,67 @@ class Variable(pd.Series):
              <pre>{}</pre>
         """.format(self.name, html)
 
-    def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__add__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=variable_name)
         return variable
 
-    def __iadd__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __iadd__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__sub__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=variable_name)
         return variable
 
-    def __isub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __isub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mul__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=variable_name)
         return variable
 
-    def __imul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __imul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__truediv__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=variable_name)
         return variable
 
-    def __itruediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __itruediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__floordiv__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=variable_name)
         return variable
 
-    def __ifloordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __ifloordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mod__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=variable_name)
         return variable
 
-    def __imod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __imod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__pow__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=variable_name)
         return variable
 
-    def __ipow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
+    def __ipow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
         return self.__pow__(other)
 
     def fillna(self, value=None, *args, **kwargs) -> "Variable":
@@ -260,27 +260,27 @@ class Variable(pd.Series):
         )
         return variable
 
-    def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
+    def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__add__(other=other)
 
-    def sub(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
+    def sub(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__sub__(other=other)
 
-    def mul(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
+    def mul(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__mul__(other=other)
 
-    def truediv(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
+    def truediv(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__truediv__(other=other)
 
-    def div(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":
+    def div(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
         return self.truediv(other=other, *args, **kwargs)
 
     def pct_change(self, *args, **kwargs) -> "Variable":
@@ -320,7 +320,7 @@ class Variable(pd.Series):
 
     def rolling(self, *args, **kwargs) -> "VariableRolling":
         """Rolling operation that preserves metadata."""
-        return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)
+        return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
 
     def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore

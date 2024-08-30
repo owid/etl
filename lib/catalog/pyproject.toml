@@ -35,7 +35,7 @@ pytest-cov = ">=2.12.1"
 watchdog = ">=2.1.5"
 argh = ">=0.26.2"
 # unpinning those would introduce tons of type errors
-pyright = "1.1.288"
+pyright = "1.1.373"
 pandas-stubs = "1.2.0.62"
 ruff = "0.1.6"
 
@@ -43,6 +43,9 @@ ruff = "0.1.6"
 extend = "../../pyproject.toml"
 
 [tool.pyright]
+reportIncompatibleMethodOverride = "none"
+reportOverlappingOverload = "none"
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

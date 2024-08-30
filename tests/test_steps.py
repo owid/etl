@@ -19,7 +19,6 @@ from owid.catalog import Dataset
 
 from etl import paths
 from etl.steps import (
-    BackportStepPrivate,
     DataStep,
     DataStepPrivate,
     SnapshotStep,
@@ -149,17 +148,6 @@ def test_data_step_private():
         DataStepPrivate(step_name, []).run()
         ds = Dataset((paths.DATA_DIR / step_name).as_posix())
         assert not ds.metadata.is_public
-
-
-@patch("etl.backport_helpers.create_dataset")
-def test_backport_step_private(mock_create_dataset):
-    with temporary_step() as step_name:
-        path = paths.DATA_DIR / step_name
-        ds = Dataset.create_empty(path)
-        ds.metadata.short_name = "test"
-        mock_create_dataset.return_value = ds
-        BackportStepPrivate(step_name, []).run()
-        assert not Dataset(path).metadata.is_public
 
 
 def test_select_dirty_steps():

@@ -453,7 +453,7 @@ def consolidate_mapping_suggestions_with_user(
         name_old = suggestion["old"]["name_old"]
         id_old = suggestion["old"]["id_old"]
         missing_new = suggestion["new"]
-        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]
+        missing_new = missing_new[~missing_new["id_new"].isin(ids_new_ignore)]  # type: ignore[reportCallIssue]
         new_indexes = missing_new.index.tolist()
 
         # display comparison to user

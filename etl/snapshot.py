@@ -91,7 +91,7 @@ class Snapshot:
         if not force and not self.is_dirty():
             return
 
-        assert len(self.metadata.outs) == 1
+        assert len(self.metadata.outs) == 1, ".dvc file is missing 'outs' field. Have you run the snapshot?"
         expected_md5 = self.metadata.outs[0]["md5"]
 
         self._download_dvc_file(expected_md5)
@@ -117,7 +117,7 @@ class Snapshot:
         if self.metadata.outs is None:
             raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
 
-        assert len(self.metadata.outs) == 1
+        assert len(self.metadata.outs) == 1, ".dvc file is missing 'outs' field. Have you run the snapshot?"
         file_size = self.path.stat().st_size
         # Compare file size if it's larger than 20MB, otherwise compare md5
         # This should be pretty safe and speeds up the process significantly
@@ -161,6 +161,7 @@ class Snapshot:
         # Upload to S3
         md5 = checksum_file(self.path)
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
+        assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
         # Update metadata file

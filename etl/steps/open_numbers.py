@@ -1,3 +1,4 @@
+# type: ignore
 #
 #  open_numbers.py
 #  etl

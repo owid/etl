@@ -49,3 +49,28 @@ steps:
     - data-private://garden/covid/latest/sweden
   data-private://garden/covid/latest/sweden:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Swedish%20Public%20Health%20Agency.csv
+  # UK
+  data-private://grapher/covid/latest/uk_covid_data:
+    - data-private://garden/covid/latest/uk_covid_data
+  data-private://garden/covid/latest/uk_covid_data:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
+  # Hospitalisations
+  data://grapher/covid/latest/hospital_and_icu:
+    - data://garden/covid/latest/hospital_and_icu
+  data://garden/covid/latest/hospital_and_icu:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
+  # Vaccinations
+  data-private://grapher/covid/latest/vaccinations:
+    - data-private://garden/covid/latest/vaccinations
+  data-private://garden/covid/latest/vaccinations:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
+  # Vaccinations by manufacturer
+  data-private://grapher/covid/latest/vaccinations_by_manufacturer:
+    - data-private://garden/covid/latest/vaccinations_by_manufacturer
+  data-private://garden/covid/latest/vaccinations_by_manufacturer:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
+  # Vaccinations by age
+  data-private://grapher/covid/latest/vaccinations_by_age_group:
+    - data-private://garden/covid/latest/vaccinations_by_age_group
+  data-private://garden/covid/latest/vaccinations_by_age_group:
+    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20age%20group.csv

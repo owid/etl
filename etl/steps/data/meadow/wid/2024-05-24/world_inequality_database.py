@@ -208,7 +208,7 @@ def harmonize_countries(tb: Table, tb_regions: Table, iso2_missing: dict, iso_2_
         )
 
     # Drop rows without match (MER if there was not any error)
-    tb = tb[~(tb["name"] == "nan")].reset_index(drop=True)
+    tb = tb.loc[~(tb["name"] == "nan"), :].reset_index(drop=True)
 
     # Drop old country and ISO alpha 2 variable. Rename the newly built variable as `country`
     tb = tb.drop(columns=["country", "iso_alpha2"])

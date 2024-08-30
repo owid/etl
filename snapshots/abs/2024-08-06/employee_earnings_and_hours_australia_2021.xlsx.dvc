@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Employee Earnings and Hours, Australia
+    description: |-
+      Includes earnings and hours statistics for characteristics such as industry, occupation, sex, age, full-time/part-time, and method of setting pay
+    date_published: "2022-01-19"
+    version_producer: May 2021
+    title_snapshot: Employee Earnings and Hours, Australia - Data cube 3. All employees (Reference period 2021)
+    description_snapshot: |-
+      Distribution, deciles and quartiles of weekly total cash earnings - age category, method of setting pay, employment status, type of employee, occupation by sex, industry and sector
+
+    # Citation
+    producer: Australian Bureau of Statistics
+    citation_full: |-
+      Australian Bureau of Statistics. (2021, May). Employee Earnings and Hours, Australia. ABS. https://www.abs.gov.au/statistics/labour/earnings-and-working-conditions/employee-earnings-and-hours-australia/may-2021.
+    attribution_short: ABS
+
+    # Files
+    url_main: https://www.abs.gov.au/statistics/labour/earnings-and-working-conditions/employee-earnings-and-hours-australia/may-2021
+    url_download: https://www.abs.gov.au/statistics/labour/earnings-and-working-conditions/employee-earnings-and-hours-australia/may-2021/63060DO003_202105.xlsx
+    date_accessed: 2024-08-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
+
+outs:
+  - md5: ca15cc953042d67b595c465afe5b71aa
+    size: 192692
+    path: employee_earnings_and_hours_australia_2021.xlsx

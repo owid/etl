@@ -90,7 +90,7 @@ class ExpressForm(utils.StepForm):
     namespace_custom: str | None = None
     update_period_date: date
 
-    def __init__(self: Self, **data: str | date | bool | int) -> None:
+    def __init__(self: Self, **data: str | date | bool | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
 

@@ -1,4 +1,42 @@
 steps:
+  # Explorer
+  export://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/hospital
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+
+  # Compact dataset (similar to former megafile)
+  data://garden/covid/latest/compact:
+    # COVID
+    - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/vaccinations_global
+    - data://garden/covid/latest/hospital
+    - data://garden/covid/latest/oxcgrt_policy
+    - data://garden/covid/latest/tracking_r
+    - data://garden/covid/latest/testing
+    - data://garden/covid/latest/combined
+    - data://garden/excess_mortality/latest/excess_mortality
+    # Regions
+    - data://garden/regions/2023-01-01/regions
+    # Demography
+    - data://garden/demography/2024-07-15/population
+    - data://garden/demography/2023-10-09/life_expectancy
+    - data://garden/un/2024-07-12/un_wpp
+    # Econ
+    - data://garden/wb/2024-03-27/world_bank_pip
+    - data://garden/un/2024-04-09/undp_hdr
+    # Health
+    - data://garden/wash/2024-01-06/who
+    - data://garden/who/2024-07-30/ghe
+    # WDI
+    - data://garden/worldbank_wdi/2024-05-20/wdi
 
   # Sequencing (variants)
   data-private://meadow/covid/latest/sequence:
@@ -19,7 +57,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
-
 
   # JHU - cases and deaths
   data://meadow/covid/latest/john_hopkins_university:
@@ -51,6 +88,9 @@ steps:
   data://meadow/covid/latest/oxcgrt_policy:
     - snapshot://covid/latest/oxcgrt_policy_compact.csv
     - snapshot://covid/latest/oxcgrt_policy_vaccines.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2020.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2021.csv
+    - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
   data://garden/covid/latest/oxcgrt_policy:
     - data://meadow/covid/latest/oxcgrt_policy
   data://grapher/covid/latest/oxcgrt_policy:
@@ -111,10 +151,11 @@ steps:
   data://grapher/covid/latest/testing:
     - data://garden/covid/latest/testing
 
-  # Combined dataset
+  # Combined dataset (megafile-related indicators)
   data://garden/covid/latest/combined:
     - data://garden/covid/latest/testing
     - data://garden/covid/latest/cases_deaths
+    - data-private://garden/covid/latest/sequence
     - data://garden/demography/2024-07-15/population
   data://grapher/covid/latest/combined:
     - data://garden/covid/latest/combined
@@ -126,34 +167,98 @@ steps:
     - data://meadow/covid/latest/sweden_covid
   data://grapher/covid/latest/sweden_covid:
     - data://garden/covid/latest/sweden_covid
-  ######################################
   # UK
-  data-private://grapher/covid/latest/uk_covid_data:
-    - data-private://garden/covid/latest/uk_covid_data
-  data-private://garden/covid/latest/uk_covid_data:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/uk_covid_data.csv
+  data://meadow/covid/latest/uk_covid:
+    - snapshot://covid/latest/uk_covid.csv
+  data://garden/covid/latest/uk_covid:
+    - data://meadow/covid/latest/uk_covid
+  data://grapher/covid/latest/uk_covid:
+    - data://garden/covid/latest/uk_covid
+
+  # Hospitalisations
+  data://meadow/covid/latest/hospital:
+    - snapshot://covid/latest/hospital.csv
+  data://garden/covid/latest/hospital:
+    - data://meadow/covid/latest/hospital
+  data://grapher/covid/latest/hospital:
+    - data://garden/covid/latest/hospital
+
+  # Reproduction rate
+  data://meadow/covid/latest/tracking_r:
+    - snapshot://covid/latest/tracking_r.csv
+  data://garden/covid/latest/tracking_r:
+    - data://meadow/covid/latest/tracking_r
+  data://grapher/covid/latest/tracking_r:
+    - data://garden/covid/latest/tracking_r
+
+  # Vaccinations
+  data://meadow/covid/latest/vaccinations_global:
+    - snapshot://covid/latest/vaccinations_global.csv
+    - snapshot://covid/latest/vaccinations_global_who.csv
+  data://garden/covid/latest/vaccinations_global:
+    - data://meadow/covid/latest/vaccinations_global
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/demography/2024-07-15/population
+  data://grapher/covid/latest/vaccinations_global:
+    - data://garden/covid/latest/vaccinations_global
+
+  data://meadow/covid/latest/vaccinations_manufacturer:
+    - snapshot://covid/latest/vaccinations_manufacturer.csv
+  data://garden/covid/latest/vaccinations_manufacturer:
+    - data://meadow/covid/latest/vaccinations_manufacturer
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/covid/latest/vaccinations_manufacturer:
+    - data://garden/covid/latest/vaccinations_manufacturer
+
+  data://meadow/covid/latest/vaccinations_age:
+    - snapshot://covid/latest/vaccinations_age.csv
+  data://garden/covid/latest/vaccinations_age:
+    - data://meadow/covid/latest/vaccinations_age
+  data://grapher/covid/latest/vaccinations_age:
+    - data://garden/covid/latest/vaccinations_age
+
+  # Excess Mortality (HMD, WMD, Karlinsky and Kobak)
+  data://meadow/excess_mortality/latest/hmd_stmf:
+    - snapshot://excess_mortality/latest/hmd_stmf.csv
+  data://meadow/excess_mortality/latest/wmd:
+    - snapshot://excess_mortality/latest/wmd.csv
+  data://meadow/excess_mortality/latest/xm_karlinsky_kobak:
+    - snapshot://excess_mortality/latest/xm_karlinsky_kobak.csv
+    - snapshot://excess_mortality/latest/xm_karlinsky_kobak_ages.csv
+  data://garden/excess_mortality/latest/hmd_stmf:
+    - data://meadow/excess_mortality/latest/hmd_stmf
+  data://garden/excess_mortality/latest/wmd:
+    - data://meadow/excess_mortality/latest/wmd
+  data://garden/excess_mortality/latest/xm_karlinsky_kobak:
+    - data://meadow/excess_mortality/latest/xm_karlinsky_kobak
+  data://garden/excess_mortality/latest/excess_mortality:
+    - data://garden/excess_mortality/latest/xm_karlinsky_kobak
+    - data://garden/excess_mortality/latest/wmd
+    - data://garden/excess_mortality/latest/hmd_stmf
+    - data://garden/demography/2022-12-08/population
+  data://grapher/excess_mortality/latest/excess_mortality:
+    - data://garden/excess_mortality/latest/excess_mortality
+
+  # Economist excess mortality
+  data://meadow/excess_mortality/latest/excess_mortality_economist:
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_per_100k.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_cumulative.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_per_100k_cumulative.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_per_100k.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_cumulative.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_per_100k_cumulative.csv
+    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/output-for-interactive/by_location_full_data.csv
+  data://garden/excess_mortality/latest/excess_mortality_economist:
+    - data://meadow/excess_mortality/latest/excess_mortality_economist
+  data-private://grapher/excess_mortality/latest/excess_mortality_economist:
+    - data://garden/excess_mortality/latest/excess_mortality_economist
+
+  ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc
   data://garden/covid/latest/ecdc:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/archived/ecdc/COVID-2019%20-%20ECDC%20(2020).csv
-  # Hospitalisations
-  data://grapher/covid/latest/hospital_and_icu:
-    - data://garden/covid/latest/hospital_and_icu
-  data://garden/covid/latest/hospital_and_icu:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-2019%20-%20Hospital%20%26%20ICU.csv
-  # Vaccinations by age
-  data-private://grapher/covid/latest/vaccinations_by_age_group:
-    - data-private://garden/covid/latest/vaccinations_by_age_group
-  data-private://garden/covid/latest/vaccinations_by_age_group:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20age%20group.csv
-  # Vaccinations by manufacturer
-  data-private://grapher/covid/latest/vaccinations_by_manufacturer:
-    - data-private://garden/covid/latest/vaccinations_by_manufacturer
-  data-private://garden/covid/latest/vaccinations_by_manufacturer:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations%20by%20manufacturer.csv
-  # Vaccinations
-  data-private://grapher/covid/latest/vaccinations:
-    - data-private://garden/covid/latest/vaccinations
-  data-private://garden/covid/latest/vaccinations:
-    - etag://raw.githubusercontent.com/owid/covid-19-data/master/scripts/grapher/COVID-19%20-%20Vaccinations.csv
