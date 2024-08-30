@@ -93,6 +93,8 @@ steps:
     - snapshot://covid/latest/oxcgrt_policy_national_2022.csv
   data://garden/covid/latest/oxcgrt_policy:
     - data://meadow/covid/latest/oxcgrt_policy
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
   data://grapher/covid/latest/oxcgrt_policy:
     - data://garden/covid/latest/oxcgrt_policy
 
