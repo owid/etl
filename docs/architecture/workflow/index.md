@@ -263,3 +263,57 @@ In principle, a grapher step only loads a single garden step.
 Note that the diagram shows a final step outside of the ETL. This is when the `grapher://` step is executed, and takes data from the ETL (from the etl `garden` step) and imports it to oure database.
 
 !!! bug "TODO: Add an example of code"
+
+## Export
+
+Sometimes we want to perform an action instead of creating a dataset. For instance, we might want to create a TSV file for an explorer, commit a CSV to a GitHub repository, or create a config for a multi-dimensional indicator. This is where the `export` step comes in.
+
+Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag.
+
+```bash
+etlr export://explorers/minerals/latest/minerals --export
+```
+
+The `def run(dest_dir):` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
+
+### Creating explorers
+
+TSV files for explorers are created using the `create_explorer` function, usually from a configuration YAML file
+
+```python
+# Create a new explorers dataset and tsv file.
+ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+ds_explorer.save()
+```
+
+### Creating multi-dimensional indicators
+
+TODO
+
+### Exporting data to GitHub
+
+One common use case for the `export` step is to commit a dataset to a GitHub repository. This is useful when we want to make a dataset available to the public. The pattern for this looks like this:
+
+```python
+if os.environ.get("CO2_BRANCH"):
+    dry_run = False
+    branch = os.environ["CO2_BRANCH"]
+else:
+    dry_run = True
+    branch = "master"
+
+gh.commit_file_to_github(
+    combined.to_csv(),
+    repo_name="co2-data",
+    file_path="owid-co2-data.csv",
+    commit_message=":bar_chart: Automated update",
+    branch=branch,
+    dry_run=dry_run,
+)
+```
+
+This code will commit the dataset to the `co2-data` repository on GitHub if you specify the `CO2_BRANCH` environment variable, i.e.
+
+```bash
+CO2_BRANCH=main etlr export://co2/latest/co2 --export
+```

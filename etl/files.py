@@ -12,7 +12,7 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union, overload
 
 import pandas as pd
 import ruamel.yaml
@@ -171,6 +171,24 @@ _MyDumper.add_representer(
     OrderedDict,
     lambda dumper, data: dumper.represent_mapping("tag:yaml.org,2002:map", data.items()),
 )
+
+
+@overload
+def yaml_dump(
+    d: Dict[str, Any],
+    stream: None = None,
+    strip_lines: bool = True,
+    replace_confusing_ascii: bool = False,
+    width: int = 120,
+) -> str:
+    ...
+
+
+@overload
+def yaml_dump(
+    d: Dict[str, Any], stream: TextIO, strip_lines: bool = True, replace_confusing_ascii: bool = False, width: int = 120
+) -> None:
+    ...
 
 
 def yaml_dump(

@@ -188,8 +188,8 @@ class FasttrackImport:
         existing_data = pd.read_csv(self.snapshot.path)
 
         exit_code = diff_print(
-            df1=existing_data,
-            df2=self.data.reset_index(),
+            df1=existing_data.set_index(["country", "year"]),
+            df2=self.data,
             df1_label="existing",
             df2_label="imported",
             absolute_tolerance=0.00000001,
