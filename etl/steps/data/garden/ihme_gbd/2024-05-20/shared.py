@@ -33,7 +33,7 @@ def add_regional_aggregates(
     # Calculate region aggregates for Rate
     tb_rate_regions = add_regions_to_rate(tb_number, regions)
     tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
-    tb_out = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
+    tb_out = pr.concat([tb_rate, tb_number], ignore_index=True)  # type: ignore
     if run_percent:
         tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
         # Check there aren't any values above 100
