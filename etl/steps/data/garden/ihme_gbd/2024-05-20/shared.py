@@ -8,7 +8,12 @@ from etl.data_helpers.population import add_population
 
 
 def add_regional_aggregates(
-    tb: Table, ds_regions: Dataset, index_cols: List[str], regions: List[str], age_group_mapping: Dict[str, List[int]]
+    tb: Table,
+    ds_regions: Dataset,
+    index_cols: List[str],
+    regions: List[str],
+    age_group_mapping: Dict[str, List[int]],
+    run_percent: bool = False,
 ) -> Table:
     """
     Adding the regional aggregated data for the OWID continent regions
@@ -27,23 +32,16 @@ def add_regional_aggregates(
     tb_number = add_regions_to_number(tb_number, age_group_mapping, ds_regions, index_cols, regions)
     # Calculate region aggregates for Rate
     tb_rate_regions = add_regions_to_rate(tb_number, regions)
-    # Calculate regions aggregates for Percent if it is in the dataset
-    if tb_percent.shape[0] > 1:
-        tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
-    else:
-        tb_percent_regions = Table()
     tb_rate = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
-    # Percent regional aggregates not really working for risk factors due to negative values where some 'risks' reduce deaths
-    if "rei" not in index_cols:
+    tb_out = pr.concat([tb_rate, tb_rate_regions], ignore_index=True)  # type: ignore
+    if run_percent:
+        tb_percent_regions = add_regions_to_percent(tb_number, regions, index_cols)
         # Check there aren't any values above 100
         tb_percent = pr.concat([tb_percent, tb_percent_regions], ignore_index=True)
         assert tb_percent["value"].max() <= 100 or tb_percent.shape[0] == 0
         assert tb_percent["value"].min() >= 0 or tb_percent.shape[0] == 0
-    # Combine all the metrics back together
-    tb_out = pr.concat([tb_number, tb_rate, tb_percent], ignore_index=True)
-    # for col in ("age", "cause", "metric", "measure", "country"):
-    #   if col in tb_out.columns:
-    #        assert tb_out[col].dtype == "category"
+        # Combine all the metrics back together
+        tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
     assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
     return tb_out
