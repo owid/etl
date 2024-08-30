@@ -571,7 +571,7 @@ def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_s
                 scenario_dod = "iea-announced-pledges-scenario"
             elif scenario == "Net zero by 2050":
                 scenario_name = "Net Zero Emissions by 2050 Scenario"
-                scenario_dod = "iea-net-zero-by-2050-scenario"
+                scenario_dod = "iea-net-zero-emissions-by-2050-scenario"
             elif scenario == "All scenarios":
                 # NOTE: The following should not be used in any string.
                 scenario_name = ""
