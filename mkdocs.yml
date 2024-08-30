@@ -221,6 +221,7 @@ nav:
       - Metadata in data pages: "guides/metadata-play.md"
       - Edit the documentation: "dev/docs.md"
       - OpenAI setup: "guides/openai.md"
+      - Sharing with external people: "guides/sharing-external.md"
 
   - Design principles:
       - Design principles & workflow: architecture/index.md
